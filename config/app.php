@@ -15,6 +15,19 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    // Check: Order->adjustStock
+    'orders' => [
+        'PENDING',
+        'WAITING',
+        'CONFIRMED',
+        'INVOICED',
+        'SHIPPING',
+        'COMPLETED',
+        'RETURNED',
+        'LOST',
+        'CANCELLED',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

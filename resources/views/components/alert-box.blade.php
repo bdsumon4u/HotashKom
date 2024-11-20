@@ -1,0 +1,1 @@
+<div {{ $attributes->merge(['class' => "alert alert-$type"]) }}><strong>{!! $message !!}</strong></div>
