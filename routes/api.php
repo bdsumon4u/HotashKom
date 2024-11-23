@@ -26,6 +26,8 @@ Route::group(['as' => 'api.'], function () {
     Route::post('menu/{menu}/sort-items', [MenuItemSortController::class])->name('menu-items.sort');
     Route::get('orders', OrderController::class)->name('orders');
 
+    Route::get('slides', [ApiController::class, 'slides']);
+    Route::get('sections', [ApiController::class, 'sections']);
     Route::get('areas/{city_id}', [ApiController::class, 'areas']);
     Route::get('categories', [ApiController::class, 'categories']);
     Route::get('products/{search}', [ApiController::class, 'products']);

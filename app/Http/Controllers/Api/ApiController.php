@@ -7,19 +7,55 @@ use App\Models\Admin;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Slide;
 use App\Pathao\Facade\Pathao;
 use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
+    public function slides()
+    {
+        return slides()->transform(function ($slide) {
+            return $slide->only(['title', 'text', 'btn_name', 'btn_href']) + [
+                'imageClassic' => [
+                    'ltr' => asset($slide->desktop_src),
+                    'rtl' => asset($slide->desktop_src),
+                ],
+                'imageFull' => [
+                    'ltr' => asset($slide->desktop_src),
+                    'rtl' => asset($slide->desktop_src),
+                ],
+                'imageMobile' => [
+                    'ltr' => asset($slide->mobile_src),
+                    'rtl' => asset($slide->mobile_src),
+                ],
+            ];
+        });
+    }
+
+    public function sections(Request $request)
+    {
+        return sections();
+    }
+
     public function areas($city_id)
     {
         return Pathao::area()->zone($city_id)->data;
     }
 
-    public function categories()
+    public function categories(Request $request)
     {
-        return response()->json(Category::all()->toArray());
+        if ($request->nested) {
+            return Category::nested($request->get('count', 0));
+        }
+
+        return Category::all()
+            ->transform(function ($category) {
+                return $category->toArray() + [
+                    'type' => 'shop',
+                ];
+            })
+            ->toJson();
     }
 
     public function products($search)

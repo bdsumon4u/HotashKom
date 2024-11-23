@@ -84,7 +84,7 @@
 </div>
 @endif
 
-@foreach($sections as $section)
+@foreach(sections() as $section)
 <!-- .block-products-carousel -->
 @includeWhen($section->type == 'carousel-grid', 'partials.products.carousel-grid', [
     'title' => $section->title,

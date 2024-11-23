@@ -4,12 +4,34 @@ use App\Http\Controllers\PageController;
 use App\Http\Middleware\ShortKodeMiddleware;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\HomeSection;
 use App\Models\Image;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\Slide;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+
+if (! function_exists('slides')) {
+    function slides()
+    {
+        return cache()->rememberForever('slides', function () {
+            return Slide::whereIsActive(1)->get([
+                'title', 'text', 'mobile_src', 'desktop_src', 'btn_name', 'btn_href',
+            ]);
+        });
+    }
+}
+
+if (! function_exists('sections')) {
+    function sections()
+    {
+        return cache()->rememberForever('homesections', function () {
+            return HomeSection::orderBy('order', 'asc')->get();
+        });
+    }
+}
 
 if (! function_exists('categories')) {
     function categories()

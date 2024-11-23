@@ -66,13 +66,13 @@
     }
 </style>
 @endpush
-<div class="block-slideshow block-slideshow--layout--with-departments block">
+<div class="block block-slideshow block-slideshow--layout--with-departments">
     <div id="slideshow-container" class="container">
         <div class="row">
             <div class="col-12 @if(setting('show_option')->category_dropdown ?? false) col-lg-9 offset-lg-3 @endif">
                 <div class="block-slideshow__body">
                     <div class="owl-carousel">
-                        @foreach($slides as $slide)
+                        @foreach(slides() as $slide)
                         <a class="block-slideshow__slide" href="{{ $slide->btn_href ?? '#' }}">
                             <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop"
                                 style="background-image: url({{ asset($slide->desktop_src) }}); background-position: center;"></div>
