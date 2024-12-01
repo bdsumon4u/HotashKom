@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\HomeSection;
 use App\Models\Order;
@@ -36,7 +37,6 @@ class ApiController extends Controller
 
     public function sections(Request $request)
     {
-        // sleep(15);
         return sections()->transform(function ($section) {
             return array_merge($section->toArray(), [
                 'categories' => $section->categories->map(function ($category) use ($section) {
@@ -44,20 +44,6 @@ class ApiController extends Controller
                         'sectionId' => $section->id,
                     ]);
                 })->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => 'All']),
-                'products' => [] /* $section->products()->transform(function ($product) {
-                    return array_merge($product->toArray(), [
-                        'images' => $product->images->pluck('src')->toArray(),
-                        'price' => $product->selling_price,
-                        'compareAtPrice' => $product->price,
-                        'badges' => [],
-                        'brand' => [],
-                        'categories' => [],
-                        'reviews' => 0,
-                        'rating' => 0,
-                        'attributes' => [],
-                        'availability' => 'in-stock',
-                    ]);
-                }), */
             ]);
         });
     }
@@ -74,25 +60,103 @@ class ApiController extends Controller
                 'reviews' => 0,
                 'rating' => 0,
                 'attributes' => [],
-                'availability' => 'in-stock',
+                'availability' => $product->should_track ? $product->stock_count : 'In Stock',
             ]);
         });
     }
 
     public function product(Request $request, Product $product)
     {
-        return array_merge($product->toArray(), [
+        if ($product->parent_id) {
+            $product = $product->parent;
+        }
+
+        $showBrandCategory = false;
+        $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
+        if ($product->variations->isNotEmpty()) {
+            $selectedVar = $product->variations->where('slug', request()->segment(2))->first()
+                ?? $product->variations->random();
+        } else {
+            $selectedVar = $product;
+            $showBrandCategory = true;
+        }
+        $options = $selectedVar->options->pluck('id', 'attribute_id')->toArray();
+        $maxQuantity = $selectedVar->should_track ? min($selectedVar->stock_count, $maxPerProduct) : $maxPerProduct;
+
+
+        $optionGroup = $product->variations->pluck('options')->flatten()->unique('id')->groupBy('attribute_id');
+
+        return array_merge($selectedVar->toArray(), [
+            'name' => $selectedVar->var_name,
             'images' => $product->images->pluck('src')->toArray(),
-            'price' => $product->selling_price,
-            'compareAtPrice' => $product->price,
+            'price' => $selectedVar->selling_price,
+            'compareAtPrice' => $selectedVar->price,
             'badges' => [],
             'brand' => $product->brand,
             'categories' => $product->categories,
             'reviews' => 0,
             'rating' => 0,
-            'attributes' => [],
-            'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+            'optionGroup' => $optionGroup,
+            'attributes' => Attribute::find($optionGroup->keys()),
+            'free_delivery' => setting('free_delivery'),
+            'deliveryText' => $this->deliveryText($product, setting('free_delivery')),
+            'availability' => $selectedVar->should_track ? $product->stock_count : 'In Stock',
+            'showBrandCategory' => $showBrandCategory,
+            'options' => $options,
+            'maxQuantity' => $maxQuantity,
+            'shipping_inside' => $selectedVar->shipping_inside,
+            'shipping_outside' => $selectedVar->shipping_outside,
+            'wholesale' => $selectedVar->wholesale,
         ]);
+    }
+
+    private function deliveryText($product, $freeDelivery)
+    {
+        if ($freeDelivery->for_all ?? false) {
+            $text = '<ul class="p-0 pl-4 mb-0 list-unstyled">';
+            if ($freeDelivery->min_quantity > 0) {
+                $text .= '<li>কমপক্ষে <strong class="text-danger">'.$freeDelivery->min_quantity.'</strong> টি প্রোডাক্ট অর্ডার করুন</li>';
+            }
+            if ($freeDelivery->min_amount > 0) {
+                $text .= '<li>কমপক্ষে <strong class="text-danger">'.$freeDelivery->min_amount.'</strong> টাকার প্রোডাক্ট অর্ডার করুন</li>';
+            }
+            $text .= '</ul>';
+
+            return $text;
+        }
+
+        if (array_key_exists($product->id, $products = ((array) ($freeDelivery->products ?? [])) ?? [])) {
+            return 'কমপক্ষে <strong class="text-danger">'.$products[$product->id].'</strong> টি অর্ডার করুন';
+        }
+
+        return false;
+    }
+
+    public function relatedProducts(Request $request, Product $product)
+    {
+        $categories = $product->categories->pluck('id')->toArray();
+        return Product::whereIsActive(1)
+            ->whereHas('categories', function ($query) use ($categories) {
+                $query->whereIn('categories.id', $categories);
+            })
+            ->whereNull('parent_id')
+            ->where('id', '!=', $product->id)
+            ->limit(config('services.products_count.related', 20))
+            ->get()
+            ->transform(function ($product) {
+                return array_merge($product->toArray(), [
+                    'images' => $product->images->pluck('src')->toArray(),
+                    'price' => $product->selling_price,
+                    'compareAtPrice' => $product->price,
+                    'badges' => [],
+                    'brand' => [],
+                    'categories' => [],
+                    'reviews' => 0,
+                    'rating' => 0,
+                    'attributes' => [],
+                    'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+                ]);
+            });
     }
 
     public function areas($city_id)
