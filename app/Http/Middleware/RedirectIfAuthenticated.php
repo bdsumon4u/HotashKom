@@ -22,11 +22,8 @@ class RedirectIfAuthenticated
             $upper = strtoupper(str_replace(['_', '-'], '', $guard));
 
             return $upper == 'WEB' || $upper == null
-                ? redirect(RouteServiceProvider::HOME)
-                : redirect(
-                    (new ReflectionClass(RouteServiceProvider::class))
-                        ->getConstant($upper.'_HOME')
-                );
+                ? redirect('/')
+                : redirect($guard.'/dashboard');
         }
 
         // if (Auth::guard($guard)->check()) {

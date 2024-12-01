@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Category;
+use App\Models\HomeSection;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Slide;
@@ -35,7 +36,63 @@ class ApiController extends Controller
 
     public function sections(Request $request)
     {
-        return sections();
+        // sleep(15);
+        return sections()->transform(function ($section) {
+            return array_merge($section->toArray(), [
+                'categories' => $section->categories->map(function ($category) use ($section) {
+                    return array_merge($category->toArray(), [
+                        'sectionId' => $section->id,
+                    ]);
+                })->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => 'All']),
+                'products' => [] /* $section->products()->transform(function ($product) {
+                    return array_merge($product->toArray(), [
+                        'images' => $product->images->pluck('src')->toArray(),
+                        'price' => $product->selling_price,
+                        'compareAtPrice' => $product->price,
+                        'badges' => [],
+                        'brand' => [],
+                        'categories' => [],
+                        'reviews' => 0,
+                        'rating' => 0,
+                        'attributes' => [],
+                        'availability' => 'in-stock',
+                    ]);
+                }), */
+            ]);
+        });
+    }
+
+    public function sectionProducts(Request $request, HomeSection $section) {
+        return $section->products(category: $request->category)->transform(function ($product) {
+            return array_merge($product->toArray(), [
+                'images' => $product->images->pluck('src')->toArray(),
+                'price' => $product->selling_price,
+                'compareAtPrice' => $product->price,
+                'badges' => [],
+                'brand' => [],
+                'categories' => [],
+                'reviews' => 0,
+                'rating' => 0,
+                'attributes' => [],
+                'availability' => 'in-stock',
+            ]);
+        });
+    }
+
+    public function product(Request $request, Product $product)
+    {
+        return array_merge($product->toArray(), [
+            'images' => $product->images->pluck('src')->toArray(),
+            'price' => $product->selling_price,
+            'compareAtPrice' => $product->price,
+            'badges' => [],
+            'brand' => $product->brand,
+            'categories' => $product->categories,
+            'reviews' => 0,
+            'rating' => 0,
+            'attributes' => [],
+            'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+        ]);
     }
 
     public function areas($city_id)

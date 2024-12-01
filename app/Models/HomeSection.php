@@ -29,7 +29,7 @@ class HomeSection extends Model
         return $this->belongsToMany(Category::class);
     }
 
-    public function products($paginate = 0)
+    public function products($paginate = 0, $category = null)
     {
         $ids = $this->items ?? [];
         $rows = $this->data->rows ?? 3;
@@ -39,7 +39,11 @@ class HomeSection extends Model
             $rows *= $cols;
         }
         $query = Product::whereIsActive(1)->whereNull('parent_id');
-        if (($this->data->source ?? false) == 'specific') {
+        if ($category) {
+            $query->whereHas('categories', function ($query) use ($category) {
+                $query->where('categories.id', $category);
+            });
+        } else if (($this->data->source ?? false) == 'specific') {
             $query->whereHas('categories', function ($query) {
                 $query->whereIn('categories.id', $this->categories->pluck('id')->toArray());
             })

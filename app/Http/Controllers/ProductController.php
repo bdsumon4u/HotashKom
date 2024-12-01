@@ -41,11 +41,9 @@ class ProductController extends Controller
             $section = HomeSection::with('categories')->findOrFail($section);
             $products = $section->products($per_page);
         } else {
-            $products = Product::whereIsActive(1)
-                ->whereNull('parent_id')
-                ->when($request->search, function ($query) use ($request) {
-                    $query->search($request->search, null, true);
-                });
+            $products = Product::search($request->search, function ($query) {
+                $query->whereIsActive(1)->whereNull('parent_id');
+            });
 
             $sorted = setting('show_option')->product_sort ?? 'random';
             if ($sorted == 'random') {

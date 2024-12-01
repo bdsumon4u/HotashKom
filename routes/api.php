@@ -28,6 +28,8 @@ Route::group(['as' => 'api.'], function () {
 
     Route::get('slides', [ApiController::class, 'slides']);
     Route::get('sections', [ApiController::class, 'sections']);
+    Route::get('sections/{section}/products', [ApiController::class, 'sectionProducts']);
+    Route::get('products/{product:slug}.json', [ApiController::class, 'product']);
     Route::get('areas/{city_id}', [ApiController::class, 'areas']);
     Route::get('categories', [ApiController::class, 'categories']);
     Route::get('products/{search}', [ApiController::class, 'products']);
