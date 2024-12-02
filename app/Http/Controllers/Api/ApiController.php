@@ -72,14 +72,22 @@ class ApiController extends Controller
         }
 
         $showBrandCategory = false;
-        $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         if ($product->variations->isNotEmpty()) {
-            $selectedVar = $product->variations->where('slug', request()->segment(2))->first()
-                ?? $product->variations->random();
+            if ($request->options) {
+                $selectedVar = $product->variations->first(function ($item) use ($request) {
+                    return $item->options->pluck('id')->diff($request->options)->isEmpty();
+                });
+            } else {
+                $selectedVar = $product->variations->where('slug', request()->segment(2))->first()
+                    ?? $product->variations->random();
+            }
         } else {
             $selectedVar = $product;
             $showBrandCategory = true;
         }
+
+        
+        $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         $options = $selectedVar->options->pluck('id', 'attribute_id')->toArray();
         $maxQuantity = $selectedVar->should_track ? min($selectedVar->stock_count, $maxPerProduct) : $maxPerProduct;
 
@@ -108,6 +116,17 @@ class ApiController extends Controller
             'shipping_outside' => $selectedVar->shipping_outside,
             'wholesale' => $selectedVar->wholesale,
         ]);
+    }
+
+    public function updatedOptions($value, $key)
+    {
+        $variation = $this->product->variations->first(function ($item) {
+            return $item->options->pluck('id')->diff($this->options)->isEmpty();
+        });
+
+        if ($variation) {
+            $this->selectedVar = $variation;
+        }
     }
 
     private function deliveryText($product, $freeDelivery)

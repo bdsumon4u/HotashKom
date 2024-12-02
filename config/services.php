@@ -35,4 +35,55 @@ return [
         ],
     ],
 
+    'services' => [
+        'one' => 'strokya/images/sprite.svg#check-12x9',
+        'two' => 'strokya/images/sprite.svg#fi-24-hours-48',
+        'three' => 'strokya/images/sprite.svg#fi-payment-security-48',
+        'four' => 'strokya/images/sprite.svg#fi-tag-48',
+    ],
+
+    'shipping' => [
+        'Inside Dhaka' => 60,
+        'Outside Dhaka' => 100,
+    ],
+
+    'stdfst' => [
+        'key' => env('STEADFAST_KEY'),
+        'secret' => env('STEADFAST_SECRET'),
+    ],
+
+    'logo' => [
+        'desktop' => [
+            'width' => 260,
+            'height' => 54
+        ],
+        'mobile' => [
+            'width' => 150,
+            'height' => 40
+        ],
+        'favicon' => [
+            'width' => 56,
+            'height' => 56
+        ],
+    ],
+
+    'products_count' => [
+        'related' => 20,
+    ],
+
+    'slides' => [
+        'mobile' => [360, 180],
+        'desktop' => [840, 395],
+    ],
+
+    'bdwebs' => [
+        'api_key' => env('BDWEBS_API_KEY'),
+        'senderid' => env('BDWEBS_SENDERID'),
+    ],
+
+    'courier_report' => [
+        'url' => env('COURIER_REPORT_URL'),
+        'key' => env('COURIER_REPORT_KEY'),
+    ],
+
 ];
