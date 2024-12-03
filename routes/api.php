@@ -34,6 +34,7 @@ Route::group(['as' => 'api.'], function () {
     Route::get('areas/{city_id}', [ApiController::class, 'areas']);
     Route::get('categories', [ApiController::class, 'categories']);
     Route::get('products/{search}', [ApiController::class, 'products']);
+    Route::get('settings', [ApiController::class, 'settings']);
     Route::get('pending-count/{admin}', [ApiController::class, 'pendingCount']);
     Route::post('pathao-webhook', [ApiController::class, 'pathaoWebhook']);
 });

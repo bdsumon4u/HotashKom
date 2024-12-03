@@ -72,8 +72,11 @@ return [
     ],
 
     'slides' => [
-        'mobile' => [360, 180],
+        // 'mobile' => [360, 180],
         'desktop' => [840, 395],
+        // SPA Mode
+        'mobile' => [510, 395],
+        // 'desktop' => [1140, 840],
     ],
 
     'bdwebs' => [

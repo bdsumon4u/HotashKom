@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\HomeSection;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\Slide;
 use App\Pathao\Facade\Pathao;
 use Illuminate\Http\Request;
@@ -203,6 +204,15 @@ class ApiController extends Controller
         $products = Product::where('name', 'like', "%$search%")->take(5)->get();
 
         return view('admin.orders.searched', compact('products'))->render();
+    }
+
+    public function settings(Request $request)
+    {
+        $keys = array_values(array_intersect($request->get('keys', []), ['company', 'logo', 'social']));
+
+        return cache()->rememberForever('settings:'.implode(';', $keys), function () use ($keys) {
+            return Setting::whereIn('name', $keys)->get(['name', 'value'])->pluck('value', 'name');
+        });
     }
 
     public function pendingCount(Admin $admin)
