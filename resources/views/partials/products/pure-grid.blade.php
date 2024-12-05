@@ -11,7 +11,7 @@
                 </h3>
                 <div class="block-header__divider"></div>
                 @isset($section)
-                    <a href="{{ route('products.index', ['section' => $section->id]) }}" class="btn btn-sm btn-all ml-3">
+                    <a href="{{ route('products.index', ['filter_section' => $section->id]) }}" class="ml-3 btn btn-sm btn-all">
                         View All
                     </a>
                 @endisset

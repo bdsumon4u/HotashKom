@@ -77,7 +77,7 @@ class ApiController extends Controller
                     return array_merge($category->toArray(), [
                         'sectionId' => $section->id,
                     ]);
-                })->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => 'All']),
+                })->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => $section->type == 'pure-grid' ? 'View All' : 'All']),
             ]);
         });
     }

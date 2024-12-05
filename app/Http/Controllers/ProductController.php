@@ -18,7 +18,6 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        info(rawurldecode($request->filter_category));
         if ($request->search) {
             GoogleTagManagerFacade::set([
                 'event' => 'search',
@@ -39,7 +38,7 @@ class ProductController extends Controller
             $cols = $productsPage->value->cols;
         }
         $per_page = $request->get('per_page', $rows * $cols);
-        if ($section = request('section', 0)) {
+        if ($section = request('filter_section', 0)) {
             $section = HomeSection::with('categories')->findOrFail($section);
             $products = $section->products($per_page);
         } else {
