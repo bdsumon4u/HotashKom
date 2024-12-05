@@ -7,7 +7,9 @@ use App\Models\Admin;
 use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\HomeSection;
+use App\Models\Menu;
 use App\Models\Order;
+use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Slide;
@@ -16,6 +18,37 @@ use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
+    public function menus()
+    {
+        return cache()->remember('menus', now()->addMinute(), function () {
+            return Menu::all()->mapWithKeys(fn ($menu) => [$menu->slug => $menu->menuItems]);
+        });
+    }
+
+    public function searchSuggestions(Request $request)
+    {
+        return Product::search($request->get('query'), fn ($query) => $query->whereNull('parent_id')->whereIsActive(1))
+            ->take($request->get('limit'))->get()->transform(function ($product) {
+                return array_merge($product->toArray(), [
+                    'images' => $product->images->pluck('src')->toArray(),
+                    'price' => $product->selling_price,
+                    'compareAtPrice' => $product->price,
+                    'badges' => [],
+                    'brand' => [],
+                    'categories' => [],
+                    'reviews' => 0,
+                    'rating' => 0,
+                    'attributes' => [],
+                    'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+                ]);
+            });
+    }
+
+    public function page(Page $page)
+    {
+        return $page->toArray();
+    }
+
     public function slides()
     {
         return slides()->transform(function ($slide) {
@@ -66,8 +99,10 @@ class ApiController extends Controller
         });
     }
 
-    public function product(Request $request, Product $product)
+    public function product(Request $request, $slug)
     {
+        $product = Product::where('slug', rawurldecode($slug))->firstOrFail();
+
         if ($product->parent_id) {
             $product = $product->parent;
         }
@@ -152,8 +187,10 @@ class ApiController extends Controller
         return false;
     }
 
-    public function relatedProducts(Request $request, Product $product)
+    public function relatedProducts(Request $request, $slug)
     {
+        $product = Product::where('slug', rawurldecode($slug))->firstOrFail();
+
         $categories = $product->categories->pluck('id')->toArray();
         return Product::whereIsActive(1)
             ->whereHas('categories', function ($query) use ($categories) {
@@ -199,6 +236,11 @@ class ApiController extends Controller
             ->toJson();
     }
 
+    public function category($slug)
+    {
+        return Category::where('slug', rawurldecode($slug))->firstOrFail()->toArray();
+    }
+
     public function products($search)
     {
         $products = Product::where('name', 'like', "%$search%")->take(5)->get();
@@ -208,11 +250,13 @@ class ApiController extends Controller
 
     public function settings(Request $request)
     {
-        $keys = array_values(array_intersect($request->get('keys', []), ['company', 'logo', 'social']));
+        $keys = array_values(array_intersect($request->get('keys', []), [
+            'company', 'logo', 'social', 'scroll_text', 'services', 'call_for_order', 'delivery_text', 'products_page',
+        ]));
 
-        return cache()->rememberForever('settings:'.implode(';', $keys), function () use ($keys) {
+        // return cache()->remember('settings:'.implode(';', $keys), now()->addMinute(), function () use ($keys) {
             return Setting::whereIn('name', $keys)->get(['name', 'value'])->pluck('value', 'name');
-        });
+        // });
     }
 
     public function pendingCount(Admin $admin)

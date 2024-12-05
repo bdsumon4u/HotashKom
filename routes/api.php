@@ -26,13 +26,19 @@ Route::group(['as' => 'api.'], function () {
     Route::post('menu/{menu}/sort-items', [MenuItemSortController::class])->name('menu-items.sort');
     Route::get('orders', OrderController::class)->name('orders');
 
+    Route::get('shop', [\App\Http\Controllers\ProductController::class, 'index']);
+    Route::get('menus', [ApiController::class, 'menus']);
+    Route::get('search/suggestions.json', [ApiController::class, 'searchSuggestions']);
+    Route::get('page/{page:slug}', [ApiController::class, 'page']);
     Route::get('slides', [ApiController::class, 'slides']);
+    Route::get('services', [ApiController::class, 'services']);
     Route::get('sections', [ApiController::class, 'sections']);
     Route::get('sections/{section}/products', [ApiController::class, 'sectionProducts']);
-    Route::get('products/{product:slug}.json', [ApiController::class, 'product']);
-    Route::get('products/{product:slug}/related.json', [ApiController::class, 'relatedProducts']);
+    Route::get('products/{slug}.json', [ApiController::class, 'product'])->name('product');
+    Route::get('products/{slug}/related.json', [ApiController::class, 'relatedProducts']);
     Route::get('areas/{city_id}', [ApiController::class, 'areas']);
     Route::get('categories', [ApiController::class, 'categories']);
+    Route::get('categories/{slug}.json', [ApiController::class, 'category']);
     Route::get('products/{search}', [ApiController::class, 'products']);
     Route::get('settings', [ApiController::class, 'settings']);
     Route::get('pending-count/{admin}', [ApiController::class, 'pendingCount']);

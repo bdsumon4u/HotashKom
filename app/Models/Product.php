@@ -221,13 +221,13 @@ class Product extends Model
      *
      * @return array
      */
-    // public function toSearchableArray()
-    // {
-    //     return array_merge($this->toArray(), [
-    //         'categories' => $this->categories->pluck('name')->toArray(),
-    //         'base_image' => optional($this->base_image)->src,
-    //     ]);
-    // }
+    public function toSearchableArray()
+    {
+        return [
+            'sku' => $this->sku,
+            'name' => $this->name,
+        ];
+    }
 
     public function shouldBeSearchable()
     {

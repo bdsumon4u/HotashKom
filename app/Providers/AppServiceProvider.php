@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Extensions\DatabaseSessionHandler;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
+
+        Paginator::useBootstrap();
 
         Session::extend('custom', function ($app) {
             $table = $app['config']['session.table'];

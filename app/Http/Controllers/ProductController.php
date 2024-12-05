@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductResource;
 use App\Models\HomeSection;
 use App\Models\Product;
 use App\Models\Setting;
@@ -17,6 +18,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        info(rawurldecode($request->filter_category));
         if ($request->search) {
             GoogleTagManagerFacade::set([
                 'event' => 'search',
@@ -41,9 +43,15 @@ class ProductController extends Controller
             $section = HomeSection::with('categories')->findOrFail($section);
             $products = $section->products($per_page);
         } else {
-            $products = Product::search($request->search, function ($query) {
-                $query->whereIsActive(1)->whereNull('parent_id');
-            });
+            if ($request->filter_category) {
+                $products = Product::whereHas('categories', function ($query) use ($request) {
+                    $query->where('categories.slug', rawurldecode($request->filter_category));
+                });
+            } else {
+                $products = Product::search($request->search, function ($query) {
+                    $query->whereIsActive(1)->whereNull('parent_id');
+                });
+            }
 
             $sorted = setting('show_option')->product_sort ?? 'random';
             if ($sorted == 'random') {
@@ -57,6 +65,10 @@ class ProductController extends Controller
         }
         $products = $products
             ->appends(request()->query());
+
+        if ($request->is('api/*')) {
+            return ProductResource::collection($products);
+        }
 
         return $this->view(compact('products', 'per_page', 'rows', 'cols', 'section'));
     }
