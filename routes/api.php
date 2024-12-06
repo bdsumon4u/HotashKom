@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\LivewireCheckoutController;
 use App\Http\Controllers\Api\MenuItemSortController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
@@ -43,4 +44,5 @@ Route::group(['as' => 'api.'], function () {
     Route::get('settings', [ApiController::class, 'settings']);
     Route::get('pending-count/{admin}', [ApiController::class, 'pendingCount']);
     Route::post('pathao-webhook', [ApiController::class, 'pathaoWebhook']);
+    Route::post('checkout', LivewireCheckoutController::class);
 });

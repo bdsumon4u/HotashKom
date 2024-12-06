@@ -251,7 +251,8 @@ class ApiController extends Controller
     public function settings(Request $request)
     {
         $keys = array_values(array_intersect($request->get('keys', []), [
-            'company', 'logo', 'social', 'scroll_text', 'services', 'call_for_order', 'delivery_text', 'products_page',
+            'company', 'logo', 'social', 'scroll_text', 'services', 'call_for_order',
+            'delivery_text', 'products_page', 'delivery_charge',
         ]));
 
         // return cache()->remember('settings:'.implode(';', $keys), now()->addMinute(), function () use ($keys) {
