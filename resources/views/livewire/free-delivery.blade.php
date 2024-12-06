@@ -1,16 +1,16 @@
 <div class="col-md-12">
-    <div class="row" x-data="{free: '{{$free_delivery ?? 0}}', all: '{{$free_for_all ?? 0}}'}">
+    <div class="row" x-data="{free: {{$free_delivery ?? 0}}, all: {{$free_for_all ?? 0}}}">
         <div class="py-2 col-md-6">
             <div class="d-flex">
                 <label for="">Delivery Charge</label>
                 <div class="ml-2 custom-control custom-checkbox checkbox-inline">
                     <input type="hidden" name="free_delivery[enabled]" x-model="free" value="0">
-                    <input id="free" class="custom-control-input" type="checkbox" wire:model.live="free_delivery" name="free_delivery[enabled]" x-model="free" value="1">
+                    <input id="free" class="custom-control-input" type="checkbox" wire:model.live="free_delivery" name="free_delivery[enabled]" x-model="free" value="1" x-bind:checked="free">
                     <label for="free" class="custom-control-label">Free Delivery</label>
                 </div>
                 <div x-show="free" class="ml-2 custom-control custom-checkbox checkbox-inline">
                     <input type="hidden" name="free_delivery[for_all]" x-model="all" value="0">
-                    <input id="all" class="custom-control-input" type="checkbox" wire:model.live="free_for_all" name="free_delivery[for_all]" x-model="all" value="1">
+                    <input id="all" class="custom-control-input" type="checkbox" wire:model.live="free_for_all" name="free_delivery[for_all]" x-model="all" value="1" x-bind:checked="all">
                     <label for="all" class="custom-control-label">For All Products</label>
                 </div>
             </div>
