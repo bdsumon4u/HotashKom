@@ -46,7 +46,7 @@ class HomeSectionController extends Controller
 
         return $this->view([
             'categories' => Category::nested(),
-        ], request('banner') ? 'banner' : '');
+        ], request('banner') ? 'banner-create' : '');
     }
 
     /**
@@ -58,12 +58,7 @@ class HomeSectionController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
 
-        if ($request->banner) {
-            dd($request->validated(), $request->all());
-        }
-
         $data = $request->validationData();
-        dd($data);
         $categories = Arr::pull($data, 'categories');
         $homeSection = HomeSection::create($data);
         if ($categories) {
@@ -96,7 +91,7 @@ class HomeSectionController extends Controller
         return $this->view([
             'section' => $homeSection,
             'categories' => Category::nested(),
-        ]);
+        ], $homeSection->type == 'banner' ? 'banner-edit' : '');
     }
 
     /**

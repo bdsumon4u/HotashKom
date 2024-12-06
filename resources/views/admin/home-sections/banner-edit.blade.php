@@ -1,5 +1,5 @@
 @extends('layouts.light.master')
-@section('title', 'Create Banner Section')
+@section('title', 'Edit Banner Section')
 
 @push('css')
 <link rel="stylesheet" type="text/css" href="{{asset('assets/css/select2.css')}}">
@@ -21,23 +21,26 @@
 @endpush
 
 @section('breadcrumb-title')
-<h3>Create Banner Section</h3>
+<h3>Edit Banner Section</h3>
 @endsection
 
 @section('breadcrumb-items')
-<li class="breadcrumb-item">Create Banner Section</li>
+<li class="breadcrumb-item">Edit Banner Section</li>
 @endsection
 
 @section('content')
 <div class="mb-5 row justify-content-center">
-    <div class="col-md-12">
-        <x-form :action="route('admin.home-sections.store', ['banner' => true])" method="POST" class="shadow-sm card rounded-0">
+    <div class="col-md-8">
+        <x-form :action="route('admin.home-sections.update', [$section, 'banner' => true])" method="PATCH" class="shadow-sm card rounded-0">
             <div class="p-3 card-header d-flex justify-content-between align-items-center">
                 <div>Add New <strong>Section</strong></div>
                 <button type="submit" class="btn btn-primary">Save Section</button>
             </div>
             <div class="p-3 card-body">
-                <livewire:banner-section :$categories />
+                <livewire:banner-section :$categories :$section />
+            </div>
+            <div class="p-3 card-footer">
+                <button type="submit" class="btn btn-primary">Save Section</button>
             </div>
         </x-form>
     </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 
 class HomeSectionRequest extends FormRequest
 {
@@ -28,6 +29,19 @@ class HomeSectionRequest extends FormRequest
                     'source' => null,
                 ], $this->get('data', [])),
             ]);
+
+            $images = Arr::get($this->get('data'), 'columns.image', []);
+            if ($this->base_image_src) {
+                array_push($images, str_replace(asset(''), '', $this->base_image_src));
+            }
+
+            $this->merge([
+                'data' => array_merge($this->get('data'), [
+                    'columns' => array_merge(Arr::get($this->get('data'), 'columns', []), [
+                        'image' => $images,
+                    ]),
+                ]),
+            ]);
         }
     }
 
@@ -51,7 +65,7 @@ class HomeSectionRequest extends FormRequest
         if ($this->get('banner')) {
             $rules += [
                 'data.columns' => 'required|array',
-                'data.columns.image.*' => 'required|url',
+                'data.columns.image.*' => 'required|string',
                 'data.columns.animation.*' => 'required|string',
                 'data.columns.link.*' => 'nullable|string',
                 'data.columns.width.*' => 'required|numeric',
