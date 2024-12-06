@@ -71,7 +71,9 @@
     </div>
     @endforeach
 
+    @if(!(end($columns) ?: ['image' => null])['image'] == null)
     <div class="col-md-12">
         <button type="button" class="btn btn-primary w-100" wire:click="addColumn">Add Item</button>
     </div>
+    @endif
 </div>

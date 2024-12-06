@@ -106,7 +106,7 @@
 @if ($section->type == 'banner')
 @php($pseudoColumns = (array)$section->data->columns)
 <div class="block block-banner">
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
             @foreach($pseudoColumns['width'] as $i => $width)
             <div class="col-md-{{$width}} mb-3">
