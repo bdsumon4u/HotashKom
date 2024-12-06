@@ -117,7 +117,7 @@
                 <a href="{{ $link ?? route('products.index', $categories ? ['filter_category' => $categories] : []) }}">
                     <img
                         data-aos="{{$pseudoColumns['animation'][$i]}}"
-                        class="border img-fluid"
+                        class="border img-fluid w-100"
                         src="{{ asset($pseudoColumns['image'][$i]) }}"
                         alt="Image"
                     >
