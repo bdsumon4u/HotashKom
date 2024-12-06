@@ -46,7 +46,7 @@ class HomeSectionController extends Controller
 
         return $this->view([
             'categories' => Category::nested(),
-        ]);
+        ], request('banner') ? 'banner' : '');
     }
 
     /**

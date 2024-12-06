@@ -1,5 +1,5 @@
 @extends('layouts.light.master')
-@section('title', 'Create Product Section')
+@section('title', 'Create Banner Section')
 
 @push('css')
 <link rel="stylesheet" type="text/css" href="{{asset('assets/css/select2.css')}}">
@@ -21,18 +21,21 @@
 @endpush
 
 @section('breadcrumb-title')
-<h3>Create Product Section</h3>
+<h3>Create Banner Section</h3>
 @endsection
 
 @section('breadcrumb-items')
-<li class="breadcrumb-item">Create Product Section</li>
+<li class="breadcrumb-item">Create Banner Section</li>
 @endsection
 
 @section('content')
 <div class="mb-5 row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-12">
         <div class="shadow-sm card rounded-0">
-            <div class="p-3 card-header">Add New <strong>Section</strong></div>
+            <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                <div>Add New <strong>Section</strong></div>
+                <button type="button" data-toggle="modal" data-target="#new-col" class="btn btn-primary">New Column</button>
+            </div>
             <div class="p-3 card-body">
                 <x-form :action="route('admin.home-sections.store')" method="POST">
                     <div class="row">
@@ -97,6 +100,64 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="new-col" tabindex="-1" aria-labelledby="new-colLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="new-colLabel">Banner Column</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="banner-image" class="d-block">
+                        <div>Image</div>
+                        <img src="" alt="Image" class="img-responsive d-block" style="max-width: 100%;">
+                    </label>
+                    <input type="file" name="image" id="banner-image" class="mb-1 form-control">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="banner-width">Width</label>
+                    <x-input name="width" id="banner-width" :value="$company->dev_name ?? null" />
+                    <x-error field="width" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="banner-animation">Animation</label>
+                    <x-input name="animation" id="banner-animation" :value="$company->dev_name ?? null" />
+                    <x-error field="animation" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="banner-link">Link</label>
+                    <x-input name="link" id="banner-link" :value="$company->dev_name ?? null" />
+                    <x-error field="link" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="dev-name">Categories</label>
+                    <x-input name="company[dev_name]" id="dev-name" :value="$company->dev_name ?? null" />
+                    <x-error field="company[dev_name]" />
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @push('js')
@@ -110,6 +171,20 @@
     $(document).ready(function(){
         $('[selector]').select2({
             // tags: true,
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $('input[type="file"]').change(function() {
+            var $img = $(this).parent().find('img');
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $img.attr('src', e.target.result);
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
         });
     });
 </script>

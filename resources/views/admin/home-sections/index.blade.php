@@ -42,7 +42,10 @@
          <div class="shadow-sm card rounded-0">
             <div class="p-3 card-header d-flex justify-content-between align-items-center">
                <strong>All Sections</strong>
-               <a href="{{ route('admin.home-sections.create') }}" class="btn btn-primary">New Section</a>
+               <div>
+                    <a href="{{ route('admin.home-sections.create') }}" class="btn btn-primary">Product Section</a>
+                    <a href="{{ route('admin.home-sections.create', ['banner' => true]) }}" class="btn btn-primary">Banner Section</a>
+               </div>
            </div>
             <div class="p-3 card-body">
                 <ul class="space" id="space-0" data-space="0">
