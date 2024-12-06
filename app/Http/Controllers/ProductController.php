@@ -54,20 +54,30 @@ class ProductController extends Controller
                     });
                 }
                 $products = $products->whereIsActive(1)->whereNull('parent_id');
+
+                $sorted = setting('show_option')->product_sort ?? 'random';
+                if ($sorted == 'random') {
+                    $products->inRandomOrder();
+                } elseif ($sorted == 'updated_at') {
+                    $products->latest('updated_at');
+                } elseif ($sorted == 'selling_price') {
+                    $products->orderBy('selling_price');
+                }
             } else {
                 $products = Product::search($request->search, function ($query) {
                     $query->whereIsActive(1)->whereNull('parent_id');
+
+                    $sorted = setting('show_option')->product_sort ?? 'random';
+                    if ($sorted == 'random') {
+                        $query->inRandomOrder();
+                    } elseif ($sorted == 'updated_at') {
+                        $query->latest('updated_at');
+                    } elseif ($sorted == 'selling_price') {
+                        $query->orderBy('selling_price');
+                    }
                 });
             }
 
-            $sorted = setting('show_option')->product_sort ?? 'random';
-            if ($sorted == 'random') {
-                $products->inRandomOrder();
-            } elseif ($sorted == 'updated_at') {
-                $products->latest('updated_at');
-            } elseif ($sorted == 'selling_price') {
-                $products->orderBy('selling_price');
-            }
             $products = $products->paginate($per_page);
         }
         $products = $products
