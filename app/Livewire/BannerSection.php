@@ -21,10 +21,10 @@ class BannerSection extends Component
             foreach ($pseudoColumns['width'] as $i => $width) {
                 $this->columns[] = [
                     'image' => $pseudoColumns['image'][$i] ?? null,
-                    'width' => $width,
-                    'animation' => $pseudoColumns['animation'][$i] ?? null,
-                    'link' => $pseudoColumns['link'][$i] ?? null,
-                    'categories' => $pseudoColumns['categories'][$i] ?? null,
+                    'width' => old('data.columns.width.'.$i, $width),
+                    'animation' => old('data.columns.animation.'.$i, $pseudoColumns['animation'][$i] ?? 'fade-right'),
+                    'link' => old('data.columns.link.'.$i, $pseudoColumns['link'][$i] ?? '#'),
+                    'categories' => old('data.columns.categories.'.$i, ((array)($pseudoColumns['categories'] ?? []))[$i] ?? []),
                 ];
             }
         }
@@ -36,7 +36,7 @@ class BannerSection extends Component
             'image' => null,
             'width' => 12,
             'animation' => 'fade-right',
-            'link' => '#',
+            'link' => '',
             'categories' => [],
         ];
     }

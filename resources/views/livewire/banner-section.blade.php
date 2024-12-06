@@ -12,7 +12,7 @@
                 <div class="form-group position-relative">
                     <img src="{{asset($column['image'])}}" alt="Image" style="max-width: 100%;">
                     <input type="hidden" name="data[columns][image_src][]" value="{{$column['image']}}">
-                    <input type="hidden" name="data[columns][image][]" value="{{$column['image']}}" id="base-image" class="form-control">
+                    <input type="hidden" name="data[columns][image][]" value="{{$column['image']}}" id="base-image-{{$i}}" class="form-control">
                     <button type="button" class="position-absolute btn btn-sm btn-danger" style="top: 0; right: 0;" wire:click="removeColumn({{$i}})">X</button>
                 </div>
                 @else
@@ -24,10 +24,10 @@
                         </button>
                         <button type="button" class="btn btn-sm btn-danger" style="top: 0; right: 0;" wire:click="removeColumn({{$i}})">Remove</button>
                     </label>
-                    <div id="preview" class="base_image-preview" style="width: 100%; margin: 5px; margin-left: 0px;">
-                        <img src="" alt="Image" data-toggle="modal" data-target="#single-picker" id="image-preview" class="img-thumbnail img-responsive d-none">
+                    <div id="preview-{{$i}}" class="base_image-preview" style="width: 100%; margin: 5px; margin-left: 0px;">
+                        <img src="" alt="Image" data-toggle="modal" data-target="#single-picker" id="image-preview-{{$i}}" class="img-thumbnail img-responsive d-none">
                         <input type="hidden" name="data[columns][image_src][]" value="{{$column['image']}}">
-                        <input type="hidden" name="data[columns][image][]" value="{{$column['image']}}" id="base-image" class="form-control">
+                        <input type="hidden" name="data[columns][image][]" value="{{$column['image']}}" id="base-image-{{$i}}" class="form-control">
                     </div>
                     @error('image')
                         <small class="text-danger">{{ $message }}</small>
@@ -38,14 +38,14 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="banner-width-{{$i}}">Width <small>Total of 12</small></label>
-                    <x-input name="data[columns][width][]" value="{{ old('data.columns.width.'.$i) }}" id="banner-width-{{$i}}" placeholder="Total of 12" />
+                    <x-input name="data[columns][width][]" wire:model="columns.{{$i}}.width" value="{{ old('data.columns.width.'.$i) }}" id="banner-width-{{$i}}" placeholder="Total of 12" />
                     <x-error field="data[columns][width][]" />
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="banner-animation-{{$i}}">Animation</label>
-                    <select name="data[columns][animation][]" class="form-control" value="{{ old('data.columns.animation.'.$i) }}" id="banner-animation-{{$i}}">
+                    <select name="data[columns][animation][]" wire:model="columns.{{$i}}.animation" class="form-control" value="{{ old('data.columns.animation.'.$i) }}" id="banner-animation-{{$i}}">
                         @foreach (['fade-left', 'fade-right', 'fade-up', 'fade-down'] as $animation)
                             <option value="{{$animation}}">{{$animation}}</option>
                         @endforeach 
@@ -56,15 +56,15 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="banner-link-{{$i}}">Link</label>
-                    <x-input name="data[columns][link][]" value="{{ old('data.columns.link.'.$i) }}" id="banner-link-{{$i}}" />
+                    <x-input name="data[columns][link][]" wire:model="columns.{{$i}}.link" value="{{ old('data.columns.link.'.$i) }}" id="banner-link-{{$i}}" />
                     <x-error field="data[columns][link][]" />
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="banner-categories-{{$i}}">Categories <small>(<strong>Ctrl+Click</strong> for Multiple)</small></label>
-                    <x-category-dropdown :categories="$categories" name="data[columns][categories][]" placeholder="Select Categories" id="banner-categories-{{$i}}" multiple="true" :selected="old('data.columns.categories.'.$i)" />
-                    <x-error field="data[columns][categories][]" class="d-block" />
+                    <x-category-dropdown :categories="$categories" name="data[columns][categories][{{$i}}][]" placeholder="Select Categories" id="banner-categories-{{$i}}" multiple="true" :selected="old('data.columns.categories.'.$i, $column['categories'] ?? [])" />
+                    <x-error field="data[columns][categories][{{$i}}][]" class="d-block" />
                 </div>
             </div>
         </div>

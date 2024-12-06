@@ -43,9 +43,17 @@ class ProductController extends Controller
             $products = $section->products($per_page);
         } else {
             if ($request->filter_category) {
-                $products = Product::whereHas('categories', function ($query) use ($request) {
-                    $query->where('categories.slug', rawurldecode($request->filter_category));
-                });
+                // if filter_category is a comma separated ids(numeric) then use it as category ids
+                if (is_numeric(str_replace(',', '', $request->filter_category))) {
+                    $products = Product::whereHas('categories', function ($query) use ($request) {
+                        $query->whereIn('categories.id', explode(',', $request->filter_category));
+                    });
+                } else {
+                    $products = Product::whereHas('categories', function ($query) use ($request) {
+                        $query->where('categories.slug', rawurldecode($request->filter_category));
+                    });
+                }
+                $products = $products->whereIsActive(1)->whereNull('parent_id');
             } else {
                 $products = Product::search($request->search, function ($query) {
                     $query->whereIsActive(1)->whereNull('parent_id');
