@@ -248,6 +248,13 @@ class ApiController extends Controller
         return view('admin.orders.searched', compact('products'))->render();
     }
 
+    public function order(Order $order)
+    {
+        return array_merge($order->toArray(), [
+            'created_at' => $order->created_at->format('Y-m-d H:i:s'),
+        ]);
+    }
+
     public function settings(Request $request)
     {
         $keys = array_values(array_intersect($request->get('keys', []), [

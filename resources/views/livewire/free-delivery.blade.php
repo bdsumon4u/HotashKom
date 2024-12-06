@@ -1,6 +1,6 @@
 <div class="col-md-12">
-    <div class="row" x-data="{free: {{$free_delivery ?? 0}}, all: {{$free_for_all ?? 0}}}">
-        <div class="col-md-6 py-2">
+    <div class="row" x-data="{free: '{{$free_delivery ?? 0}}', all: '{{$free_for_all ?? 0}}'}">
+        <div class="py-2 col-md-6">
             <div class="d-flex">
                 <label for="">Delivery Charge</label>
                 <div class="ml-2 custom-control custom-checkbox checkbox-inline">
@@ -14,7 +14,7 @@
                     <label for="all" class="custom-control-label">For All Products</label>
                 </div>
             </div>
-            <div x-show="free && !all" class="row px-3">
+            <div x-show="free && !all" class="px-3 row">
                 <input type="search" wire:model.live.debounce.250ms="search" id="search"
                     placeholder="Search Product" class="form-control">
                 
@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div x-show="!free || !all" class="row borderr py-2">
+            <div x-show="!free || !all" class="py-2 row borderr">
                 @php
                     $default_area = setting('default_area');
                 @endphp
@@ -53,13 +53,13 @@
                     <x-error field="delivery_charge.outside_dhaka" />
                 </div>
             </div>
-            <div x-show="free && all" class="row borderr py-2">
-                <div class="col-md-6 pr-0">
+            <div x-show="free && all" class="py-2 row borderr">
+                <div class="pr-0 col-md-6">
                     <label for="products_page-rows">Minimum No. of Products</label>
                     <x-input name="free_delivery[min_quantity]" id="free_delivery-min_quantity" :value="$min_quantity ?? false" />
                     <x-error field="free_delivery.min_quantity" />
                 </div>
-                <div class="col-md-6 pl-0">
+                <div class="pl-0 col-md-6">
                     <label for="products_page-cols">Minimum Total Amount</label>
                     <x-input name="free_delivery[min_amount]" id="free_delivery-min_amount" :value="$min_amount ?? false" />
                     <x-error field="free_delivery.min_amount" />
@@ -67,7 +67,7 @@
             </div>
         </div>
         <div class="col-md-12" x-show="free && !all">
-            <div class="table-responsive my-2">
+            <div class="my-2 table-responsive">
                 <table class="table table-bordered table-hover">
                     <thead>
                         <tr>

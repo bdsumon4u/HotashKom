@@ -45,4 +45,5 @@ Route::group(['as' => 'api.'], function () {
     Route::get('pending-count/{admin}', [ApiController::class, 'pendingCount']);
     Route::post('pathao-webhook', [ApiController::class, 'pathaoWebhook']);
     Route::post('checkout', LivewireCheckoutController::class);
+    Route::get('orders/{order}', [ApiController::class, 'order']);
 });

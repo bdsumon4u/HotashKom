@@ -19,6 +19,8 @@ use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class Checkout extends Component
 {
+    public ?Order $order = null;
+
     public array $cart = [];
 
     public $isFreeDelivery = false;
@@ -205,7 +207,7 @@ class Checkout extends Component
             return redirect()->back()->with('error', 'প্রিয় গ্রাহক, আরও অর্ডার করতে চাইলে আমাদের হেল্প লাইন '.setting('company')->phone.' নাম্বারে কল দিয়ে সরাসরি কথা বলুন।');
         }
 
-        $order = DB::transaction(function () use ($data, &$order, $fraud) {
+        $this->order = DB::transaction(function () use ($data, &$order, $fraud) {
             $products = Product::find(array_keys($this->cart))
                 ->mapWithKeys(function (Product $product) use ($fraud) {
                     $id = $product->id;
@@ -299,7 +301,7 @@ class Checkout extends Component
             return $order;
         });
 
-        if (! $order) {
+        if (! $this->order) {
             return back();
         }
 
@@ -322,7 +324,7 @@ class Checkout extends Component
         session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Recieved. Thanks For Your Order.');
 
         return redirect()->route('thank-you', [
-            'order' => optional($order)->getKey(),
+            'order' => optional($this->order)->getKey(),
         ]);
     }
 
