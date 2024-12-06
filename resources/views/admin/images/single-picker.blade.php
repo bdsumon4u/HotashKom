@@ -10,18 +10,18 @@
         <div class="modal-content">
 
             <!-- Modal Header -->
-            <div class="modal-header p-3">
+            <div class="p-3 modal-header">
                 <h4 class="modal-title">Image Picker</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
 
             <!-- Modal body -->
-            <div class="modal-body p-3">
+            <div class="p-3 modal-body">
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="card rounded-0">
                             <div class="card-body">
-                                <x-form method="post" :action="route('admin.images.store')" id="image-dropzone-single" class="dropzone" has-files>
+                                <x-form method="post" :action="route('admin.images.store', isset($resize) ? ['resize' => $resize] : [])" id="image-dropzone-single" class="dropzone" has-files>
                                     <div class="dz-message needsclick">
                                         <i class="icon-cloud-up"></i>
                                         <h6>Drop files here or click to upload.</h6>
@@ -51,7 +51,7 @@
             </div>
 
             <!-- Modal footer -->
-            <div class="modal-footer p-3">
+            <div class="p-3 modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -88,9 +88,9 @@
     });
 
     $('#single-picker').on('click', '.select-image', function (ev) {
-        $('.base_image-preview').html('<img src="'+$(this).data('src')+'" alt="Base Image" data-toggle="modal" data-target="#single-picker" id="base_image-preview" class="img-thumbnail img-responsive" style="height: 150px; width: 150px; margin: 5px; margin-left: 0;"><input type="hidden" name="base_image" value="'+$(this).data('id')+'"><input type="hidden" name="base_image_src" value="'+$(this).data('src')+'">').removeClass('d-none');
+        $('.base_image-preview').html('<img src="'+$(this).data('src')+'" alt="Base Image" data-toggle="modal" data-target="#single-picker" id="base_image-preview" class="img-thumbnail img-responsive" style="width: 100%; margin: 5px; margin-left: 0;"><input type="hidden" name="base_image" value="'+$(this).data('id')+'"><input type="hidden" name="base_image_src" value="'+$(this).data('src')+'">').removeClass('d-none');
         $(this).parents('.modal').modal('hide');
-        $.notify('<i class="fa fa-bell-o mr-1"></i> Base image selected', {
+        $.notify('<i class="mr-1 fa fa-bell-o"></i> Base image selected', {
             type: 'success',
             allow_dismiss: true,
             // delay: 2000,

@@ -46,6 +46,7 @@ class ImageController extends Controller
                 'width' => 700,
                 'height' => 700,
                 'dir' => 'images',
+                'resize' => $request->has('resize') ? $request->resize : true,
             ]),
             'extension' => $file->guessClientExtension(),
             'mime' => $file->getClientMimeType(),

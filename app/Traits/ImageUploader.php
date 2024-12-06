@@ -3,7 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 
 trait ImageUploader
 {
@@ -20,7 +20,7 @@ trait ImageUploader
             time(),
         ]).'-'.preg_replace('/\s+/', '-', $file->getClientOriginalName());
 
-        $image = Image::make($file);
+        $image = Image::read($file);
         if (data_get($arg, 'resize', true)) {
             $image = $image->{$arg['method'] ?? 'resize'}($arg['width'], $arg['height']);
         }
