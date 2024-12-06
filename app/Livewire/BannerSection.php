@@ -9,22 +9,7 @@ class BannerSection extends Component
 {
     public Collection $categories;
 
-    public array $columns = [
-        [
-            'image' => 'https://via.placeholder.com/1910x1274',
-            'width' => 8,
-            'animation' => 'fade-left',
-            'link' => '#',
-            'categories' => [1, 2],
-        ],
-        [
-            'image' => 'https://via.placeholder.com/1910x1274',
-            'width' => 4,
-            'animation' => 'fade-right',
-            'link' => '#',
-            'categories' => [3, 4],
-        ],
-    ];
+    public array $columns = [];
 
     public function mount()
     {

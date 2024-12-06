@@ -29,7 +29,21 @@
 @endsection
 
 @section('content')
-<livewire:banner-section :categories="$categories" />
+<div class="mb-5 row justify-content-center">
+    <div class="col-md-12">
+        <x-form :action="route('admin.home-sections.store', ['banner' => true])" method="POST" class="shadow-sm card rounded-0">
+            <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                <div>Add New <strong>Section</strong></div>
+                <button type="submit" class="btn btn-primary">Save Section</button>
+            </div>
+            <div class="p-3 card-body">
+                <livewire:banner-section :$categories />
+            </div>
+        </x-form>
+    </div>
+</div>
+
+@include('admin.images.single-picker', ['selected' => old('base_image', 0), 'resize' => false])
 @endsection
 
 @push('js')

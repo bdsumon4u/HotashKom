@@ -57,7 +57,13 @@ class HomeSectionController extends Controller
     public function store(HomeSectionRequest $request)
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
+
+        if ($request->banner) {
+            dd($request->validated(), $request->all());
+        }
+
         $data = $request->validationData();
+        dd($data);
         $categories = Arr::pull($data, 'categories');
         $homeSection = HomeSection::create($data);
         if ($categories) {

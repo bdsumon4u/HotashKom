@@ -16,6 +16,21 @@ class HomeSectionRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        if ($this->get('banner')) {
+            $this->merge([
+                'title' => 'Banner',
+                'type' => 'banner',
+                'data' => array_merge([
+                    'rows' => 1,
+                    'cols' => 1,
+                    'source' => null,
+                ], $this->get('data', [])),
+            ]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,7 +38,7 @@ class HomeSectionRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'title' => 'required',
             'type' => 'required',
             'items' => 'nullable|array',
@@ -32,5 +47,18 @@ class HomeSectionRequest extends FormRequest
             'data.cols' => 'required|integer',
             'data.source' => 'nullable',
         ];
+
+        if ($this->get('banner')) {
+            $rules += [
+                'data.columns' => 'required|array',
+                'data.columns.image.*' => 'required|url',
+                'data.columns.animation.*' => 'required|string',
+                'data.columns.link.*' => 'nullable|string',
+                'data.columns.width.*' => 'required|numeric',
+                'data.columns.categories.*' => 'nullable|array',
+            ];
+        }
+
+        return $rules;
     }
 }
