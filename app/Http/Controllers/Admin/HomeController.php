@@ -18,9 +18,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $_start = Carbon::parse(\request('start_d'));
+        $_start = Carbon::parse(request('start_d'));
         $start = $_start->format('Y-m-d');
-        $_end = Carbon::parse(\request('end_d'));
+        $_end = Carbon::parse(request('end_d'));
         $end = $_end->format('Y-m-d');
 
         $totalSQL = 'COUNT(*) as order_count, SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.subtotal"))) + SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.shipping_cost"))) - COALESCE(SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.discount"))), 0) as total_amount';
@@ -87,7 +87,7 @@ class HomeController extends Controller
             ->select('admins.id', 'admins.name', 'admins.email', 'admins.role_id', DB::raw('MAX(sessions.last_activity) as last_activity'))
             ->leftJoin('sessions', 'sessions.userable_id', '=', 'admins.id')
             ->where('sessions.userable_type', Admin::class)
-            ->groupBy('admins.id', 'admins.email');
+            ->groupBy('admins.id', 'admins.name', 'admins.email', 'admins.role_id'); // Add all selected non-aggregated columns to GROUP BY
 
         // Get online admins
         $online = $query->having('last_activity', '>=', now()->subMinutes(5)->timestamp)->get();
