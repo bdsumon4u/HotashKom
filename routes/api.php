@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\LivewireCheckoutController;
 use App\Http\Controllers\Api\MenuItemSortController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['as' => 'api.'], function () {
+Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function () {
     Route::get('products', ProductController::class)->name('products');
     Route::get('images', [ImageController::class, 'index'])->name('images.index');
     Route::get('images/single', [ImageController::class, 'single'])->name('images.single');
