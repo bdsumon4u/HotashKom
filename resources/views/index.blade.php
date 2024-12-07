@@ -126,6 +126,7 @@
             @endforeach
         </div>
     </div>
+</div>
 @endif
 <!-- .block-products-carousel / end -->
 @endforeach
