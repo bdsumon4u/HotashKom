@@ -132,7 +132,7 @@
             z-index: 9999;
         }
         .header-fixed .site__body {
-            padding-top: 11rem;
+            padding-top: 4rem;
         }
         @media (max-width: 991px) {
             .header-fixed .site__header {

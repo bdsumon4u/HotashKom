@@ -1,5 +1,11 @@
 @push('styles')
 <style>
+    .block-slideshow__body, .block-slideshow__slide {
+        height: 590px !important;
+    }
+    .block-slideshow__slide-image--desktop {
+        background-size: cover;
+    }
     .block-slideshow__body .owl-carousel .owl-nav {
         /* position: absolute; */
         height: 100%;
@@ -66,31 +72,27 @@
     }
 </style>
 @endpush
-<div class="block block-slideshow block-slideshow--layout--with-departments">
-    <div id="slideshow-container" class="container">
-        <div class="row">
-            <div class="col-12 @if(setting('show_option')->category_dropdown ?? false) col-lg-9 offset-lg-3 @endif">
-                <div class="block-slideshow__body">
-                    <div class="owl-carousel">
-                        @foreach(slides() as $slide)
-                        <a class="block-slideshow__slide" href="{{ $slide->btn_href ?? '#' }}">
-                            <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop"
-                                style="background-image: url({{ asset($slide->desktop_src) }}); background-position: center;"></div>
-                            <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile"
-                                style="background-image: url({{ asset($slide->mobile_src) }}); background-position: center;"></div>
-                            <div class="block-slideshow__slide-content">
-                                <div class="block-slideshow__slide-title">{!! $slide->title !!}</div>
-                                <div class="block-slideshow__slide-text">{!! $slide->text !!}</div>
-                                @if($slide->btn_href && $slide->btn_name)
-                                <div class="block-slideshow__slide-button">
-                                    <span class="btn btn-primary btn-lg">{{ $slide->btn_name }}</span>
-                                </div>
-                                @endif
-                            </div>
-                        </a>
-                        @endforeach
+<div class="block block-slideshow -block-slideshow--layout--with-departments">
+    <div id="slideshow-container" class="-container-fluid">
+        <div class="block-slideshow__body">
+            <div class="owl-carousel">
+                @foreach(slides() as $slide)
+                <a class="block-slideshow__slide" href="{{ $slide->btn_href ?? '#' }}">
+                    <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop"
+                        style="background-image: url({{ asset($slide->desktop_src) }}); background-position: center;"></div>
+                    <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile"
+                        style="background-image: url({{ asset($slide->mobile_src) }}); background-position: center;"></div>
+                    <div class="block-slideshow__slide-content">
+                        <div class="block-slideshow__slide-title">{!! $slide->title !!}</div>
+                        <div class="block-slideshow__slide-text">{!! $slide->text !!}</div>
+                        @if($slide->btn_href && $slide->btn_name)
+                        <div class="block-slideshow__slide-button">
+                            <span class="btn btn-primary btn-lg">{{ $slide->btn_name }}</span>
+                        </div>
+                        @endif
                     </div>
-                </div>
+                </a>
+                @endforeach
             </div>
         </div>
     </div>

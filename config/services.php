@@ -73,7 +73,7 @@ return [
 
     'slides' => [
         'mobile' => [360, 180],
-        'desktop' => [840, 395],
+        'desktop' => [1600, 500],
     ],
 
     'bdwebs' => [

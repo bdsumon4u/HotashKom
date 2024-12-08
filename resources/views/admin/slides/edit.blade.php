@@ -18,11 +18,11 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row justify-content-center mb-5">
+    <div class="mb-5 row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header p-3">Edit Slide</div>
-                <div class="card-body p-3">
+                <div class="p-3 card-header">Edit Slide</div>
+                <div class="p-3 card-body">
                     <x-form method="patch" :action="route('admin.slides.update', $slide)" has-files>
                         <div class="form-group">
                             <x-label for="title" />

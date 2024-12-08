@@ -15,23 +15,23 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row justify-content-center mb-5">
+    <div class="mb-5 row justify-content-center">
         <div class="col-md-10">
             <div class="card">
-                <div class="card-header p-3">Upload Images</div>
-                <div class="card-body p-3">
+                <div class="p-3 card-header">Upload Images</div>
+                <div class="p-3 card-body">
                     <x-form method="post" :action="route('admin.slides.store')" id="slides-dropzone" class="dropzone" has-files>
                         <div class="dz-message needsclick">
                             <i class="icon-cloud-up"></i>
                             <h6>Drop files here or click to upload.</h6>
-                            <span class="note needsclick">(Recommended <strong>1125x395</strong> dimension.)</span>
+                            <span class="note needsclick">(Recommended <strong>{{implode('x', config('services.slides.desktop'))}}</strong> dimension.)</span>
                         </div>
                     </x-form>
                 </div>
             </div>
-            <div class="card mb-5">
-                <div class="card-header p-3">Current Slides</div>
-                <div class="card-body p-3">
+            <div class="mb-5 card">
+                <div class="p-3 card-header">Current Slides</div>
+                <div class="p-3 card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
