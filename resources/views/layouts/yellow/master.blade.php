@@ -17,11 +17,6 @@
     <link rel="stylesheet" href="{{ asset('strokya/fonts/stroyka/stroyka.css') }}">
     @include('layouts.yellow.color')
     <style>
-        *,html,body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
         .topbar__item {
             flex: none;
         }
@@ -187,7 +182,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet">
 </head>
 
-<body class="header-fixed" style="margin: 0; padding: 0; overflow: auto;">
+<body class="header-fixed" style="margin: 0; padding: 0;">
     @include('googletagmanager::body')
     <x-metapixel-body/>
     <!-- quickview-modal -->
