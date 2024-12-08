@@ -52,6 +52,7 @@
         }
         .block-slideshow__body {
             margin-top: 5px !important;
+            overflow: hidden;
         }
     }
     @media (max-width: 767px) {
