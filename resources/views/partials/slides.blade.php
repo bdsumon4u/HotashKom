@@ -53,6 +53,7 @@
         .block-slideshow__body {
             margin-top: 5px !important;
             overflow: hidden;
+            max-width: 100%;
         }
     }
     @media (max-width: 767px) {
