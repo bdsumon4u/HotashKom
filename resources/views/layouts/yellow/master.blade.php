@@ -17,6 +17,11 @@
     <link rel="stylesheet" href="{{ asset('strokya/fonts/stroyka/stroyka.css') }}">
     @include('layouts.yellow.color')
     <style>
+        *,html,body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
         .topbar__item {
             flex: none;
         }
