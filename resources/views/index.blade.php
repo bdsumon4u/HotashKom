@@ -3,7 +3,7 @@
 @section('title', 'Home')
 
 @push('styles')
-  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  {{-- <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" /> --}}
 @endpush
 
 @section('content')
@@ -186,7 +186,7 @@
 @endsection
 
 @push('scripts')
-  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  {{-- <script src="https://unpkg.com/aos@next/dist/aos.js"></script> --}}
   <script>
     // AOS.init();
   </script>
