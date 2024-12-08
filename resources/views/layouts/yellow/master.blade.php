@@ -187,7 +187,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet">
 </head>
 
-<body class="header-fixed" style="margin: 0; padding: 0;">
+<body class="header-fixed" style="margin: 0; padding: 0; overflow-y: auto;">
     @include('googletagmanager::body')
     <x-metapixel-body/>
     <!-- quickview-modal -->
