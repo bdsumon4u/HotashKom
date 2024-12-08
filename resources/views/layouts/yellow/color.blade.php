@@ -83,7 +83,8 @@
     .departments {
         color: {{$color->category_menu->text_color ?? null}} !important;
     }
-    .departments__body {
+    .departments__body,
+    .nav-links__submenu {
         background: {{$color->category_menu->background_color ?? null}} !important;
     }
     .departments__links>li:hover>a {

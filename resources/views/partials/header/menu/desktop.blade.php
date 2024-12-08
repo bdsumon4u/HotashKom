@@ -11,7 +11,7 @@
                 </div>
             </a>
             @if($category->childrens->isNotEmpty())
-            <div class="nav-links__submenu nav-links__submenu--type--menu" style="background: white; width: 220px;">
+            <div class="nav-links__submenu nav-links__submenu--type--menu" style="width: 220px;">
                 <ul class="departments__links">
                     @foreach($category->childrens as $category)
                     <li class="departments__item ">
