@@ -42,14 +42,6 @@
             padding-left: 5px;
             padding-right: 5px;
         }
-        #slideshow-container > div {
-            margin-left: -5px;
-            margin-right: -5px;
-        }
-        #slideshow-container > div > div {
-            padding-left: 5px;
-            padding-right: 5px;
-        }
         .block-slideshow__body {
             margin-top: 5px !important;
             overflow: hidden;
