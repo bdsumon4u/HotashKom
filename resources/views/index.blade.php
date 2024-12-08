@@ -3,7 +3,7 @@
 @section('title', 'Home')
 
 @push('styles')
-  {{-- <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" /> --}}
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 @endpush
 
 @section('content')
@@ -105,7 +105,7 @@
 ])
 @if ($section->type == 'banner')
 @php($pseudoColumns = (array)$section->data->columns)
-<div class="block block-banner">
+<div class="block block-banner" style="overflow: hidden;">
     <div class="container-fluid">
         <div class="row">
             @foreach($pseudoColumns['width'] as $i => $width)
@@ -186,8 +186,8 @@
 @endsection
 
 @push('scripts')
-  {{-- <script src="https://unpkg.com/aos@next/dist/aos.js"></script> --}}
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
   <script>
-    // AOS.init();
+    AOS.init();
   </script>
 @endpush
