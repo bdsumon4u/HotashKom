@@ -139,6 +139,8 @@
                 position: fixed;
                 width: 100%;
                 z-index: 9999;
+                max-width: 100vw;
+                overflow: hidden;
             }
             .header-fixed .site__body {
                 padding-top: 85px;
