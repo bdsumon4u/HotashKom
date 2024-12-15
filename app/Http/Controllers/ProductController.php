@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
+use App\Models\Category;
 use App\Models\HomeSection;
 use App\Models\Product;
 use App\Models\Setting;
@@ -30,6 +31,7 @@ class ProductController extends Controller
             ]);
         }
         // \LaravelFacebookPixel::createEvent('PageView', $parameters = []);
+        $categories = collect();
         $section = null;
         $rows = 3;
         $cols = 5;
@@ -39,8 +41,9 @@ class ProductController extends Controller
         }
         $per_page = $request->get('per_page', $rows * $cols);
         if ($section = request('filter_section', 0)) {
-            $section = HomeSection::with('categories')->findOrFail($section);
+            $section = HomeSection::with('categories.childrens.image')->findOrFail($section);
             $products = $section->products($per_page);
+            $categories = $section->categories;
         } else {
             if ($request->filter_category) {
                 // if filter_category is a comma separated ids(numeric) then use it as category ids
@@ -48,10 +51,12 @@ class ProductController extends Controller
                     $products = Product::whereHas('categories', function ($query) use ($request) {
                         $query->whereIn('categories.id', explode(',', $request->filter_category));
                     });
+                    $categories = Category::with('childrens.image')->whereIn('id', explode(',', $request->filter_category))->get();
                 } else {
                     $products = Product::whereHas('categories', function ($query) use ($request) {
                         $query->where('categories.slug', rawurldecode($request->filter_category));
                     });
+                    $categories = Category::with('childrens.image')->where('slug', rawurldecode($request->filter_category))->get();
                 }
                 $products = $products->whereIsActive(1)->whereNull('parent_id');
 
@@ -87,7 +92,21 @@ class ProductController extends Controller
             return ProductResource::collection($products);
         }
 
-        return $this->view(compact('products', 'per_page', 'rows', 'cols', 'section'));
+        $categories = $categories->map(fn($cat)=>$cat->childrens)->filter->map(function ($category) {
+            if ($category->relationLoaded('image')) {
+                $image = $category->image;
+            } else {
+                $images = $category->products->pluck('images')->filter();
+                $image = $images->isEmpty() ? null : $images->random()->first();
+            }
+
+            // Set the image_src property with a fallback placeholder
+            $category->image_src = asset($image->path ?? 'https://placehold.co/600x600?text=No+Product');
+
+            return $category;
+        })->flatten();
+
+        return $this->view(compact('categories', 'products', 'per_page', 'rows', 'cols', 'section'));
     }
 
     /**

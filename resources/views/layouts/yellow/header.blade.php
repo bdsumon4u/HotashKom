@@ -12,7 +12,7 @@
                 <div class="header-col header-col-center col-lg-6 col-xl-6 d-none d-lg-flex d-xl-flex">
                     <div class="main-navigation kapee-navigation">
                         <ul id="menu-mobile-menu" class="menu">
-                            @include('layouts.maroon.header-menu-items')
+                            @include('layouts.yellow.header-menu-items')
                         </ul>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                 <div class="header-col header-col-center col-lg-6 col-xl-6 d-none d-lg-flex d-xl-flex">
                     <div class="main-navigation kapee-navigation">
                         <ul id="menu-mobile-menu-1" class="menu">
-                            @include('layouts.maroon.header-menu-items')
+                            @include('layouts.yellow.header-menu-items')
                         </ul>
                     </div>
                 </div>
