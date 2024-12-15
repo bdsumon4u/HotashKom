@@ -101,7 +101,7 @@ class ProductController extends Controller
             }
 
             // Set the image_src property with a fallback placeholder
-            $category->image_src = asset($image->path ?? 'https://placehold.co/600x600?text=No+Product');
+            $category->image_src = asset($image->path ?? 'https://placehold.co/600x600?text='.$category->name);
 
             return $category;
         })->flatten();

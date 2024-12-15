@@ -37,7 +37,7 @@
                                                     vertical-align: middle;
                                                     display: inline-block
                                                 }
-                                            </style><a href="https://maroonedbd.com/product-category/bag_bari/mens-bag/">
+                                            </style><a href="{{route('products.index', ['filter_category' => $category->id])}}">
                                                 <img fetchpriority="high" decoding="async" width="1024" height="585"
                                                     alt="{{ $category->name }}"
                                                     data-srcset="{{ $category->image_src }} 1024w, {{ $category->image_src }} 300w, {{ $category->image_src }} 768w, {{ $category->image_src }} 1050w"
