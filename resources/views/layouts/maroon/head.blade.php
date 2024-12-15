@@ -10,13 +10,17 @@
             html.className = html.className.replace(/\bno-js\b/, 'js')
         })(document.documentElement);
     </script>
-    <title>Marooned – Clothing Brand</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <title>{{ $company->name }} - @yield('title')</title>
+    <link rel="icon" type="image/png" href="{{ asset($logo->favicon) }}"><!-- fonts -->
+    <!-- css -->
+    @include('googletagmanager::head')
+    <x-metapixel-head/>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Montserrat%7CRoboto%3A100%2C300%2C400%2C500%2C700%2C900%2C100italic%2C300italic%2C400italic%2C500italic%2C700italic%2C900italic%7CLato%3A100%2C300%2C400%2C700%2C900%2C100italic%2C300italic%2C400italic%2C700italic%2C900italic%7CLato%3A100%2C100i%2C300%2C300i%2C400%2C400i%2C700%2C700i%2C900%2C900i%7CRoboto%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CRoboto%20Slab%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&amp;subset=latin%2Clatin-ext&amp;display=swap">
     <meta name="robots" content="max-image-preview:large">
-    <link rel="shortcut icon" sizes="32x32" href=" /wp-content/uploads/2023/07/MAROONED-LOGO.png">
-    <link rel="apple-touch-icon" sizes="152x152"
-        href=" /wp-content/uploads/2023/07/MAROONED-LOGO.png">
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <meta name="theme-color" content="#2370F4">
@@ -621,9 +625,6 @@
         type="text/css" media="all">
     <link rel="stylesheet" id="kapee-ext-front-css"
         href="/wp-content/cache/busting/1/wp-content/plugins/kapee-extensions/assets/css/kapee-front-1.1.4.css"
-        type="text/css" media="all">
-    <link rel="stylesheet" id="rs-plugin-settings-css"
-        href="/wp-content/cache/busting/1/wp-content/plugins/revslider/public/assets/css/rs6-6.3.1.css"
         type="text/css" media="all">
     <style id="rs-plugin-settings-inline-css" type="text/css"></style>
     <style id="woocommerce-inline-inline-css" type="text/css">
@@ -2315,26 +2316,7 @@
     <script type="text/javascript"
         src="/wp-content/cache/busting/1/wp-content/plugins/woocommerce/assets/js/jquery-blockui/jquery.blockUI.min-2.7.0-wc.6.4.0.js"
         id="jquery-blockui-js"></script>
-    <script type="text/javascript" id="wc-add-to-cart-js-extra">
-        /* <![CDATA[ */
-        var wc_add_to_cart_params = {
-            "ajax_url": "\/wp-admin\/admin-ajax.php",
-            "wc_ajax_url": "\/?wc-ajax=%%endpoint%%",
-            "i18n_view_cart": "View cart",
-            "cart_url": "https:\/\/maroonedbd.com\/?page_id=18",
-            "is_cart": "",
-            "cart_redirect_after_add": "no"
-        }; /* ]]> */
-    </script>
-    <script type="text/javascript"
-        src="/wp-content/cache/busting/1/wp-content/plugins/woocommerce/assets/js/frontend/add-to-cart.min-6.4.0.js"
-        id="wc-add-to-cart-js"></script>
-    <script type="text/javascript"
-        src="/wp-content/cache/busting/1/wp-content/plugins/js_composer/assets/js/vendors/woocommerce-add-to-cart-6.4.2.js"
-        id="vc_woocommerce-add-to-cart-js-js"></script> <!--[if lt IE 9]>
-<script data-wpacu-script-handle='html5' type="text/javascript"
-    src="/wp-content/themes/kapee/assets/js/html5.js?ver=3.7.3" id="html5-js"></script>
-<![endif]-->
+    
     <script>
         document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
     </script>
@@ -3310,4 +3292,20 @@
         }
     </style>
     <style id="custom-advance-chaty-css"></style>
+    @stack('styles')
+    @livewireStyles
+    <script>
+        jQuery(document).ready(function() {
+            $('.block-slideshow .owl-carousel').owlCarousel({
+                items: 1,
+                nav: true,
+                dots: true,
+                loop: true,
+                autoplay: true,
+                autoplayTimeout: 3000,
+                autoplaySpeed: 500,
+                autoplayHoverPause: true,
+            });
+        });
+    </script>
 </head>

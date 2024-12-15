@@ -53,11 +53,12 @@ class ComposerServiceProvider extends ServiceProvider
             });
         }
 
-        View::composer(['layouts.yellow.master'], function ($view) {
+        View::composer(['layouts.yellow.master', 'layouts.maroon.master'], function ($view) {
             $view->with('categories', Category::nested(10));
         });
 
         $settingsPages = [
+            '*',
             'partials.header.*',
             'partials.footer',
             'products.show',
