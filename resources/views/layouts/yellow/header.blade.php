@@ -18,7 +18,7 @@
                 </div>
                 <div class="header-col header-col-right col-lg-3 col-xl-3 d-none d-lg-flex d-xl-flex">
                     <div class="kapee-ajax-search ajax-search-style-1 ajax-search-square">
-                        <form method="get" class="searchform" action="https://maroonedbd.com/"> <input
+                        <form method="get" class="searchform" action="/api/search-product"> <input
                                 type="search" class="search-field" name="s" value=""
                                 placeholder="Search for products, categories, brands, sku..." autocomplete="off">
                             <button type="submit" class="search-submit">Search</button>
@@ -51,7 +51,7 @@
                 <div class="header-col header-col-center col-lg-9 col-xl-9 d-none d-lg-flex d-xl-flex"></div>
                 <div class="header-col header-col-center col-12 d-flex d-lg-none d-xl-none">
                     <div class="kapee-ajax-search ajax-search-style-1 ajax-search-square">
-                        <form method="get" class="searchform" action="https://maroonedbd.com/"> <input
+                        <form method="get" class="searchform" action="/api/search-product"> <input
                                 type="search" class="search-field" name="s" value=""
                                 placeholder="Search for products, categories, brands, sku..." autocomplete="off">
                             <button type="submit" class="search-submit">Search</button>
@@ -87,7 +87,7 @@
                 </div>
                 <div class="header-col header-col-right col-lg-3 col-xl-3 d-none d-lg-flex d-xl-flex">
                     <div class="kapee-ajax-search ajax-search-style-1 ajax-search-square">
-                        <form method="get" class="searchform" action="https://maroonedbd.com/"> <input
+                        <form method="get" class="searchform" action="/api/search-product"> <input
                                 type="search" class="search-field" name="s" value=""
                                 placeholder="Search for products, categories, brands, sku..." autocomplete="off">
                             <button type="submit" class="search-submit">Search</button>
@@ -108,7 +108,7 @@
                 </div>
                 <div class="header-col header-col-center col-8 justify-content-center d-flex d-lg-none d-xl-none">
                     <div class="kapee-ajax-search ajax-search-style-1 ajax-search-square">
-                        <form method="get" class="searchform" action="https://maroonedbd.com/"> <input
+                        <form method="get" class="searchform" action="/api/search-product"> <input
                                 type="search" class="search-field" name="s" value=""
                                 placeholder="Search for products, categories, brands, sku..." autocomplete="off">
                             <button type="submit" class="search-submit">Search</button>

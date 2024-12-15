@@ -6,7 +6,9 @@ use App\Http\Controllers\Api\LivewireCheckoutController;
 use App\Http\Controllers\Api\MenuItemSortController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Models\Product;
 use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,4 +49,20 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function () {
     Route::post('pathao-webhook', [ApiController::class, 'pathaoWebhook']);
     Route::post('checkout', LivewireCheckoutController::class);
     Route::get('orders/{order}', [ApiController::class, 'order']);
+
+    Route::get('search-product', function (Request $request) {
+        $products = Product::whereIsActive(1)->whereNull('parent_id')->where('name', 'like', "%{$request->get('query')}%")
+            ->orWhere('name', 'like', "%{$request->search}%")
+            ->get();
+        return response()->json(['suggestions' => $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'img' => optional($product->base_image)->src,
+                'price' => '<span class=\"woocommerce-Price-amount amount\"><bdi><span class=\"woocommerce-Price-currencySymbol\">&#2547;&nbsp;</span>'.$product->selling_price.'</bdi></span>',
+                'type' => 'product',
+                'url' => route('products.show', $product->slug),
+                'value' => $product->name,
+            ];
+        })]);
+    });
 });

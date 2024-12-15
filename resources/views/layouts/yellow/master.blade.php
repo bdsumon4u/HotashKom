@@ -494,7 +494,7 @@
         /* <![CDATA[ */
         var kapee_options = {
             "rtl": "",
-            "ajax_url": "https:\/\/maroonedbd.com\/wp-admin\/admin-ajax.php",
+            "ajax_url": "/api/search-product",
             "0": "",
             "nonce": "2a8e95d9fb",
             "sticky_header": "1",
