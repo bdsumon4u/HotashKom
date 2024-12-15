@@ -96,8 +96,9 @@ class ProductController extends Controller
             if ($category->relationLoaded('image')) {
                 $image = $category->image;
             } else {
-                $images = $category->products->pluck('images')->filter();
-                $image = $images->isEmpty() ? null : $images->random()->first();
+                $image = null;
+                // $images = $category->products->pluck('images')->filter();
+                // $image = $images->isEmpty() ? null : $images->random()->first();
             }
 
             // Set the image_src property with a fallback placeholder
