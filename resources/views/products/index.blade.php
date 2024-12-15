@@ -3,6 +3,7 @@
 @section('title', 'Products')
 
 @section('content')
+    @if($categories->isNotEmpty())
     <article class="post- page type-page status-publish hentry">
         <div class="entry-content">
             <div data-elementor-type="wp-page" class="elementor elementor-">
@@ -62,6 +63,7 @@
             </div>
         </div>
     </article>
+    @else
     <div class="products product-style-1 row grid-view products-wrap grid-columns-4 ">
         @foreach($products as $product)
         <div
@@ -126,4 +128,5 @@
         </div>
         @endforeach
     </div>
+    @endif
 @endsection
