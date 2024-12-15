@@ -768,9 +768,7 @@
         .kapee-tour.tour-classic .nav-tabs .nav-link,.kapee-accordion[class*="accordion-icon-"] .card-title a:after,
         .woocommerce table.wishlist_table tr td.product-remove a:before,
         .slick-slider button.slick-arrow,
-        .owl-carousel .owl-nav button[class*="owl-"],
-        .owl-nav-arrow .owl-carousel .owl-nav button[class*="owl-"],
-        .owl-nav-arrow .owl-carousel .owl-nav button[class*="owl-"]:hover,
+        
         .mobile-menu-wrapper ul.mobile-main-menu li.menu-item-has-children>.menu-toggle {
             color: #555
         }
@@ -979,7 +977,7 @@
         .kapee-accordion.accordion-pills .card-header a:not(.collapsed),
         .kapee-accordion.accordion-pills .card-header a:not(.collapsed):after,
         .kapee-social.icons-theme-colour a:hover,
-        .owl-carousel .owl-nav button[class*="owl-"]:hover,
+        
         .slick-slider .slick-arrow:hover,
         .kapee-button .btn-style-outline.btn-color-primary:hover,
         .mobile-menu-header a,
@@ -1056,8 +1054,7 @@
         .kapee-tour.tour-pills .nav-tabs .nav-link.active,
         .kapee-accordion.accordion-pills .card-header a:not(.collapsed),
         .kapee-social.icons-theme-colour a:hover,
-        .owl-carousel .owl-nav button[class*="owl-"]:hover,
-        .owl-carousel .owl-dots .owl-dot.active span,
+        
         .slick-slider .slick-arrow:hover,
         .kapee-button .btn-style-flat.btn-color-primary,
         .kapee-button .btn-style-outline.btn-color-primary:hover,
@@ -1111,7 +1108,7 @@
         .kapee-tour.tour-classic .nav-tabs .nav-link.active,
         .kapee-tour.tour-classic .nav-tabs+.tab-content .tab-pane,
         .slick-slider button.slick-arrow,
-        .owl-carousel .owl-nav button[class*="owl-"],
+        
         .kapee-canvas-sidebar,
         .mobile-menu-wrapper,
         .kapee-mobile-navbar {
@@ -1134,9 +1131,7 @@
         }
 
         .woocommerce .widget_price_filter .price_slider_wrapper .ui-widget-content,
-        .owl-carousel .owl-dots .owl-dot span {
-            background-color: #e9e9e9
-        }
+        
 
         .portfolio-post-loop .post-thumbnail:after {
             background-color: rgba(0, 0, 0, .4)
