@@ -3,7 +3,7 @@
 
 @include('layouts.maroon.head')
 
-<body class="header-fixed" style="margin: 0; padding: 0;">
+<body class="header-fixed has-mobile-bottom-navbar" style="margin: 0; padding: 0;">
     @include('googletagmanager::body')
     <x-metapixel-body />
 

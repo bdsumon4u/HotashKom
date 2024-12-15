@@ -8,9 +8,9 @@
                             <h5 class="footer-contacts__title">{{ $company->name ?? '' }}</h5>
                             <div class="footer-contacts__text">{{ $company->tagline ?? '' }}</div>
                             <ul class="footer-contacts__contacts">
-                                <li><i class="footer-contacts__icon fas fa-globe-americas"></i> {{ $company->address ?? '' }}</li>
-                                <li><i class="footer-contacts__icon far fa-envelope"></i> {{ $company->email ?? '' }}</li>
-                                <li><i class="footer-contacts__icon fas fa-mobile-alt"></i> {{ $company->phone ?? '' }}</li>
+                                <li><i class="footer-contacts__icon fa fas fa-globe"></i> {{ $company->address ?? '' }}</li>
+                                <li><i class="footer-contacts__icon fa far fa-envelope"></i> {{ $company->email ?? '' }}</li>
+                                <li><i class="footer-contacts__icon fa fas fa-phone"></i> {{ $company->phone ?? '' }}</li>
                             </ul>
                         </div>
                     </div>
@@ -35,12 +35,12 @@
                             <ul class="footer-newsletter__social-links">
                                 <li class="footer-newsletter__social-link footer-newsletter__social-link--phone">
                                     <a href="tel:{{$company->phone}}" target="_blank" class="bg-primary">
-                                        <i class="fas fa-phone"></i>
+                                        <i class="fa fas fa-phone"></i>
                                     </a>
                                 </li>
                                 <li class="footer-newsletter__social-link footer-newsletter__social-link--phone">
                                     <a href="mailto:{{$company->email}}" target="_blank" class="bg-secondary">
-                                        <i class="fas fa-envelope"></i>
+                                        <i class="fa fas fa-envelope"></i>
                                     </a>
                                 </li>
                                 @foreach($social ?? [] as $item => $data)
@@ -49,16 +49,16 @@
                                         <a href="{{ url($link ?? '#') }}" target="_blank">
                                             @switch($item)
                                                 @case('facebook')
-                                                <i class="fab fa-facebook-f"></i>
+                                                <i class="fa fab fa-facebook-f"></i>
                                                 @break
                                                 @case('twitter')
-                                                <i class="fab fa-twitter"></i>
+                                                <i class="fa fab fa-twitter"></i>
                                                 @break
                                                 @case('instagram')
-                                                <i class="fab fa-instagram"></i>
+                                                <i class="fa fab fa-instagram"></i>
                                                 @break
                                                 @case('youtube')
-                                                <i class="fab fa-youtube"></i>
+                                                <i class="fa fab fa-youtube"></i>
                                                 @break
                                             @endswitch
                                         </a>
