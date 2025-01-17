@@ -136,14 +136,12 @@ class OrderController extends Controller
 
                 return $products;
             })
-            ->groupBy('id')->map(function ($item) {
-                return [
-                    'name' => $item->random()['name'],
-                    'slug' => $item->random()['slug'],
-                    'quantity' => $item->sum('quantity'),
-                    'total' => $item->sum('total'),
-                ];
-            })->sortByDesc('quantity')->toArray();
+            ->groupBy('id')->map(fn($item) => [
+                'name' => $item->random()['name'],
+                'slug' => $item->random()['slug'],
+                'quantity' => $item->sum('quantity'),
+                'total' => $item->sum('total'),
+            ])->sortByDesc('quantity')->toArray();
 
         return view('admin.orders.filter', [
             'start' => $start,
@@ -214,16 +212,14 @@ class OrderController extends Controller
         if (! (($SteadFast = setting('SteadFast'))->enabled ?? false)) {
             return 0;
         }
-        $orders = Order::whereIn('id', $order_ids)->where('data->courier', 'SteadFast')->get()->map(function ($order) {
-            return [
-                'invoice' => $order->id,
-                'recipient_name' => $order->name ?? 'N/A',
-                'recipient_address' => $order->address ?? 'N/A',
-                'recipient_phone' => $order->phone ?? '',
-                'cod_amount' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0),
-                'note' => $order->note,
-            ];
-        })->toJson();
+        $orders = Order::whereIn('id', $order_ids)->where('data->courier', 'SteadFast')->get()->map(fn($order) => [
+            'invoice' => $order->id,
+            'recipient_name' => $order->name ?? 'N/A',
+            'recipient_address' => $order->address ?? 'N/A',
+            'recipient_phone' => $order->phone ?? '',
+            'cod_amount' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0),
+            'note' => $order->note,
+        ])->toJson();
 
         $response = Http::withHeaders([
             'Api-Key' => $SteadFast->key,
@@ -335,9 +331,7 @@ class OrderController extends Controller
     {
         $quantities = $request->quantity;
         $productIDs = collect($order->products)
-            ->map(function ($product) {
-                return $product->id;
-            });
+            ->map(fn($product) => $product->id);
         $products = Product::find($productIDs)
             ->map(function (Product $product) use ($quantities) {
                 if ($quantity = data_get($quantities, $product->id)) {
@@ -393,14 +387,14 @@ class OrderController extends Controller
             return null;
         }, $products);
 
-        DB::transaction(function () use ($order) {
+        DB::transaction(function () use ($order): void {
             $phone = $order->phone;
             $order->delete();
 
             // update data.is_fraud, data.is_repeat for other orders
             $orders = Order::where('phone', $phone)->get();
             // is_fraud
-            $orders->each(function ($order) use ($orders) {
+            $orders->each(function ($order) use ($orders): void {
                 // where order_id is less than $order->id and status is CANCELLED or RETURNED
                 $order->update([
                     'data' => [
@@ -411,7 +405,7 @@ class OrderController extends Controller
             });
         });
 
-        return request()->expectsJson() ? true : redirect(action([self::class, 'index']))
+        return request()->expectsJson() ? true : redirect(action(self::index(...)))
             ->with('success', 'Order Has Been Deleted.');
     }
 }

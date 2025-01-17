@@ -48,14 +48,12 @@ class HomeController extends Controller
 
                 return $products;
             })
-            ->groupBy('id')->mapWithKeys(function ($item, $id) {
-                return [$id => [
-                    'name' => $item->random()['name'],
-                    'slug' => $item->random()['slug'],
-                    'quantity' => $item->sum('quantity'),
-                    'total' => $item->sum('total'),
-                ]];
-            })->sortByDesc('quantity')->toArray();
+            ->groupBy('id')->mapWithKeys(fn($item, $id) => [$id => [
+                'name' => $item->random()['name'],
+                'slug' => $item->random()['slug'],
+                'quantity' => $item->sum('quantity'),
+                'total' => $item->sum('total'),
+            ]])->sortByDesc('quantity')->toArray();
 
         $data = (clone $orderQ)
             ->selectRaw($totalSQL)

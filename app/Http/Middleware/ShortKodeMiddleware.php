@@ -29,7 +29,7 @@ class ShortKodeMiddleware
         ];
 
         foreach ($stack as $code => $view) {
-            if (strpos($content, $code) != false) {
+            if (str_contains((string) $content, $code)) {
                 $content = str_replace($code, View::make($view), $content);
             }
         }

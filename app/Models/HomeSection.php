@@ -19,7 +19,7 @@ class HomeSection extends Model
 
     public static function booted()
     {
-        static::deleted(function () {
+        static::deleted(function (): void {
             cache()->forget('homesections');
         });
     }
@@ -40,18 +40,18 @@ class HomeSection extends Model
         }
         $query = Product::whereIsActive(1)->whereNull('parent_id');
         if ($category) {
-            $query->whereHas('categories', function ($query) use ($category) {
+            $query->whereHas('categories', function ($query) use ($category): void {
                 $query->where('categories.id', $category);
             });
         } else if (($this->data->source ?? false) == 'specific') {
-            $query->whereHas('categories', function ($query) {
+            $query->whereHas('categories', function ($query): void {
                 $query->whereIn('categories.id', $this->categories->pluck('id')->toArray());
             })
                 ->orWhereIn('id', $ids);
         }
         $query
             // ->inRandomOrder()
-            ->when(! $paginate, function ($query) use ($rows, $cols) {
+            ->when(! $paginate, function ($query) use ($rows, $cols): void {
                 $query->take($rows * $cols);
             });
         if ($ids) {

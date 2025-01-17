@@ -48,18 +48,14 @@ class Product extends Model
      */
     protected static function booted()
     {
-        static::saved(function ($product) {
+        static::saved(function ($product): void {
             if (App::runningInConsole()) {
                 if ($product->categories->isEmpty() || $product->images->isEmpty()) {
                     $categories = range(1, 30);
-                    $categories = array_map(function ($key) use ($categories) {
-                        return $categories[$key];
-                    }, array_rand($categories, mt_rand(2, 4)));
+                    $categories = array_map(fn($key) => $categories[$key], array_rand($categories, mt_rand(2, 4)));
 
                     $additionals = range(47, 67);
-                    $additionals = array_map(function ($key) use ($additionals) {
-                        return $additionals[$key];
-                    }, array_rand($additionals, mt_rand(4, 7)));
+                    $additionals = array_map(fn($key) => $additionals[$key], array_rand($additionals, mt_rand(4, 7)));
 
                     ProductCreated::dispatch($product, [
                         'categories' => $categories,
@@ -70,11 +66,11 @@ class Product extends Model
             }
         });
 
-        static::deleting(function ($product) {
+        static::deleting(function ($product): void {
             $product->variations->each->delete();
         });
 
-        static::addGlobalScope('latest', function (Builder $builder) {
+        static::addGlobalScope('latest', function (Builder $builder): void {
             $builder->latest('products.created_at');
         });
     }
@@ -167,7 +163,7 @@ class Product extends Model
 
     public function getWholesaleAttribute($value)
     {
-        $data = json_decode($value, true) ?? [];
+        $data = json_decode((string) $value, true) ?? [];
         if (empty($data) && $this->parent_id) {
             return $this->parent->wholesale;
         }
@@ -199,9 +195,7 @@ class Product extends Model
             $images = $this->parent->images ?? collect();
         }
 
-        return $images->first(function (Image $image) {
-            return $image->pivot->img_type == 'base';
-        });
+        return $images->first(fn(Image $image) => $image->pivot->img_type == 'base');
     }
 
     public function getAdditionalImagesAttribute()
@@ -211,9 +205,7 @@ class Product extends Model
             $images = $this->parent->images ?? collect();
         }
 
-        return $images->filter(function (Image $image) {
-            return $image->pivot->img_type == 'additional';
-        });
+        return $images->filter(fn(Image $image) => $image->pivot->img_type == 'additional');
     }
 
     /**

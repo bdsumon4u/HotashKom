@@ -29,7 +29,7 @@ class ComposerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        View::composer('*', function ($view) {
+        View::composer('*', function ($view): void {
             $parameters = optional(Route::current())
                 ->parameters();
             foreach ($parameters ?: [] as $key => $value) {
@@ -46,14 +46,12 @@ class ComposerServiceProvider extends ServiceProvider
         ];
 
         foreach ($menus as $slug => $view) {
-            View::composer("partials.{$view}", function ($view) use ($slug) {
-                $view->withMenuItems(cache()->rememberForever('menus:'.$slug, function () use ($slug) {
-                    return optional(Menu::whereSlug($slug)->first())->menuItems ?: new Collection;
-                }));
+            View::composer("partials.{$view}", function ($view) use ($slug): void {
+                $view->withMenuItems(cache()->rememberForever('menus:'.$slug, fn() => optional(Menu::whereSlug($slug)->first())->menuItems ?: new Collection));
             });
         }
 
-        View::composer(['layouts.yellow.master'], function ($view) {
+        View::composer(['layouts.yellow.master'], function ($view): void {
             $view->with('categories', Category::nested(10));
         });
 
@@ -69,7 +67,7 @@ class ComposerServiceProvider extends ServiceProvider
             'layouts.yellow.master',
             'layouts.errors.master',
         ];
-        View::composer($settingsPages, function ($view) {
+        View::composer($settingsPages, function ($view): void {
             $view->with(Setting::array());
         });
     }

@@ -20,71 +20,13 @@ class ApiController extends Controller
 {
     public function menus()
     {
-        return cache()->remember('menus', now()->addMinute(), function () {
-            return Menu::all()->mapWithKeys(fn ($menu) => [$menu->slug => $menu->menuItems]);
-        });
+        return cache()->remember('menus', now()->addMinute(), fn() => Menu::all()->mapWithKeys(fn ($menu) => [$menu->slug => $menu->menuItems]));
     }
 
     public function searchSuggestions(Request $request)
     {
         return Product::search($request->get('query'), fn ($query) => $query->whereNull('parent_id')->whereIsActive(1))
-            ->take($request->get('limit'))->get()->transform(function ($product) {
-                return array_merge($product->toArray(), [
-                    'images' => $product->images->pluck('src')->toArray(),
-                    'price' => $product->selling_price,
-                    'compareAtPrice' => $product->price,
-                    'badges' => [],
-                    'brand' => [],
-                    'categories' => [],
-                    'reviews' => 0,
-                    'rating' => 0,
-                    'attributes' => [],
-                    'availability' => $product->should_track ? $product->stock_count : 'In Stock',
-                ]);
-            });
-    }
-
-    public function page(Page $page)
-    {
-        return $page->toArray();
-    }
-
-    public function slides()
-    {
-        return slides()->transform(function ($slide) {
-            return $slide->only(['title', 'text', 'btn_name', 'btn_href']) + [
-                'imageClassic' => [
-                    'ltr' => asset($slide->desktop_src),
-                    'rtl' => asset($slide->desktop_src),
-                ],
-                'imageFull' => [
-                    'ltr' => asset($slide->desktop_src),
-                    'rtl' => asset($slide->desktop_src),
-                ],
-                'imageMobile' => [
-                    'ltr' => asset($slide->mobile_src),
-                    'rtl' => asset($slide->mobile_src),
-                ],
-            ];
-        });
-    }
-
-    public function sections(Request $request)
-    {
-        return sections()->transform(function ($section) {
-            return array_merge($section->toArray(), [
-                'categories' => $section->categories->map(function ($category) use ($section) {
-                    return array_merge($category->toArray(), [
-                        'sectionId' => $section->id,
-                    ]);
-                })->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => $section->type == 'pure-grid' ? 'View All' : 'All']),
-            ]);
-        });
-    }
-
-    public function sectionProducts(Request $request, HomeSection $section) {
-        return $section->products(category: $request->category)->transform(function ($product) {
-            return array_merge($product->toArray(), [
+            ->take($request->get('limit'))->get()->transform(fn($product) => array_merge($product->toArray(), [
                 'images' => $product->images->pluck('src')->toArray(),
                 'price' => $product->selling_price,
                 'compareAtPrice' => $product->price,
@@ -95,13 +37,59 @@ class ApiController extends Controller
                 'rating' => 0,
                 'attributes' => [],
                 'availability' => $product->should_track ? $product->stock_count : 'In Stock',
-            ]);
-        });
+            ]));
+    }
+
+    public function page(Page $page)
+    {
+        return $page->toArray();
+    }
+
+    public function slides()
+    {
+        return slides()->transform(fn($slide) => $slide->only(['title', 'text', 'btn_name', 'btn_href']) + [
+            'imageClassic' => [
+                'ltr' => asset($slide->desktop_src),
+                'rtl' => asset($slide->desktop_src),
+            ],
+            'imageFull' => [
+                'ltr' => asset($slide->desktop_src),
+                'rtl' => asset($slide->desktop_src),
+            ],
+            'imageMobile' => [
+                'ltr' => asset($slide->mobile_src),
+                'rtl' => asset($slide->mobile_src),
+            ],
+        ]);
+    }
+
+    public function sections(Request $request)
+    {
+        return sections()->transform(fn($section) => array_merge($section->toArray(), [
+            'categories' => $section->categories->map(fn($category) => array_merge($category->toArray(), [
+                'sectionId' => $section->id,
+            ]))->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => $section->type == 'pure-grid' ? 'View All' : 'All']),
+        ]));
+    }
+
+    public function sectionProducts(Request $request, HomeSection $section) {
+        return $section->products(category: $request->category)->transform(fn($product) => array_merge($product->toArray(), [
+            'images' => $product->images->pluck('src')->toArray(),
+            'price' => $product->selling_price,
+            'compareAtPrice' => $product->price,
+            'badges' => [],
+            'brand' => [],
+            'categories' => [],
+            'reviews' => 0,
+            'rating' => 0,
+            'attributes' => [],
+            'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+        ]));
     }
 
     public function product(Request $request, $slug)
     {
-        $product = Product::where('slug', rawurldecode($slug))->firstOrFail();
+        $product = Product::where('slug', rawurldecode((string) $slug))->firstOrFail();
 
         if ($product->parent_id) {
             $product = $product->parent;
@@ -110,9 +98,7 @@ class ApiController extends Controller
         $showBrandCategory = false;
         if ($product->variations->isNotEmpty()) {
             if ($request->options) {
-                $selectedVar = $product->variations->first(function ($item) use ($request) {
-                    return $item->options->pluck('id')->diff($request->options)->isEmpty();
-                });
+                $selectedVar = $product->variations->first(fn($item) => $item->options->pluck('id')->diff($request->options)->isEmpty());
             } else {
                 $selectedVar = $product->variations->where('slug', request()->segment(2))->first()
                     ?? $product->variations->random();
@@ -156,9 +142,7 @@ class ApiController extends Controller
 
     public function updatedOptions($value, $key)
     {
-        $variation = $this->product->variations->first(function ($item) {
-            return $item->options->pluck('id')->diff($this->options)->isEmpty();
-        });
+        $variation = $this->product->variations->first(fn($item) => $item->options->pluck('id')->diff($this->options)->isEmpty());
 
         if ($variation) {
             $this->selectedVar = $variation;
@@ -189,31 +173,29 @@ class ApiController extends Controller
 
     public function relatedProducts(Request $request, $slug)
     {
-        $product = Product::where('slug', rawurldecode($slug))->firstOrFail();
+        $product = Product::where('slug', rawurldecode((string) $slug))->firstOrFail();
 
         $categories = $product->categories->pluck('id')->toArray();
         return Product::whereIsActive(1)
-            ->whereHas('categories', function ($query) use ($categories) {
+            ->whereHas('categories', function ($query) use ($categories): void {
                 $query->whereIn('categories.id', $categories);
             })
             ->whereNull('parent_id')
             ->where('id', '!=', $product->id)
             ->limit(config('services.products_count.related', 20))
             ->get()
-            ->transform(function ($product) {
-                return array_merge($product->toArray(), [
-                    'images' => $product->images->pluck('src')->toArray(),
-                    'price' => $product->selling_price,
-                    'compareAtPrice' => $product->price,
-                    'badges' => [],
-                    'brand' => [],
-                    'categories' => [],
-                    'reviews' => 0,
-                    'rating' => 0,
-                    'attributes' => [],
-                    'availability' => $product->should_track ? $product->stock_count : 'In Stock',
-                ]);
-            });
+            ->transform(fn($product) => array_merge($product->toArray(), [
+                'images' => $product->images->pluck('src')->toArray(),
+                'price' => $product->selling_price,
+                'compareAtPrice' => $product->price,
+                'badges' => [],
+                'brand' => [],
+                'categories' => [],
+                'reviews' => 0,
+                'rating' => 0,
+                'attributes' => [],
+                'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+            ]));
     }
 
     public function areas($city_id)
@@ -228,17 +210,15 @@ class ApiController extends Controller
         }
 
         return Category::all()
-            ->transform(function ($category) {
-                return $category->toArray() + [
-                    'type' => 'shop',
-                ];
-            })
+            ->transform(fn($category) => $category->toArray() + [
+                'type' => 'shop',
+            ])
             ->toJson();
     }
 
     public function category($slug)
     {
-        return Category::where('slug', rawurldecode($slug))->firstOrFail()->toArray();
+        return Category::where('slug', rawurldecode((string) $slug))->firstOrFail()->toArray();
     }
 
     public function products($search)
@@ -269,7 +249,7 @@ class ApiController extends Controller
 
     public function pendingCount(Admin $admin)
     {
-        return Order::where('status', 'PENDING')->when($admin->role_id == Admin::SALESMAN, function ($query) use (&$admin) {
+        return Order::where('status', 'PENDING')->when($admin->role_id == Admin::SALESMAN, function ($query) use (&$admin): void {
             $query->where('admin_id', $admin->id);
         })->count();
     }

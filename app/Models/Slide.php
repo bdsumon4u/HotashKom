@@ -12,11 +12,11 @@ class Slide extends Model
 
     public static function booted()
     {
-        static::saved(function ($menu) {
+        static::saved(function ($menu): void {
             cache()->put('slides', static::whereIsActive(1)->get());
         });
 
-        static::deleted(function () {
+        static::deleted(function (): void {
             cache()->forget('slides');
         });
     }

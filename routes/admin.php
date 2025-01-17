@@ -25,9 +25,9 @@ use Hotash\LaravelMultiUi\Facades\MultiUi;
 use Illuminate\Support\Facades\Route;
 
 // Controller Level Namespace
-Route::group(['as' => 'admin.'], function () {
+Route::group(['as' => 'admin.'], function (): void {
 
-    Route::namespace('App\\Http\\Controllers\\Admin')->group(function () {
+    Route::namespace('App\\Http\\Controllers\\Admin')->group(function (): void {
         // Admin Level Namespace & No Prefix
         MultiUi::routes([
             'register' => false,
@@ -49,7 +49,7 @@ Route::group(['as' => 'admin.'], function () {
     // Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
 
     Route::redirect('/admin', '/admin/dashboard', 301); // Permanent Redirect
-    Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function () {
+    Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function (): void {
         // Admin Level Namespace & 'admin' Prefix
         Route::get('/dashboard', [HomeController::class, 'index'])->name('home');
         Route::match(['get', 'post'], '/profile', ChangePasswordController::class)

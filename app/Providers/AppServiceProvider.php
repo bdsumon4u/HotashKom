@@ -42,19 +42,15 @@ class AppServiceProvider extends ServiceProvider
 
         Builder::macro(
             'withWhereHas',
-            function ($relation, $constraint) {
-                return $this
-                    ->whereHas($relation, $constraint)
-                    ->with([$relation => $constraint]);
-            }
+            fn($relation, $constraint) => $this
+                ->whereHas($relation, $constraint)
+                ->with([$relation => $constraint])
         );
 
-        $this->app->bind('pathao', function () {
-            return new \App\Pathao\Manage\Manage(
-                new \App\Pathao\Apis\AreaApi,
-                new \App\Pathao\Apis\StoreApi,
-                new \App\Pathao\Apis\OrderApi
-            );
-        });
+        $this->app->bind('pathao', fn() => new \App\Pathao\Manage\Manage(
+            new \App\Pathao\Apis\AreaApi,
+            new \App\Pathao\Apis\StoreApi,
+            new \App\Pathao\Apis\OrderApi
+        ));
     }
 }

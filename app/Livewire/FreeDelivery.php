@@ -30,7 +30,7 @@ class FreeDelivery extends Component
         $this->min_amount = $freeDelivery->min_amount ?? 1;
 
         $products = ((array) ($freeDelivery->products ?? [])) ?? [];
-        Product::find(array_keys($products))->each(function ($product) use ($products) {
+        Product::find(array_keys($products))->each(function ($product) use ($products): void {
             $this->addProduct($product, $products[$product->id], true);
         });
         $this->delivery_charge = json_decode(json_encode($deliveryCharge), true);
@@ -74,7 +74,7 @@ class FreeDelivery extends Component
     public function render()
     {
         $products = collect();
-        if (strlen($this->search) > 2) {
+        if (strlen((string) $this->search) > 2) {
             $products = Product::where(fn ($q) => $q->where('name', 'like', "%$this->search%")->orWhere('sku', $this->search))
                 ->whereNotIn('id', array_keys($this->selectedProducts))
                 ->whereNull('parent_id')

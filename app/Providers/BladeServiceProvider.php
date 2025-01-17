@@ -24,30 +24,19 @@ class BladeServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Blade::directive('exp', function ($expression) {
-            return "<?php $expression ?>";
-        });
+        Blade::directive('exp', fn($expression) => "<?php $expression ?>");
 
         foreach (['title', 'content'] as $layout) {
-            Blade::directive($layout, function ($expression) use ($layout) {
-                return "<?php \$__env->startSection('{$layout}', {$expression}); ?>";
-            });
-            Blade::directive("end{$layout}", function () {
-                return '<?php $__env->stopSection(); ?>';
-            });
+            Blade::directive($layout, fn($expression) => "<?php \$__env->startSection('{$layout}', {$expression}); ?>");
+            Blade::directive("end{$layout}", fn() => '<?php $__env->stopSection(); ?>');
         }
 
         foreach (['title', 'content'] as $layout) {
-            Blade::directive($layout, function ($expression) use ($layout) {
-                return "<?php \$__env->startSection('{$layout}', {$expression}); ?>";
-            });
-            Blade::directive("end{$layout}", function () {
-                return '<?php $__env->stopSection(); ?>';
-            });
+            Blade::directive($layout, fn($expression) => "<?php \$__env->startSection('{$layout}', {$expression}); ?>");
+            Blade::directive("end{$layout}", fn() => '<?php $__env->stopSection(); ?>');
         }
 
-        Blade::directive('errors', function () {
-            return '<?php if ($errors->any()): ?>
+        Blade::directive('errors', fn() => '<?php if ($errors->any()): ?>
                 <div class="alert alert-danger" role="alert">
                     <ul>
                         <?php foreach($errors->all() as $error): ?>
@@ -55,7 +44,6 @@ class BladeServiceProvider extends ServiceProvider
                         <?php endforeach ?>
                     </ul>
                 </div>
-            <?php endif ?>';
-        });
+            <?php endif ?>');
     }
 }

@@ -41,11 +41,11 @@ class ProductVariationController extends Controller
         $attributes = collect($request->get('attributes'));
         $options = Option::find($attributes->flatten());
 
-        DB::transaction(function () use ($attributes, $product, $options) {
+        DB::transaction(function () use ($attributes, $product, $options): void {
             $product->variations()->delete();
             $variations = collect($attributes->first())->crossJoin(...$attributes->splice(1));
 
-            $variations->each(function ($items, $i) use ($product, $options) {
+            $variations->each(function ($items, $i) use ($product, $options): void {
                 $name = $options->filter(fn ($item) => in_array($item->id, $items))->pluck('name')->join('-');
                 $sku = $product->sku.'('.implode('-', $items).')';
                 $slug = $product->slug.'('.implode('-', $items).')';

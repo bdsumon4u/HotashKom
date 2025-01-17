@@ -19,7 +19,7 @@ class ProductRequest extends FormRequest
     public function prepareForValidation()
     {
         $sku = $this->get('sku');
-        $this->merge(['sku' => strtoupper($sku)]);
+        $this->merge(['sku' => strtoupper((string) $sku)]);
     }
 
     /**

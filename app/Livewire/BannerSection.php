@@ -10,7 +10,7 @@ class BannerSection extends Component
 {
     public Collection $categories;
 
-    public ?HomeSection $section;
+    public ?HomeSection $section = null;
 
     public array $columns = [];
 

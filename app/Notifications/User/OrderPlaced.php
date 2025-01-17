@@ -12,16 +12,13 @@ class OrderPlaced extends Notification
 {
     use Queueable;
 
-    public $order;
-
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($order)
+    public function __construct(public $order)
     {
-        $this->order = $order;
     }
 
     /**
@@ -55,9 +52,7 @@ class OrderPlaced extends Notification
      */
     public function toArray($notifiable)
     {
-        $code = Cache::remember('order:confirm:'.$this->order->id, 5 * 60, function () {
-            return mt_rand(1000, 999999);
-        });
+        $code = Cache::remember('order:confirm:'.$this->order->id, 5 * 60, fn() => mt_rand(1000, 999999));
 
         return [
             'msg' => 'Thanks for shopping. Your order ID is '.$this->order->id.'. Login: '.url('auth'),

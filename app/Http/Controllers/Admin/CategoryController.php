@@ -48,7 +48,7 @@ class CategoryController extends Controller
             ]);
 
             collect($data['categories'])
-                ->each(function ($data) {
+                ->each(function ($data): void {
                     Category::find($data['id'])->update($data);
                 });
 
@@ -120,7 +120,7 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
-        DB::transaction(function () use ($category) {
+        DB::transaction(function () use ($category): void {
             $category->childrens()->delete();
             $category->delete();
         });

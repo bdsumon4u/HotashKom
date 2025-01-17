@@ -146,7 +146,7 @@ class ReportController extends Controller
         $type = $request->get('date_type', 'status_at');
         $top = $request->get('top_by', 'order_amount');
 
-        $query = User::withWhereHas('orders', function ($query) use ($type, $_start, $_end) {
+        $query = User::withWhereHas('orders', function ($query) use ($type, $_start, $_end): void {
             $query->where('status', 'COMPLETED')
                 ->whereBetween($type, [
                     $_start->startOfDay()->toDateTimeString(),

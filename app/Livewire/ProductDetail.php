@@ -22,9 +22,7 @@ class ProductDetail extends Component
 
     public function updatedOptions($value, $key)
     {
-        $variation = $this->product->variations->first(function ($item) {
-            return $item->options->pluck('id')->diff($this->options)->isEmpty();
-        });
+        $variation = $this->product->variations->first(fn($item) => $item->options->pluck('id')->diff($this->options)->isEmpty());
 
         if ($variation) {
             $this->selectedVar = $variation;

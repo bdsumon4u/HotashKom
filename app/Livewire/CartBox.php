@@ -15,9 +15,7 @@ class CartBox extends Component
     public function refresh()
     {
         $this->cart = session()->get('cart', []);
-        $this->subtotal = collect($this->cart)->sum(function ($item) {
-            return $item['price'] * $item['quantity'];
-        });
+        $this->subtotal = collect($this->cart)->sum(fn($item) => $item['price'] * $item['quantity']);
     }
 
     public function mount()
@@ -53,9 +51,7 @@ class CartBox extends Component
 
     public function updatedCart()
     {
-        $this->subtotal = collect($this->cart)->sum(function ($item) {
-            return $item['price'] * $item['quantity'];
-        });
+        $this->subtotal = collect($this->cart)->sum(fn($item) => $item['price'] * $item['quantity']);
 
         $this->dispatch('cartBoxUpdated');
     }

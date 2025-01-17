@@ -72,13 +72,11 @@ class EditOrder extends Component
 
     public function getCourierReportProperty()
     {
-        return cache()->remember('courier:'.($this->order->phone ?? ''), now()->addDay(), function () {
-            return Http::withToken(config('services.courier_report.key'))
-                ->post(config('services.courier_report.url'), [
-                    'phone' => $this->order->phone ?? '',
-                ])
-                ->json();
-        });
+        return cache()->remember('courier:'.($this->order->phone ?? ''), now()->addDay(), fn() => Http::withToken(config('services.courier_report.key'))
+            ->post(config('services.courier_report.url'), [
+                'phone' => $this->order->phone ?? '',
+            ])
+            ->json());
     }
 
     protected function prepareForValidation($attributes): array
@@ -253,7 +251,7 @@ class EditOrder extends Component
     public function render()
     {
         $products = collect();
-        if (strlen($this->search) > 2) {
+        if (strlen((string) $this->search) > 2) {
             $products = Product::with('variations.options')
                 ->whereNotIn('id', array_keys($this->selectedProducts))
                 ->where(fn ($q) => $q->where('name', 'like', "%$this->search%")->orWhere('sku', $this->search))

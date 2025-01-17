@@ -8,26 +8,8 @@ use App\Pathao\Apis\StoreApi;
 
 class Manage
 {
-    /**
-     * @var AreaApi
-     */
-    private $area;
-
-    /**
-     * @var StoreApi
-     */
-    private $store;
-
-    /**
-     * @var OrderApi
-     */
-    private $order;
-
-    public function __construct(AreaApi $areaApi, StoreApi $storeApi, OrderApi $orderApi)
+    public function __construct(private readonly AreaApi $area, private readonly StoreApi $store, private readonly OrderApi $order)
     {
-        $this->area = $areaApi;
-        $this->store = $storeApi;
-        $this->order = $orderApi;
     }
 
     public function area(): AreaApi

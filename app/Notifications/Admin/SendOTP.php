@@ -14,16 +14,13 @@ class SendOTP extends Notification
 {
     use Queueable;
 
-    public $otp;
-
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($otp)
+    public function __construct(public $otp)
     {
-        $this->otp = $otp;
     }
 
     /**

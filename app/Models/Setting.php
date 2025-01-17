@@ -14,7 +14,7 @@ class Setting extends Model
 
     public static function booted()
     {
-        static::saved(function ($setting) {
+        static::saved(function ($setting): void {
             Cache::put('settings:'.$setting->name, $setting);
             Cache::forget('settings');
         });
@@ -22,17 +22,13 @@ class Setting extends Model
 
     public static function array()
     {
-        return Cache::rememberForever('settings', function () {
-            return self::all()->flatMap(function ($setting) {
-                return [$setting->name => $setting->value];
-            })->toArray();
-        });
+        return Cache::rememberForever('settings', fn() => self::all()->flatMap(fn($setting) => [$setting->name => $setting->value])->toArray());
     }
 
     public function value(): Attribute
     {
         return Attribute::make(
-            fn ($value) => json_decode($value),
+            fn ($value) => json_decode((string) $value),
             fn ($value) => $this->attributes['value'] = json_encode(
                 is_array($value) ? array_merge((array) $this->value, $value) : $value
             ),

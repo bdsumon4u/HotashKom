@@ -12,20 +12,18 @@ class Brand extends Model
 
     public static function booted()
     {
-        static::saved(function () {
+        static::saved(function (): void {
             cache()->forget('brands');
         });
 
-        static::deleting(function () {
+        static::deleting(function (): void {
             cache()->forget('brands');
         });
     }
 
     public static function cached()
     {
-        return cache()->rememberForever('brands', function () {
-            return Brand::all();
-        });
+        return cache()->rememberForever('brands', fn() => Brand::all());
     }
 
     public function image()

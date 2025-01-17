@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function () {
+Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): void {
     Route::get('products', ProductController::class)->name('products');
     Route::get('images', [ImageController::class, 'index'])->name('images.index');
     Route::get('images/single', [ImageController::class, 'single'])->name('images.single');

@@ -32,15 +32,13 @@ class CategoryProductController extends Controller
             'ecommerce' => [
                 'item_list_id' => $category->id,
                 'item_list_name' => $category->name,
-                'items' => $products->map(function ($product) {
-                    return [
-                        'item_id' => $product->id,
-                        'item_name' => $product->name,
-                        'price' => $product->selling_price,
-                        'item_category' => $product->category,
-                        'quantity' => 1,
-                    ];
-                })->toArray(),
+                'items' => $products->map(fn($product) => [
+                    'item_id' => $product->id,
+                    'item_name' => $product->name,
+                    'price' => $product->selling_price,
+                    'item_category' => $product->category,
+                    'quantity' => 1,
+                ])->toArray(),
             ],
         ]);
 

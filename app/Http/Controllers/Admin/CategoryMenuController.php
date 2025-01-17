@@ -42,7 +42,7 @@ class CategoryMenuController extends Controller
             ]);
 
             collect($data['category'])
-                ->each(function ($val, $key) {
+                ->each(function ($val, $key): void {
                     CategoryMenu::updateOrInsert(['category_id' => $key], []);
                 })->toArray();
         }
@@ -53,7 +53,7 @@ class CategoryMenuController extends Controller
             ]);
 
             collect($data['categories'])
-                ->each(function ($val, $key) {
+                ->each(function ($val, $key): void {
                     CategoryMenu::updateOrInsert(['id' => $val['id']], $val);
                 })->toArray();
 
@@ -78,7 +78,7 @@ class CategoryMenuController extends Controller
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
 
-        return DB::transaction(function () use ($categoryMenu) {
+        return DB::transaction(function () use ($categoryMenu): void {
             $categoryMenu->childrens()->delete();
             $categoryMenu->delete();
         });

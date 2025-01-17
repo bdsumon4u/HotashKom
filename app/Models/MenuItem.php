@@ -18,16 +18,16 @@ class MenuItem extends Model
      */
     protected static function booted()
     {
-        static::addGlobalScope('order', function (Builder $builder) {
+        static::addGlobalScope('order', function (Builder $builder): void {
             $builder->orderBy('order');
             // $builder->latest('order'); // Not Working
         });
 
-        static::saved(function ($item) {
+        static::saved(function ($item): void {
             cache()->forget('menus:'.$item->menu->slug);
         });
 
-        static::deleting(function ($item) {
+        static::deleting(function ($item): void {
             cache()->forget('menus:'.$item->menu->slug);
         });
     }

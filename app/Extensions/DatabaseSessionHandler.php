@@ -19,7 +19,7 @@ class DatabaseSessionHandler extends \Illuminate\Session\DatabaseSessionHandler
     {
         if ($this->container->bound(Guard::class)) {
             // info(($this->user() ? get_class($this->user()) : null));
-            $payload['userable_type'] = $this->user() ? get_class($this->user()) : null;
+            $payload['userable_type'] = $this->user() ? $this->user()::class : null;
             $payload['userable_id'] = $this->userId();
         }
 

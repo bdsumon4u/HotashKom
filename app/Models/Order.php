@@ -41,7 +41,7 @@ class Order extends Model
 
     public static function booted()
     {
-        static::retrieved(function (Order $order) {
+        static::retrieved(function (Order $order): void {
             if (empty($order->data['city_name'] ?? '') && ! empty($order->data['city_id'] ?? '')) {
                 $order->fill(['data' => ['city_name' => current(array_filter($order->getCityList(), fn ($c) => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
                 $order->fill(['data' => ['area_name' => current(array_filter($order->getAreaList(), fn ($a) => $a->zone_id == ($order->data['area_id'] ?? '')))->zone_name ?? 'N/A']]);
@@ -49,7 +49,7 @@ class Order extends Model
             }
         });
 
-        static::saving(function (Order $order) {
+        static::saving(function (Order $order): void {
             $order->adjustStock();
 
             if (! $order->isDirty('data')) {
@@ -140,13 +140,13 @@ class Order extends Model
 
     public function products(): Attribute
     {
-        return Attribute::get(fn ($products) => json_decode($products));
+        return Attribute::get(fn ($products) => json_decode((string) $products));
     }
 
     public function data(): Attribute
     {
         return Attribute::make(
-            fn ($data) => json_decode($data, true),
+            fn ($data) => json_decode((string) $data, true),
             fn ($data) => $this->attributes['data'] = json_encode(array_merge($this->data, $data)),
         );
     }
@@ -179,9 +179,7 @@ class Order extends Model
     {
         $products = (array) $products;
 
-        return array_reduce($products, function ($sum, $product) {
-            return $sum + ((array) $product)['total'];
-        });
+        return array_reduce($products, fn($sum, $product) => $sum + ((array) $product)['total']);
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -201,7 +199,7 @@ class Order extends Model
         $cityList = cache()->remember('pathao_cities', now()->addDay(), function () use (&$exception) {
             try {
                 return Pathao::area()->city()->data;
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 $exception = true;
 
                 return [];
@@ -227,7 +225,7 @@ class Order extends Model
             $areaList = cache()->remember('pathao_areas:'.$this->data['city_id'], now()->addDay(), function () use (&$exception) {
                 try {
                     return Pathao::area()->zone($this->data['city_id'])->data;
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     $exception = true;
 
                     return [];

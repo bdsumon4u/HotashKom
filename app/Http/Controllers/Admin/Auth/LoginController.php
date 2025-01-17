@@ -175,9 +175,7 @@ class LoginController extends Controller
             ]);
         }
         $ttl = (property_exists($this, 'decayMinutes') ? $this->decayMinutes : 2) * 60;
-        $otp = Cache::remember($key, $ttl, function () {
-            return mt_rand(1000, 999999);
-        });
+        $otp = Cache::remember($key, $ttl, fn() => mt_rand(1000, 999999));
         $user->notify(new SendOTP($otp));
     }
 }

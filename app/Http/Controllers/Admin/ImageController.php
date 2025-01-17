@@ -88,7 +88,7 @@ class ImageController extends Controller
         return request()->expectsJson()
             ? response()->json(['success' => 'Image Has Been Deleted.'])
             : redirect()
-                ->action([self::class, 'index'])
+                ->action(self::index(...))
                 ->with('success', 'Image Has Been Deleted.');
     }
 }

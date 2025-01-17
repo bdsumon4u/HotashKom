@@ -12,14 +12,14 @@ class Category extends Model
 
     public static function booted()
     {
-        static::saved(function ($category) {
+        static::saved(function ($category): void {
             cache()->forget('categories:nested');
             cache()->forget('homesections');
             // cache()->forget('catmenu:nested');
             // cache()->forget('catmenu:nestedwithparent');
         });
 
-        static::deleting(function ($category) {
+        static::deleting(function ($category): void {
             $category->childrens->each->delete();
             // optional($category->categoryMenu)->delete();
             cache()->forget('categories:nested');
@@ -47,7 +47,7 @@ class Category extends Model
     public static function nested($count = 0)
     {
         $query = self::whereNull('parent_id')
-            ->with(['childrens' => function ($category) {
+            ->with(['childrens' => function ($category): void {
                 $category->with('childrens')->orderBy('order');
             }])
             ->withCount('childrens')
@@ -58,9 +58,7 @@ class Category extends Model
             return $query->get();
         }
 
-        return cache()->rememberForever('categories:nested', function () use ($query) {
-            return $query->get();
-        });
+        return cache()->rememberForever('categories:nested', fn() => $query->get());
     }
 
     public function products()

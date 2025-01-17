@@ -7,22 +7,13 @@ use Illuminate\View\View;
 
 class CategoryMenu extends Component
 {
-    public $categories;
-
-    /**
-     * @var int
-     */
-    public $space;
-
     /**
      * Create a new component instance.
      *
      * @param  int  $space
      */
-    public function __construct($categories, $space = 0)
+    public function __construct(public $categories, public $space = 0)
     {
-        $this->categories = $categories;
-        $this->space = $space;
     }
 
     /**

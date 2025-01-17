@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Session;
 //     return redirect()->back();
 // })->name('lang');
 
-Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class])->group(function () {
+Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class])->group(function (): void {
     Route::get('auth', 'App\\Http\\Controllers\\User\\Auth\\LoginController@showLoginForm')->middleware('guest:user')->name('auth');
 
     Route::get('/categories', [ApiController::class, 'categories'])->name('categories');

@@ -12,12 +12,12 @@ class CategoryMenu extends Model
 
     public static function booted()
     {
-        static::saved(function ($menu) {
+        static::saved(function ($menu): void {
             cache()->forget('catmenu:nested');
             cache()->forget('catmenu:nestedwithparent');
         });
 
-        static::deleting(function ($menu) {
+        static::deleting(function ($menu): void {
             cache()->forget('catmenu:nested');
             cache()->forget('catmenu:nestedwithparent');
         });
@@ -41,28 +41,24 @@ class CategoryMenu extends Model
     public static function nested($count = 0)
     {
         $query = self::whereNull('parent_id')
-            ->with(['childrens' => function ($category) {
+            ->with(['childrens' => function ($category): void {
                 $category->with('childrens');
             }])
             ->orderBy('order');
         $count && $query->take($count);
 
-        return cache()->rememberForever('catmenu:nested', function () use ($query) {
-            return $query->get();
-        });
+        return cache()->rememberForever('catmenu:nested', fn() => $query->get());
     }
 
     public static function nestedWithParent($count = 0)
     {
         $query = self::whereNull('parent_id')
-            ->with(['childrens' => function ($category) {
+            ->with(['childrens' => function ($category): void {
                 $category->with('parent', 'childrens');
             }])
             ->orderBy('order');
         $count && $query->take($count);
 
-        return cache()->rememberForever('catmenu:nestedwithparent', function () use ($query) {
-            return $query->get();
-        });
+        return cache()->rememberForever('catmenu:nestedwithparent', fn() => $query->get());
     }
 }

@@ -155,7 +155,7 @@ class BaseApi
             } else {
                 $response = json_decode($e->getResponse()->getBody()->getContents());
                 $message = $response->message;
-                $errors = isset($response->errors) ? $response->errors : [];
+                $errors = $response->errors ?? [];
             }
             throw new PathaoException($message, $e->getCode(), $errors);
         }

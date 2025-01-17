@@ -19,10 +19,8 @@ class Controller extends BaseController
     protected function view($data = [], $view = '', $mergeData = [])
     {
         if (empty($this->viewPath)) {
-            $str = Str::beforeLast(Str::after(\get_called_class(), __NAMESPACE__.'\\'), 'Controller');
-            $dir = array_map(function ($item) {
-                return Str::kebab($item);
-            }, explode('\\', $str));
+            $str = Str::beforeLast(Str::after(static::class, __NAMESPACE__.'\\'), 'Controller');
+            $dir = array_map(fn($item) => Str::kebab($item), explode('\\', $str));
             $dir[] = Str::plural(array_pop($dir));
             $this->viewPath = implode('.', $dir);
         }
@@ -40,7 +38,7 @@ class Controller extends BaseController
         $App = App::getNamespace();
 
         // Model Name & Key Name
-        $Model = Str::beforeLast(Str::afterLast(\get_called_class(), '\\'), 'Controller');
+        $Model = Str::beforeLast(Str::afterLast(static::class, '\\'), 'Controller');
         $keyName = Str::lower($Model);
 
         // Route Model

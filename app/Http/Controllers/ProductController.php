@@ -45,11 +45,11 @@ class ProductController extends Controller
             if ($request->filter_category) {
                 // if filter_category is a comma separated ids(numeric) then use it as category ids
                 if (is_numeric(str_replace(',', '', $request->filter_category))) {
-                    $products = Product::whereHas('categories', function ($query) use ($request) {
+                    $products = Product::whereHas('categories', function ($query) use ($request): void {
                         $query->whereIn('categories.id', explode(',', $request->filter_category));
                     });
                 } else {
-                    $products = Product::whereHas('categories', function ($query) use ($request) {
+                    $products = Product::whereHas('categories', function ($query) use ($request): void {
                         $query->where('categories.slug', rawurldecode($request->filter_category));
                     });
                 }
@@ -64,7 +64,7 @@ class ProductController extends Controller
                     $products->orderBy('selling_price');
                 }
             } else {
-                $products = Product::search($request->search, function ($query) {
+                $products = Product::search($request->search, function ($query): void {
                     $query->whereIsActive(1)->whereNull('parent_id');
 
                     $sorted = setting('show_option')->product_sort ?? 'random';
@@ -103,7 +103,7 @@ class ProductController extends Controller
         $product->load(['brand', 'categories', 'variations.options']);
         $categories = $product->categories->pluck('id')->toArray();
         $products = Product::whereIsActive(1)
-            ->whereHas('categories', function ($query) use ($categories) {
+            ->whereHas('categories', function ($query) use ($categories): void {
                 $query->whereIn('categories.id', $categories);
             })
             ->whereNull('parent_id')
