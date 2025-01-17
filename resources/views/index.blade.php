@@ -1,7 +1,7 @@
 @extends('layouts.yellow.master')
 
 @section('content')
-    
+
 @include('partials.slides')
 
 <!-- .block-features -->
