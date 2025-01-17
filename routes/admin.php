@@ -48,7 +48,7 @@ Route::group(['as' => 'admin.'], function (): void {
 
     // Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
 
-    Route::redirect('/admin', '/admin/dashboard', 301); // Permanent Redirect
+    Route::permanentRedirect('/admin', '/admin/dashboard'); // Permanent Redirect
     Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function (): void {
         // Admin Level Namespace & 'admin' Prefix
         Route::get('/dashboard', [HomeController::class, 'index'])->name('home');

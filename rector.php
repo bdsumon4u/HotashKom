@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use RectorLaravel\Set\LaravelLevelSetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -16,4 +17,7 @@ return RectorConfig::configure()
     ->withPhpSets()
     ->withTypeCoverageLevel(25)
     ->withDeadCodeLevel(25)
-    ->withCodeQualityLevel(25);
+    ->withCodeQualityLevel(25)
+    ->withSets([
+        LaravelLevelSetList::UP_TO_LARAVEL_110,
+    ]);

@@ -71,47 +71,51 @@ class Product extends Model
         });
     }
 
-    public function getVarNameAttribute()
+    protected function varName(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        if (! $this->parent_id) {
-            return $this->name;
-        }
-
-        return $this->parent->name.' ['.$this->name.']';
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+            if (! $this->parent_id) {
+                return $this->name;
+            }
+            return $this->parent->name.' ['.$this->name.']';
+        });
     }
 
-    public function getShippingInsideAttribute($value)
+    protected function shippingInside(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        if (! $this->parent_id) {
-            return $value ?? setting('delivery_charge')->inside_dhaka;
-        }
-
-        return $value ?? $this->parent->shipping_inside ?? setting('delivery_charge')->inside_dhaka;
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
+            if (! $this->parent_id) {
+                return $value ?? setting('delivery_charge')->inside_dhaka;
+            }
+            return $value ?? $this->parent->shipping_inside ?? setting('delivery_charge')->inside_dhaka;
+        });
     }
 
-    public function getShippingOutsideAttribute($value)
+    protected function shippingOutside(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        if (! $this->parent_id) {
-            return $value ?? setting('delivery_charge')->outside_dhaka;
-        }
-
-        return $value ?? $this->parent->shipping_outside ?? setting('delivery_charge')->outside_dhaka;
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
+            if (! $this->parent_id) {
+                return $value ?? setting('delivery_charge')->outside_dhaka;
+            }
+            return $value ?? $this->parent->shipping_outside ?? setting('delivery_charge')->outside_dhaka;
+        });
     }
 
-    public function getCategoryAttribute()
+    protected function category(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        if ($this->parent_id) {
-            return $this->parent->categories()->inRandomOrder()->first(['name'])->name ?? 'Uncategorized';
-        }
-
-        return $this->categories()->inRandomOrder()->first(['name'])->name ?? 'Uncategorized';
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+            if ($this->parent_id) {
+                return $this->parent->categories()->inRandomOrder()->first(['name'])->name ?? 'Uncategorized';
+            }
+            return $this->categories()->inRandomOrder()->first(['name'])->name ?? 'Uncategorized';
+        });
     }
 
-    public function getInStockAttribute()
+    protected function inStock(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return $this->track_stock
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn() => $this->track_stock
             ? $this->stock_count
-            : true;
+            : true);
     }
 
     public function categories()
@@ -146,28 +150,25 @@ class Product extends Model
     {
         return $this->belongsToMany(Option::class);
     }
-
-    public function setWholesaleAttribute($value): void
+    protected function wholesale(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        $data = [];
-        foreach ($value['quantity'] as $key => $quantity) {
-            $data[$quantity] = $value['price'][$key];
-        }
-        ksort($data);
-        $this->attributes['wholesale'] = json_encode($data);
-    }
-
-    public function getWholesaleAttribute($value)
-    {
-        $data = json_decode((string) $value, true) ?? [];
-        if (empty($data) && $this->parent_id) {
-            return $this->parent->wholesale;
-        }
-
-        return [
-            'quantity' => array_keys($data),
-            'price' => array_values($data),
-        ];
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
+            $data = json_decode((string) $value, true) ?? [];
+            if (empty($data) && $this->parent_id) {
+                return $this->parent->wholesale;
+            }
+            return [
+                'quantity' => array_keys($data),
+                'price' => array_values($data),
+            ];
+        }, set: function ($value) {
+            $data = [];
+            foreach ($value['quantity'] as $key => $quantity) {
+                $data[$quantity] = $value['price'][$key];
+            }
+            ksort($data);
+            return ['wholesale' => json_encode($data)];
+        });
     }
 
     public function getPrice(int $quantity)
@@ -184,24 +185,26 @@ class Product extends Model
         return $price;
     }
 
-    public function getBaseImageAttribute()
+    protected function baseImage(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        $images = $this->images ?? collect();
-        if ($images->isEmpty()) {
-            $images = $this->parent->images ?? collect();
-        }
-
-        return $images->first(fn(Image $image): bool => $image->pivot->img_type == 'base');
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+            $images = $this->images ?? collect();
+            if ($images->isEmpty()) {
+                $images = $this->parent->images ?? collect();
+            }
+            return $images->first(fn(Image $image): bool => $image->pivot->img_type == 'base');
+        });
     }
 
-    public function getAdditionalImagesAttribute()
+    protected function additionalImages(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        $images = $this->images ?? collect();
-        if ($images->isEmpty()) {
-            $images = $this->parent->images ?? collect();
-        }
-
-        return $images->filter(fn(Image $image): bool => $image->pivot->img_type == 'additional');
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+            $images = $this->images ?? collect();
+            if ($images->isEmpty()) {
+                $images = $this->parent->images ?? collect();
+            }
+            return $images->filter(fn(Image $image): bool => $image->pivot->img_type == 'additional');
+        });
     }
 
     /**

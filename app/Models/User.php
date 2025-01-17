@@ -30,15 +30,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    /**
      * Send the email verification notification.
      */
     public function sendEmailVerificationNotification(): void
@@ -59,5 +50,14 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+    /**
+     * The attributes that should be cast to native types.
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+        ];
     }
 }

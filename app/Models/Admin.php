@@ -38,17 +38,6 @@ class Admin extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'role_id' => 'integer',
-        'is_active' => 'boolean',
-        'email_verified_at' => 'datetime',
-    ];
-
-    /**
      * Send the email verification notification.
      */
     public function sendEmailVerificationNotification(): void
@@ -75,5 +64,16 @@ class Admin extends Authenticatable
         return $this->role_id == static::ADMIN && $role === 'admin'
             || $this->role_id == static::MANAGER && $role === 'manager'
             || $this->role_id == static::SALESMAN && $role === 'salesman';
+    }
+    /**
+     * The attributes that should be cast to native types.
+     */
+    protected function casts(): array
+    {
+        return [
+            'role_id' => 'integer',
+            'is_active' => 'boolean',
+            'email_verified_at' => 'datetime',
+        ];
     }
 }
