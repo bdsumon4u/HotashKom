@@ -11,20 +11,16 @@ class AttributeOptionController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function index(Attribute $attribute)
+    public function index(Attribute $attribute): void
     {
         //
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function create(Attribute $attribute)
+    public function create(Attribute $attribute): void
     {
         //
     }
@@ -51,20 +47,16 @@ class AttributeOptionController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function show(Attribute $attribute, Option $option)
+    public function show(Attribute $attribute, Option $option): void
     {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function edit(Attribute $attribute, Option $option)
+    public function edit(Attribute $attribute, Option $option): void
     {
         //
     }

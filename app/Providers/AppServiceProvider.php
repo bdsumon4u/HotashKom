@@ -13,20 +13,16 @@ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         Schema::defaultStringLength(191);
 
@@ -47,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
                 ->with([$relation => $constraint])
         );
 
-        $this->app->bind('pathao', fn() => new \App\Pathao\Manage\Manage(
+        $this->app->bind('pathao', fn(): \App\Pathao\Manage\Manage => new \App\Pathao\Manage\Manage(
             new \App\Pathao\Apis\AreaApi,
             new \App\Pathao\Apis\StoreApi,
             new \App\Pathao\Apis\OrderApi

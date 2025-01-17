@@ -10,7 +10,7 @@ class Category extends Model
         'parent_id', 'image_id', 'name', 'slug', 'order',
     ];
 
-    public static function booted()
+    public static function booted(): void
     {
         static::saved(function ($category): void {
             cache()->forget('categories:nested');

@@ -9,7 +9,7 @@ class ProductCard extends Component
 {
     public Product $product;
 
-    public function addToCart()
+    public function addToCart(): void
     {
         $cart = session()->get('cart', []);
         $fraudQuantity = setting('fraud')->max_qty_per_product ?? 3;

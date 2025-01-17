@@ -31,7 +31,7 @@ class ApiController extends Controller
         return Artisan::call('scout:import', ['model' => "App\Product"]);
     }
 
-    public function linkOptimize()
+    public function linkOptimize(): void
     {
         Artisan::call('storage:link');
         Artisan::call('optimize:clear');

@@ -29,10 +29,8 @@ class SlideController extends Controller
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): void
     {
         //
     }
@@ -68,10 +66,8 @@ class SlideController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function show(Slide $slide)
+    public function show(Slide $slide): void
     {
         //
     }

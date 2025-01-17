@@ -10,7 +10,7 @@ class CategoryMenu extends Model
 
     protected $with = ['category'];
 
-    public static function booted()
+    public static function booted(): void
     {
         static::saved(function ($menu): void {
             cache()->forget('catmenu:nested');

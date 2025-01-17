@@ -24,10 +24,8 @@ class AttributeController extends Controller
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): void
     {
         //
     }
@@ -49,20 +47,16 @@ class AttributeController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function show(Attribute $attribute)
+    public function show(Attribute $attribute): void
     {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function edit(Attribute $attribute)
+    public function edit(Attribute $attribute): void
     {
         //
     }

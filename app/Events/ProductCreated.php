@@ -12,8 +12,14 @@ class ProductCreated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    /**
+     * @var mixed[]
+     */
     public $data;
 
+    /**
+     * @var \App\Models\Product
+     */
     public $product;
 
     /**
@@ -32,7 +38,7 @@ class ProductCreated
      *
      * @return \Illuminate\Broadcasting\Channel|array
      */
-    public function broadcastOn()
+    public function broadcastOn(): \Illuminate\Broadcasting\PrivateChannel
     {
         return new PrivateChannel('channel-name');
     }

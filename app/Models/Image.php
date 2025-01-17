@@ -20,7 +20,7 @@ class Image extends Model
 
         for ($i = 0; $bytes > 1024; $bytes /= 1024, $i++);
 
-        return Attribute::get(fn () => round($bytes, 2).' '.$units[$i]);
+        return Attribute::get(fn (): string => round($bytes, 2).' '.$units[$i]);
     }
 
     public function src(): Attribute

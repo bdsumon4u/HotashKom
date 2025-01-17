@@ -27,7 +27,7 @@ class VerifyEmail extends Notification
      * @param  mixed  $notifiable
      * @return array|string
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['mail'];
     }
@@ -75,9 +75,8 @@ class VerifyEmail extends Notification
      * Set a callback that should be used when building the notification mail message.
      *
      * @param  \Closure  $callback
-     * @return void
      */
-    public static function toMailUsing($callback)
+    public static function toMailUsing($callback): void
     {
         static::$toMailCallback = $callback;
     }

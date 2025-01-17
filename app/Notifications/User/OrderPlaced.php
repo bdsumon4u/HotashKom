@@ -25,9 +25,8 @@ class OrderPlaced extends Notification
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
-     * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return [SMSChannel::class];
     }
@@ -48,11 +47,10 @@ class OrderPlaced extends Notification
      * Get the array representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return array
      */
-    public function toArray($notifiable)
+    public function toArray($notifiable): array
     {
-        $code = Cache::remember('order:confirm:'.$this->order->id, 5 * 60, fn() => mt_rand(1000, 999999));
+        $code = Cache::remember('order:confirm:'.$this->order->id, 5 * 60, fn(): int => mt_rand(1000, 999999));
 
         return [
             'msg' => 'Thanks for shopping. Your order ID is '.$this->order->id.'. Login: '.url('auth'),

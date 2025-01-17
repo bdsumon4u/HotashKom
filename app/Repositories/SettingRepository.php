@@ -11,7 +11,7 @@ class SettingRepository
         return Setting::updateOrCreate(compact('name'), compact('value'));
     }
 
-    public function setMany($data)
+    public function setMany($data): void
     {
         isset($data['logo'])
         && $data = $this->mergeLogo($data);

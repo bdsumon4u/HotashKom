@@ -67,10 +67,8 @@ class ReportController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function show(Report $report)
+    public function show(Report $report): void
     {
         //
     }

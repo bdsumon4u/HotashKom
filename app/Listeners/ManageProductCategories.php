@@ -18,9 +18,8 @@ class ManageProductCategories
      * Handle the event.
      *
      * @param  object  $event
-     * @return void
      */
-    public function handle($event)
+    public function handle($event): void
     {
         $event->product->categories()->sync($event->data['categories']);
     }

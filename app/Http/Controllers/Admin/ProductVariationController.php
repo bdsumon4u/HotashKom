@@ -12,20 +12,16 @@ class ProductVariationController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function index(Product $product)
+    public function index(Product $product): void
     {
         //
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function create(Product $product)
+    public function create(Product $product): void
     {
         //
     }
@@ -46,7 +42,7 @@ class ProductVariationController extends Controller
             $variations = collect($attributes->first())->crossJoin(...$attributes->splice(1));
 
             $variations->each(function ($items, $i) use ($product, $options): void {
-                $name = $options->filter(fn ($item) => in_array($item->id, $items))->pluck('name')->join('-');
+                $name = $options->filter(fn ($item): bool => in_array($item->id, $items))->pluck('name')->join('-');
                 $sku = $product->sku.'('.implode('-', $items).')';
                 $slug = $product->slug.'('.implode('-', $items).')';
                 if (! $variation = $product->variations()->firstWhere('sku', $sku)) {
@@ -68,20 +64,16 @@ class ProductVariationController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function show(Product $product, Product $variation)
+    public function show(Product $product, Product $variation): void
     {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function edit(Product $product, Product $variation)
+    public function edit(Product $product, Product $variation): void
     {
         //
     }
@@ -123,10 +115,8 @@ class ProductVariationController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product, Product $variation)
+    public function destroy(Product $product, Product $variation): void
     {
         //
     }

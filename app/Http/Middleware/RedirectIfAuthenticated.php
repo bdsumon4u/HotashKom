@@ -21,7 +21,7 @@ class RedirectIfAuthenticated
         if (Auth::guard($guard)->check()) {
             $upper = strtoupper(str_replace(['_', '-'], '', $guard));
 
-            return $upper == 'WEB' || $upper == null
+            return $upper === 'WEB' || $upper == null
                 ? redirect('/')
                 : redirect($guard.'/dashboard');
         }

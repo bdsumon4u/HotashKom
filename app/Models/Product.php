@@ -49,20 +49,16 @@ class Product extends Model
     protected static function booted()
     {
         static::saved(function ($product): void {
-            if (App::runningInConsole()) {
-                if ($product->categories->isEmpty() || $product->images->isEmpty()) {
-                    $categories = range(1, 30);
-                    $categories = array_map(fn($key) => $categories[$key], array_rand($categories, mt_rand(2, 4)));
-
-                    $additionals = range(47, 67);
-                    $additionals = array_map(fn($key) => $additionals[$key], array_rand($additionals, mt_rand(4, 7)));
-
-                    ProductCreated::dispatch($product, [
-                        'categories' => $categories,
-                        'base_image' => mt_rand(47, 67),
-                        'additional_images' => $additionals,
-                    ]);
-                }
+            if (App::runningInConsole() && ($product->categories->isEmpty() || $product->images->isEmpty())) {
+                $categories = range(1, 30);
+                $categories = array_map(fn($key) => $categories[$key], array_rand($categories, mt_rand(2, 4)));
+                $additionals = range(47, 67);
+                $additionals = array_map(fn($key) => $additionals[$key], array_rand($additionals, mt_rand(4, 7)));
+                ProductCreated::dispatch($product, [
+                    'categories' => $categories,
+                    'base_image' => mt_rand(47, 67),
+                    'additional_images' => $additionals,
+                ]);
             }
         });
 
@@ -151,7 +147,7 @@ class Product extends Model
         return $this->belongsToMany(Option::class);
     }
 
-    public function setWholesaleAttribute($value)
+    public function setWholesaleAttribute($value): void
     {
         $data = [];
         foreach ($value['quantity'] as $key => $quantity) {
@@ -195,7 +191,7 @@ class Product extends Model
             $images = $this->parent->images ?? collect();
         }
 
-        return $images->first(fn(Image $image) => $image->pivot->img_type == 'base');
+        return $images->first(fn(Image $image): bool => $image->pivot->img_type == 'base');
     }
 
     public function getAdditionalImagesAttribute()
@@ -205,15 +201,13 @@ class Product extends Model
             $images = $this->parent->images ?? collect();
         }
 
-        return $images->filter(fn(Image $image) => $image->pivot->img_type == 'additional');
+        return $images->filter(fn(Image $image): bool => $image->pivot->img_type == 'additional');
     }
 
     /**
      * Get the indexable data array for the model.
-     *
-     * @return array
      */
-    public function toSearchableArray()
+    public function toSearchableArray(): array
     {
         return [
             'sku' => $this->sku,

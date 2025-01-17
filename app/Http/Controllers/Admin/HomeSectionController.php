@@ -21,7 +21,7 @@ class HomeSectionController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         if (request()->has('orders')) {
             $orders = request('orders');
-            DB::statement('UPDATE home_sections SET `order` = CASE id '.implode(' ', array_map(fn($id) => "WHEN $id THEN $orders[$id] ", array_keys($orders))).'END');
+            DB::statement('UPDATE home_sections SET `order` = CASE id '.implode(' ', array_map(fn($id): string => "WHEN $id THEN $orders[$id] ", array_keys($orders))).'END');
 
             cache()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
 
@@ -69,10 +69,8 @@ class HomeSectionController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function show(HomeSection $homeSection)
+    public function show(HomeSection $homeSection): void
     {
         //
     }

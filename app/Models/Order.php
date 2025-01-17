@@ -39,12 +39,12 @@ class Order extends Model
 
     protected static $logAttributes = ['data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal'];
 
-    public static function booted()
+    public static function booted(): void
     {
         static::retrieved(function (Order $order): void {
             if (empty($order->data['city_name'] ?? '') && ! empty($order->data['city_id'] ?? '')) {
-                $order->fill(['data' => ['city_name' => current(array_filter($order->getCityList(), fn ($c) => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
-                $order->fill(['data' => ['area_name' => current(array_filter($order->getAreaList(), fn ($a) => $a->zone_id == ($order->data['area_id'] ?? '')))->zone_name ?? 'N/A']]);
+                $order->fill(['data' => ['city_name' => current(array_filter($order->getCityList(), fn ($c): bool => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
+                $order->fill(['data' => ['area_name' => current(array_filter($order->getAreaList(), fn ($a): bool => $a->zone_id == ($order->data['area_id'] ?? '')))->zone_name ?? 'N/A']]);
                 $order->save();
             }
         });
@@ -74,13 +74,13 @@ class Order extends Model
                         $matches[$city->city_name] = $match[0]['score'];
                     }
                 }
-                if ($matches) {
+                if ($matches !== []) {
                     asort($matches);
-                    $city = current(array_filter($order->getCityList(), fn ($c) => $c->city_name === key($matches)));
+                    $city = current(array_filter($order->getCityList(), fn ($c): bool => $c->city_name === key($matches)));
                     $order->fill(['data' => ['city_id' => $city->city_id, 'city_name' => $city->city_name ?? 'N/A']]);
                 }
             } else {
-                $order->fill(['data' => ['city_name' => current(array_filter($order->getCityList(), fn ($c) => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
+                $order->fill(['data' => ['city_name' => current(array_filter($order->getCityList(), fn ($c): bool => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
             }
 
             if (false) {
@@ -90,18 +90,18 @@ class Order extends Model
                         $matches[$area->zone_name] = $match[0]['score'];
                     }
                 }
-                if ($matches) {
+                if ($matches !== []) {
                     asort($matches);
-                    $area = current(array_filter($order->getAreaList(), fn ($a) => $a->zone_name === key($matches)));
+                    $area = current(array_filter($order->getAreaList(), fn ($a): bool => $a->zone_name === key($matches)));
                     $order->fill(['data' => ['area_id' => $area->zone_id, 'area_name' => $area->zone_name ?? 'N/A']]);
                 }
             } else {
-                $order->fill(['data' => ['area_name' => current(array_filter($order->getAreaList(), fn ($a) => $a->zone_id == $order->data['area_id']))->zone_name ?? 'N/A']]);
+                $order->fill(['data' => ['area_name' => current(array_filter($order->getAreaList(), fn ($a): bool => $a->zone_id == $order->data['area_id']))->zone_name ?? 'N/A']]);
             }
         });
     }
 
-    public function adjustStock()
+    public function adjustStock(): void
     {
         if ($this->exists && ! $this->isDirty('status')) {
             return;
@@ -140,13 +140,13 @@ class Order extends Model
 
     public function products(): Attribute
     {
-        return Attribute::get(fn ($products) => json_decode((string) $products));
+        return Attribute::get(fn ($products): mixed => json_decode((string) $products));
     }
 
     public function data(): Attribute
     {
         return Attribute::make(
-            fn ($data) => json_decode((string) $data, true),
+            fn ($data): mixed => json_decode((string) $data, true),
             fn ($data) => $this->attributes['data'] = json_encode(array_merge($this->data, $data)),
         );
     }
@@ -155,12 +155,12 @@ class Order extends Model
     {
         $pad = str_pad($this->id, 10, '0', STR_PAD_LEFT);
 
-        return Attribute::get(fn () => substr($pad, 0, 3).'-'.substr($pad, 3, 3).'-'.substr($pad, 6, 4));
+        return Attribute::get(fn (): string => substr($pad, 0, 3).'-'.substr($pad, 3, 3).'-'.substr($pad, 6, 4));
     }
 
     public function condition(): Attribute
     {
-        return Attribute::get(fn () => intval($this->data['subtotal']) + intval($this->data['shipping_cost']) - intval($this->data['advanced'] ?? 0) - intval($this->data['discount'] ?? 0));
+        return Attribute::get(fn (): int => intval($this->data['subtotal']) + intval($this->data['shipping_cost']) - intval($this->data['advanced'] ?? 0) - intval($this->data['discount'] ?? 0));
     }
 
     public function user()

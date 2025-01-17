@@ -9,34 +9,30 @@ class BladeServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }
 
     /**
      * Bootstrap services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        Blade::directive('exp', fn($expression) => "<?php $expression ?>");
+        Blade::directive('exp', fn($expression): string => "<?php $expression ?>");
 
         foreach (['title', 'content'] as $layout) {
-            Blade::directive($layout, fn($expression) => "<?php \$__env->startSection('{$layout}', {$expression}); ?>");
-            Blade::directive("end{$layout}", fn() => '<?php $__env->stopSection(); ?>');
+            Blade::directive($layout, fn($expression): string => "<?php \$__env->startSection('{$layout}', {$expression}); ?>");
+            Blade::directive("end{$layout}", fn(): string => '<?php $__env->stopSection(); ?>');
         }
 
         foreach (['title', 'content'] as $layout) {
-            Blade::directive($layout, fn($expression) => "<?php \$__env->startSection('{$layout}', {$expression}); ?>");
-            Blade::directive("end{$layout}", fn() => '<?php $__env->stopSection(); ?>');
+            Blade::directive($layout, fn($expression): string => "<?php \$__env->startSection('{$layout}', {$expression}); ?>");
+            Blade::directive("end{$layout}", fn(): string => '<?php $__env->stopSection(); ?>');
         }
 
-        Blade::directive('errors', fn() => '<?php if ($errors->any()): ?>
+        Blade::directive('errors', fn(): string => '<?php if ($errors->any()): ?>
                 <div class="alert alert-danger" role="alert">
                     <ul>
                         <?php foreach($errors->all() as $error): ?>

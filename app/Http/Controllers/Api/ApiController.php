@@ -140,7 +140,7 @@ class ApiController extends Controller
         ]);
     }
 
-    public function updatedOptions($value, $key)
+    public function updatedOptions($value, $key): void
     {
         $variation = $this->product->variations->first(fn($item) => $item->options->pluck('id')->diff($this->options)->isEmpty());
 
@@ -159,9 +159,8 @@ class ApiController extends Controller
             if ($freeDelivery->min_amount > 0) {
                 $text .= '<li>কমপক্ষে <strong class="text-danger">'.$freeDelivery->min_amount.'</strong> টাকার প্রোডাক্ট অর্ডার করুন</li>';
             }
-            $text .= '</ul>';
 
-            return $text;
+            return $text . '</ul>';
         }
 
         if (array_key_exists($product->id, $products = ((array) ($freeDelivery->products ?? [])) ?? [])) {
@@ -254,7 +253,7 @@ class ApiController extends Controller
         })->count();
     }
 
-    public function pathaoWebhook(Request $request)
+    public function pathaoWebhook(Request $request): void
     {
         $Pathao = setting('Pathao');
         if ($request->header('X-PATHAO-Signature') != $Pathao->store_id) {

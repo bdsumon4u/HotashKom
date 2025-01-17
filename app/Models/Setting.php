@@ -12,7 +12,7 @@ class Setting extends Model
         'name', 'value',
     ];
 
-    public static function booted()
+    public static function booted(): void
     {
         static::saved(function ($setting): void {
             Cache::put('settings:'.$setting->name, $setting);
@@ -28,7 +28,7 @@ class Setting extends Model
     public function value(): Attribute
     {
         return Attribute::make(
-            fn ($value) => json_decode((string) $value),
+            fn ($value): mixed => json_decode((string) $value),
             fn ($value) => $this->attributes['value'] = json_encode(
                 is_array($value) ? array_merge((array) $this->value, $value) : $value
             ),

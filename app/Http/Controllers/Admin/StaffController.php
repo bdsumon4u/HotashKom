@@ -67,10 +67,8 @@ class StaffController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function show(Admin $admin)
+    public function show(Admin $admin): void
     {
         //
     }
@@ -127,10 +125,8 @@ class StaffController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function destroy(Admin $admin)
+    public function destroy(Admin $admin): void
     {
         //
     }

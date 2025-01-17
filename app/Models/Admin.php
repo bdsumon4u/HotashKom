@@ -50,10 +50,8 @@ class Admin extends Authenticatable
 
     /**
      * Send the email verification notification.
-     *
-     * @return void
      */
-    public function sendEmailVerificationNotification()
+    public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmail);
     }
@@ -62,9 +60,8 @@ class Admin extends Authenticatable
      * Send the password reset notification.
      *
      * @param  string  $token
-     * @return void
      */
-    public function sendPasswordResetNotification($token)
+    public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPassword($token));
     }
@@ -75,8 +72,8 @@ class Admin extends Authenticatable
             return parent::is($role);
         }
 
-        return $this->role_id == static::ADMIN && $role == 'admin'
-            || $this->role_id == static::MANAGER && $role == 'manager'
-            || $this->role_id == static::SALESMAN && $role == 'salesman';
+        return $this->role_id == static::ADMIN && $role === 'admin'
+            || $this->role_id == static::MANAGER && $role === 'manager'
+            || $this->role_id == static::SALESMAN && $role === 'salesman';
     }
 }

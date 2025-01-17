@@ -10,7 +10,7 @@ class Brand extends Model
         'image_id', 'name', 'slug',
     ];
 
-    public static function booted()
+    public static function booted(): void
     {
         static::saved(function (): void {
             cache()->forget('brands');

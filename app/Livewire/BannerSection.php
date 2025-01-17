@@ -14,7 +14,7 @@ class BannerSection extends Component
 
     public array $columns = [];
 
-    public function mount()
+    public function mount(): void
     {
         if (isset($this->section)) {
             $pseudoColumns = (array) $this->section->data->columns;
@@ -30,7 +30,7 @@ class BannerSection extends Component
         }
     }
 
-    public function addColumn()
+    public function addColumn(): void
     {
         $this->columns[] = [
             'image' => null,
@@ -41,7 +41,7 @@ class BannerSection extends Component
         ];
     }
 
-    public function removeColumn($i)
+    public function removeColumn($i): void
     {
         unset($this->columns[$i]);
         $this->columns = array_values($this->columns);

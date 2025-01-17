@@ -15,7 +15,7 @@ class SectionProduct extends Component
 
     public array $categoryIds = [];
 
-    public function mount(array $selectedIds = [])
+    public function mount(array $selectedIds = []): void
     {
         $this->selectedIds = $selectedIds;
     }
@@ -27,7 +27,7 @@ class SectionProduct extends Component
         }
         $this->products = Product::whereNull('parent_id')
             ->where(fn ($q) => $q->where('name', 'like', "%$this->search%")->orWhere('sku', $this->search))
-            ->take(5)->get()->map(fn($product, $i) => [
+            ->take(5)->get()->map(fn($product, $i): array => [
                 'order' => $i + 1,
                 'id' => $product->id,
                 'name' => $product->name,
@@ -36,7 +36,7 @@ class SectionProduct extends Component
             ])->toArray();
     }
 
-    public function updateTaskOrder($data)
+    public function updateTaskOrder($data): void
     {
         $this->selectedIds = [];
         foreach ($data as $item) {
@@ -44,14 +44,14 @@ class SectionProduct extends Component
         }
     }
 
-    public function addProduct($id)
+    public function addProduct($id): void
     {
         $this->selectedIds[] = $id;
 
         $this->dispatch('notify', ['message' => 'Product added successfully.']);
     }
 
-    public function removeProduct($id)
+    public function removeProduct($id): void
     {
         $this->selectedIds = array_diff($this->selectedIds, [$id]);
     }

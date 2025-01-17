@@ -20,7 +20,7 @@ class ProductDetail extends Component
 
     public bool $showBrandCategory = false;
 
-    public function updatedOptions($value, $key)
+    public function updatedOptions($value, $key): void
     {
         $variation = $this->product->variations->first(fn($item) => $item->options->pluck('id')->diff($this->options)->isEmpty());
 
@@ -29,21 +29,21 @@ class ProductDetail extends Component
         }
     }
 
-    public function increment()
+    public function increment(): void
     {
         if ($this->quantity < $this->maxQuantity) {
             $this->quantity++;
         }
     }
 
-    public function decrement()
+    public function decrement(): void
     {
         if ($this->quantity > 1) {
             $this->quantity--;
         }
     }
 
-    public function addToCart()
+    public function addToCart(): void
     {
         $cart = session()->get('cart', []);
         if (isset($cart[$this->selectedVar->id])) {
@@ -105,7 +105,7 @@ class ProductDetail extends Component
         return redirect()->route('checkout');
     }
 
-    public function mount()
+    public function mount(): void
     {
         $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         if ($this->product->variations->isNotEmpty()) {
@@ -129,9 +129,8 @@ class ProductDetail extends Component
             if ($freeDelivery->min_amount > 0) {
                 $text .= '<li>কমপক্ষে <strong class="text-danger">'.$freeDelivery->min_amount.'</strong> টাকার প্রোডাক্ট অর্ডার করুন</li>';
             }
-            $text .= '</ul>';
 
-            return $text;
+            return $text . '</ul>';
         }
 
         if (array_key_exists($this->product->id, $products = ((array) ($freeDelivery->products ?? [])) ?? [])) {

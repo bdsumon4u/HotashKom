@@ -14,7 +14,7 @@ class Authenticate extends Middleware
      *
      * @var string
      */
-    protected $redirectModelNameTo = null;
+    protected $redirectModelNameTo;
 
     protected $redirectAdminTo = '/';
 

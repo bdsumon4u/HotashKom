@@ -8,15 +8,13 @@ class ProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
 
-    public function prepareForValidation()
+    public function prepareForValidation(): void
     {
         $sku = $this->get('sku');
         $this->merge(['sku' => strtoupper((string) $sku)]);
@@ -24,10 +22,8 @@ class ProductRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         $rules = [
             'name' => 'required|max:255',

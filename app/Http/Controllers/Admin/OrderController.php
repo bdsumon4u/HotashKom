@@ -136,7 +136,7 @@ class OrderController extends Controller
 
                 return $products;
             })
-            ->groupBy('id')->map(fn($item) => [
+            ->groupBy('id')->map(fn($item): array => [
                 'name' => $item->random()['name'],
                 'slug' => $item->random()['slug'],
                 'quantity' => $item->sum('quantity'),
@@ -207,12 +207,12 @@ class OrderController extends Controller
             ->withSuccess('Orders are sent to Courier.');
     }
 
-    private function steadFast($order_ids)
+    private function steadFast($order_ids): int
     {
         if (! (($SteadFast = setting('SteadFast'))->enabled ?? false)) {
             return 0;
         }
-        $orders = Order::whereIn('id', $order_ids)->where('data->courier', 'SteadFast')->get()->map(fn($order) => [
+        $orders = Order::whereIn('id', $order_ids)->where('data->courier', 'SteadFast')->get()->map(fn($order): array => [
             'invoice' => $order->id,
             'recipient_name' => $order->name ?? 'N/A',
             'recipient_address' => $order->address ?? 'N/A',
@@ -249,7 +249,7 @@ class OrderController extends Controller
         return count($data['data'] ?? []);
     }
 
-    private function pathao($order)
+    private function pathao($order): void
     {
         $data = [
             'store_id' => setting('Pathao')->store_id, // Find in store list,

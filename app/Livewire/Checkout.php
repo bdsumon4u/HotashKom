@@ -42,21 +42,21 @@ class Checkout extends Component
     public $note = '';
 
     #[On('cartBoxUpdated')]
-    public function refresh()
+    public function refresh(): void
     {
         $this->cart = session('cart', []);
-        $this->subtotal = collect($this->cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+        $this->subtotal = collect($this->cart)->sum(fn($item): int|float => $item['price'] * $item['quantity']);
         $this->updatedShipping();
     }
 
-    public function remove($id)
+    public function remove($id): void
     {
         unset($this->cart[$id]);
         session()->put('cart', $this->cart);
         $this->cartUpdated();
     }
 
-    public function increaseQuantity($id)
+    public function increaseQuantity($id): void
     {
         if ($this->cart[$id]['quantity'] < $this->cart[$id]['max'] || $this->cart[$id]['max'] === -1) {
             $this->cart[$id]['quantity']++;
@@ -65,7 +65,7 @@ class Checkout extends Component
         }
     }
 
-    public function decreaseQuantity($id)
+    public function decreaseQuantity($id): void
     {
         if ($this->cart[$id]['quantity'] > 1) {
             $this->cart[$id]['quantity']--;
@@ -101,7 +101,7 @@ class Checkout extends Component
             if ($this->subtotal < $freeDelivery->min_amount) {
                 return $shipping_cost;
             }
-            $quantity = array_reduce($this->cart, fn($sum, $product) => $sum + $product['quantity'], 0);
+            $quantity = array_reduce($this->cart, fn($sum, $product): float|int|array => $sum + $product['quantity'], 0);
             if ($quantity < $freeDelivery->min_quantity) {
                 return $shipping_cost;
             }
@@ -122,22 +122,22 @@ class Checkout extends Component
         return $shipping_cost;
     }
 
-    public function updatedShipping()
+    public function updatedShipping(): void
     {
         $this->shipping_cost = $this->shippingCost();
 
         $this->total = $this->subtotal + $this->shipping_cost;
     }
 
-    public function cartUpdated()
+    public function cartUpdated(): void
     {
-        $this->subtotal = collect($this->cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+        $this->subtotal = collect($this->cart)->sum(fn($item): int|float => $item['price'] * $item['quantity']);
 
         $this->updatedShipping();
         $this->dispatch('cartUpdated');
     }
 
-    public function mount()
+    public function mount(): void
     {
         // if (!(setting('show_option')->hide_phone_prefix ?? false)) {
         //     $this->phone = '+880';
@@ -263,7 +263,7 @@ class Checkout extends Component
                     'is_repeat' => $oldOrders->count() > 0,
                     'shipping_area' => $data['shipping'],
                     'shipping_cost' => $this->shipping_cost,
-                    'subtotal' => is_array($products) ? array_reduce($products, fn($sum, $product) => $sum += $product['total'], 0) : $products->sum('total'),
+                    'subtotal' => is_array($products) ? array_reduce($products, fn($sum, $product): float|int|array => $sum += $product['total'], 0) : $products->sum('total'),
                 ],
             ];
 
@@ -278,7 +278,7 @@ class Checkout extends Component
                     'currency' => 'BDT',
                     'transaction_id' => $order->id,
                     'value' => $order->data['subtotal'],
-                    'items' => array_values(array_map(fn($product) => [
+                    'items' => array_values(array_map(fn($product): array => [
                         'item_id' => $product['id'],
                         'item_name' => $product['name'],
                         'item_category' => $product['category'],
@@ -324,7 +324,9 @@ class Checkout extends Component
             return $user;
         }
 
-        $user = User::query()->firstOrCreate(
+        // $user->notify(new AccountCreated());
+
+        return User::query()->firstOrCreate(
             ['phone_number' => $data['phone']],
             array_merge(Arr::except($data, 'phone'), [
                 'email_verified_at' => now(),
@@ -332,10 +334,6 @@ class Checkout extends Component
                 'remember_token' => Str::random(10),
             ])
         );
-
-        // $user->notify(new AccountCreated());
-
-        return $user;
     }
 
     public function render()

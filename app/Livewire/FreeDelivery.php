@@ -21,7 +21,7 @@ class FreeDelivery extends Component
 
     public $search;
 
-    public function mount($freeDelivery, $deliveryCharge)
+    public function mount($freeDelivery, $deliveryCharge): void
     {
         $freeDelivery = optional($freeDelivery);
         $this->free_delivery = (int)$freeDelivery->enabled ?? 0;
@@ -57,12 +57,12 @@ class FreeDelivery extends Component
         }
     }
 
-    public function increaseQuantity($id)
+    public function increaseQuantity($id): void
     {
         $this->selectedProducts[$id]['quantity']++;
     }
 
-    public function decreaseQuantity($id)
+    public function decreaseQuantity($id): void
     {
         if ($this->selectedProducts[$id]['quantity'] > 1) {
             $this->selectedProducts[$id]['quantity']--;

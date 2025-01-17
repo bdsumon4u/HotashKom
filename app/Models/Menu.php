@@ -12,7 +12,7 @@ class Menu extends Model
         'name', 'slug',
     ];
 
-    public static function booted()
+    public static function booted(): void
     {
         static::saved(function ($menu): void {
             cache()->forget('menus:'.$menu->slug);

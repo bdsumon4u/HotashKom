@@ -40,7 +40,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectLoggedOut = null;
+    protected $redirectLoggedOut;
 
     /**
      * Create a new controller instance.
@@ -167,7 +167,7 @@ class LoginController extends Controller
     /**
      * @throws ValidationException
      */
-    private function sendOTP(&$user)
+    private function sendOTP(&$user): void
     {
         if (Cache::get($key = 'auth:'.\request()->get('login'))) {
             throw ValidationException::withMessages([
@@ -175,7 +175,7 @@ class LoginController extends Controller
             ]);
         }
         $ttl = (property_exists($this, 'decayMinutes') ? $this->decayMinutes : 2) * 60;
-        $otp = Cache::remember($key, $ttl, fn() => mt_rand(1000, 999999));
+        $otp = Cache::remember($key, $ttl, fn(): int => mt_rand(1000, 999999));
         $user->notify(new SendOTP($otp));
     }
 }

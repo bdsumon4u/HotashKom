@@ -88,7 +88,7 @@ class EditOrder extends Component
         return $attributes;
     }
 
-    public function mount(Order $order)
+    public function mount(Order $order): void
     {
         $this->order = $order; // Initialize before access
         $this->fill($this->order->only($this->attrs) + $this->order->data);
@@ -135,7 +135,7 @@ class EditOrder extends Component
         $this->dispatch('notify', ['message' => 'Product added successfully.']);
     }
 
-    public function increaseQuantity($id)
+    public function increaseQuantity($id): void
     {
         if (! isset($this->selectedProducts[$id])) {
             return;
@@ -146,7 +146,7 @@ class EditOrder extends Component
         $this->updatedShippingArea('');
     }
 
-    public function decreaseQuantity($id)
+    public function decreaseQuantity($id): void
     {
         if (! isset($this->selectedProducts[$id])) {
             return;
@@ -161,15 +161,15 @@ class EditOrder extends Component
         $this->updatedShippingArea('');
     }
 
-    public function updatedShippingArea($value)
+    public function updatedShippingArea($value): void
     {
         $shipping_cost = 0;
         if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
-            $shipping_cost = setting('delivery_charge')->{$this->shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping_area, 0);
+            $shipping_cost = setting('delivery_charge')->{$this->shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping_area, 0);
         } else {
             $shipping_cost = collect($this->selectedProducts)->sum(function ($item) {
-                $default = setting('delivery_charge')->{$this->shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping_area, 0);
-                if ($this->shipping_area == 'Inside Dhaka') {
+                $default = setting('delivery_charge')->{$this->shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping_area, 0);
+                if ($this->shipping_area === 'Inside Dhaka') {
                     return ($item['shipping_inside'] ?? $default) * (setting('show_option')->quantitywise_delivery_charge ?? false ? $item['quantity'] : 1);
                 } else {
                     return ($item['shipping_outside'] ?? $default) * (setting('show_option')->quantitywise_delivery_charge ?? false ? $item['quantity'] : 1);
@@ -231,7 +231,9 @@ class EditOrder extends Component
             return $user;
         }
 
-        $user = User::query()->firstOrCreate(
+        // $user->notify(new AccountCreated());
+
+        return User::query()->firstOrCreate(
             ['phone_number' => $this->order->phone],
             array_merge([
                 'name' => $this->order->name,
@@ -242,10 +244,6 @@ class EditOrder extends Component
                 'remember_token' => Str::random(10),
             ])
         );
-
-        // $user->notify(new AccountCreated());
-
-        return $user;
     }
 
     public function render()

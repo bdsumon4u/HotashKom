@@ -32,8 +32,8 @@ class CheckoutController extends Controller
                 'event' => 'begin_checkout',
                 'ecommerce' => [
                     'currency' => 'BDT',
-                    'value' => array_sum(array_map(fn($product) => $product['price'] * $product['quantity'], $cart)),
-                    'items' => array_values(array_map(fn($product) => [
+                    'value' => array_sum(array_map(fn($product): int|float => $product['price'] * $product['quantity'], $cart)),
+                    'items' => array_values(array_map(fn($product): array => [
                         'item_id' => $product['id'],
                         'item_name' => $product['name'],
                         'item_category' => $product['category'],
@@ -147,7 +147,9 @@ class CheckoutController extends Controller
             return $user;
         }
 
-        $user = User::query()->firstOrCreate(
+        // $user->notify(new AccountCreated());
+
+        return User::query()->firstOrCreate(
             ['phone_number' => $data['phone']],
             array_merge(Arr::except($data, 'phone'), [
                 'email_verified_at' => now(),
@@ -155,9 +157,5 @@ class CheckoutController extends Controller
                 'remember_token' => Str::random(10),
             ])
         );
-
-        // $user->notify(new AccountCreated());
-
-        return $user;
     }
 }

@@ -17,7 +17,7 @@ class HomeSection extends Model
         'data' => 'object',
     ];
 
-    public static function booted()
+    public static function booted(): void
     {
         static::deleted(function (): void {
             cache()->forget('homesections');

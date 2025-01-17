@@ -55,10 +55,8 @@ class LivewireCheckoutController extends Controller
         $livewire->shipping = $request->input('shipping');
 
         $livewire->cartUpdated();
-        if ($livewire->checkout() instanceof \Illuminate\Http\RedirectResponse) {
-            if (session('error')) {
-                return response()->json(['message' => session('error')], 422);
-            }
+        if ($livewire->checkout() instanceof \Illuminate\Http\RedirectResponse && session('error')) {
+            return response()->json(['message' => session('error')], 422);
         }
 
         return response()->json(['message' => 'Order placed successfully.', 'order' => $livewire->order]);

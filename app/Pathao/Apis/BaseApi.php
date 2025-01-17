@@ -16,10 +16,7 @@ class BaseApi
      */
     private $baseUrl;
 
-    /**
-     * @var Client
-     */
-    private $request;
+    private readonly \GuzzleHttp\Client $request;
 
     /**
      * @var array
@@ -39,7 +36,7 @@ class BaseApi
     /**
      * Set Base Url on sandbox mode
      */
-    private function setBaseUrl()
+    private function setBaseUrl(): void
     {
         if (config('pathao.sandbox') == true) {
             $this->baseUrl = 'https://hermes-api.p-stageenv.xyz';
@@ -51,7 +48,7 @@ class BaseApi
     /**
      * Set Default Headers
      */
-    private function setHeaders()
+    private function setHeaders(): void
     {
         $this->headers = [
             'Accept' => 'application/json',
@@ -64,7 +61,7 @@ class BaseApi
      *
      * @param  array  $header
      */
-    private function mergeHeader($header)
+    private function mergeHeader($header): void
     {
         $this->headers = array_merge($this->headers, $header);
     }
@@ -74,7 +71,7 @@ class BaseApi
      *
      * @throws PathaoException|GuzzleException
      */
-    private function authenticate()
+    private function authenticate(): void
     {
         try {
             $Pathao = optional(app(SettingRepository::class)->first('Pathao')->value);
@@ -169,7 +166,7 @@ class BaseApi
      *
      * @throws PathaoCourierValidationException
      */
-    public function validation($data, $requiredFields)
+    public function validation($data, $requiredFields): void
     {
         if (! is_array($data) || ! is_array($requiredFields)) {
             throw new \TypeError('Argument must be of the type array', 500);
