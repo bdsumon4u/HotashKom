@@ -168,23 +168,15 @@ class BaseApi
      */
     public function validation($data, $requiredFields): void
     {
-        if (! is_array($data) || ! is_array($requiredFields)) {
-            throw new \TypeError('Argument must be of the type array', 500);
-        }
+        throw_if(! is_array($data) || ! is_array($requiredFields), new \TypeError('Argument must be of the type array', 500));
 
-        if (! count($data) || ! count($requiredFields)) {
-            throw new PathaoCourierValidationException('Invalid data!', 422);
-        }
+        throw_if(! count($data) || ! count($requiredFields), new PathaoCourierValidationException('Invalid data!', 422));
 
         $requiredColumns = array_diff($requiredFields, array_keys($data));
-        if (count($requiredColumns)) {
-            throw new PathaoCourierValidationException($requiredColumns, 422);
-        }
+        throw_if(count($requiredColumns), new PathaoCourierValidationException($requiredColumns, 422));
 
         foreach ($requiredFields as $filed) {
-            if (isset($data[$filed]) && empty($data[$filed])) {
-                throw new PathaoCourierValidationException("$filed is required", 422);
-            }
+            throw_if(isset($data[$filed]) && empty($data[$filed]), new PathaoCourierValidationException("$filed is required", 422));
         }
 
     }

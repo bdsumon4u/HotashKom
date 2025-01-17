@@ -186,9 +186,7 @@ class Checkout extends Component
             $data['phone'] = '+880'.$data['phone'];
         }
 
-        if (count($this->cart) === 0) {
-            throw ValidationException::withMessages(['products' => 'Your cart is empty.']);
-        }
+        throw_if(count($this->cart) === 0, ValidationException::withMessages(['products' => 'Your cart is empty.']));
 
         $fraud = setting('fraud');
 

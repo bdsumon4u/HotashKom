@@ -50,12 +50,8 @@ class CheckoutController extends Controller
         $fraud = setting('fraud');
 
         if (Cache::has('fraud:hourly:'.$request->ip()) || Cache::has('fraud:daily:'.$data['phone'])) {
-            if (Cache::get('fraud:hourly:'.$request->ip()) >= ($fraud->allow_per_hour ?? 3)) {
-                abort(429, 'You have reached the maximum limit of orders per hour.');
-            }
-            if (Cache::get('fraud:daily:'.$request->ip()) >= ($fraud->allow_per_day ?? 7)) {
-                abort(429, 'You have reached the maximum limit of orders per day.');
-            }
+            abort_if(Cache::get('fraud:hourly:'.$request->ip()) >= ($fraud->allow_per_hour ?? 3), 429, 'You have reached the maximum limit of orders per hour.');
+            abort_if(Cache::get('fraud:daily:'.$request->ip()) >= ($fraud->allow_per_day ?? 7), 429, 'You have reached the maximum limit of orders per day.');
         }
 
         $order = DB::transaction(function () use ($data, &$order) {

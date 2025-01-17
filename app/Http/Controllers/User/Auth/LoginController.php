@@ -122,11 +122,9 @@ class LoginController extends Controller
      */
     private function sendOTP(&$user): void
     {
-        if (Cache::get($key = 'auth:'.\request()->get('login'))) {
-            throw ValidationException::withMessages([
-                'password' => ['Please wait for OTP.'],
-            ]);
-        }
+        throw_if(Cache::get($key = 'auth:'.\request()->get('login')), ValidationException::withMessages([
+            'password' => ['Please wait for OTP.'],
+        ]));
         $ttl = (property_exists($this, 'decayMinutes') ? $this->decayMinutes : 2) * 60;
         $otp = Cache::remember($key, $ttl, fn(): int => mt_rand(1000, 999999));
         $user->notify(new SendOTP($otp));
