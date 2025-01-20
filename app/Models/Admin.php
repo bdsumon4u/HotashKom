@@ -4,11 +4,15 @@ namespace App\Models;
 
 use App\Notifications\Admin\ResetPassword;
 use App\Notifications\Admin\VerifyEmail;
+use Filament\Models\Contracts\HasTenants;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Spatie\Activitylog\Traits\CausesActivity;
 
-class Admin extends Authenticatable
+class Admin extends Authenticatable implements HasTenants
 {
     use CausesActivity;
     use Notifiable;
@@ -75,5 +79,15 @@ class Admin extends Authenticatable
             'is_active' => 'boolean',
             'email_verified_at' => 'datetime',
         ];
+    }
+
+    public function canAccessTenant(Model $tenant): bool
+    {
+        return true;
+    }
+
+    public function getTenants(Panel $panel): array|Collection
+    {
+        return [];
     }
 }

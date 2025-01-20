@@ -31,8 +31,9 @@ class ProductController extends Controller
                 ? '<span class="text-'.($product->stock_count ? 'success' : 'danger').'">'.$product->stock_count.' In Stock</span>'
                 : '<span class="text-success">In Stock</span>')
             ->addColumn('actions', fn(Product $product): string => '<div>
-                    <a href="'.route('admin.products.edit', $product).'" class="btn btn-block btn-primary">Edit</a>
-                    <a href="'.route('admin.products.destroy', $product).'" data-action="delete" class="btn btn-block btn-danger">Delete</a>
+                    <a href="'.route('admin.products.edit', $product).'" class="btn btn-sm btn-block btn-primary">Edit</a>
+                    <a target="_blank" href="/landing/'.$product->id.'" class="btn btn-sm btn-block btn-info">Landing</a>
+                    <a href="'.route('admin.products.destroy', $product).'" data-action="delete" class="btn btn-sm btn-block btn-danger">Delete</a>
                 </div>')
             ->rawColumns(['image', 'name', 'pricing', 'stock', 'actions'])
             ->make(true);

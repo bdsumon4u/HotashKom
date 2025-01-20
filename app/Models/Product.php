@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Events\ProductCreated;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 use Laravel\Scout\Searchable;
 use Nicolaslopezj\Searchable\SearchableTrait;
@@ -205,6 +206,11 @@ class Product extends Model
             }
             return $images->filter(fn(Image $image): bool => $image->pivot->img_type == 'additional');
         });
+    }
+
+    public function landings(): HasMany
+    {
+        return $this->hasMany(Landing::class);
     }
 
     /**
