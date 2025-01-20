@@ -37,6 +37,17 @@
                         <h2 class="elementor-heading-title elementor-size-default">{{ $leftTitle }}</h2>
                     </div>
                 </div>
+                @if($leftContent)
+                <div class="elementor-element e-con-full e-flex e-con e-child" data-id="4650077"
+                    data-element_type="container">
+                    <div class="elementor-element elementor-element-e708d06 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
+                        data-id="e708d06" data-element_type="widget" data-widget_type="icon-list.default">
+                        <div class="elementor-widget-container">
+                            {!! $leftContent !!}
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
             <div class="elementor-element elementor-element-fd83858 e-con-full e-flex e-con e-child" data-id="fd83858"
                 data-element_type="container">
@@ -46,34 +57,20 @@
                         <h2 class="elementor-heading-title elementor-size-default">{{ $rightTitle }}</h2>
                     </div>
                 </div>
+                @if($rightContent)
+                <div class="elementor-element e-con-full e-flex e-con e-child" data-id="f65900a"
+                    data-element_type="container">
+                    <div class="elementor-element elementor-element-7913f0d elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
+                        data-id="7913f0d" data-element_type="widget" data-widget_type="icon-list.default">
+                        <div class="elementor-widget-container">
+                            {!! $rightContent !!}
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
-@endif
-@if($leftContent && $rightContent)
-<div class="elementor-element elementor-element-965b25e e-flex e-con-boxed e-con e-parent" data-id="965b25e"
-    data-element_type="container">
-    <div class="e-con-inner">
-        <div class="elementor-element elementor-element-4650077 e-con-full e-flex e-con e-child" data-id="4650077"
-            data-element_type="container">
-            <div class="elementor-element elementor-element-e708d06 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
-                data-id="e708d06" data-element_type="widget" data-widget_type="icon-list.default">
-                <div class="elementor-widget-container">
-                    {!! $leftContent !!}
-                </div>
-            </div>
-        </div>
-        <div class="elementor-element elementor-element-f65900a e-con-full e-flex e-con e-child" data-id="f65900a"
-            data-element_type="container">
-            <div class="elementor-element elementor-element-7913f0d elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
-                data-id="7913f0d" data-element_type="widget" data-widget_type="icon-list.default">
-                <div class="elementor-widget-container">
-                    {!! $rightContent !!}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 @endif
 <div class="elementor-element elementor-element-261c4e1 e-flex e-con-boxed e-con e-parent" data-id="261c4e1"
     data-element_type="container">
