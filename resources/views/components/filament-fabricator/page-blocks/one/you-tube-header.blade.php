@@ -33,33 +33,21 @@
                     data-settings="{&quot;highlighted_text&quot;:&quot; \u09b2\u09be\u09b2 \u099a\u09be\u09b2&quot;,&quot;headline_style&quot;:&quot;highlight&quot;,&quot;marker&quot;:&quot;circle&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;highlight_animation_duration&quot;:1200,&quot;highlight_iteration_delay&quot;:8000}"
                     data-widget_type="animated-headline.default">
                     <div class="elementor-widget-container">
-                        <h3 class="elementor-headline">
-                            <span class="elementor-headline-plain-text elementor-headline-text-wrapper">ওজন
-                                হ্রাসে, ডায়াবেটিস নিয়ন্ত্রণে, হৃদরোগের ঝুঁকি কমাতে, শরীরের ইমোনিটি এবং
-                                এনার্জি সাপোর্টর জন্য</span>
-                            <span
-                                class="elementor-headline-dynamic-wrapper elementor-headline-text-wrapper">
-                                <span
-                                    class="elementor-headline-dynamic-text elementor-headline-text-active">
-                                    লাল চাল</span>
-                            </span>
-                            <span class="elementor-headline-plain-text elementor-headline-text-wrapper">
-                                হোক আপনার আমার নিত্য দিনের খাবার</span>
+                        <h3 class="elementor-headline elementor-headline-plain-text elementor-headline-text-wrapper">
+                            {!! $headline !!}
                         </h3>
                     </div>
                 </div>
                 <div class="elementor-element elementor-element-d7f836e elementor-widget__width-initial elementor-widget elementor-widget-text-editor"
                     data-id="d7f836e" data-element_type="widget" data-widget_type="text-editor.default">
                     <div class="elementor-widget-container">
-                        <p>কিশোরগঞ্জের হাওর অঞ্চল থেকে সংগ্রহ কৃত এই চাল সম্পুর্ন কেমিক্যাল, রং বিহীন, হাফ ও
-                            ফুল ফাইবার সমৃদ্ধ। সংগ্রহ করার পর লাল চাল গুলো ঝেড়ে পরিস্কার করে রোদে শুকিয়ে
-                            ফুড গ্রেড পলিতে পেকেট করা হয়। বর্তমানে আমাদের কাছে আউশ জাতীয় লাল চাল আছে। ক্রয়
-                            করতে চাইলে অর্ডার অথবা কল করুন।</p>
+                        {!! $description !!}
                     </div>
                 </div>
+                @isset($youtube_link)
                 <div class="elementor-element elementor-element-fef2488 elementor-widget elementor-widget-video"
                     data-id="fef2488" data-element_type="widget"
-                    data-settings="{&quot;youtube_url&quot;:&quot;https:\/\/youtu.be\/Wuls05qIKuU?si=V87zAjhQ8Da7GyZ_&quot;,&quot;autoplay&quot;:&quot;yes&quot;,&quot;play_on_mobile&quot;:&quot;yes&quot;,&quot;video_type&quot;:&quot;youtube&quot;,&quot;controls&quot;:&quot;yes&quot;}"
+                    data-settings='{"youtube_url":"{{$youtube_link}}","autoplay":"yes","play_on_mobile":"yes","video_type":"youtube","controls":"yes"}'
                     data-widget_type="video.default">
                     <div class="elementor-widget-container">
                         <div class="elementor-wrapper elementor-open-inline">
@@ -67,6 +55,7 @@
                         </div>
                     </div>
                 </div>
+                @endisset
                 <div class="elementor-element elementor-element-896d874 elementor-align-center elementor-widget__width-initial elementor-widget elementor-widget-button"
                     data-id="896d874" data-element_type="widget" data-widget_type="button.default">
                     <div class="elementor-widget-container">

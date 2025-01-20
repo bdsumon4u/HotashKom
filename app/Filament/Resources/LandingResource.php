@@ -42,7 +42,8 @@ class LandingResource extends PageResource
 
                         Group::make()->schema(FilamentFabricator::getSchemaSlot(ResourceSchemaSlot::BLOCKS_AFTER)),
                     ])
-                    ->columnSpan(2),
+                    ->columnSpan(2)
+                    ->disabled(fn (Get $get) => $get('layout') === FilamentFabricator::getDefaultLayoutName()),
 
                 Group::make()
                     ->columnSpan(1)
@@ -91,6 +92,7 @@ class LandingResource extends PageResource
                                     ->default(fn () => FilamentFabricator::getDefaultLayoutName())
                                     ->live()
                                     ->required()
+                                    ->disableOptionWhen(fn (string $value) => $value === FilamentFabricator::getDefaultLayoutName())
                                     ->afterStateUpdated(fn (?PageContract $record, Get $get, Set $set) => static::getPageBlocks($record, $get, $set)),
 
                                 Select::make('parent_id')
@@ -113,7 +115,8 @@ class LandingResource extends PageResource
                                                 $query->where('id', '!=', $record->id);
                                             }
                                         }
-                                    ),
+                                    )
+                                    ->hidden(),
                             ]),
 
                         Group::make()->schema(FilamentFabricator::getSchemaSlot(ResourceSchemaSlot::SIDEBAR_AFTER)),
