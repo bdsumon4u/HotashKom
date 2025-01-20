@@ -39,13 +39,10 @@ class YouTubeHeader extends PageBlock
         return $data;
     }
 
-    public static function default(?PageContract $record, Get $get, Set $set): array
+    public static function default(array $data): array
     {
         return [
-            'data' => [
-                'headline' => 'ওজন হ্রাসে, ডায়াবেটিস নিয়ন্ত্রণে, হৃদরোগের ঝুঁকি কমাতে, শরীরের ইমোনিটি এবং এনার্জি সাপোর্টর জন্য লাল চাল হোক আপনার আমার নিত্য দিনের খাবারের অংশ।',
-                'youtube_link' => 'https://youtu.be/Wuls05qIKuU?si=V87zAjhQ8Da7GyZ_',
-            ],
+            'data' => $data,
             'type' => static::getBlockName(),
         ];
     }

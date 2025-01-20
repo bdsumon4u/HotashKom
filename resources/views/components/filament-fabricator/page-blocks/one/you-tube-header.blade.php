@@ -44,10 +44,10 @@
                         {!! $description !!}
                     </div>
                 </div>
-                @isset($youtube_link)
+                @isset($youtubeLink)
                 <div class="elementor-element elementor-element-fef2488 elementor-widget elementor-widget-video"
                     data-id="fef2488" data-element_type="widget"
-                    data-settings='{"youtube_url":"{{$youtube_link}}","autoplay":"yes","play_on_mobile":"yes","video_type":"youtube","controls":"yes"}'
+                    data-settings='{"youtube_url":"{{$youtubeLink}}","autoplay":"yes","play_on_mobile":"yes","video_type":"youtube","controls":"yes"}'
                     data-widget_type="video.default">
                     <div class="elementor-widget-container">
                         <div class="elementor-wrapper elementor-open-inline">

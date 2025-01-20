@@ -46,10 +46,10 @@ class TwoColList extends PageBlock
         return $data;
     }
 
-    public static function default(?PageContract $record, Get $get, Set $set): array
+    public static function default(array $data): array
     {
         return [
-            'data' => [],
+            'data' => $data,
             'type' => static::getBlockName(),
         ];
     }

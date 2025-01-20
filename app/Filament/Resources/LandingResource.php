@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Fabricator\Layouts\DefaultLayout;
 use Closure;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
@@ -59,6 +60,7 @@ class LandingResource extends PageResource
 
                                 TextInput::make('title')
                                     ->label(__('filament-fabricator::page-resource.labels.title'))
+                                    ->default(fn () => Filament::getTenant()->name)
                                     ->afterStateUpdated(function (Get $get, Set $set, ?string $state, ?PageContract $record) {
                                         if (! $get('is_slug_changed_manually') && filled($state) && blank($record)) {
                                             $set('slug', Str::slug($state, language: config('app.locale', 'en')));
@@ -73,6 +75,7 @@ class LandingResource extends PageResource
 
                                 TextInput::make('slug')
                                     ->label(__('filament-fabricator::page-resource.labels.slug'))
+                                    ->default(fn () => Filament::getTenant()->slug)
                                     ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule, Get $get) => $rule->where('parent_id', $get('parent_id')))
                                     ->afterStateUpdated(function (Set $set) {
                                         $set('is_slug_changed_manually', true);

@@ -744,10 +744,7 @@
     <script
         src="https://demo.orioit.com/wp-content/plugins/woocommerce/assets/js/frontend/order-attribution.min.js?ver=9.4.2"
         id="wc-order-attribution-js"></script>
-    <script src="https://demo.orioit.com/wp-content/plugins/cartflows/assets/js/checkout-template.js?ver=2.0.12"
-        id="wcf-checkout-template-js"></script>
-    <script src="https://demo.orioit.com/wp-content/plugins/cartflows-pro/assets/js/checkout.js?ver=2.0.10"
-        id="wcf-pro-checkout-js"></script>
+    
     <script id="bdt-uikit-js-extra">
         var element_pack_ajax_login_config = {
             "ajaxurl": "https:\/\/demo.orioit.com\/wp-admin\/admin-ajax.php",
