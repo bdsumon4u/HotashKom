@@ -39,14 +39,6 @@ class YouTubeHeader extends PageBlock
         return $data;
     }
 
-    public static function default(array $data): array
-    {
-        return [
-            'data' => $data,
-            'type' => static::getBlockName(),
-        ];
-    }
-
     private static function highlightWords(string $text, ?string $highlights): string
     {
         if (! $highlights) {

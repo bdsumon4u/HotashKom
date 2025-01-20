@@ -50,7 +50,7 @@ class ProductController extends Controller
         $data = $request->validationData();
         event(new ProductCreated($product = Product::create($data), $data));
 
-        return redirect()->action(self::edit(...), $product)->with('success', 'Product Has Been Created.');
+        return redirect()->action([static::class, 'edit'], $product)->with('success', 'Product Has Been Created.');
     }
 
     /**
@@ -97,7 +97,7 @@ class ProductController extends Controller
 
         event(new ProductUpdated($product, $data));
 
-        return redirect()->action(self::index(...))->with('success', 'Product Has Been Updated. Check <a href="'.route('products.show', $product).'" target="_blank">Product</a>');
+        return redirect()->action([static::class, 'index'])->with('success', 'Product Has Been Updated. Check <a href="'.route('products.show', $product).'" target="_blank">Product</a>');
     }
 
     /**

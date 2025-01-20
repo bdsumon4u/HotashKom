@@ -25,12 +25,4 @@ class OneColList extends PageBlock
     {
         return $data;
     }
-
-    public static function default(?PageContract $record, Get $get, Set $set): array
-    {
-        return [
-            'data' => [],
-            'type' => static::getBlockName(),
-        ];
-    }
 }

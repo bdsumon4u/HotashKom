@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Filament\Fabricator\PageBlocks\One;
+namespace App\Filament\Fabricator\PageBlocks\Two;
 
 use App\Filament\Fabricator\PageBlocks\HasBlockName;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Builder\Block;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\TextInput;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 use Z3d0X\FilamentFabricator\Models\Contracts\Page as PageContract;
 
-class NormalText extends PageBlock
+class RoundedHeading extends PageBlock
 {
     use HasBlockName;
 
@@ -17,7 +18,11 @@ class NormalText extends PageBlock
     {
         return Block::make(static::getBlockName())
             ->schema([
-                //
+                Hidden::make('thumbnail')
+                    ->default(fn () => Filament::getTenant()->base_image->src),
+                TextInput::make('heading')
+                    ->required(),
+                TextInput::make('subheading'),
             ]);
     }
 

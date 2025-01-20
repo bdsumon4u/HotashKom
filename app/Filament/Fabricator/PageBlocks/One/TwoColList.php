@@ -46,14 +46,6 @@ class TwoColList extends PageBlock
         return $data;
     }
 
-    public static function default(array $data): array
-    {
-        return [
-            'data' => $data,
-            'type' => static::getBlockName(),
-        ];
-    }
-
     private static function transformListHtmlQuick(?string $listHtml): ?string
     {
         if (!  $listHtml) {
