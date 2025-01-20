@@ -20,23 +20,18 @@ class TwoColList extends PageBlock
     {
         return Block::make(static::getBlockName())
             ->schema([
-                TextInput::make('title')
-                    ->columnSpanFull(),
+                Group::make([
+                    TextInput::make('title'),
+                    RichEditor::make('content'),
+                ])
+                ->columnSpanFull(),
                 Group::make([
                     TextInput::make('left_title'),
-                    RichEditor::make('left_list')
-                        ->disableToolbarButtons([
-                            'attachFiles', 'codeBlock', 'blockquote', 'h2', 'h3', 'undo', 'redo',
-                        ])
-                        ->required(),
+                    RichEditor::make('left_content'),
                 ]),
                 Group::make([
                     TextInput::make('right_title'),
-                    RichEditor::make('right_list')
-                        ->disableToolbarButtons([
-                            'attachFiles', 'codeBlock', 'blockquote', 'h2', 'h3', 'undo', 'redo',
-                        ])
-                        ->required(),
+                    RichEditor::make('right_content'),
                 ]),
             ])
             ->columns(2);
@@ -44,8 +39,9 @@ class TwoColList extends PageBlock
 
     public static function mutateData(array $data): array
     {
-        $data['left_list'] = static::transformListHtmlQuick($data['left_list']);
-        $data['right_list'] = static::transformListHtmlQuick($data['right_list']);
+        $data['content'] = static::transformListHtmlQuick($data['content']);
+        $data['left_content'] = static::transformListHtmlQuick($data['left_content']);
+        $data['right_content'] = static::transformListHtmlQuick($data['right_content']);
 
         return $data;
     }
@@ -58,8 +54,12 @@ class TwoColList extends PageBlock
         ];
     }
 
-    private static function transformListHtmlQuick(string $listHtml): string
+    private static function transformListHtmlQuick(?string $listHtml): ?string
     {
+        if (!  $listHtml) {
+            return $listHtml;
+        }
+
         // Define the SVG icon
         $icon = '<span class="elementor-icon-list-icon">
                     <svg aria-hidden="true" class="e-font-icon-svg e-far-hand-point-right" viewBox="0 0 512 512"
