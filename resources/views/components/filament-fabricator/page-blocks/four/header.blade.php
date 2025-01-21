@@ -17,21 +17,6 @@
         <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-063a7ad"
             data-id="063a7ad" data-element_type="column">
             <div class="elementor-widget-wrap elementor-element-populated">
-                <div class="elementor-element elementor-element-1a8f807 elementor-hidden-desktop elementor-hidden-tablet elementor-hidden-mobile e-flex e-con-boxed e-con e-parent"
-                    data-id="1a8f807" data-element_type="container">
-                    <div class="e-con-inner">
-                        <div class="elementor-element elementor-element-3a0263e elementor-widget elementor-widget-image"
-                            data-id="3a0263e" data-element_type="widget" data-widget_type="image.default">
-                            <div class="elementor-widget-container">
-                                <img fetchpriority="high" decoding="async" width="696" height="392"
-                                    src="https://demo.orioit.com/wp-content/uploads/2024/11/p1_balachao_1.jpeg"
-                                    class="attachment-large size-large wp-image-208" alt=""
-                                    srcset="https://demo.orioit.com/wp-content/uploads/2024/11/p1_balachao_1.jpeg 696w, https://demo.orioit.com/wp-content/uploads/2024/11/p1_balachao_1-600x338.jpeg 600w, https://demo.orioit.com/wp-content/uploads/2024/11/p1_balachao_1-300x169.jpeg 300w"
-                                    sizes="(max-width: 696px) 100vw, 696px" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <section
                     class="elementor-section elementor-inner-section elementor-element elementor-element-07d43da elementor-section-boxed elementor-section-height-default"
                     data-id="07d43da" data-element_type="section">
@@ -82,10 +67,8 @@
                                     data-id="cca248f" data-element_type="widget" data-widget_type="image.default">
                                     <div class="elementor-widget-container">
                                         <img decoding="async" width="418" height="418"
-                                            src="https://demo.orioit.com/wp-content/uploads/2024/11/balachao.jpg"
-                                            class="attachment-large size-large wp-image-209" alt=""
-                                            srcset="https://demo.orioit.com/wp-content/uploads/2024/11/balachao.jpg 418w, https://demo.orioit.com/wp-content/uploads/2024/11/balachao-300x300.jpg 300w, https://demo.orioit.com/wp-content/uploads/2024/11/balachao-100x100.jpg 100w, https://demo.orioit.com/wp-content/uploads/2024/11/balachao-150x150.jpg 150w"
-                                            sizes="(max-width: 418px) 100vw, 418px" />
+                                            src="{{ asset(optional($page->product->base_image)->src) }}"
+                                            class="attachment-large size-large wp-image-209" alt="" />
                                     </div>
                                 </div>
                             </div>
