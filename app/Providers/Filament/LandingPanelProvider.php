@@ -63,6 +63,7 @@ class LandingPanelProvider extends PanelProvider
             ])
             ->authGuard('admin')
             ->tenant(Product::class)
-            ->tenantMenu(false);
+            ->tenantMenu(false)
+            ->viteTheme('resources/css/filament/landing/theme.css');
     }
 }
