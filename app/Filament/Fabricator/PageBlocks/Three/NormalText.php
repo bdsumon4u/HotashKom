@@ -2,11 +2,12 @@
 
 namespace App\Filament\Fabricator\PageBlocks\Three;
 
+use AmidEsfahani\FilamentTinyEditor\TinyEditor;
 use App\Filament\Fabricator\PageBlocks\HasBlockName;
 use Filament\Forms\Components\Builder\Block;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
-class Pricing extends PageBlock
+class NormalText extends PageBlock
 {
     use HasBlockName;
 
@@ -14,7 +15,8 @@ class Pricing extends PageBlock
     {
         return Block::make(static::getBlockName())
             ->schema([
-                //
+                TinyEditor::make('content')
+                    ->required(),
             ]);
     }
 
