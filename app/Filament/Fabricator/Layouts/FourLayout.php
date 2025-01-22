@@ -53,9 +53,9 @@ class FourLayout extends Layout
             ]),
             NormalText::default([
                 'content' => '
-                    <h2><span style="font-size: 48px;">৫০০ গ্রাম এর পূর্বমূল্য <span style="text-decoration: line-through; color: #ff0000;">৯৫০</span> এখন ছাড়ে ৮০০ টাকা</span></h2>
+                    <h2><span style="font-size: 48px;">৫০০ গ্রাম এর পূর্বমূল্য <span style="color: #ff0000;"><s>৯৫০</s></span> এখন ছাড়ে ৮০০ টাকা</span></h2>
                     <hr>
-                    <h2><span style="font-size: 48px;">১ কেজি এর পূর্বমূল্য <span style="text-decoration: line-through; color: #ff0000;">১৮০০</span> এখন ছাড়ে ১৫৫০ টাকা</span></h2>
+                    <h2><span style="font-size: 48px;">১ কেজি এর পূর্বমূল্য <span style="color: #ff0000;"><s>১৮০০</s></span> এখন ছাড়ে ১৫৫০ টাকা</span></h2>
                 ',
             ]),
             Features::default([
