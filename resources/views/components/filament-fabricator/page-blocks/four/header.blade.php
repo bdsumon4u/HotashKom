@@ -67,7 +67,7 @@
                                     data-id="cca248f" data-element_type="widget" data-widget_type="image.default">
                                     <div class="elementor-widget-container">
                                         <img decoding="async" width="418" height="418"
-                                            src="{{ asset(optional($page->product->base_image)->src) }}"
+                                            src="{{ asset($thumbnail) }}"
                                             class="attachment-large size-large wp-image-209" alt="" />
                                     </div>
                                 </div>

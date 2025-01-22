@@ -8,7 +8,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
-class CustomerReview extends PageBlock
+class AdditionalImages extends PageBlock
 {
     use HasBlockName;
 
@@ -21,8 +21,7 @@ class CustomerReview extends PageBlock
                 FileUpload::make('images')
                     ->image()
                     ->multiple()
-                    ->reorderable()
-                    ->required(),
+                    ->reorderable(),
             ]);
     }
 
