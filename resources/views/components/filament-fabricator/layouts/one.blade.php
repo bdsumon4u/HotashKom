@@ -601,26 +601,6 @@
                     </div>
                 </div>
             </section>
-            <section
-                class="elementor-section elementor-top-section elementor-element elementor-element-e3d773d elementor-section-boxed elementor-section-height-default"
-                data-id="e3d773d" data-element_type="section"
-                data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
-                <div class="elementor-container elementor-column-gap-no">
-                    <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-fa53a06"
-                        data-id="fa53a06" data-element_type="column">
-                        <div class="elementor-widget-wrap elementor-element-populated">
-                            <div class="elementor-element elementor-element-1ccff08 elementor-widget elementor-widget-heading"
-                                data-id="1ccff08" data-element_type="widget" data-widget_type="heading.default">
-                                <div class="elementor-widget-container">
-                                    <h2 class="elementor-heading-title elementor-size-default">Copyright © 2024 Orio IT
-                                        | This website made with by <a href="https://orioit.com/"
-                                            style="color:green">Orio IT</a></h2>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
     </div>
 
