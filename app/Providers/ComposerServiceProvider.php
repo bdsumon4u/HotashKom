@@ -43,7 +43,7 @@ class ComposerServiceProvider extends ServiceProvider
 
         foreach ($menus as $slug => $view) {
             View::composer("partials.{$view}", function ($view) use ($slug): void {
-                $view->withMenuItems(cache()->rememberForever('menus:'.$slug, fn() => optional(Menu::whereSlug($slug)->first())->menuItems ?: new Collection));
+                $view->withMenuItems(cache()->rememberForever('menus:'.$slug, fn () => optional(Menu::whereSlug($slug)->first())->menuItems ?: new Collection));
             });
         }
 

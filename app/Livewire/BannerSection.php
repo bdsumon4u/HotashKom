@@ -24,7 +24,7 @@ class BannerSection extends Component
                     'width' => old('data.columns.width.'.$i, $width),
                     'animation' => old('data.columns.animation.'.$i, $pseudoColumns['animation'][$i] ?? 'fade-right'),
                     'link' => old('data.columns.link.'.$i, $pseudoColumns['link'][$i] ?? '#'),
-                    'categories' => old('data.columns.categories.'.$i, ((array)($pseudoColumns['categories'] ?? []))[$i] ?? []),
+                    'categories' => old('data.columns.categories.'.$i, ((array) ($pseudoColumns['categories'] ?? []))[$i] ?? []),
                 ];
             }
         }

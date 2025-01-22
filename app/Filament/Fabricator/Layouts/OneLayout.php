@@ -2,8 +2,6 @@
 
 namespace App\Filament\Fabricator\Layouts;
 
-use App\Filament\Fabricator\PageBlocks\One\NormalText;
-use App\Filament\Fabricator\PageBlocks\One\OneColList;
 use App\Filament\Fabricator\PageBlocks\One\ContentColumn;
 use App\Filament\Fabricator\PageBlocks\One\YouTubeHeader;
 use Filament\Forms\Get;

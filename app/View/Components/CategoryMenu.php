@@ -12,9 +12,7 @@ class CategoryMenu extends Component
      *
      * @param  int  $space
      */
-    public function __construct(public $categories, public $space = 0)
-    {
-    }
+    public function __construct(public $categories, public $space = 0) {}
 
     /**
      * Get the view / contents that represent the component.

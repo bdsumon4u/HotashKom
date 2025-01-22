@@ -55,15 +55,15 @@ return [
     'logo' => [
         'desktop' => [
             'width' => 260,
-            'height' => 54
+            'height' => 54,
         ],
         'mobile' => [
             'width' => 150,
-            'height' => 40
+            'height' => 40,
         ],
         'favicon' => [
             'width' => 56,
-            'height' => 56
+            'height' => 56,
         ],
     ],
 

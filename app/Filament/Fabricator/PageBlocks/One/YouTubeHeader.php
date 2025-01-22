@@ -3,16 +3,10 @@
 namespace App\Filament\Fabricator\PageBlocks\One;
 
 use App\Filament\Fabricator\PageBlocks\HasBlockName;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
-use Z3d0X\FilamentFabricator\Models\Contracts\Page as PageContract;
 
 class YouTubeHeader extends PageBlock
 {
@@ -49,7 +43,7 @@ class YouTubeHeader extends PageBlock
         $escapedWords = array_map('trim', array_map('preg_quote', explode('|', $highlights)));
 
         // Create a regex pattern to match the words
-        $pattern = '/(' . implode('|', $escapedWords) . ')/i';
+        $pattern = '/('.implode('|', $escapedWords).')/i';
 
         // Replace the matched words with a <div>-wrapped version
         $replacement = '<span class="elementor-headline-dynamic-wrapper elementor-headline-text-wrapper">

@@ -12,7 +12,6 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
-use App\Models\Slide;
 use App\Pathao\Facade\Pathao;
 use Illuminate\Http\Request;
 
@@ -20,13 +19,13 @@ class ApiController extends Controller
 {
     public function menus()
     {
-        return cache()->remember('menus', now()->addMinute(), fn() => Menu::all()->mapWithKeys(fn ($menu) => [$menu->slug => $menu->menuItems]));
+        return cache()->remember('menus', now()->addMinute(), fn () => Menu::all()->mapWithKeys(fn ($menu) => [$menu->slug => $menu->menuItems]));
     }
 
     public function searchSuggestions(Request $request)
     {
         return Product::search($request->get('query'), fn ($query) => $query->whereNull('parent_id')->whereIsActive(1))
-            ->take($request->get('limit'))->get()->transform(fn($product) => array_merge($product->toArray(), [
+            ->take($request->get('limit'))->get()->transform(fn ($product) => array_merge($product->toArray(), [
                 'images' => $product->images->pluck('src')->toArray(),
                 'price' => $product->selling_price,
                 'compareAtPrice' => $product->price,
@@ -47,7 +46,7 @@ class ApiController extends Controller
 
     public function slides()
     {
-        return slides()->transform(fn($slide) => $slide->only(['title', 'text', 'btn_name', 'btn_href']) + [
+        return slides()->transform(fn ($slide) => $slide->only(['title', 'text', 'btn_name', 'btn_href']) + [
             'imageClassic' => [
                 'ltr' => asset($slide->desktop_src),
                 'rtl' => asset($slide->desktop_src),
@@ -65,15 +64,16 @@ class ApiController extends Controller
 
     public function sections(Request $request)
     {
-        return sections()->transform(fn($section) => array_merge($section->toArray(), [
-            'categories' => $section->categories->map(fn($category) => array_merge($category->toArray(), [
+        return sections()->transform(fn ($section) => array_merge($section->toArray(), [
+            'categories' => $section->categories->map(fn ($category) => array_merge($category->toArray(), [
                 'sectionId' => $section->id,
             ]))->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => $section->type == 'pure-grid' ? 'View All' : 'All']),
         ]));
     }
 
-    public function sectionProducts(Request $request, HomeSection $section) {
-        return $section->products(category: $request->category)->transform(fn($product) => array_merge($product->toArray(), [
+    public function sectionProducts(Request $request, HomeSection $section)
+    {
+        return $section->products(category: $request->category)->transform(fn ($product) => array_merge($product->toArray(), [
             'images' => $product->images->pluck('src')->toArray(),
             'price' => $product->selling_price,
             'compareAtPrice' => $product->price,
@@ -98,7 +98,7 @@ class ApiController extends Controller
         $showBrandCategory = false;
         if ($product->variations->isNotEmpty()) {
             if ($request->options) {
-                $selectedVar = $product->variations->first(fn($item) => $item->options->pluck('id')->diff($request->options)->isEmpty());
+                $selectedVar = $product->variations->first(fn ($item) => $item->options->pluck('id')->diff($request->options)->isEmpty());
             } else {
                 $selectedVar = $product->variations->where('slug', request()->segment(2))->first()
                     ?? $product->variations->random();
@@ -108,11 +108,9 @@ class ApiController extends Controller
             $showBrandCategory = true;
         }
 
-        
         $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         $options = $selectedVar->options->pluck('id', 'attribute_id')->toArray();
         $maxQuantity = $selectedVar->should_track ? min($selectedVar->stock_count, $maxPerProduct) : $maxPerProduct;
-
 
         $optionGroup = $product->variations->pluck('options')->flatten()->unique('id')->groupBy('attribute_id');
 
@@ -142,7 +140,7 @@ class ApiController extends Controller
 
     public function updatedOptions($value, $key): void
     {
-        $variation = $this->product->variations->first(fn($item) => $item->options->pluck('id')->diff($this->options)->isEmpty());
+        $variation = $this->product->variations->first(fn ($item) => $item->options->pluck('id')->diff($this->options)->isEmpty());
 
         if ($variation) {
             $this->selectedVar = $variation;
@@ -160,7 +158,7 @@ class ApiController extends Controller
                 $text .= '<li>কমপক্ষে <strong class="text-danger">'.$freeDelivery->min_amount.'</strong> টাকার প্রোডাক্ট অর্ডার করুন</li>';
             }
 
-            return $text . '</ul>';
+            return $text.'</ul>';
         }
 
         if (array_key_exists($product->id, $products = ((array) ($freeDelivery->products ?? [])) ?? [])) {
@@ -175,6 +173,7 @@ class ApiController extends Controller
         $product = Product::where('slug', rawurldecode((string) $slug))->firstOrFail();
 
         $categories = $product->categories->pluck('id')->toArray();
+
         return Product::whereIsActive(1)
             ->whereHas('categories', function ($query) use ($categories): void {
                 $query->whereIn('categories.id', $categories);
@@ -183,7 +182,7 @@ class ApiController extends Controller
             ->where('id', '!=', $product->id)
             ->limit(config('services.products_count.related', 20))
             ->get()
-            ->transform(fn($product) => array_merge($product->toArray(), [
+            ->transform(fn ($product) => array_merge($product->toArray(), [
                 'images' => $product->images->pluck('src')->toArray(),
                 'price' => $product->selling_price,
                 'compareAtPrice' => $product->price,
@@ -209,7 +208,7 @@ class ApiController extends Controller
         }
 
         return Category::all()
-            ->transform(fn($category) => $category->toArray() + [
+            ->transform(fn ($category) => $category->toArray() + [
                 'type' => 'shop',
             ])
             ->toJson();
@@ -242,7 +241,7 @@ class ApiController extends Controller
         ]));
 
         // return cache()->remember('settings:'.implode(';', $keys), now()->addMinute(), function () use ($keys) {
-            return Setting::whereIn('name', $keys)->get(['name', 'value'])->pluck('value', 'name');
+        return Setting::whereIn('name', $keys)->get(['name', 'value'])->pluck('value', 'name');
         // });
     }
 

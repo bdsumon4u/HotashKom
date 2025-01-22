@@ -136,7 +136,7 @@ class OrderController extends Controller
 
                 return $products;
             })
-            ->groupBy('id')->map(fn($item): array => [
+            ->groupBy('id')->map(fn ($item): array => [
                 'name' => $item->random()['name'],
                 'slug' => $item->random()['slug'],
                 'quantity' => $item->sum('quantity'),
@@ -212,7 +212,7 @@ class OrderController extends Controller
         if (! (($SteadFast = setting('SteadFast'))->enabled ?? false)) {
             return 0;
         }
-        $orders = Order::whereIn('id', $order_ids)->where('data->courier', 'SteadFast')->get()->map(fn($order): array => [
+        $orders = Order::whereIn('id', $order_ids)->where('data->courier', 'SteadFast')->get()->map(fn ($order): array => [
             'invoice' => $order->id,
             'recipient_name' => $order->name ?? 'N/A',
             'recipient_address' => $order->address ?? 'N/A',
@@ -331,7 +331,7 @@ class OrderController extends Controller
     {
         $quantities = $request->quantity;
         $productIDs = collect($order->products)
-            ->map(fn($product) => $product->id);
+            ->map(fn ($product) => $product->id);
         $products = Product::find($productIDs)
             ->map(function (Product $product) use ($quantities) {
                 if ($quantity = data_get($quantities, $product->id)) {

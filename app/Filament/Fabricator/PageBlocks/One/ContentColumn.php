@@ -7,9 +7,6 @@ use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use Z3d0X\FilamentFabricator\Models\Contracts\Page as PageContract;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
 class ContentColumn extends PageBlock
@@ -24,7 +21,7 @@ class ContentColumn extends PageBlock
                     TextInput::make('title'),
                     RichEditor::make('content'),
                 ])
-                ->columnSpanFull(),
+                    ->columnSpanFull(),
                 Group::make([
                     TextInput::make('left_title'),
                     RichEditor::make('left_content'),
@@ -48,7 +45,7 @@ class ContentColumn extends PageBlock
 
     private static function transformListHtmlQuick(?string $listHtml): ?string
     {
-        if (!  $listHtml) {
+        if (! $listHtml) {
             return $listHtml;
         }
 
@@ -68,7 +65,8 @@ class ContentColumn extends PageBlock
         // Add classes to LI tags and wrap content
         $listHtml = preg_replace_callback('/<li>(.*?)<\/li>/s', function ($matches) use ($icon) {
             $content = $matches[1];
-            return '<li class="elementor-icon-list-item">' . $icon . '<span class="elementor-icon-list-text">' . $content . '</span></li>';
+
+            return '<li class="elementor-icon-list-item">'.$icon.'<span class="elementor-icon-list-text">'.$content.'</span></li>';
         }, $listHtml);
 
         return $listHtml;

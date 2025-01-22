@@ -8,7 +8,6 @@ use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
-use Z3d0X\FilamentFabricator\Models\Contracts\Page as PageContract;
 
 class RoundedHeading extends PageBlock
 {

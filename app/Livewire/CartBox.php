@@ -15,7 +15,7 @@ class CartBox extends Component
     public function refresh(): void
     {
         $this->cart = session()->get('cart', []);
-        $this->subtotal = collect($this->cart)->sum(fn($item): int|float => $item['price'] * $item['quantity']);
+        $this->subtotal = collect($this->cart)->sum(fn ($item): int|float => $item['price'] * $item['quantity']);
     }
 
     public function mount(): void
@@ -51,7 +51,7 @@ class CartBox extends Component
 
     public function updatedCart(): void
     {
-        $this->subtotal = collect($this->cart)->sum(fn($item): int|float => $item['price'] * $item['quantity']);
+        $this->subtotal = collect($this->cart)->sum(fn ($item): int|float => $item['price'] * $item['quantity']);
 
         $this->dispatch('cartBoxUpdated');
     }

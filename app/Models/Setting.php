@@ -22,7 +22,7 @@ class Setting extends Model
 
     public static function array()
     {
-        return Cache::rememberForever('settings', fn() => self::all()->flatMap(fn($setting) => [$setting->name => $setting->value])->toArray());
+        return Cache::rememberForever('settings', fn () => self::all()->flatMap(fn ($setting) => [$setting->name => $setting->value])->toArray());
     }
 
     public function value(): Attribute

@@ -22,9 +22,9 @@ return new class extends Migration
             $table->unique(['slug', 'parent_id']);
         });
     }
-    
+
     public function down()
     {
         Schema::dropIfExists(config('filament-fabricator.table_name', 'pages'));
-    }    
+    }
 };

@@ -20,7 +20,7 @@ class Controller extends BaseController
     {
         if (empty($this->viewPath)) {
             $str = Str::beforeLast(Str::after(static::class, __NAMESPACE__.'\\'), 'Controller');
-            $dir = array_map(fn($item) => Str::kebab($item), explode('\\', $str));
+            $dir = array_map(fn ($item) => Str::kebab($item), explode('\\', $str));
             $dir[] = Str::plural(array_pop($dir));
             $this->viewPath = implode('.', $dir);
         }

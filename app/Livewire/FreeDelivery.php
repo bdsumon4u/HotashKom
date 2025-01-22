@@ -24,8 +24,8 @@ class FreeDelivery extends Component
     public function mount($freeDelivery, $deliveryCharge): void
     {
         $freeDelivery = optional($freeDelivery);
-        $this->free_delivery = (int)$freeDelivery->enabled ?? 0;
-        $this->free_for_all = (int)$freeDelivery->for_all ?? 0;
+        $this->free_delivery = (int) $freeDelivery->enabled ?? 0;
+        $this->free_for_all = (int) $freeDelivery->for_all ?? 0;
         $this->min_quantity = $freeDelivery->min_quantity ?? 1;
         $this->min_amount = $freeDelivery->min_amount ?? 1;
 

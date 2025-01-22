@@ -19,9 +19,7 @@ class SendOTP extends Notification
      *
      * @return void
      */
-    public function __construct(public $otp)
-    {
-    }
+    public function __construct(public $otp) {}
 
     /**
      * Get the notification's delivery channels.

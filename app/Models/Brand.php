@@ -23,7 +23,7 @@ class Brand extends Model
 
     public static function cached()
     {
-        return cache()->rememberForever('brands', fn() => Brand::all());
+        return cache()->rememberForever('brands', fn () => Brand::all());
     }
 
     public function image()

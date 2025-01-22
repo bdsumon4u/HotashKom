@@ -41,7 +41,7 @@ class BoxList extends PageBlock
 
     private static function transformListHtmlQuick(?string $listHtml): ?string
     {
-        if (!  $listHtml) {
+        if (! $listHtml) {
             return $listHtml;
         }
 
@@ -51,13 +51,14 @@ class BoxList extends PageBlock
         // Add classes to LI tags and wrap content
         $listHtml = preg_replace_callback('/<li>(.*?)<\/li>/s', function ($matches) {
             $content = $matches[1];
+
             return '<li
                 class="elementor-element elementor-element-5b45d67 elementor-invisible elementor-widget elementor-widget-heading"
                 data-element_type="widget"
                 data-settings="{&quot;_animation&quot;:&quot;fadeInLeft&quot;}"
                 data-widget_type="heading.default">
                 <div class="elementor-widget-container">
-                    <h2 class="elementor-heading-title elementor-size-default">' . $content . '</h2>
+                    <h2 class="elementor-heading-title elementor-size-default">'.$content.'</h2>
                 </div>
             </li>';
         }, $listHtml);

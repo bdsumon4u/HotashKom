@@ -3,7 +3,6 @@
 namespace App\Filament\Fabricator\PageBlocks\Four;
 
 use App\Filament\Fabricator\PageBlocks\HasBlockName;
-use Faker\Provider\ar_EG\Text;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;

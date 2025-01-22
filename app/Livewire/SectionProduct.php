@@ -27,7 +27,7 @@ class SectionProduct extends Component
         }
         $this->products = Product::whereNull('parent_id')
             ->where(fn ($q) => $q->where('name', 'like', "%$this->search%")->orWhere('sku', $this->search))
-            ->take(5)->get()->map(fn($product, $i): array => [
+            ->take(5)->get()->map(fn ($product, $i): array => [
                 'order' => $i + 1,
                 'id' => $product->id,
                 'name' => $product->name,
@@ -60,7 +60,7 @@ class SectionProduct extends Component
     {
         return view('livewire.section-product', [
             'selectedProducts' => Product::whereIn('id', $this->selectedIds)
-                ->get()->mapWithKeys(fn($product, $i) => [$product->id => [
+                ->get()->mapWithKeys(fn ($product, $i) => [$product->id => [
                     'order' => array_search($product->id, $this->selectedIds) + 1,
                     'id' => $product->id,
                     'name' => $product->name,

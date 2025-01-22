@@ -69,19 +69,19 @@ class OrderController extends Controller
                     }
                 },
             ])
-            ->editColumn('id', fn($row): string => '<a class="btn btn-light btn-sm text-nowrap px-2" href="'.route('admin.orders.edit', $row->id).'">'.$row->id.'<i class="fa fa-eye ml-1"></i></a>')
-            ->editColumn('created_at', fn($row): string => "<div class='text-nowrap'>".$row->created_at->format('d-M-Y').'<br>'.$row->created_at->format('h:i A').'</div>')
-            ->addColumn('amount', fn($row): int => intval($row->data['subtotal']) + intval($row->data['shipping_cost']) - intval($row->data['discount'] ?? 0) - intval($row->data['advanced'] ?? 0))
+            ->editColumn('id', fn ($row): string => '<a class="btn btn-light btn-sm text-nowrap px-2" href="'.route('admin.orders.edit', $row->id).'">'.$row->id.'<i class="fa fa-eye ml-1"></i></a>')
+            ->editColumn('created_at', fn ($row): string => "<div class='text-nowrap'>".$row->created_at->format('d-M-Y').'<br>'.$row->created_at->format('h:i A').'</div>')
+            ->addColumn('amount', fn ($row): int => intval($row->data['subtotal']) + intval($row->data['shipping_cost']) - intval($row->data['discount'] ?? 0) - intval($row->data['advanced'] ?? 0))
             ->editColumn('status', function ($row) {
                 $return = '<select data-id="'.$row->id.'" onchange="changeStatus" class="status-column form-control-sm">';
                 foreach (config('app.orders', []) as $status) {
                     $return .= '<option value="'.$status.'" '.($status == $row->status ? 'selected' : '').'>'.$status.'</option>';
                 }
 
-                return $return . '</select>';
+                return $return.'</select>';
             })
-            ->addColumn('checkbox', fn($row): string => '<input type="checkbox" class="form-control" name="order_id[]" value="'.$row->id.'" style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">')
-            ->editColumn('customer', fn($row): string => "
+            ->addColumn('checkbox', fn ($row): string => '<input type="checkbox" class="form-control" name="order_id[]" value="'.$row->id.'" style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">')
+            ->editColumn('customer', fn ($row): string => "
                     <div>
                         <div><i class='fa fa-user mr-1'></i>{$row->name}</div>
                         <div><i class='fa fa-phone mr-1'></i><a href='tel:{$row->phone}'>{$row->phone}</a></div>
@@ -127,7 +127,7 @@ class OrderController extends Controller
                     $return .= '<a href="'.route('admin.orders.booking', ['order_id' => $row->id]).'" class="btn btn-sm btn-primary">Submit</a>';
                 }
 
-                return $return . '<div style="white-space: nowrap; display: none;">Tracking Code: <a href="https://www.steadfast.com.bd/?tracking_code=" target="_blank"></a></div>';
+                return $return.'<div style="white-space: nowrap; display: none;">Tracking Code: <a href="https://www.steadfast.com.bd/?tracking_code=" target="_blank"></a></div>';
             })
             ->filterColumn('customer', function ($query, $keyword): void {
                 $query->where('name', 'like', '%'.$keyword.'%')
@@ -147,7 +147,7 @@ class OrderController extends Controller
                     $return .= '<option value="'.$id.'" '.($id == $row->admin_id ? 'selected' : '').'>'.$name.'</option>';
                 }
 
-                return $return . '</select>';
+                return $return.'</select>';
             })
             ->filterColumn('created_at', function ($query, $keyword): void {
                 if (str_contains($keyword, ' - ')) {
@@ -158,7 +158,7 @@ class OrderController extends Controller
                     ]);
                 }
             })
-            ->addColumn('actions', fn(Order $product): string => '<div>
+            ->addColumn('actions', fn (Order $product): string => '<div>
                     <a href="'.route('admin.orders.destroy', $product).'" data-action="delete" class="btn btn-block btn-danger">Delete</a>
                 </div>')
             ->rawColumns(['checkbox', 'id', 'customer', 'products', 'status', 'courier', 'staff', 'created_at', 'actions'])

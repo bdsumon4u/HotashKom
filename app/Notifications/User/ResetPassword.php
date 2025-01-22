@@ -36,9 +36,7 @@ class ResetPassword extends Notification
          * The password reset token.
          */
         public $token
-    )
-    {
-    }
+    ) {}
 
     /**
      * Get the notification's channels.

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Widgets;
 
-use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Z3d0X\FilamentFabricator\Resources\PageResource;

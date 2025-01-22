@@ -8,9 +8,7 @@ use App\Pathao\Apis\StoreApi;
 
 class Manage
 {
-    public function __construct(private readonly AreaApi $area, private readonly StoreApi $store, private readonly OrderApi $order)
-    {
-    }
+    public function __construct(private readonly AreaApi $area, private readonly StoreApi $store, private readonly OrderApi $order) {}
 
     public function area(): AreaApi
     {

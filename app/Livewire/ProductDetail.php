@@ -22,7 +22,7 @@ class ProductDetail extends Component
 
     public function updatedOptions($value, $key): void
     {
-        $variation = $this->product->variations->first(fn($item) => $item->options->pluck('id')->diff($this->options)->isEmpty());
+        $variation = $this->product->variations->first(fn ($item) => $item->options->pluck('id')->diff($this->options)->isEmpty());
 
         if ($variation) {
             $this->selectedVar = $variation;
@@ -130,7 +130,7 @@ class ProductDetail extends Component
                 $text .= '<li>কমপক্ষে <strong class="text-danger">'.$freeDelivery->min_amount.'</strong> টাকার প্রোডাক্ট অর্ডার করুন</li>';
             }
 
-            return $text . '</ul>';
+            return $text.'</ul>';
         }
 
         if (array_key_exists($this->product->id, $products = ((array) ($freeDelivery->products ?? [])) ?? [])) {

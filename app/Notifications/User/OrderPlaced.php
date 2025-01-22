@@ -17,9 +17,7 @@ class OrderPlaced extends Notification
      *
      * @return void
      */
-    public function __construct(public $order)
-    {
-    }
+    public function __construct(public $order) {}
 
     /**
      * Get the notification's delivery channels.
@@ -50,7 +48,7 @@ class OrderPlaced extends Notification
      */
     public function toArray($notifiable): array
     {
-        $code = Cache::remember('order:confirm:'.$this->order->id, 5 * 60, fn(): int => mt_rand(1000, 999999));
+        $code = Cache::remember('order:confirm:'.$this->order->id, 5 * 60, fn (): int => mt_rand(1000, 999999));
 
         return [
             'msg' => 'Thanks for shopping. Your order ID is '.$this->order->id.'. Login: '.url('auth'),

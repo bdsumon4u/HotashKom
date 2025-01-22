@@ -7,7 +7,6 @@ use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
 class YouTubePrice extends PageBlock

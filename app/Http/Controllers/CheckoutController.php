@@ -32,8 +32,8 @@ class CheckoutController extends Controller
                 'event' => 'begin_checkout',
                 'ecommerce' => [
                     'currency' => 'BDT',
-                    'value' => array_sum(array_map(fn($product): int|float => $product['price'] * $product['quantity'], $cart)),
-                    'items' => array_values(array_map(fn($product): array => [
+                    'value' => array_sum(array_map(fn ($product): int|float => $product['price'] * $product['quantity'], $cart)),
+                    'items' => array_values(array_map(fn ($product): array => [
                         'item_id' => $product['id'],
                         'item_name' => $product['name'],
                         'item_category' => $product['category'],
@@ -111,7 +111,7 @@ class CheckoutController extends Controller
                     'is_repeat' => $oldOrders->count() > 0,
                     'shipping_area' => $data['shipping'],
                     'shipping_cost' => setting('delivery_charge')->{$data['shipping'] == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$data['shipping']),
-                    'subtotal' => is_array($products) ? array_reduce($products, fn($sum, $product) => $sum += $product['total']) : $products->sum('total'),
+                    'subtotal' => is_array($products) ? array_reduce($products, fn ($sum, $product) => $sum += $product['total']) : $products->sum('total'),
                 ],
             ];
 

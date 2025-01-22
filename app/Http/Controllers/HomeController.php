@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\HomeSection;
-use App\Models\Slide;
 use Illuminate\Http\Request;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 

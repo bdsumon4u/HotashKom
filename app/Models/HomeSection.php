@@ -38,7 +38,7 @@ class HomeSection extends Model
             $query->whereHas('categories', function ($query) use ($category): void {
                 $query->where('categories.id', $category);
             });
-        } else if (($this->data->source ?? false) == 'specific') {
+        } elseif (($this->data->source ?? false) == 'specific') {
             $query->whereHas('categories', function ($query): void {
                 $query->whereIn('categories.id', $this->categories->pluck('id')->toArray());
             })
@@ -71,6 +71,7 @@ class HomeSection extends Model
             ? $query->paginate($paginate)
             : $query->get();
     }
+
     protected function casts(): array
     {
         return [

@@ -45,7 +45,7 @@ class Checkout extends Component
     public function refresh(): void
     {
         $this->cart = session('cart', []);
-        $this->subtotal = collect($this->cart)->sum(fn($item): int|float => $item['price'] * $item['quantity']);
+        $this->subtotal = collect($this->cart)->sum(fn ($item): int|float => $item['price'] * $item['quantity']);
         $this->updatedShipping();
     }
 
@@ -101,7 +101,7 @@ class Checkout extends Component
             if ($this->subtotal < $freeDelivery->min_amount) {
                 return $shipping_cost;
             }
-            $quantity = array_reduce($this->cart, fn($sum, $product): float|int|array => $sum + $product['quantity'], 0);
+            $quantity = array_reduce($this->cart, fn ($sum, $product): float|int|array => $sum + $product['quantity'], 0);
             if ($quantity < $freeDelivery->min_quantity) {
                 return $shipping_cost;
             }
@@ -131,7 +131,7 @@ class Checkout extends Component
 
     public function cartUpdated(): void
     {
-        $this->subtotal = collect($this->cart)->sum(fn($item): int|float => $item['price'] * $item['quantity']);
+        $this->subtotal = collect($this->cart)->sum(fn ($item): int|float => $item['price'] * $item['quantity']);
 
         $this->updatedShipping();
         $this->dispatch('cartUpdated');
@@ -261,7 +261,7 @@ class Checkout extends Component
                     'is_repeat' => $oldOrders->count() > 0,
                     'shipping_area' => $data['shipping'],
                     'shipping_cost' => $this->shipping_cost,
-                    'subtotal' => is_array($products) ? array_reduce($products, fn($sum, $product): float|int|array => $sum += $product['total'], 0) : $products->sum('total'),
+                    'subtotal' => is_array($products) ? array_reduce($products, fn ($sum, $product): float|int|array => $sum += $product['total'], 0) : $products->sum('total'),
                 ],
             ];
 
@@ -276,7 +276,7 @@ class Checkout extends Component
                     'currency' => 'BDT',
                     'transaction_id' => $order->id,
                     'value' => $order->data['subtotal'],
-                    'items' => array_values(array_map(fn($product): array => [
+                    'items' => array_values(array_map(fn ($product): array => [
                         'item_id' => $product['id'],
                         'item_name' => $product['name'],
                         'item_category' => $product['category'],

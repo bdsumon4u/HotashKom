@@ -58,7 +58,7 @@ class Category extends Model
             return $query->get();
         }
 
-        return cache()->rememberForever('categories:nested', fn() => $query->get());
+        return cache()->rememberForever('categories:nested', fn () => $query->get());
     }
 
     public function products()

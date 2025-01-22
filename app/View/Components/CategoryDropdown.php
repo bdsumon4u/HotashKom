@@ -11,9 +11,7 @@ class CategoryDropdown extends Component
      *
      * @return void
      */
-    public function __construct(public $categories, public $name, public $placeholder, public $id, public $multiple = false, public $selected = 0, public $disabled = 0)
-    {
-    }
+    public function __construct(public $categories, public $name, public $placeholder, public $id, public $multiple = false, public $selected = 0, public $disabled = 0) {}
 
     /**
      * Get the view / contents that represent the component.

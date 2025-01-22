@@ -52,9 +52,9 @@ class Product extends Model
         static::saved(function ($product): void {
             if (App::runningInConsole() && ($product->categories->isEmpty() || $product->images->isEmpty())) {
                 $categories = range(1, 30);
-                $categories = array_map(fn($key) => $categories[$key], array_rand($categories, mt_rand(2, 4)));
+                $categories = array_map(fn ($key) => $categories[$key], array_rand($categories, mt_rand(2, 4)));
                 $additionals = range(47, 67);
-                $additionals = array_map(fn($key) => $additionals[$key], array_rand($additionals, mt_rand(4, 7)));
+                $additionals = array_map(fn ($key) => $additionals[$key], array_rand($additionals, mt_rand(4, 7)));
                 ProductCreated::dispatch($product, [
                     'categories' => $categories,
                     'base_image' => mt_rand(47, 67),
@@ -78,6 +78,7 @@ class Product extends Model
             if (! $this->parent_id) {
                 return $this->name;
             }
+
             return $this->parent->name.' ['.$this->name.']';
         });
     }
@@ -88,6 +89,7 @@ class Product extends Model
             if (! $this->parent_id) {
                 return $value ?? setting('delivery_charge')->inside_dhaka;
             }
+
             return $value ?? $this->parent->shipping_inside ?? setting('delivery_charge')->inside_dhaka;
         });
     }
@@ -98,6 +100,7 @@ class Product extends Model
             if (! $this->parent_id) {
                 return $value ?? setting('delivery_charge')->outside_dhaka;
             }
+
             return $value ?? $this->parent->shipping_outside ?? setting('delivery_charge')->outside_dhaka;
         });
     }
@@ -108,13 +111,14 @@ class Product extends Model
             if ($this->parent_id) {
                 return $this->parent->categories()->inRandomOrder()->first(['name'])->name ?? 'Uncategorized';
             }
+
             return $this->categories()->inRandomOrder()->first(['name'])->name ?? 'Uncategorized';
         });
     }
 
     protected function inStock(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn() => $this->track_stock
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn () => $this->track_stock
             ? $this->stock_count
             : true);
     }
@@ -151,6 +155,7 @@ class Product extends Model
     {
         return $this->belongsToMany(Option::class);
     }
+
     protected function wholesale(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
@@ -158,6 +163,7 @@ class Product extends Model
             if (empty($data) && $this->parent_id) {
                 return $this->parent->wholesale;
             }
+
             return [
                 'quantity' => array_keys($data),
                 'price' => array_values($data),
@@ -168,6 +174,7 @@ class Product extends Model
                 $data[$quantity] = $value['price'][$key];
             }
             ksort($data);
+
             return ['wholesale' => json_encode($data)];
         });
     }
@@ -193,7 +200,8 @@ class Product extends Model
             if ($images->isEmpty()) {
                 $images = $this->parent->images ?? collect();
             }
-            return $images->first(fn(Image $image): bool => $image->pivot->img_type == 'base');
+
+            return $images->first(fn (Image $image): bool => $image->pivot->img_type == 'base');
         });
     }
 
@@ -204,7 +212,8 @@ class Product extends Model
             if ($images->isEmpty()) {
                 $images = $this->parent->images ?? collect();
             }
-            return $images->filter(fn(Image $image): bool => $image->pivot->img_type == 'additional');
+
+            return $images->filter(fn (Image $image): bool => $image->pivot->img_type == 'additional');
         });
     }
 

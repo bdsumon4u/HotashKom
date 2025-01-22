@@ -6,8 +6,6 @@ use App\Filament\Fabricator\PageBlocks\HasBlockName;
 use Filament\Forms\Components\Builder\Block;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Testing\Fluent\Concerns\Has;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
 class CheckList extends PageBlock
@@ -34,7 +32,7 @@ class CheckList extends PageBlock
 
     private static function transformListHtmlQuick(?string $listHtml): ?string
     {
-        if (!  $listHtml) {
+        if (! $listHtml) {
             return $listHtml;
         }
 
@@ -52,7 +50,8 @@ class CheckList extends PageBlock
         // Add classes to LI tags and wrap content
         $listHtml = preg_replace_callback('/<li>(.*?)<\/li>/s', function ($matches) use ($icon) {
             $content = $matches[1];
-            return '<li class="elementor-icon-list-item">' . $icon . '<span class="elementor-icon-list-text">' . $content . '</span></li>';
+
+            return '<li class="elementor-icon-list-item">'.$icon.'<span class="elementor-icon-list-text">'.$content.'</span></li>';
         }, $listHtml);
 
         return $listHtml;

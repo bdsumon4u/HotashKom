@@ -69,6 +69,7 @@ class Admin extends Authenticatable implements HasTenants
             || $this->role_id == static::MANAGER && $role === 'manager'
             || $this->role_id == static::SALESMAN && $role === 'salesman';
     }
+
     /**
      * The attributes that should be cast to native types.
      */

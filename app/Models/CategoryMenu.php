@@ -47,7 +47,7 @@ class CategoryMenu extends Model
             ->orderBy('order');
         $count && $query->take($count);
 
-        return cache()->rememberForever('catmenu:nested', fn() => $query->get());
+        return cache()->rememberForever('catmenu:nested', fn () => $query->get());
     }
 
     public static function nestedWithParent($count = 0)
@@ -59,6 +59,6 @@ class CategoryMenu extends Model
             ->orderBy('order');
         $count && $query->take($count);
 
-        return cache()->rememberForever('catmenu:nestedwithparent', fn() => $query->get());
+        return cache()->rememberForever('catmenu:nestedwithparent', fn () => $query->get());
     }
 }

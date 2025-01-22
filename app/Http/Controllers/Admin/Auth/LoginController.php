@@ -173,7 +173,7 @@ class LoginController extends Controller
             'password' => ['Please wait for OTP.'],
         ]));
         $ttl = (property_exists($this, 'decayMinutes') ? $this->decayMinutes : 2) * 60;
-        $otp = Cache::remember($key, $ttl, fn(): int => mt_rand(1000, 999999));
+        $otp = Cache::remember($key, $ttl, fn (): int => mt_rand(1000, 999999));
         $user->notify(new SendOTP($otp));
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Filament\Fabricator\Layouts;
 
-use App\Filament\Fabricator\PageBlocks\Three\NormalText;
 use App\Filament\Fabricator\PageBlocks\Three\BoxList;
 use App\Filament\Fabricator\PageBlocks\Three\CheckList;
 use App\Filament\Fabricator\PageBlocks\Three\CountdownHeader;
+use App\Filament\Fabricator\PageBlocks\Three\NormalText;
 use App\Filament\Fabricator\PageBlocks\Three\YouTube;
 use Filament\Forms\Get;
 use Filament\Forms\Set;

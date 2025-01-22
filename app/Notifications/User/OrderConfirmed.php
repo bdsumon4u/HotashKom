@@ -16,9 +16,7 @@ class OrderConfirmed extends Notification
      *
      * @return void
      */
-    public function __construct(public $order)
-    {
-    }
+    public function __construct(public $order) {}
 
     /**
      * Get the notification's delivery channels.
