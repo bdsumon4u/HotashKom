@@ -12,7 +12,7 @@ use Filament\Forms\Set;
 use Z3d0X\FilamentFabricator\Models\Contracts\Page as PageContract;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
-class TwoColList extends PageBlock
+class ContentColumn extends PageBlock
 {
     use HasBlockName;
 
