@@ -2,6 +2,8 @@
 
 namespace App\Filament\Fabricator\Layouts;
 
+use App\Filament\Fabricator\PageBlocks\Two\AdditionalImages;
+use App\Filament\Fabricator\PageBlocks\Two\ContactNumber;
 use App\Filament\Fabricator\PageBlocks\Two\RoundedHeading;
 use App\Filament\Fabricator\PageBlocks\Two\YouTubePrice;
 use Filament\Facades\Filament;
@@ -29,6 +31,14 @@ class TwoLayout extends Layout
                 'price_text' => '৩ পিস টি-শার্টের মূল্য',
                 'price_amount' => '১১৯০',
                 'price_subtext' => 'ডেলিভারি চার্জ প্রযোজ্য',
+            ]),
+            AdditionalImages::default([
+                'title' => 'আরো ছবি',
+                'images' => Filament::getTenant()->additional_images->map->src->toArray(),
+            ]),
+            ContactNumber::default([
+                'instruction' => 'সাইজে প্রবলেম হলে অথবা অন্য কোন সমস্যার হলে রির্টান বা এক্সেচঞ্জ করে নিতে পারবেন ৭থেকে ১০ দিনের ভিতরে',
+                'contact_number' => setting('company')->phone,
             ]),
         ];
     }

@@ -4,6 +4,7 @@ namespace App\Filament\Fabricator\PageBlocks\Two;
 
 use App\Filament\Fabricator\PageBlocks\HasBlockName;
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\TextInput;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
 class ContactNumber extends PageBlock
@@ -14,7 +15,10 @@ class ContactNumber extends PageBlock
     {
         return Block::make(static::getBlockName())
             ->schema([
-                //
+                TextInput::make('instruction')
+                    ->required(),
+                TextInput::make('contact_number')
+                    ->required(),
             ]);
     }
 

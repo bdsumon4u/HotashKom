@@ -14,27 +14,14 @@
                     <div class="elementor-widget-container">
                         <div class="elementor-image-carousel-wrapper swiper" dir="ltr">
                             <div class="elementor-image-carousel swiper-wrapper" aria-live="off">
-                                <div class="swiper-slide" role="group" aria-roledescription="slide"
-                                    aria-label="1 of 3">
+                                @foreach($images as $image)
+                                <div class="swiper-slide" role="group" aria-roledescription="slide">
                                     <figure class="swiper-slide-inner"><img decoding="async"
                                             class="swiper-slide-image"
-                                            src="https://demo.orioit.com/wp-content/uploads/2024/11/tshirt3-1.jpg"
+                                            src="{{ Str::isUrl($image) ? $image : asset('storage/'.$image) }}"
                                             alt="tshirt3" /></figure>
                                 </div>
-                                <div class="swiper-slide" role="group" aria-roledescription="slide"
-                                    aria-label="2 of 3">
-                                    <figure class="swiper-slide-inner"><img decoding="async"
-                                            class="swiper-slide-image"
-                                            src="https://demo.orioit.com/wp-content/uploads/2024/11/tshirt2-1.jpg"
-                                            alt="tshirt2" /></figure>
-                                </div>
-                                <div class="swiper-slide" role="group" aria-roledescription="slide"
-                                    aria-label="3 of 3">
-                                    <figure class="swiper-slide-inner"><img decoding="async"
-                                            class="swiper-slide-image"
-                                            src="https://demo.orioit.com/wp-content/uploads/2024/11/tshirt-2.jpg"
-                                            alt="tshirt" /></figure>
-                                </div>
+                                @endforeach
                             </div>
                             <div class="elementor-swiper-button elementor-swiper-button-prev"
                                 role="button" tabindex="0">

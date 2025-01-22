@@ -4,6 +4,8 @@ namespace App\Filament\Fabricator\PageBlocks\Two;
 
 use App\Filament\Fabricator\PageBlocks\HasBlockName;
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
 
 class AdditionalImages extends PageBlock
@@ -14,7 +16,12 @@ class AdditionalImages extends PageBlock
     {
         return Block::make(static::getBlockName())
             ->schema([
-                //
+                TextInput::make('title')
+                    ->required(),
+                FileUpload::make('images')
+                    ->image()
+                    ->multiple()
+                    ->reorderable(),
             ]);
     }
 
