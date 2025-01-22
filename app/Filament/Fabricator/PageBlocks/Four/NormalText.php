@@ -30,7 +30,7 @@ class NormalText extends PageBlock
                 </span>
             </div>
         </div>
-        ', $data['content']);
+        ', (string) $data['content']);
 
         return $data;
     }

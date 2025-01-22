@@ -38,13 +38,13 @@ class LandingResource extends PageResource
                         Group::make()->schema(FilamentFabricator::getSchemaSlot(ResourceSchemaSlot::BLOCKS_BEFORE)),
 
                         PageBuilder::make('blocks')
-                            ->blocks(fn (Get $get) => array_filter(FilamentFabricator::getPageBlocks(), fn ($block) => Str::startsWith($block->getName(), $get('layout').'.')))
+                            ->blocks(fn (Get $get): array => array_filter(FilamentFabricator::getPageBlocks(), fn ($block) => Str::startsWith($block->getName(), $get('layout').'.')))
                             ->label(__('filament-fabricator::page-resource.labels.blocks')),
 
                         Group::make()->schema(FilamentFabricator::getSchemaSlot(ResourceSchemaSlot::BLOCKS_AFTER)),
                     ])
                     ->columnSpan(2)
-                    ->disabled(fn (Get $get) => $get('layout') === FilamentFabricator::getDefaultLayoutName()),
+                    ->disabled(fn (Get $get): bool => $get('layout') === FilamentFabricator::getDefaultLayoutName()),
 
                 Group::make()
                     ->columnSpan(1)
@@ -55,13 +55,13 @@ class LandingResource extends PageResource
                             ->schema([
                                 Placeholder::make('page_url')
                                     ->label(__('filament-fabricator::page-resource.labels.url'))
-                                    ->visible(fn (?PageContract $record) => config('filament-fabricator.routing.enabled') && filled($record))
+                                    ->visible(fn (?PageContract $record): bool => config('filament-fabricator.routing.enabled') && filled($record))
                                     ->content(fn (?PageContract $record) => FilamentFabricator::getPageUrlFromId($record?->id)),
 
                                 TextInput::make('title')
                                     ->label(__('filament-fabricator::page-resource.labels.title'))
                                     ->default(fn () => Filament::getTenant()->name)
-                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $state, ?PageContract $record) {
+                                    ->afterStateUpdated(function (Get $get, Set $set, ?string $state, ?PageContract $record): void {
                                         if (! $get('is_slug_changed_manually') && filled($state) && blank($record)) {
                                             $set('slug', Str::slug($state, language: config('app.locale', 'en')));
                                         }
@@ -77,15 +77,13 @@ class LandingResource extends PageResource
                                     ->label(__('filament-fabricator::page-resource.labels.slug'))
                                     ->default(fn () => Filament::getTenant()->slug)
                                     ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule, Get $get) => $rule->where('parent_id', $get('parent_id')))
-                                    ->afterStateUpdated(function (Set $set) {
+                                    ->afterStateUpdated(function (Set $set): void {
                                         $set('is_slug_changed_manually', true);
                                     })
-                                    ->rule(function ($state) {
-                                        return function (string $attribute, $value, Closure $fail) use ($state) {
-                                            if ($state !== '/' && (Str::startsWith($value, '/') || Str::endsWith($value, '/'))) {
-                                                $fail(__('filament-fabricator::page-resource.errors.slug_starts_or_ends_with_slash'));
-                                            }
-                                        };
+                                    ->rule(fn($state): \Closure => function (string $attribute, $value, Closure $fail) use ($state): void {
+                                        if ($state !== '/' && (Str::startsWith($value, '/') || Str::endsWith($value, '/'))) {
+                                            $fail(__('filament-fabricator::page-resource.errors.slug_starts_or_ends_with_slash'));
+                                        }
                                     })
                                     ->required(),
 
@@ -95,7 +93,7 @@ class LandingResource extends PageResource
                                     ->default(fn () => FilamentFabricator::getDefaultLayoutName())
                                     ->live()
                                     ->required()
-                                    ->disableOptionWhen(fn (string $value) => $value === FilamentFabricator::getDefaultLayoutName())
+                                    ->disableOptionWhen(fn (string $value): bool => $value === FilamentFabricator::getDefaultLayoutName())
                                     ->afterStateUpdated(fn (?PageContract $record, Get $get, Set $set) => static::getPageBlocks($record, $get, $set)),
 
                                 Select::make('parent_id')
@@ -104,16 +102,16 @@ class LandingResource extends PageResource
                                     ->preload()
                                     ->reactive()
                                     ->suffixAction(
-                                        fn ($get, $context) => FormAction::make($context.'-parent')
+                                        fn ($get, $context): \Filament\Forms\Components\Actions\Action => FormAction::make($context.'-parent')
                                             ->icon('heroicon-o-arrow-top-right-on-square')
-                                            ->url(fn () => PageResource::getUrl($context, ['record' => $get('parent_id')]))
+                                            ->url(fn (): string => PageResource::getUrl($context, ['record' => $get('parent_id')]))
                                             ->openUrlInNewTab()
                                             ->visible(fn () => filled($get('parent_id')))
                                     )
                                     ->relationship(
                                         'parent',
                                         'title',
-                                        function (Builder $query, ?PageContract $record) {
+                                        function (Builder $query, ?PageContract $record): void {
                                             if (filled($record)) {
                                                 $query->where('id', '!=', $record->id);
                                             }
@@ -131,7 +129,7 @@ class LandingResource extends PageResource
     public static function getPageBlocks(?PageContract $record, Get $get, Set $set)
     {
         $layoutName = collect(File::allFiles(app_path('Filament/Fabricator/Layouts')))
-            ->filter(fn (SplFileInfo $file) => $file->getExtension() === 'php')
+            ->filter(fn (SplFileInfo $file): bool => $file->getExtension() === 'php')
             ->first(fn (SplFileInfo $file) => Str::of($file->getFilename())->before('Layout.php')->kebab()->is($get('layout')))
             ->getFileNameWithoutExtension();
 

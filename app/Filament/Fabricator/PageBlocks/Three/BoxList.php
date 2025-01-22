@@ -61,7 +61,7 @@ class BoxList extends PageBlock
                     <h2 class="elementor-heading-title elementor-size-default">'.$content.'</h2>
                 </div>
             </li>';
-        }, $listHtml);
+        }, (string) $listHtml);
 
         return $listHtml;
     }

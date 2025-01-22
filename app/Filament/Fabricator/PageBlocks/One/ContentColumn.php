@@ -67,7 +67,7 @@ class ContentColumn extends PageBlock
             $content = $matches[1];
 
             return '<li class="elementor-icon-list-item">'.$icon.'<span class="elementor-icon-list-text">'.$content.'</span></li>';
-        }, $listHtml);
+        }, (string) $listHtml);
 
         return $listHtml;
     }
