@@ -19,6 +19,8 @@ use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class Checkout extends Component
 {
+    protected string $store = 'cart';
+
     public ?Order $order = null;
 
     public array $cart = [];
@@ -44,7 +46,7 @@ class Checkout extends Component
     #[On('cartBoxUpdated')]
     public function refresh(): void
     {
-        $this->cart = session('cart', []);
+        $this->cart = session($this->store, []);
         $this->subtotal = collect($this->cart)->sum(fn ($item): int|float => $item['price'] * $item['quantity']);
         $this->updatedShipping();
     }
@@ -52,7 +54,7 @@ class Checkout extends Component
     public function remove($id): void
     {
         unset($this->cart[$id]);
-        session()->put('cart', $this->cart);
+        session()->put($this->store, $this->cart);
         $this->cartUpdated();
     }
 
@@ -60,7 +62,7 @@ class Checkout extends Component
     {
         if ($this->cart[$id]['quantity'] < $this->cart[$id]['max'] || $this->cart[$id]['max'] === -1) {
             $this->cart[$id]['quantity']++;
-            session()->put('cart', $this->cart);
+            session()->put($this->store, $this->cart);
             $this->cartUpdated();
         }
     }
@@ -69,7 +71,7 @@ class Checkout extends Component
     {
         if ($this->cart[$id]['quantity'] > 1) {
             $this->cart[$id]['quantity']--;
-            session()->put('cart', $this->cart);
+            session()->put($this->store, $this->cart);
             $this->cartUpdated();
         }
     }
@@ -160,7 +162,7 @@ class Checkout extends Component
             $this->note = $user->note ?? '';
         }
 
-        $this->cart = session()->get('cart', []);
+        $this->cart = session()->get($this->store, []);
         $this->cartUpdated();
     }
 
@@ -308,7 +310,7 @@ class Checkout extends Component
         // Undefined index email.
         // $data['email'] && Mail::to($data['email'])->queue(new OrderPlaced($order));
 
-        session()->forget('cart');
+        session()->forget($this->store);
         session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Recieved. Thanks For Your Order.');
 
         return redirect()->route('thank-you', [

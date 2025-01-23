@@ -2,7 +2,7 @@
 
 @title('Order Status')
 
-@content
+@section('content')
     <div class="block mt-4">
         <div class="container">
             <div class="row justify-content-center">
@@ -32,11 +32,11 @@
                                         <div class="form-group">
                                             <label for="">Please check your sms for the code.</label>
                                             <div class="row">
-                                                <div class="col-md-7 my-1">
+                                                <div class="my-1 col-md-7">
                                                     <input type="text" name="code" value="{{ old('code') }}"
                                                         class="form-control" placeholder="Confirmation Code">
                                                 </div>
-                                                <div class="col px-0 my-1 d-flex align-items-center justify-content-around">
+                                                <div class="px-0 my-1 col d-flex align-items-center justify-content-around">
                                                     <button name="action" value="resend"
                                                         class="btn btn-sm btn-secondary">Resend Code</button>
                                                     <div class="mx-1"></div>
@@ -94,4 +94,4 @@
             </div>
         </div>
     </div>
-@endcontent
+@endsection

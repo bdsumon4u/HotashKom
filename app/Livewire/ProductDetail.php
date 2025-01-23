@@ -8,6 +8,8 @@ use Livewire\Component;
 
 class ProductDetail extends Component
 {
+    private string $store = 'cart';
+
     public Product $product;
 
     public Product $selectedVar;
@@ -19,6 +21,17 @@ class ProductDetail extends Component
     public int $quantity = 1;
 
     public bool $showBrandCategory = false;
+
+    public static function landing(Product $product): self
+    {
+        $component = new self();
+        $component->product = $product;
+        $component->store = 'landing';
+        $component->mount();
+        $component->addToCart();
+
+        return $component;
+    }
 
     public function updatedOptions($value, $key): void
     {
@@ -45,7 +58,7 @@ class ProductDetail extends Component
 
     public function addToCart(): void
     {
-        $cart = session()->get('cart', []);
+        $cart = session()->get($this->store, []);
         if (isset($cart[$this->selectedVar->id])) {
             $quantity = $cart[$this->selectedVar->id]['quantity'] = min($this->quantity, $this->maxQuantity);
             $cart[$this->selectedVar->id]['price'] = $this->selectedVar->getPrice($quantity);
@@ -65,7 +78,7 @@ class ProductDetail extends Component
             ];
         }
 
-        session()->put('cart', $cart);
+        session()->put($this->store, $cart);
         $product = $cart[$this->selectedVar->id];
 
         $this->dispatch('dataLayer', [
@@ -91,12 +104,12 @@ class ProductDetail extends Component
 
     public function orderNow()
     {
-        $cart = session()->get('cart', []);
+        $cart = session()->get($this->store, []);
         $kart = session()->get('kart');
         if (isset($cart[$kart])) {
             unset($cart[$kart]);
         }
-        session()->put('cart', $cart);
+        session()->put($this->store, $cart);
 
         $this->addToCart();
 

@@ -10,7 +10,7 @@
 </style>
 @endpush
 
-@content
+@section('content')
 
 @include('partials.page-header', [
     'paths' => [
@@ -21,9 +21,9 @@
     'page_title' => 'Cart Details'
 ])
 
-<div class="cart block">
+<div class="block cart">
     <div class="container">
-        <div class="row justify-content-end pt-5">
+        <div class="pt-5 row justify-content-end">
             <div class="col-12 col-md-8">
                 @include('partials.cart-table')
             </div>
@@ -39,7 +39,7 @@
                                 </tr>
                             </thead>
                         </table>
-                        <a class="btn btn-primary btn-xl btn-block cart__checkout-button px-2" href="{{ route('checkout') }}">Proceed to checkout</a>
+                        <a class="px-2 btn btn-primary btn-xl btn-block cart__checkout-button" href="{{ route('checkout') }}">Proceed to checkout</a>
                     </div>
                 </div>
             </div>
