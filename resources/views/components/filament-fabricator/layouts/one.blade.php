@@ -61,7 +61,7 @@
 
             <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
 
-            <livewire:fabricator.one.checkout :product="$page->product" />
+            <livewire:fabricator.checkout layout="one" :product="$page->product" />
         </div>
     </div>
 
