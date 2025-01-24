@@ -14,7 +14,7 @@
                     <div class="elementor-widget-container">
                         <div class="elementor-image-carousel-wrapper swiper" dir="ltr">
                             <div class="elementor-image-carousel swiper-wrapper" aria-live="off">
-                                @foreach($images as $image)
+                                @foreach($images ?: $page->product->additional_images->map->src as $image)
                                 <div class="swiper-slide" role="group" aria-roledescription="slide">
                                     <figure class="swiper-slide-inner"><img decoding="async"
                                             class="swiper-slide-image"
