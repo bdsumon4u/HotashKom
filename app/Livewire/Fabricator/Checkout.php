@@ -8,7 +8,6 @@ use App\Models\Product;
 class Checkout extends \App\Livewire\Checkout
 {
     protected string $store = 'landing';
-    public string $layout = 'default';
     public Product $product;
 
     public function increaseQuantity($id): void
@@ -44,6 +43,6 @@ class Checkout extends \App\Livewire\Checkout
 
     public function render()
     {
-        return view('livewire.fabricator.'.$this->layout.'.checkout');
+        return view('livewire.fabricator.checkout');
     }
 }

@@ -1,18 +1,18 @@
 <section
-    class="elementor-section elementor-top-section elementor-element elementor-element-c559378 elementor-section-boxed elementor-section-height-default"
+    class="elementor-section elementor-top-section elementor-element elementor-element-c559378 elementor-element-ab204be elementor-section-boxed elementor-section-height-default"
     data-id="c559378" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
     <div class="elementor-container elementor-column-gap-no">
-        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-9a6b06a"
+        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-82536c1 elementor-element-9a6b06a elementor-element-4bea656d"
             data-id="9a6b06a" data-element_type="column">
             <div class="elementor-widget-wrap elementor-element-populated">
-                <div class="elementor-element elementor-element-72090b7 elementor-widget elementor-widget-heading"
+                <div class="elementor-element elementor-element-72090b7 elementor-element-68acae2 elementor-element-37676298 elementor-element-4e1d8f5a elementor-widget elementor-widget-heading"
                     data-id="72090b7" data-element_type="widget" data-widget_type="heading.default">
                     <div class="elementor-widget-container">
                         <h2 class="elementor-heading-title elementor-size-default">অর্ডার করতে নিচের ফর্মটি
                             পূরণ করুন</h2>
                     </div>
                 </div>
-                <div class="elementor-element elementor-element-7d864ca elementor-widget elementor-widget-checkout-form"
+                <div class="elementor-element elementor-element-7d864ca elementor-element-50bfeb0b elementor-widget elementor-widget-checkout-form"
                     data-id="7d864ca" data-element_type="widget" id="order"
                     data-widget_type="checkout-form.default">
                     <div class="elementor-widget-container">
