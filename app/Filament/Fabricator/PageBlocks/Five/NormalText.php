@@ -36,7 +36,7 @@ class NormalText extends PageBlock
                 $tag = $matches[1]; // Heading tag (e.g., h1, h2, etc.)
                 $attributes = $matches[2]; // Existing attributes
                 // Add the class if it doesn't already exist
-                if (strpos($attributes, 'class=') !== false) {
+                if (str_contains($attributes, 'class=')) {
                     // Append the classes to existing class attributes
                     return "<{$tag}".preg_replace('/class="(.*?)"/', 'class="$1 elementor-headline e-animated"', $attributes).'>';
                 } else {
@@ -68,7 +68,7 @@ class NormalText extends PageBlock
 
                 return "<{$headingTag}>{$transformedContent}</{$headingTag}>";
             },
-            $htmlContent
+            (string) $htmlContent
         );
 
         return $htmlContent;
