@@ -1,5 +1,3 @@
-@aware(['page'])
-
 <section
     class="elementor-section elementor-top-section elementor-element elementor-element-05fe02b elementor-element-c559378 elementor-element-ab204be elementor-section-boxed elementor-section-height-default"
     data-id="c559378" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
@@ -14,7 +12,7 @@
                             পূরণ করুন</h2>
                     </div>
                 </div>
-                @if($page->layout == 'five')
+                @if($layout == 'five')
                 <div class="elementor-element elementor-element-31ee8a7 elementor-headline--style-highlight elementor-widget elementor-widget-animated-headline"
                     data-id="31ee8a7" data-element_type="widget"
                     data-settings="{&quot;marker&quot;:&quot;underline_zigzag&quot;,&quot;highlighted_text&quot;:&quot;01819000000&quot;,&quot;headline_style&quot;:&quot;highlight&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;highlight_animation_duration&quot;:1200,&quot;highlight_iteration_delay&quot;:8000}"

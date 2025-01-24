@@ -8,6 +8,7 @@ use App\Models\Product;
 class Checkout extends \App\Livewire\Checkout
 {
     protected string $store = 'landing';
+    public ?string $layout = null;
     public Product $product;
 
     public function increaseQuantity($id): void

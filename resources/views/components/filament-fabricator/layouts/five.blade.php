@@ -117,7 +117,7 @@
                 </div>
             </section>
             
-            <livewire:fabricator.checkout :product="$page->product" />
+            <livewire:fabricator.checkout layout="five" :product="$page->product" />
         </div>
     </div>
 
