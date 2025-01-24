@@ -12,30 +12,31 @@
                             পূরণ করুন</h2>
                     </div>
                 </div>
-                @if($layout == 'five')
-                <div class="elementor-element elementor-element-31ee8a7 elementor-headline--style-highlight elementor-widget elementor-widget-animated-headline"
-                    data-id="31ee8a7" data-element_type="widget"
-                    data-settings="{&quot;marker&quot;:&quot;underline_zigzag&quot;,&quot;highlighted_text&quot;:&quot;01819000000&quot;,&quot;headline_style&quot;:&quot;highlight&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;highlight_animation_duration&quot;:1200,&quot;highlight_iteration_delay&quot;:8000}"
-                    data-widget_type="animated-headline.default">
-                    <div class="elementor-widget-container">
-                        <a href="tel:{{setting('company')->phone}}">
+                @if ($layout == 'five')
+                    <div class="elementor-element elementor-element-31ee8a7 elementor-headline--style-highlight elementor-widget elementor-widget-animated-headline"
+                        data-id="31ee8a7" data-element_type="widget"
+                        data-settings="{&quot;marker&quot;:&quot;underline_zigzag&quot;,&quot;highlighted_text&quot;:&quot;01819000000&quot;,&quot;headline_style&quot;:&quot;highlight&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;highlight_animation_duration&quot;:1200,&quot;highlight_iteration_delay&quot;:8000}"
+                        data-widget_type="animated-headline.default">
+                        <div class="elementor-widget-container">
+                            <a href="tel:{{ setting('company')->phone }}">
 
-                            <h3 class="elementor-headline e-animated e-hide-highlight">
-                                <span class="elementor-headline-plain-text elementor-headline-text-wrapper">ফোনে অর্ডার
-                                    করুন: </span>
-                                <span class="elementor-headline-dynamic-wrapper elementor-headline-text-wrapper">
-                                    <span
-                                        class="elementor-headline-dynamic-text elementor-headline-text-active">{{setting('company')->phone}}</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 150"
-                                        preserveAspectRatio="none">
-                                        <path
-                                            d="M9.3,127.3c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,0.4,282.3,7.2C380.1,129.6,181.2,130.6,70,139 c82.6-2.9,254.2-1,335.9,1.3c-56,1.4-137.2-0.3-197.1,9">
-                                        </path>
-                                    </svg></span>
-                            </h3>
-                        </a>
+                                <h3 class="elementor-headline e-animated e-hide-highlight">
+                                    <span class="elementor-headline-plain-text elementor-headline-text-wrapper">ফোনে
+                                        অর্ডার
+                                        করুন: </span>
+                                    <span class="elementor-headline-dynamic-wrapper elementor-headline-text-wrapper">
+                                        <span
+                                            class="elementor-headline-dynamic-text elementor-headline-text-active">{{ setting('company')->phone }}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 150"
+                                            preserveAspectRatio="none">
+                                            <path
+                                                d="M9.3,127.3c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,0.4,282.3,7.2C380.1,129.6,181.2,130.6,70,139 c82.6-2.9,254.2-1,335.9,1.3c-56,1.4-137.2-0.3-197.1,9">
+                                            </path>
+                                        </svg></span>
+                                </h3>
+                            </a>
+                        </div>
                     </div>
-                </div>
                 @endif
                 <div class="elementor-element elementor-element-7d864ca elementor-element-50bfeb0b elementor-widget elementor-widget-checkout-form"
                     data-id="7d864ca" data-element_type="widget" id="order"
@@ -52,7 +53,22 @@
                                     <form wire:submit="checkout" name="checkout" method="post"
                                         class="checkout woocommerce-checkout" enctype="multipart/form-data">
 
-
+                                        @if(session()->has('error') || $errors->any())
+                                        <div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">
+                                            <ul class="woocommerce-error" role="alert">
+                                                @if(session()->has('error'))
+                                                <li data-id="billing_first_name">
+                                                    {{ session('error') }}
+                                                </li>
+                                                @endif
+                                                @foreach($errors->all() as $error)
+                                                <li data-id="billing_address_1">
+                                                    {{ $error }}
+                                                </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                        @endif
 
                                         <div class="wcf-col2-set col2-set" id="customer_details">
                                             <div class="wcf-col-1 col-1">
@@ -97,10 +113,10 @@
                                                             <label for="billing_phone" class="">আপনার ফোন
                                                                 নাম্বার&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label><span
-                                                                class="woocommerce-input-wrapper"><input type="tel"
-                                                                    wire:model="phone" class="input-text "
-                                                                    name="billing_phone" id="billing_phone"
-                                                                    placeholder=""
+                                                                class="woocommerce-input-wrapper"><input
+                                                                    type="tel" wire:model="phone"
+                                                                    class="input-text " name="billing_phone"
+                                                                    id="billing_phone" placeholder=""
                                                                     value="{{ setting('show_option')->hide_phone_prefix ?? false ? '' : '+880' }}"
                                                                     aria-required="true" autocomplete="tel" />
                                                                 <span
@@ -116,13 +132,12 @@
                                         </div>
 
 
-                                        <div
-                                            style="margin-top: 0"
+                                        <div style="margin-top: 0"
                                             class="wcf-product-option-wrap wcf-yp-skin-cards wcf-product-option-after-customer">
-                                            <h3 id="your_products_heading" style="margin-bottom: .25rem;"> Your Products </h3>
+                                            <h3 id="your_products_heading" style="margin-bottom: .25rem;"> Your
+                                                Products </h3>
                                             <div class="wcf-qty-options">
-                                                <span class="wcf-field-required-error">{{ $errors->first('products') }}</span>
-                                                @foreach($product->variations->isEmpty() ? [$product] : $product->variations as $product)
+                                                @foreach ($product->variations->isEmpty() ? [$product] : $product->variations as $product)
                                                     <div class="wcf-qty-row wcf-qty-row-452 "
                                                         data-options="{&quot;product_id&quot;:440,&quot;variation_id&quot;:452,&quot;type&quot;:&quot;variation&quot;,&quot;unique_id&quot;:&quot;zwr6yipq&quot;,&quot;mode&quot;:&quot;quantity&quot;,&quot;highlight_text&quot;:&quot;&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;default_quantity&quot;:1,&quot;original_price&quot;:&quot;200&quot;,&quot;discounted_price&quot;:&quot;&quot;,&quot;total_discounted_price&quot;:&quot;&quot;,&quot;currency&quot;:&quot;&amp;#2547;&amp;nbsp;&quot;,&quot;cart_item_key&quot;:&quot;4606109fe00ffd19b2a98941e90aaaa8&quot;,&quot;save_value&quot;:&quot;&quot;,&quot;save_percent&quot;:&quot;&quot;,&quot;sign_up_fee&quot;:0,&quot;subscription_price&quot;:&quot;200&quot;,&quot;trial_period_string&quot;:&quot;&quot;}">
                                                         <div class="wcf-item">
