@@ -1,17 +1,44 @@
+@aware(['page'])
+
 <section
-    class="elementor-section elementor-top-section elementor-element elementor-element-c559378 elementor-element-ab204be elementor-section-boxed elementor-section-height-default"
+    class="elementor-section elementor-top-section elementor-element elementor-element-05fe02b elementor-element-c559378 elementor-element-ab204be elementor-section-boxed elementor-section-height-default"
     data-id="c559378" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
     <div class="elementor-container elementor-column-gap-no">
-        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-82536c1 elementor-element-9a6b06a elementor-element-4bea656d"
+        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-82720a5 elementor-element-82536c1 elementor-element-9a6b06a elementor-element-4bea656d"
             data-id="9a6b06a" data-element_type="column">
             <div class="elementor-widget-wrap elementor-element-populated">
-                <div class="elementor-element elementor-element-72090b7 elementor-element-68acae2 elementor-element-37676298 elementor-element-4e1d8f5a elementor-widget elementor-widget-heading"
+                <div class="elementor-element elementor-element-9a9501a elementor-element-72090b7 elementor-element-68acae2 elementor-element-37676298 elementor-element-4e1d8f5a elementor-widget elementor-widget-heading"
                     data-id="72090b7" data-element_type="widget" data-widget_type="heading.default">
                     <div class="elementor-widget-container">
                         <h2 class="elementor-heading-title elementor-size-default">অর্ডার করতে নিচের ফর্মটি
                             পূরণ করুন</h2>
                     </div>
                 </div>
+                @if($page->layout == 'five')
+                <div class="elementor-element elementor-element-31ee8a7 elementor-headline--style-highlight elementor-widget elementor-widget-animated-headline"
+                    data-id="31ee8a7" data-element_type="widget"
+                    data-settings="{&quot;marker&quot;:&quot;underline_zigzag&quot;,&quot;highlighted_text&quot;:&quot;01819000000&quot;,&quot;headline_style&quot;:&quot;highlight&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;highlight_animation_duration&quot;:1200,&quot;highlight_iteration_delay&quot;:8000}"
+                    data-widget_type="animated-headline.default">
+                    <div class="elementor-widget-container">
+                        <a href="tel:{{setting('company')->phone}}">
+
+                            <h3 class="elementor-headline e-animated e-hide-highlight">
+                                <span class="elementor-headline-plain-text elementor-headline-text-wrapper">ফোনে অর্ডার
+                                    করুন: </span>
+                                <span class="elementor-headline-dynamic-wrapper elementor-headline-text-wrapper">
+                                    <span
+                                        class="elementor-headline-dynamic-text elementor-headline-text-active">{{setting('company')->phone}}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 150"
+                                        preserveAspectRatio="none">
+                                        <path
+                                            d="M9.3,127.3c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,0.4,282.3,7.2C380.1,129.6,181.2,130.6,70,139 c82.6-2.9,254.2-1,335.9,1.3c-56,1.4-137.2-0.3-197.1,9">
+                                        </path>
+                                    </svg></span>
+                            </h3>
+                        </a>
+                    </div>
+                </div>
+                @endif
                 <div class="elementor-element elementor-element-7d864ca elementor-element-50bfeb0b elementor-widget elementor-widget-checkout-form"
                     data-id="7d864ca" data-element_type="widget" id="order"
                     data-widget_type="checkout-form.default">
@@ -49,8 +76,9 @@
                                                                     name="billing_first_name" id="billing_first_name"
                                                                     placeholder="" value="" aria-required="true"
                                                                     autocomplete="given-name" />
-                                                                    <span class="wcf-field-required-error">{{ $errors->first('name') }}</span>
-                                                                    </span></p>
+                                                                <span
+                                                                    class="wcf-field-required-error">{{ $errors->first('name') }}</span>
+                                                            </span></p>
                                                         <p class="form-row form-row-wide address-field wcf-column-100 validate-required"
                                                             id="billing_address_1_field" data-priority="50"><label
                                                                 for="billing_address_1" class="">আপনার সম্পূর্ণ
@@ -62,8 +90,9 @@
                                                                     placeholder="House number and street name"
                                                                     value="" aria-required="true"
                                                                     autocomplete="address-line1" />
-                                                                    <span class="wcf-field-required-error">{{ $errors->first('address') }}</span>
-                                                                    </span>
+                                                                <span
+                                                                    class="wcf-field-required-error">{{ $errors->first('address') }}</span>
+                                                            </span>
                                                         </p>
                                                         <p class="form-row form-row-wide wcf-column-100 validate-required validate-phone"
                                                             id="billing_phone_field" data-priority="100">
@@ -76,8 +105,9 @@
                                                                     placeholder=""
                                                                     value="{{ setting('show_option')->hide_phone_prefix ?? false ? '' : '+880' }}"
                                                                     aria-required="true" autocomplete="tel" />
-                                                                    <span class="wcf-field-required-error">{{ $errors->first('phone') }}</span>
-                                                                    </span>
+                                                                <span
+                                                                    class="wcf-field-required-error">{{ $errors->first('phone') }}</span>
+                                                            </span>
                                                         </p>
                                                     </div>
 
