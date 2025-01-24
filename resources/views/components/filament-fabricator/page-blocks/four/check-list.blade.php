@@ -34,12 +34,13 @@
                                 <div class="elementor-element elementor-element-cb24452 elementor-widget elementor-widget-image"
                                     data-id="cb24452" data-element_type="widget" data-widget_type="image.default">
                                     <div class="elementor-widget-container">
-                                        <img loading="lazy" decoding="async"
-                                            src="{{asset('storage/'.$image)}}"
+                                        @php($image ??= $page->product->base_image->src)
+                                        <img loading="lazy" decoding="async" width="350" height="350"
+                                            src="{{Str::isUrl($image) ? $image : asset('storage/'.$image)}}"
                                             class="attachment-large size-large wp-image-191" alt="" />
                                     </div>
                                 </div>
-                                <div class="elementor-element elementor-element-086665d elementor-mobile-align-center elementor-widget elementor-widget-button"
+                                <div class="elementor-element elementor-element-086665d elementor-align-center elementor-widget elementor-widget-button"
                                     data-id="086665d" data-element_type="widget" data-widget_type="button.default">
                                     <div class="elementor-widget-container">
                                         <div class="elementor-button-wrapper">
