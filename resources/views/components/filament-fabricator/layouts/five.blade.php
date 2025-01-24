@@ -21,6 +21,9 @@
     <link rel='stylesheet' id='elementor-post-7-css'
         href='https://demo.orioit.com/wp-content/uploads/elementor/css/post-7.css?ver=1736836498' media='all' />
     
+    <link rel='stylesheet' id='wcf-frontend-global-css'
+        href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/frontend.css?ver=2.0.12') }}' media='all' />
+    
     <link rel='stylesheet' id='swiper-css'
         href='https://demo.orioit.com/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=8.4.5'
         media='all' />
