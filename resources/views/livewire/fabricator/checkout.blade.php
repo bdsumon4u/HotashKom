@@ -113,28 +113,16 @@
 
                                             </div>
 
-                                            <div class="wcf-col-2 col-2">
-
-                                                <div class="woocommerce-shipping-fields">
-                                                </div>
-                                                <div class="woocommerce-additional-fields">
-
-
-                                                    <input type="hidden" class="input-hidden _wcf_flow_id"
-                                                        name="_wcf_flow_id" value="456"><input type="hidden"
-                                                        class="input-hidden _wcf_checkout_id" name="_wcf_checkout_id"
-                                                        value="459">
-                                                </div>
-                                            </div>
                                         </div>
 
 
                                         <div
+                                            style="margin-top: 0"
                                             class="wcf-product-option-wrap wcf-yp-skin-cards wcf-product-option-after-customer">
-                                            <h3 id="your_products_heading"> Your Products </h3>
+                                            <h3 id="your_products_heading" style="margin-bottom: .25rem;"> Your Products </h3>
                                             <div class="wcf-qty-options">
-                                                @dump($cart = session()->get('landing', []))
-                                                @forelse($product->variations as $product)
+                                                <span class="wcf-field-required-error">{{ $errors->first('products') }}</span>
+                                                @foreach($product->variations->isEmpty() ? [$product] : $product->variations as $product)
                                                     <div class="wcf-qty-row wcf-qty-row-452 "
                                                         data-options="{&quot;product_id&quot;:440,&quot;variation_id&quot;:452,&quot;type&quot;:&quot;variation&quot;,&quot;unique_id&quot;:&quot;zwr6yipq&quot;,&quot;mode&quot;:&quot;quantity&quot;,&quot;highlight_text&quot;:&quot;&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;default_quantity&quot;:1,&quot;original_price&quot;:&quot;200&quot;,&quot;discounted_price&quot;:&quot;&quot;,&quot;total_discounted_price&quot;:&quot;&quot;,&quot;currency&quot;:&quot;&amp;#2547;&amp;nbsp;&quot;,&quot;cart_item_key&quot;:&quot;4606109fe00ffd19b2a98941e90aaaa8&quot;,&quot;save_value&quot;:&quot;&quot;,&quot;save_percent&quot;:&quot;&quot;,&quot;sign_up_fee&quot;:0,&quot;subscription_price&quot;:&quot;200&quot;,&quot;trial_period_string&quot;:&quot;&quot;}">
                                                         <div class="wcf-item">
@@ -192,61 +180,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @empty
-                                                    <div class="wcf-qty-row wcf-qty-row-449 "
-                                                        data-options="{&quot;product_id&quot;:440,&quot;variation_id&quot;:449,&quot;type&quot;:&quot;variation&quot;,&quot;unique_id&quot;:&quot;zwr6yipq&quot;,&quot;mode&quot;:&quot;quantity&quot;,&quot;highlight_text&quot;:&quot;&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;default_quantity&quot;:1,&quot;original_price&quot;:&quot;400&quot;,&quot;discounted_price&quot;:&quot;&quot;,&quot;total_discounted_price&quot;:&quot;&quot;,&quot;currency&quot;:&quot;&amp;#2547;&amp;nbsp;&quot;,&quot;cart_item_key&quot;:&quot;4606109fe00ffd19b2a98941e90aaaa8&quot;,&quot;save_value&quot;:&quot;&quot;,&quot;save_percent&quot;:&quot;&quot;,&quot;sign_up_fee&quot;:0,&quot;subscription_price&quot;:&quot;400&quot;,&quot;trial_period_string&quot;:&quot;&quot;}">
-                                                        <div class="wcf-item">
-                                                            <div class="wcf-item-selector wcf-item-multiple-sel">
-                                                                <input class="wcf-multiple-sel" type="checkbox"
-                                                                    name="wcf-multiple-sel" value="449">
-                                                            </div>
-
-                                                            <div class="wcf-item-image" style=""><img
-                                                                    fetchpriority="high" decoding="async"
-                                                                    width="300" height="300"
-                                                                    src="https://demo.orioit.com/wp-content/uploads/2024/11/Red-Aus-Rice-1000g-Side-300x300.webp"
-                                                                    class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
-                                                                    alt="" /></div>
-                                                            <div class="wcf-item-content-options">
-                                                                <div class="wcf-item-wrap">
-                                                                    <span
-                                                                        class="wcf-display-title">red-rice</span><span
-                                                                        class="wcf-display-title-quantity"><span
-                                                                            class="dashicons dashicons-no-alt"></span><span
-                                                                            class="wcf-display-quantity">1</span></span>
-                                                                    <div class="wcf-display-attributes"><span
-                                                                            class="wcf-att-inner">red rice 1:
-                                                                            2KG<span
-                                                                                class="wcf-att-sep">,</span></span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="wcf-qty ">
-                                                                    <div class="wcf-qty-selection-wrap">
-                                                                        <span
-                                                                            class="wcf-qty-selection-btn wcf-qty-decrement wcf-qty-change-icon"
-                                                                            title="">&minus;</span>
-                                                                        <input autocomplete="off" type="number"
-                                                                            value="1" step="1"
-                                                                            name="wcf_qty_selection"
-                                                                            class="wcf-qty-selection"
-                                                                            data-sale-limit="false" title="">
-                                                                        <span
-                                                                            class="wcf-qty-selection-btn wcf-qty-increment wcf-qty-change-icon"
-                                                                            title="">&plus;</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="wcf-price">
-                                                                    <div class="wcf-display-price wcf-field-label">
-                                                                        <span
-                                                                            class="woocommerce-Price-amount amount"><span
-                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;400.00</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endforelse
+                                                @endforeach
                                             </div>
                                         </div>
 

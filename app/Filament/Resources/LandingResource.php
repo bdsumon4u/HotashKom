@@ -132,6 +132,10 @@ class LandingResource extends PageResource
             ->filter(fn (SplFileInfo $file): bool => $file->getExtension() === 'php')
             ->first(fn (SplFileInfo $file) => Str::of($file->getFilename())->before('Layout.php')->kebab()->is($get('layout')))
             ->getFileNameWithoutExtension();
+        
+        if (! $get('is_slug_changed_manually') && filled($get('title')) && blank($record)) {
+            $set('slug', Str::of($layoutName)->beforeLast('Layout')->prepend($get('title'))->slug('-', config('app.locale', 'en')));
+        }
 
         $blocks = collect($record?->blocks)->filter(fn ($block) => Str::startsWith($block['type'], Str::of($layoutName)->replaceLast('Layout', '.')->kebab()));
 
