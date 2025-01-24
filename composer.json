@@ -29,6 +29,7 @@
         "z3d0x/filament-fabricator": "^2.4"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.14",
         "driftingly/rector-laravel": "^2.0",
         "fakerphp/faker": "^1.23",
         "laravel/pail": "^1.1",
