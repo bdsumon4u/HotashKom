@@ -248,7 +248,22 @@
                 const next = activeG === lastG ? 0 : (activeG + 1);
                 gallery.eq(next).trigger('click');
             });
-            setInterval(() => $('.zoom-control.right').trigger('click'), 3000);
+            
+            // Automatic navigation logic inside setInterval
+            setInterval(() => {
+                let gallery = $('.xzoom-gallery');
+                gallery.each(function (g, e) {
+                    if ($(e).hasClass('xactive')) {
+                        activeG = g; // Find the active image index
+                    }
+                    lastG = g; // Find the last image index
+                });
+                const next = activeG === lastG ? 0 : (activeG + 1); // Calculate next index
+                gallery.removeClass('xactive'); // Remove active class from all
+                gallery.eq(next).addClass('xactive'); // Add active class to the next image
+
+                $('img.xzoom').attr('src', gallery.eq(next).attr('src'));
+            }, 3000);
         });
     </script>
 @endpush

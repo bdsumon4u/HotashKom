@@ -148,7 +148,10 @@
             }
         }
 
-
+        .dropcart__products-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
 
         /** StickyNav **/
         .site-header.sticky {
