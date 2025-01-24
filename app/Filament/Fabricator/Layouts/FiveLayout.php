@@ -26,7 +26,7 @@ class FiveLayout extends Layout
             ]),
             NormalText::default([
                 'content' => '
-                    <h1>মাত্র ৭*দি*নে চেহারায় কমবে ৫*বছ*র</h1>
+                    <h1>মাত্র ৭*দি*নে চেহারায় কমবে <span style="text-decoration: underline;">৫*বছ*র</span></h1>
                     <p>ব্রনের কারনে ত্বকে গর্তের মতো হয়ে, আর একে pores বলে। আর এই pores দূর করতে সবচেয়ে Best হলো Rice Serum. এটি ছেলে মেয়ে সবাই ব্যবহার করতে পারবে। কোণ প্রকার সাইড ইফেক্ট নেই।</p>
                 ',
             ]),
