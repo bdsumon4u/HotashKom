@@ -80,7 +80,7 @@ class LandingResource extends PageResource
                                     ->afterStateUpdated(function (Set $set): void {
                                         $set('is_slug_changed_manually', true);
                                     })
-                                    ->rule(fn($state): \Closure => function (string $attribute, $value, Closure $fail) use ($state): void {
+                                    ->rule(fn ($state): \Closure => function (string $attribute, $value, Closure $fail) use ($state): void {
                                         if ($state !== '/' && (Str::startsWith($value, '/') || Str::endsWith($value, '/'))) {
                                             $fail(__('filament-fabricator::page-resource.errors.slug_starts_or_ends_with_slash'));
                                         }
@@ -132,7 +132,7 @@ class LandingResource extends PageResource
             ->filter(fn (SplFileInfo $file): bool => $file->getExtension() === 'php')
             ->first(fn (SplFileInfo $file) => Str::of($file->getFilename())->before('Layout.php')->kebab()->is($get('layout')))
             ->getFileNameWithoutExtension();
-        
+
         if (! $get('is_slug_changed_manually') && filled($get('title')) && blank($record)) {
             $set('slug', Str::of($layoutName)->beforeLast('Layout')->prepend($get('title'))->slug('-', config('app.locale', 'en')));
         }

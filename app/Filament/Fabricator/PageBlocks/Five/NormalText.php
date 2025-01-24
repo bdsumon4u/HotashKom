@@ -38,7 +38,7 @@ class NormalText extends PageBlock
                 // Add the class if it doesn't already exist
                 if (strpos($attributes, 'class=') !== false) {
                     // Append the classes to existing class attributes
-                    return "<{$tag}" . preg_replace('/class="(.*?)"/', 'class="$1 elementor-headline e-animated"', $attributes) . '>';
+                    return "<{$tag}".preg_replace('/class="(.*?)"/', 'class="$1 elementor-headline e-animated"', $attributes).'>';
                 } else {
                     // Add a new class attribute
                     return "<{$tag}{$attributes} class=\"elementor-headline e-animated\">";

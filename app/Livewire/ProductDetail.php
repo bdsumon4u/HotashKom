@@ -24,7 +24,7 @@ class ProductDetail extends Component
 
     public static function landing(Product $product): self
     {
-        $component = new self();
+        $component = new self;
         $component->product = $product;
         $component->store = 'landing';
         $component->mount();

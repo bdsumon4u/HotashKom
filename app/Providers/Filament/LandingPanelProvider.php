@@ -25,7 +25,7 @@ class LandingPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         PreviewAction::configureUsing(fn (PreviewAction $action) => $action->hidden());
-    
+
         return $panel
             ->default()
             ->id('landing')

@@ -4,7 +4,6 @@ namespace App\Filament\Fabricator\PageBlocks\Five;
 
 use App\Filament\Fabricator\PageBlocks\HasBlockName;
 use Filament\Forms\Components\Builder\Block;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Z3d0X\FilamentFabricator\PageBlocks\PageBlock;
