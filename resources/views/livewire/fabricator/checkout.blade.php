@@ -53,21 +53,21 @@
                                     <form wire:submit="checkout" name="checkout" method="post"
                                         class="checkout woocommerce-checkout" enctype="multipart/form-data">
 
-                                        @if(session()->has('error') || $errors->any())
-                                        <div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">
-                                            <ul class="woocommerce-error" role="alert">
-                                                @if(session()->has('error'))
-                                                <li data-id="billing_first_name">
-                                                    {{ session('error') }}
-                                                </li>
-                                                @endif
-                                                @foreach($errors->all() as $error)
-                                                <li data-id="billing_address_1">
-                                                    {{ $error }}
-                                                </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
+                                        @if (session()->has('error') || $errors->any())
+                                            <div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">
+                                                <ul class="woocommerce-error" role="alert">
+                                                    @if (session()->has('error'))
+                                                        <li data-id="billing_first_name">
+                                                            {{ session('error') }}
+                                                        </li>
+                                                    @endif
+                                                    @foreach ($errors->all() as $error)
+                                                        <li data-id="billing_address_1">
+                                                            {{ $error }}
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
                                         @endif
 
                                         <div class="wcf-col2-set col2-set" id="customer_details">
@@ -92,7 +92,58 @@
                                                                     autocomplete="given-name" />
                                                                 <span
                                                                     class="wcf-field-required-error">{{ $errors->first('name') }}</span>
-                                                            </span></p>
+                                                            </span>
+                                                        </p>
+                                                        <div class="form-row form-row-wide address-field wcf-column-100 validate-required"
+                                                            id="billing_address_1_field" data-priority="50"><label
+                                                                for="billing_address_1" class="">Shipping&nbsp;<abbr class="required"
+                                                                    title="required">*</abbr></label><div
+                                                                class="woocommerce-input-wrapper">
+                                                                
+
+                                                                <ul id="shipping_method"
+                                                                    style="border: 1px solid var( --wcf-field-border-color ); display: flex; column-gap: 1rem; padding: .5rem;"
+                                                                    class="woocommerce-shipping-methods">
+                                                                    <li style="white-space: nowrap; margin: 0;">
+                                                                        <input type="radio"
+                                                                            wire:model.live="shipping"
+                                                                            name="shipping_method[0]" data-index="0"
+                                                                            id="shipping_method_0_flat_rate1"
+                                                                            value="Inside Dhaka"
+                                                                            class="shipping_method"
+                                                                            checked='checked' /><label
+                                                                            for="shipping_method_0_flat_rate1">ঢাকা শহর <strong
+                                                                                class="woocommerce-Price-amount amount"><bdi>
+                                                                                    @if (!(setting('show_option')->productwise_delivery_charge ?? false))
+                                                                                        <strong
+                                                                                            class="woocommerce-Price-currencySymbol">&#2547;</strong>
+                                                                                        {{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->inside_dhaka }}
+                                                                                    @endif
+                                                                                </bdi>
+                                                                            </strong></label>
+                                                                    </li>
+                                                                    <li style="white-space: nowrap; margin: 0;">
+                                                                        <input type="radio"
+                                                                            wire:model.live="shipping"
+                                                                            name="shipping_method[0]" data-index="0"
+                                                                            id="shipping_method_0_flat_rate2"
+                                                                            value="Outside Dhaka"
+                                                                            class="shipping_method" /><label
+                                                                            for="shipping_method_0_flat_rate2">ঢাকার বাইরে <strong
+                                                                                class="woocommerce-Price-amount amount"><bdi>
+                                                                                    @if (!(setting('show_option')->productwise_delivery_charge ?? false))
+                                                                                        <strong
+                                                                                            class="woocommerce-Price-currencySymbol">&#2547;</strong>
+                                                                                        {{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->outside_dhaka }}
+                                                                                    @endif
+                                                                                </bdi></strong></label>
+                                                                    </li>
+                                                                </ul>
+                                                                
+                                                                <div
+                                                                    class="wcf-field-required-error">{{ $errors->first('address') }}</div>
+                                                            </div>
+                                                        </div>
                                                         <p class="form-row form-row-wide address-field wcf-column-100 validate-required"
                                                             id="billing_address_1_field" data-priority="50"><label
                                                                 for="billing_address_1" class="">আপনার সম্পূর্ণ
@@ -232,7 +283,7 @@
                                                     </tbody>
                                                     <tfoot>
 
-                                                        <tr class="cart-subtotal">
+                                                        <tr class="cart-subtotal" style="display: none;">
                                                             <th>Subtotal</th>
                                                             <td><span class="woocommerce-Price-amount amount"><bdi><span
                                                                             class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $subtotal }}</bdi></span>
@@ -244,48 +295,8 @@
 
                                                         <tr class="woocommerce-shipping-totals shipping">
                                                             <th>Shipping</th>
-                                                            <td data-title="Shipping">
-                                                                <ul id="shipping_method"
-                                                                    class="woocommerce-shipping-methods">
-                                                                    <li style="white-space: nowrap">
-                                                                        <input type="radio"
-                                                                            wire:model.live="shipping"
-                                                                            name="shipping_method[0]" data-index="0"
-                                                                            id="shipping_method_0_flat_rate1"
-                                                                            value="Inside Dhaka"
-                                                                            class="shipping_method"
-                                                                            checked='checked' /><label
-                                                                            for="shipping_method_0_flat_rate1">Inside
-                                                                            Dhaka <strong
-                                                                                class="woocommerce-Price-amount amount"><bdi>
-                                                                                    @if (!(setting('show_option')->productwise_delivery_charge ?? false))
-                                                                                        <strong
-                                                                                            class="woocommerce-Price-currencySymbol">&#2547;</strong>
-                                                                                        {{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->inside_dhaka }}
-                                                                                    @endif
-                                                                                </bdi>
-                                                                            </strong></label>
-                                                                    </li>
-                                                                    <li style="white-space: nowrap">
-                                                                        <input type="radio"
-                                                                            wire:model.live="shipping"
-                                                                            name="shipping_method[0]" data-index="0"
-                                                                            id="shipping_method_0_flat_rate2"
-                                                                            value="Outside Dhaka"
-                                                                            class="shipping_method" /><label
-                                                                            for="shipping_method_0_flat_rate2">Outside
-                                                                            Dhaka <strong
-                                                                                class="woocommerce-Price-amount amount"><bdi>
-                                                                                    @if (!(setting('show_option')->productwise_delivery_charge ?? false))
-                                                                                        <strong
-                                                                                            class="woocommerce-Price-currencySymbol">&#2547;</strong>
-                                                                                        {{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->outside_dhaka }}
-                                                                                    @endif
-                                                                                </bdi></strong></label>
-                                                                    </li>
-                                                                </ul>
-
-
+                                                            <td><span class="woocommerce-Price-amount amount"><bdi><span
+                                                                            class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $shipping_cost }}</bdi></span>
                                                             </td>
                                                         </tr>
 
