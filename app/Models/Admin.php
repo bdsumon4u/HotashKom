@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Notifications\Admin\ResetPassword;
 use App\Notifications\Admin\VerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Spatie\Activitylog\Traits\CausesActivity;
 
-class Admin extends Authenticatable implements HasTenants
+class Admin extends Authenticatable implements FilamentUser, HasTenants
 {
     use CausesActivity;
     use Notifiable;
@@ -90,5 +91,9 @@ class Admin extends Authenticatable implements HasTenants
     public function getTenants(Panel $panel): array|Collection
     {
         return [];
+    }
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
     }
 }
