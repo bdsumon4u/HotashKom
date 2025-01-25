@@ -350,7 +350,7 @@
                                                                     process your order, support your
                                                                     experience throughout this website, and
                                                                     for other purposes described in our <a
-                                                                        href="https://demo.orioit.com/?page_id=3"
+                                                                        href="{{ url('/privacy-policy') }}"
                                                                         class="woocommerce-privacy-policy-link"
                                                                         target="_blank">privacy policy</a>.
                                                                 </p>

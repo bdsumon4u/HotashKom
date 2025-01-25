@@ -86,6 +86,39 @@
             data-elementor-post-type="cartflows_step">
 
 
+            <section
+                class="elementor-section elementor-top-section elementor-element elementor-element-e52e0d5 elementor-section-boxed elementor-section-height-default"
+                data-id="e52e0d5" data-element_type="section"
+                data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+                <div class="elementor-container elementor-column-gap-no">
+                    <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-80c8d67"
+                        data-id="80c8d67" data-element_type="column">
+                        <div class="elementor-widget-wrap elementor-element-populated">
+                            <section
+                                class="elementor-section elementor-inner-section elementor-element elementor-element-69c4d70 elementor-section-content-middle elementor-section-boxed elementor-section-height-default"
+                                data-id="69c4d70" data-element_type="section">
+                                <div class="elementor-container elementor-column-gap-no">
+                                    <div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-b26a6da"
+                                        data-id="b26a6da" data-element_type="column">
+                                        <div class="elementor-widget-wrap elementor-element-populated">
+                                            <div class="elementor-element elementor-element-1602e80 elementor-widget elementor-widget-image"
+                                                data-id="1602e80" data-element_type="widget"
+                                                data-widget_type="image.default">
+                                                <div class="elementor-widget-container">
+                                                    <img decoding="async"
+                                                        style="width: 219px;"
+                                                        src="{{ asset(setting('logo')->desktop) }}"
+                                                        class="attachment-full size-full wp-image-128" alt="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
 

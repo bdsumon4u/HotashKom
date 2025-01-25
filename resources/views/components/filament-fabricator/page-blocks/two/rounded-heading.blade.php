@@ -12,7 +12,7 @@
                     data-id="e938b01" data-element_type="widget" data-widget_type="image.default">
                     <div class="elementor-widget-container">
                         <img decoding="async"
-                            src="{{ $thumbnail }}"
+                            src="{{ asset(setting('logo')->desktop) }}"
                             class="attachment-full size-full wp-image-128" alt="" />
                     </div>
                 </div>

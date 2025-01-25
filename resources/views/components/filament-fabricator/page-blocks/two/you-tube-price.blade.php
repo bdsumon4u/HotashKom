@@ -61,11 +61,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="elementor-element elementor-element-9657489 elementor-widget elementor-widget-image"
+                <div style="display: none;" class="elementor-element elementor-element-9657489 elementor-widget elementor-widget-image"
                     data-id="9657489" data-element_type="widget" data-widget_type="image.default">
                     <div class="elementor-widget-container">
-                        <img decoding="async" width="1" height="1"
-                            src="https://demo.orioit.com/wp-content/uploads/2024/11/WhatsApp-Image-2024-02-24-at-10.28.07-PM-1024x1024-1.jpeg"
+                        <img decoding="async" width="350" height="350"
+                            src="{{ $page->product->base_image->src }}"
                             class="attachment-large size-large wp-image-131" alt="" />
                     </div>
                 </div>

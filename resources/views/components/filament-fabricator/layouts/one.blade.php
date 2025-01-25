@@ -13,6 +13,12 @@
     <link rel='stylesheet' id='wcf-frontend-global-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/frontend.css?ver=2.0.12') }}' media='all' />
     
+    <link rel='stylesheet' id='widget-image-css'
+        href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=3.25.9') }}'
+        media='all' />
+    <link rel='stylesheet' id='e-shapes-css'
+        href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/css/conditionals/shapes.min.css?ver=3.25.9') }}'
+        media='all' />
     <link rel='stylesheet' id='woocommerce-general-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/css/woocommerce.css?ver=9.4.2') }}'
         media='all' />
@@ -21,6 +27,7 @@
         media='all' />
     <link rel='stylesheet' id='elementor-post-7-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/uploads/elementor/css/post-7.css?ver=1736836498') }}' media='all' />
+    
     <link rel='stylesheet' id='widget-animated-headline-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor-pro/assets/css/widget-animated-headline.min.css?ver=3.25.2') }}'
         media='all' />
@@ -59,6 +66,40 @@
             data-elementor-post-type="cartflows_step">
             
 
+            <section
+                class="elementor-section elementor-top-section elementor-element elementor-element-e52e0d5 elementor-section-boxed elementor-section-height-default"
+                data-id="e52e0d5" data-element_type="section"
+                data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+                <div class="elementor-container elementor-column-gap-no">
+                    <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-80c8d67"
+                        data-id="80c8d67" data-element_type="column">
+                        <div class="elementor-widget-wrap elementor-element-populated">
+                            <section
+                                class="elementor-section elementor-inner-section elementor-element elementor-element-69c4d70 elementor-section-content-middle elementor-section-boxed elementor-section-height-default"
+                                data-id="69c4d70" data-element_type="section">
+                                <div class="elementor-container elementor-column-gap-no">
+                                    <div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-b26a6da"
+                                        data-id="b26a6da" data-element_type="column">
+                                        <div class="elementor-widget-wrap elementor-element-populated">
+                                            <div class="elementor-element elementor-element-1602e80 elementor-widget elementor-widget-image"
+                                                data-id="1602e80" data-element_type="widget"
+                                                data-widget_type="image.default">
+                                                <div class="elementor-widget-container">
+                                                    <img decoding="async"
+                                                        style="width: 219px;"
+                                                        src="{{ asset(setting('logo')->desktop) }}"
+                                                        class="attachment-full size-full wp-image-128" alt="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
             <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
 
             <livewire:fabricator.checkout :product="$page->product" />
