@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-sm-12">
-        <h4><small class="border-bottom mb-1">General</small></h4>
+        <h4><small class="mb-1 border-bottom">General</small></h4>
     </div>
     <div class="col-sm-12">
         <div class="form-group">
@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div class="col-sm-12">
-                <h4><small class="border-bottom mb-1">Inventory</small></h4>
+                <h4><small class="mb-1 border-bottom">Inventory</small></h4>
             </div>
             <div class="col-sm-12">
                 <div class="form-group">
@@ -91,8 +91,8 @@
                 </div>
             </div>
         </div>
-        <div class="card rounded-0 shadow-sm">
-            <div class="card-header p-1">
+        <div class="shadow-sm card rounded-0">
+            <div class="p-1 card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <strong>Wholesale (Quantity|Price)</strong>
                     <button type="button" class="btn btn-primary btn-sm add-wholesale">
@@ -100,9 +100,9 @@
                     </button>
                 </div>
             </div>
-            <div class="card-body p-1">
+            <div class="p-1 card-body">
                 @foreach (old('wholesale.price', $product->wholesale['price'] ?? []) as $price)
-                    <div class="form-group mb-1">
+                    <div class="mb-1 form-group">
                         <div class="input-group">
                             <x-input name="wholesale[quantity][]" placeholder="Quantity" value="{{old('wholesale.quantity', $product->wholesale['quantity'] ?? [])[$loop->index]}}" />
                             <x-input name="wholesale[price][]" placeholder="Price" value="{{$price}}" />
@@ -127,7 +127,7 @@
             <div class="col-md-6">
                 <div class="row">
                     <div class="col-sm-12">
-                        <h4><small class="border-bottom mb-1">Delivery Charge</small></h4>
+                        <h4><small class="mb-1 border-bottom">Delivery Charge</small></h4>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
@@ -144,7 +144,7 @@
                         </div>
                     </div>
                     <div class="col-sm-12">
-                        <h4><small class="border-bottom mb-1">Delivery and Return Policy</small></h4>
+                        <h4><small class="mb-1 border-bottom">Delivery and Return Policy</small></h4>
                     </div>
                     <div class="col-sm-12">
                         <div class="form-group">
@@ -166,15 +166,15 @@
             <div class="col-md-6">
                 <div class="row">
                     <div class="col-sm-12">
-                        <h4><small class="border-bottom mb-1">Product Images</small></h4>
+                        <h4><small class="mb-1 border-bottom">Product Images</small></h4>
                     </div>
                     <div class="col-sm-12">
                         <div class="form-group">
                             <!-- Button to Open the Modal -->
-                            <label for="base_image" class="d-block mb-0">
+                            <label for="base_image" class="mb-0 d-block">
                                 <strong>Base Image</strong>
-                                <button type="button" class="btn single btn-light px-2" data-toggle="modal" data-target="#single-picker" style="background: transparent; margin-left: 5px;">
-                                    <i class="fa fa-image text-secondary mr-1"></i>
+                                <button type="button" class="px-2 btn single btn-light" data-toggle="modal" data-target="#single-picker" style="background: transparent; margin-left: 5px;">
+                                    <i class="mr-1 fa fa-image text-secondary"></i>
                                     <span>Browse</span>
                                 </button>
                             </label>
@@ -188,14 +188,14 @@
                             @enderror
                         </div>
                         <div class="form-group">
-                            <label for="additional_images" class="d-block mb-0">
+                            <label for="additional_images" class="mb-0 d-block">
                                 <strong>Additional Images</strong>
-                                <button type="button" class="btn multiple btn-light px-2" data-toggle="modal" data-target="#multi-picker" style="background: transparent; margin-left: 5px;">
-                                    <i class="fa fa-image text-secondary mr-1"></i>
+                                <button type="button" class="px-2 btn multiple btn-light" data-toggle="modal" data-target="#multi-picker" style="background: transparent; margin-left: 5px;">
+                                    <i class="mr-1 fa fa-image text-secondary"></i>
                                     <span>Browse</span>
                                 </button>
                             </label>
-                            <ul id="sortable" class="additional_images-previews d-flex flex-wrap" style="margin-left: -5px;">
+                            <ul id="sortable" class="flex-wrap additional_images-previews d-flex" style="margin-left: -5px;">
                                 @php
                                     $ids = old('additional_images', $product->additional_images->pluck('id')->toArray());
                                     $srcs = old('additional_images_srcs', $product->additional_images->pluck('src')->toArray());
@@ -229,7 +229,7 @@
                                             class="custom-control-input"
                                             id="{{ $key }}"
                                             value="{{ $key }}"
-                                            {{ $key == old('desc_img_pos', $product->desc_img_pos) ? 'checked' : '' }}>
+                                            {{ $key == old('desc_img_pos', $product->desc_img_pos ?? 'after_content') ? 'checked' : '' }}>
                                         <label class="custom-control-label"
                                             for="{{ $key }}">{{ $option }}</label>
                                     </div>
