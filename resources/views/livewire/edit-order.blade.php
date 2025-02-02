@@ -308,5 +308,114 @@
                     class="btn btn-primary btn-xl btn-block">Update</button>
             </div>
         </div>
+        @if($order->exists)
+        <?php
+            function getData($data) {
+                if (isset($data['data'])) {
+                    $data = array_merge($data, $data['data']);
+                    unset($data['data']);
+                }
+                return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+        ?>
+        <div class="shadow-sm card rounded-0">
+            <div class="p-3 card-header">
+                <h5 class="card-title">Activities</h5>
+            </div>
+            <div class="p-3 card-body">
+                {{-- Accordion --}}
+                <div id="accordion">
+                    @foreach($order->activities()->latest()->get() as $activity)
+                        <div class="mb-1 shadow-sm card rounded-0">
+                            <div class="px-3 py-2 card-header" id="heading{{ $activity->id }}">
+                                <a class="text-dark" data-toggle="collapse" href="#collapse-{{$activity->id}}">
+                                    <div class="pb-1 mb-1 border-bottom text-primary">{{ $activity->description }}</div>
+                                    <div class="d-flex justify-content-between">
+                                        <div><i class="mr-1 fa fa-user"></i>{{ $activity->causer->name ?? 'System' }}</div>
+                                        <div><i class="mr-1 fa fa-clock-o"></i>{{ $activity->created_at->format('d-M-Y h:i A') }}</div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <div id="collapse-{{$activity->id}}" class="collapse" data-parent="#accordion">
+                                <div class="p-3 card-body">
+                                    <table class="table table-responsive">
+                                        <tbody>
+                                            @if($activity->changes['old'] ?? false)
+                                            <tr>
+                                                <th class="text-center">OLD</th>
+                                                <th class="text-center">NEW</th>
+                                            </tr>
+                                            @endif
+                                            <tr>
+                                                @if($activity->changes['old'] ?? false)
+                                                <td>
+                                                    <pre><div class="language-php">{{ getData($activity->changes['old'] ?? []) }}</div></pre>
+                                                </td>
+                                                @endif
+                                                <td>
+                                                    <pre><div class="language-php">{{ getData($activity->changes['attributes'] ?? []) }}</div></pre>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @if(config('services.courier_report.url') && config('services.courier_report.key'))
+        <div class="shadow-sm card rounded-0">
+            <div class="p-3 card-header">
+                <h5 class="card-title">Courier Report</h5>
+            </div>
+            <div class="p-3 card-body">
+                @if(is_string($this->courier_report))
+                <div class="alert alert-danger">{{ $this->courier_report }}</div>
+                <div class="alert alert-danger">Please wait 5 minutes</div>
+                @else
+                <div class="flex-wrap d-flex" style="column-gap: 1rem;">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Courier</th>
+                                    <th>Total</th>
+                                    <th class="bg-success">Delivered</th>
+                                    <th class="bg-danger">Failed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(['Pathao', 'SteadFast', 'RedX', 'PaperFly'] as $provider)
+                                @php($report = $this->courier_report['courierData'][strtolower($provider)])
+                                <tr>
+                                    <th>{{$provider}}</th>
+                                    <td class="font-weight-bold">{{$report['total_parcel']}}</td>
+                                    <td class="font-weight-bold bg-success">{{$report['success_parcel']}}</td>
+                                    <td class="font-weight-bold bg-danger">{{$report['cancelled_parcel']}}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="flex: 1;display: flex;flex-direction: column;justify-content: center;" class="p-2 border font-weight-bold">
+                        @php($summary = $this->courier_report['courierData']['summary'])
+                        @php($failure = $summary['success_ratio'] > 0 ? 100 - $summary['success_ratio'] : 0)
+                        <div class="px-3 py-1 my-1 text-center border border-secondary">Summary:</div>
+                        <div class="px-3 py-2 my-1 bg-success">Delivered: {{$summary['success_parcel']}} ({{$summary['success_ratio']}}%)</div>
+                        <div class="px-3 py-2 my-1 bg-danger">Failed: {{$summary['cancelled_parcel']}} ({{$failure}}%)</div>
+                        <div class="d-flex">
+                            <div class="px-1 py-2 my-1 text-center bg-success text-nowrap w-100" @if (round($summary['success_ratio']) > 0) style="width: {{$summary['success_ratio']}}% !important;" @endif title="Success Rate: {{$summary['success_ratio']}}%">{{$summary['success_ratio']}}%</div>
+                            <div class="px-1 py-2 my-1 text-center bg-danger text-nowrap w-100" @if (round($failure) > 0) style="width: {{$failure}}% !important;" @endif title="Failure Rate: {{$failure}}%">{{$failure}}%</div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
+        @endif
+        @endif
     </div>
 </div>

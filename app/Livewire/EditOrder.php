@@ -72,11 +72,28 @@ class EditOrder extends Component
 
     public function getCourierReportProperty()
     {
-        return cache()->remember('courier:'.($this->order->phone ?? ''), now()->addDay(), fn () => Http::withToken(config('services.courier_report.key'))
-            ->post(config('services.courier_report.url'), [
-                'phone' => $this->order->phone ?? '',
-            ])
-            ->json());
+        $report = cache()->remember(
+            'courier:'.($this->order->phone ?? ''),
+            now()->addDay(),
+            function () {
+                try {
+                    return Http::retry(3, 100)
+                        ->withToken(config('services.courier_report.key'))
+                        ->post(config('services.courier_report.url'), [
+                            'phone' => $this->order->phone ?? '',
+                        ])
+                        ->json();
+                } catch (\Exception $e) {
+                    return $e->getMessage();
+                }
+            },
+        );
+
+        if (is_string($report)) {
+            cache()->forget('courier:'.($this->order->phone ?? ''));
+        }
+
+        return $report;
     }
 
     protected function prepareForValidation($attributes): array

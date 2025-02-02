@@ -92,6 +92,7 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
     {
         return [];
     }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return true;

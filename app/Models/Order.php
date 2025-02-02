@@ -25,19 +25,7 @@ class Order extends Model
         'data' => '{"subtotal":0,"shipping_cost":0,"advanced":0,"discount":0,"courier":"Other","city_id":"","area_id":"","weight":0.5}',
     ];
 
-    protected static $logOnlyDirty = true;
-
     protected static $logFillable = true;
-
-    protected static $logName = 'orders';
-
-    protected static $submitEmptyLogs = false;
-
-    protected static $ignoreChangedAttributes = ['status_at', 'updated_at'];
-
-    protected static $logAttributesToIgnore = ['status_at', 'updated_at', 'data'];
-
-    protected static $logAttributes = ['data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal'];
 
     public static function booted(): void
     {
@@ -186,7 +174,10 @@ class Order extends Model
     {
         return LogOptions::defaults()
             ->logOnlyDirty()
-            ->dontLogIfAttributesChangedOnly(['status_at', 'updated_at']);
+            ->useLogName('orders')
+            ->dontSubmitEmptyLogs()
+            ->dontLogIfAttributesChangedOnly(['status_at', 'updated_at'])
+            ->logOnly(['name', 'phone', 'status', 'data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal']);
     }
 
     public function getCityList()
