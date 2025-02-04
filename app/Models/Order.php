@@ -167,7 +167,7 @@ class Order extends Model
     {
         $products = (array) $products;
 
-        return array_reduce($products, fn ($sum, $product) => $sum + ((array) $product)['total']);
+        return array_reduce($products, fn ($sum, $product) => $sum + ((array) $product)['total']) ?? 0;
     }
 
     public function getActivitylogOptions(): LogOptions
