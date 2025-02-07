@@ -32,6 +32,7 @@ class SettingRequest extends FormRequest
                 'company.contact_name' => 'required',
                 'company.email' => 'required',
                 'company.phone' => 'required',
+                'company.whatsapp' => 'nullable',
                 'company.tagline' => 'required',
                 'company.address' => 'required',
                 'company.office_time' => 'required',
