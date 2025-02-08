@@ -1,5 +1,7 @@
 # HotashKom - E-Commerce Platform
 
+[![License](https://img.shields.io/badge/license-Restricted-red)](LICENSE.md)
+
 ## Overview
 
 A comprehensive Laravel e-commerce platform designed for the Bangladesh market, featuring advanced product management, dynamic content creation, integrated courier services, and robust order processing capabilities. The platform offers both customer-facing features and powerful administrative tools.
