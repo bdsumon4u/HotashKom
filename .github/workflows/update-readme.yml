@@ -1,0 +1,58 @@
+name: Update README with Active Deployments
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # Runs daily at 2 AM UTC
+  workflow_dispatch: # Allows manual trigger from GitHub Actions
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Active Domains
+        run: |
+          API_URL="https://sites.cyber32.net/api/sites?status=Active"
+          RESPONSE=$(curl -s "$API_URL")
+
+          # Extract domains and count
+          DEPLOYMENTS=$(echo "$RESPONSE" | jq -r '.[].domain')
+          COUNT=$(echo "$DEPLOYMENTS" | wc -l)
+          
+          # Get current time in Asia/Dhaka timezone
+          LAST_UPDATED=$(TZ=Asia/Dhaka date +"%Y-%m-%d %H:%M:%S Asia/Dhaka")
+          
+          if [ -z "$RESPONSE" ] || [ "$RESPONSE" == "[]" ]; then
+            echo "No active domains found. Exiting."
+            exit 1
+          fi
+
+          echo "## Active Deployments" >> domains.md
+          echo "These 🔥 \$\${\color{red}$COUNT}\$\$ 🔥 domains are live now" >> domains.md
+          echo "" >> domains.md
+          echo "_Last updated: **$LAST_UPDATED**_" >> domains.md
+          echo "" >> domains.md
+          echo "| # | Domain |" >> domains.md
+          echo "|---|--------|" >> domains.md
+          i=1
+          for domain in $DEPLOYMENTS; do
+            echo "| $i | [$domain](http://$domain) |" >> domains.md
+            i=$((i + 1))
+          done
+
+      - name: Update README.md
+        run: |
+          awk '/## Active Deployments/{flag=1; next} /##/{flag=0} !flag' README.md > temp.md
+          cat temp.md domains.md > README.md
+          rm temp.md domains.md
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add README.md
+          git commit -m "Auto-update Deployments List - $(date +'%Y-%m-%d')" || exit 0
+          git push
