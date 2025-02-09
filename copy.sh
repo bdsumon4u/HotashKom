@@ -88,6 +88,13 @@ done
 [[ -z $target_mail_pass ]] && read -p "Enter target email password: " target_mail_pass
 [[ -z $target_root_dir ]] && read -p "Enter target site root directory: " -ei "$default_root_dir" target_root_dir
 
+# Function to add SSH host to known_hosts if not already present
+add_ssh_host_to_known_hosts() {
+    if ! grep -q "$ssh_host" ~/.ssh/known_hosts; then
+        echo "Adding $ssh_host to known_hosts..."
+        ssh-keyscan -H "$ssh_host" >> ~/.ssh/known_hosts
+    fi
+}
 
 # Function to check if the public key is installed on the target server
 check_public_key_installed() {
@@ -111,6 +118,9 @@ connect_to_target() {
         return 1
     fi
 }
+
+# Add SSH host to known_hosts if not already present
+add_ssh_host_to_known_hosts
 
 # Try to connect to the target server
 connect_to_target || {
