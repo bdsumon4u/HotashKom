@@ -43,8 +43,7 @@ class LandingResource extends PageResource
 
                         Group::make()->schema(FilamentFabricator::getSchemaSlot(ResourceSchemaSlot::BLOCKS_AFTER)),
                     ])
-                    ->columnSpan(2)
-                    ->disabled(fn (Get $get): bool => $get('layout') === FilamentFabricator::getDefaultLayoutName()),
+                    ->columnSpan(2),
 
                 Group::make()
                     ->columnSpan(1)
