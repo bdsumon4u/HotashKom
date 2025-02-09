@@ -157,28 +157,30 @@ zip -r -1 -y -9 site_backup.zip . -x "storage/app/pathao*" "storage/app/mpdf" "s
 scp -i $ssh_private_key site_backup.zip $target_username@$ssh_host:site_backup.zip
 rm site_backup.zip database_backup.sql
 
-# Unzip files and import database on the target
-ssh -i $ssh_private_key $target_username@$ssh_host "unzip -o site_backup.zip -d $target_root_dir && rm site_backup.zip"
-ssh -i $ssh_private_key $target_username@$ssh_host "cd $target_root_dir && mysql -u $target_db_uname -p$target_db_upass $target_db_dbase < database_backup.sql && rm database_backup.sql"
+# Unzip files, import database, update .env, and run deployment commands in a single SSH session
+ssh -i $ssh_private_key $target_username@$ssh_host <<EOF
+  # Unzip files and remove the backup
+  unzip -o site_backup.zip -d $target_root_dir && rm site_backup.zip
 
-# Update .env file on the target
-scp -i $ssh_private_key .env $target_username@$ssh_host:$target_root_dir/.env
-ssh -i $ssh_private_key $target_username@$ssh_host "sed -i \"s/APP_NAME=.*/APP_NAME='$target_site'/\" $target_root_dir/.env"
-# ssh -i $ssh_private_key $target_username@$ssh_host "sed -i 's/APP_DEBUG=.*/APP_DEBUG=true/' $target_root_dir/.env"
-ssh -i $ssh_private_key $target_username@$ssh_host "sed -i \"s|APP_URL=.*|APP_URL=https://www.$target_domain|\" $target_root_dir/.env"
-ssh -i $ssh_private_key $target_username@$ssh_host "sed -i \"s/DB_DATABASE=.*/DB_DATABASE=$target_db_dbase/\" $target_root_dir/.env"
-ssh -i $ssh_private_key $target_username@$ssh_host "sed -i \"s/DB_USERNAME=.*/DB_USERNAME=$target_db_uname/\" $target_root_dir/.env"
-ssh -i $ssh_private_key $target_username@$ssh_host "sed -i \"s|DB_PASSWORD=.*|DB_PASSWORD='$(echo $target_db_upass | sed 's/|/\\|/g')'|\" $target_root_dir/.env"
-ssh -i $ssh_private_key $target_username@$ssh_host "sed -i \"s/MAIL_HOST=.*/MAIL_HOST=mail.$target_domain/\" $target_root_dir/.env"
-ssh -i $ssh_private_key $target_username@$ssh_host "sed -i \"s/MAIL_USERNAME=.*/MAIL_USERNAME=$target_mail_user/\" $target_root_dir/.env"
-ssh -i $ssh_private_key $target_username@$ssh_host "sed -i \"s|MAIL_PASSWORD=.*|MAIL_PASSWORD='$(echo $target_mail_pass | sed 's/|/\\|/g')'|\" $target_root_dir/.env"
-ssh -i $ssh_private_key $target_username@$ssh_host "sed -i \"s/MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=$target_mail_user/\" $target_root_dir/.env"
+  # Import the database
+  cd $target_root_dir
+  mysql -u $target_db_uname -p$target_db_upass $target_db_dbase < database_backup.sql && rm database_backup.sql
 
+  # Update .env file
+  sed -i "s/APP_NAME=.*/APP_NAME='$target_site'/" $target_root_dir/.env
+  sed -i "s|APP_URL=.*|APP_URL=https://www.$target_domain|" $target_root_dir/.env
+  sed -i "s/DB_DATABASE=.*/DB_DATABASE=$target_db_dbase/" $target_root_dir/.env
+  sed -i "s/DB_USERNAME=.*/DB_USERNAME=$target_db_uname/" $target_root_dir/.env
+  sed -i "s|DB_PASSWORD=.*|DB_PASSWORD='$(echo $target_db_upass | sed 's/|/\\|/g')'|" $target_root_dir/.env
+  sed -i "s/MAIL_HOST=.*/MAIL_HOST=mail.$target_domain/" $target_root_dir/.env
+  sed -i "s/MAIL_USERNAME=.*/MAIL_USERNAME=$target_mail_user/" $target_root_dir/.env
+  sed -i "s|MAIL_PASSWORD=.*|MAIL_PASSWORD='$(echo $target_mail_pass | sed 's/|/\\|/g')'|" $target_root_dir/.env
+  sed -i "s/MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=$target_mail_user/" $target_root_dir/.env
 
-# Done
-ssh -i $ssh_private_key $target_username@$ssh_host \
-  "cd $target_root_dir && \
-  ./server_deploy.sh && \
-  rm -rf public/storage storage/app/pathao* && \
-  /opt/alt/php82/usr/bin/php artisan storage:link && \
-  /opt/alt/php82/usr/bin/php artisan optimize:clear"
+  # Run deployment commands
+  cd $target_root_dir
+  ./server_deploy.sh
+  rm -rf public/storage storage/app/pathao*
+  /opt/alt/php82/usr/bin/php artisan storage:link
+  /opt/alt/php82/usr/bin/php artisan optimize:clear
+EOF
