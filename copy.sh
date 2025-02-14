@@ -181,5 +181,5 @@ ssh -i $ssh_private_key $target_username@$ssh_host <<EOF
   ./server_deploy.sh
   rm -rf public/storage storage/app/pathao*
   /opt/alt/php82/usr/bin/php artisan storage:link
-  /opt/alt/php82/usr/bin/php artisan optimize:clear
+  # /opt/alt/php82/usr/bin/php artisan optimize:clear
 EOF
