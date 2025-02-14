@@ -11,8 +11,7 @@ else
 fi
 
 # Enter maintenance mode
-(/opt/alt/php82/usr/bin/php artisan down --message 'The app is being (quickly!) updated. Please try again in a minute.') || true
-# (/opt/alt/php82/usr/bin/php artisan down) || true
+(/opt/alt/php82/usr/bin/php artisan down) || true
     # Update codebase
     # git fetch origin production
     # git reset --hard origin/production
