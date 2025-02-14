@@ -204,7 +204,7 @@ class Order extends Model
         return $cityList;
     }
 
-    public function getAreaList()
+    public function getAreaList($cityId = null)
     {
         if (! (setting('Pathao')->enabled ?? false)) {
             return [];
@@ -212,10 +212,12 @@ class Order extends Model
 
         $areaList = [];
         $exception = false;
-        if ($this->data['city_id'] ?? false) {
-            $areaList = cache()->remember('pathao_areas:'.$this->data['city_id'], now()->addDay(), function () use (&$exception) {
+        $cityId ??= $this->data['city_id'] ?? false;
+        if ($cityId) {
+
+            $areaList = cache()->remember('pathao_areas:'.$cityId, now()->addDay(), function () use (&$exception, &$cityId) {
                 try {
-                    return Pathao::area()->zone($this->data['city_id'])->data;
+                    return Pathao::area()->zone($cityId)->data;
                 } catch (\Exception) {
                     $exception = true;
 
@@ -225,7 +227,7 @@ class Order extends Model
         }
 
         if ($exception) {
-            cache()->forget('pathao_areas:'.$this->data['city_id']);
+            cache()->forget('pathao_areas:'.$cityId);
         }
 
         return $areaList;

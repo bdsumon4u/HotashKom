@@ -85,7 +85,7 @@
                         </div>
                         <select wire:loading.remove wire:target="city_id" class="form-control" wire:model="area_id">
                             <option value="" selected>Select Area</option>
-                            @foreach ($order->getAreaList() as $area)
+                            @foreach ($order->getAreaList($city_id) as $area)
                                 <option value="{{ $area->zone_id }}">
                                     {{ $area->zone_name }}
                                 </option>
