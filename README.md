@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}228}$$ 🔥 domains are live now
+These 🔥 $${\color{red}230}$$ 🔥 domains are live now
 
-_Last updated: **2025-02-09 14:55:18 Asia/Dhaka**_
+_Last updated: **2025-02-15 08:49:49 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -316,14 +316,16 @@ _Last updated: **2025-02-09 14:55:18 Asia/Dhaka**_
 | 215 | [newarrivalmart.com](http://newarrivalmart.com) |
 | 216 | [smartvalybd.com](http://smartvalybd.com) |
 | 217 | [anowertrading.com](http://anowertrading.com) |
-| 218 | [actualdreammart.com](http://actualdreammart.com) |
-| 219 | [arafonlineshop.com](http://arafonlineshop.com) |
-| 220 | [ghorerponnobd.com](http://ghorerponnobd.com) |
-| 221 | [samarketingbd.com](http://samarketingbd.com) |
-| 222 | [tsonlinebd.com](http://tsonlinebd.com) |
-| 223 | [adhunikeshop.com](http://adhunikeshop.com) |
-| 224 | [cncemart.com](http://cncemart.com) |
-| 225 | [halalbusinessbd.com](http://halalbusinessbd.com) |
-| 226 | [sohozebazar.com](http://sohozebazar.com) |
-| 227 | [akandamart.com](http://akandamart.com) |
-| 228 | [holybazar24.com](http://holybazar24.com) |
+| 218 | [arafonlineshop.com](http://arafonlineshop.com) |
+| 219 | [ghorerponnobd.com](http://ghorerponnobd.com) |
+| 220 | [samarketingbd.com](http://samarketingbd.com) |
+| 221 | [tsonlinebd.com](http://tsonlinebd.com) |
+| 222 | [adhunikeshop.com](http://adhunikeshop.com) |
+| 223 | [cncemart.com](http://cncemart.com) |
+| 224 | [halalbusinessbd.com](http://halalbusinessbd.com) |
+| 225 | [sohozebazar.com](http://sohozebazar.com) |
+| 226 | [akandamart.com](http://akandamart.com) |
+| 227 | [holybazar24.com](http://holybazar24.com) |
+| 228 | [homazzshop.com](http://homazzshop.com) |
+| 229 | [ikramart.com](http://ikramart.com) |
+| 230 | [asbabbd.com](http://asbabbd.com) |
