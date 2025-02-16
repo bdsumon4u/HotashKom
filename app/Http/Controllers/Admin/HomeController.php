@@ -82,10 +82,10 @@ class HomeController extends Controller
         }
 
         $query = DB::table('admins')
-            ->select('admins.id', 'admins.name', 'admins.email', 'admins.role_id', DB::raw('MAX(sessions.last_activity) as last_activity'))
+            ->select('admins.id', 'admins.name', 'admins.email', 'admins.role_id', 'admins.is_active', DB::raw('MAX(sessions.last_activity) as last_activity'))
             ->leftJoin('sessions', 'sessions.userable_id', '=', 'admins.id')
             ->where('sessions.userable_type', Admin::class)
-            ->groupBy('admins.id', 'admins.name', 'admins.email', 'admins.role_id'); // Add all selected non-aggregated columns to GROUP BY
+            ->groupBy('admins.id', 'admins.name', 'admins.email', 'admins.role_id', 'admins.is_active'); // Add all selected non-aggregated columns to GROUP BY
 
         // Get online admins
         $online = $query->having('last_activity', '>=', now()->subMinutes(5)->timestamp)->get();
