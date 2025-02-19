@@ -217,7 +217,7 @@
                         <div class="form-group" x-data="{desc_img: {{old('desc_img', $product->desc_img ?? 0)}}}">
                             <div class="checkbox d-inline checkbox-primary">
                                 <input type="hidden" name="desc_img" value="0">
-                                <x-checkbox name="desc_img" x-model="desc_img" value="1" />
+                                <x-checkbox name="desc_img" @change="desc_img = $event.target.checked" x-bind:checked="desc_img" value="1" />
                                 <label for="desc_img">Show Images in Description</label>
                                 <x-error field="desc_img" />
                             </div>
