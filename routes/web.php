@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderTrackController;
 use App\Http\Controllers\ProductController;
 use App\Http\Middleware\GoogleTagManagerMiddleware;
 use Combindma\FacebookPixel\MetaPixelMiddleware;
+use Hotash\LaravelMultiUi\Facades\MultiUi;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 
@@ -24,6 +25,30 @@ use Illuminate\Support\Facades\Session;
 
 Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class])->group(function (): void {
     Route::get('auth', 'App\\Http\\Controllers\\User\\Auth\\LoginController@showLoginForm')->middleware('guest:user')->name('auth');
+
+    Route::group(['as' => 'user.'], function (): void {
+
+        Route::namespace('App\\Http\\Controllers\\User')->group(function (): void {
+            // Admin Level Namespace & No Prefix
+            MultiUi::routes([
+                'register' => false,
+                'URLs' => [
+                    'login' => 'login',
+                    'register' => 'register',
+                    'reset/password' => 'reset-pass',
+                    'logout' => 'logout',
+                ],
+                'prefix' => [
+                    'URL' => 'user-',
+                    'except' => ['login', 'register'],
+                ],
+            ]);
+            //...
+            //...
+            Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
+        });
+
+    });
 
     Route::get('/categories', [ApiController::class, 'categories'])->name('categories');
     Route::get('/brands', [ApiController::class, 'brands'])->name('brands');
