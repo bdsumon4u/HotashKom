@@ -15,7 +15,7 @@
                         <label>আপনার নাম: <span class="text-danger">*</span></label>
                     </div>
                     <div class="form-group col-md-9">
-                        <x-input name="name" wire:model="name" place-holder="এখানে আপনার নাম লিখুন।" placeholder="Type your name here." />
+                        <x-input name="name" wire:model="name" @blur="$wire.updateField('name', $event.target.value)" place-holder="এখানে আপনার নাম লিখুন।" placeholder="Type your name here." />
                         <x-error field="name" />
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                                 <span class="input-group-text">+880</span>
                             </div>
                             @endunless
-                            <x-input type="tel" name="phone" wire:model="phone" place-holder="আপনার ফোন নম্বর লিখুন।" placeholder="Type your phone number." />
+                            <x-input type="tel" name="phone" wire:model="phone" @blur="$wire.updateField('phone', $event.target.value)" place-holder="আপনার ফোন নম্বর লিখুন।" placeholder="Type your phone number." />
                             <x-error field="phone" />
                         </div>
                     </div>
@@ -42,11 +42,11 @@
                     <div class="form-group col-md-9">
                         <div class="form-control @error('shipping') is-invalid @enderror h-auto">
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" wire:model.live="shipping" class="custom-control-input" id="inside-dhaka" name="shipping" value="Inside Dhaka">
+                                <input type="radio" wire:model.live="shipping" @change="$wire.updateField('shipping', $event.target.value)" class="custom-control-input" id="inside-dhaka" name="shipping" value="Inside Dhaka">
                                 <label class="custom-control-label" for="inside-dhaka">ঢাকা শহর @if(!(setting('show_option')->productwise_delivery_charge ?? false)) ({{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->inside_dhaka }} টাকা) @endif</label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" wire:model.live="shipping" class="custom-control-input" id="outside-dhaka" name="shipping" value="Outside Dhaka">
+                                <input type="radio" wire:model.live="shipping" @change="$wire.updateField('shipping', $event.target.value)" class="custom-control-input" id="outside-dhaka" name="shipping" value="Outside Dhaka">
                                 <label class="custom-control-label" for="outside-dhaka">ঢাকার বাইরে @if(!(setting('show_option')->productwise_delivery_charge ?? false)) ({{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->outside_dhaka }} টাকা) @endif</label>
                             </div>
                         </div>
@@ -58,7 +58,7 @@
                         <label>আপনার ঠিকানা: <span class="text-danger">*</span></label>
                     </div>
                     <div class="form-group col-md-9">
-                        <x-textarea name="address" wire:model="address" place-holder="এখানে আপনার পুরো ঠিকানা লিখুন।" placeholder="Type your address here."></x-textarea>
+                        <x-textarea name="address" wire:model="address" @blur="$wire.updateField('address', $event.target.value)" place-holder="এখানে আপনার পুরো ঠিকানা লিখুন।" placeholder="Type your address here."></x-textarea>
                         <x-error field="address" />
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                         <label>নোট (অপশনাল):</label>
                     </div>
                     <div class="form-group col-md-9">
-                        <x-textarea name="note" wire:model="note" placeholder="আপনি চাইলে কোন নোট লিখতে পারেন।"></x-textarea>
+                        <x-textarea name="note" wire:model="note" @blur="$wire.updateField('note', $event.target.value)" placeholder="আপনি চাইলে কোন নোট লিখতে পারেন।"></x-textarea>
                         <x-error field="note" />
                     </div>
                 </div>

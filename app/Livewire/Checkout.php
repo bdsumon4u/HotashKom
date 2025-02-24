@@ -8,8 +8,10 @@ use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\AccountCreated;
 use App\Notifications\User\OrderPlaced;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -43,7 +45,17 @@ class Checkout extends Component
 
     public $note = '';
 
-    #[On('cartBoxUpdated')]
+    protected $listeners = ["updateField"];
+
+    public function updateField($field, $value)
+    {
+        $this->$field = $value;
+
+        if ($value) {
+            Cookie::queue(Cookie::make($field, $value, 10 * 365 * 24 * 60)); // 10 years
+        }
+    }
+
     public function refresh(): void
     {
         $this->cart = session($this->store, []);
@@ -139,7 +151,7 @@ class Checkout extends Component
         $this->dispatch('cartUpdated');
     }
 
-    public function mount(): void
+    public function mount(Request $request): void
     {
         // if (!(setting('show_option')->hide_phone_prefix ?? false)) {
         //     $this->phone = '+880';
@@ -160,6 +172,11 @@ class Checkout extends Component
             }
             $this->address = $user->address ?? '';
             $this->note = $user->note ?? '';
+        } else {
+            $this->name = Cookie::get('name', '');
+            $this->phone = Cookie::get('phone', '');
+            $this->address = Cookie::get('address', '');
+            $this->note = Cookie::get('note', '');
         }
 
         $this->cart = session()->get($this->store, []);
