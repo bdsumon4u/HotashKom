@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}244}$$ 🔥 domains are live now
+These 🔥 $${\color{red}246}$$ 🔥 domains are live now
 
-_Last updated: **2025-02-24 08:56:45 Asia/Dhaka**_
+_Last updated: **2025-02-25 08:55:59 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -343,3 +343,5 @@ _Last updated: **2025-02-24 08:56:45 Asia/Dhaka**_
 | 242 | [sugondhashop.com](http://sugondhashop.com) |
 | 243 | [sultanshopbd.com](http://sultanshopbd.com) |
 | 244 | [jarinshop.com](http://jarinshop.com) |
+| 245 | [naharemart.com](http://naharemart.com) |
+| 246 | [shephalistore.com](http://shephalistore.com) |
