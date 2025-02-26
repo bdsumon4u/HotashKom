@@ -34,7 +34,14 @@
     // Send data to the server before the user leaves
     window.addEventListener("beforeunload", function (event) {
         // Send data using Fetch API (asynchronous)
-        navigator.sendBeacon("/api/save-checkout-progress");
+        navigator.sendBeacon(
+            "/save-checkout-progress",
+            new Blob([JSON.stringify({
+                name: $('#name').val(),
+                phone: $('#phone').val(),
+                address: $('#address').val(),
+            })], { type: 'application/json' })
+        );
 
         // Optional: If you want to use Fetch (uncomment below)
         // fetch("/api/save-checkout-progress", {

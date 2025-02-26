@@ -1,10 +1,10 @@
 <header class="main-nav">
-    <div class="logo-wrapper px-3 py-2 d-flex align-items-center justify-content-between">
+    <div class="px-3 py-2 logo-wrapper d-flex align-items-center justify-content-between">
         <a href="{{ route('admin.home') }}">
             <img class="img-fluid but-not-fluid" src="{{ asset($logo->login ?? (setting('logo')->desktop ?? '')) }}"
                 alt="">
         </a>
-        <div class="back-btn px-3 py-2"><i class="fa fa-angle-left"></i></div>
+        <div class="px-3 py-2 back-btn"><i class="fa fa-angle-left"></i></div>
     </div>
     <div class="logo-icon-wrapper">
         <a href="{{ route('admin.home') }}">
@@ -15,13 +15,13 @@
         <div class="main-navbar">
             <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
             <div id="mainnav">
-                <ul class="nav-menu custom-scrollbar pb-5">
+                <ul class="pb-5 nav-menu custom-scrollbar">
                     <li class="back-btn">
                         <a href="{{ route('admin.home') }}">
                             <img class="img-fluid" src="{{ asset($logo->favicon ?? '') }}" height="36" width="36"
                                 alt="">
                         </a>
-                        <div class="mobile-back text-right"><span>Back</span><i class="fa fa-angle-right pl-2"
+                        <div class="text-right mobile-back"><span>Back</span><i class="pl-2 fa fa-angle-right"
                                 aria-hidden="true"></i></div>
                     </li>
                     <li>
@@ -34,6 +34,19 @@
 
                     <li class="sidebar-title">
                         <h6>Ecommerce</h6>
+                    </li>
+
+                    <li>
+                        <a class="nav-link d-flex menu-title link-nav {{ request()->is('admin/carts*') ? 'active' : '' }}"
+                            href="{{ route('admin.carts.index') }}">
+                            <i class="d-block" data-feather="shopping-cart"> </i>
+                            <span class="d-block">Carts</span>
+                            @php
+                                $pendingCount = DB::table('shopping_cart')->where('updated_at', '<', now()->subDays(3))->count();
+                            @endphp
+                            <span
+                                class="ml-auto text-white d-flex badge badge-primary align-items-center">{{ $pendingCount }}</span>
+                        </a>
                     </li>
 
                     <li>
@@ -51,7 +64,7 @@
                                     ->count();
                             @endphp
                             <span
-                                class="d-flex text-white badge badge-primary pending-count ml-auto align-items-center">{{ $pendingCount }}</span>
+                                class="ml-auto text-white d-flex badge badge-primary pending-count align-items-center">{{ $pendingCount }}</span>
                         </a>
                     </li>
 

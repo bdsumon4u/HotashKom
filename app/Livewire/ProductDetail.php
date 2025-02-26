@@ -8,8 +8,6 @@ use Livewire\Component;
 
 class ProductDetail extends Component
 {
-    private string $store = 'cart';
-
     public Product $product;
 
     public Product $selectedVar;
@@ -26,9 +24,8 @@ class ProductDetail extends Component
     {
         $component = new self;
         $component->product = $product;
-        $component->store = 'landing';
         $component->mount();
-        $component->addToCart();
+        $component->addToCart('landing');
 
         return $component;
     }
@@ -56,43 +53,42 @@ class ProductDetail extends Component
         }
     }
 
-    public function addToCart(): void
+    public function addToCart($instance = 'default')
     {
-        $cart = session()->get($this->store, []);
-        if (isset($cart[$this->selectedVar->id])) {
-            $quantity = $cart[$this->selectedVar->id]['quantity'] = min($this->quantity, $this->maxQuantity);
-            $cart[$this->selectedVar->id]['price'] = $this->selectedVar->getPrice($quantity);
-        } else {
-            $cart[$this->selectedVar->id] = [
-                'id' => $this->selectedVar->id,
+        session(['kart' => $instance]);
+        if ($instance == 'landing') {
+            cart()->destroy();
+        }
+        cart()->instance($instance)->add(
+            $this->selectedVar->id,
+            $this->selectedVar->var_name,
+            $quantity = min($this->quantity, $this->maxQuantity),
+            $this->selectedVar->getPrice($quantity),
+            [
                 'parent_id' => $this->selectedVar->parent_id ?? $this->selectedVar->id,
-                'name' => $this->selectedVar->var_name,
                 'slug' => $this->selectedVar->slug,
                 'image' => optional($this->selectedVar->base_image)->path,
                 'category' => $this->product->category,
-                'quantity' => $quantity = min($this->quantity, $this->maxQuantity),
-                'price' => $this->selectedVar->getPrice($quantity),
                 'max' => $this->maxQuantity,
                 'shipping_inside' => $this->selectedVar->shipping_inside,
                 'shipping_outside' => $this->selectedVar->shipping_outside,
-            ];
-        }
+            ],
+        );
 
-        session()->put($this->store, $cart);
-        $product = $cart[$this->selectedVar->id];
+        storeOrUpdateCart();
 
         $this->dispatch('dataLayer', [
             'event' => 'add_to_cart',
             'ecommerce' => [
                 'currency' => 'BDT',
-                'value' => $product['price'] * $product['quantity'],
+                'value' => $this->selectedVar->getPrice($quantity),
                 'items' => [
                     [
-                        'item_id' => $product['id'],
-                        'item_name' => $product['name'],
-                        'item_category' => $product['category'],
-                        'price' => $product['price'],
-                        'quantity' => $product['quantity'],
+                        'item_id' => $this->selectedVar->id,
+                        'item_name' => $this->selectedVar->name,
+                        'item_category' => $this->product->category,
+                        'price' => $this->selectedVar->getPrice($quantity),
+                        'quantity' => $quantity,
                     ],
                 ],
             ],
@@ -100,22 +96,10 @@ class ProductDetail extends Component
 
         $this->dispatch('cartUpdated');
         $this->dispatch('notify', ['message' => 'Product added to cart']);
-    }
 
-    public function orderNow()
-    {
-        $cart = session()->get($this->store, []);
-        $kart = session()->get('kart');
-        if (isset($cart[$kart])) {
-            unset($cart[$kart]);
+        if ($instance != 'default' && $instance != 'landing') {
+            return redirect()->route('checkout');
         }
-        session()->put($this->store, $cart);
-
-        $this->addToCart();
-
-        session()->put('kart', $this->selectedVar->id);
-
-        return redirect()->route('checkout');
     }
 
     public function mount(): void

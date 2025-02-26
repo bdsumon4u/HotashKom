@@ -194,12 +194,15 @@
                                                         <div class="wcf-item">
                                                             <div class="wcf-item-selector wcf-item-multiple-sel">
                                                                 <input class="wcf-multiple-sel" type="checkbox"
-                                                                    @if (isset($cart[$product->id])) wire:click="remove({{ $product->id }})"
-                                                                @else
-                                                                wire:click="increaseQuantity({{ $product->id }})" @endif
+                                                                    @if ($row = cart()->content()->first(fn ($item) => $item->id == $product->id))
+                                                                        wire:click="remove('{{ $row->rowId }}')"
+                                                                        checked
+                                                                    @else
+                                                                        wire:click="increaseQuantity({{ $product->id }})"
+                                                                    @endif
                                                                     name="wcf-multiple-sel"
                                                                     value="{{ $product->id }}"
-                                                                    @checked(isset($cart[$product->id]))>
+                                                                >
                                                             </div>
 
                                                             <div class="wcf-item-image" style=""><img
@@ -215,7 +218,7 @@
                                                                         class="wcf-display-title-quantity">
                                                                         <div class="wcf-display-attributes"><span
                                                                                 class="wcf-att-inner">Price: Tk
-                                                                                {{ $prc = $cart[$product->id]['price'] ?? $product->selling_price }}</span>
+                                                                                {{ $prc = $row->price ?? $product->selling_price }}</span>
                                                                         </div>
                                                                 </div>
 
@@ -226,7 +229,7 @@
                                                                             title=""
                                                                             wire:click="decreaseQuantity({{ $product->id }})">&minus;</span>
                                                                         <input autocomplete="off" type="number"
-                                                                            value="{{ $qty = $cart[$product->id]['quantity'] ?? 0 }}"
+                                                                            value="{{ $qty = $row->qty ?? 0 }}"
                                                                             step="1" name="wcf_qty_selection"
                                                                             class="wcf-qty-selection"
                                                                             data-sale-limit="false" title="">
@@ -268,15 +271,15 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @foreach ($cart as $item)
+                                                        @foreach (cart()->content() as $item)
                                                             <tr class="cart_item">
-                                                                <td class="product-name">{{ $item['name'] }}&nbsp;
+                                                                <td class="product-name">{{ $item->name }}&nbsp;
                                                                     <strong
-                                                                        class="product-quantity">&times;&nbsp;{{ $item['quantity'] }}</strong>
+                                                                        class="product-quantity">&times;&nbsp;{{ $item->qty }}</strong>
                                                                 </td>
                                                                 <td class="product-total">
                                                                     <span class="woocommerce-Price-amount amount"><bdi><span
-                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $item['price'] * $item['quantity'] }}</bdi></span>
+                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $item->qty * $item->price }}</bdi></span>
                                                                 </td>
                                                             </tr>
                                                         @endforeach
@@ -286,7 +289,7 @@
                                                         <tr class="cart-subtotal" style="display: none;">
                                                             <th>Subtotal</th>
                                                             <td><span class="woocommerce-Price-amount amount"><bdi><span
-                                                                            class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $subtotal }}</bdi></span>
+                                                                            class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ cart()->subtotal() }}</bdi></span>
                                                             </td>
                                                         </tr>
 
@@ -296,7 +299,7 @@
                                                         <tr class="woocommerce-shipping-totals shipping">
                                                             <th>Shipping</th>
                                                             <td><span class="woocommerce-Price-amount amount"><bdi><span
-                                                                            class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $shipping_cost }}</bdi></span>
+                                                                            class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ cart()->getCost('deliveryFee') }}</bdi></span>
                                                             </td>
                                                         </tr>
 
@@ -309,7 +312,7 @@
                                                             <th>Total</th>
                                                             <td><strong><span
                                                                         class="woocommerce-Price-amount amount"><bdi><span
-                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $total }}</bdi></span></strong>
+                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ cart()->total() }}</bdi></span></strong>
                                                             </td>
                                                         </tr>
 
@@ -363,7 +366,7 @@
                                                             name="woocommerce_checkout_place_order" id="place_order"
                                                             value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00"
                                                             data-value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00">Place
-                                                            Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;{{ $total }}</button>
+                                                            Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;{{ cart()->total() }}</button>
 
                                                         <input type="hidden" id="woocommerce-process-checkout-nonce"
                                                             name="woocommerce-process-checkout-nonce"
@@ -386,4 +389,28 @@
             </div>
         </div>
     </div>
+    <script>
+    console.log('ami');
+        // Send data to the server before the user leaves
+        window.addEventListener("beforeunload", function (event) {
+            // Send data using Fetch API (asynchronous)
+            console.log('send');
+            navigator.sendBeacon(
+                "/save-checkout-progress",
+                new Blob([JSON.stringify({
+                    name: document.getElementById('billing_first_name').value,
+                    phone: document.getElementById('billing_phone').value,
+                    address: document.getElementById('billing_address_1').value,
+                })], { type: 'application/json' })
+            );
+
+            // Optional: If you want to use Fetch (uncomment below)
+            // fetch("/api/save-checkout-progress", {
+            //     method: "POST",
+            //     headers: { "Content-Type": "application/json" },
+            //     body: JSON.stringify(formData),
+            //     keepalive: true, // Ensures request completes before browser unloads
+            // });
+        });
+    </script>
 </section>

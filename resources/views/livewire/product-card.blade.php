@@ -51,7 +51,7 @@
                 </button>
             @endif
             @if (($show_option->product_grid_button ?? false) == 'order_now')
-                <button wire:click="orderNow" class="btn btn-primary product-card__ordernow" type="button"
+                <button wire:click="addToCart('kart')" class="btn btn-primary product-card__ordernow" type="button"
                     {{ $available ? '' : 'disabled' }}>
                     {!! $show_option->order_now_icon ?? null !!}
                     <span class="ml-1">{{ $show_option->order_now_text ?? '' }}</span>

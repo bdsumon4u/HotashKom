@@ -1,6 +1,6 @@
 <div class="product__info">
-    <h3 class="product__name mb-2" data-name="{{ $selectedVar->var_name }}">{{ $product->name }}</h1>
-        <div class="d-flex justify-content-between border-top pt-2 mb-2">
+    <h3 class="mb-2 product__name" data-name="{{ $selectedVar->var_name }}">{{ $product->name }}</h1>
+        <div class="pt-2 mb-2 d-flex justify-content-between border-top">
             <div>Product Code: <strong>{{ $selectedVar->sku }}</strong></div>
             <div>Availability:
                 <strong>
@@ -26,7 +26,7 @@
         </div>
 
         @foreach ($attributes as $attribute)
-            <div class="form-group product__option mb-1 d-flex align-items-center" style="column-gap: .5rem;">
+            <div class="mb-1 form-group product__option d-flex align-items-center" style="column-gap: .5rem;">
                 <label class="product__option-label">{{ $attribute->name }}:</label>
                 @if (strtolower($attribute->name) == 'color')
                     <div class="input-radio-color">
@@ -52,7 +52,7 @@
                                     <input type="radio" wire:model.live="options.{{ $attribute->id }}"
                                         name="options[{{ $attribute->id }}]" value="{{ $option->id }}"
                                         class="option-picker">
-                                    <span>{{ $option->name }}</span>
+                                    <span class="p-1 @if($options[$attribute->id] == $option->id) border-primary @endif">{{ $option->name }}</span>
                                 </label>
                             @endforeach
                         </div>
@@ -64,10 +64,10 @@
         <div class="product__sidebar">
             <!-- .product__options -->
             <form class="product__options">
-                <div class="form-group product__option mb-1">
+                <div class="mb-1 form-group product__option">
                     {{-- <label class="product__option-label" for="product-quantity">Quantity</label> --}}
                     <div
-                        class="product__actions-item d-flex justify-content-between align-items-center border-top pt-1">
+                        class="pt-1 product__actions-item d-flex justify-content-between align-items-center border-top">
                         <big>Quantity</big>
                         <div class="input-number product__quantity">
                             <input id="product-quantity" class="input-number__input form-control"
@@ -77,7 +77,7 @@
                             <div class="input-number__sub" wire:click="decrement"></div>
                         </div>
                     </div>
-                    <div class="product__actions overflow-hidden">
+                    <div class="overflow-hidden product__actions">
                         @php($available = !$selectedVar->should_track || $selectedVar->stock_count > 0)
                         @php($show_option = setting('show_option'))
                         <div class="product__buttons @if ($show_option->product_detail_buttons_inline ?? false) d-lg-inline-flex @endif w-100"
@@ -85,7 +85,7 @@
                             @if ($show_option->product_detail_order_now ?? false)
                                 <div class="product__actions-item product__actions-item--ordernow"
                                     @if ($show_option->product_detail_buttons_inline ?? false) style="flex: 1;" @endif>
-                                    <button type="button" wire:click="orderNow"
+                                    <button type="button" wire:click="addToCart('kart')"
                                         class="btn btn-primary product__ordernow btn-lg btn-block"
                                         {{ $available ? '' : 'disabled' }}>
                                         {!! $show_option->order_now_icon ?? null !!}
@@ -107,13 +107,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="call-for-order p-1 text-center mt-2" style="border: 2px dashed #dedede;">
+                <div class="p-1 mt-2 text-center call-for-order" style="border: 2px dashed #dedede;">
                     <div>এই পণ্য সম্পর্কে প্রশ্ন আছে? অনুগ্রহপূর্বক কল করুন:</div>
                     @foreach (explode(' ', setting('call_for_order')) as $phone)
                         @if ($phone = trim($phone))
                             <a href="tel:{{ $phone }}" class="text-danger">
-                                <div class="lead mt-1">
-                                    <i class="fa fas fa-phone mr-2"></i>
+                                <div class="mt-1 lead">
+                                    <i class="mr-2 fa fas fa-phone"></i>
                                     <span>{{ $phone }}</span>
                                 </div>
                             </a>
@@ -121,23 +121,23 @@
                     @endforeach
                 </div>
                 @if (($free_delivery->enabled ?? false) && $deliveryText)
-                    <div class="text-center font-weight-bold border mt-2">
-                        <p class="border-bottom mb-1">আজ অর্ডার করলে <br> সারা বাংলাদেশে ডেলিভারি চার্জ <strong
+                    <div class="mt-2 text-center border font-weight-bold">
+                        <p class="mb-1 border-bottom">আজ অর্ডার করলে <br> সারা বাংলাদেশে ডেলিভারি চার্জ <strong
                                 class="text-danger">ফ্রি</strong></p>
                         {!! $deliveryText !!}
                     </div>
                 @endif
                 @if ($product->variations->isEmpty() || $showBrandCategory)
-                    <div class="product__footer mt-2 mb-2 border p-3">
+                    <div class="p-3 mt-2 mb-2 border product__footer">
                         <div class="product__tags tags">
                             @if ($product->brand)
-                                <p class="text-secondary mb-0">
+                                <p class="mb-0 text-secondary">
                                     Brand: <a href="{{ route('brands.products', $product->brand) }}"
                                         class="text-primary badge badge-light"><big>{{ $product->brand->name }}</big></a>
                                 </p>
                             @endif
                             <div class="mt-2">
-                                <p class="text-secondary mb-0 d-inline-block mr-2">Categories:</p>
+                                <p class="mb-0 mr-2 text-secondary d-inline-block">Categories:</p>
                                 @foreach ($product->categories as $category)
                                     <a href="{{ route('categories.products', $category) }}"
                                         class="badge badge-primary">{{ $category->name }}</a>

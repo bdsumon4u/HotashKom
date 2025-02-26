@@ -8,32 +8,20 @@ use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\AccountCreated;
 use App\Notifications\User\OrderPlaced;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Livewire\Attributes\On;
 use Livewire\Component;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class Checkout extends Component
 {
-    protected string $store = 'cart';
-
     public ?Order $order = null;
 
-    public array $cart = [];
-
     public $isFreeDelivery = false;
-
-    public $shipping_cost = 0;
-
-    public $subtotal = 0;
-
-    public $total = 0;
 
     public $name = '';
 
@@ -45,45 +33,38 @@ class Checkout extends Component
 
     public $note = '';
 
-    protected $listeners = ["updateField"];
+    protected $listeners = ['updateField'];
 
     public function updateField($field, $value)
     {
         $this->$field = $value;
 
-        if ($value) {
-            Cookie::queue(Cookie::make($field, $value, 10 * 365 * 24 * 60)); // 10 years
-        }
-    }
+        longCookie($field, $value);
 
-    public function refresh(): void
-    {
-        $this->cart = session($this->store, []);
-        $this->subtotal = collect($this->cart)->sum(fn ($item): int|float => $item['price'] * $item['quantity']);
+        // I don't know how, but it works.
         $this->updatedShipping();
     }
 
     public function remove($id): void
     {
-        unset($this->cart[$id]);
-        session()->put($this->store, $this->cart);
+        cart()->remove($id);
         $this->cartUpdated();
     }
 
     public function increaseQuantity($id): void
     {
-        if ($this->cart[$id]['quantity'] < $this->cart[$id]['max'] || $this->cart[$id]['max'] === -1) {
-            $this->cart[$id]['quantity']++;
-            session()->put($this->store, $this->cart);
+        $item = cart()->get($id);
+        if ($item->qty < $item->options->max || $item->options->max === -1) {
+            cart()->update($id, $item->qty + 1);
             $this->cartUpdated();
         }
     }
 
     public function decreaseQuantity($id): void
     {
-        if ($this->cart[$id]['quantity'] > 1) {
-            $this->cart[$id]['quantity']--;
-            session()->put($this->store, $this->cart);
+        $item = cart()->get($id);
+        if ($item->qty > 1) {
+            cart()->update($id, $item->qty - 1);
             $this->cartUpdated();
         }
     }
@@ -95,11 +76,11 @@ class Checkout extends Component
             if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
                 $shipping_cost = setting('delivery_charge')->{$this->shipping == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping);
             } else {
-                $shipping_cost = collect($this->cart)->sum(function ($item) {
+                $shipping_cost = cart()->content()->sum(function ($item) {
                     if ($this->shipping == 'Inside Dhaka') {
-                        return $item['shipping_inside'] * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item['quantity'] : 1);
+                        return $item['shipping_inside'] * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
                     } else {
-                        return $item['shipping_outside'] * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item['quantity'] : 1);
+                        return $item['shipping_outside'] * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
                     }
                 });
             }
@@ -112,10 +93,10 @@ class Checkout extends Component
         }
 
         if ($freeDelivery->for_all ?? false) {
-            if ($this->subtotal < $freeDelivery->min_amount) {
+            if (cart()->subTotal() < $freeDelivery->min_amount) {
                 return $shipping_cost;
             }
-            $quantity = array_reduce($this->cart, fn ($sum, $product): float|int|array => $sum + $product['quantity'], 0);
+            $quantity = cart()->content()->sum(fn ($product) => $product->qty);
             if ($quantity < $freeDelivery->min_quantity) {
                 return $shipping_cost;
             }
@@ -126,7 +107,7 @@ class Checkout extends Component
         }
 
         foreach ((array) $freeDelivery->products ?? [] as $id => $qty) {
-            if (collect($this->cart)->where('parent_id', $id)->where('quantity', '>=', $qty)->count()) {
+            if (cart()->content()->where('options.parent_id', $id)->where('quantity', '>=', $qty)->count()) {
                 $this->isFreeDelivery = true;
 
                 return 0;
@@ -138,20 +119,16 @@ class Checkout extends Component
 
     public function updatedShipping(): void
     {
-        $this->shipping_cost = $this->shippingCost();
-
-        $this->total = $this->subtotal + $this->shipping_cost;
+        cart()->addCost('deliveryFee', $this->shippingCost());
     }
 
     public function cartUpdated(): void
     {
-        $this->subtotal = collect($this->cart)->sum(fn ($item): int|float => $item['price'] * $item['quantity']);
-
         $this->updatedShipping();
         $this->dispatch('cartUpdated');
     }
 
-    public function mount(Request $request): void
+    public function mount(): void
     {
         // if (!(setting('show_option')->hide_phone_prefix ?? false)) {
         //     $this->phone = '+880';
@@ -159,10 +136,10 @@ class Checkout extends Component
 
         $default_area = setting('default_area');
         if ($default_area->inside ?? false) {
-            $this->shipping = 'Inside Dhaka';
+            $shipping = 'Inside Dhaka';
         }
         if ($default_area->outside ?? false) {
-            $this->shipping = 'Outside Dhaka';
+            $shipping = 'Outside Dhaka';
         }
 
         if ($user = auth('user')->user()) {
@@ -174,12 +151,12 @@ class Checkout extends Component
             $this->note = $user->note ?? '';
         } else {
             $this->name = Cookie::get('name', '');
+            $this->shipping = Cookie::get('shipping', $shipping);
             $this->phone = Cookie::get('phone', '');
             $this->address = Cookie::get('address', '');
             $this->note = Cookie::get('note', '');
         }
 
-        $this->cart = session()->get($this->store, []);
         $this->cartUpdated();
     }
 
@@ -205,7 +182,7 @@ class Checkout extends Component
             $data['phone'] = '+880'.$data['phone'];
         }
 
-        throw_if(count($this->cart) === 0, ValidationException::withMessages(['products' => 'Your cart is empty.']));
+        throw_if(cart()->count() === 0, ValidationException::withMessages(['products' => 'Your cart is empty.']));
 
         $fraud = setting('fraud');
 
@@ -219,10 +196,10 @@ class Checkout extends Component
         }
 
         $this->order = DB::transaction(function () use ($data, &$order, $fraud) {
-            $products = Product::find(array_keys($this->cart))
+            $products = Product::find(cart()->content()->pluck('id'))
                 ->mapWithKeys(function (Product $product) use ($fraud) {
                     $id = $product->id;
-                    $quantity = min($this->cart[$id]['quantity'], $fraud->max_qty_per_product ?? 3);
+                    $quantity = min(cart($id)->qty, $fraud->max_qty_per_product ?? 3);
 
                     if ($quantity <= 0) {
                         return null;
@@ -279,8 +256,8 @@ class Checkout extends Component
                     'is_fraud' => $oldOrders->whereIn('status', ['CANCELLED', 'RETURNED'])->count() > 0,
                     'is_repeat' => $oldOrders->count() > 0,
                     'shipping_area' => $data['shipping'],
-                    'shipping_cost' => $this->shipping_cost,
-                    'subtotal' => is_array($products) ? array_reduce($products, fn ($sum, $product): float|int|array => $sum += $product['total'], 0) : $products->sum('total'),
+                    'shipping_cost' => $this->shippingCost(),
+                    'subtotal' => cart()->subtotal(),
                 ],
             ];
 
@@ -312,6 +289,8 @@ class Checkout extends Component
             return back();
         }
 
+        deleteOrUpdateCart();
+
         Cache::add('fraud:hourly:'.request()->ip(), 0, now()->addHour());
         Cache::add('fraud:daily:'.request()->ip(), 0, now()->addDay());
 
@@ -327,7 +306,7 @@ class Checkout extends Component
         // Undefined index email.
         // $data['email'] && Mail::to($data['email'])->queue(new OrderPlaced($order));
 
-        session()->forget($this->store);
+        cart()->destroy();
         session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Recieved. Thanks For Your Order.');
 
         return redirect()->route('thank-you', [

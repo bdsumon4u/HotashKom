@@ -8,6 +8,7 @@
         "php": "^8.2",
         "amidesfahani/filament-tinyeditor": "^2.1",
         "awcodes/filament-tiptap-editor": "^3.0",
+        "azmolla/laravelcart": "^1.1",
         "blade-ui-kit/blade-ui-kit": "^0.6.2",
         "combindma/laravel-facebook-pixel": "^5.0",
         "filament/filament": "^3.2",

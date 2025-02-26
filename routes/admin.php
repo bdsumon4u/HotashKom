@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\CartController;
 use Hotash\LaravelMultiUi\Facades\MultiUi;
 use Illuminate\Support\Facades\Route;
 
@@ -51,6 +52,8 @@ Route::group(['as' => 'admin.'], function (): void {
     Route::permanentRedirect('/admin', '/admin/dashboard'); // Permanent Redirect
     Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function (): void {
         // Admin Level Namespace & 'admin' Prefix
+        Route::get('carts', [CartController::class, 'index'])->name('carts.index');
+        Route::delete('carts/{identifier}', [CartController::class, 'destroy'])->name('carts.destroy');
         Route::get('/dashboard', [HomeController::class, 'index'])->name('home');
         Route::match(['get', 'post'], '/profile', ChangePasswordController::class)
             ->name('password.change');
