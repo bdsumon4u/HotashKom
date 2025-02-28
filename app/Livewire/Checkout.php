@@ -78,9 +78,9 @@ class Checkout extends Component
             } else {
                 $shipping_cost = cart()->content()->sum(function ($item) {
                     if ($this->shipping == 'Inside Dhaka') {
-                        return $item['shipping_inside'] * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
+                        return $item->options->shipping_inside * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
                     } else {
-                        return $item['shipping_outside'] * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
+                        return $item->options->shipping_outside * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
                     }
                 });
             }
