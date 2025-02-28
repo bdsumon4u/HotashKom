@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 if (! function_exists('slides')) {
     function slides()
@@ -194,22 +195,30 @@ function cart($id = null): CartInstance|CartItem
         return $cart;
     }
 
-    return $cart->first(fn ($item) => $item->id == $id);
+    return $cart->content()->first(fn ($item) => $item->id == $id);
 }
 
 function storeOrUpdateCart($phone = null, $name = '')
 {
-    info('amiparina');
     if (! $phone = $phone ?? Cookie::get('phone', '')) {
         return;
     }
 
-    info($phone, cart()->content()->toArray());
-    if (strlen($phone) < 11) {
+    if (Str::startsWith($phone, '01')) {
+        $phone = '+88'.$phone;
+    } else if (Str::startsWith($phone, '1')) {
+        $phone = '+880'.$phone;
+    }
+
+    if (strlen($phone) != 14) {
         return;
     }
 
     $content = cart()->content()->mapWithKeys(fn ($item) => [$item->options->parent_id => $item]);
+
+    if ($content->isEmpty()) {
+        return;
+    }
 
     $identifier = session()->getId();
     if ($cart = DB::table('shopping_cart')->where('phone', $phone)->first()) {
@@ -247,33 +256,54 @@ function storeOrUpdateCart($phone = null, $name = '')
 
 function deleteOrUpdateCart()
 {
-    $content = cart()->content()->mapWithKeys(fn ($item) => [$item->parent_id => $item]);
+    $phone = Cookie::get('phone', '');
+    $content = cart()->content()->mapWithKeys(fn ($item) => [$item->options->parent_id => $item]);
+
+    if (Str::startsWith($phone, '01')) {
+        $phone = '+88'.$phone;
+    } else if (Str::startsWith($phone, '1')) {
+        $phone = '+880'.$phone;
+    }
+
+    if (strlen($phone) != 14) {
+        return;
+    }
+
+    $identifier = session()->getId();
+    $cart = $cart = DB::table('shopping_cart')
+        ->where('phone', $phone)
+        ->first();
+    if ($cart) {
+        $identifier = $cart->identifier;
+    }
 
     $cart = DB::table('shopping_cart')
-        ->where('identifier', session()->getId())
+        ->where('identifier', $identifier)
         ->first();
 
     if ($cart) {
         $content = unserialize($cart->content)->diffKeys($content);
         if ($content->isEmpty()) {
             return DB::table('shopping_cart')
-                ->where('identifier', session()->getId())
+                ->where('identifier', $identifier)
                 ->delete();
         }
         DB::table('shopping_cart')
-            ->where('identifier', session()->getId())
+            ->where('identifier', $identifier)
             ->update([
                 'name' => Cookie::get('name'),
-                'phone' => Cookie::get('phone'),
+                'phone' => $phone,
                 'content' => serialize($content),
+                'identifier' => session()->getId(),
                 'updated_at' => now(),
             ]);
+        return;
     }
 
     DB::table('shopping_cart')
         ->insert([
             'name' => Cookie::get('name'),
-            'phone' => Cookie::get('phone'),
+            'phone' => $phone,
             'instance' => 'default',
             'identifier' => session()->getId(),
             'content' => serialize($content),
