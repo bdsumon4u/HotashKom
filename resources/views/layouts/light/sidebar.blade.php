@@ -42,10 +42,10 @@
                             <i class="d-block" data-feather="shopping-cart"> </i>
                             <span class="d-block">Carts</span>
                             @php
-                                $pendingCount = DB::table('shopping_cart')->where('updated_at', '<', now()->subDays(3))->count();
+                                $count = DB::table('shopping_cart')->where('updated_at', '<', now()->subDay())->count();
                             @endphp
                             <span
-                                class="ml-auto text-white d-flex badge badge-primary align-items-center">{{ $pendingCount }}</span>
+                                class="ml-auto text-white d-flex badge badge-primary align-items-center">{{ $count }}</span>
                         </a>
                     </li>
 
@@ -55,7 +55,7 @@
                             <i class="d-block" data-feather="shopping-bag"> </i>
                             <span class="d-block">Orders</span>
                             @php
-                                $pendingCount = \App\Models\Order::where('status', 'PENDING')
+                                $count = \App\Models\Order::where('status', 'PENDING')
                                     ->when(auth('admin')->user()->role_id == \App\Models\Admin::SALESMAN, function (
                                         $query,
                                     ) {
@@ -64,7 +64,7 @@
                                     ->count();
                             @endphp
                             <span
-                                class="ml-auto text-white d-flex badge badge-primary pending-count align-items-center">{{ $pendingCount }}</span>
+                                class="ml-auto text-white d-flex badge badge-primary pending-count align-items-center">{{ $count }}</span>
                         </a>
                     </li>
 

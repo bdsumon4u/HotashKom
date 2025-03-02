@@ -151,7 +151,7 @@ class Checkout extends Component
             $this->note = $user->note ?? '';
         } else {
             $this->name = Cookie::get('name', '');
-            $this->shipping = Cookie::get('shipping', $shipping);
+            $this->shipping = Cookie::get('shipping', $shipping ?? '');
             $this->phone = Cookie::get('phone', '');
             $this->address = Cookie::get('address', '');
             $this->note = Cookie::get('note', '');
