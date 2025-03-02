@@ -183,7 +183,7 @@ function genSKU($repeat = 5, $length = null)
 function cdn(string $url)
 {
     if ($username = config('services.gumlet.username')) {
-        return str_replace(request()->getHost(), 'https://'.$username.'.gumlet.io', $url) . '?fit=resize&w=150&h=150';
+        return str_replace(request()->getHost(), $username.'.gumlet.io', $url) . '?fit=resize&w=150&h=150';
     }
 
     if ($username = config('services.cloudinary.username')) {
@@ -191,7 +191,7 @@ function cdn(string $url)
     }
 
     if ($username = config('services.imagekit.username')) {
-        return str_replace(request()->getHost(), 'https://ik.imagekit.io/'.$username, $url) . '??tr=w-150,h-150';
+        return str_replace(request()->getHost(), 'ik.imagekit.io/'.$username, $url) . '??tr=w-150,h-150';
     }
 
     return asset($url);
