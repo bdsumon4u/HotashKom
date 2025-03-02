@@ -14,7 +14,7 @@
     </div>
     <div class="product-card__image">
         <a href="{{ route('products.show', $product) }}">
-            <img src="https://res.cloudinary.com/alexhari/image/fetch/w_150,h_150,c_thumb/{{ asset(optional($product->base_image)->src) }}" alt="Base Image" style="width: 100%; height: 100%;">
+            <img src="{{ cdn(optional($product->base_image)->src) }}" alt="Base Image" style="width: 100%; height: 100%;">
         </a>
     </div>
     <div class="product-card__info">

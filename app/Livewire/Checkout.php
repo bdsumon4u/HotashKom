@@ -42,7 +42,7 @@ class Checkout extends Component
         longCookie($field, $value);
 
         // I don't know how, but it works.
-        $this->updatedShipping();
+        // $this->updatedShipping(); // doesn't work.
     }
 
     public function remove($id): void

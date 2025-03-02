@@ -108,6 +108,7 @@ class SettingRequest extends FormRequest
             'show_option' => 'required|array',
             'discount_text' => 'required',
             'services' => 'required|array',
+            'scripts' => 'nullable',
         ];
     }
 }

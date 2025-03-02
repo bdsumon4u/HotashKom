@@ -180,6 +180,23 @@ function genSKU($repeat = 5, $length = null)
     return $sku;
 }
 
+function cdn(string $url)
+{
+    if ($username = config('services.gumlet.username')) {
+        return str_replace(request()->getHost(), 'https://'.$username.'.gumlet.io', $url) . '?fit=resize&w=150&h=150';
+    }
+
+    if ($username = config('services.cloudinary.username')) {
+        return 'https://res.cloudinary.com/'.$username.'/image/fetch/w_150,h_150,c_thumb/'.asset($url);
+    }
+
+    if ($username = config('services.imagekit.username')) {
+        return str_replace(request()->getHost(), 'https://ik.imagekit.io/'.$username, $url) . '??tr=w-150,h-150';
+    }
+
+    return asset($url);
+}
+
 function longCookie($field, $value)
 {
     if ($value) {
