@@ -52,6 +52,7 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
 
     Route::get('/categories', [ApiController::class, 'categories'])->name('categories');
     Route::get('/brands', [ApiController::class, 'brands'])->name('brands');
+    Route::post('save-checkout-progress', [ApiController::class, 'saveCheckoutProgress']);
 
     Route::get('/', HomeController::class)->name('/');
     Route::get('/sections/{section}/products', HomeSectionProductController::class)->name('home-sections.products');

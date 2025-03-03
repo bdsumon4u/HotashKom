@@ -27,19 +27,18 @@ class CheckoutController extends Controller
         if ($request->isMethod('GET')) {
             //\LaravelFacebookPixel::createEvent('AddToCart', $parameters = []);
 
-            $cart = session()->get('cart', []);
             GoogleTagManagerFacade::set([
                 'event' => 'begin_checkout',
                 'ecommerce' => [
                     'currency' => 'BDT',
-                    'value' => array_sum(array_map(fn ($product): int|float => $product['price'] * $product['quantity'], $cart)),
-                    'items' => array_values(array_map(fn ($product): array => [
-                        'item_id' => $product['id'],
-                        'item_name' => $product['name'],
-                        'item_category' => $product['category'],
-                        'price' => $product['price'],
-                        'quantity' => $product['quantity'],
-                    ], $cart)),
+                    'value' => cart()->subTotal(),
+                    'items' => cart()->content()->map(fn ($product) => [
+                        'item_id' => $product->id,
+                        'item_name' => $product->name,
+                        'item_category' => $product->options->category,
+                        'price' => $product->price,
+                        'quantity' => $product->qty,
+                    ]),
                 ],
             ]);
 

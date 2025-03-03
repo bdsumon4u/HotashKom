@@ -11,34 +11,41 @@
             </tr>
         </thead>
         <tbody class="cart-table__body">
-            @forelse (session()->get('cart', []) as $product)
-            <tr class="cart-table__row" data-id="{{$product['id']}}">
-                <td class="cart-table__column cart-table__column--image">
-                    <a href="{{route('products.show', $product['slug'])}}">
-                        <img src="{{asset($product['image'])}}" alt=""></a>
+            @forelse (cart()->content() as $product)
+                <tr class="cart-table__row" data-id="{{ $product->id }}">
+                    <td class="cart-table__column cart-table__column--image">
+                        <a href="{{ route('products.show', $product->options->slug) }}">
+                            <img src="{{ asset($product->options->image) }}" alt=""></a>
                     </td>
-                <td class="cart-table__column cart-table__column--product">
-                    <a href="{{route('products.show', $product['slug'])}}" class="cart-table__product-name">{{$product['name']}}</a>
-                </td>
-                <td class="cart-table__column cart-table__column--price" data-title="Price">TK {{$product['price']}}</td>
-                <td class="cart-table__column cart-table__column--quantity" data-title="Quantity">
-                    <div class="input-number product__quantity">
-                        <input class="form-control input-number__input" type="number" min="1" value="{{$product['quantity']}}" max="{{$product['max']}}" readonly />
-                        <div class="input-number__add" wire:click="increaseQuantity({{$product['id']}})"></div>
-                        <div class="input-number__sub" wire:click="decreaseQuantity({{$product['id']}})"></div>
-                    </div>
-                </td>
-                <td class="cart-table__column cart-table__column--total" data-title="Total">TK {{$product['price']*$product['quantity']}}</td>
-                <td class="cart-table__column cart-table__column--remove">
-                    <button type="button" class="btn btn-light btn-sm btn-svg-icon" wire:click="remove({{$product['id']}})">
-                        <svg width="12px" height="12px">
-                            <use xlink:href="{{ asset('strokya/images/sprite.svg#cross-12') }}"></use>
-                        </svg>
-                    </button>
-                </td>
-            </tr>
+                    <td class="cart-table__column cart-table__column--product">
+                        <a href="{{ route('products.show', $product->options->slug) }}"
+                            class="cart-table__product-name">{{ $product->name }}</a>
+                    </td>
+                    <td class="cart-table__column cart-table__column--price" data-title="Price">TK {{ $product->price }}
+                    </td>
+                    <td class="cart-table__column cart-table__column--quantity" data-title="Quantity">
+                        <div class="input-number product__quantity">
+                            <input class="form-control input-number__input" type="number" min="1"
+                                value="{{ $product->qty }}" max="{{ $product->max }}" readonly />
+                            <div class="input-number__add" wire:click="increaseQuantity('{{ $product->rowId }}')"></div>
+                            <div class="input-number__sub" wire:click="decreaseQuantity('{{ $product->rowId }}')"></div>
+                        </div>
+                    </td>
+                    <td class="cart-table__column cart-table__column--total" data-title="Total">TK
+                        {{ $product->price * $product->qty }}</td>
+                    <td class="cart-table__column cart-table__column--remove">
+                        <button type="button" class="btn btn-light btn-sm btn-svg-icon"
+                            wire:click="remove('{{ $product->rowId }}')">
+                            <svg width="12px" height="12px">
+                                <use xlink:href="{{ asset('strokya/images/sprite.svg#cross-12') }}"></use>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
             @empty
-            <tr class="bg-danger"><td colspan="6" class="text-center py-2">No Items In Cart.</td></tr>
+                <tr class="bg-danger">
+                    <td colspan="6" class="py-2 text-center">No Items In Cart.</td>
+                </tr>
             @endforelse
         </tbody>
     </table>

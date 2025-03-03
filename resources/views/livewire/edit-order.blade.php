@@ -402,7 +402,7 @@
                     </div>
                     <div style="flex: 1;display: flex;flex-direction: column;justify-content: center;" class="p-2 border font-weight-bold">
                         @php($summary = $this->courier_report['courierData']['summary'])
-                        @php($failure = $summary['total_parcel'] > 0 ? ($summary['cancelled_parcel'] / $summary['total_parcel']) * 100 : 0)
+                        @php($failure = $summary['total_parcel'] > 0 ? number_format(($summary['cancelled_parcel'] / $summary['total_parcel']) * 100, 2) : 0)
                         <div class="px-3 py-1 my-1 text-center border border-secondary">Summary:</div>
                         <div class="px-3 py-2 my-1 bg-success">Delivered: {{$summary['success_parcel']}} ({{$summary['success_ratio']}}%)</div>
                         <div class="px-3 py-2 my-1 bg-danger">Failed: {{$summary['cancelled_parcel']}} ({{$failure}}%)</div>

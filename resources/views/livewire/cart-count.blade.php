@@ -1,1 +1,1 @@
-<span class="indicator__value cart-count">{{ count(session('cart', [])) }}</span>
+<span class="indicator__value cart-count">{{ cart()->count() }}</span>

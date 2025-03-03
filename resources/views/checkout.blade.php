@@ -20,7 +20,7 @@
 @endpush
 
 @section('content')
-    <div class="checkout block mt-1">
+    <div class="block mt-1 checkout">
         <div class="container">
             <x-form checkoutform :action="route('checkout')" method="POST">
                 <livewire:checkout />
@@ -30,6 +30,28 @@
 @endsection
 
 @push('scripts')
+<script>
+    // Send data to the server before the user leaves
+    window.addEventListener("beforeunload", function (event) {
+        // Send data using Fetch API (asynchronous)
+        navigator.sendBeacon(
+            "/save-checkout-progress",
+            new Blob([JSON.stringify({
+                name: $('#name').val(),
+                phone: $('#phone').val(),
+                address: $('#address').val(),
+            })], { type: 'application/json' })
+        );
+
+        // Optional: If you want to use Fetch (uncomment below)
+        // fetch("/api/save-checkout-progress", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify(formData),
+        //     keepalive: true, // Ensures request completes before browser unloads
+        // });
+    });
+</script>
 <script>
     $(document).ready(function() {
         $('[place-order]').on('click', function (ev) {

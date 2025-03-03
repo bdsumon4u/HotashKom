@@ -10,8 +10,14 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Slide;
+use Azmolla\Shoppingcart\Cart as CartInstance;
+use Azmolla\Shoppingcart\CartItem;
+use Azmolla\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 if (! function_exists('slides')) {
     function slides()
@@ -172,4 +178,152 @@ function genSKU($repeat = 5, $length = null)
     }
 
     return $sku;
+}
+
+function cdn(string $url)
+{
+    if ($username = config('services.gumlet.username')) {
+        return str_replace(request()->getHost(), $username.'.gumlet.io', $url) . '?fit=resize&w=150&h=150';
+    }
+
+    if ($username = config('services.cloudinary.username')) {
+        return 'https://res.cloudinary.com/'.$username.'/image/fetch/w_150,h_150,c_thumb/'.asset($url);
+    }
+
+    if ($username = config('services.imagekit.username')) {
+        return str_replace(request()->getHost(), 'ik.imagekit.io/'.$username, $url) . '??tr=w-150,h-150';
+    }
+
+    return asset($url);
+}
+
+function longCookie($field, $value)
+{
+    if ($value) {
+        Cookie::queue(Cookie::make($field, $value, 10 * 365 * 24 * 60)); // 10 years
+    }
+}
+
+function cart($id = null): CartInstance|CartItem
+{
+    $cart = Cart::instance(session('kart', 'default'));
+
+    if (! $id) {
+        return $cart;
+    }
+
+    return $cart->content()->first(fn ($item) => $item->id == $id);
+}
+
+function storeOrUpdateCart($phone = null, $name = '')
+{
+    if (! $phone = $phone ?? Cookie::get('phone', '')) {
+        return;
+    }
+
+    if (Str::startsWith($phone, '01')) {
+        $phone = '+88'.$phone;
+    } else if (Str::startsWith($phone, '1')) {
+        $phone = '+880'.$phone;
+    }
+
+    if (strlen($phone) != 14) {
+        return;
+    }
+
+    $content = cart()->content()->mapWithKeys(fn ($item) => [$item->options->parent_id => $item]);
+
+    if ($content->isEmpty()) {
+        return;
+    }
+
+    $identifier = session()->getId();
+    if ($cart = DB::table('shopping_cart')->where('phone', $phone)->first()) {
+        $identifier = $cart->identifier;
+    }
+
+    $cart = DB::table('shopping_cart')
+        ->where('identifier', $identifier)
+        ->first();
+
+    if ($cart) {
+        DB::table('shopping_cart')
+            ->where('identifier', $identifier)
+            ->update([
+                'identifier' => session()->getId(),
+                'name' => Cookie::get('name', $name),
+                'phone' => $phone,
+                'content' => serialize($content->union(unserialize($cart->content))),
+                'updated_at' => now(),
+            ]);
+
+        return;
+    }
+
+    DB::table('shopping_cart')
+        ->insert([
+            'name' => Cookie::get('name', $name),
+            'phone' => $phone,
+            'instance' => 'default',
+            'identifier' => session()->getId(),
+            'content' => serialize($content),
+            'updated_at' => now(),
+        ]);
+}
+
+function deleteOrUpdateCart()
+{
+    $phone = Cookie::get('phone', '');
+    $content = cart()->content()->mapWithKeys(fn ($item) => [$item->options->parent_id => $item]);
+
+    if (Str::startsWith($phone, '01')) {
+        $phone = '+88'.$phone;
+    } else if (Str::startsWith($phone, '1')) {
+        $phone = '+880'.$phone;
+    }
+
+    if (strlen($phone) != 14) {
+        return;
+    }
+
+    $identifier = session()->getId();
+    $cart = $cart = DB::table('shopping_cart')
+        ->where('phone', $phone)
+        ->first();
+    if ($cart) {
+        $identifier = $cart->identifier;
+    }
+
+    $cart = DB::table('shopping_cart')
+        ->where('identifier', $identifier)
+        ->first();
+
+    if ($cart) {
+        $content = unserialize($cart->content)->diffKeys($content);
+        if ($content->isEmpty()) {
+            return DB::table('shopping_cart')
+                ->where('identifier', $identifier)
+                ->delete();
+        }
+        DB::table('shopping_cart')
+            ->where('identifier', $identifier)
+            ->update([
+                'name' => Cookie::get('name'),
+                'phone' => $phone,
+                'content' => serialize($content),
+                'identifier' => session()->getId(),
+                'updated_at' => now(),
+            ]);
+        return;
+    }
+
+    DB::table('shopping_cart')
+        ->insert([
+            'name' => Cookie::get('name'),
+            'phone' => $phone,
+            'instance' => 'default',
+            'identifier' => session()->getId(),
+            'content' => serialize($content),
+            'updated_at' => now(),
+        ]);
 }

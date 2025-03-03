@@ -86,4 +86,15 @@ return [
         'key' => env('COURIER_REPORT_KEY'),
     ],
 
+    'imagekit' => [
+        'username' => env('IMAGEKIT_USERNAME'),
+    ],
+
+    'cloudinary' => [
+        'username' => env('CLOUDINARY_USERNAME'),
+    ],
+
+    'gumlet' => [
+        'username' => env('GUMLET_USERNAME'),
+    ],
 ];

@@ -9,42 +9,41 @@ class ProductCard extends Component
 {
     public Product $product;
 
-    public function addToCart(): void
+    public function addToCart($instance = 'default')
     {
-        $cart = session()->get('cart', []);
+        session(['kart' => $instance]);
         $fraudQuantity = setting('fraud')->max_qty_per_product ?? 3;
 
-        if (! isset($cart[$this->product->id])) {
-            $cart[$this->product->id] = [
-                'id' => $this->product->id,
+        cart()->add(
+            $this->product->id,
+            $this->product->name,
+            1,
+            $this->product->selling_price,
+            [
                 'parent_id' => $this->product->parent_id ?? $this->product->id,
-                'name' => $this->product->name,
                 'slug' => $this->product->slug,
                 'image' => optional($this->product->base_image)->path,
                 'category' => $this->product->category,
-                'quantity' => 1,
-                'price' => $this->product->selling_price,
                 'max' => $this->product->should_track ? min($this->product->stock_count, $fraudQuantity) : $fraudQuantity,
                 'shipping_inside' => $this->product->shipping_inside,
                 'shipping_outside' => $this->product->shipping_outside,
-            ];
-        }
+            ],
+        );
 
-        session()->put('cart', $cart);
-        $product = $cart[$this->product->id];
+        storeOrUpdateCart();
 
         $this->dispatch('dataLayer', [
             'event' => 'add_to_cart',
             'ecommerce' => [
                 'currency' => 'BDT',
-                'value' => $product['price'] * $product['quantity'],
+                'value' => $this->product->selling_price,
                 'items' => [
                     [
-                        'item_id' => $product['id'],
-                        'item_name' => $product['name'],
-                        'item_category' => $product['category'],
-                        'price' => $product['price'],
-                        'quantity' => $product['quantity'],
+                        'item_id' => $this->product->id,
+                        'item_name' => $this->product->name,
+                        'item_category' => $this->product->category,
+                        'price' => $this->product->selling_price,
+                        'quantity' => 1,
                     ],
                 ],
             ],
@@ -52,22 +51,10 @@ class ProductCard extends Component
 
         $this->dispatch('cartUpdated');
         $this->dispatch('notify', ['message' => 'Product added to cart']);
-    }
 
-    public function orderNow()
-    {
-        $cart = session()->get('cart', []);
-        $kart = session()->get('kart');
-        if (isset($cart[$kart])) {
-            unset($cart[$kart]);
+        if ($instance != 'default') {
+            return redirect()->route('checkout');
         }
-        session()->put('cart', $cart);
-
-        $this->addToCart();
-
-        session()->put('kart', $this->product->id);
-
-        return redirect()->route('checkout');
     }
 
     public function render()

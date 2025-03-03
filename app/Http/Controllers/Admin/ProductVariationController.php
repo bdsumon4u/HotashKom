@@ -7,6 +7,7 @@ use App\Models\Option;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ProductVariationController extends Controller
 {
@@ -86,7 +87,7 @@ class ProductVariationController extends Controller
     public function update(Request $request, Product $product, Product $variation)
     {
         abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
-        $variation->update($request->validate([
+        $validator = Validator::make($request->all(), [
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
             'wholesale.quantity' => 'sometimes|array',
@@ -94,9 +95,14 @@ class ProductVariationController extends Controller
             'wholesale.quantity.*' => 'required|integer|gt:1',
             'wholesale.price.*' => 'required|integer|min:1',
             'should_track' => 'required|boolean',
-            'stock_count' => 'nullable|numeric',
             'sku' => 'required|unique:products,sku,'.$variation->id,
-        ]));
+        ]);
+
+        $validator->sometimes('stock_count', 'required|numeric', function ($input) {
+            return $input->should_track == 1;
+        });
+
+        $variation->update($validator->validate());
 
         // $query = "UPDATE products SET ";
         // foreach ($request->variations as $name => $variation) {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4fe92ffa2e5b23cfb3d98cd6f375e796",
+    "content-hash": "bbd41be56cf28bdcc92117fa1935a066",
     "packages": [
         {
             "name": "amidesfahani/filament-tinyeditor",
@@ -211,6 +211,83 @@
                 }
             ],
             "time": "2025-01-15T15:50:08+00:00"
+        },
+        {
+            "name": "azmolla/laravelcart",
+            "version": "v1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/AbiruzzamanMolla/Laravel-Cart-with-Session-and-Database.git",
+                "reference": "bdaa6475f017f6aaac459d7d56d88d5930ce0083"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/AbiruzzamanMolla/Laravel-Cart-with-Session-and-Database/zipball/bdaa6475f017f6aaac459d7d56d88d5930ce0083",
+                "reference": "bdaa6475f017f6aaac459d7d56d88d5930ce0083",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/events": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/session": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.18",
+                "mockery/mockery": "^1.4",
+                "orchestra/testbench": "^7",
+                "phpunit/phpunit": "^9.5|^10.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Cart": "Azmolla\\Shoppingcart\\Facades\\Cart"
+                    },
+                    "providers": [
+                        "Azmolla\\Shoppingcart\\ShoppingcartServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Azmolla\\Shoppingcart\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rob Gloudemans",
+                    "email": "info@robgloudemans.nl"
+                },
+                {
+                    "name": "Michael V.",
+                    "email": "michael@michaelbelgium.me"
+                },
+                {
+                    "name": "Abiruzzaman Molla",
+                    "email": "abiruzzaman.molla@gmail.com",
+                    "homepage": "https://www.linkedin.com/in/abiruzzamanmolla/",
+                    "role": "Backend Developer"
+                }
+            ],
+            "description": "Laravel Shopping cart",
+            "homepage": "https://github.com/AbiruzzamanMolla/Laravel-Cart-with-Session-and-Database",
+            "keywords": [
+                "az-lara-cart",
+                "cart",
+                "laravel",
+                "php-cart",
+                "php-laravel-cart",
+                "shoppingcart"
+            ],
+            "support": {
+                "issues": "https://github.com/AbiruzzamanMolla/Laravel-Cart-with-Session-and-Database/issues",
+                "source": "https://github.com/AbiruzzamanMolla/Laravel-Cart-with-Session-and-Database/tree/v1.1.5"
+            },
+            "time": "2025-02-25T05:46:44+00:00"
         },
         {
             "name": "blade-ui-kit/blade-heroicons",
