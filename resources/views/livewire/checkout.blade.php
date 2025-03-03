@@ -53,7 +53,7 @@
                                         class="custom-control-input" id="inside-dhaka" name="shipping"
                                         value="Inside Dhaka">
                                     <label class="custom-control-label" for="inside-dhaka">ঢাকা শহর @if (!(setting('show_option')->productwise_delivery_charge ?? false))
-                                            ({{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->inside_dhaka }}
+                                            ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Inside Dhaka') }}
                                             টাকা)
                                         @endif
                                     </label>
@@ -64,7 +64,7 @@
                                         class="custom-control-input" id="outside-dhaka" name="shipping"
                                         value="Outside Dhaka">
                                     <label class="custom-control-label" for="outside-dhaka">ঢাকার বাইরে @if (!(setting('show_option')->productwise_delivery_charge ?? false))
-                                            ({{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->outside_dhaka }}
+                                            ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Outside Dhaka') }}
                                             টাকা)
                                         @endif
                                     </label>

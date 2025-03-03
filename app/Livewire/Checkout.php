@@ -69,15 +69,23 @@ class Checkout extends Component
         }
     }
 
-    private function shippingCost()
+    public function shippingCost(?string $area = null)
     {
+        $area ??= $this->shipping;
         $shipping_cost = 0;
-        if ($this->shipping) {
+        if ($area) {
             if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
-                $shipping_cost = setting('delivery_charge')->{$this->shipping == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping);
+                return cart()->content()->max(function ($item) use ($area) {
+                    if ($area == 'Inside Dhaka') {
+                        return $item->options->shipping_inside;
+                    } else {
+                        return $item->options->shipping_outside;
+                    }
+                });
+                $shipping_cost = setting('delivery_charge')->{$area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$area);
             } else {
-                $shipping_cost = cart()->content()->sum(function ($item) {
-                    if ($this->shipping == 'Inside Dhaka') {
+                $shipping_cost = cart()->content()->sum(function ($item) use ($area) {
+                    if ($area == 'Inside Dhaka') {
                         return $item->options->shipping_inside * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
                     } else {
                         return $item->options->shipping_outside * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
