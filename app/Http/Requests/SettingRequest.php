@@ -51,6 +51,7 @@ class SettingRequest extends FormRequest
                 'delivery_text' => 'sometimes',
                 'free_delivery' => 'sometimes',
                 'default_area' => 'required|array',
+                'show_option' => 'required|array',
             ];
         }
 

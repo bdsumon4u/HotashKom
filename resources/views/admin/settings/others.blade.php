@@ -70,25 +70,6 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-12">
-            <div class="d-flex">
-                {{-- Enable Productwise Delivery Charge --}}
-                <div class="ml-3 checkbox checkbox-secondary">
-                    <input type="hidden" name="show_option[productwise_delivery_charge]" value="0">
-                    <x-checkbox id="productwise-delivery-charge" name="show_option[productwise_delivery_charge]"
-                        value="1" :checked="!!($show_option->productwise_delivery_charge ?? false)" />
-                    <label for="productwise-delivery-charge" class="my-1">Productwise Delivery Charge</label>
-                </div>
-
-                {{-- Enable Quantitywise Delivery Charge --}}
-                <div class="ml-3 checkbox checkbox-secondary">
-                    <input type="hidden" name="show_option[quantitywise_delivery_charge]" value="0">
-                    <x-checkbox id="quantitywise-delivery-charge" name="show_option[quantitywise_delivery_charge]"
-                        value="1" :checked="!!($show_option->quantitywise_delivery_charge ?? false)" />
-                    <label for="quantitywise-delivery-charge" class="my-1">Quantitywise Delivery Charge</label>
-                </div>
-            </div>
-        </div>
         <div class="my-3 border col-md-12"></div>
         <div class="col-md-8">
             <div class="form-group">
