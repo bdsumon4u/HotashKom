@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Pathao\Facade\Pathao;
+use App\Redx\Facade\Redx;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -31,8 +32,8 @@ class Order extends Model
     {
         static::retrieved(function (Order $order): void {
             if (empty($order->data['city_name'] ?? '') && ! empty($order->data['city_id'] ?? '')) {
-                $order->fill(['data' => ['city_name' => current(array_filter($order->getCityList(), fn ($c): bool => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
-                $order->fill(['data' => ['area_name' => current(array_filter($order->getAreaList(), fn ($a): bool => $a->zone_id == ($order->data['area_id'] ?? '')))->zone_name ?? 'N/A']]);
+                $order->fill(['data' => ['city_name' => current(array_filter($order->pathaoCityList(), fn ($c): bool => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
+                $order->fill(['data' => ['area_name' => current(array_filter($order->pathaoAreaList(), fn ($a): bool => $a->zone_id == ($order->data['area_id'] ?? '')))->zone_name ?? 'N/A']]);
                 $order->save();
             }
         });
@@ -57,34 +58,36 @@ class Order extends Model
 
             if (false && empty($order->data['city_id'] ?? '')) {
                 $matches = [];
-                foreach ($order->getCityList() as $city) {
+                foreach ($order->pathaoCityList() as $city) {
                     if ($match = $fuse->search($city->city_name)) {
                         $matches[$city->city_name] = $match[0]['score'];
                     }
                 }
                 if ($matches !== []) {
                     asort($matches);
-                    $city = current(array_filter($order->getCityList(), fn ($c): bool => $c->city_name === key($matches)));
+                    $city = current(array_filter($order->pathaoCityList(), fn ($c): bool => $c->city_name === key($matches)));
                     $order->fill(['data' => ['city_id' => $city->city_id, 'city_name' => $city->city_name ?? 'N/A']]);
                 }
-            } else {
-                $order->fill(['data' => ['city_name' => current(array_filter($order->getCityList(), fn ($c): bool => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
+            } elseif ($order->data['courier'] == 'Pathao') {
+                $order->fill(['data' => ['city_name' => current(array_filter($order->pathaoCityList(), fn ($c): bool => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
             }
 
             if (false) {
                 $matches = [];
-                foreach ($order->getAreaList() as $area) {
+                foreach ($order->pathaoAreaList() as $area) {
                     if ($match = $fuse->search($area->zone_name)) {
                         $matches[$area->zone_name] = $match[0]['score'];
                     }
                 }
                 if ($matches !== []) {
                     asort($matches);
-                    $area = current(array_filter($order->getAreaList(), fn ($a): bool => $a->zone_name === key($matches)));
+                    $area = current(array_filter($order->pathaoAreaList(), fn ($a): bool => $a->zone_name === key($matches)));
                     $order->fill(['data' => ['area_id' => $area->zone_id, 'area_name' => $area->zone_name ?? 'N/A']]);
                 }
-            } else {
-                $order->fill(['data' => ['area_name' => current(array_filter($order->getAreaList(), fn ($a): bool => $a->zone_id == $order->data['area_id']))->zone_name ?? 'N/A']]);
+            } elseif ($order->data['courier'] == 'Pathao') {
+                $order->fill(['data' => ['area_name' => current(array_filter($order->pathaoAreaList(), fn ($a): bool => $a->zone_id == $order->data['area_id']))->zone_name ?? 'N/A']]);
+            } elseif ($order->data['courier'] == 'Redx') {
+                $order->fill(['data' => ['area_name' => current(array_filter($order->redxAreaList(), fn ($a): bool => $a->id == $order->data['area_id']))->name ?? 'N/A']]);
             }
         });
     }
@@ -180,7 +183,7 @@ class Order extends Model
             ->logOnly(['name', 'phone', 'status', 'data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal']);
     }
 
-    public function getCityList()
+    public function pathaoCityList()
     {
         if (! (setting('Pathao')->enabled ?? false)) {
             return [];
@@ -204,7 +207,7 @@ class Order extends Model
         return $cityList;
     }
 
-    public function getAreaList($cityId = null)
+    public function pathaoAreaList($cityId = null)
     {
         if (! (setting('Pathao')->enabled ?? false)) {
             return [];
@@ -228,6 +231,31 @@ class Order extends Model
 
         if ($exception) {
             cache()->forget('pathao_areas:'.$cityId);
+        }
+
+        return $areaList;
+    }
+
+    public function redxAreaList()
+    {
+        if (! (setting('Redx')->enabled ?? config('redx.enabled'))) {
+            return [];
+        }
+
+        $areaList = [];
+        $exception = false;
+        $areaList = cache()->remember('redx_areas', now()->addDay(), function () use (&$exception) {
+            try {
+                return Redx::area()->list()->areas;
+            } catch (\Exception) {
+                $exception = true;
+
+                return [];
+            }
+        });
+
+        if ($exception) {
+            cache()->forget('redx_areas');
         }
 
         return $areaList;

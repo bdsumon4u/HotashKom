@@ -48,5 +48,11 @@ class AppServiceProvider extends ServiceProvider
             new \App\Pathao\Apis\StoreApi,
             new \App\Pathao\Apis\OrderApi
         ));
+
+        $this->app->bind('redx', fn (): \App\Redx\Manage\Manage => new \App\Redx\Manage\Manage(
+            new \App\Redx\Apis\AreaApi,
+            new \App\Redx\Apis\StoreApi,
+            new \App\Redx\Apis\OrderApi
+        ));
     }
 }

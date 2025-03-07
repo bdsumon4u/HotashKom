@@ -57,11 +57,11 @@
 @endpush
 
 @section('content')
-    <div class="row mb-5">
-        <div class="col-md-8 mx-auto">
+    <div class="mb-5 row">
+        <div class="mx-auto col-md-8">
             <div class="reports-table">
-                <div class="card rounded-0 shadow-sm">
-                    <div class="card-header p-3">
+                <div class="shadow-sm card rounded-0">
+                    <div class="p-3 card-header">
                         <form action="">
                             <div class="row">
                                 <div class="col-auto pr-1">
@@ -81,7 +81,7 @@
                                     <div class="col-auto px-1">
                                         <select name="courier" id="courier" class="form-control">
                                             <option value="">Courier</option>
-                                            @foreach (['Pathao', 'SteadFast', 'Other'] as $courier)
+                                            @foreach (couriers() as $courier)
                                                 <option value="{{ $courier }}"
                                                     @if (request()->get('courier') == $courier) selected @endif>{{ $courier }}
                                                 </option>
@@ -110,21 +110,21 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col pl-1">
+                                <div class="pl-1 col">
                                     <button class="btn btn-primary" type="submit">Filter</button>
                                 </div>
-                                <div class="col pl-1">
-                                    <button class="btn btn-primary d-block ml-auto" onclick="window.print()">Print</button>
+                                <div class="pl-1 col">
+                                    <button class="ml-auto btn btn-primary d-block" onclick="window.print()">Print</button>
                                 </div>
                             </div>
                         </form>
                     </div>
-                    <div class="card-body p-3 d-print-none">
+                    <div class="p-3 card-body d-print-none">
                         <div class="row">
                             @foreach ($orders as $status => $count)
                                 <div class="col-xl-3 box-col- col-lg-3 col-md-3">
-                                    <div class="card rounded-sm o-hidden">
-                                        <div class="card-body p-3">
+                                    <div class="rounded-sm card o-hidden">
+                                        <div class="p-3 card-body">
                                             <div class="media">
                                                 <div class="media-body">
                                                     @php
@@ -149,8 +149,8 @@
                                                                 $statData,
                                                             ),
                                                         ) }}">
-                                                        <p class="f-w-500 font-roboto mb-2">{{ $status }} Orders</p>
-                                                        <h4 class="f-w-500 mb-0 f-26"><span
+                                                        <p class="mb-2 f-w-500 font-roboto">{{ $status }} Orders</p>
+                                                        <h4 class="mb-0 f-w-500 f-26"><span
                                                                 class="-counter-">{{ $count }}</span></h4>
                                                         <span class="-counter-">Taka: {{ $amounts[$status] }}</span>
                                                     </a>
@@ -162,7 +162,7 @@
                             @endforeach
                         </div>
                     </div>
-                    <div class="card-footer p-3">
+                    <div class="p-3 card-footer">
                         @include('admin.reports.filtered')
                     </div>
                 </div>

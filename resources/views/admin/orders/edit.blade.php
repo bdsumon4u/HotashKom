@@ -2,6 +2,7 @@
 @section('title', 'Edit Order')
 
 @push('css')
+<link rel="stylesheet" type="text/css" href="{{asset('assets/css/select2.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/prism.css') }}">
 @endpush
 
@@ -17,27 +18,27 @@
 @endsection
 
 @section('content')
-    <div class="row mb-5">
+    <div class="mb-5 row">
         <div class="col-sm-12">
             <div class="orders-table">
-                <div class="card rounded-0 shadow-sm">
-                    <div class="card-header p-3 d-flex justify-content-between align-items-center">
+                <div class="shadow-sm card rounded-0">
+                    <div class="p-3 card-header d-flex justify-content-between align-items-center">
                         <strong>Edit Order</strong>
                         <div>
-                            <a href="{{ route('admin.orders.invoices', ['order_id' => $order->id]) }}" class="btn btn-sm btn-primary ml-1">Invoice</a>
-                            <a href="{{ route('admin.orders.booking', ['order_id' => $order->id]) }}" class="btn btn-sm btn-primary ml-1">Send to Courier</a>
+                            <a href="{{ route('admin.orders.invoices', ['order_id' => $order->id]) }}" class="ml-1 btn btn-sm btn-primary">Invoice</a>
+                            <a href="{{ route('admin.orders.booking', ['order_id' => $order->id]) }}" class="ml-1 btn btn-sm btn-primary">Send to Courier</a>
                         </div>
                     </div>
-                    <div class="card-body p-3">
+                    <div class="p-3 card-body">
                         <livewire:edit-order :order="$order" />
                     </div>
                 </div>
-                <div class="card rounded-0 shadow-sm">
+                <div class="shadow-sm card rounded-0">
 
-                    <div class="card-header p-3">
+                    <div class="p-3 card-header">
                         <h5 class="text-center">Other Orders</h5>
                     </div>
-                    <div class="card-footer rounded-0 p-3">
+                    <div class="p-3 card-footer rounded-0">
                         <table class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
@@ -55,7 +56,7 @@
                                 @foreach ($orders as $order)
                                 <tr>
                                     <td>
-                                        <a class="btn btn-light btn-sm text-nowrap px-2" target="_blank" href="{{ route('admin.orders.edit', $order) }}">{{ $order->id }} <i class="fa fa-eye"></i></a>
+                                        <a class="px-2 btn btn-light btn-sm text-nowrap" target="_blank" href="{{ route('admin.orders.edit', $order) }}">{{ $order->id }} <i class="fa fa-eye"></i></a>
                                     </td>
                                     <td>
                                         @foreach ($order->products as $product)
@@ -80,6 +81,8 @@
 @endsection
 
 @push('js')
+    <script src="{{asset('assets/js/select2/select2.full.min.js')}}"></script>
+    <script src="{{asset('assets/js/select2/select2-custom.js')}}"></script>
     <script src="{{ asset('assets/js/prism/prism.min.js') }}"></script>
 @endpush
 

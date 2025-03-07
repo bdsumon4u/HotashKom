@@ -180,10 +180,20 @@ function genSKU($repeat = 5, $length = null)
     return $sku;
 }
 
+function couriers()
+{
+    return array_filter([
+        'Pathao',
+        config('redx.enabled') ? 'Redx' : null,
+        'SteadFast',
+        'Other',
+    ]);
+}
+
 function cdn(string $url)
 {
     if ($username = config('services.gumlet.username')) {
-        return str_replace(request()->getHost(), $username.'.gumlet.io', $url) . '?fit=resize&w=150&h=150';
+        return str_replace(request()->getHost(), $username.'.gumlet.io', $url).'?fit=resize&w=150&h=150';
     }
 
     if ($username = config('services.cloudinary.username')) {
@@ -191,7 +201,7 @@ function cdn(string $url)
     }
 
     if ($username = config('services.imagekit.username')) {
-        return str_replace(request()->getHost(), 'ik.imagekit.io/'.$username, $url) . '??tr=w-150,h-150';
+        return str_replace(request()->getHost(), 'ik.imagekit.io/'.$username, $url).'??tr=w-150,h-150';
     }
 
     return asset($url);
@@ -223,7 +233,7 @@ function storeOrUpdateCart($phone = null, $name = '')
 
     if (Str::startsWith($phone, '01')) {
         $phone = '+88'.$phone;
-    } else if (Str::startsWith($phone, '1')) {
+    } elseif (Str::startsWith($phone, '1')) {
         $phone = '+880'.$phone;
     }
 
@@ -278,7 +288,7 @@ function deleteOrUpdateCart()
 
     if (Str::startsWith($phone, '01')) {
         $phone = '+88'.$phone;
-    } else if (Str::startsWith($phone, '1')) {
+    } elseif (Str::startsWith($phone, '1')) {
         $phone = '+880'.$phone;
     }
 
@@ -314,6 +324,7 @@ function deleteOrUpdateCart()
                 'identifier' => session()->getId(),
                 'updated_at' => now(),
             ]);
+
         return;
     }
 

@@ -69,7 +69,7 @@ class OrderController extends Controller
                     }
                 },
             ])
-            ->editColumn('id', fn ($row): string => '<a class="btn btn-light btn-sm text-nowrap px-2" href="'.route('admin.orders.edit', $row->id).'">'.$row->id.'<i class="fa fa-eye ml-1"></i></a>')
+            ->editColumn('id', fn ($row): string => '<a class="px-2 btn btn-light btn-sm text-nowrap" href="'.route('admin.orders.edit', $row->id).'">'.$row->id.'<i class="ml-1 fa fa-eye"></i></a>')
             ->editColumn('created_at', fn ($row): string => "<div class='text-nowrap'>".$row->created_at->format('d-M-Y').'<br>'.$row->created_at->format('h:i A').'</div>')
             ->addColumn('amount', fn ($row): int => intval($row->data['subtotal']) + intval($row->data['shipping_cost']) - intval($row->data['discount'] ?? 0) - intval($row->data['advanced'] ?? 0))
             ->editColumn('status', function ($row) {
@@ -83,10 +83,10 @@ class OrderController extends Controller
             ->addColumn('checkbox', fn ($row): string => '<input type="checkbox" class="form-control" name="order_id[]" value="'.$row->id.'" style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">')
             ->editColumn('customer', fn ($row): string => "
                     <div>
-                        <div><i class='fa fa-user mr-1'></i>{$row->name}</div>
-                        <div><i class='fa fa-phone mr-1'></i><a href='tel:{$row->phone}'>{$row->phone}</a></div>
-                        <div><i class='fa fa-map-marker mr-1'></i>{$row->address}</div>".
-                ($row->note ? "<div class='text-danger'><i class='fa fa-sticky-note-o mr-1'></i>{$row->note}</div>" : '').
+                        <div><i class='mr-1 fa fa-user'></i>{$row->name}</div>
+                        <div><i class='mr-1 fa fa-phone'></i><a href='tel:{$row->phone}'>{$row->phone}</a></div>
+                        <div><i class='mr-1 fa fa-map-marker'></i>{$row->address}</div>".
+                ($row->note ? "<div class='text-danger'><i class='mr-1 fa fa-sticky-note-o'></i>{$row->note}</div>" : '').
                 '</div>')
             ->editColumn('products', function ($row) {
                 $products = '<ul style="list-style: none; padding-left: 1rem;">';
@@ -101,7 +101,7 @@ class OrderController extends Controller
                 $selected = ($row->data['courier'] ?? false) ? $row->data['courier'] : 'Other';
 
                 $return = '<select data-id="'.$row->id.'" onchange="changeCourier" class="courier-column form-control-sm">';
-                foreach (['Pathao', 'SteadFast', 'Other'] as $provider) {
+                foreach (couriers() as $provider) {
                     $return .= '<option value="'.$provider.'" '.($provider == $selected ? 'selected' : '').'>'.$provider.'</option>';
                 }
                 $return .= '</select>';
@@ -117,6 +117,11 @@ class OrderController extends Controller
                     $return .= '<div style="white-space: nowrap;">Weight: '.($row->data['weight'] ?? '0.5').' kg</div>';
 
                     $link = 'https://merchant.pathao.com/tracking?consignment_id='.($row->data['consignment_id'] ?? '').'&phone='.Str::after($row->phone, '+88');
+                } elseif ($row->data['courier'] == 'Redx') {
+                    // append area and weight
+                    $return .= '<div style="white-space: nowrap;">Area: '.($row->data['area_name'] ?? '<strong class="text-danger">N/A</strong>').'</div>';
+                    $return .= '<div style="white-space: nowrap;">Weight: '.($row->data['weight'] ?? '500').' gm</div>';
+                    $link = 'https://redx.com.bd/track-global-parcel/?trackingId='.($row->data['consignment_id'] ?? '');
                 } elseif ($row->data['courier'] == 'SteadFast') {
                     $link = 'https://www.steadfast.com.bd/user/consignment/'.($row->data['consignment_id'] ?? '');
                 }

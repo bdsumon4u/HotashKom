@@ -32,23 +32,23 @@
 @endsection
 
 @section('content')
-    <div class="row mb-5">
+    <div class="mb-5 row">
         <div class="col-sm-12">
             <div class="orders-table">
-                <div class="card rounded-0 shadow-sm">
-                    <div class="card-header p-2">
-                        <div class="row px-3 justify-content-between align-items-center">
+                <div class="shadow-sm card rounded-0">
+                    <div class="p-2 card-header">
+                        <div class="px-3 row justify-content-between align-items-center">
                             <div>All Orders</div>
                             <div>
                                 <a href="{{route('admin.orders.create')}}" class="btn btn-sm btn-primary">New Order</a>
-                                <a href="{{ route('admin.orders.pathao-csv') }}" class="btn btn-sm btn-primary ml-1">Pathao CSV</a>
+                                <a href="{{ route('admin.orders.pathao-csv') }}" class="ml-1 btn btn-sm btn-primary">Pathao CSV</a>
                             </div>
                         </div>
                         <div class="row d-none" style="row-gap: .25rem;">
                             <div class="col-auto pr-0 d-flex align-items-center" check-count></div>
                             @unless(false && in_array(request('status'), ['CONFIRMED', 'INVOICED']))
                             <div class="col-auto px-1">
-                                <select name="status" id="status" onchange="changeStatus()" class="form-control form-control-sm bg-primary text-white">
+                                <select name="status" id="status" onchange="changeStatus()" class="text-white form-control form-control-sm bg-primary">
                                     <option value="">Change Status</option>
                                     @foreach(config('app.orders', []) as $status)
                                         @php $show = false @endphp
@@ -83,9 +83,9 @@
                             @endunless
                             @unless(request('status') == 'SHIPPING')
                             <div class="col-auto px-1">
-                                <select name="courier" id="courier" onchange="changeCourier()" class="form-control form-control-sm bg-primary text-white">
+                                <select name="courier" id="courier" onchange="changeCourier()" class="text-white form-control form-control-sm bg-primary">
                                     <option value="">Change Courier</option>
-                                    @foreach(['Pathao', 'SteadFast', 'Other'] as $provider)
+                                    @foreach(couriers() as $provider)
                                     <option value="{{ $provider }}">{{ $provider }}</option>
                                     @endforeach
                                 </select>
@@ -93,14 +93,14 @@
                             @endunless
                             <div class="col-auto pl-0 ml-auto">
                                 @if(request('status') == 'CONFIRMED')
-                                <button onclick="printInvoice()" id="invoice" class="btn btn-sm btn-primary ml-1">Print Invoice</button>
+                                <button onclick="printInvoice()" id="invoice" class="ml-1 btn btn-sm btn-primary">Print Invoice</button>
                                 @elseif(request('status') == 'INVOICED')
-                                <button onclick="courier()" id="courier" class="btn btn-sm btn-primary ml-1">Send to Courier</button>
+                                <button onclick="courier()" id="courier" class="ml-1 btn btn-sm btn-primary">Send to Courier</button>
                                 @endif
                             </div>
                         </div>
                     </div>
-                    <div class="card-body p-3">
+                    <div class="p-3 card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
                                 <thead>
