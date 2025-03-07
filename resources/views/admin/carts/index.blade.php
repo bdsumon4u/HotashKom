@@ -15,7 +15,7 @@
         <div class="shadow-sm card rounded-0">
             <div class="p-3 card-header">
                 <div class="px-3 row justify-content-between align-items-center">
-                    <div>এরা প্রোডাক্ট কার্টে এড করেছে কিন্তু অর্ডার করেনি।</div>
+                    <div><strong class="text-danger">এরা প্রোডাক্ট কার্টে এড করেছে কিন্তু অর্ডার করেনি।</strong></div>
                 </div>
             </div>
             <div class="p-3 card-body">
@@ -33,8 +33,8 @@
                             @foreach($carts as $cart)
                             <tr class="border border-danger">
                                 <td>
-                                    <div>{{ $cart->name }}</div>
-                                    <div><a href="tel:{{ $cart->phone }}">{{ $cart->phone }}</a></div>
+                                    <div><a style="display: flex; column-gap: 5px;" href="{{ route('admin.orders.index', ['status' => '', 'phone' => $cart->phone]) }}" target="_blank">{{ $cart->name }} <i style="width: 15px;" data-feather="link"> </i></a></div>
+                                    <div class="mt-2"><a href="tel:{{ $cart->phone }}">{{ $cart->phone }}</a></div>
                                 </td>
                                 <td>
                                     @foreach(unserialize($cart->content) as $product)

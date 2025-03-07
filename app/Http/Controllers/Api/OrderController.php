@@ -33,6 +33,10 @@ class OrderController extends Controller
             $orders->where('user_id', $request->user_id);
         }
 
+        if ($request->phone) {
+            $orders->where('phone', $request->phone);
+        }
+
         if ($request->status) {
             $orders->where('status', $request->status);
         }
