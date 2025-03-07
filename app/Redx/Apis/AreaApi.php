@@ -17,8 +17,6 @@ class AreaApi extends BaseApi
      */
     public function list()
     {
-        $response = $this->authorization()->send('GET', 'v1.0.0-beta/areas');
-
-        return $response;
+        return $this->authorization()->send('GET', 'v1.0.0-beta/areas');
     }
 }

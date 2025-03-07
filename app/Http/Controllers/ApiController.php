@@ -17,7 +17,7 @@ class ApiController extends Controller
         return view('brands');
     }
 
-    public function saveCheckoutProgress(Request $request)
+    public function saveCheckoutProgress(Request $request): void
     {
         foreach ($data = $request->json()->all() as $field => $value) {
             longCookie($field, $value);

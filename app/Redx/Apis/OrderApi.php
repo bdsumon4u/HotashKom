@@ -18,9 +18,7 @@ class OrderApi extends BaseApi
      */
     public function create($array)
     {
-        $response = $this->authorization()->send('POST', 'v1.0.0-beta/parcel', $array);
-
-        return $response;
+        return $this->authorization()->send('POST', 'v1.0.0-beta/parcel', $array);
     }
 
     /**

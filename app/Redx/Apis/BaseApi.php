@@ -14,10 +14,7 @@ class BaseApi
      */
     private $baseUrl;
 
-    /**
-     * @var Client
-     */
-    private $request;
+    private readonly \GuzzleHttp\Client $request;
 
     /**
      * @var array
@@ -37,19 +34,15 @@ class BaseApi
     /**
      * Set Base Url on sandbox mode
      */
-    private function setBaseUrl()
+    private function setBaseUrl(): void
     {
-        if (config('redx.sandbox') == true) {
-            $this->baseUrl = 'https://sandbox.redx.com.bd';
-        } else {
-            $this->baseUrl = 'https://openapi.redx.com.bd';
-        }
+        $this->baseUrl = config('redx.sandbox') == true ? 'https://sandbox.redx.com.bd' : 'https://openapi.redx.com.bd';
     }
 
     /**
      * Set Default Headers
      */
-    private function setHeaders()
+    private function setHeaders(): void
     {
         $this->headers = [
             'Accept' => 'application/json',
@@ -62,7 +55,7 @@ class BaseApi
      *
      * @param  array  $header
      */
-    private function mergeHeader($header)
+    private function mergeHeader($header): void
     {
         $this->headers = array_merge($this->headers, $header);
     }
@@ -105,7 +98,7 @@ class BaseApi
         } catch (ClientException $e) {
             $response = json_decode($e->getResponse()->getBody()->getContents());
             $message = $response->message;
-            $errors = isset($response->errors) ? $response->errors : [];
+            $errors = $response->errors ?? [];
             throw new RedxException($message, $e->getCode(), $errors);
         }
     }

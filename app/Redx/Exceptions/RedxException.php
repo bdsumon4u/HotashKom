@@ -8,20 +8,15 @@ use Throwable;
 
 class RedxException extends Exception
 {
-    public $errors;
-
-    public function __construct($message = '', $code = 0, $errors = [], ?Throwable $previous = null)
+    public function __construct($message = '', $code = 0, public $errors = [], ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        $this->errors = $errors;
     }
 
     /**
      * Json return
-     *
-     * @return array
      */
-    public function render()
+    public function render(): array
     {
         return [
             'error' => true,

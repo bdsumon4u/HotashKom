@@ -32,7 +32,7 @@ class CheckoutController extends Controller
                 'ecommerce' => [
                     'currency' => 'BDT',
                     'value' => cart()->subTotal(),
-                    'items' => cart()->content()->map(fn ($product) => [
+                    'items' => cart()->content()->map(fn ($product): array => [
                         'item_id' => $product->id,
                         'item_name' => $product->name,
                         'item_category' => $product->options->category,

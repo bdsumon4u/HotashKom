@@ -35,7 +35,7 @@ class Checkout extends Component
 
     protected $listeners = ['updateField'];
 
-    public function updateField($field, $value)
+    public function updateField($field, $value): void
     {
         $this->$field = $value;
 

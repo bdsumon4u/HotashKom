@@ -17,9 +17,7 @@ class StoreApi extends BaseApi
      */
     public function list()
     {
-        $response = $this->authorization()->send('GET', 'v1.0.0-beta/pickup/stores');
-
-        return $response;
+        return $this->authorization()->send('GET', 'v1.0.0-beta/pickup/stores');
     }
 
     /**
@@ -49,8 +47,6 @@ class StoreApi extends BaseApi
      */
     public function create($storeInfo)
     {
-        $response = $this->authorization()->send('POST', 'v1.0.0-beta/pickup/store', $storeInfo);
-
-        return $response;
+        return $this->authorization()->send('POST', 'v1.0.0-beta/pickup/store', $storeInfo);
     }
 }
