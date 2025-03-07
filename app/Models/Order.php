@@ -180,7 +180,7 @@ class Order extends Model
             ->useLogName('orders')
             ->dontSubmitEmptyLogs()
             ->dontLogIfAttributesChangedOnly(['status_at', 'updated_at'])
-            ->logOnly(['name', 'phone', 'status', 'data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal']);
+            ->logOnly(['admin_id', 'name', 'phone', 'address', 'status', 'status_at', 'products', 'note', 'data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal']);
     }
 
     public function pathaoCityList()
