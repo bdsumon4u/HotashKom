@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,6 +13,26 @@ class CartController extends Controller
      */
     public function index(Request $request)
     {
+        if (! ($last = cache('last_cart_cleanup_at')) || $last->addHour()->isPast()) {
+            $carts = DB::table('shopping_cart')->where('updated_at', '>=', now()->subMinutes(75))->get()->keyBy('phone');
+            Order::query()->whereIn('phone', $carts->keys())->where('created_at', '>=', now()->subWeek())->get()->groupBy('phone')->each(function ($orders, $phone) use (&$carts): void {
+                $productIDs = DB::table('products')
+                    ->whereIn('id', $orders->flatMap(fn ($order) => array_keys((array) $order->products))->unique())
+                    ->selectRaw('CASE WHEN parent_id IS NOT NULL THEN parent_id ELSE id END as selected_id')
+                    ->pluck('selected_id', 'selected_id');
+
+                $content = unserialize($carts[$phone]->content)->diffKeys($productIDs);
+                if ($content->isEmpty()) {
+                    DB::table('shopping_cart')->where('phone', $phone)->delete();
+                } else {
+                    DB::table('shopping_cart')->where('phone', $phone)->update([
+                        'content' => serialize($content),
+                    ]);
+                }
+            });
+        }
+        cache()->rememberForever('last_cart_cleanup_at', fn () => now());
+
         return view('admin.carts.index', [
             'carts' => DB::table('shopping_cart')
                 ->orderBy('updated_at')

@@ -98,7 +98,7 @@ class ProductVariationController extends Controller
             'sku' => 'required|unique:products,sku,'.$variation->id,
         ]);
 
-        $validator->sometimes('stock_count', 'required|numeric', fn($input): bool => $input->should_track == 1);
+        $validator->sometimes('stock_count', 'required|numeric', fn ($input): bool => $input->should_track == 1);
 
         $variation->update($validator->validate());
 
