@@ -75,14 +75,13 @@ class Checkout extends Component
         $shipping_cost = 0;
         if ($area) {
             if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
-                return cart()->content()->max(function ($item) use ($area) {
+                $shipping_cost = cart()->content()->max(function ($item) use ($area) {
                     if ($area == 'Inside Dhaka') {
                         return $item->options->shipping_inside;
                     } else {
                         return $item->options->shipping_outside;
                     }
                 });
-                $shipping_cost = setting('delivery_charge')->{$area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$area);
             } else {
                 $shipping_cost = cart()->content()->sum(function ($item) use ($area) {
                     if ($area == 'Inside Dhaka') {
@@ -115,7 +114,7 @@ class Checkout extends Component
         }
 
         foreach ((array) $freeDelivery->products ?? [] as $id => $qty) {
-            if (cart()->content()->where('options.parent_id', $id)->where('quantity', '>=', $qty)->count()) {
+            if (cart()->content()->where('options.parent_id', $id)->where('qty', '>=', $qty)->count()) {
                 $this->isFreeDelivery = true;
 
                 return 0;
