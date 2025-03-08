@@ -71,6 +71,7 @@ class Checkout extends Component
 
     public function shippingCost(?string $area = null)
     {
+        $this->isFreeDelivery = false;
         $area ??= $this->shipping;
         $shipping_cost = 0;
         if ($area) {
@@ -113,7 +114,7 @@ class Checkout extends Component
             return 0;
         }
 
-        foreach ((array) $freeDelivery->products ?? [] as $id => $qty) {
+        foreach ((array) ($freeDelivery->products ?? []) as $id => $qty) {
             if (cart()->content()->where('options.parent_id', $id)->where('qty', '>=', $qty)->count()) {
                 $this->isFreeDelivery = true;
 

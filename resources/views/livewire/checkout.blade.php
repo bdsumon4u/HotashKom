@@ -52,10 +52,9 @@
                                         @change="$wire.updateField('shipping', $event.target.value)"
                                         class="custom-control-input" id="inside-dhaka" name="shipping"
                                         value="Inside Dhaka">
-                                    <label class="custom-control-label" for="inside-dhaka">ঢাকা শহর @if (!(setting('show_option')->productwise_delivery_charge ?? false))
+                                    <label class="custom-control-label" for="inside-dhaka">ঢাকা শহর
                                             ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Inside Dhaka') }}
                                             টাকা)
-                                        @endif
                                     </label>
                                 </div>
                                 <div class="custom-control custom-radio custom-control-inline">
@@ -63,10 +62,9 @@
                                         @change="$wire.updateField('shipping', $event.target.value)"
                                         class="custom-control-input" id="outside-dhaka" name="shipping"
                                         value="Outside Dhaka">
-                                    <label class="custom-control-label" for="outside-dhaka">ঢাকার বাইরে @if (!(setting('show_option')->productwise_delivery_charge ?? false))
+                                    <label class="custom-control-label" for="outside-dhaka">ঢাকার বাইরে
                                             ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Outside Dhaka') }}
                                             টাকা)
-                                        @endif
                                     </label>
                                 </div>
                             </div>
