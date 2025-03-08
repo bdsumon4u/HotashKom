@@ -86,6 +86,10 @@ class Product extends Model
     protected function shippingInside(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
+            if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
+                return setting('delivery_charge')->inside_dhaka;
+            }
+
             if (! $this->parent_id) {
                 return $value ?? setting('delivery_charge')->inside_dhaka;
             }
@@ -97,6 +101,10 @@ class Product extends Model
     protected function shippingOutside(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
+            if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
+                return setting('delivery_charge')->inside_dhaka;
+            }
+
             if (! $this->parent_id) {
                 return $value ?? setting('delivery_charge')->outside_dhaka;
             }

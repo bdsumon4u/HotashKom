@@ -75,7 +75,9 @@ class Checkout extends Component
         $area ??= $this->shipping;
         $shipping_cost = 0;
         if ($area) {
+            /*
             if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
+            */
                 $shipping_cost = cart()->content()->max(function ($item) use ($area) {
                     if ($area == 'Inside Dhaka') {
                         return $item->options->shipping_inside;
@@ -83,6 +85,7 @@ class Checkout extends Component
                         return $item->options->shipping_outside;
                     }
                 });
+            /*
             } else {
                 $shipping_cost = cart()->content()->sum(function ($item) use ($area) {
                     if ($area == 'Inside Dhaka') {
@@ -92,6 +95,7 @@ class Checkout extends Component
                     }
                 });
             }
+            */
         }
 
         $freeDelivery = setting('free_delivery');
