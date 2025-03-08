@@ -192,6 +192,10 @@ function couriers()
 
 function cdn(string $url, int $w = 150, int $h = 150)
 {
+    if (parse_url($url, PHP_URL_HOST) == 'placehold.co') {
+        return $url;
+    }
+
     if ($username = config('services.gumlet.username')) {
         return str_replace(request()->getHost(), $username.'.gumlet.io', $url).'?fit=resize&w='.$w.'&h='.$h;
     }
