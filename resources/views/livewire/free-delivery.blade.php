@@ -29,7 +29,7 @@
                     $default_area = setting('default_area');
                 @endphp
                 <div class="col-md-6 pr-md-1">
-                    <label for="products_page-rows" class="d-flex justify-content-between">
+                    <label for="products_page-rows" class="d-flex justify-content-between" style="font-size: 90%">
                         <div>Inside Dhaka</div>
                         <div>
                             <input type="hidden" name="default_area[inside]" value="0">
@@ -41,7 +41,7 @@
                     <x-error field="delivery_charge.inside_dhaka" />
                 </div>
                 <div class="col-md-6 pl-md-1">
-                    <label for="products_page-cols" class="d-flex justify-content-between">
+                    <label for="products_page-cols" class="d-flex justify-content-between" style="font-size: 90%">
                         <div>Outside Dhaka</div>
                         <div>
                             <input type="hidden" name="default_area[outside]" value="0">
