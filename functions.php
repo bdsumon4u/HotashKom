@@ -190,18 +190,18 @@ function couriers()
     ]);
 }
 
-function cdn(string $url)
+function cdn(string $url, int $w = 150, int $h = 150)
 {
     if ($username = config('services.gumlet.username')) {
-        return str_replace(request()->getHost(), $username.'.gumlet.io', $url).'?fit=resize&w=150&h=150';
+        return str_replace(request()->getHost(), $username.'.gumlet.io', $url).'?fit=resize&w='.$w.'&h='.$h;
     }
 
     if ($username = config('services.cloudinary.username')) {
-        return 'https://res.cloudinary.com/'.$username.'/image/fetch/w_150,h_150,c_thumb/'.asset($url);
+        return 'https://res.cloudinary.com/'.$username.'/image/fetch/w_'.$w.',h_'.$h.',c_thumb/'.asset($url);
     }
 
     if ($username = config('services.imagekit.username')) {
-        return str_replace(request()->getHost(), 'ik.imagekit.io/'.$username, $url).'??tr=w-150,h-150';
+        return str_replace(request()->getHost(), 'ik.imagekit.io/'.$username, $url).'??tr=w-'.$w.',h-'.$h;
     }
 
     return asset($url);

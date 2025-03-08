@@ -75,9 +75,9 @@
                         @foreach(slides() as $slide)
                         <a class="block-slideshow__slide" href="{{ $slide->btn_href ?? '#' }}">
                             <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop"
-                                style="background-image: url({{ asset($slide->desktop_src) }}); background-position: center;"></div>
+                                style="background-image: url({{ cdn($slide->desktop_src, 840, 395) }}); background-position: center;"></div>
                             <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile"
-                                style="background-image: url({{ asset($slide->mobile_src) }}); background-position: center;"></div>
+                                style="background-image: url({{ cdn($slide->mobile_src, 360, 180) }}); background-position: center;"></div>
                             <div class="block-slideshow__slide-content">
                                 <div class="block-slideshow__slide-title">{!! $slide->title !!}</div>
                                 <div class="block-slideshow__slide-text">{!! $slide->text !!}</div>

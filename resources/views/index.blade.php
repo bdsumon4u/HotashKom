@@ -67,7 +67,7 @@
                         <div class="product-card">
                             <div class="product-card__image">
                                 <a href="{{ route('categories.products', $category) }}">
-                                    <img src="{{ $category->image_src }}" alt="Product Image">
+                                    <img src="{{ cdn($category->image_src, 100, 100) }}" alt="Product Image">
                                 </a>
                             </div>
                             <div class="product-card__info">
@@ -118,7 +118,7 @@
                     <img
                         data-aos="{{$pseudoColumns['animation'][$i]}}"
                         class="border img-fluid w-100"
-                        src="{{ asset($pseudoColumns['image'][$i]) }}"
+                        src="{{ cdn($pseudoColumns['image'][$i]) }}"
                         alt="Image"
                     >
                 </a>
@@ -162,7 +162,7 @@
                         <div class="product-card">
                             <div class="product-card__image">
                                 <a href="{{ route('brands.products', $brand) }}">
-                                    <img src="{{ $brand->image_src }}" alt="Product Image">
+                                    <img src="{{ cdn($brand->image_src, 100, 100) }}" alt="Product Image">
                                 </a>
                             </div>
                             <div class="product-card__info">
