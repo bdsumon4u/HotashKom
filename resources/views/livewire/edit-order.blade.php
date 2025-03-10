@@ -269,6 +269,12 @@
                         </tbody>
                     </table>
                 </div>
+
+
+                <h5 class="mt-3">Courier Report</h5>
+                <div style="height: 645px; overflow: hidden; position: relative;">
+                    <iframe src="https://www.bdcommerce.app/tools/delivery-fraud-check/{{$order->phone}}" width="1200" height="800" scrolling="no" style="position: absolute; top: -110px; left: -580px; overflow: hidden;"></iframe>
+                </div>
             </div>
         </div>
     </div>
