@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoices</title>
+    <title>Stickers</title>
     <style>
         @page { size: 10cm 6.2cm; margin: 2px; }
         body { font-family: Arial, sans-serif; font-size: 10px; margin: 0; padding: 0; }
@@ -58,14 +58,22 @@
                     <td colspan="3"><strong>Subtotal</strong></td>
                     <td>{{ $order->data['subtotal'] }}</td>
                 </tr>
+                @if($advanced = $order->data['advanced'] ?? 0)
+                <tr>
+                    <td colspan="3"><strong>Advanced</strong></td>
+                    <td>{{ $advanced }}</td>
+                </tr>
+                @endif
                 <tr>
                     <td colspan="3"><strong>Delivery</strong></td>
                     <td>{{ $order->data['shipping_cost'] }}</td>
                 </tr>
+                @if($discount = $order->data['discount'] ?? 0)
                 <tr>
                     <td colspan="3"><strong>Discount</strong></td>
-                    <td>{{ $order->data['discount'] ?? 0 }}</td>
+                    <td>{{ $discount }}</td>
                 </tr>
+                @endif
                 <tr>
                     <td colspan="3"><strong>Total</strong></td>
                     <td><strong>{{ $order->condition }}</strong></td>
