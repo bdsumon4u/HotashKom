@@ -7,7 +7,8 @@
     <style>
         @page { size: 10cm 6.2cm; margin: 2px; }
         body { font-family: Arial, sans-serif; font-size: 10px; margin: 0; padding: 0; }
-        .header img { max-height: 40px; }
+        img[alt="Logo"] { max-height: 40px; }
+        img[alt="Barcode"] { max-height: 36px; }
         .title { font-size: 12px; font-weight: bold; }
         p, .products th, .products td { font-size: 10px; margin: 0; }
         .products th, .products td { border: 1px solid black; padding: 1px; text-align: center; }
@@ -27,6 +28,7 @@
                     </td>
                     <td align="right">
                         <img src="data:image/jpeg;base64, {{base64_encode(file_get_contents('https://barcode.tec-it.com/barcode.ashx?data='.$order->barcode.'&code=Code128'))}}" alt="Barcode">
+                        <p><small>{{ $order->created_at->format('M d, Y') }}</small></p>
                         <p><strong>{{ $order->name }}</strong></p>
                         <p>{{ $order->phone }}</p>
                         <p>{{ $order->address }}</p>
