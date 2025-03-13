@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,8 +15,9 @@ class CartController extends Controller
     public function index(Request $request)
     {
         if (! ($last = cache('last_cart_cleanup_at')) || $last->addHour()->isPast()) {
-            $carts = DB::table('shopping_cart')->where('updated_at', '>=', now()->subMinutes(75))->get()->keyBy('phone');
-            Order::query()->whereIn('phone', $carts->keys())->where('created_at', '>=', now()->subWeek())->get()->groupBy('phone')->each(function ($orders, $phone) use (&$carts): void {
+            $last ??= now();
+            $carts = DB::table('shopping_cart')->where('updated_at', '>=', $last)->get()->keyBy('phone');
+            Order::query()->whereIn('phone', $carts->keys())->where('created_at', '>=', (clone $last)->subWeek())->get()->groupBy('phone')->each(function ($orders, $phone) use (&$carts): void {
                 $productIDs = DB::table('products')
                     ->whereIn('id', $orders->flatMap(fn ($order) => array_keys((array) $order->products))->unique())
                     ->selectRaw('CASE WHEN parent_id IS NOT NULL THEN parent_id ELSE id END as selected_id')
