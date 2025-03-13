@@ -6,12 +6,13 @@
     <title>Stickers</title>
     <style>
         @page { size: 10cm 6.2cm; margin: 2px; }
-        body { font-family: Arial, sans-serif; font-size: 10px; margin: 0; padding: 0; }
+        body { font-size: 10px; margin: 0; padding: 0; }
         img[alt="Logo"] { max-height: 40px; }
         img[alt="Barcode"] { max-height: 36px; }
         .title { font-size: 12px; font-weight: bold; }
-        p, .products th, .products td { font-size: 10px; margin: 0; }
-        .products th, .products td { border: 1px solid black; padding: 1px; text-align: center; }
+        table { border-collapse: collapse; }
+        p, th, td { font-size: 10px; margin: 0; }
+        .products th, .products td, .summary th, .summary td { border: 1px solid black; padding: 1px; text-align: center; }
     </style>
 </head>
 <body>
@@ -48,12 +49,21 @@
             <tbody>
                 @foreach ($order->products as $product)
                 <tr>
-                    <td>{{ $product->name }}</td>
+                    <td>
+                        <div>
+                            <img style="height: 40px; width: 40px; float: left;" src="data:image/jpeg;base64, {{base64_encode(file_get_contents(asset($product->image)))}}" alt="Barcode">
+                            <div style="min-height: 40px;">{{ $product->name }}</div>
+                        </div>
+                    </td>
                     <td>{{ $product->quantity }}</td>
                     <td>{{ $product->price }}</td>
                     <td>{{ $product->quantity * $product->price }}</td>
                 </tr>
                 @endforeach
+            </tbody>
+        </table>
+        <table class="summary" width="50%;" style="float: right; margin-top: 2px;">
+            <tbody>
                 <tr>
                     <td colspan="3"><strong>Subtotal</strong></td>
                     <td>{{ $order->data['subtotal'] }}</td>
