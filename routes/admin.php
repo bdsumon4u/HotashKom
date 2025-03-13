@@ -63,6 +63,7 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::get('/reports/customer', [ReportController::class, 'customer'])->name('reports.customer');
         Route::get('/orders/pathao-csv', [OrderController::class, 'csv'])->name('orders.pathao-csv');
         Route::get('/orders/invoices', [OrderController::class, 'invoices'])->name('orders.invoices');
+        Route::get('/orders/stickers', [OrderController::class, 'stickers'])->name('orders.stickers');
         Route::get('/orders/booking', [OrderController::class, 'booking'])->name('orders.booking');
         Route::post('/orders/change-courier', [OrderController::class, 'courier'])->name('orders.courier');
         Route::post('/orders/change-status', [OrderController::class, 'status'])->name('orders.status');

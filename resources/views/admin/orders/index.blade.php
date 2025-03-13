@@ -93,6 +93,7 @@
                             @endunless
                             <div class="col-auto pl-0 ml-auto">
                                 @if(request('status') == 'CONFIRMED')
+                                <button onclick="printSticker()" id="sticker" class="ml-1 btn btn-sm btn-primary">Print Sticker</button>
                                 <button onclick="printInvoice()" id="invoice" class="ml-1 btn btn-sm btn-primary">Print Invoice</button>
                                 @elseif(request('status') == 'INVOICED')
                                 <button onclick="courier()" id="courier" class="ml-1 btn btn-sm btn-primary">Send to Courier</button>
@@ -407,6 +408,11 @@
 
         function printInvoice() {
             window.open('{{ route('admin.orders.invoices') }}?order_id=' + $('[name="order_id[]"]:checked').map(function () {
+                return $(this).val();
+            }).get().join(','), '_blank');
+        }
+        function printSticker() {
+            window.open('{{ route('admin.orders.stickers') }}?order_id=' + $('[name="order_id[]"]:checked').map(function () {
                 return $(this).val();
             }).get().join(','), '_blank');
         }

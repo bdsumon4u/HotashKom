@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Notifications\User\OrderConfirmed;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -164,6 +165,24 @@ class OrderController extends Controller
         $orders = Order::whereIn('id', $order_ids)->get();
 
         return view('admin.orders.invoices', compact('orders'));
+    }
+
+    public function stickers(Request $request)
+    {
+        $request->validate(['order_id' => 'required']);
+        $order_ids = explode(',', $request->order_id);
+        $order_ids = array_map('trim', $order_ids);
+        $order_ids = array_filter($order_ids);
+
+        $orders = Order::whereIn('id', $order_ids)->get();
+
+        // Load PDF view
+        $pdf = Pdf::loadView('admin.orders.stickers', compact('orders'));
+
+        // Set paper size to 10x6.2 cm
+        $pdf->setPaper([0, 0, 283.46, 175.748]); // Convert cm to points (1cm = 28.346 pts)
+
+        return $pdf->stream('sticker.pdf');
     }
 
     public function csv(Request $request)
