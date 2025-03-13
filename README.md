@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}249}$$ 🔥 domains are live now
+These 🔥 $${\color{red}252}$$ 🔥 domains are live now
 
-_Last updated: **2025-03-12 08:57:57 Asia/Dhaka**_
+_Last updated: **2025-03-13 08:59:44 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -348,3 +348,6 @@ _Last updated: **2025-03-12 08:57:57 Asia/Dhaka**_
 | 247 | [muajeshop.com](http://muajeshop.com) |
 | 248 | [fatemashopbd.com](http://fatemashopbd.com) |
 | 249 | [kidsneedsbd.net](http://kidsneedsbd.net) |
+| 250 | [praptyorganic.com](http://praptyorganic.com) |
+| 251 | [phindabd.com](http://phindabd.com) |
+| 252 | [wfashopbd.com](http://wfashopbd.com) |
