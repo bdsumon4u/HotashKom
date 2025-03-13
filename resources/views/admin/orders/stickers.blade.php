@@ -7,8 +7,7 @@
     <style>
         @page { size: 10cm 6.2cm; margin: 2px; }
         body { font-size: 10px; margin: 0; padding: 0; }
-        img[alt="Logo"] { max-height: 40px; }
-        img[alt="Barcode"] { max-height: 36px; }
+        .header img { max-height: 40px; }
         .title { font-size: 12px; font-weight: bold; }
         table { border-collapse: collapse; }
         p, th, td { font-size: 10px; margin: 0; }
@@ -50,8 +49,11 @@
                 @foreach ($order->products as $product)
                 <tr>
                     <td>
-                        <div>
-                            <img style="height: 40px; width: 40px; float: left;" src="data:image/jpeg;base64, {{base64_encode(file_get_contents(asset($product->image)))}}" alt="Barcode">
+                        @php
+                            $path = str($product->image)->after('storage/')->prepend('app/public/');
+                        @endphp
+                        <div style="clear: both;">
+                            <img style="height: 40px; width: 40px; float: left; margin: 0;" src="data:image/jpeg;base64, {{base64_encode(file_get_contents(storage_path($path)))}}" alt="Barcode">
                             <div style="min-height: 40px;">{{ $product->name }}</div>
                         </div>
                     </td>
