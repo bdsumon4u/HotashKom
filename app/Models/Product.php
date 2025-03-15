@@ -94,7 +94,7 @@ class Product extends Model
                 return $value ?? setting('delivery_charge')->inside_dhaka;
             }
 
-            return $value ?? $this->parent->shipping_inside ?? setting('delivery_charge')->inside_dhaka;
+            return $this->parent->shipping_inside;
         });
     }
 
@@ -109,7 +109,7 @@ class Product extends Model
                 return $value ?? setting('delivery_charge')->outside_dhaka;
             }
 
-            return $value ?? $this->parent->shipping_outside ?? setting('delivery_charge')->outside_dhaka;
+            return $this->parent->shipping_outside;
         });
     }
 
