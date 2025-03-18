@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}253}$$ 🔥 domains are live now
+These 🔥 $${\color{red}258}$$ 🔥 domains are live now
 
-_Last updated: **2025-03-17 09:02:05 Asia/Dhaka**_
+_Last updated: **2025-03-18 09:01:36 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -351,4 +351,9 @@ _Last updated: **2025-03-17 09:02:05 Asia/Dhaka**_
 | 250 | [praptyorganic.com](http://praptyorganic.com) |
 | 251 | [phindabd.com](http://phindabd.com) |
 | 252 | [wfashopbd.com](http://wfashopbd.com) |
-| 253 | [sunnahtexbd.com](http://sunnahtexbd.com) |
+| 253 | [gazipurbazarbd.com](http://gazipurbazarbd.com) |
+| 254 | [sunnahtexbd.com](http://sunnahtexbd.com) |
+| 255 | [tajbusinesspoint.com](http://tajbusinesspoint.com) |
+| 256 | [tukitaki24.com](http://tukitaki24.com) |
+| 257 | [radiantbazar.com](http://radiantbazar.com) |
+| 258 | [runakunja.com](http://runakunja.com) |
