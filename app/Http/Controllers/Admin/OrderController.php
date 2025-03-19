@@ -177,7 +177,12 @@ class OrderController extends Controller
         $orders = Order::whereIn('id', $order_ids)->get();
 
         // Load PDF view
-        $pdf = Pdf::loadView('admin.orders.stickers', compact('orders'));
+        $pdf = Pdf::loadView('admin.orders.stickers', compact('orders'))
+            ->setOption([
+                // 'fontDir' => public_path('/fonts'),
+                // 'fontCache' => public_path('/fonts'),
+                // 'defaultFont' => 'nikosh'
+            ]);
 
         // Set paper size to 10x6.2 cm
         $pdf->setPaper([0, 0, 283.46, 175.748]); // Convert cm to points (1cm = 28.346 pts)

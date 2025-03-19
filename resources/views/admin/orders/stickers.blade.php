@@ -5,13 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stickers</title>
     <style>
+        @font-face {
+            font-family: 'Nikosh';
+            font-weight: normal;
+            font-style: normal;
+            font-variant: normal;
+            src: url("fonts/Nikosh.ttf") format('truetype');
+        }
+
         @page { size: 10cm 6.2cm; margin: 2px; }
-        body { font-size: 10px; margin: 0; padding: 0; }
+        body { font-family: 'Nikosh', serif; font-size: 10px; margin: 0; padding: 0; }
         .header img { max-height: 40px; }
-        .title { font-size: 12px; font-weight: bold; }
+        .title { font-weight: bold; }
         table { border-collapse: collapse; }
-        p, th, td { font-size: 10px; margin: 0; }
-        .products th, .products td, .summary th, .summary td { border: 1px solid black; padding: 1px; text-align: center; }
+        p, th, td { margin: 0; margin-bottom: -1px; }
+        .products th, .products td, .summary th, .summary td { border: 0.5px solid black; padding: 0.5px 2px; text-align: center; }
     </style>
 </head>
 <body>
@@ -22,21 +30,31 @@
                 <tr>
                     <td align="left">
                         <img src="{{ public_path($logo->mobile) }}" alt="Logo">
+                    </td>
+                    <td align="center">
+                        <p><small>{{ $order->created_at->format('M d, Y') }}</small></p>
+                    </td>
+                    <td align="right">
+                        <img src="data:image/jpeg;base64, {{base64_encode(file_get_contents('https://barcode.tec-it.com/barcode.ashx?data='.$order->barcode.'&code=Code128'))}}" alt="Barcode">
+                    </td>
+                </tr>
+            </table>
+            <table width="100%">
+                <tr>
+                    <td align="left">
                         <p class="title">{{ $company->name }}</p>
                         <p>{{ $company->phone }}</p>
                         <p>{{ $company->address }}</p>
                     </td>
                     <td align="right">
-                        <img src="data:image/jpeg;base64, {{base64_encode(file_get_contents('https://barcode.tec-it.com/barcode.ashx?data='.$order->barcode.'&code=Code128'))}}" alt="Barcode">
-                        <p><small>{{ $order->created_at->format('M d, Y') }}</small></p>
-                        <p><strong>{{ $order->name }}</strong></p>
+                        <p>{{ $order->name }}</p>
                         <p>{{ $order->phone }}</p>
                         <p>{{ $order->address }}</p>
                     </td>
                 </tr>
             </table>
         </div>
-        <table class="products" width="100%">
+        <table class="products" width="100%" style="margin-top: 2px;">
             <thead>
                 <tr>
                     <th>Item</th>
