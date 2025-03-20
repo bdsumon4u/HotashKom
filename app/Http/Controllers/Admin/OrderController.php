@@ -357,7 +357,7 @@ class OrderController extends Controller
             // 'delivery_type' => 48, // 48 for normal delivery or 12 for on demand delivery
             // 'item_type' => 2, // 1 for document, 2 for parcel
             'instruction' => $order->note,
-            'is_closed_box' => true,
+            'is_closed_box' => false,
             'value' => 100,
             // 'item_quantity' => 1, // item quantity
             'parcel_weight' => $order->data['weight'] ?? 500, // parcel weight
