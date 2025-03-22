@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}257}$$ 🔥 domains are live now
+These 🔥 $${\color{red}262}$$ 🔥 domains are live now
 
-_Last updated: **2025-03-21 09:01:50 Asia/Dhaka**_
+_Last updated: **2025-03-22 08:58:50 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -356,3 +356,8 @@ _Last updated: **2025-03-21 09:01:50 Asia/Dhaka**_
 | 255 | [tukitaki24.com](http://tukitaki24.com) |
 | 256 | [radiantbazar.com](http://radiantbazar.com) |
 | 257 | [runakunja.com](http://runakunja.com) |
+| 258 | [orinshop.com](http://orinshop.com) |
+| 259 | [lifestyleshoppingbd.com](http://lifestyleshoppingbd.com) |
+| 260 | [quickvaly.com](http://quickvaly.com) |
+| 261 | [ahbemart.com](http://ahbemart.com) |
+| 262 | [smartshopovertop.com](http://smartshopovertop.com) |
