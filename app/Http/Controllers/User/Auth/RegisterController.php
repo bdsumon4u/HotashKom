@@ -8,6 +8,7 @@ use Hotash\LaravelMultiUi\Backend\RegistersUsers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -48,9 +49,15 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+        $phone = Str::replace(['-', ' '], '', $data['phone_number']);
+        if (Str::startsWith($phone, '01')) {
+            $phone = '+88' . $phone;
+        }
+        $data['phone_number'] = $phone;
+
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
             'phone_number' => ['required', 'string', 'regex:/^\+8801\d{9}$/', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -63,6 +70,12 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $phone = Str::replace(['-', ' '], '', $data['phone_number']);
+        if (Str::startsWith($phone, '01')) {
+            $phone = '+88' . $phone;
+        }
+        $data['phone_number'] = $phone;
+
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],

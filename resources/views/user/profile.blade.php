@@ -12,7 +12,7 @@
                     </div>
                     <div class="card-divider"></div>
                     <div class="card-body">
-                        <x-form method="POST" :action="route('user.profile.edit')">
+                        <x-form method="POST" :action="route('user.profile')">
                             @php($user = auth()->user())
                             <div class="row no-gutters">
                                 <div class="col-md-12">
@@ -46,7 +46,7 @@
                                         <x-error field="address" />
                                     </div>
                                 </div>
-                                <div class="form-group mb-0">
+                                <div class="mb-0 form-group">
                                     <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
                             </div>

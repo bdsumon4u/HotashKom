@@ -55,6 +55,11 @@ class ProductDetail extends Component
 
     public function addToCart($instance = 'default')
     {
+        if (! auth('user')->check()) {
+            $this->dispatch('notify', ['message' => 'Please login to add product to cart', 'type' => 'error']);
+            return redirect()->route('user.login')->with('danger', 'Please login to add product to cart');
+        }
+
         session(['kart' => $instance]);
         if ($instance == 'landing') {
             cart()->destroy();

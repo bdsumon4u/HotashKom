@@ -11,6 +11,11 @@ class ProductCard extends Component
 
     public function addToCart($instance = 'default')
     {
+        if (! auth('user')->check()) {
+            $this->dispatch('notify', ['message' => 'Please login to add product to cart', 'type' => 'error']);
+            return redirect()->route('user.login')->with('danger', 'Please login to add product to cart');
+        }
+
         session(['kart' => $instance]);
         $fraudQuantity = setting('fraud')->max_qty_per_product ?? 3;
 

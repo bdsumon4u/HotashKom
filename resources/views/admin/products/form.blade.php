@@ -90,6 +90,13 @@
                     <x-error field="selling_price" />
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="suggested_price">Suggested Retail Price</label>
+                    <x-input name="suggested_price" :value="$product->suggested_price" />
+                    <x-error field="suggested_price" />
+                </div>
+            </div>
         </div>
         <div class="shadow-sm card rounded-0">
             <div class="p-1 card-header">

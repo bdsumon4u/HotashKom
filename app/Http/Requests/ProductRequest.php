@@ -33,6 +33,7 @@ class ProductRequest extends FormRequest
             'brand' => 'nullable|integer',
             'price' => 'required|integer',
             'selling_price' => 'required|integer',
+            'suggested_price' => 'nullable',
             'wholesale.quantity' => 'sometimes|array',
             'wholesale.price' => 'sometimes|array',
             'wholesale.quantity.*' => 'required|integer|gt:1',

@@ -5,9 +5,12 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
-
                 <div class="card-body">
+                    @foreach($errors->all() as $error)
+                        <div class="alert alert-danger" role="alert">
+                            {{ $error }}
+                        </div>
+                    @endforeach
                     <form method="POST" action="{{ route('user.login') }}">
                         @csrf
 
@@ -51,7 +54,7 @@
                             </div>
                         </div>
 
-                        <div class="form-group row mb-0">
+                        <div class="mb-0 form-group row">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('Login') }}

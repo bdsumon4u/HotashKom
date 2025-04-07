@@ -90,6 +90,7 @@ class ProductVariationController extends Controller
         $validator = Validator::make($request->all(), [
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
+            'suggested_price' => 'nullable',
             'wholesale.quantity' => 'sometimes|array',
             'wholesale.price' => 'sometimes|array',
             'wholesale.quantity.*' => 'required|integer|gt:1',

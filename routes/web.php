@@ -31,7 +31,7 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
         Route::namespace('App\\Http\\Controllers\\User')->group(function (): void {
             // Admin Level Namespace & No Prefix
             MultiUi::routes([
-                'register' => false,
+                'register' => true,
                 'URLs' => [
                     'login' => 'login',
                     'register' => 'register',
@@ -46,6 +46,13 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
             //...
             //...
             Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
+
+            // Password reset routes
+            Route::post('password/resend-otp', 'Auth\ForgotPasswordController@resendOtp')->name('password.resend-otp');
+
+            // User profile and orders routes
+            Route::match(['get', 'post'], 'profile', 'ProfileController')->name('profile');
+            Route::get('orders', 'OrderController')->name('orders');
         });
 
     });
