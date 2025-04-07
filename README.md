@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}259}$$ 🔥 domains are live now
+These 🔥 $${\color{red}260}$$ 🔥 domains are live now
 
-_Last updated: **2025-04-06 09:06:51 Asia/Dhaka**_
+_Last updated: **2025-04-07 09:07:22 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -358,3 +358,4 @@ _Last updated: **2025-04-06 09:06:51 Asia/Dhaka**_
 | 257 | [quickvaly.com](http://quickvaly.com) |
 | 258 | [ahbemart.com](http://ahbemart.com) |
 | 259 | [smartshopovertop.com](http://smartshopovertop.com) |
+| 260 | [shoppingmela24.com](http://shoppingmela24.com) |
