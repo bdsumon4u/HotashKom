@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
@@ -34,6 +35,13 @@ class Checkout extends Component
     public $note = '';
 
     protected $listeners = ['updateField'];
+
+    public $retail = [];
+
+    public $retailDeliveryFee = 0;
+
+    #[Validate('required|numeric|min:0')]
+    public $advanced = 0;
 
     public function updateField($field, $value): void
     {
@@ -131,12 +139,17 @@ class Checkout extends Component
 
     public function updatedShipping(): void
     {
-        cart()->addCost('deliveryFee', $this->shippingCost());
+        $this->retailDeliveryFee = $this->shippingCost();
+        cart()->addCost('deliveryFee', $this->retailDeliveryFee);
     }
 
     public function cartUpdated(): void
     {
         $this->updatedShipping();
+        $this->retail = cart()->content()->mapWithKeys(fn ($item) => [$item->id => [
+            'price' => $item->options->retail_price,
+            'quantity' => $item->qty,
+        ]])->toArray();
         $this->dispatch('cartUpdated');
     }
 
@@ -174,6 +187,11 @@ class Checkout extends Component
 
     public function checkout()
     {
+        if (! auth('user')->check()) {
+            $this->dispatch('notify', ['message' => 'Please login to add product to cart', 'type' => 'error']);
+            return redirect()->route('user.login')->with('danger', 'Please login to add product to cart');
+        }
+
         if (! ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)) {
             if (Str::startsWith($this->phone, '01')) {
                 $this->phone = Str::after($this->phone, '0');
@@ -232,6 +250,7 @@ class Checkout extends Component
                         'slug' => $product->slug,
                         'image' => optional($product->base_image)->src,
                         'price' => $selling = $product->getPrice($quantity),
+                        'retail_price' => $this->retail[$id]['price'] ?? $selling,
                         'quantity' => $quantity,
                         'category' => $product->category,
                         'total' => $quantity * $selling,
@@ -269,6 +288,8 @@ class Checkout extends Component
                     'is_repeat' => $oldOrders->count() > 0,
                     'shipping_area' => $data['shipping'],
                     'shipping_cost' => $this->shippingCost(),
+                    'retail_delivery_fee' => $this->retailDeliveryFee,
+                    'advanced' => $this->advanced,
                     'subtotal' => cart()->subtotal(),
                 ],
             ];

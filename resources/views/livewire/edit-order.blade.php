@@ -228,6 +228,7 @@
                                     </td>
                                 </tr>
                             @endforeach
+                            @php($retail = 0)
                             @foreach ($selectedProducts as $product)
                                 <tr>
                                     <td>
@@ -238,12 +239,12 @@
                                         <a
                                             href="{{ route('products.show', $product['slug']) }}">{{ $product['name'] }}</a>
 
-                                        <div class="mt-2 d-flex flex-column flex-md-row">
-                                            <div class="mr-md-2 text-nowrap">
-                                                Unit Price: {{ $product['price'] }}
+                                        <div class="mt-2 d-flex flex-column">
+                                            <div class="text-nowrap">
+                                                Unit Price: {{ $product['price'] }} (buy); {{ $product['retail_price'] }} (sell)
                                             </div>
-                                            <div class="ml-md-2 text-nowrap">
-                                                Total Price: {{ $product['price'] * $product['quantity'] }}
+                                            <div class="text-nowrap">
+                                                Total Price: {{ $product['price'] * $product['quantity'] }} (buy); {{ $amount = $product['retail_price'] * $product['quantity'] }} (sell)
                                             </div>
                                         </div>
                                     </td>
@@ -265,6 +266,7 @@
                                         </div>
                                     </td>
                                 </tr>
+                            @php($retail += $amount)
                             @endforeach
                         </tbody>
                     </table>
@@ -287,21 +289,31 @@
                 <table class="table checkout__totals table-borderless">
                     <tbody class="checkout__totals-subtotals">
                         <tr>
-                            <th>Order Status</th>
+                            <th style="vertical-align: middle;">Order Status</th>
                             <td>
-                                <select wire:model="status" id="status" class="form-control">
+                                <select wire:model="status" id="status" class="form-control" {{ $order->status === 'RETURNED' ? 'disabled' : '' }}>
                                     @foreach (config('app.orders', []) as $stat)
-                                        <option value="{{ $stat }}">{{ $stat }}</option>
+                                        @if($order->status === 'COMPLETED')
+                                            <option value="{{ $stat }}" {{ $stat === 'RETURNED' ? '' : 'disabled' }}>{{ $stat }}</option>
+                                        @else
+                                            <option value="{{ $stat }}" {{ $stat === 'RETURNED' ? 'disabled' : '' }}>{{ $stat }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </td>
                         </tr>
                         <tr>
                             <th>Subtotal</th>
-                            <td class="checkout-subtotal">{!! theMoney($subtotal) !!}</td>
+                            <td class="checkout-subtotal">{!! theMoney($subtotal) !!} (buy); {!! theMoney($retail) !!} (sell)</td>
                         </tr>
                         <tr>
-                            <th>Delivery Charge</th>
+                            <th style="font-size: 12px; white-space: nowrap;">Reseller Delivery Charge</th>
+                            <td>
+                                {!! theMoney($order->data['retail_delivery_fee']) !!}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Our Delivery Charge</th>
                             <td class="shipping">
                                 <input class="shipping form-control" style="height: auto; padding: 2px 8px;"
                                     type="text" wire:model.live.debounce.350ms="shipping_cost"
@@ -311,14 +323,14 @@
                     </tbody>
                     <tfoot class="checkout__totals-footer">
                         <tr>
-                            <th>Advanced</th>
+                            <th>Reseller Advanced</th>
                             <td>
                                 <input style="height: auto; padding: 2px 8px;" type="text"
                                     wire:model.live.debounce.350ms="advanced" class="form-control">
                             </td>
                         </tr>
                         <tr>
-                            <th>Discount</th>
+                            <th>Our Discount</th>
                             <td>
                                 <input style="height: auto; padding: 2px 8px;" type="text"
                                     wire:model.live.debounce.350ms="discount" class="form-control">
@@ -326,7 +338,10 @@
                         </tr>
                         <tr>
                             <th>Grand Total</th>
-                            <th class="checkout-subtotal"><strong>{!! theMoney($subtotal + $shipping_cost - $advanced - $discount) !!}</strong></td>
+                            <td class="checkout-subtotal">
+                                <strong>{!! theMoney($subtotal + $shipping_cost - $discount) !!}</strong> (buy);
+                                <strong>{!! theMoney($retail + $order->data['retail_delivery_fee'] - $advanced) !!}</strong> (sell)
+                            </td>
                         </tr>
                         <tr>
                             <th>Note <small>(Optional)</small></th>
@@ -354,6 +369,33 @@
                 return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
             ?>
+            <div class="shadow-sm card rounded-0">
+                <div class="p-3 card-header">
+                    <h5 class="card-title">Reseller</h5>
+                </div>
+                <div class="p-3 card-body">
+                    <table class="table table-responsive table-borderless w-100">
+                        <tbody>
+                            <tr>
+                                <th class="py-1">Name</th>
+                                <td class="py-1">{{ $order->user->name }}</td>
+                            </tr>
+                            <tr>
+                                <th class="py-1">Phone</th>
+                                <td class="py-1">{{ $order->user->phone_number }}</td>
+                            </tr>
+                            <tr>
+                                <th class="py-1">Address</th>
+                                <td class="py-1">{{ $order->user->address }}</td>
+                            </tr>
+                            <tr>
+                                <th class="py-1">Balance</th>
+                                <td class="py-1">{{ $order->user->balance }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div class="shadow-sm card rounded-0">
                 <div class="p-3 card-header">
                     <h5 class="card-title">Activities</h5>

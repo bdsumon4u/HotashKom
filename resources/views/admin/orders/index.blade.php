@@ -46,7 +46,7 @@
                         </div>
                         <div class="row d-none" style="row-gap: .25rem;">
                             <div class="col-auto pr-0 d-flex align-items-center" check-count></div>
-                            @unless(false && in_array(request('status'), ['CONFIRMED', 'INVOICED']))
+                            @if(request('status') != 'RETURNED')
                             <div class="col-auto px-1">
                                 <select name="status" id="status" onchange="changeStatus()" class="text-white form-control form-control-sm bg-primary">
                                     <option value="">Change Status</option>
@@ -65,8 +65,10 @@
                                                 @php $show = in_array(request('status'), ['PENDING', 'WAITING']) @endphp
                                                 @break
                                         
-                                            @case('COMPLETED')
                                             @case('RETURNED')
+                                                @php $show = in_array(request('status'), ['COMPLETED']) @endphp
+                                                @break
+                                            @case('COMPLETED')
                                             @case('LOST')
                                                 @php $show = in_array(request('status'), ['SHIPPING']) @endphp
                                                 @break
@@ -74,14 +76,13 @@
                                             @default
                                                 
                                         @endswitch
-                                        @if($show || true)
+                                        @if($show)
                                         <option value="{{ $status }}">{{ $status }}</option>
                                         @endif
                                     @endforeach
                                 </select>
                             </div>
-                            @endunless
-                            @unless(request('status') == 'SHIPPING')
+                            @unless(request('status') == 'SHIPPING' || request('status') == 'COMPLETED')
                             <div class="col-auto px-1">
                                 <select name="courier" id="courier" onchange="changeCourier()" class="text-white form-control form-control-sm bg-primary">
                                     <option value="">Change Courier</option>
@@ -91,6 +92,7 @@
                                 </select>
                             </div>
                             @endunless
+                            @endif
                             <div class="col-auto pl-0 ml-auto">
                                 @if(request('status') == 'CONFIRMED')
                                 <button onclick="printSticker()" id="sticker" class="ml-1 btn btn-sm btn-primary">Print Sticker</button>

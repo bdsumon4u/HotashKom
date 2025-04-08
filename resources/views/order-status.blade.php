@@ -56,17 +56,21 @@
                                     <thead>
                                         <tr>
                                             <th>Product</th>
-                                            <th>Total</th>
+                                            <th>Buy</th>
+                                            <th>Sell</th>
                                         </tr>
                                     </thead>
                                     <tbody class="card-table__body card-table__body--merge-rows">
+                                        @php($retail = 0)
                                         @foreach ($order->products as $product)
                                             <tr>
                                                 <td><a
                                                         href="{{ route('products.show', $product->slug) }}">{{ $product->name }}</a>
                                                     × {{ $product->quantity }}</td>
                                                 <td>{!! theMoney($product->quantity * $product->price) !!}</td>
+                                                <td>{!! theMoney($amount = $product->quantity * $product->retail_price) !!}</td>
                                             </tr>
+                                        @php($retail += $amount)
                                         @endforeach
                                     </tbody>
                                     <tbody class="card-table__body card-table__body--merge-rows">
@@ -74,16 +78,33 @@
                                         <tr>
                                             <th>Subtotal</th>
                                             <td>{!! theMoney($data['subtotal']) !!}</td>
+                                            <td>{!! theMoney($retail) !!}</td>
                                         </tr>
+                                        @if ($data['advanced'])
+                                        <tr>
+                                            <th>Advanced</th>
+                                            <td>{!! theMoney(0) !!}</td>
+                                            <td>{!! theMoney($data['advanced']) !!}</td>
+                                            </tr>
+                                        @endif
+                                        @if ($data['discount'])
+                                            <tr>
+                                                <th>Discount</th>
+                                                <td>{!! theMoney($data['discount']) !!}</td>
+                                                <td>{!! theMoney(0) !!}</td>
+                                            </tr>
+                                        @endif
                                         <tr>
                                             <th>Delivery Charge</th>
                                             <td>{!! theMoney($data['shipping_cost']) !!}</td>
+                                            <td>{!! theMoney($data['retail_delivery_fee']) !!}</td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th>Total</th>
                                             <td>{!! theMoney($data['subtotal'] + $data['shipping_cost']) !!}</td>
+                                            <td>{!! theMoney($retail + $data['retail_delivery_fee']) !!}</td>
                                         </tr>
                                     </tfoot>
                                 </table>

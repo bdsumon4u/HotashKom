@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Attribute;
 use App\Models\Product;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class ProductDetail extends Component
@@ -17,6 +18,9 @@ class ProductDetail extends Component
     public int $maxQuantity = 0;
 
     public int $quantity = 1;
+
+    #[Validate('required|numeric|min:0')]
+    public int $retailPrice = 0;
 
     public bool $showBrandCategory = false;
 
@@ -75,6 +79,7 @@ class ProductDetail extends Component
                 'image' => optional($this->selectedVar->base_image)->path,
                 'category' => $this->product->category,
                 'max' => $this->maxQuantity,
+                'retail_price' => $this->retailPrice,
                 'shipping_inside' => $this->selectedVar->shipping_inside,
                 'shipping_outside' => $this->selectedVar->shipping_outside,
             ],
@@ -119,6 +124,7 @@ class ProductDetail extends Component
         }
         $this->options = $this->selectedVar->options->pluck('id', 'attribute_id')->toArray();
         $this->maxQuantity = $this->selectedVar->should_track ? min($this->selectedVar->stock_count, $maxPerProduct) : $maxPerProduct;
+        $this->retailPrice = (int)($this->selectedVar->selling_price * 1.25);
     }
 
     public function deliveryText($freeDelivery)
