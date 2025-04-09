@@ -28,6 +28,8 @@ return [
         'CANCELLED',
     ],
 
+    'round_robin_order_receiving' => env('ROUND_ROBIN_ORDER_RECEIVING', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

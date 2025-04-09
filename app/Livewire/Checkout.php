@@ -17,6 +17,8 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
+use function Illuminate\Support\defer;
+
 class Checkout extends Component
 {
     public ?Order $order = null;
@@ -78,13 +80,13 @@ class Checkout extends Component
             /*
             if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
             */
-                $shipping_cost = cart()->content()->max(function ($item) use ($area) {
-                    if ($area == 'Inside Dhaka') {
-                        return $item->options->shipping_inside;
-                    } else {
-                        return $item->options->shipping_outside;
-                    }
-                });
+            $shipping_cost = cart()->content()->max(function ($item) use ($area) {
+                if ($area == 'Inside Dhaka') {
+                    return $item->options->shipping_inside;
+                } else {
+                    return $item->options->shipping_outside;
+                }
+            });
             /*
             } else {
                 $shipping_cost = cart()->content()->sum(function ($item) use ($area) {
@@ -251,14 +253,25 @@ class Checkout extends Component
 
             $oldOrders = Order::select(['id', 'admin_id', 'status'])->where('phone', $data['phone'])->get();
             $adminIds = $oldOrders->pluck('admin_id')->unique()->toArray();
-            $adminQ = Admin::where('role_id', Admin::SALESMAN)->where('is_active', true)->inRandomOrder();
-            if (count($adminIds) > 0) {
-                $data['admin_id'] = $adminQ->whereIn('id', $adminIds)->first()->id ?? $adminQ->first()->id ?? Admin::where('is_active', true)->inRandomOrder()->first()->id;
+
+            if (config('app.round_robin_order_receiving')) {
+                $adminQ = Admin::orderByRaw('CASE WHEN is_active = 1 THEN 0 ELSE 1 END, role_id desc, last_order_received_at asc');
+                if (count($adminIds) > 0) {
+                    $admin = $adminQ->whereIn('id', $adminIds)->first() ?? $adminQ->first();
+                } else {
+                    $admin = $adminQ->first();
+                }
             } else {
-                $data['admin_id'] = $adminQ->first()->id ?? Admin::where('is_active', true)->inRandomOrder()->first()->id;
+                $adminQ = Admin::where('role_id', Admin::SALESMAN)->where('is_active', true)->inRandomOrder();
+                if (count($adminIds) > 0) {
+                    $admin = $adminQ->whereIn('id', $adminIds)->first() ?? $adminQ->first() ?? Admin::where('is_active', true)->inRandomOrder()->first();
+                } else {
+                    $admin = $adminQ->first() ?? Admin::where('is_active', true)->inRandomOrder()->first();
+                }
             }
 
             $data += [
+                'admin_id' => $admin->id,
                 'user_id' => $user->id, // If User Logged In
                 'status' => $status,
                 'status_at' => now()->toDateTimeString(),
@@ -277,6 +290,8 @@ class Checkout extends Component
 
             $order = Order::create($data);
             $user->notify(new OrderPlaced($order));
+
+            defer(fn () => $admin->update(['last_order_received_at' => now()]));
 
             GoogleTagManagerFacade::flash([
                 'event' => 'purchase',

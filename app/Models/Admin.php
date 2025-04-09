@@ -30,7 +30,7 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role_id', 'is_active',
+        'name', 'email', 'password', 'role_id', 'is_active', 'last_order_received_at',
     ];
 
     /**
