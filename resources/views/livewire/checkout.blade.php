@@ -107,10 +107,10 @@
                                 <th>Subtotal</th>
                                 <td class="checkout-subtotal">{!! theMoney(cart()->subTotal()) !!}</td>
                             </tr>
-                            @if ($shipping)
+                            @if ($shipping && ($fee = cart()->getCost('deliveryFee')))
                                 <tr>
                                     <th>Delivery Charge</th>
-                                    <td class="shipping">{!! ($fee = cart()->getCost('deliveryFee')) ? theMoney($fee) : 'FREE' !!}</td>
+                                    <td class="shipping">{!! theMoney($fee) !!}</td>
                                 </tr>
                             @endif
                         </tbody>
@@ -159,10 +159,10 @@
                                 <th>Subtotal</th>
                                 <td class="checkout-subtotal desktop">{!! theMoney(cart()->subTotal()) !!}</td>
                             </tr>
-                            @if ($shipping)
+                            @if ($shipping && ($fee = cart()->getCost('deliveryFee')))
                                 <tr>
                                     <th>Delivery Charge</th>
-                                    <td class="shipping">{!! ($fee = cart()->getCost('deliveryFee')) ? theMoney($fee) : 'FREE' !!}</td>
+                                    <td class="shipping">{!! theMoney($fee) !!}</td>
                                 </tr>
                             @endif
                         </tbody>
