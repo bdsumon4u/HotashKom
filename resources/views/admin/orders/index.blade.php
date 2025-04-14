@@ -140,7 +140,7 @@
     <script src="{{asset('assets/js/product-list-custom.js')}}"></script>
 @endpush
 
-@php($parameters = array_merge(request()->query(), auth()->user()->is('salesman') ? ['staff_id' => auth()->id()] : []))
+@php($parameters = array_merge(request()->query(), request('status') && auth()->user()->is('salesman') ? ['staff_id' => auth()->id()] : []))
 
 @push('scripts')
     <script>
