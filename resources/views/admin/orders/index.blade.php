@@ -140,6 +140,8 @@
     <script src="{{asset('assets/js/product-list-custom.js')}}"></script>
 @endpush
 
+@php($parameters = array_merge(request()->query(), auth()->user()->is('salesman') ? ['staff_id' => auth()->id()] : []))
+
 @push('scripts')
     <script>
         var checklist = new Set();
@@ -213,7 +215,7 @@
             ],
             processing: true,
             serverSide: true,
-            ajax: "{!! route('api.orders', request()->query()) !!}",
+            ajax: "{!! route('api.orders', $parameters) !!}",
             columns: [
                 @if($bulk)
                 { data: 'checkbox', name: 'checkbox', sortable: false, searchable: false},
