@@ -6,6 +6,7 @@ use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -88,6 +89,30 @@ class Order extends Model
                 $order->fill(['data' => ['area_name' => current(array_filter($order->pathaoAreaList(), fn ($a): bool => $a->zone_id == $order->data['area_id']))->zone_name ?? 'N/A']]);
             } elseif ($order->data['courier'] == 'Redx') {
                 $order->fill(['data' => ['area_name' => current(array_filter($order->redxAreaList(), fn ($a): bool => $a->id == $order->data['area_id']))->name ?? 'N/A']]);
+            }
+        });
+
+        static::updated(function (Order $order) {
+            $status = Arr::get($order->getChanges(), 'status');
+            if (! in_array($status, ['COMPLETED', 'RETURNED'])) {
+                return;
+            }
+            $retail = collect($order->products)->sum(function ($product) {
+                return $product->retail_price * $product->quantity;
+            });
+            $amount = $retail + $order->data['retail_delivery_fee'] - $order->data['advanced']
+                - $order->data['subtotal'] + $order->data['discount'];
+            
+            if ($status == 'COMPLETED') {
+                $order->user->deposit($amount-$order->data['shipping_cost'], [
+                    'reason' => 'Order #'.$order->id.' is '.$status,
+                    'order_id' => $order->id,
+                ]);
+            } else if ($status == 'RETURNED') {
+                $order->user->forceWithdraw($amount, [
+                    'reason' => 'Order #'.$order->id.' is '.$status,
+                    'order_id' => $order->id,
+                ]);
             }
         });
     }

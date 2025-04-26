@@ -19,10 +19,12 @@ class ProfileController extends Controller
         }
 
         $data = $request->validate([
-            'name' => 'required',
-            'email' => 'nullable',
-            'phone_number' => 'required',
-            'address' => 'nullable',
+            'name' => 'required|string|max:255',
+            'shop_name' => 'string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone_number' => 'required|string|max:255',
+            'bkash_number' => 'string|max:255',
+            'address' => 'nullable|string|max:255',
         ]);
 
         auth('user')->user()->update($data);

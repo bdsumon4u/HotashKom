@@ -51,8 +51,12 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
             Route::post('password/resend-otp', 'Auth\ForgotPasswordController@resendOtp')->name('password.resend-otp');
 
             // User profile and orders routes
-            Route::match(['get', 'post'], 'profile', 'ProfileController')->name('profile');
-            Route::get('orders', 'OrderController')->name('orders');
+            Route::middleware('auth:user')->group(function () {
+                Route::match(['get', 'post'], 'profile', 'ProfileController')->name('profile');
+                Route::get('orders', 'OrderController')->name('orders');
+            });
+
+            Route::get('transactions', 'TransactionController@index')->name('transactions');
         });
 
     });

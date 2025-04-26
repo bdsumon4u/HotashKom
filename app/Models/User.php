@@ -8,6 +8,7 @@ use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Arr;
 
 class User extends Authenticatable implements Wallet
 {
@@ -20,7 +21,7 @@ class User extends Authenticatable implements Wallet
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'phone_number', 'address', 'password',
+        'name', 'shop_name', 'email', 'phone_number', 'bkash_number', 'address', 'password', 'is_verified',
     ];
 
     /**
@@ -31,6 +32,17 @@ class User extends Authenticatable implements Wallet
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public static function booted(): void
+    {
+        static::updated(function (User $user) {
+            if (Arr::get($user->getChanges(), 'is_verified')) {
+                $user->deposit(0, [
+                    'reason' => 'Verify Reseller Account',
+                ]);
+            }
+        });
+    }
 
     /**
      * Send the email verification notification.

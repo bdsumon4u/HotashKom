@@ -22,6 +22,8 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\CartController;
+use App\Http\Controllers\Admin\ResellerController;
+use App\Http\Controllers\Admin\TransactionController;
 use Hotash\LaravelMultiUi\Facades\MultiUi;
 use Illuminate\Support\Facades\Route;
 
@@ -71,6 +73,13 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::patch('/orders/{order}/update-quantity', [OrderController::class, 'updateQuantity'])->name('orders.update-quantity');
         Route::post('/logout-others/{admin}', [ApiController::class, 'logoutOthers'])->name('logout-others');
         Route::get('/customers', CustomerController::class)->name('customers');
+
+        Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
+        Route::get('resellers/{id}/edit', [ResellerController::class, 'edit'])->name('resellers.edit');
+        Route::put('resellers/{id}', [ResellerController::class, 'update'])->name('resellers.update');
+        Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
+        Route::post('transactions/{id}/withdraw', [TransactionController::class, 'withdraw'])->name('transactions.withdraw');
         Route::resources([
             'staffs' => StaffController::class,
             'slides' => SlideController::class,

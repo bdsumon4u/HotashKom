@@ -192,6 +192,14 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.resellers.index' ? 'active' : '' }}"
+                            href="{{ route('admin.resellers.index') }}">
+                            <i data-feather="users"> </i>
+                            <span>Resellers</span>
+                        </a>
+                    </li>
+
                     <li class="sidebar-title">
                         <h6>Settings</h6>
                     </li>

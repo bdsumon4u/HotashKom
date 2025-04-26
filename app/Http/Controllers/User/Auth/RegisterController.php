@@ -49,16 +49,14 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        $phone = Str::replace(['-', ' '], '', $data['phone_number']);
-        if (Str::startsWith($phone, '01')) {
-            $phone = '+88' . $phone;
-        }
-        $data['phone_number'] = $phone;
+        $this->prefixCountryCode($data);
 
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
+            'shop_name' => ['required', 'string', 'max:255'],
+            // 'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
             'phone_number' => ['required', 'string', 'regex:/^\+8801\d{9}$/', 'unique:users'],
+            'bkash_number' => ['required', 'string', 'regex:/^\+8801\d{9}$/', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
@@ -70,15 +68,13 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $phone = Str::replace(['-', ' '], '', $data['phone_number']);
-        if (Str::startsWith($phone, '01')) {
-            $phone = '+88' . $phone;
-        }
-        $data['phone_number'] = $phone;
+        $this->prefixCountryCode($data);
+
+        dd($data);
 
         return User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
+            // 'email' => $data['email'],
             'phone_number' => $data['phone_number'],
             'password' => Hash::make($data['password']),
         ]);
@@ -102,5 +98,16 @@ class RegisterController extends Controller
     protected function guard()
     {
         return Auth::guard('user');
+    }
+
+    private function prefixCountryCode(array &$data)
+    {
+        foreach (['phone', 'bkash'] as $type) {
+            $number = Str::replace(['-', ' '], '', $data[$type.'_number']);
+            if (Str::startsWith($number, '01')) {
+                $number = '+88' . $number;
+            }
+            $data[$type.'_number'] = $number;
+        }
     }
 }

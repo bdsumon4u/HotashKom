@@ -47,4 +47,7 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
     Route::post('pathao-webhook', [ApiController::class, 'pathaoWebhook']);
     Route::post('checkout', LivewireCheckoutController::class);
     Route::get('orders/{order}', [ApiController::class, 'order']);
+    Route::get('resellers', App\Http\Controllers\Api\ResellerController::class)->name('resellers');
+    Route::put('resellers/{id}', [App\Http\Controllers\Api\ResellerController::class, 'update'])->name('resellers.update');
+    Route::post('resellers/{id}/toggle-verify', [App\Http\Controllers\Api\ResellerController::class, 'toggleVerify'])->name('resellers.toggle-verify');
 });

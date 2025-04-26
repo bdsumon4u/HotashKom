@@ -1,0 +1,134 @@
+@extends('layouts.light.master')
+@section('title', 'Edit Reseller')
+
+@section('breadcrumb-title')
+    <h3>Edit Reseller</h3>
+@endsection
+
+@section('breadcrumb-items')
+    <li class="breadcrumb-item">Resellers</li>
+    <li class="breadcrumb-item active">Edit</li>
+@endsection
+
+@section('content')
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="p-3 card-header">
+                        <h5>Edit Reseller Information</h5>
+                    </div>
+                    <div class="p-3 card-body">
+                        <form id="editResellerForm" method="POST"
+                            action="{{ route('admin.resellers.update', $reseller->id) }}">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                            id="name" name="name" value="{{ old('name', $reseller->name) }}" required>
+                                        @error('name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="shop_name">Shop Name</label>
+                                        <input type="text" class="form-control @error('shop_name') is-invalid @enderror"
+                                            id="shop_name" name="shop_name" value="{{ old('shop_name', $reseller->shop_name) }}"
+                                            required>
+                                        @error('shop_name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="phone_number">Phone Number</label>
+                                        <input type="text" class="form-control @error('phone_number') is-invalid @enderror"
+                                            id="phone_number" name="phone_number"
+                                            value="{{ old('phone_number', $reseller->phone_number) }}" required>
+                                        @error('phone_number')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="bkash_number">bKash Number</label>
+                                        <input type="text" class="form-control @error('bkash_number') is-invalid @enderror"
+                                            id="bkash_number" name="bkash_number"
+                                            value="{{ old('bkash_number', $reseller->bkash_number) }}" required>
+                                        @error('bkash_number')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="is_verified" name="is_verified"
+                                                value="1" {{ $reseller->is_verified ? 'checked' : '' }}>
+                                            <label class="custom-control-label" for="is_verified">Verified</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Update Reseller</button>
+                                <a href="{{ route('admin.resellers.index') }}" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#editResellerForm').on('submit', function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'PUT',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $.notify('Reseller updated successfully', 'success');
+                        setTimeout(function() {
+                            window.location.href =
+                                '{{ route('admin.resellers.index') }}';
+                        }, 1000);
+                    },
+                    error: function(xhr) {
+                        var errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            Object.keys(errors).forEach(function(key) {
+                                var input = $('#' + key);
+                                input.addClass('is-invalid');
+                                input.next('.invalid-feedback').text(errors[key][0]);
+                            });
+                        }
+                        $.notify('Error updating reseller', 'error');
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

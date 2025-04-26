@@ -35,6 +35,7 @@
                 <ul class="account-menu__links">
                     <li><a href="{{ route('user.profile') }}">Edit Profile</a></li>
                     <li><a href="{{ route('user.orders') }}">Order History</a></li>
+                    <li><a href="{{ route('user.transactions') }}">Transactions</a></li>
                 </ul>
                 <div class="account-menu__divider"></div>
                 <ul class="account-menu__links">
