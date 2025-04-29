@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}270}$$ 🔥 domains are live now
+These 🔥 $${\color{red}269}$$ 🔥 domains are live now
 
-_Last updated: **2025-04-28 09:13:08 Asia/Dhaka**_
+_Last updated: **2025-04-29 09:09:19 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -339,33 +339,32 @@ _Last updated: **2025-04-28 09:13:08 Asia/Dhaka**_
 | 238 | [fashionbaribd.com](http://fashionbaribd.com) |
 | 239 | [muajeshop.com](http://muajeshop.com) |
 | 240 | [fatemashopbd.com](http://fatemashopbd.com) |
-| 241 | [kidsneedsbd.net](http://kidsneedsbd.net) |
-| 242 | [praptyorganic.com](http://praptyorganic.com) |
-| 243 | [phindabd.com](http://phindabd.com) |
-| 244 | [wfashopbd.com](http://wfashopbd.com) |
-| 245 | [gazipurbazarbd.com](http://gazipurbazarbd.com) |
-| 246 | [sunnahtexbd.com](http://sunnahtexbd.com) |
-| 247 | [tajbusinesspoint.com](http://tajbusinesspoint.com) |
-| 248 | [tukitaki24.com](http://tukitaki24.com) |
-| 249 | [radiantbazar.com](http://radiantbazar.com) |
-| 250 | [runakunja.com](http://runakunja.com) |
-| 251 | [orinshop.com](http://orinshop.com) |
-| 252 | [lifestyleshoppingbd.com](http://lifestyleshoppingbd.com) |
-| 253 | [quickvaly.com](http://quickvaly.com) |
-| 254 | [ahbemart.com](http://ahbemart.com) |
-| 255 | [smartshopovertop.com](http://smartshopovertop.com) |
-| 256 | [shoppingmela24.com](http://shoppingmela24.com) |
-| 257 | [almustaqimenterprise.com](http://almustaqimenterprise.com) |
-| 258 | [welcomezonebd.com](http://welcomezonebd.com) |
-| 259 | [fairmartzone.com](http://fairmartzone.com) |
-| 260 | [astha-24.com](http://astha-24.com) |
-| 261 | [hatbajar24.com](http://hatbajar24.com) |
-| 262 | [bismillahonline.com](http://bismillahonline.com) |
-| 263 | [shebaemart.com](http://shebaemart.com) |
-| 264 | [shawonmart.com](http://shawonmart.com) |
-| 265 | [dailyponno24.com](http://dailyponno24.com) |
-| 266 | [tahaminasmart.com](http://tahaminasmart.com) |
-| 267 | [adhunikmartbd.com](http://adhunikmartbd.com) |
-| 268 | [sawadmart.com](http://sawadmart.com) |
-| 269 | [bagantheke.com](http://bagantheke.com) |
-| 270 | [smartponno.com](http://smartponno.com) |
+| 241 | [praptyorganic.com](http://praptyorganic.com) |
+| 242 | [phindabd.com](http://phindabd.com) |
+| 243 | [wfashopbd.com](http://wfashopbd.com) |
+| 244 | [gazipurbazarbd.com](http://gazipurbazarbd.com) |
+| 245 | [sunnahtexbd.com](http://sunnahtexbd.com) |
+| 246 | [tajbusinesspoint.com](http://tajbusinesspoint.com) |
+| 247 | [tukitaki24.com](http://tukitaki24.com) |
+| 248 | [radiantbazar.com](http://radiantbazar.com) |
+| 249 | [runakunja.com](http://runakunja.com) |
+| 250 | [orinshop.com](http://orinshop.com) |
+| 251 | [lifestyleshoppingbd.com](http://lifestyleshoppingbd.com) |
+| 252 | [quickvaly.com](http://quickvaly.com) |
+| 253 | [ahbemart.com](http://ahbemart.com) |
+| 254 | [smartshopovertop.com](http://smartshopovertop.com) |
+| 255 | [shoppingmela24.com](http://shoppingmela24.com) |
+| 256 | [almustaqimenterprise.com](http://almustaqimenterprise.com) |
+| 257 | [welcomezonebd.com](http://welcomezonebd.com) |
+| 258 | [fairmartzone.com](http://fairmartzone.com) |
+| 259 | [astha-24.com](http://astha-24.com) |
+| 260 | [hatbajar24.com](http://hatbajar24.com) |
+| 261 | [bismillahonline.com](http://bismillahonline.com) |
+| 262 | [shebaemart.com](http://shebaemart.com) |
+| 263 | [shawonmart.com](http://shawonmart.com) |
+| 264 | [dailyponno24.com](http://dailyponno24.com) |
+| 265 | [tahaminasmart.com](http://tahaminasmart.com) |
+| 266 | [adhunikmartbd.com](http://adhunikmartbd.com) |
+| 267 | [sawadmart.com](http://sawadmart.com) |
+| 268 | [bagantheke.com](http://bagantheke.com) |
+| 269 | [smartponno.com](http://smartponno.com) |
