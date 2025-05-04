@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}270}$$ 🔥 domains are live now
+These 🔥 $${\color{red}273}$$ 🔥 domains are live now
 
-_Last updated: **2025-05-03 09:07:40 Asia/Dhaka**_
+_Last updated: **2025-05-04 09:18:56 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -369,3 +369,6 @@ _Last updated: **2025-05-03 09:07:40 Asia/Dhaka**_
 | 268 | [sawadmart.com](http://sawadmart.com) |
 | 269 | [bagantheke.com](http://bagantheke.com) |
 | 270 | [smartponno.com](http://smartponno.com) |
+| 271 | [bestbdbuy.com](http://bestbdbuy.com) |
+| 272 | [purebazaarbd.com](http://purebazaarbd.com) |
+| 273 | [fiazhat.com](http://fiazhat.com) |
