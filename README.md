@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}273}$$ 🔥 domains are live now
+These 🔥 $${\color{red}277}$$ 🔥 domains are live now
 
-_Last updated: **2025-05-04 09:18:56 Asia/Dhaka**_
+_Last updated: **2025-05-05 09:15:31 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -372,3 +372,7 @@ _Last updated: **2025-05-04 09:18:56 Asia/Dhaka**_
 | 271 | [bestbdbuy.com](http://bestbdbuy.com) |
 | 272 | [purebazaarbd.com](http://purebazaarbd.com) |
 | 273 | [fiazhat.com](http://fiazhat.com) |
+| 274 | [khanemart.com](http://khanemart.com) |
+| 275 | [zareefshop24.com](http://zareefshop24.com) |
+| 276 | [easyvaly.com](http://easyvaly.com) |
+| 277 | [mimiemart.com](http://mimiemart.com) |
