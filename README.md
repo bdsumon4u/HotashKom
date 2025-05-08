@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}278}$$ 🔥 domains are live now
+These 🔥 $${\color{red}284}$$ 🔥 domains are live now
 
-_Last updated: **2025-05-07 09:13:06 Asia/Dhaka**_
+_Last updated: **2025-05-08 09:14:16 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -377,3 +377,9 @@ _Last updated: **2025-05-07 09:13:06 Asia/Dhaka**_
 | 276 | [easyvaly.com](http://easyvaly.com) |
 | 277 | [mimiemart.com](http://mimiemart.com) |
 | 278 | [eshambdshop.com](http://eshambdshop.com) |
+| 279 | [needvaly.com](http://needvaly.com) |
+| 280 | [marketvaly.com](http://marketvaly.com) |
+| 281 | [shantoshop.com](http://shantoshop.com) |
+| 282 | [minibazarbd.com](http://minibazarbd.com) |
+| 283 | [rafidenterprise.com](http://rafidenterprise.com) |
+| 284 | [hellomedicine24.com](http://hellomedicine24.com) |
