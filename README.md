@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}284}$$ 🔥 domains are live now
+These 🔥 $${\color{red}290}$$ 🔥 domains are live now
 
-_Last updated: **2025-05-11 09:17:00 Asia/Dhaka**_
+_Last updated: **2025-05-12 09:16:49 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -383,3 +383,9 @@ _Last updated: **2025-05-11 09:17:00 Asia/Dhaka**_
 | 282 | [minibazarbd.com](http://minibazarbd.com) |
 | 283 | [rafidenterprise.com](http://rafidenterprise.com) |
 | 284 | [hellomedicine24.com](http://hellomedicine24.com) |
+| 285 | [tmshopworld.com](http://tmshopworld.com) |
+| 286 | [jrshop24.com](http://jrshop24.com) |
+| 287 | [dailyvaly.com](http://dailyvaly.com) |
+| 288 | [unityebazar.com](http://unityebazar.com) |
+| 289 | [topvaly.com](http://topvaly.com) |
+| 290 | [gmgallerybd.com](http://gmgallerybd.com) |
