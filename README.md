@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}290}$$ 🔥 domains are live now
+These 🔥 $${\color{red}294}$$ 🔥 domains are live now
 
-_Last updated: **2025-05-12 09:16:49 Asia/Dhaka**_
+_Last updated: **2025-05-13 09:15:02 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -389,3 +389,7 @@ _Last updated: **2025-05-12 09:16:49 Asia/Dhaka**_
 | 288 | [unityebazar.com](http://unityebazar.com) |
 | 289 | [topvaly.com](http://topvaly.com) |
 | 290 | [gmgallerybd.com](http://gmgallerybd.com) |
+| 291 | [amraisera.com](http://amraisera.com) |
+| 292 | [deshrupayanbd.com](http://deshrupayanbd.com) |
+| 293 | [storevaly.com](http://storevaly.com) |
+| 294 | [barkoli.com](http://barkoli.com) |
