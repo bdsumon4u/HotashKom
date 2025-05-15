@@ -252,15 +252,22 @@ class ApiController extends Controller
         })->count();
     }
 
-    public function pathaoWebhook(Request $request): void
+    public function pathaoWebhook(Request $request)
     {
+        if ($request->event == 'webhook_integration') {
+            return response()->json(['message' => 'Webhook processed'], 202)
+                ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
+        }
+
         $Pathao = setting('Pathao');
         if ($request->header('X-PATHAO-Signature') != $Pathao->store_id) {
-            return;
+            return response()->json(['message' => 'Webhook processed'], 202)
+                ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
         }
 
         if (! $order = Order::find($request->merchant_order_id)/*->orWhere('data->consignment_id', $request->consignment_id)->first()*/) {
-            return;
+            return response()->json(['message' => 'Webhook processed'], 202)
+                ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
         }
 
         // $courier = $request->only([
@@ -298,5 +305,8 @@ class ApiController extends Controller
         }
 
         $order->save();
+
+        return response()->json(['message' => 'Webhook processed'], 202)
+            ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
     }
 }
