@@ -74,7 +74,7 @@ class EditOrder extends Component
     {
         $report = cache()->remember(
             'courier:'.($this->order->phone ?? ''),
-            now()->addHour(),
+            now()->addHours(4),
             function () {
                 try {
                     return Http::retry(3, 100)
