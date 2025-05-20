@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}278}$$ 🔥 domains are live now
+These 🔥 $${\color{red}284}$$ 🔥 domains are live now
 
-_Last updated: **2025-05-19 09:20:44 Asia/Dhaka**_
+_Last updated: **2025-05-20 09:15:17 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -377,3 +377,9 @@ _Last updated: **2025-05-19 09:20:44 Asia/Dhaka**_
 | 276 | [uniquestall.com](http://uniquestall.com) |
 | 277 | [srsngallery.com](http://srsngallery.com) |
 | 278 | [barkolibd.com](http://barkolibd.com) |
+| 279 | [nittobazarbd.com](http://nittobazarbd.com) |
+| 280 | [nayeembd.com](http://nayeembd.com) |
+| 281 | [shadeenshop.com](http://shadeenshop.com) |
+| 282 | [zsbazar.com](http://zsbazar.com) |
+| 283 | [ssbdgallery.com](http://ssbdgallery.com) |
+| 284 | [faizulshop.com](http://faizulshop.com) |
