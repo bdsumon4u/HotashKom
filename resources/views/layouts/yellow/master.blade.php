@@ -252,7 +252,7 @@
             // $(document).on('change', '.option-picker', function (ev) {
             //     var options = [];
             //     $(document).find('.option-picker:checked').each((_, item) => options.push(item.value));
-                
+
             //     $.get({
             //         url: '',
             //         data: {options},
@@ -340,8 +340,60 @@
             $(".widget-connect__button-activator-icon").click(function () {
                 $(this).toggleClass("active");
                 $(".widget-connect").toggleClass("active");
-                $("a.widget-connect__button").toggleClass("button-slide-out button-slide");        
+                $("a.widget-connect__button").toggleClass("button-slide-out button-slide");
             });
+        });
+    </script>
+    <!-- Scripts -->
+    <script>
+        // Handle Facebook events
+        document.addEventListener('facebookEvent', function(event) {
+            // early return condition
+            if (event.detail.length === 0) {
+                return;
+            }
+
+            const { eventName, customData, eventId } = event.detail[0];
+
+            // Track event with fbq
+            fbq('track', eventName, customData, eventId);
+
+            // Log for debugging
+            console.log('Facebook Event Tracked:', {
+                eventName,
+                customData,
+                eventId
+            });
+        });
+
+        // Handle meta tags
+        document.addEventListener('addMetaTags', function(event) {
+            const { 'user-email': email, 'user-phone': phone, 'client-ip': ip } = event.detail;
+
+            // Remove existing meta tags
+            document.querySelectorAll('meta[name^="user-"], meta[name="client-ip"]').forEach(tag => tag.remove());
+
+            // Add new meta tags
+            if (email) {
+                const meta = document.createElement('meta');
+                meta.name = 'user-email';
+                meta.content = email;
+                document.head.appendChild(meta);
+            }
+
+            if (phone) {
+                const meta = document.createElement('meta');
+                meta.name = 'user-phone';
+                meta.content = phone;
+                document.head.appendChild(meta);
+            }
+
+            if (ip) {
+                const meta = document.createElement('meta');
+                meta.name = 'client-ip';
+                meta.content = ip;
+                document.head.appendChild(meta);
+            }
         });
     </script>
 </body>

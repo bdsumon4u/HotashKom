@@ -90,7 +90,7 @@ class ProductDetail extends Component
             'id' => $this->selectedVar->id,
             'name' => $this->selectedVar->var_name,
             'price' => $this->selectedVar->getPrice($quantity),
-        ]);
+        ], $this);
 
         $this->dispatch('cartUpdated');
         $this->dispatch('notify', ['message' => 'Product added to cart']);

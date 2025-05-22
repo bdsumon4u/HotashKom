@@ -305,7 +305,7 @@ class Checkout extends Component
             $this->facebookService->trackPurchase([
                 'id' => $order->id,
                 'total' => $order->data['subtotal']
-            ], $products);
+            ], $products, $this);
 
             GoogleTagManagerFacade::flash([
                 'event' => 'purchase',

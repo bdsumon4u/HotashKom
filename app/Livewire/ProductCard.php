@@ -44,7 +44,7 @@ class ProductCard extends Component
             'id' => $this->product->id,
             'name' => $this->product->name,
             'price' => $this->product->selling_price,
-        ]);
+        ], $this);
 
         $this->dispatch('cartUpdated');
         $this->dispatch('notify', ['message' => 'Product added to cart']);

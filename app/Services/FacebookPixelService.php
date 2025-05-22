@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Combindma\FacebookPixel\Facades\MetaPixel;
 use Illuminate\Support\Facades\Log;
+use Livewire\Component;
 
 class FacebookPixelService
 {
@@ -33,18 +34,26 @@ class FacebookPixelService
      * @param string $eventName
      * @param array $customData
      * @param array $userData
+     * @param Component|null $component
      * @return void
      */
-    public function trackEvent(string $eventName, array $customData = [], array $userData = [])
+    public function trackEvent(string $eventName, array $customData = [], array $userData = [], ?Component $component = null)
     {
         try {
             // Generate event ID
             $eventId = $this->generateEventId($eventName, $userData, $customData);
 
-            // Track event with event ID
-            MetaPixel::track($eventName, array_merge($customData, [
-                'event_id' => $eventId
-            ]));
+            // Track server-side
+            MetaPixel::track($eventName, $customData, $eventId);
+
+            // If component is provided, dispatch event to browser
+            if ($component) {
+                $component->dispatch('facebookEvent', [
+                    'eventName' => $eventName,
+                    'customData' => $customData,
+                    'eventId' => $eventId
+                ]);
+            }
 
             // Log for debugging
             Log::info('Facebook Event Tracked', [
@@ -62,16 +71,17 @@ class FacebookPixelService
      * Track AddToCart event
      *
      * @param array $product
+     * @param Component|null $component
      * @return void
      */
-    public function trackAddToCart(array $product)
+    public function trackAddToCart(array $product, ?Component $component = null)
     {
         $this->trackEvent('AddToCart', [
             'currency' => 'BDT',
             'value' => $product['price'],
             'content_ids' => [$product['id']],
             'content_name' => $product['name']
-        ]);
+        ], [], $component);
     }
 
     /**
@@ -79,9 +89,10 @@ class FacebookPixelService
      *
      * @param array $order
      * @param array $products
+     * @param Component|null $component
      * @return void
      */
-    public function trackPurchase(array $order, array $products)
+    public function trackPurchase(array $order, array $products, ?Component $component = null)
     {
         $this->trackEvent('Purchase', [
             'currency' => 'BDT',
@@ -89,6 +100,6 @@ class FacebookPixelService
             'content_ids' => array_column($products, 'id'),
             'content_name' => 'Purchase',
             'transaction_id' => $order['id']
-        ]);
+        ], [], $component);
     }
 }
