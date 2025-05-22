@@ -3,11 +3,18 @@
 namespace App\Livewire;
 
 use App\Models\Product;
+use App\Services\FacebookConversionService;
 use Livewire\Component;
 
 class ProductCard extends Component
 {
     public Product $product;
+    protected $facebookService;
+
+    public function boot(FacebookConversionService $facebookService)
+    {
+        $this->facebookService = $facebookService;
+    }
 
     public function addToCart($instance = 'default')
     {
@@ -31,6 +38,19 @@ class ProductCard extends Component
         );
 
         storeOrUpdateCart();
+
+        // Track AddToCart event with Facebook Conversion API
+        if ($this->facebookService && $this->facebookService->isEnabled()) {
+            $this->facebookService->trackEvent('AddToCart', [
+                'client_ip_address' => request()->ip(),
+                'client_user_agent' => request()->userAgent(),
+            ], [
+                'currency' => 'BDT',
+                'value' => $this->product->selling_price,
+                'content_ids' => [$this->product->id],
+                'content_name' => $this->product->name,
+            ]);
+        }
 
         $this->dispatch('dataLayer', [
             'event' => 'add_to_cart',

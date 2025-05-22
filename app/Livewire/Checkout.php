@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\AccountCreated;
 use App\Notifications\User\OrderPlaced;
+use App\Services\FacebookConversionService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
@@ -36,6 +37,13 @@ class Checkout extends Component
     public $note = '';
 
     protected $listeners = ['updateField'];
+
+    protected $facebookService;
+
+    public function boot(FacebookConversionService $facebookService)
+    {
+        $this->facebookService = $facebookService;
+    }
 
     public function updateField($field, $value): void
     {
@@ -292,6 +300,19 @@ class Checkout extends Component
             $user->notify(new OrderPlaced($order));
 
             defer(fn () => $admin->update(['last_order_received_at' => now()]));
+
+            // Track Purchase event with Facebook Conversion API
+            if ($this->facebookService && $this->facebookService->isEnabled()) {
+                $this->facebookService->trackEvent('Purchase', [
+                    'client_ip_address' => request()->ip(),
+                    'client_user_agent' => request()->userAgent(),
+                ], [
+                    'currency' => 'BDT',
+                    'value' => $order->data['subtotal'],
+                    'content_ids' => array_column($products, 'id'),
+                    'content_name' => 'Purchase',
+                ]);
+            }
 
             GoogleTagManagerFacade::flash([
                 'event' => 'purchase',

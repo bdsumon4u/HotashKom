@@ -2,6 +2,26 @@
     @php $id = array_merge($id, explode(' ', setting('pixel_ids'))); @endphp
     <!-- Facebook Pixel Code -->
     <script @if($nonce)nonce="{{$nonce()}}"@endif>
+        // Helper function to generate event ID (matches server-side implementation)
+        function generateEventId(eventName, userData, customData) {
+            const data = {
+                event_name: eventName,
+                user_data: {
+                    email: userData?.email,
+                    phone: userData?.phone,
+                    client_ip_address: userData?.client_ip_address
+                },
+                custom_data: {
+                    content_ids: customData?.content_ids,
+                    value: customData?.value
+                },
+                timestamp: Math.floor(Date.now() / 1000)
+            };
+
+            // Generate SHA-256 hash
+            return btoa(JSON.stringify(data));
+        }
+
         !function(f,b,e,v,n,t,s)
         {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};

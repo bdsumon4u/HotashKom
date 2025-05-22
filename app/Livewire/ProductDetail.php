@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Attribute;
 use App\Models\Product;
+use App\Services\FacebookConversionService;
 use Livewire\Component;
 
 class ProductDetail extends Component
@@ -19,6 +20,13 @@ class ProductDetail extends Component
     public int $quantity = 1;
 
     public bool $showBrandCategory = false;
+
+    protected $facebookService;
+
+    public function boot(FacebookConversionService $facebookService)
+    {
+        $this->facebookService = $facebookService;
+    }
 
     public static function landing(Product $product): self
     {
@@ -76,6 +84,30 @@ class ProductDetail extends Component
         );
 
         storeOrUpdateCart();
+
+        // Track AddToCart event with Facebook Conversion API
+        if ($this->facebookService && $this->facebookService->isEnabled()) {
+            $this->facebookService->trackEvent('AddToCart', [
+                'client_ip_address' => request()->ip(),
+                'client_user_agent' => request()->userAgent(),
+            ], [
+                'currency' => 'BDT',
+                'value' => $this->selectedVar->getPrice($quantity),
+                'content_ids' => [$this->selectedVar->id],
+                'content_name' => $this->selectedVar->var_name,
+            ]);
+        }
+
+        // Dispatch event for client-side tracking
+        $this->dispatch('facebookEvent', [
+            'eventName' => 'AddToCart',
+            'customData' => [
+                'currency' => 'BDT',
+                'value' => $this->selectedVar->getPrice($quantity),
+                'content_ids' => [$this->selectedVar->id],
+                'content_name' => $this->selectedVar->var_name,
+            ]
+        ]);
 
         $this->dispatch('dataLayer', [
             'event' => 'add_to_cart',
@@ -140,6 +172,13 @@ class ProductDetail extends Component
     public function render()
     {
         $optionGroup = $this->product->variations->pluck('options')->flatten()->unique('id')->groupBy('attribute_id');
+
+        // Add meta tags for Facebook tracking
+        $this->dispatch('addMetaTags', [
+            'user-email' => auth('user')->user()?->email,
+            'user-phone' => auth('user')->user()?->phone_number,
+            'client-ip' => request()->ip(),
+        ]);
 
         return view('livewire.product-detail', [
             'optionGroup' => $optionGroup,

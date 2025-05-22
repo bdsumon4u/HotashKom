@@ -12,6 +12,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "blade-ui-kit/blade-ui-kit": "^0.6.2",
         "combindma/laravel-facebook-pixel": "^5.0",
+        "facebook/php-business-sdk": "^19.0",
         "filament/filament": "^3.2",
         "hotash/laravel-multi-ui": "dev-master",
         "intervention/image": "^3.9",
