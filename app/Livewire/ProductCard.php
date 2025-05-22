@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Product;
-use App\Services\FacebookConversionService;
+use App\Services\FacebookPixelService;
 use Livewire\Component;
 
 class ProductCard extends Component
@@ -11,7 +11,7 @@ class ProductCard extends Component
     public Product $product;
     protected $facebookService;
 
-    public function boot(FacebookConversionService $facebookService)
+    public function boot(FacebookPixelService $facebookService)
     {
         $this->facebookService = $facebookService;
     }
@@ -39,34 +39,11 @@ class ProductCard extends Component
 
         storeOrUpdateCart();
 
-        // Track AddToCart event with Facebook Conversion API
-        if ($this->facebookService && $this->facebookService->isEnabled()) {
-            $this->facebookService->trackEvent('AddToCart', [
-                'client_ip_address' => request()->ip(),
-                'client_user_agent' => request()->userAgent(),
-            ], [
-                'currency' => 'BDT',
-                'value' => $this->product->selling_price,
-                'content_ids' => [$this->product->id],
-                'content_name' => $this->product->name,
-            ]);
-        }
-
-        $this->dispatch('dataLayer', [
-            'event' => 'add_to_cart',
-            'ecommerce' => [
-                'currency' => 'BDT',
-                'value' => $this->product->selling_price,
-                'items' => [
-                    [
-                        'item_id' => $this->product->id,
-                        'item_name' => $this->product->name,
-                        'item_category' => $this->product->category,
-                        'price' => $this->product->selling_price,
-                        'quantity' => 1,
-                    ],
-                ],
-            ],
+        // Track AddToCart event
+        $this->facebookService->trackAddToCart([
+            'id' => $this->product->id,
+            'name' => $this->product->name,
+            'price' => $this->product->selling_price,
         ]);
 
         $this->dispatch('cartUpdated');

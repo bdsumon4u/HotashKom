@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Attribute;
 use App\Models\Product;
-use App\Services\FacebookConversionService;
+use App\Services\FacebookPixelService;
 use Livewire\Component;
 
 class ProductDetail extends Component
@@ -23,7 +23,7 @@ class ProductDetail extends Component
 
     protected $facebookService;
 
-    public function boot(FacebookConversionService $facebookService)
+    public function boot(FacebookPixelService $facebookService)
     {
         $this->facebookService = $facebookService;
     }
@@ -85,45 +85,11 @@ class ProductDetail extends Component
 
         storeOrUpdateCart();
 
-        // Track AddToCart event with Facebook Conversion API
-        if ($this->facebookService && $this->facebookService->isEnabled()) {
-            $this->facebookService->trackEvent('AddToCart', [
-                'client_ip_address' => request()->ip(),
-                'client_user_agent' => request()->userAgent(),
-            ], [
-                'currency' => 'BDT',
-                'value' => $this->selectedVar->getPrice($quantity),
-                'content_ids' => [$this->selectedVar->id],
-                'content_name' => $this->selectedVar->var_name,
-            ]);
-        }
-
-        // Dispatch event for client-side tracking
-        $this->dispatch('facebookEvent', [
-            'eventName' => 'AddToCart',
-            'customData' => [
-                'currency' => 'BDT',
-                'value' => $this->selectedVar->getPrice($quantity),
-                'content_ids' => [$this->selectedVar->id],
-                'content_name' => $this->selectedVar->var_name,
-            ]
-        ]);
-
-        $this->dispatch('dataLayer', [
-            'event' => 'add_to_cart',
-            'ecommerce' => [
-                'currency' => 'BDT',
-                'value' => $this->selectedVar->getPrice($quantity),
-                'items' => [
-                    [
-                        'item_id' => $this->selectedVar->id,
-                        'item_name' => $this->selectedVar->name,
-                        'item_category' => $this->product->category,
-                        'price' => $this->selectedVar->getPrice($quantity),
-                        'quantity' => $quantity,
-                    ],
-                ],
-            ],
+        // Track AddToCart event
+        $this->facebookService->trackAddToCart([
+            'id' => $this->selectedVar->id,
+            'name' => $this->selectedVar->var_name,
+            'price' => $this->selectedVar->getPrice($quantity),
         ]);
 
         $this->dispatch('cartUpdated');
