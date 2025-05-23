@@ -3,6 +3,10 @@
 namespace App\Services;
 
 use Combindma\FacebookPixel\Facades\MetaPixel;
+use FacebookAds\Object\ServerSide\Content;
+use FacebookAds\Object\ServerSide\CustomData;
+use FacebookAds\Object\ServerSide\DeliveryCategory;
+use FacebookAds\Object\ServerSide\UserData;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
@@ -29,7 +33,44 @@ class FacebookPixelService
     }
 
     /**
-     * Track an event with deduplication
+     * Create server-side custom data object
+     *
+     * @param array $customData
+     * @return CustomData
+     */
+    protected function createServerCustomData(array $customData)
+    {
+        $customDataObj = new CustomData();
+
+        if (isset($customData['currency'])) {
+            $customDataObj->setCurrency($customData['currency']);
+        }
+        if (isset($customData['value'])) {
+            $customDataObj->setValue($customData['value']);
+        }
+        $customDataObj->setContentIds($customData['content_ids']);
+        if (isset($customData['content_ids'])) {
+            $contents = [];
+            foreach ($customData['content_ids'] as $id) {
+                $content = new Content();
+                $content->setProductId($id);
+                $content->setTitle($customData['content_name']);
+                $content->setQuantity($customData['quantity'] ?? 1);
+                $content->setItemPrice($customData['value']);
+                $content->setDeliveryCategory(DeliveryCategory::HOME_DELIVERY);
+                $contents[] = $content;
+            }
+            $customDataObj->setContents($contents);
+        }
+        if (isset($customData['content_name'])) {
+            $customDataObj->setContentName($customData['content_name']);
+        }
+
+        return $customDataObj;
+    }
+
+    /**
+     * Track an event with both client and server-side tracking
      *
      * @param string $eventName
      * @param array $customData
@@ -43,8 +84,12 @@ class FacebookPixelService
             // Generate event ID
             $eventId = $this->generateEventId($eventName, $userData, $customData);
 
-            // Track server-side
-            MetaPixel::track($eventName, $customData, $eventId);
+            // Client-side tracking
+            // MetaPixel::track($eventName, $customData, $eventId);
+
+            // Server-side tracking
+            $serverCustomData = $this->createServerCustomData($customData);
+            MetaPixel::send($eventName, $eventId, $serverCustomData);
 
             // If component is provided, dispatch event to browser
             if ($component) {
@@ -80,7 +125,8 @@ class FacebookPixelService
             'currency' => 'BDT',
             'value' => $product['price'],
             'content_ids' => [$product['id']],
-            'content_name' => $product['name']
+            'content_name' => $product['name'],
+            'quantity' => 1
         ], [], $component);
     }
 
@@ -99,7 +145,8 @@ class FacebookPixelService
             'value' => $order['total'],
             'content_ids' => array_column($products, 'id'),
             'content_name' => 'Purchase',
-            'transaction_id' => $order['id']
+            'transaction_id' => $order['id'],
+            'quantity' => array_sum(array_column($products, 'quantity'))
         ], [], $component);
     }
 }
