@@ -306,6 +306,7 @@ class Checkout extends Component
                 'id' => $order->id,
                 'total' => $order->data['subtotal']
             ], $products, [
+                'name' => $user->name,
                 'email' => $user->email,
                 'phone' => $user->phone_number,
                 'external_id' => $user->id,

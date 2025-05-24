@@ -71,7 +71,23 @@ class FacebookPixelService
 
     protected function createServerUserData(array $userData)
     {
-        $userDataObj = new UserData($userData);
+        $userDataObj = MetaPixel::userData();
+        if (isset($userData['name'])) {
+            $nameParts = explode(' ', trim($userData['name']));
+            $firstName = '';
+            $lastName = '';
+
+            $firstName = $nameParts[0];
+            if (count($nameParts) === 2) {
+                $lastName = $nameParts[1];
+            } else {
+                $firstName .= ' ' . $nameParts[1];
+                $lastName = implode(' ', array_slice($nameParts, 2));
+            }
+            $userDataObj->setFirstName($firstName);
+            $userDataObj->setLastName($lastName);
+        }
+
         if (isset($userData['email'])) {
             $userDataObj->setEmail($userData['email']);
         }
