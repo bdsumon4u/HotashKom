@@ -69,6 +69,22 @@ class FacebookPixelService
         return $customDataObj;
     }
 
+    protected function createServerUserData(array $userData)
+    {
+        $userDataObj = new UserData($userData);
+        if (isset($userData['email'])) {
+            $userDataObj->setEmail($userData['email']);
+        }
+        if (isset($userData['phone'])) {
+            $userDataObj->setPhone($userData['phone']);
+        }
+        if (isset($userData['external_id'])) {
+            $userDataObj->setExternalId($userData['external_id']);
+        }
+
+        return $userDataObj;
+    }
+
     /**
      * Track an event with both client and server-side tracking
      *
@@ -89,7 +105,8 @@ class FacebookPixelService
 
             // Server-side tracking
             $serverCustomData = $this->createServerCustomData($customData);
-            MetaPixel::send($eventName, $eventId, $serverCustomData);
+            $serverUserData = $this->createServerUserData($userData);
+            MetaPixel::send($eventName, $eventId, $serverCustomData, $serverUserData);
 
             // If component is provided, dispatch event to browser
             if ($component) {
@@ -138,7 +155,7 @@ class FacebookPixelService
      * @param Component|null $component
      * @return void
      */
-    public function trackPurchase(array $order, array $products, ?Component $component = null)
+    public function trackPurchase(array $order, array $products, array $userData, ?Component $component = null)
     {
         $this->trackEvent('Purchase', [
             'currency' => 'BDT',
@@ -147,6 +164,6 @@ class FacebookPixelService
             'content_name' => 'Purchase',
             'transaction_id' => $order['id'],
             'quantity' => array_sum(array_column($products, 'quantity'))
-        ], [], $component);
+        ], $userData, $component);
     }
 }
