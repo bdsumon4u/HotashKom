@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}287}$$ 🔥 domains are live now
+These 🔥 $${\color{red}291}$$ 🔥 domains are live now
 
-_Last updated: **2025-05-23 09:14:30 Asia/Dhaka**_
+_Last updated: **2025-05-25 09:22:13 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -386,3 +386,7 @@ _Last updated: **2025-05-23 09:14:30 Asia/Dhaka**_
 | 285 | [pickmartsbd.com](http://pickmartsbd.com) |
 | 286 | [hilehilibd.com](http://hilehilibd.com) |
 | 287 | [sbemart.com](http://sbemart.com) |
+| 288 | [rupalibazar.com](http://rupalibazar.com) |
+| 289 | [kroybdbazar.com](http://kroybdbazar.com) |
+| 290 | [islamtradersbd.com](http://islamtradersbd.com) |
+| 291 | [shomadhanbazar.com](http://shomadhanbazar.com) |
