@@ -1,1 +1,0 @@
-{!! LaravelFacebookPixel::bodyContent() !!}

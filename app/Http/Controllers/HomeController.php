@@ -14,12 +14,12 @@ class HomeController extends Controller
      */
     public function __invoke(Request $request)
     {
-
-        GoogleTagManagerFacade::set([
-            'event' => 'page_view',
-            'page_type' => 'home',
-        ]);
-        //  \LaravelFacebookPixel::createEvent('PageView', $parameters = []);
+        if (GoogleTagManagerFacade::isEnabled()) {
+            GoogleTagManagerFacade::set([
+                'event' => 'page_view',
+                'page_type' => 'home',
+            ]);
+        }
 
         return view('index');
     }

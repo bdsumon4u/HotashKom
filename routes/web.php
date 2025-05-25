@@ -9,12 +9,12 @@ use App\Http\Controllers\HomeSectionProductController;
 use App\Http\Controllers\OrderTrackController;
 use App\Http\Controllers\ProductController;
 use App\Http\Middleware\GoogleTagManagerMiddleware;
-use Combindma\FacebookPixel\MetaPixelMiddleware;
+use Hotash\FacebookPixel\MetaPixelMiddleware;
 use Hotash\LaravelMultiUi\Facades\MultiUi;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 
-//Language Change
+// Language Change
 // Route::get('lang/{locale}', function ($locale) {
 //     if (!in_array($locale, ['en', 'de', 'es', 'fr', 'pt', 'cn', 'ae'])) {
 //         abort(400);
@@ -43,8 +43,8 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
                     'except' => ['login', 'register'],
                 ],
             ]);
-            //...
-            //...
+            // ...
+            // ...
             Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
         });
 

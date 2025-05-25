@@ -262,11 +262,11 @@ class OrderController extends Controller
         }
 
         if ($error) {
-            return redirect()->back() //$this->invoices($request);
+            return redirect()->back() // $this->invoices($request);
                 ->withDanger('Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.');
         }
 
-        return redirect()->back() //$this->invoices($request);
+        return redirect()->back() // $this->invoices($request);
             ->withSuccess('Orders are sent to Courier.');
     }
 

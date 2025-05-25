@@ -16,8 +16,13 @@ class GoogleTagManagerMiddleware
      */
     public function handle($request, Closure $next)
     {
-        config(['googletagmanager.id' => setting('gtm_id', 'gtm_id')]);
-        GoogleTagManagerFacade::setId(config('googletagmanager.id'));
+        if ($gtmId = setting('gtm_id')) {
+            config(['googletagmanager.id' => $gtmId]);
+            GoogleTagManagerFacade::setId(config('googletagmanager.id'));
+            GoogleTagManagerFacade::enable();
+        } else {
+            GoogleTagManagerFacade::disable();
+        }
 
         if (! $request->is('checkout') && ! $request->is('save-checkout-progress')) {
             Cart::instance('kart')->destroy();

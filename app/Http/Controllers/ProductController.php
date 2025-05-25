@@ -18,18 +18,20 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->search) {
-            GoogleTagManagerFacade::set([
-                'event' => 'search',
-                'search_term' => $request->search,
-            ]);
-        } else {
-            GoogleTagManagerFacade::set([
-                'event' => 'page_view',
-                'page_type' => 'shop',
-            ]);
+        if (GoogleTagManagerFacade::isEnabled()) {
+            if ($request->search) {
+                GoogleTagManagerFacade::set([
+                    'event' => 'search',
+                    'search_term' => $request->search,
+                ]);
+            } else {
+                GoogleTagManagerFacade::set([
+                    'event' => 'page_view',
+                    'page_type' => 'shop',
+                ]);
+            }
         }
-        // \LaravelFacebookPixel::createEvent('PageView', $parameters = []);
+
         $section = null;
         $rows = 3;
         $cols = 5;
@@ -110,23 +112,25 @@ class ProductController extends Controller
             ->where('id', '!=', $product->id)
             ->limit(config('services.products_count.related', 20))
             ->get();
-        //  \LaravelFacebookPixel::createEvent('ViewContent', $parameters = []);
-        GoogleTagManagerFacade::set([
-            'event' => 'view_item',
-            'ecommerce' => [
-                'currency' => 'BDT',
-                'value' => $product->selling_price,
-                'items' => [
-                    [
-                        'item_id' => $product->id,
-                        'item_name' => $product->name,
-                        'price' => $product->selling_price,
-                        'item_category' => $product->category,
-                        'quantity' => 1,
+
+        if (GoogleTagManagerFacade::isEnabled()) {
+            GoogleTagManagerFacade::set([
+                'event' => 'view_item',
+                'ecommerce' => [
+                    'currency' => 'BDT',
+                    'value' => $product->selling_price,
+                    'items' => [
+                        [
+                            'item_id' => $product->id,
+                            'item_name' => $product->name,
+                            'price' => $product->selling_price,
+                            'item_category' => $product->category,
+                            'quantity' => 1,
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
+        }
 
         return $this->view(compact('product', 'products'));
     }

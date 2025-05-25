@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\AccountCreated;
 use App\Notifications\User\OrderPlaced;
+use App\Services\FacebookPixelService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
@@ -36,6 +37,13 @@ class Checkout extends Component
     public $note = '';
 
     protected $listeners = ['updateField'];
+
+    protected $facebookService;
+
+    public function boot(FacebookPixelService $facebookService)
+    {
+        $this->facebookService = $facebookService;
+    }
 
     public function updateField($field, $value): void
     {
@@ -286,28 +294,56 @@ class Checkout extends Component
                 ],
             ];
 
-            // \LaravelFacebookPixel::createEvent('Purchase', ['currency' => 'USD', 'value' => data_get(json_decode($data['data'], true), 'subtotal')]);
-
             $order = Order::create($data);
-            $user->notify(new OrderPlaced($order));
 
-            defer(fn () => $admin->update(['last_order_received_at' => now()]));
+            defer(function () use ($admin, $user, $order) {
+                $admin->update(['last_order_received_at' => now()]);
+                $user->notify(new OrderPlaced($order));
 
-            GoogleTagManagerFacade::flash([
-                'event' => 'purchase',
-                'ecommerce' => [
-                    'currency' => 'BDT',
-                    'transaction_id' => $order->id,
-                    'value' => $order->data['subtotal'],
-                    'items' => array_values(array_map(fn ($product): array => [
-                        'item_id' => $product['id'],
-                        'item_name' => $product['name'],
-                        'item_category' => $product['category'],
-                        'price' => $product['price'],
-                        'quantity' => $product['quantity'],
-                    ], $products)),
-                ],
-            ]);
+                deleteOrUpdateCart();
+
+                Cache::add('fraud:hourly:'.request()->ip(), 0, now()->addHour());
+                Cache::add('fraud:daily:'.request()->ip(), 0, now()->addDay());
+
+                Cache::increment('fraud:hourly:'.request()->ip());
+                Cache::increment('fraud:daily:'.request()->ip());
+
+                Cache::add('fraud:hourly:'.$order->phone, 0, now()->addHour());
+                Cache::add('fraud:daily:'.$order->phone, 0, now()->addDay());
+
+                Cache::increment('fraud:hourly:'.$order->phone);
+                Cache::increment('fraud:daily:'.$order->phone);
+            });
+
+            if (config('meta-pixel.meta_pixel')) {
+                $this->facebookService->trackPurchase([
+                    'id' => $order->id,
+                    'total' => $order->data['subtotal'],
+                ], $products, [
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone_number,
+                    'external_id' => $user->id,
+                ], $this);
+            }
+
+            if (GoogleTagManagerFacade::isEnabled()) {
+                GoogleTagManagerFacade::flash([
+                    'event' => 'purchase',
+                    'ecommerce' => [
+                        'currency' => 'BDT',
+                        'transaction_id' => $order->id,
+                        'value' => $order->data['subtotal'],
+                        'items' => array_values(array_map(fn ($product): array => [
+                            'item_id' => $product['id'],
+                            'item_name' => $product['name'],
+                            'item_category' => $product['category'],
+                            'price' => $product['price'],
+                            'quantity' => $product['quantity'],
+                        ], $products)),
+                    ],
+                ]);
+            }
 
             return $order;
         });
@@ -315,20 +351,6 @@ class Checkout extends Component
         if (! $this->order) {
             return back();
         }
-
-        deleteOrUpdateCart();
-
-        Cache::add('fraud:hourly:'.request()->ip(), 0, now()->addHour());
-        Cache::add('fraud:daily:'.request()->ip(), 0, now()->addDay());
-
-        Cache::increment('fraud:hourly:'.request()->ip());
-        Cache::increment('fraud:daily:'.request()->ip());
-
-        Cache::add('fraud:hourly:'.$data['phone'], 0, now()->addHour());
-        Cache::add('fraud:daily:'.$data['phone'], 0, now()->addDay());
-
-        Cache::increment('fraud:hourly:'.$data['phone']);
-        Cache::increment('fraud:daily:'.$data['phone']);
 
         // Undefined index email.
         // $data['email'] && Mail::to($data['email'])->queue(new OrderPlaced($order));

@@ -15,11 +15,13 @@ class PageController extends Controller
      */
     public function __invoke(Request $request, Page $page)
     {
-        GoogleTagManagerFacade::set([
-            'event' => 'page_view',
-            'page_type' => 'page',
-            'content' => $page->toArray(),
-        ]);
+        if (GoogleTagManagerFacade::isEnabled()) {
+            GoogleTagManagerFacade::set([
+                'event' => 'page_view',
+                'page_type' => 'page',
+                'content' => $page->toArray(),
+            ]);
+        }
 
         return view('page');
     }

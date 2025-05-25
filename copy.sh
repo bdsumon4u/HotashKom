@@ -100,7 +100,7 @@ add_ssh_host_to_known_hosts() {
 check_public_key_installed() {
     # Check if the public key exists in the authorized_keys file on the server
     ssh -i $ssh_private_key $target_username@$ssh_host "grep -q '$(cat $ssh_private_key.pub)' .ssh/authorized_keys"
-    
+
     # Return the exit status of the previous command
     return $?
 }
@@ -126,7 +126,7 @@ add_ssh_host_to_known_hosts
 connect_to_target || {
     # Check if the public key is installed on the target server
     check_public_key_installed
-    
+
     # If the public key is not installed, prompt the user to add it
     if [ $? -ne 0 ]; then
         echo
@@ -142,7 +142,7 @@ connect_to_target || {
             exit 1
         fi
     fi
-    
+
     # Retry connecting to the target server
     connect_to_target
 }
@@ -180,6 +180,6 @@ ssh -i $ssh_private_key $target_username@$ssh_host <<EOF
   # Run deployment commands
   ./server_deploy.sh
   rm -rf public/storage storage/app/pathao*
-  /opt/alt/php82/usr/bin/php artisan storage:link
-  # /opt/alt/php82/usr/bin/php artisan optimize:clear
+  /opt/alt/php83/usr/bin/php artisan storage:link
+  # /opt/alt/php83/usr/bin/php artisan optimize:clear
 EOF

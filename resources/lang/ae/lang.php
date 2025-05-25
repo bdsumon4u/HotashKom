@@ -1,6 +1,6 @@
 <?php
 
-//Arabic
+// Arabic
 return [
     'Welcome' => 'أهلا بك',
     'Back' => 'عودة',

@@ -25,22 +25,22 @@ class CheckoutController extends Controller
     public function __invoke(CheckoutRequest $request)
     {
         if ($request->isMethod('GET')) {
-            //\LaravelFacebookPixel::createEvent('AddToCart', $parameters = []);
-
-            GoogleTagManagerFacade::set([
-                'event' => 'begin_checkout',
-                'ecommerce' => [
-                    'currency' => 'BDT',
-                    'value' => cart()->subTotal(),
-                    'items' => cart()->content()->map(fn ($product): array => [
-                        'item_id' => $product->id,
-                        'item_name' => $product->name,
-                        'item_category' => $product->options->category,
-                        'price' => $product->price,
-                        'quantity' => $product->qty,
-                    ]),
-                ],
-            ]);
+            if (GoogleTagManagerFacade::isEnabled()) {
+                GoogleTagManagerFacade::set([
+                    'event' => 'begin_checkout',
+                    'ecommerce' => [
+                        'currency' => 'BDT',
+                        'value' => cart()->subTotal(),
+                        'items' => cart()->content()->map(fn ($product): array => [
+                            'item_id' => $product->id,
+                            'item_name' => $product->name,
+                            'item_category' => $product->options->category,
+                            'price' => $product->price,
+                            'quantity' => $product->qty,
+                        ]),
+                    ],
+                ]);
+            }
 
             return view('checkout');
         }
@@ -113,8 +113,6 @@ class CheckoutController extends Controller
                     'subtotal' => is_array($products) ? array_reduce($products, fn ($sum, $product) => $sum += $product['total']) : $products->sum('total'),
                 ],
             ];
-
-            // \LaravelFacebookPixel::createEvent('Purchase', ['currency' => 'USD', 'value' => data_get(json_decode($data['data'], true), 'subtotal')]);
 
             $order = Order::create($data);
             $user->notify(new OrderPlaced($order));

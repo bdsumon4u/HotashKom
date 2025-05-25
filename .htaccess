@@ -5,7 +5,7 @@
     Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
     Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
     Header set Access-Control-Max-Age "86400"
-    
+
     # Allow credentials (optional)
     # Header set Access-Control-Allow-Credentials "true"
 </IfModule>
@@ -19,7 +19,7 @@
     </FilesMatch>
 
     RewriteEngine On
-    
+
     # If the request is for the API or a specific resource, apply CORS headers
     RewriteCond %{REQUEST_URI} ^/api/ [NC]
     Header set Access-Control-Allow-Origin "*"
@@ -29,14 +29,14 @@
 
     # Allow credentials if required (optional)
     # Header set Access-Control-Allow-Credentials "true"
-    
+
     # Handle OPTIONS preflight request
     RewriteCond %{REQUEST_METHOD} OPTIONS
-    
-    
+
+
     RewriteCond %{HTTP_HOST} !^www\. [NC]
     RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
-    
+
     RewriteCond %{REQUEST_FILENAME} -d [OR]
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ ^$1 [N]
@@ -58,7 +58,7 @@
     php_value memory_limit 100M
     php_value post_max_size 50M
     php_value session.gc_maxlifetime 1440
-    php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
+    php_value session.save_path "/var/cpanel/php/sessions/ea-php83"
     php_value upload_max_filesize 10M
     php_flag zlib.output_compression Off
 </IfModule>
@@ -70,13 +70,13 @@
     php_value memory_limit 100M
     php_value post_max_size 50M
     php_value session.gc_maxlifetime 1440
-    php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
+    php_value session.save_path "/var/cpanel/php/sessions/ea-php83"
     php_value upload_max_filesize 10M
     php_flag zlib.output_compression Off
 </IfModule>
 # END cPanel-generated php ini directives, do not edit
 # php -- BEGIN cPanel-generated handler, do not edit
-# Set the “ea-php82” package as the default “PHP” programming language.
+# Set the “ea-php83” package as the default “PHP” programming language.
 <IfModule mime_module>
-    AddHandler application/x-httpd-alt-php82 .php .php8 .phtml
+    AddHandler application/x-httpd-alt-php83 .php .php8 .phtml
 </IfModule>

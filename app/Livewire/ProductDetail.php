@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Attribute;
 use App\Models\Product;
+use App\Services\FacebookPixelService;
 use Livewire\Component;
 
 class ProductDetail extends Component
@@ -19,6 +20,13 @@ class ProductDetail extends Component
     public int $quantity = 1;
 
     public bool $showBrandCategory = false;
+
+    protected $facebookService;
+
+    public function boot(FacebookPixelService $facebookService)
+    {
+        $this->facebookService = $facebookService;
+    }
 
     public static function landing(Product $product): self
     {
@@ -77,22 +85,14 @@ class ProductDetail extends Component
 
         storeOrUpdateCart();
 
-        $this->dispatch('dataLayer', [
-            'event' => 'add_to_cart',
-            'ecommerce' => [
-                'currency' => 'BDT',
-                'value' => $this->selectedVar->getPrice($quantity),
-                'items' => [
-                    [
-                        'item_id' => $this->selectedVar->id,
-                        'item_name' => $this->selectedVar->name,
-                        'item_category' => $this->product->category,
-                        'price' => $this->selectedVar->getPrice($quantity),
-                        'quantity' => $quantity,
-                    ],
-                ],
-            ],
-        ]);
+        if (config('meta-pixel.meta_pixel')) {
+            $this->facebookService->trackAddToCart([
+                'id' => $this->selectedVar->id,
+                'name' => $this->selectedVar->var_name,
+                'price' => $this->selectedVar->getPrice($quantity),
+                'page_url' => route('products.show', $this->product->slug),
+            ], $this);
+        }
 
         $this->dispatch('cartUpdated');
         $this->dispatch('notify', ['message' => 'Product added to cart']);

@@ -6,5 +6,6 @@ return [
     App\Providers\ComposerServiceProvider::class,
     App\Providers\Filament\LandingPanelProvider::class,
     App\Providers\TelescopeServiceProvider::class,
+    App\Providers\BladeServiceProvider::class,
     Yajra\DataTables\DataTablesServiceProvider::class,
 ];

@@ -27,20 +27,22 @@ class CategoryProductController extends Controller
         }
         $products = $products->paginate($per_page)->appends(request()->query());
 
-        GoogleTagManagerFacade::set([
-            'event' => 'view_item_list',
-            'ecommerce' => [
-                'item_list_id' => $category->id,
-                'item_list_name' => $category->name,
-                'items' => $products->map(fn ($product): array => [
-                    'item_id' => $product->id,
-                    'item_name' => $product->name,
-                    'price' => $product->selling_price,
-                    'item_category' => $product->category,
-                    'quantity' => 1,
-                ])->toArray(),
-            ],
-        ]);
+        if (GoogleTagManagerFacade::isEnabled()) {
+            GoogleTagManagerFacade::set([
+                'event' => 'view_item_list',
+                'ecommerce' => [
+                    'item_list_id' => $category->id,
+                    'item_list_name' => $category->name,
+                    'items' => $products->map(fn ($product): array => [
+                        'item_id' => $product->id,
+                        'item_name' => $product->name,
+                        'price' => $product->selling_price,
+                        'item_category' => $product->category,
+                        'quantity' => 1,
+                    ])->toArray(),
+                ],
+            ]);
+        }
 
         return view('products.index', [
             'products' => $products,

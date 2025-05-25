@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\AttributeOptionController;
 use App\Http\Controllers\Admin\Auth\ChangePasswordController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CategoryMenuController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -21,7 +22,6 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
-use App\Http\Controllers\Admin\CartController;
 use Hotash\LaravelMultiUi\Facades\MultiUi;
 use Illuminate\Support\Facades\Route;
 
@@ -43,8 +43,8 @@ Route::group(['as' => 'admin.'], function (): void {
                 'except' => ['login', 'register'],
             ],
         ]);
-        //...
-        //...
+        // ...
+        // ...
     });
 
     // Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
@@ -93,5 +93,5 @@ Route::group(['as' => 'admin.'], function (): void {
 });
 
 // Controller Level Namespace & No Prefix
-//...
-//...
+// ...
+// ...

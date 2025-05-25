@@ -265,7 +265,7 @@ class ApiController extends Controller
                 ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
         }
 
-        if (! $order = Order::find($request->merchant_order_id)/*->orWhere('data->consignment_id', $request->consignment_id)->first()*/) {
+        if (! $order = Order::find($request->merchant_order_id)/* ->orWhere('data->consignment_id', $request->consignment_id)->first() */) {
             return response()->json(['message' => 'Webhook processed'], 202)
                 ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
         }
