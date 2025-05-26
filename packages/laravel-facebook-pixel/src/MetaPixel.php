@@ -143,6 +143,7 @@ class MetaPixel
                 ->setExternalId($user['external_id'])
                 ->setClientIpAddress(Request::ip())
                 ->setClientUserAgent(Request::userAgent())
+                // ->setFbc(Request::get('fbclid') ?? Arr::get($_COOKIE, '_fbc'))
                 ->setFbc(Arr::get($_COOKIE, '_fbc'))
                 ->setFbp(Arr::get($_COOKIE, '_fbp'));
         }
@@ -150,6 +151,7 @@ class MetaPixel
         return $this->userData
             ->setClientIpAddress(Request::ip())
             ->setClientUserAgent(Request::userAgent())
+            // ->setFbc(Request::get('fbclid') ?? Arr::get($_COOKIE, '_fbc'))
             ->setFbc(Arr::get($_COOKIE, '_fbc'))
             ->setFbp(Arr::get($_COOKIE, '_fbp'));
     }

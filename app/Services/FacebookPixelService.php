@@ -69,13 +69,12 @@ class FacebookPixelService
         $userDataObj = MetaPixel::userData();
         if (isset($userData['name'])) {
             $nameParts = explode(' ', trim($userData['name']));
-            $firstName = '';
             $lastName = '';
 
             $firstName = $nameParts[0];
             if (count($nameParts) === 2) {
                 $lastName = $nameParts[1];
-            } else {
+            } else if (count($nameParts) > 2) {
                 $firstName .= ' '.$nameParts[1];
                 $lastName = implode(' ', array_slice($nameParts, 2));
             }
@@ -112,11 +111,11 @@ class FacebookPixelService
 
             // If component is provided, dispatch event to browser
             if ($component) {
-                // info('dispatching event to browser', [
-                //     'eventName' => $eventName,
-                //     'customData' => $customData,
-                //     'eventId' => $eventId,
-                // ]);
+                info('dispatching event to browser', [
+                    'eventName' => $eventName,
+                    'customData' => $customData,
+                    'eventId' => $eventId,
+                ]);
                 $component->dispatch('facebookEvent', [
                     'eventName' => $eventName,
                     'customData' => $customData,
@@ -125,6 +124,11 @@ class FacebookPixelService
             }
 
             defer(function () use ($eventName, $eventId, $customData, $userData) {
+                // info('dispatching event to server', [
+                //     'eventName' => $eventName,
+                //     'customData' => $customData,
+                //     'eventId' => $eventId,
+                // ]);
                 // Server-side tracking
                 $serverCustomData = $this->createServerCustomData($customData);
                 $serverUserData = $this->createServerUserData($userData);
