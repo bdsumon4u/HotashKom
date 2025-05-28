@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}294}$$ 🔥 domains are live now
+These 🔥 $${\color{red}295}$$ 🔥 domains are live now
 
-_Last updated: **2025-05-27 09:14:23 Asia/Dhaka**_
+_Last updated: **2025-05-28 09:16:28 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -393,3 +393,4 @@ _Last updated: **2025-05-27 09:14:23 Asia/Dhaka**_
 | 292 | [deshisell.com](http://deshisell.com) |
 | 293 | [jannatshop.com](http://jannatshop.com) |
 | 294 | [mistyphool.com](http://mistyphool.com) |
+| 295 | [shopnoemela.com](http://shopnoemela.com) |
