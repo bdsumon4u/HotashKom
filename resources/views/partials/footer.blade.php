@@ -72,11 +72,13 @@
             </div>
             <div class="site-footer__bottom">
                 <div class="site-footer__copyright">
-                    Copyright 2020 - {{ date('Y') }} &copy; {{ $company->name ?? '' }}
+                    &copy; {{ $company->name ?? '' }}
                 </div>
+                @if($company->dev_name != '#' and $company->dev_link != '#')
                 <div class="site-footer__payments">
                     Developed By <a href="{{$company->dev_link??'https://cyber32.com'}}" class="text-danger">{{$company->dev_name??'Cyber 32'}}</a>
                 </div>
+                @endif
             </div>
         </div>
     </div>
