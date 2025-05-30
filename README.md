@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}301}$$ 🔥 domains are live now
+These 🔥 $${\color{red}302}$$ 🔥 domains are live now
 
-_Last updated: **2025-05-29 09:16:42 Asia/Dhaka**_
+_Last updated: **2025-05-30 09:14:52 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -400,3 +400,4 @@ _Last updated: **2025-05-29 09:16:42 Asia/Dhaka**_
 | 299 | [startvaly.com](http://startvaly.com) |
 | 300 | [siddikshop.com](http://siddikshop.com) |
 | 301 | [premiumeshop.com](http://premiumeshop.com) |
+| 302 | [morevaly.com](http://morevaly.com) |
