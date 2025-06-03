@@ -271,10 +271,12 @@
                 </div>
 
 
+                @if (config('services.courier_report.cheap') && \Illuminate\Support\Carbon::parse(config('services.courier_report.expires'))->isFuture())
                 <h5 class="mt-3">Courier Report</h5>
                 <div style="height: 645px; overflow: hidden; position: relative;">
                     <iframe src="https://www.bdcommerce.app/tools/delivery-fraud-check/{{$order->phone}}" width="1200" height="800" scrolling="no" style="position: absolute; top: -110px; left: -580px; overflow: hidden;"></iframe>
                 </div>
+                @endif
             </div>
         </div>
     </div>
@@ -416,7 +418,6 @@
                     <div class="p-3 card-body">
                         @if (is_string($this->courier_report))
                             <div class="alert alert-danger">{{ $this->courier_report }}</div>
-                            <div class="alert alert-danger">Please wait 5 minutes</div>
                         @else
                             <div class="flex-wrap d-flex" style="column-gap: 1rem;">
                                 <div class="table-responsive">

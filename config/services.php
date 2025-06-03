@@ -82,8 +82,10 @@ return [
     ],
 
     'courier_report' => [
+        'cheap' => env('CHEAP_COURIER_REPORT'),
         'url' => env('COURIER_REPORT_URL'),
         'key' => env('COURIER_REPORT_KEY'),
+        'expires' => env('COURIER_EXPIRES'),
     ],
 
     'imagekit' => [
