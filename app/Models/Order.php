@@ -72,7 +72,7 @@ class Order extends Model
                 $order->fill(['data' => ['city_name' => current(array_filter($order->pathaoCityList(), fn ($c): bool => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
             }
 
-            if (false) {
+            if (false && empty($order->data['area_id'] ?? '')) {
                 $matches = [];
                 foreach ($order->pathaoAreaList() as $area) {
                     if ($match = $fuse->search($area->zone_name)) {
