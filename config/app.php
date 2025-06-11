@@ -22,7 +22,7 @@ return [
         'CONFIRMED',
         'INVOICED',
         'SHIPPING',
-        'COMPLETED',
+        'DELIVERED',
         'RETURNED',
         'LOST',
         'CANCELLED',
