@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
@@ -25,9 +26,21 @@ class ProfileController extends Controller
             'phone_number' => 'required|string|max:255',
             'bkash_number' => 'string|max:255',
             'address' => 'nullable|string|max:255',
+            'website' => 'nullable|url|max:255',
+            'domain' => 'nullable|string|max:255|regex:/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/',
+            'db_name' => 'nullable|string|max:255',
+            'db_username' => 'nullable|string|max:255',
+            'db_password' => 'nullable|string|min:6',
         ]);
 
-        auth('user')->user()->update($data);
+        $user = auth('user')->user();
+
+        // Only update database password if provided
+        if (empty($data['db_password'])) {
+            unset($data['db_password']);
+        }
+
+        $user->update($data);
 
         return back()->withSuccess('Profile Updated.');
     }

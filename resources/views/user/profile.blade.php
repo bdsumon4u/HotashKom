@@ -61,6 +61,7 @@
                                         <x-error field="email" />
                                     </div>
                                 </div>
+
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="profile-phone">Phone Number</label>
@@ -88,6 +89,72 @@
                                     </div>
                                 </div>
 
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="domain">Domain</label>
+                                        <x-input name="domain" id="domain" placeholder="Your Domain (e.g. myshop.com)"
+                                            :value="$user->domain" />
+                                        <x-error field="domain" />
+                                        <small class="form-text text-muted">Your custom domain for your shop</small>
+                                    </div>
+                                </div>
+
+                                @if($user->api_token)
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="api_token">API Token</label>
+                                        <div class="input-group">
+                                            <x-input name="api_token" id="api_token" :value="$user->api_token" readonly />
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary" onclick="copyApiToken()">
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">Use this token to authenticate your API requests</small>
+                                    </div>
+                                </div>
+                                @endif
+
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">Database Configuration</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="db_name">Database Name</label>
+                                                        <x-input name="db_name" id="db_name" placeholder="Database Name"
+                                                            :value="$user->db_name" />
+                                                        <x-error field="db_name" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="db_username">Database Username</label>
+                                                        <x-input name="db_username" id="db_username" placeholder="Database Username"
+                                                            :value="$user->db_username" />
+                                                        <x-error field="db_username" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="db_password">Database Password</label>
+                                                        <x-input type="password" name="db_password" id="db_password"
+                                                            placeholder="Database Password" />
+                                                        <x-error field="db_password" />
+                                                        <small class="form-text text-muted">Leave blank if you don't want to change the password</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-0 form-group">
                                     <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
@@ -99,3 +166,14 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+function copyApiToken() {
+    var apiTokenInput = document.getElementById('api_token');
+    apiTokenInput.select();
+    document.execCommand('copy');
+    alert('API token copied to clipboard!');
+}
+</script>
+@endpush
