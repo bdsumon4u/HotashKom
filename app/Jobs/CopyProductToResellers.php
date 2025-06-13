@@ -11,13 +11,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Model;
 
 class CopyProductToResellers implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $product;
+    protected $idMap = [];
 
     /**
      * Create a new job instance.
@@ -30,26 +30,113 @@ class CopyProductToResellers implements ShouldQueue
     /**
      * Get or create a resource in reseller's database
      */
-    protected function getOrCreateResource(string $table, Model $model, string $uniqueColumn): int
+    protected function getOrCreateResource(string $table, int $sourceId, string $uniqueColumn, $uniqueValue): int
     {
-        $data = $model->getRawOriginal();
-
-        $existing = DB::connection('reseller')
-            ->table($table)
-            ->where($uniqueColumn, $data[$uniqueColumn])
-            ->first();
-
-        if ($existing) {
-            return $existing->id;
+        // If we already have the ID mapping, return it
+        if (isset($this->idMap[$table][$sourceId])) {
+            return $this->idMap[$table][$sourceId];
         }
 
-        $insertData = $data;
+        // First check if the resource's ID exists in source_id column
+        $existingBySourceId = DB::connection('reseller')
+            ->table($table)
+            ->where('source_id', $sourceId)
+            ->first();
+
+        if ($existingBySourceId) {
+            // Resource already exists with this source_id, store mapping and return
+            $this->idMap[$table][$sourceId] = $existingBySourceId->id;
+            return $existingBySourceId->id;
+        }
+
+        // If not found by source_id, check if unique column exists
+        $existingByUnique = DB::connection('reseller')
+            ->table($table)
+            ->where($uniqueColumn, $uniqueValue)
+            ->first();
+
+        if ($existingByUnique) {
+            // Update source_id in reseller's database to match original resource's ID
+            DB::connection('reseller')
+                ->table($table)
+                ->where($uniqueColumn, $uniqueValue)
+                ->update(['source_id' => $sourceId]);
+
+            // Store the ID mapping
+            $this->idMap[$table][$sourceId] = $existingByUnique->id;
+            return $existingByUnique->id;
+        }
+
+        // Get the original data
+        $data = DB::table($table)
+            ->where('id', $sourceId)
+            ->first();
+
+        if (!$data) {
+            throw new \Exception("Resource not found in source database: {$table} {$sourceId}");
+        }
+
+        // Convert to array and handle foreign keys
+        $insertData = (array) $data;
+        $foreignKeys = [];
+        foreach ($insertData as $key => $value) {
+            if (str_ends_with($key, '_id') && $value) {
+                $foreignKeys[$key] = $value;
+            }
+        }
+
+        // If we have foreign keys, get all related IDs in one query per table
+        if (!empty($foreignKeys)) {
+            $relatedIds = [];
+            foreach ($foreignKeys as $key => $value) {
+                // Get the table name from the foreign key
+                $relatedTable = str_replace('_id', 's', $key);
+
+                if (!isset($relatedIds[$relatedTable])) {
+                    $relatedIds[$relatedTable] = [];
+                }
+                $relatedIds[$relatedTable][] = $value;
+            }
+
+            // Get all related IDs in one query per table
+            foreach ($relatedIds as $table => $ids) {
+                $existingRelated = DB::connection('reseller')
+                    ->table($table)
+                    ->whereIn('source_id', $ids)
+                    ->get(['id', 'source_id']);
+
+                foreach ($existingRelated as $related) {
+                    if (isset($this->idMap[$table][$related->source_id])) {
+                        continue;
+                    }
+                    $this->idMap[$table][$related->source_id] = $related->id;
+                }
+            }
+
+            // Update foreign keys with new IDs
+            foreach ($foreignKeys as $key => $value) {
+                // Get the table name from the foreign key
+                $relatedTable = str_replace('_id', 's', $key);
+
+                if (isset($this->idMap[$relatedTable][$value])) {
+                    $insertData[$key] = $this->idMap[$relatedTable][$value];
+                }
+            }
+        }
+
+        // Set source_id to original ID and remove id from data
         $insertData['source_id'] = $insertData['id'];
         unset($insertData['id']);
 
-        return DB::connection('reseller')
+        // Insert the data and get the new auto-generated ID
+        $newId = DB::connection('reseller')
             ->table($table)
             ->insertGetId($insertData);
+
+        // Store the ID mapping
+        $this->idMap[$table][$sourceId] = $newId;
+
+        return $newId;
     }
 
     /**
@@ -65,98 +152,115 @@ class CopyProductToResellers implements ShouldQueue
                 // Connect to reseller's database using their config
                 config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
 
+                // Get the product data
+                $productData = $this->product->getRawOriginal();
+
                 // Copy brand if exists
-                $brandId = null;
-                if ($this->product->brand_id) {
-                    $brand = $this->product->brand()->first();
-                    $brandId = $this->getOrCreateResource('brands', $brand, 'slug');
+                if ($productData['brand_id']) {
+                    $brand = DB::table('brands')->where('id', $productData['brand_id'])->first();
+                    $newBrandId = $this->getOrCreateResource('brands', $productData['brand_id'], 'slug', $brand->slug);
+                    $productData['brand_id'] = $newBrandId;
                 }
 
                 // Copy categories
                 $categoryIds = [];
-                $categories = $this->product->categories()->get();
+                $categories = DB::table('category_product')
+                    ->where('product_id', $this->product->id)
+                    ->get(['category_id']);
+
                 foreach ($categories as $category) {
-                    $categoryIds[] = $this->getOrCreateResource('categories', $category, 'slug');
+                    $cat = DB::table('categories')->where('id', $category->category_id)->first();
+                    $newCategoryId = $this->getOrCreateResource('categories', $category->category_id, 'slug', $cat->slug);
+                    $categoryIds[] = $newCategoryId;
                 }
 
                 // Copy images
                 $imageIds = [];
-                $images = $this->product->images()->get();
+                $images = DB::table('image_product')
+                    ->where('product_id', $this->product->id)
+                    ->get(['image_id', 'img_type', 'order']);
+
                 foreach ($images as $image) {
-                    $imageIds[] = $this->getOrCreateResource('images', $image, 'filename');
+                    $img = DB::table('images')->where('id', $image->image_id)->first();
+                    $newImageId = $this->getOrCreateResource('images', $image->image_id, 'filename', $img->filename);
+                    $imageIds[] = [
+                        'id' => $newImageId,
+                        'img_type' => $image->img_type,
+                        'order' => $image->order
+                    ];
                 }
 
                 // Copy attributes and options
                 $optionIds = [];
-                $options = $this->product->options()->with('attribute')->get();
+                $options = DB::table('option_product')
+                    ->where('product_id', $this->product->id)
+                    ->get(['option_id']);
+
                 foreach ($options as $option) {
-                    $attributeId = $this->getOrCreateResource('attributes', $option->attribute, 'name');
-                    $optionIds[] = $this->getOrCreateResource('options', $option, 'name');
+                    $opt = DB::table('options')->where('id', $option->option_id)->first();
+                    $attr = DB::table('attributes')->where('id', $opt->attribute_id)->first();
+
+                    $newAttrId = $this->getOrCreateResource('attributes', $attr->id, 'name', $attr->name);
+                    $newOptId = $this->getOrCreateResource('options', $opt->id, 'name', $opt->name);
+
+                    $optionIds[] = $newOptId;
                 }
 
                 // Copy main product
-                $productData = $this->product->getRawOriginal();
-                unset($productData['id']);
-                $productData['source_id'] = $this->product->id;
-                $productData['brand_id'] = $brandId;
+                $insertData = $productData;
+                $insertData['source_id'] = $insertData['id'];
+                unset($insertData['id']);
 
-                $productId = DB::connection('reseller')->table('products')->insertGetId($productData);
-
-                // Create category relationships
-                foreach ($categoryIds as $categoryId) {
-                    DB::connection('reseller')->table('category_product')->insert([
-                        'category_id' => $categoryId,
-                        'product_id' => $productId,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-
-                // Create image relationships
-                foreach ($images as $index => $image) {
-                    DB::connection('reseller')->table('image_product')->insert([
-                        'image_id' => $imageIds[$index],
-                        'product_id' => $productId,
-                        'img_type' => $image->pivot->img_type,
-                        'order' => $image->pivot->order,
-                        'created_at' => $image->pivot->created_at,
-                        'updated_at' => $image->pivot->updated_at,
-                    ]);
-                }
-
-                // Create option relationships
-                foreach ($optionIds as $optionId) {
-                    DB::connection('reseller')->table('option_product')->insert([
-                        'option_id' => $optionId,
-                        'product_id' => $productId,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
+                $newProductId = DB::connection('reseller')
+                    ->table('products')
+                    ->insertGetId($insertData);
 
                 // Copy variations if any
-                $variations = $this->product->variations()->get();
+                $variations = DB::table('products')
+                    ->where('parent_id', $this->product->id)
+                    ->get();
+
                 foreach ($variations as $variation) {
-                    $variationData = $variation->getRawOriginal();
-                    unset($variationData['id']);
-                    $variationData['source_id'] = $variation->id;
-                    $variationData['parent_id'] = $productId;
-                    $variationData['brand_id'] = $brandId;
+                    $varData = (array) $variation;
+                    $varData['parent_id'] = $newProductId;
+                    $varData['source_id'] = $varData['id'];
+                    unset($varData['id']);
 
-                    $variationId = DB::connection('reseller')->table('products')->insertGetId($variationData);
+                    DB::connection('reseller')
+                        ->table('products')
+                        ->insert($varData);
+                }
 
-                    // Copy variation images
-                    $variationImages = $variation->images()->get();
-                    foreach ($variationImages as $index => $image) {
-                        DB::connection('reseller')->table('image_product')->insert([
-                            'image_id' => $imageIds[$index],
-                            'product_id' => $variationId,
-                            'img_type' => $image->pivot->img_type,
-                            'order' => $image->pivot->order,
-                            'created_at' => $image->pivot->created_at,
-                            'updated_at' => $image->pivot->updated_at,
+                // Insert category relationships
+                foreach ($categoryIds as $categoryId) {
+                    DB::connection('reseller')
+                        ->table('category_product')
+                        ->insert([
+                            'product_id' => $newProductId,
+                            'category_id' => $categoryId
                         ]);
-                    }
+                }
+
+                // Insert image relationships
+                foreach ($imageIds as $image) {
+                    DB::connection('reseller')
+                        ->table('image_product')
+                        ->insert([
+                            'product_id' => $newProductId,
+                            'image_id' => $image['id'],
+                            'img_type' => $image['img_type'],
+                            'order' => $image['order']
+                        ]);
+                }
+
+                // Insert option relationships
+                foreach ($optionIds as $optionId) {
+                    DB::connection('reseller')
+                        ->table('option_product')
+                        ->insert([
+                            'product_id' => $newProductId,
+                            'option_id' => $optionId
+                        ]);
                 }
 
                 Log::info("Successfully copied product {$this->product->id} to reseller {$reseller->id}");

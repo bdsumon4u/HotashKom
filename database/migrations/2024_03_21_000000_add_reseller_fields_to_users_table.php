@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('domain')->nullable()->after('address');
             $table->string('api_token', 80)->unique()->nullable()->after('domain');
-            $table->boolean('is_active')->default(true)->after('api_token');
+            $table->boolean('is_active')->default(false)->after('api_token');
 
             // Database configuration
             $table->string('db_name')->nullable()->after('is_active');

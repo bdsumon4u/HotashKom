@@ -19,6 +19,7 @@ class CopyResourceToResellers implements ShouldQueue
     protected $model;
     protected $uniqueColumn;
     protected $table;
+    protected $idMap = [];
 
     /**
      * Create a new job instance.
@@ -28,6 +29,124 @@ class CopyResourceToResellers implements ShouldQueue
         $this->model = $model;
         $this->uniqueColumn = $uniqueColumn;
         $this->table = $model->getTable();
+    }
+
+    /**
+     * Get or create a resource in reseller's database
+     */
+    protected function getOrCreateResource(): int
+    {
+        // If we already have the ID mapping, return it
+        if (isset($this->idMap[$this->table][$this->model->id])) {
+            return $this->idMap[$this->table][$this->model->id];
+        }
+
+        $data = $this->model->getRawOriginal();
+
+        // First check if the resource's ID exists in source_id column
+        $existingBySourceId = DB::connection('reseller')
+            ->table($this->table)
+            ->where('source_id', $this->model->id)
+            ->first();
+
+        if ($existingBySourceId) {
+            // Resource already exists with this source_id, store mapping and return
+            $this->idMap[$this->table][$this->model->id] = $existingBySourceId->id;
+            return $existingBySourceId->id;
+        }
+
+        // If not found by source_id, check if unique column exists
+        $existingByUnique = DB::connection('reseller')
+            ->table($this->table)
+            ->where($this->uniqueColumn, $data[$this->uniqueColumn])
+            ->first();
+
+        if ($existingByUnique) {
+            // Update source_id in reseller's database to match original resource's ID
+            DB::connection('reseller')
+                ->table($this->table)
+                ->where($this->uniqueColumn, $data[$this->uniqueColumn])
+                ->update(['source_id' => $this->model->id]);
+
+            // Store the ID mapping
+            $this->idMap[$this->table][$this->model->id] = $existingByUnique->id;
+            return $existingByUnique->id;
+        }
+
+        // Handle foreign keys in the data
+        $foreignKeys = [];
+        foreach ($data as $key => $value) {
+            if (str_ends_with($key, '_id') && $value) {
+                $foreignKeys[$key] = $value;
+            }
+        }
+
+        // If we have foreign keys, get all related IDs in one query per table
+        if (!empty($foreignKeys)) {
+            $relatedIds = [];
+            foreach ($foreignKeys as $key => $value) {
+                // Get the relationship method name by removing '_id' from the foreign key
+                $relationName = str_replace('_id', '', $key);
+
+                // Check if the relationship method exists
+                if (method_exists($this->model, $relationName)) {
+                    $relatedModel = $this->model->{$relationName}()->getRelated();
+                    $relatedTable = $relatedModel->getTable();
+
+                    if (!isset($relatedIds[$relatedTable])) {
+                        $relatedIds[$relatedTable] = [];
+                    }
+                    $relatedIds[$relatedTable][] = $value;
+                }
+            }
+
+            // Get all related IDs in one query per table
+            foreach ($relatedIds as $table => $ids) {
+                $existingRelated = DB::connection('reseller')
+                    ->table($table)
+                    ->whereIn('source_id', $ids)
+                    ->get(['id', 'source_id']);
+
+                foreach ($existingRelated as $related) {
+                    if (isset($this->idMap[$table][$related->source_id])) {
+                        continue;
+                    }
+                    $this->idMap[$table][$related->source_id] = $related->id;
+                }
+            }
+
+            // Update foreign keys with new IDs
+            foreach ($foreignKeys as $key => $value) {
+                // Get the relationship method name by removing '_id' from the foreign key
+                $relationName = str_replace('_id', '', $key);
+
+                // Check if the relationship method exists
+                if (method_exists($this->model, $relationName)) {
+                    $relatedModel = $this->model->{$relationName}()->getRelated();
+                    $relatedTable = $relatedModel->getTable();
+
+                    if (isset($this->idMap[$relatedTable][$value])) {
+                        $data[$key] = $this->idMap[$relatedTable][$value];
+                    }
+                }
+            }
+        }
+
+        // Prepare data for insertion
+        $insertData = $data;
+        // Set source_id to original ID and remove id from data
+        $insertData['source_id'] = $insertData['id'];
+        unset($insertData['id']);
+
+        // Insert the data and get the new auto-generated ID
+        $newId = DB::connection('reseller')
+            ->table($this->table)
+            ->insertGetId($insertData);
+
+        // Store the ID mapping
+        $this->idMap[$this->table][$this->model->id] = $newId;
+
+        return $newId;
     }
 
     /**
@@ -43,34 +162,13 @@ class CopyResourceToResellers implements ShouldQueue
                 // Connect to reseller's database using their config
                 config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
 
-                // Get raw data from the model
-                $data = $this->model->getRawOriginal();
+                // Get or create the resource
+                $newId = $this->getOrCreateResource();
 
-                // Check if resource exists in reseller's database
-                $existing = DB::connection('reseller')
-                    ->table($this->table)
-                    ->where($this->uniqueColumn, $data[$this->uniqueColumn])
-                    ->first();
-
-                if ($existing) {
-                    // Update source_id in oninda database
-                    DB::table($this->table)
-                        ->where('id', $this->model->id)
-                        ->update(['source_id' => $existing->id]);
-
-                    Log::info("Resource {$this->model->id} from {$this->table} already exists in reseller {$reseller->id}'s database. Updated source_id.");
-                } else {
-                    // Copy resource to reseller's database
-                    $insertData = $data;
-                    $insertData['source_id'] = $insertData['id'];
-                    unset($insertData['id']);
-
-                    DB::connection('reseller')->table($this->table)->insert($insertData);
-                    Log::info("Copied resource {$this->model->id} from {$this->table} to reseller {$reseller->id}'s database.");
-                }
+                Log::info("Successfully copied {$this->table} {$this->model->id} to reseller {$reseller->id}");
 
             } catch (\Exception $e) {
-                Log::error("Failed to copy resource {$this->model->id} from {$this->table} to reseller {$reseller->id}: " . $e->getMessage());
+                Log::error("Failed to copy {$this->table} {$this->model->id} to reseller {$reseller->id}: " . $e->getMessage());
                 continue;
             }
         }
