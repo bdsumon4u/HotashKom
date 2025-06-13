@@ -18,7 +18,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
-    private $base_url = 'https://portal.steadfast.com.bd/api/v1';
+    private $base_url = 'https://portal.packzy.com/api/v1';
 
     /**
      * Display a listing of the resource.
