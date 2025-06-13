@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Events\ProductCreated;
+use App\Jobs\CopyProductToResellers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -60,6 +61,11 @@ class Product extends Model
                     'base_image' => mt_rand(47, 67),
                     'additional_images' => $additionals,
                 ]);
+            }
+
+            // Dispatch job to copy product to reseller databases
+            if ($product->wasRecentlyCreated) {
+                CopyProductToResellers::dispatch($product);
             }
         });
 

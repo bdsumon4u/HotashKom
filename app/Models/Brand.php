@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\CopyResourceToResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
@@ -12,8 +13,13 @@ class Brand extends Model
 
     public static function booted(): void
     {
-        static::saved(function (): void {
+        static::saved(function ($brand): void {
             cache()->forget('brands');
+
+            // Dispatch job to copy brand to reseller databases
+            if ($brand->wasRecentlyCreated) {
+                CopyResourceToResellers::dispatch($brand, 'slug');
+            }
         });
 
         static::deleting(function (): void {

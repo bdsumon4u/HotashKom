@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\CopyResourceToResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
@@ -17,6 +18,11 @@ class Category extends Model
             cache()->forget('homesections');
             // cache()->forget('catmenu:nested');
             // cache()->forget('catmenu:nestedwithparent');
+
+            // Dispatch job to copy category to reseller databases
+            if ($category->wasRecentlyCreated) {
+                CopyResourceToResellers::dispatch($category, 'slug');
+            }
         });
 
         static::deleting(function ($category): void {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\CopyResourceToResellers;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,6 +13,16 @@ class Image extends Model
     protected $fillable = [
         'filename', 'disk', 'path', 'extension', 'mime', 'size',
     ];
+
+    public static function booted(): void
+    {
+        static::saved(function ($image): void {
+            // Dispatch job to copy image to reseller databases
+            if ($image->wasRecentlyCreated) {
+                CopyResourceToResellers::dispatch($image, 'filename');
+            }
+        });
+    }
 
     public function sizeHuman(): Attribute
     {
