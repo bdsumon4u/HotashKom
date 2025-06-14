@@ -56,23 +56,23 @@
                                             @case('WAITING')
                                                 @php $show = in_array(request('status'), ['PENDING', 'CANCELLED']) @endphp
                                                 @break
-                                        
+
                                             @case('CONFIRMED')
                                                 @php $show = in_array(request('status'), ['PENDING', 'WAITING', 'CANCELLED']) @endphp
                                                 @break
-                                        
+
                                             @case('CANCELLED')
                                                 @php $show = in_array(request('status'), ['PENDING', 'WAITING']) @endphp
                                                 @break
-                                        
+
                                             @case('COMPLETED')
                                             @case('RETURNED')
                                             @case('LOST')
                                                 @php $show = in_array(request('status'), ['SHIPPING']) @endphp
                                                 @break
-                                        
+
                                             @default
-                                                
+
                                         @endswitch
                                         @if($show || true)
                                         <option value="{{ $status }}">{{ $status }}</option>
@@ -91,6 +91,16 @@
                                 </select>
                             </div>
                             @endunless
+                            @if(!auth()->user()->is('salesman'))
+                            <div class="col-auto px-1">
+                                <select name="staff" id="staff" onchange="changeStaff()" class="text-white form-control form-control-sm bg-primary">
+                                    <option value="">Change Staff</option>
+                                    @foreach(\App\Models\Admin::where('role_id', \App\Models\Admin::SALESMAN)->get() as $staff)
+                                    <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @endif
                             <div class="col-auto pl-0 ml-auto">
                                 @if(request('status') == 'CONFIRMED')
                                 <button onclick="printSticker()" id="sticker" class="ml-1 btn btn-sm btn-primary">Print Sticker</button>
@@ -363,8 +373,6 @@
             });
         }
 
-        $(document).on('change', '.staff-column', changeStaff);
-
         function changeStaff() {
             $('[name="staff"]').prop('disabled', true);
 
@@ -392,10 +400,7 @@
                 complete: function () {
                     $('[name="staff"]').prop('disabled', false);
                     $('[name="staff"]').val('');
-                },
-                error: function (response) {
-                    $.notify(response?.responseJSON?.message || 'Staff update failed.', {type: 'danger'});
-                },
+                }
             });
         }
 
