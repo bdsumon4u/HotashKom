@@ -105,7 +105,7 @@ class RegisterController extends Controller
         foreach (['phone', 'bkash'] as $type) {
             $number = Str::replace(['-', ' '], '', $data[$type.'_number']);
             if (Str::startsWith($number, '01')) {
-                $number = '+88' . $number;
+                $number = '+88'.$number;
             }
             $data[$type.'_number'] = $number;
         }

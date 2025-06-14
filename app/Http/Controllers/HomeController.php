@@ -19,7 +19,6 @@ class HomeController extends Controller
             'event' => 'page_view',
             'page_type' => 'home',
         ]);
-        //  \LaravelFacebookPixel::createEvent('PageView', $parameters = []);
 
         return view('index');
     }

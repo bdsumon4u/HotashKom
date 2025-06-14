@@ -13,6 +13,7 @@ class ProductCard extends Component
     {
         if (! auth('user')->check()) {
             $this->dispatch('notify', ['message' => 'Please login to add product to cart', 'type' => 'error']);
+
             return redirect()->route('user.login')->with('danger', 'Please login to add product to cart');
         }
 

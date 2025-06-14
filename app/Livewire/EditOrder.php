@@ -125,12 +125,13 @@ class EditOrder extends Component
 
         $quantity = 1;
         $id = $product->id;
-        // Manage Stock
+
+        if ($product->should_track && $product->stock_count <= 0) {
+            return session()->flash('error', 'Out of Stock.');
+        }
+
         if ($product->should_track) {
-            if ($product->stock_count <= 0) {
-                return session()->flash('error', 'Out of Stock.');
-            }
-            $quantity = $product->stock_count >= $quantity ? $quantity : $product->stock_count;
+            $quantity = min($product->stock_count, $quantity);
             $product->decrement('stock_count', $quantity);
         }
 

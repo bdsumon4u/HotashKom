@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use App\Events\ProductCreated;
 use App\Jobs\CopyProductToResellers;
 use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\App;
 use Laravel\Scout\Searchable;
 use Nicolaslopezj\Searchable\SearchableTrait;
 
@@ -60,7 +58,7 @@ class Product extends Model
 
         static::deleting(function ($product): void {
             // Dispatch job to remove product from reseller databases
-            if (!$product->parent_id) { // not a variation
+            if (! $product->parent_id) { // not a variation
                 RemoveResourceFromResellers::dispatch($product->getTable(), $product->id);
             }
             $product->variations->each->delete();

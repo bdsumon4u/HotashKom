@@ -36,7 +36,7 @@ class TransactionController extends Controller
                     if (isset($meta['trx_id']) && isset($meta['admin_id'])) {
                         return '<span class="text-muted">Trx ID: '.$meta['trx_id'].' by staff #'.$meta['admin_id'].'</span>';
                     }
-                    
+
                     $title = $row->meta['reason'] ?? 'N/A';
                     if ($id = $meta['order_id'] ?? false) {
                         return '<a target="_blank" href="'.route('admin.orders.edit', $id).'">'.$title.'</a>';

@@ -102,13 +102,13 @@ class Order extends Model
             });
             $amount = $retail + $order->data['retail_delivery_fee'] - $order->data['advanced']
                 - $order->data['subtotal'] + $order->data['discount'];
-            
+
             if ($status == 'COMPLETED') {
-                $order->user->deposit($amount-$order->data['shipping_cost'], [
+                $order->user->deposit($amount - $order->data['shipping_cost'], [
                     'reason' => 'Order #'.$order->id.' is '.$status,
                     'order_id' => $order->id,
                 ]);
-            } else if ($status == 'RETURNED') {
+            } elseif ($status == 'RETURNED') {
                 $order->user->forceWithdraw($amount, [
                     'reason' => 'Order #'.$order->id.' is '.$status,
                     'order_id' => $order->id,
@@ -119,12 +119,12 @@ class Order extends Model
 
     public function adjustStock(): void
     {
-        if ($this->exists && ! $this->isDirty('status')) {
+        if ($this->wasRecentlyCreated || ($this->exists && ! $this->isDirty('status'))) {
             return;
         }
 
-        $increment = ['PENDING', 'WAITING', 'RETURNED', 'CANCELLED'];
-        $decrement = ['CONFIRMED', 'INVOICED', 'SHIPPING', 'COMPLETED', 'LOST'];
+        $increment = config('app.increment');
+        $decrement = config('app.decrement');
 
         $prev = $this->getOriginal('status');
         $next = $this->getAttribute('status');

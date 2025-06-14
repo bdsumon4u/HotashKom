@@ -105,7 +105,7 @@ class LoginController extends Controller
     {
         $phone = Str::replace(['-', ' '], '', $request->phone);
         if (Str::startsWith($phone, '01')) {
-            $phone = '+88' . $phone;
+            $phone = '+88'.$phone;
         }
         $request->merge(['phone' => $phone]);
 

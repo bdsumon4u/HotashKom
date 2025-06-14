@@ -17,8 +17,11 @@ class CopyResourceToResellers implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $model;
+
     protected $uniqueColumn;
+
     protected $table;
+
     protected $idMap = [];
 
     /**
@@ -52,6 +55,7 @@ class CopyResourceToResellers implements ShouldQueue
         if ($existingBySourceId) {
             // Resource already exists with this source_id, store mapping and return
             $this->idMap[$this->table][$this->model->id] = $existingBySourceId->id;
+
             return $existingBySourceId->id;
         }
 
@@ -70,6 +74,7 @@ class CopyResourceToResellers implements ShouldQueue
 
             // Store the ID mapping
             $this->idMap[$this->table][$this->model->id] = $existingByUnique->id;
+
             return $existingByUnique->id;
         }
 
@@ -82,7 +87,7 @@ class CopyResourceToResellers implements ShouldQueue
         }
 
         // If we have foreign keys, get all related IDs in one query per table
-        if (!empty($foreignKeys)) {
+        if (! empty($foreignKeys)) {
             $relatedIds = [];
             foreach ($foreignKeys as $key => $value) {
                 // Get the relationship method name by removing '_id' from the foreign key
@@ -93,7 +98,7 @@ class CopyResourceToResellers implements ShouldQueue
                     $relatedModel = $this->model->{$relationName}()->getRelated();
                     $relatedTable = $relatedModel->getTable();
 
-                    if (!isset($relatedIds[$relatedTable])) {
+                    if (! isset($relatedIds[$relatedTable])) {
                         $relatedIds[$relatedTable] = [];
                     }
                     $relatedIds[$relatedTable][] = $value;
@@ -175,7 +180,8 @@ class CopyResourceToResellers implements ShouldQueue
                 Log::info("Successfully copied {$this->table} {$this->model->id} to reseller {$reseller->id}");
 
             } catch (\Exception $e) {
-                Log::error("Failed to copy {$this->table} {$this->model->id} to reseller {$reseller->id}: " . $e->getMessage());
+                Log::error("Failed to copy {$this->table} {$this->model->id} to reseller {$reseller->id}: ".$e->getMessage());
+
                 continue;
             }
         }

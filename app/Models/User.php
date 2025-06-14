@@ -9,9 +9,8 @@ use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable implements Wallet
 {
@@ -115,7 +114,7 @@ class User extends Authenticatable implements Wallet
      */
     protected function getCacheKeysToClear(string $table): ?array
     {
-        return match($table) {
+        return match ($table) {
             'categories' => ['categories:nested', 'homesections'],
             'brands' => ['brands'],
             default => null

@@ -79,7 +79,7 @@ class OrderController extends Controller
             ->editColumn('status', function ($row) {
                 $return = '<select data-id="'.$row->id.'" onchange="changeStatus" class="status-column form-control-sm">';
                 foreach (config('app.orders', []) as $status) {
-                    if($row->status === 'COMPLETED') {
+                    if ($row->status === 'COMPLETED') {
                         $return .= '<option value="'.$status.'" '.($status === 'RETURNED' ? '' : 'disabled').' '.($status === $row->status ? 'selected' : '').'>'.$status.'</option>';
                     } else {
                         $return .= '<option value="'.$status.'" '.($status === 'RETURNED' ? 'disabled' : '').' '.($status === $row->status ? 'selected' : '').'>'.$status.'</option>';

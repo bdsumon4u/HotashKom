@@ -77,12 +77,13 @@ class RemoveProductVariationsFromResellers implements ShouldQueue
 
                     Log::info("Removed variations for product {$this->productId} from reseller database {$reseller->database}");
                 } catch (\Exception $e) {
-                    Log::error("Failed to remove variations from reseller {$reseller->database}: " . $e->getMessage());
+                    Log::error("Failed to remove variations from reseller {$reseller->database}: ".$e->getMessage());
+
                     continue;
                 }
             }
         } catch (\Exception $e) {
-            Log::error("Failed to process resellers: " . $e->getMessage());
+            Log::error('Failed to process resellers: '.$e->getMessage());
             throw $e;
         }
     }

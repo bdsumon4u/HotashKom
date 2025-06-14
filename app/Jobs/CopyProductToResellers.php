@@ -17,6 +17,7 @@ class CopyProductToResellers implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $product;
+
     protected $idMap = [];
 
     /**
@@ -46,6 +47,7 @@ class CopyProductToResellers implements ShouldQueue
         if ($existingBySourceId) {
             // Resource already exists with this source_id, store mapping and return
             $this->idMap[$table][$sourceId] = $existingBySourceId->id;
+
             return $existingBySourceId->id;
         }
 
@@ -64,6 +66,7 @@ class CopyProductToResellers implements ShouldQueue
 
             // Store the ID mapping
             $this->idMap[$table][$sourceId] = $existingByUnique->id;
+
             return $existingByUnique->id;
         }
 
@@ -72,7 +75,7 @@ class CopyProductToResellers implements ShouldQueue
             ->where('id', $sourceId)
             ->first();
 
-        if (!$data) {
+        if (! $data) {
             throw new \Exception("Resource not found in source database: {$table} {$sourceId}");
         }
 
@@ -86,13 +89,13 @@ class CopyProductToResellers implements ShouldQueue
         }
 
         // If we have foreign keys, get all related IDs in one query per table
-        if (!empty($foreignKeys)) {
+        if (! empty($foreignKeys)) {
             $relatedIds = [];
             foreach ($foreignKeys as $key => $value) {
                 // Get the table name from the foreign key
                 $relatedTable = str_replace('_id', 's', $key);
 
-                if (!isset($relatedIds[$relatedTable])) {
+                if (! isset($relatedIds[$relatedTable])) {
                     $relatedIds[$relatedTable] = [];
                 }
                 $relatedIds[$relatedTable][] = $value;
@@ -186,7 +189,7 @@ class CopyProductToResellers implements ShouldQueue
                     $imageIds[] = [
                         'id' => $newImageId,
                         'img_type' => $image->img_type,
-                        'order' => $image->order
+                        'order' => $image->order,
                     ];
                 }
 
@@ -237,7 +240,7 @@ class CopyProductToResellers implements ShouldQueue
                         ->table('category_product')
                         ->insert([
                             'product_id' => $newProductId,
-                            'category_id' => $categoryId
+                            'category_id' => $categoryId,
                         ]);
                 }
 
@@ -249,7 +252,7 @@ class CopyProductToResellers implements ShouldQueue
                             'product_id' => $newProductId,
                             'image_id' => $image['id'],
                             'img_type' => $image['img_type'],
-                            'order' => $image['order']
+                            'order' => $image['order'],
                         ]);
                 }
 
@@ -259,14 +262,15 @@ class CopyProductToResellers implements ShouldQueue
                         ->table('option_product')
                         ->insert([
                             'product_id' => $newProductId,
-                            'option_id' => $optionId
+                            'option_id' => $optionId,
                         ]);
                 }
 
                 Log::info("Successfully copied product {$this->product->id} to reseller {$reseller->id}");
 
             } catch (\Exception $e) {
-                Log::error("Failed to copy product {$this->product->id} to reseller {$reseller->id}: " . $e->getMessage());
+                Log::error("Failed to copy product {$this->product->id} to reseller {$reseller->id}: ".$e->getMessage());
+
                 continue;
             }
         }

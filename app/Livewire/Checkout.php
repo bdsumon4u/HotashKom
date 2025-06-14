@@ -86,13 +86,13 @@ class Checkout extends Component
             /*
             if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
             */
-                $shipping_cost = cart()->content()->max(function ($item) use ($area) {
-                    if ($area == 'Inside Dhaka') {
-                        return $item->options->shipping_inside;
-                    } else {
-                        return $item->options->shipping_outside;
-                    }
-                });
+            $shipping_cost = cart()->content()->max(function ($item) use ($area) {
+                if ($area == 'Inside Dhaka') {
+                    return $item->options->shipping_inside;
+                } else {
+                    return $item->options->shipping_outside;
+                }
+            });
             /*
             } else {
                 $shipping_cost = cart()->content()->sum(function ($item) use ($area) {
@@ -189,6 +189,7 @@ class Checkout extends Component
     {
         if (! auth('user')->check()) {
             $this->dispatch('notify', ['message' => 'Please login to add product to cart', 'type' => 'error']);
+
             return redirect()->route('user.login')->with('danger', 'Please login to add product to cart');
         }
 
@@ -233,14 +234,6 @@ class Checkout extends Component
 
                     if ($quantity <= 0) {
                         return null;
-                    }
-                    // Manage Stock
-                    if ($product->should_track) {
-                        if ($product->stock_count <= 0) {
-                            return null; // Allow overstock
-                        }
-                        $quantity = $product->stock_count >= $quantity ? $quantity : $product->stock_count;
-                        $product->decrement('stock_count', $quantity);
                     }
 
                     // Needed Attributes
@@ -293,8 +286,6 @@ class Checkout extends Component
                     'subtotal' => cart()->subtotal(),
                 ],
             ];
-
-            // \LaravelFacebookPixel::createEvent('Purchase', ['currency' => 'USD', 'value' => data_get(json_decode($data['data'], true), 'subtotal')]);
 
             $order = Order::create($data);
             $user->notify(new OrderPlaced($order));

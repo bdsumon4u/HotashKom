@@ -48,7 +48,7 @@ return new class extends Migration
         DB::table('images')->update(['source_id' => DB::raw('id')]);
 
         // Add source_id to products table if it doesn't exist
-        if (!Schema::hasColumn('products', 'source_id')) {
+        if (! Schema::hasColumn('products', 'source_id')) {
             Schema::table('products', function (Blueprint $table) {
                 $table->unsignedBigInteger('source_id')->nullable()->after('id');
                 $table->index('source_id');

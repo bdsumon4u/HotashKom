@@ -16,6 +16,7 @@ class RemoveResourceFromResellers implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $table;
+
     protected $id;
 
     /**
@@ -56,7 +57,8 @@ class RemoveResourceFromResellers implements ShouldQueue
                 Log::info("Successfully removed {$this->table} {$this->id} from reseller {$reseller->id}");
 
             } catch (\Exception $e) {
-                Log::error("Failed to remove {$this->table} {$this->id} from reseller {$reseller->id}: " . $e->getMessage());
+                Log::error("Failed to remove {$this->table} {$this->id} from reseller {$reseller->id}: ".$e->getMessage());
+
                 continue;
             }
         }

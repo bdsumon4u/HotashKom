@@ -28,6 +28,10 @@ return [
         'CANCELLED',
     ],
 
+    'increment' => ['PENDING', 'WAITING', 'RETURNED', 'CANCELLED'],
+
+    'decrement' => ['CONFIRMED', 'INVOICED', 'SHIPPING', 'COMPLETED', 'LOST'],
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

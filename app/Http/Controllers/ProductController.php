@@ -29,7 +29,7 @@ class ProductController extends Controller
                 'page_type' => 'shop',
             ]);
         }
-        // \LaravelFacebookPixel::createEvent('PageView', $parameters = []);
+
         $section = null;
         $rows = 3;
         $cols = 5;
@@ -110,7 +110,7 @@ class ProductController extends Controller
             ->where('id', '!=', $product->id)
             ->limit(config('services.products_count.related', 20))
             ->get();
-        //  \LaravelFacebookPixel::createEvent('ViewContent', $parameters = []);
+
         GoogleTagManagerFacade::set([
             'event' => 'view_item',
             'ecommerce' => [

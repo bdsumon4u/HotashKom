@@ -18,7 +18,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
-    private $base_url = 'https://portal.steadfast.com.bd/api/v1';
+    private $base_url = 'https://portal.packzy.com/api/v1';
 
     /**
      * Display a listing of the resource.
@@ -448,6 +448,7 @@ class OrderController extends Controller
                             'image' => optional($product->base_image)->src,
                             'price' => $selling = $product->getPrice($quantity),
                             'quantity' => $quantity,
+                            'category' => $product->category,
                             'total' => $quantity * $selling,
                         ];
                     }
@@ -477,9 +478,19 @@ class OrderController extends Controller
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
         $products = is_array($order->products) ? $order->products : get_object_vars($order->products);
         array_map(function ($product) {
-            if ($product = Product::find($product->id)) {
-                $product->should_track && $product->increment('stock_count', intval($product->quantity));
+            if (! $product = Product::find($product->id)) {
+                return null;
             }
+
+            if (! $product->should_track) {
+                return null;
+            }
+
+            if (! in_array($product->status, config('app.decrement'))) {
+                return null;
+            }
+
+            $product->increment('stock_count', intval($product->quantity));
 
             return null;
         }, $products);

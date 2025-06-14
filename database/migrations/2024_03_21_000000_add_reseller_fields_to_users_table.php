@@ -31,7 +31,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn([
                 'domain', 'api_token', 'is_active',
-                'db_name', 'db_username', 'db_password'
+                'db_name', 'db_username', 'db_password',
             ]);
         });
     }
