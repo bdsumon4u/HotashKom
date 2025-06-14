@@ -159,11 +159,18 @@ class CopyResourceToResellers implements ShouldQueue
 
         foreach ($resellers as $reseller) {
             try {
-                // Connect to reseller's database using their config
+                // Configure reseller database connection
                 config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
+
+                // Purge and reconnect to ensure fresh connection
+                DB::purge('reseller');
+                DB::reconnect('reseller');
 
                 // Get or create the resource
                 $newId = $this->getOrCreateResource();
+
+                // Clear reseller's cache
+                $reseller->clearResellerCache($this->table);
 
                 Log::info("Successfully copied {$this->table} {$this->model->id} to reseller {$reseller->id}");
 

@@ -10,6 +10,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class User extends Authenticatable implements Wallet
 {
@@ -106,5 +108,35 @@ class User extends Authenticatable implements Wallet
             'email_verified_at' => 'datetime',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Get cache keys to clear based on table
+     */
+    protected function getCacheKeysToClear(string $table): ?array
+    {
+        return match($table) {
+            'categories' => ['categories:nested', 'homesections'],
+            'brands' => ['brands'],
+            default => null
+        };
+    }
+
+    /**
+     * Clear reseller's cache
+     */
+    public function clearResellerCache(string $table): void
+    {
+        // Get cache keys to clear
+        $cacheKeys = $this->getCacheKeysToClear($table);
+
+        // Only proceed if we have keys to clear
+        if ($cacheKeys) {
+            // Clear specific cache keys
+            DB::connection('reseller')
+                ->table('cache')
+                ->whereIn('key', $cacheKeys)
+                ->delete();
+        }
     }
 }

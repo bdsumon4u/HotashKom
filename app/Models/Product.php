@@ -52,18 +52,6 @@ class Product extends Model
     public static function booted()
     {
         static::saved(function ($product): void {
-            if (App::runningInConsole() && ($product->categories->isEmpty() || $product->images->isEmpty())) {
-                $categories = range(1, 30);
-                $categories = array_map(fn ($key) => $categories[$key], array_rand($categories, mt_rand(2, 4)));
-                $additionals = range(47, 67);
-                $additionals = array_map(fn ($key) => $additionals[$key], array_rand($additionals, mt_rand(4, 7)));
-                ProductCreated::dispatch($product, [
-                    'categories' => $categories,
-                    'base_image' => mt_rand(47, 67),
-                    'additional_images' => $additionals,
-                ]);
-            }
-
             // Dispatch job to copy product to reseller databases
             if ($product->wasRecentlyCreated) {
                 CopyProductToResellers::dispatch($product);

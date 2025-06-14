@@ -37,14 +37,21 @@ class RemoveResourceFromResellers implements ShouldQueue
 
         foreach ($resellers as $reseller) {
             try {
-                // Connect to reseller's database using their config
+                // Configure reseller database connection
                 config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
+
+                // Purge and reconnect to ensure fresh connection
+                DB::purge('reseller');
+                DB::reconnect('reseller');
 
                 // Set source_id to null for the resource
                 DB::connection('reseller')
                     ->table($this->table)
                     ->where('source_id', $this->id)
                     ->update(['source_id' => null]);
+
+                // Clear reseller's cache
+                $reseller->clearResellerCache($this->table);
 
                 Log::info("Successfully removed {$this->table} {$this->id} from reseller {$reseller->id}");
 
