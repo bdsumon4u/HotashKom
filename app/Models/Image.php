@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,8 +20,13 @@ class Image extends Model
         static::saved(function ($image): void {
             // Dispatch job to copy image to reseller databases
             if ($image->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($image, 'filename');
+                CopyResourceToResellers::dispatch($image, 'path');
             }
+        });
+
+        static::deleting(function ($image): void {
+            // Dispatch job to remove image from reseller databases
+            RemoveResourceFromResellers::dispatch($image->getTable(), $image->id);
         });
     }
 

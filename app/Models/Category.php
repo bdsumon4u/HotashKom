@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
@@ -26,6 +27,8 @@ class Category extends Model
         });
 
         static::deleting(function ($category): void {
+            // Dispatch job to remove category from reseller databases
+            RemoveResourceFromResellers::dispatch($category->getTable(), $category->id);
             $category->childrens->each->delete();
             // optional($category->categoryMenu)->delete();
             cache()->forget('categories:nested');

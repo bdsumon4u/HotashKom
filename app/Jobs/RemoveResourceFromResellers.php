@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class RemoveResourceFromResellers implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $table;
+    protected $id;
+
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(string $table, int $id)
+    {
+        $this->table = $table;
+        $this->id = $id;
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        // Get all active resellers
+        $resellers = User::where('is_active', true)->get();
+
+        foreach ($resellers as $reseller) {
+            try {
+                // Connect to reseller's database using their config
+                config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
+
+                // Set source_id to null for the resource
+                DB::connection('reseller')
+                    ->table($this->table)
+                    ->where('source_id', $this->id)
+                    ->update(['source_id' => null]);
+
+                Log::info("Successfully removed {$this->table} {$this->id} from reseller {$reseller->id}");
+
+            } catch (\Exception $e) {
+                Log::error("Failed to remove {$this->table} {$this->id} from reseller {$reseller->id}: " . $e->getMessage());
+                continue;
+            }
+        }
+    }
+}

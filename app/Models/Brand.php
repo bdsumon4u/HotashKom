@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
@@ -22,7 +23,9 @@ class Brand extends Model
             }
         });
 
-        static::deleting(function (): void {
+        static::deleting(function ($brand): void {
+            // Dispatch job to remove brand from reseller databases
+            RemoveResourceFromResellers::dispatch($brand->getTable(), $brand->id);
             cache()->forget('brands');
         });
     }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Events\ProductCreated;
 use App\Jobs\CopyProductToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,7 +49,7 @@ class Product extends Model
      *
      * @return void
      */
-    protected static function booted()
+    public static function booted()
     {
         static::saved(function ($product): void {
             if (App::runningInConsole() && ($product->categories->isEmpty() || $product->images->isEmpty())) {
@@ -70,6 +71,8 @@ class Product extends Model
         });
 
         static::deleting(function ($product): void {
+            // Dispatch job to remove product from reseller databases
+            RemoveResourceFromResellers::dispatch($product->getTable(), $product->id);
             $product->variations->each->delete();
         });
 

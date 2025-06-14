@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Attribute extends Model
@@ -14,8 +15,13 @@ class Attribute extends Model
         static::saved(function ($attribute): void {
             // Dispatch job to copy attribute to reseller databases
             if ($attribute->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($attribute, 'name');
+                CopyResourceToResellers::dispatch($attribute, 'slug');
             }
+        });
+
+        static::deleting(function ($attribute): void {
+            // Dispatch job to remove attribute from reseller databases
+            RemoveResourceFromResellers::dispatch($attribute->getTable(), $attribute->id);
         });
     }
 
