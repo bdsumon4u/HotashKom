@@ -72,7 +72,9 @@ class Product extends Model
 
         static::deleting(function ($product): void {
             // Dispatch job to remove product from reseller databases
-            RemoveResourceFromResellers::dispatch($product->getTable(), $product->id);
+            if (!$product->parent_id) { // not a variation
+                RemoveResourceFromResellers::dispatch($product->getTable(), $product->id);
+            }
             $product->variations->each->delete();
         });
 

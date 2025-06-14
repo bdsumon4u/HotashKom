@@ -40,14 +40,13 @@ class ProductVariationController extends Controller
         $options = Option::find($attributes->flatten());
 
         DB::transaction(function () use ($attributes, $product, $options): void {
-            // Store old variations for rollback if needed
-            $oldVariations = $product->variations()->get();
-            $oldVariationIds = $oldVariations->pluck('id')->toArray();
-
-            // Delete old variations from main database
-            $product->variations()->delete();
-
             try {
+                // Delete all existing variations first
+                $product->variations()->delete();
+
+                // Delete variations from reseller databases
+                RemoveProductVariationsFromResellers::dispatch($product->id);
+
                 $variations = collect($attributes->first())->crossJoin(...$attributes->splice(1));
                 $newVariations = collect();
 
@@ -55,30 +54,23 @@ class ProductVariationController extends Controller
                     $name = $options->filter(fn ($item): bool => in_array($item->id, $items))->pluck('name')->join('-');
                     $sku = $product->sku.'('.implode('-', $items).')';
                     $slug = $product->slug.'('.implode('-', $items).')';
-                    if (! $variation = $product->variations()->firstWhere('sku', $sku)) {
-                        $variation = $product->replicate();
-                        $variation->forceFill([
-                            'name' => $name,
-                            'sku' => $sku,
-                            'slug' => $slug,
-                            'parent_id' => $product->id,
-                        ]);
-                        $variation->save();
-                    }
+
+                    // Create new variation
+                    $variation = $product->replicate();
+                    $variation->forceFill([
+                        'name' => $name,
+                        'sku' => $sku,
+                        'slug' => $slug,
+                        'parent_id' => $product->id,
+                    ]);
+                    $variation->save();
+
+                    // Sync options
                     $variation->options()->sync($items);
                     $newVariations->push($variation);
                 });
 
-                // Only dispatch job to remove old variations from reseller databases after successful creation
-                if (!empty($oldVariationIds)) {
-                    RemoveProductVariationsFromResellers::dispatch($oldVariationIds);
-                }
-
             } catch (\Exception $e) {
-                // Restore old variations if new ones fail to create
-                foreach ($oldVariations as $variation) {
-                    $variation->save();
-                }
                 throw $e;
             }
         });
