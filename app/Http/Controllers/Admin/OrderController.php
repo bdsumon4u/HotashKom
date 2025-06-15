@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exports\PathaoExport;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use App\Models\Product;
 use App\Notifications\User\OrderConfirmed;
@@ -441,16 +442,7 @@ class OrderController extends Controller
                         }
                     }
                     if ($quantity > 0) {
-                        return [
-                            'id' => $product->id,
-                            'name' => $product->name,
-                            'slug' => $product->slug,
-                            'image' => optional($product->base_image)->src,
-                            'price' => $selling = $product->getPrice($quantity),
-                            'quantity' => $quantity,
-                            'category' => $product->category,
-                            'total' => $quantity * $selling,
-                        ];
+                        return (new ProductResource($product))->toCartItem($quantity);
                     }
                 }
             })->filter(function ($product) {

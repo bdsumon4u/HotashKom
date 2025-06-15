@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Livewire\Checkout;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -32,22 +33,30 @@ class LivewireCheckoutController extends Controller
         $livewire = new Checkout;
         $livewire->mount();
 
-        $livewire->cart = collect($data['cart'])->mapWithKeys(function ($item) {
-            if (! $product = Product::find($item['id'])) {
-                return null;
-            }
+        // Clear existing cart
+        cart()->destroy();
 
-            return [$product->id => [
-                'id' => $product->id,
-                'parent_id' => $product->parent_id ?? $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
-                'image' => optional($product->base_image)->path,
-                'category' => $product->category,
-                'quantity' => $item['quantity'],
-                'price' => $product->getPrice($item['quantity']),
-            ]];
-        })->filter()->toArray();
+        // Add items to cart
+        foreach ($data['cart'] as $item) {
+            if ($product = Product::find($item['id'])) {
+                $cartItem = (new ProductResource($product))->toCartItem($item['quantity']);
+                cart()->add([
+                    'id' => $cartItem['id'],
+                    'name' => $cartItem['name'],
+                    'qty' => $cartItem['quantity'],
+                    'price' => $cartItem['price'],
+                    'options' => [
+                        'parent_id' => $cartItem['parent_id'],
+                        'slug' => $cartItem['slug'],
+                        'image' => $cartItem['image'],
+                        'category' => $cartItem['category'],
+                        'shipping_inside' => $product->shipping_inside,
+                        'shipping_outside' => $product->shipping_outside,
+                    ],
+                ]);
+            }
+        }
+
         $livewire->name = $request->input('name');
         $livewire->phone = $request->input('phone');
         $livewire->address = $request->input('address');

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Http\Resources\ProductResource;
 use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Product;
@@ -236,18 +237,9 @@ class Checkout extends Component
                         return null;
                     }
 
-                    // Needed Attributes
-                    return [$id => [
-                        'id' => $id,
-                        'name' => $product->var_name,
-                        'slug' => $product->slug,
-                        'image' => optional($product->base_image)->src,
-                        'price' => $selling = $product->getPrice($quantity),
-                        'retail_price' => $this->retail[$id]['price'] ?? $selling,
-                        'quantity' => $quantity,
-                        'category' => $product->category,
-                        'total' => $quantity * $selling,
-                    ]];
+                    $productData = (new ProductResource($product))->toCartItem($quantity);
+                    $productData['retail_price'] = $this->retail[$id]['price'] ?? $productData['price'];
+                    return [$id => $productData];
                 })->filter(function ($product) {
                     return $product != null; // Only Available Products
                 })->toArray();
