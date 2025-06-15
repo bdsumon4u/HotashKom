@@ -307,6 +307,12 @@
                             <td class="checkout-subtotal">{!! theMoney($subtotal) !!} (buy); {!! theMoney($retail) !!} (sell)</td>
                         </tr>
                         <tr>
+                            <th style="font-size: 12px; white-space: nowrap;">Reseller Discount</th>
+                            <td>
+                                {!! theMoney($order->data['retail_discount'] ?? 0) !!}
+                            </td>
+                        </tr>
+                        <tr>
                             <th style="font-size: 12px; white-space: nowrap;">Reseller Delivery Charge</th>
                             <td>
                                 {!! theMoney($order->data['retail_delivery_fee']) !!}
@@ -340,7 +346,7 @@
                             <th>Grand Total</th>
                             <td class="checkout-subtotal">
                                 <strong>{!! theMoney($subtotal + $shipping_cost - $discount) !!}</strong> (buy);
-                                <strong>{!! theMoney($retail + $order->data['retail_delivery_fee'] - $advanced) !!}</strong> (sell)
+                                <strong>{!! theMoney($retail + $order->data['retail_delivery_fee'] - $advanced - ($order->data['retail_discount'] ?? 0)) !!}</strong> (sell)
                             </td>
                         </tr>
                         <tr>

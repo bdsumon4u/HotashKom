@@ -44,6 +44,9 @@ class Checkout extends Component
     #[Validate('required|numeric|min:0')]
     public $advanced = 0;
 
+    #[Validate('nullable|numeric|min:0')]
+    public $retailDiscount = 0;
+
     public function updateField($field, $value): void
     {
         $this->$field = $value;
@@ -175,12 +178,14 @@ class Checkout extends Component
             }
             $this->address = $user->address ?? '';
             $this->note = $user->note ?? '';
+            $this->retailDiscount = $user->discount ?? 0;
         } else {
             $this->name = Cookie::get('name', '');
             $this->shipping = Cookie::get('shipping', $shipping ?? '');
             $this->phone = Cookie::get('phone', '');
             $this->address = Cookie::get('address', '');
             $this->note = Cookie::get('note', '');
+            $this->retailDiscount = Cookie::get('retail_discount', 0);
         }
 
         $this->cartUpdated();
@@ -208,6 +213,7 @@ class Checkout extends Component
             'address' => 'required',
             'note' => 'nullable',
             'shipping' => 'required',
+            'retailDiscount' => 'nullable|numeric|min:0',
         ]);
 
         if (! $hidePrefix) {
@@ -239,6 +245,7 @@ class Checkout extends Component
 
                     $productData = (new ProductResource($product))->toCartItem($quantity);
                     $productData['retail_price'] = $this->retail[$id]['price'] ?? $productData['price'];
+
                     return [$id => $productData];
                 })->filter(function ($product) {
                     return $product != null; // Only Available Products
@@ -275,6 +282,7 @@ class Checkout extends Component
                     'shipping_cost' => $this->shippingCost(),
                     'retail_delivery_fee' => $this->retailDeliveryFee,
                     'advanced' => $this->advanced,
+                    'retail_discount' => $this->retailDiscount,
                     'subtotal' => cart()->subtotal(),
                 ],
             ];

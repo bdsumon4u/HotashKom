@@ -24,7 +24,7 @@ class Order extends Model
 
     protected $attributes = [
         'status' => 'CONFIRMED',
-        'data' => '{"subtotal":0,"shipping_cost":0,"advanced":0,"discount":0,"courier":"Other","city_id":"","area_id":"","weight":0.5}',
+        'data' => '{"subtotal":0,"shipping_cost":0,"retail_delivery_fee":0,"advanced":0,"discount":0,"retail_discount":0,"courier":"Other","city_id":"","area_id":"","weight":0.5}',
     ];
 
     protected static $logFillable = true;
@@ -100,16 +100,16 @@ class Order extends Model
             $retail = collect($order->products)->sum(function ($product) {
                 return $product->retail_price * $product->quantity;
             });
-            $amount = $retail + $order->data['retail_delivery_fee'] - $order->data['advanced']
-                - $order->data['subtotal'] + $order->data['discount'];
 
             if ($status == 'COMPLETED') {
-                $order->user->deposit($amount - $order->data['shipping_cost'], [
+                $amount = $retail + $order->data['retail_delivery_fee'] - $order->data['advanced'] - $order->data['retail_discount']
+                    - ($order->data['subtotal'] + $order->data['shipping_cost'] - $order->data['discount']);
+                $order->user->deposit($amount, [
                     'reason' => 'Order #'.$order->id.' is '.$status,
                     'order_id' => $order->id,
                 ]);
             } elseif ($status == 'RETURNED') {
-                $order->user->forceWithdraw($amount, [
+                $order->user->forceWithdraw($retail + $order->data['advanced'] - $order->data['retail_delivery_fee'], [
                     'reason' => 'Order #'.$order->id.' is '.$status,
                     'order_id' => $order->id,
                 ]);
@@ -119,7 +119,11 @@ class Order extends Model
 
     public function adjustStock(): void
     {
-        if ($this->wasRecentlyCreated || ($this->exists && ! $this->isDirty('status'))) {
+        if ($this->wasRecentlyCreated && $this->type == self::ONLINE) {
+            return;
+        }
+
+        if ($this->exists && ! $this->isDirty('status')) {
             return;
         }
 

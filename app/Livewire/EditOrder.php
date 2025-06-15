@@ -49,6 +49,8 @@ class EditOrder extends Component
 
     public int $advanced = 0;
 
+    public int $retail_discount = 0;
+
     #[Validate('required')]
     public string $shipping_area = '';
 

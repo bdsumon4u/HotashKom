@@ -124,6 +124,22 @@
                                         step="10" class="form-control form-control-sm" x-model="retail_delivery" />
                                 </td>
                             </tr>
+                            <tr>
+                                <th>Advanced</th>
+                                <td>
+                                    <input type="number" @focus="$event.target.select()" x-model="advanced"
+                                        step="10" class="form-control form-control-sm" x-model="advanced" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Discount (TK)</th>
+                                <td>
+                                    <input type="number" @focus="$event.target.select()" wire:model="retailDiscount"
+                                        @blur="$wire.updateField('retailDiscount', $event.target.value)"
+                                        step="10" min="0" class="form-control form-control-sm" />
+                                    <x-error field="retailDiscount" />
+                                </td>
+                            </tr>
                         </tbody>
                         <tfoot class="checkout__totals-footer">
                             <tr>
@@ -132,7 +148,7 @@
                             </tr>
                             <tr>
                                 <th>Selling</th>
-                                <td x-text="format(subtotal + Number(retail_delivery))"></td>
+                                <td x-text="format(subtotal + Number(retail_delivery) - Number(retailDiscount))"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -194,13 +210,22 @@
                                         x-model="advanced" />
                                 </td>
                             </tr>
+                            <tr>
+                                <th>Discount (TK)</th>
+                                <td>
+                                    <input type="number" @focus="$event.target.select()" wire:model="retailDiscount"
+                                        @blur="$wire.updateField('retailDiscount', $event.target.value)"
+                                        step="10" min="0" class="form-control form-control-sm" />
+                                    <x-error field="retailDiscount" />
+                                </td>
+                            </tr>
                         </tbody>
                         <tfoot class="checkout__totals-footer">
                             <tr>
                                 <th>Total</th>
                                 <td style="font-size:16px;">
                                     <div><span>{!! theMoney(cart()->total()) !!}</span> (buy)</div>
-                                    <div><span x-text="format(subtotal + Number(retail_delivery))"></span> (sell)</div>
+                                    <div><span x-text="format(subtotal + Number(retail_delivery) - Number(retailDiscount))"></span> (sell)</div>
                                 </td>
                             </tr>
                         </tfoot>
@@ -247,6 +272,7 @@
                 retail: @entangle('retail'),
                 advanced: @entangle('advanced'),
                 retail_delivery: @entangle('retailDeliveryFee'),
+                retailDiscount: @entangle('retailDiscount'),
                 get subtotal() {
                     if (!this.retail || typeof this.retail !== 'object') return 0;
                     return Object.values(this.retail).reduce((a, b) => a + b.price * b.quantity, 0);

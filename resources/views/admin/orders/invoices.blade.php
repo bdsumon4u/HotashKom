@@ -121,6 +121,7 @@
                             </tr>
                             </thead>
                             <tbody>
+                            @php($retail = 0)
                             @foreach($order->products as $product)
                                 <tr>
                                     @unless (setting('show_option')->hide_invoice_image ?? false)
@@ -129,19 +130,20 @@
                                     </td>
                                     @endunless
                                     <td>{{ $product->name }}</td>
-                                    <td>{{ $product->price }}</td>
+                                    <td>{{ $product->retail_price }}</td>
                                     <td>{{ $product->quantity }}</td>
-                                    <td>{{ $product->quantity * $product->price }}</td>
+                                    <td>{{ $amount = $product->quantity * $product->retail_price }}</td>
                                 </tr>
+                            @php($retail += $amount)
                             @endforeach
                             <tr>
                                 <th class="py-1" rowspan="5" colspan="{{(setting('show_option')->hide_invoice_image ?? false)?2:3}}" style="text-align: center; vertical-align: middle; font-size: 24px;">
-                                    <span style="font-weight: 400;">Condition</span>: TK. {{ $order->condition }}
+                                    <span style="font-weight: 400;">Condition</span>: TK. {{ $retail + $order->data['retail_delivery_fee'] - ($order->data['retail_discount'] ?? 0) - ($order->data['advanced'] ?? 0) }}
                                 </th>
                             </tr>
                             <tr>
                                 <th class="py-1">Subtotal</th>
-                                <th class="py-1">{{ $order->data['subtotal'] }}</th>
+                                <th class="py-1">{{ $retail }}</th>
                             </tr>
                             <tr>
                                 <th class="py-1">Advanced</th>
@@ -149,11 +151,11 @@
                             </tr>
                             <tr>
                                 <th class="py-1">Delivery</th>
-                                <th class="py-1">{{ $order->data['shipping_cost'] }}</th>
+                                <th class="py-1">{{ $order->data['retail_delivery_fee'] }}</th>
                             </tr>
                             <tr>
                                 <th class="py-1">Discount</th>
-                                <th class="py-1">{{ $order->data['discount'] ?? 0 }}</th>
+                                <th class="py-1">{{ $order->data['retail_discount'] ?? 0 }}</th>
                             </tr>
                             </tbody>
                         </table>
@@ -185,7 +187,7 @@
                         window.location.href = '{{ route('admin.orders.index', ['status' => 'INVOICED']) }}';
                     },
                     complete: function () {
-                        
+
                     }
                 });
             } else {

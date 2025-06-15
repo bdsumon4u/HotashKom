@@ -81,17 +81,17 @@
                                             <td>{!! theMoney($retail) !!}</td>
                                         </tr>
                                         @if ($data['advanced'])
-                                        <tr>
-                                            <th>Advanced</th>
-                                            <td>{!! theMoney(0) !!}</td>
-                                            <td>{!! theMoney($data['advanced']) !!}</td>
+                                            <tr>
+                                                <th>Advanced</th>
+                                                <td>{!! theMoney(0) !!}</td>
+                                                <td>{!! theMoney($data['advanced']) !!}</td>
                                             </tr>
                                         @endif
-                                        @if ($data['discount'])
+                                        @if ($data['retail_discount'])
                                             <tr>
                                                 <th>Discount</th>
-                                                <td>{!! theMoney($data['discount']) !!}</td>
-                                                <td>{!! theMoney(0) !!}</td>
+                                                <td>{!! theMoney($data['discount'] ?? 0) !!}</td>
+                                                <td>{!! theMoney($data['retail_discount']) !!}</td>
                                             </tr>
                                         @endif
                                         <tr>
@@ -102,9 +102,9 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th>Total</th>
-                                            <td>{!! theMoney($data['subtotal'] + $data['shipping_cost']) !!}</td>
-                                            <td>{!! theMoney($retail + $data['retail_delivery_fee']) !!}</td>
+                                            <th>Grand Total</th>
+                                            <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] - ($data['discount'] ?? 0)) !!}</td>
+                                            <td>{!! theMoney($retail + $data['retail_delivery_fee'] - ($data['advanced'] ?? 0) - ($data['retail_discount'] ?? 0)) !!}</td>
                                         </tr>
                                     </tfoot>
                                 </table>
