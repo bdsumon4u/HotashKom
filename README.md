@@ -95,16 +95,16 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
 ## Active Deployments
 These 🔥 $${\color{red}315}$$ 🔥 domains are live now
 
-_Last updated: **2025-06-14 09:15:08 Asia/Dhaka**_
+_Last updated: **2025-06-15 09:26:16 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
-| 1 | [scom1.cyber32.net](http://scom1.cyber32.net) |
-| 2 | [priyomarket.com](http://priyomarket.com) |
-| 3 | [iuddokta.com](http://iuddokta.com) |
-| 4 | [kroymela.com](http://kroymela.com) |
-| 5 | [bagstorebd.com](http://bagstorebd.com) |
-| 6 | [smbazarbd.com](http://smbazarbd.com) |
+| 1 | [priyomarket.com](http://priyomarket.com) |
+| 2 | [iuddokta.com](http://iuddokta.com) |
+| 3 | [kroymela.com](http://kroymela.com) |
+| 4 | [bagstorebd.com](http://bagstorebd.com) |
+| 5 | [smbazarbd.com](http://smbazarbd.com) |
+| 6 | [ramboshopping.com](http://ramboshopping.com) |
 | 7 | [bikroyjogot.com](http://bikroyjogot.com) |
 | 8 | [honestshop24.com](http://honestshop24.com) |
 | 9 | [emaxbd.com](http://emaxbd.com) |
