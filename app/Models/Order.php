@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\SyncProductStockWithResellers;
 use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -150,6 +151,8 @@ class Order extends Model
 
         foreach ($DBproducts as $product) {
             $product->increment('stock_count', $fact * $products[$product->id]->quantity);
+            // Dispatch job to sync stock with resellers
+            SyncProductStockWithResellers::dispatch($product);
         }
     }
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Jobs\CopyProductToResellers;
 use App\Jobs\RemoveResourceFromResellers;
+use App\Jobs\SyncProductStockWithResellers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -53,6 +54,13 @@ class Product extends Model
             // Dispatch job to copy product to reseller databases
             if ($product->wasRecentlyCreated) {
                 CopyProductToResellers::dispatch($product);
+
+                return;
+            }
+
+            // Dispatch job to sync stock attributes if they were changed
+            if ($product->isDirty(['should_track', 'stock_count'])) {
+                SyncProductStockWithResellers::dispatch($product);
             }
         });
 

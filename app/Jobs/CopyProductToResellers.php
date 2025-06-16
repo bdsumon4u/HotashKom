@@ -155,6 +155,10 @@ class CopyProductToResellers implements ShouldQueue
                 // Connect to reseller's database using their config
                 config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
 
+                // Purge and reconnect to ensure fresh connection
+                DB::purge('reseller');
+                DB::reconnect('reseller');
+
                 // Get the product data
                 $productData = $this->product->getRawOriginal();
 
