@@ -133,11 +133,6 @@ class EditOrder extends Component
             return session()->flash('error', 'Out of Stock.');
         }
 
-        if ($product->should_track) {
-            $quantity = min($product->stock_count, $quantity);
-            $product->decrement('stock_count', $quantity);
-        }
-
         $productData = (new ProductResource($product))->toCartItem($quantity);
         $productData['shipping_inside'] = $product->shipping_inside;
         $productData['shipping_outside'] = $product->shipping_outside;

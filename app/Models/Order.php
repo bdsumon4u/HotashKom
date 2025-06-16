@@ -41,7 +41,11 @@ class Order extends Model
         });
 
         static::saving(function (Order $order): void {
-            $order->adjustStock();
+            info('saving');
+            if (!$order->exists || $order->isDirty('status')) {
+                info('does not exist or status changed');
+                $order->adjustStock();
+            }
 
             if (! $order->isDirty('data')) {
                 return;
@@ -120,37 +124,54 @@ class Order extends Model
 
     public function adjustStock(): void
     {
-        if ($this->wasRecentlyCreated && $this->type == self::ONLINE) {
+        info('adjusting stock', ['order' => $this->id]);
+        $sign = function () {
+            $increment = config('app.increment');
+            $decrement = config('app.decrement');
+            if (!$this->exists) {
+                info('does not exist');
+                if (in_array($this->status, $decrement)) {
+                    return -1;
+                }
+
+                return 0;
+            }
+
+            info('exists');
+            $prev = $this->getOriginal('status');
+            $next = $this->getAttribute('status');
+
+            // if both prev and next belongs to same group, then no need to adjust stock
+            if (in_array($prev, $increment) && in_array($next, $increment)) {
+                return 0;
+            }
+            if (in_array($prev, $decrement) && in_array($next, $decrement)) {
+                return 0;
+            }
+
+            if (in_array($next, $decrement)) {
+                return -1;
+            }
+
+            return 1;
+        };
+
+        if (! $fact = $sign()) {
+            info('no fact');
             return;
         }
 
-        if ($this->exists && ! $this->isDirty('status')) {
-            return;
-        }
-
-        $increment = config('app.increment');
-        $decrement = config('app.decrement');
-
-        $prev = $this->getOriginal('status');
-        $next = $this->getAttribute('status');
-
-        // if both prev and next belongs to same group, then no need to adjust stock
-        if (in_array($prev, $increment) && in_array($next, $increment)) {
-            return;
-        }
-        if (in_array($prev, $decrement) && in_array($next, $decrement)) {
-            return;
-        }
-
-        $fact = 1;
-        if (in_array($next, $decrement)) {
-            $fact = -1;
-        }
-
+        info('fact', ['fact' => $fact]);
+        info('products', ['products' => $this->products]);
+        info('x', array_keys($products = (array) $this->products));
+        info('x', $products);
         $DBproducts = Product::where('should_track', true)->find(array_keys($products = (array) $this->products));
 
         foreach ($DBproducts as $product) {
-            $product->increment('stock_count', $fact * $products[$product->id]->quantity);
+            info('adjusting stock', ['product' => $product->id, 'fact' => $fact, 'quantity' => $products[$product->id]->quantity]);
+            $increment = $fact * $products[$product->id]->quantity;
+            $product->increment('stock_count', $increment);
+            info('incremented', ['product' => $product->id, 'increment' => $increment]);
             // Dispatch job to sync stock with resellers
             SyncProductStockWithResellers::dispatch($product);
         }

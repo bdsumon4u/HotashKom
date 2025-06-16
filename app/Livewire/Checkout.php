@@ -247,9 +247,7 @@ class Checkout extends Component
                     $productData['retail_price'] = $this->retail[$id]['price'] ?? $productData['price'];
 
                     return [$id => $productData];
-                })->filter(function ($product) {
-                    return $product != null; // Only Available Products
-                })->toArray();
+                })->filter()->toArray();
 
             if (empty($products)) {
                 return $this->dispatch('notify', ['message' => 'All products are out of stock.', 'type' => 'danger']);
