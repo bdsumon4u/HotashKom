@@ -122,7 +122,7 @@
             <div class="p-3 card-body">
                 <div class="px-3 row">
                     <input type="search" wire:model.live.debounce.250ms="search" id="search"
-                        placeholder="Search Product" class="col-md-6 form-control">
+                        placeholder="Search Product" class="col-md-6 form-control" disabled>
 
                     @if (session()->has('error'))
                         <strong class="col-md-6 text-danger d-flex align-items-center">{{ session('error') }}</strong>
@@ -223,7 +223,7 @@
 
                                         @if ($available = !$selectedVar->should_track || $selectedVar->stock_count > 0)
                                             <button type="button" class="btn btn-primary"
-                                                wire:click="addProduct({{ $selectedVar }})">Add to Order</button>
+                                                wire:click="addProduct({{ $selectedVar }})" disabled>Add to Order</button>
                                         @endif
                                     </td>
                                 </tr>
@@ -254,14 +254,14 @@
                                                 class="form-control input-number__input"
                                                 name="quantity[{{ $product['id'] }}]"
                                                 value="{{ old('quantity.' . $product['id'], $product['quantity']) }}"
-                                                min="1" readonly style="border-radius: 2px;">
+                                                min="1" readonly style="border-radius: 2px;" disabled>
                                             <div class="input-number__add"
-                                                wire:click="increaseQuantity({{ $product['id'] }})">
-
+                                                wire:click="increaseQuantity({{ $product['id'] }})" disabled
+                                            >
                                             </div>
                                             <div class="input-number__sub"
-                                                wire:click="decreaseQuantity({{ $product['id'] }})">
-
+                                                wire:click="decreaseQuantity({{ $product['id'] }})" disabled
+                                            >
                                             </div>
                                         </div>
                                     </td>
@@ -272,11 +272,12 @@
                     </table>
                 </div>
 
-
+                @if ($order->exists)
                 <h5 class="mt-3">Courier Report</h5>
                 <div style="height: 645px; overflow: hidden; position: relative;">
                     <iframe src="https://www.bdcommerce.app/tools/delivery-fraud-check/{{$order->phone}}" width="1200" height="800" scrolling="no" style="position: absolute; top: -110px; left: -580px; overflow: hidden;"></iframe>
                 </div>
+                @endif
             </div>
         </div>
     </div>
@@ -313,6 +314,12 @@
                             </td>
                         </tr>
                         <tr>
+                            <th style="font-size: 12px; white-space: nowrap;">Reseller Advanced</th>
+                            <td>
+                                {!! theMoney($order->data['advanced'] ?? 0) !!}
+                            </td>
+                        </tr>
+                        <tr>
                             <th style="font-size: 12px; white-space: nowrap;">Reseller Delivery Charge</th>
                             <td>
                                 {!! theMoney($order->data['retail_delivery_fee']) !!}
@@ -328,13 +335,6 @@
                         </tr>
                     </tbody>
                     <tfoot class="checkout__totals-footer">
-                        <tr>
-                            <th>Reseller Advanced</th>
-                            <td>
-                                <input style="height: auto; padding: 2px 8px;" type="text"
-                                    wire:model.live.debounce.350ms="advanced" class="form-control">
-                            </td>
-                        </tr>
                         <tr>
                             <th>Our Discount</th>
                             <td>

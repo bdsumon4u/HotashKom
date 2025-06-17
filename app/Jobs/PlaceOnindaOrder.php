@@ -104,7 +104,8 @@ class PlaceOnindaOrder implements ShouldQueue
 
             // Create new order in Oninda database using Eloquent
             $attributes = $resellerOrder->getAttributes();
-            unset($attributes['id'], $attributes['source_id']);
+            $attributes['source_id'] = $resellerOrder->id;
+            unset($attributes['id']);
 
             // Override specific attributes
             $attributes['user_id'] = $reseller->id;

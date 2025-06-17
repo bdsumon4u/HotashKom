@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\SyncOrderStatusWithReseller;
 use App\Jobs\SyncProductStockWithResellers;
 use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
@@ -42,7 +43,7 @@ class Order extends Model
 
         static::saving(function (Order $order): void {
             info('saving');
-            if (!$order->exists || $order->isDirty('status')) {
+            if (! $order->exists || $order->isDirty('status')) {
                 info('does not exist or status changed');
                 $order->adjustStock();
             }
@@ -99,6 +100,12 @@ class Order extends Model
 
         static::updated(function (Order $order) {
             $status = Arr::get($order->getChanges(), 'status');
+
+            // Dispatch job to sync status with resellers
+            if ($status) {
+                SyncOrderStatusWithReseller::dispatch($order->id);
+            }
+
             if (! in_array($status, ['COMPLETED', 'RETURNED'])) {
                 return;
             }
@@ -128,7 +135,7 @@ class Order extends Model
         $sign = function () {
             $increment = config('app.increment');
             $decrement = config('app.decrement');
-            if (!$this->exists) {
+            if (! $this->exists) {
                 info('does not exist');
                 if (in_array($this->status, $decrement)) {
                     return -1;
@@ -158,6 +165,7 @@ class Order extends Model
 
         if (! $fact = $sign()) {
             info('no fact');
+
             return;
         }
 
