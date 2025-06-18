@@ -15,7 +15,7 @@ class Attribute extends Model
         static::saved(function ($attribute): void {
             // Dispatch job to copy attribute to reseller databases
             if ($attribute->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($attribute, 'slug');
+                CopyResourceToResellers::dispatch($attribute, 'name');
             }
         });
 

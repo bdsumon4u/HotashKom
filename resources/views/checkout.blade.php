@@ -22,7 +22,7 @@
 @section('content')
     <div class="block mt-1 checkout">
         <div class="container">
-            @if (auth()->user()->is_verified)
+            @if (auth()->user()?->is_verified)
             <x-form checkoutform :action="route('checkout')" method="POST">
                 <livewire:checkout />
             </x-form>
