@@ -358,6 +358,7 @@ class CopyResourceToResellers implements ShouldQueue
 
         foreach ($resellers as $reseller) {
             try {
+                $this->idMap = [];
                 // Configure reseller database connection
                 config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
 
@@ -371,7 +372,7 @@ class CopyResourceToResellers implements ShouldQueue
                 // Clear reseller's cache
                 $reseller->clearResellerCache($this->table);
 
-                Log::info("Successfully copied {$this->table} {$this->model->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName()."]");
+                Log::info("Successfully copied {$this->table} {$this->model->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName().']');
 
             } catch (\Exception $e) {
                 Log::error("Failed to copy {$this->table} {$this->model->id} to reseller {$reseller->id}: ".$e->getMessage());

@@ -169,6 +169,7 @@ class CopyProductToResellers implements ShouldQueue
 
         foreach ($resellers as $reseller) {
             try {
+                $this->idMap = [];
                 // Connect to reseller's database using their config
                 config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
 
@@ -305,7 +306,7 @@ class CopyProductToResellers implements ShouldQueue
                         ]);
                 }
 
-                Log::info("Successfully copied product {$this->product->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName()."]");
+                Log::info("Successfully copied product {$this->product->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName().']');
 
             } catch (\Exception $e) {
                 Log::error("Failed to copy product {$this->product->id} to reseller {$reseller->id}: ".$e->getMessage());
