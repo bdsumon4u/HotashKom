@@ -26,6 +26,7 @@ class PlaceOnindaOrder implements ShouldQueue
 
     public function handle(): void
     {
+        info('placeOnindaOrder', ['orderId' => $this->orderId, 'domain' => $this->domain]);
         try {
             // Find reseller
             $reseller = User::where('domain', $this->domain)->first();

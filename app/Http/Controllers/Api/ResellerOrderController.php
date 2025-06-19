@@ -15,6 +15,7 @@ class ResellerOrderController extends Controller
      */
     public function placeOrder(Request $request): JsonResponse
     {
+        info('placeOrder', ['request' => $request->all()]);
         $validator = Validator::make($request->all(), [
             'order_id' => 'required|integer',
             'domain' => 'required|string',
@@ -28,6 +29,7 @@ class ResellerOrderController extends Controller
         }
 
         // Dispatch job to place order on Oninda
+        info('dispatching job', ['request' => $request->all()]);
         PlaceOnindaOrder::dispatch($request->order_id, $request->domain);
 
         return response()->json([
