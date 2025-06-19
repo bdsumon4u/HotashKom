@@ -15,7 +15,7 @@ class Option extends Model
         static::saved(function ($option): void {
             // Dispatch job to copy option to reseller databases
             if ($option->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($option, 'name');
+                CopyResourceToResellers::dispatch($option);
             }
         });
 
@@ -23,5 +23,10 @@ class Option extends Model
             // Dispatch job to remove option from reseller databases
             RemoveResourceFromResellers::dispatch($option->getTable(), $option->id);
         });
+    }
+
+    public function attribute()
+    {
+        return $this->belongsTo(Attribute::class);
     }
 }

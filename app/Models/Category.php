@@ -22,7 +22,7 @@ class Category extends Model
 
             // Dispatch job to copy category to reseller databases
             if ($category->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($category, 'slug');
+                CopyResourceToResellers::dispatch($category);
             }
         });
 

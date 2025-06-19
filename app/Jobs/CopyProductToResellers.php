@@ -143,6 +143,23 @@ class CopyProductToResellers implements ShouldQueue
     }
 
     /**
+     * Generate a unique value for a column in the reseller's products table
+     */
+    protected function getUniqueValue(string $column, string $value): string
+    {
+        $baseValue = $value;
+        $suffix = '-oninda';
+        $i = 1;
+        $newValue = $baseValue;
+        while (DB::connection('reseller')->table('products')->where($column, $newValue)->exists()) {
+            $newValue = $baseValue.$suffix.($i > 1 ? "-$i" : '');
+            $i++;
+        }
+
+        return $newValue;
+    }
+
+    /**
      * Execute the job.
      */
     public function handle(): void
@@ -218,6 +235,10 @@ class CopyProductToResellers implements ShouldQueue
                 $insertData['source_id'] = $insertData['id'];
                 unset($insertData['id']);
 
+                // Ensure unique slug and sku
+                $insertData['slug'] = $this->getUniqueValue('slug', $insertData['slug']);
+                $insertData['sku'] = $this->getUniqueValue('sku', $insertData['sku']);
+
                 $newProductId = DB::connection('reseller')
                     ->table('products')
                     ->insertGetId($insertData);
@@ -232,6 +253,10 @@ class CopyProductToResellers implements ShouldQueue
                     $varData['parent_id'] = $newProductId;
                     $varData['source_id'] = $varData['id'];
                     unset($varData['id']);
+
+                    // Ensure unique slug and sku for variations
+                    $varData['slug'] = $this->getUniqueValue('slug', $varData['slug']);
+                    $varData['sku'] = $this->getUniqueValue('sku', $varData['sku']);
 
                     DB::connection('reseller')
                         ->table('products')

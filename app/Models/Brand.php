@@ -19,7 +19,7 @@ class Brand extends Model
 
             // Dispatch job to copy brand to reseller databases
             if ($brand->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($brand, 'slug');
+                CopyResourceToResellers::dispatch($brand);
             }
         });
 

@@ -20,7 +20,7 @@ class Image extends Model
         static::saved(function ($image): void {
             // Dispatch job to copy image to reseller databases
             if ($image->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($image, 'path');
+                CopyResourceToResellers::dispatch($image);
             }
         });
 
