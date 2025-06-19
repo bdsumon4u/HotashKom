@@ -180,10 +180,14 @@ class CopyProductToResellers implements ShouldQueue
                 $productData = $this->product->getRawOriginal();
 
                 // Copy brand if exists
-                if ($productData['brand_id']) {
+                if (! empty($productData['brand_id'])) {
                     $brand = DB::table('brands')->where('id', $productData['brand_id'])->first();
-                    $newBrandId = $this->getOrCreateResource('brands', $productData['brand_id'], 'slug', $brand->slug);
-                    $productData['brand_id'] = $newBrandId;
+                    if ($brand) {
+                        $newBrandId = $this->getOrCreateResource('brands', $productData['brand_id'], 'slug', $brand->slug);
+                        $productData['brand_id'] = $newBrandId;
+                    } else {
+                        unset($productData['brand_id']);
+                    }
                 }
 
                 // Copy categories
@@ -194,8 +198,10 @@ class CopyProductToResellers implements ShouldQueue
 
                 foreach ($categories as $category) {
                     $cat = DB::table('categories')->where('id', $category->category_id)->first();
-                    $newCategoryId = $this->getOrCreateResource('categories', $category->category_id, 'slug', $cat->slug);
-                    $categoryIds[] = $newCategoryId;
+                    if ($cat) {
+                        $newCategoryId = $this->getOrCreateResource('categories', $category->category_id, 'slug', $cat->slug);
+                        $categoryIds[] = $newCategoryId;
+                    }
                 }
 
                 // Copy images
@@ -206,12 +212,14 @@ class CopyProductToResellers implements ShouldQueue
 
                 foreach ($images as $image) {
                     $img = DB::table('images')->where('id', $image->image_id)->first();
-                    $newImageId = $this->getOrCreateResource('images', $image->image_id, 'filename', $img->filename);
-                    $imageIds[] = [
-                        'id' => $newImageId,
-                        'img_type' => $image->img_type,
-                        'order' => $image->order,
-                    ];
+                    if ($img) {
+                        $newImageId = $this->getOrCreateResource('images', $image->image_id, 'filename', $img->filename);
+                        $imageIds[] = [
+                            'id' => $newImageId,
+                            'img_type' => $image->img_type,
+                            'order' => $image->order,
+                        ];
+                    }
                 }
 
                 // Copy attributes and options
@@ -222,12 +230,14 @@ class CopyProductToResellers implements ShouldQueue
 
                 foreach ($options as $option) {
                     $opt = DB::table('options')->where('id', $option->option_id)->first();
-                    $attr = DB::table('attributes')->where('id', $opt->attribute_id)->first();
-
-                    $newAttrId = $this->getOrCreateResource('attributes', $attr->id, 'name', $attr->name);
-                    $newOptId = $this->getOrCreateResource('options', $opt->id, 'name', $opt->name);
-
-                    $optionIds[] = $newOptId;
+                    if ($opt) {
+                        $attr = DB::table('attributes')->where('id', $opt->attribute_id)->first();
+                        if ($attr) {
+                            $newAttrId = $this->getOrCreateResource('attributes', $attr->id, 'name', $attr->name);
+                            $newOptId = $this->getOrCreateResource('options', $opt->id, 'name', $opt->name);
+                            $optionIds[] = $newOptId;
+                        }
+                    }
                 }
 
                 // Copy main product
