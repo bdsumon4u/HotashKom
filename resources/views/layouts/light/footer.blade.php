@@ -5,7 +5,7 @@
         <p class="mb-0">Copyright {{date('Y')}} © All rights reserved.</p>
       </div>
       <div class="col-md-6">
-        <p class="pull-right mb-0">Developed with <i class="fa fa-heart font-secondary"></i> <a href="{{$company->dev_link??'https://cyber32.com'}}" class="text-danger">{{$company->dev_name??'Cyber32'}}</a></p>
+        <p class="pull-right mb-0">Developed with <i class="fa fa-heart font-secondary"></i> <a href="{{$company->dev_link??'https://hotash.tech'}}" class="text-danger">{{$company->dev_name??'Hotash Tech'}}</a></p>
       </div>
     </div>
   </div>
