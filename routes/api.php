@@ -50,6 +50,6 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
     Route::get('resellers', App\Http\Controllers\Api\ResellerController::class)->name('resellers');
     Route::put('resellers/{id}', [App\Http\Controllers\Api\ResellerController::class, 'update'])->name('resellers.update');
     Route::post('resellers/{id}/toggle-verify', [App\Http\Controllers\Api\ResellerController::class, 'toggleVerify'])->name('resellers.toggle-verify');
-    Route::post('/reseller/orders/place', [App\Http\Controllers\Api\ResellerOrderController::class, 'placeOrder'])
+    Route::post('reseller/orders/place', [App\Http\Controllers\Api\ResellerOrderController::class, 'placeOrder'])
         ->name('api.reseller.orders.place');
 });

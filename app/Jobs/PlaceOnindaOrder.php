@@ -36,6 +36,12 @@ class PlaceOnindaOrder implements ShouldQueue
                 return;
             }
 
+            // If the reseller has already placed the order, return
+            if ($reseller->orders()->where('source_id', $this->orderId)->exists()) {
+                Log::info("Order {$this->orderId} already placed on Oninda");
+                return;
+            }
+
             // Configure reseller database connection
             config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
 
