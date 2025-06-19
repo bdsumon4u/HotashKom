@@ -305,7 +305,7 @@ class CopyProductToResellers implements ShouldQueue
                         ]);
                 }
 
-                Log::info("Successfully copied product {$this->product->id} to reseller {$reseller->id}");
+                Log::info("Successfully copied product {$this->product->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName()."]");
 
             } catch (\Exception $e) {
                 Log::error("Failed to copy product {$this->product->id} to reseller {$reseller->id}: ".$e->getMessage());
