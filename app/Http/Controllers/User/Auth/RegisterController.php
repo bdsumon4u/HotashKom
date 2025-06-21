@@ -70,12 +70,14 @@ class RegisterController extends Controller
     {
         $this->prefixCountryCode($data);
 
-        dd($data);
+        // dd($data);
 
         return User::create([
             'name' => $data['name'],
+            'shop_name' => $data['shop_name'],
             // 'email' => $data['email'],
             'phone_number' => $data['phone_number'],
+            'bkash_number' => $data['bkash_number'],
             'password' => Hash::make($data['password']),
         ]);
     }
