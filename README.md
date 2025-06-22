@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}327}$$ 🔥 domains are live now
+These 🔥 $${\color{red}328}$$ 🔥 domains are live now
 
-_Last updated: **2025-06-21 09:16:37 Asia/Dhaka**_
+_Last updated: **2025-06-22 09:35:10 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -426,3 +426,4 @@ _Last updated: **2025-06-21 09:16:37 Asia/Dhaka**_
 | 325 | [buybdsell.com](http://buybdsell.com) |
 | 326 | [hamjaeshop.com](http://hamjaeshop.com) |
 | 327 | [kroyebazar.com](http://kroyebazar.com) |
+| 328 | [imransdealbook.com](http://imransdealbook.com) |
