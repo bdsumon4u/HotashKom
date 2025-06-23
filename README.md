@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}328}$$ 🔥 domains are live now
+These 🔥 $${\color{red}334}$$ 🔥 domains are live now
 
-_Last updated: **2025-06-22 09:35:10 Asia/Dhaka**_
+_Last updated: **2025-06-23 09:36:32 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -427,3 +427,9 @@ _Last updated: **2025-06-22 09:35:10 Asia/Dhaka**_
 | 326 | [hamjaeshop.com](http://hamjaeshop.com) |
 | 327 | [kroyebazar.com](http://kroyebazar.com) |
 | 328 | [imransdealbook.com](http://imransdealbook.com) |
+| 329 | [ladybirdsbd.com](http://ladybirdsbd.com) |
+| 330 | [happyemart.com](http://happyemart.com) |
+| 331 | [aminemart.com](http://aminemart.com) |
+| 332 | [angkanmart.com](http://angkanmart.com) |
+| 333 | [taqwaemart.com](http://taqwaemart.com) |
+| 334 | [sylsky.com](http://sylsky.com) |
