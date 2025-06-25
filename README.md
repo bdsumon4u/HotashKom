@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}333}$$ 🔥 domains are live now
+These 🔥 $${\color{red}334}$$ 🔥 domains are live now
 
-_Last updated: **2025-06-24 09:21:19 Asia/Dhaka**_
+_Last updated: **2025-06-25 09:22:33 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -426,9 +426,10 @@ _Last updated: **2025-06-24 09:21:19 Asia/Dhaka**_
 | 325 | [hamjaeshop.com](http://hamjaeshop.com) |
 | 326 | [kroyebazar.com](http://kroyebazar.com) |
 | 327 | [imransdealbook.com](http://imransdealbook.com) |
-| 328 | [ladybirdsbd.com](http://ladybirdsbd.com) |
-| 329 | [happyemart.com](http://happyemart.com) |
-| 330 | [aminemart.com](http://aminemart.com) |
-| 331 | [angkanmart.com](http://angkanmart.com) |
-| 332 | [taqwaemart.com](http://taqwaemart.com) |
-| 333 | [sylsky.com](http://sylsky.com) |
+| 328 | [bondhonbazar04.com](http://bondhonbazar04.com) |
+| 329 | [ladybirdsbd.com](http://ladybirdsbd.com) |
+| 330 | [happyemart.com](http://happyemart.com) |
+| 331 | [aminemart.com](http://aminemart.com) |
+| 332 | [angkanmart.com](http://angkanmart.com) |
+| 333 | [taqwaemart.com](http://taqwaemart.com) |
+| 334 | [sylsky.com](http://sylsky.com) |
