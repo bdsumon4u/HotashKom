@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}334}$$ 🔥 domains are live now
+These 🔥 $${\color{red}335}$$ 🔥 domains are live now
 
-_Last updated: **2025-06-25 09:22:33 Asia/Dhaka**_
+_Last updated: **2025-06-26 09:21:19 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -433,3 +433,4 @@ _Last updated: **2025-06-25 09:22:33 Asia/Dhaka**_
 | 332 | [angkanmart.com](http://angkanmart.com) |
 | 333 | [taqwaemart.com](http://taqwaemart.com) |
 | 334 | [sylsky.com](http://sylsky.com) |
+| 335 | [mrbdshop.com](http://mrbdshop.com) |
