@@ -246,13 +246,43 @@ class CopyProductToResellers implements ShouldQueue
                 $insertData['source_id'] = $insertData['id'];
                 unset($insertData['id']);
 
-                // Ensure unique slug and sku
-                $insertData['slug'] = $this->getUniqueValue('slug', $insertData['slug']);
-                $insertData['sku'] = $this->getUniqueValue('sku', $insertData['sku']);
-
-                $newProductId = DB::connection('reseller')
+                // Check if product already exists by source_id first
+                $existingBySourceId = DB::connection('reseller')
                     ->table('products')
-                    ->insertGetId($insertData);
+                    ->where('source_id', $this->product->id)
+                    ->first();
+
+                if ($existingBySourceId) {
+                    // Product already exists with this source_id, use existing ID
+                    $newProductId = $existingBySourceId->id;
+                    $this->idMap['products'][$this->product->id] = $newProductId;
+                } else {
+                    // Check if product with same slug already exists
+                    $existingBySlug = DB::connection('reseller')
+                        ->table('products')
+                        ->where('slug', $insertData['slug'])
+                        ->first();
+
+                    if ($existingBySlug) {
+                        // Update existing product's source_id to link it to this source product
+                        DB::connection('reseller')
+                            ->table('products')
+                            ->where('id', $existingBySlug->id)
+                            ->update(['source_id' => $this->product->id]);
+
+                        $newProductId = $existingBySlug->id;
+                        $this->idMap['products'][$this->product->id] = $newProductId;
+                    } else {
+                        // Generate unique SKU only (no slug modification needed)
+                        $insertData['sku'] = $this->getUniqueValue('sku', $insertData['sku']);
+
+                        $newProductId = DB::connection('reseller')
+                            ->table('products')
+                            ->insertGetId($insertData);
+
+                        $this->idMap['products'][$this->product->id] = $newProductId;
+                    }
+                }
 
                 // Copy variations if any
                 $variations = DB::table('products')
@@ -265,13 +295,37 @@ class CopyProductToResellers implements ShouldQueue
                     $varData['source_id'] = $varData['id'];
                     unset($varData['id']);
 
-                    // Ensure unique slug and sku for variations
-                    $varData['slug'] = $this->getUniqueValue('slug', $varData['slug']);
-                    $varData['sku'] = $this->getUniqueValue('sku', $varData['sku']);
-
-                    DB::connection('reseller')
+                    // Check if variation already exists by source_id first
+                    $existingVarBySourceId = DB::connection('reseller')
                         ->table('products')
-                        ->insert($varData);
+                        ->where('source_id', $variation->id)
+                        ->first();
+
+                    if ($existingVarBySourceId) {
+                        // Variation already exists with this source_id, skip
+                        continue;
+                    }
+
+                    // Check if variation with same slug already exists
+                    $existingVarBySlug = DB::connection('reseller')
+                        ->table('products')
+                        ->where('slug', $varData['slug'])
+                        ->first();
+
+                    if ($existingVarBySlug) {
+                        // Update existing variation's source_id
+                        DB::connection('reseller')
+                            ->table('products')
+                            ->where('id', $existingVarBySlug->id)
+                            ->update(['source_id' => $variation->id]);
+                    } else {
+                        // Generate unique SKU only for new variations
+                        $varData['sku'] = $this->getUniqueValue('sku', $varData['sku']);
+
+                        DB::connection('reseller')
+                            ->table('products')
+                            ->insert($varData);
+                    }
                 }
 
                 // Insert category relationships
