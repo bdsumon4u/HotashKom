@@ -32,7 +32,11 @@ class RemoveProductVariationsFromResellers implements ShouldQueue
     {
         try {
             // Get all active resellers
-            $resellers = User::where('is_active', true)->get();
+            $resellers = User::where('is_active', true)
+                ->whereNotNull('db_password')
+                ->where('db_password', '!=', '')
+                ->inRandomOrder()
+                ->get();
 
             foreach ($resellers as $reseller) {
                 try {

@@ -19,7 +19,7 @@ class Product extends Model
     protected $with = ['images'];
 
     protected $fillable = [
-        'brand_id', 'name', 'slug', 'description', 'price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
+        'brand_id', 'name', 'slug', 'description', 'price', 'selling_price', 'suggested_price', 'wholesale', 'sku', 'source_id',
         'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'shipping_inside', 'shipping_outside', 'delivery_text',
     ];
 
@@ -183,7 +183,7 @@ class Product extends Model
             ];
         }, set: function ($value) {
             $data = [];
-            foreach ($value['quantity'] as $key => $quantity) {
+            foreach (($value['quantity'] ?? []) as $key => $quantity) {
                 $data[$quantity] = $value['price'][$key];
             }
             ksort($data);

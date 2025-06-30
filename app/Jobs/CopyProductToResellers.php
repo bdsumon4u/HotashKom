@@ -81,6 +81,7 @@ class CopyProductToResellers implements ShouldQueue
 
         // Convert to array and handle foreign keys
         $insertData = (array) $data;
+
         $foreignKeys = [];
         foreach ($insertData as $key => $value) {
             if (str_ends_with($key, '_id') && $value) {
@@ -131,10 +132,16 @@ class CopyProductToResellers implements ShouldQueue
         $insertData['source_id'] = $insertData['id'];
         unset($insertData['id']);
 
-        // Insert the data and get the new auto-generated ID
-        $newId = DB::connection('reseller')
-            ->table($table)
-            ->insertGetId($insertData);
+        // Use Product model for insertion to handle encoding properly
+        if ($table === 'products') {
+            $newModel = Product::on('reseller')->create($insertData);
+            $newId = $newModel->id;
+        } else {
+            // Use DB facade for other tables
+            $newId = DB::connection('reseller')
+                ->table($table)
+                ->insertGetId($insertData);
+        }
 
         // Store the ID mapping
         $this->idMap[$table][$sourceId] = $newId;
@@ -164,8 +171,12 @@ class CopyProductToResellers implements ShouldQueue
      */
     public function handle(): void
     {
-        // Get all active resellers
-        $resellers = User::where('is_active', true)->get();
+        // Get all active resellers with database configuration
+        $resellers = User::where('is_active', true)
+            ->whereNotNull('db_password')
+            ->where('db_password', '!=', '')
+            ->inRandomOrder()
+            ->get();
 
         foreach ($resellers as $reseller) {
             try {
@@ -177,17 +188,14 @@ class CopyProductToResellers implements ShouldQueue
                 DB::purge('reseller');
                 DB::reconnect('reseller');
 
-                // Get the product data
-                $productData = $this->product->getRawOriginal();
-
                 // Copy brand if exists
-                if (! empty($productData['brand_id'])) {
-                    $brand = DB::table('brands')->where('id', $productData['brand_id'])->first();
+                if (! empty($this->product->brand_id)) {
+                    $brand = DB::table('brands')->where('id', $this->product->brand_id)->first();
                     if ($brand) {
-                        $newBrandId = $this->getOrCreateResource('brands', $productData['brand_id'], 'slug', $brand->slug);
-                        $productData['brand_id'] = $newBrandId;
+                        $newBrandId = $this->getOrCreateResource('brands', $this->product->brand_id, 'slug', $brand->slug);
+                        $this->product->brand_id = $newBrandId;
                     } else {
-                        unset($productData['brand_id']);
+                        $this->product->brand_id = null;
                     }
                 }
 
@@ -242,9 +250,9 @@ class CopyProductToResellers implements ShouldQueue
                 }
 
                 // Copy main product
-                $insertData = $productData;
-                $insertData['source_id'] = $insertData['id'];
-                unset($insertData['id']);
+                $productData = $this->product->getAttributes();
+                $productData['source_id'] = $productData['id'];
+                unset($productData['id']);
 
                 // Check if product already exists by source_id first
                 $existingBySourceId = DB::connection('reseller')
@@ -260,7 +268,7 @@ class CopyProductToResellers implements ShouldQueue
                     // Check if product with same slug already exists
                     $existingBySlug = DB::connection('reseller')
                         ->table('products')
-                        ->where('slug', $insertData['slug'])
+                        ->where('slug', $productData['slug'])
                         ->first();
 
                     if ($existingBySlug) {
@@ -269,17 +277,16 @@ class CopyProductToResellers implements ShouldQueue
                             ->table('products')
                             ->where('id', $existingBySlug->id)
                             ->update(['source_id' => $this->product->id]);
-
                         $newProductId = $existingBySlug->id;
                         $this->idMap['products'][$this->product->id] = $newProductId;
                     } else {
                         // Generate unique SKU only (no slug modification needed)
-                        $insertData['sku'] = $this->getUniqueValue('sku', $insertData['sku']);
+                        $productData['sku'] = $this->getUniqueValue('sku', $productData['sku']);
 
-                        $newProductId = DB::connection('reseller')
-                            ->table('products')
-                            ->insertGetId($insertData);
-
+                        // Use Product model for insertion to handle encoding properly
+                        info('Creating product', $productData);
+                        $newProduct = Product::on('reseller')->create($productData);
+                        $newProductId = $newProduct->id;
                         $this->idMap['products'][$this->product->id] = $newProductId;
                     }
                 }
@@ -322,9 +329,8 @@ class CopyProductToResellers implements ShouldQueue
                         // Generate unique SKU only for new variations
                         $varData['sku'] = $this->getUniqueValue('sku', $varData['sku']);
 
-                        DB::connection('reseller')
-                            ->table('products')
-                            ->insert($varData);
+                        // Use Product model for insertion to handle encoding properly
+                        Product::on('reseller')->create($varData);
                     }
                 }
 
@@ -363,7 +369,7 @@ class CopyProductToResellers implements ShouldQueue
                 Log::info("Successfully copied product {$this->product->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName().']');
 
             } catch (\Exception $e) {
-                Log::error("Failed to copy product {$this->product->id} to reseller {$reseller->id}: ".$e->getMessage());
+                Log::error("Failed to copy product {$this->product->id} to reseller {$reseller->id}: ".$e->getMessage().' at line '.$e->getLine().' in '.$e->getFile());
 
                 continue;
             }
