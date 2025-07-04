@@ -2,6 +2,9 @@
 
 namespace App\Listeners;
 
+use App\Events\ProductCreated;
+use App\Events\ProductUpdated;
+
 class ManageProductCategories
 {
     /**
@@ -20,7 +23,7 @@ class ManageProductCategories
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle(ProductCreated|ProductUpdated $event)
     {
         $event->product->categories()->sync($event->data['categories']);
     }

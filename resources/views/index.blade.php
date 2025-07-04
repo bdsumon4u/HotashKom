@@ -107,7 +107,7 @@
                 @php($link = $pseudoColumns['link'][$i])
                 @php($link = $link && $link != '#' ? $link : null)
                 @php($link = $link ? url($link) : null)
-                @php($categories = implode(',', ((array)$pseudoColumns['categories'] ?? [])[$i] ?? []))
+                @php($categories = implode(',', ((array)($pseudoColumns['categories'] ?? []))[$i] ?? []))
                 <a href="{{ $link ?? route('products.index', $categories ? ['filter_category' => $categories] : []) }}">
                     <img
                         data-aos="{{$pseudoColumns['animation'][$i]}}"

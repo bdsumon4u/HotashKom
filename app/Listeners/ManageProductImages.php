@@ -2,6 +2,9 @@
 
 namespace App\Listeners;
 
+use App\Events\ProductCreated;
+use App\Events\ProductUpdated;
+
 class ManageProductImages
 {
     /**
@@ -20,7 +23,7 @@ class ManageProductImages
      * @param  object  $event
      * @return void
      */
-    public function handle($event)
+    public function handle(ProductCreated|ProductUpdated $event)
     {
         $order = 0;
         $images = [$event->data['base_image'] => ['img_type' => 'base']];
