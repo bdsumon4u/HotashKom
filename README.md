@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}333}$$ 🔥 domains are live now
+These 🔥 $${\color{red}334}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-04 09:21:16 Asia/Dhaka**_
+_Last updated: **2025-07-05 09:17:15 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -432,3 +432,4 @@ _Last updated: **2025-07-04 09:21:16 Asia/Dhaka**_
 | 331 | [punommart.com](http://punommart.com) |
 | 332 | [rsenterprise25.com](http://rsenterprise25.com) |
 | 333 | [infinitebazar.com](http://infinitebazar.com) |
+| 334 | [buybelo.com](http://buybelo.com) |
