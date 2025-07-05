@@ -16,6 +16,12 @@ class CopyProductToResellers implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 3;
+
+    public $backoff = [10, 30, 60]; // Retry delays in seconds
+
+    public $timeout = 600; // 10 minutes timeout for products
+
     protected $product;
 
     protected $idMap = [];
@@ -26,6 +32,27 @@ class CopyProductToResellers implements ShouldQueue
     public function __construct(Product $product)
     {
         $this->product = $product;
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        Log::error("Product copy job failed for product {$this->product->id}: ".$exception->getMessage());
+    }
+
+    /**
+     * Retry the job if it fails due to connection issues
+     */
+    public function retryAfter(\Throwable $exception): int
+    {
+        if ($this->attempts() >= $this->tries) {
+            return 0; // Don't retry anymore
+        }
+
+        // Return the backoff delay for this attempt
+        return $this->backoff[$this->attempts() - 1] ?? 60;
     }
 
     /**
@@ -181,12 +208,22 @@ class CopyProductToResellers implements ShouldQueue
         foreach ($resellers as $reseller) {
             try {
                 $this->idMap = [];
-                // Connect to reseller's database using their config
-                config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
+
+                // Configure reseller database connection with timeout
+                $config = $reseller->getDatabaseConfig();
+                $config['options'] = [
+                    \PDO::ATTR_TIMEOUT => 30, // 30 seconds connection timeout
+                    \PDO::ATTR_PERSISTENT => false, // Don't use persistent connections
+                ];
+
+                config(['database.connections.reseller' => $config]);
 
                 // Purge and reconnect to ensure fresh connection
                 DB::purge('reseller');
                 DB::reconnect('reseller');
+
+                // Test connection before proceeding
+                DB::connection('reseller')->getPdo();
 
                 // Copy brand if exists
                 if (! empty($this->product->brand_id)) {
@@ -368,10 +405,15 @@ class CopyProductToResellers implements ShouldQueue
 
                 Log::info("Successfully copied product {$this->product->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName().']');
 
-            } catch (\Exception $e) {
-                Log::error("Failed to copy product {$this->product->id} to reseller {$reseller->id}: ".$e->getMessage().' at line '.$e->getLine().' in '.$e->getFile());
-
+            } catch (\PDOException $e) {
+                Log::error("Database connection failed for reseller {$reseller->id}: " . $e->getMessage());
                 continue;
+            } catch (\Exception $e) {
+                Log::error("Failed to copy product {$this->product->id} to reseller {$reseller->id}: " . $e->getMessage().' at line '.$e->getLine().' in '.$e->getFile());
+                continue;
+            } finally {
+                // Always purge the connection to free up resources
+                DB::purge('reseller');
             }
         }
     }

@@ -16,6 +16,12 @@ class CopyResourceToResellers implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 3;
+
+    public $backoff = [10, 30, 60]; // Retry delays in seconds
+
+    public $timeout = 300; // 5 minutes timeout
+
     protected $model;
 
     protected $table;
@@ -29,6 +35,27 @@ class CopyResourceToResellers implements ShouldQueue
     {
         $this->model = $model;
         $this->table = $model->getTable();
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        Log::error("Job failed for {$this->table} {$this->model->id}: ".$exception->getMessage());
+    }
+
+    /**
+     * Retry the job if it fails due to connection issues
+     */
+    public function retryAfter(\Throwable $exception): int
+    {
+        if ($this->attempts() >= $this->tries) {
+            return 0; // Don't retry anymore
+        }
+
+        // Return the backoff delay for this attempt
+        return $this->backoff[$this->attempts() - 1] ?? 60;
     }
 
     /**
@@ -365,12 +392,22 @@ class CopyResourceToResellers implements ShouldQueue
         foreach ($resellers as $reseller) {
             try {
                 $this->idMap = [];
-                // Configure reseller database connection
-                config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);
+
+                // Configure reseller database connection with timeout
+                $config = $reseller->getDatabaseConfig();
+                $config['options'] = [
+                    \PDO::ATTR_TIMEOUT => 30, // 30 seconds connection timeout
+                    \PDO::ATTR_PERSISTENT => false, // Don't use persistent connections
+                ];
+
+                config(['database.connections.reseller' => $config]);
 
                 // Purge and reconnect to ensure fresh connection
                 DB::purge('reseller');
                 DB::reconnect('reseller');
+
+                // Test connection before proceeding
+                DB::connection('reseller')->getPdo();
 
                 // Get or create the resource
                 $newId = $this->getOrCreateResource();
@@ -380,10 +417,17 @@ class CopyResourceToResellers implements ShouldQueue
 
                 Log::info("Successfully copied {$this->table} {$this->model->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName().']');
 
+            } catch (\PDOException $e) {
+                Log::error("Database connection failed for reseller {$reseller->id}: ".$e->getMessage());
+
+                continue;
             } catch (\Exception $e) {
                 Log::error("Failed to copy {$this->table} {$this->model->id} to reseller {$reseller->id}: ".$e->getMessage());
 
                 continue;
+            } finally {
+                // Always purge the connection to free up resources
+                DB::purge('reseller');
             }
         }
     }
