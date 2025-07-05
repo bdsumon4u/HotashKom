@@ -252,15 +252,22 @@ class ApiController extends Controller
         })->count();
     }
 
-    public function pathaoWebhook(Request $request): void
+    public function pathaoWebhook(Request $request)
     {
-        $Pathao = setting('Pathao');
-        if ($request->header('X-PATHAO-Signature') != $Pathao->store_id) {
-            return;
+        if ($request->event == 'webhook_integration') {
+            return response()->json(['message' => 'Webhook processed'], 202)
+                ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
         }
 
-        if (! $order = Order::find($request->merchant_order_id)/*->orWhere('data->consignment_id', $request->consignment_id)->first()*/) {
-            return;
+        $Pathao = setting('Pathao');
+        if ($request->header('X-PATHAO-Signature') != $Pathao->store_id) {
+            return response()->json(['message' => 'Webhook processed'], 202)
+                ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
+        }
+
+        if (! $order = Order::find($request->merchant_order_id)/* ->orWhere('data->consignment_id', $request->consignment_id)->first() */) {
+            return response()->json(['message' => 'Webhook processed'], 202)
+                ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
         }
 
         // $courier = $request->only([
@@ -273,30 +280,33 @@ class ApiController extends Controller
         // ]);
         // $order->forceFill(['courier' => ['booking' => 'Pathao'] + $courier]);
 
-        if ($request->order_status_slug == 'Pickup_Requested') {
+        if ($request->event == 'order.pickup-requested') {
             $order->fill([
                 'status' => 'SHIPPING',
                 'data' => [
                     'consignment_id' => $request->consignment_id,
                 ],
             ]);
-        } elseif ($request->order_status_slug == 'Pickup_Cancelled') {
+        } elseif ($request->event == 'order.pickup-cancelled') {
             $order->status = 'CANCELLED';
             $order->status_at = now();
-        } elseif ($request->order_status_slug == 'On_Hold') {
+        } elseif ($request->event == 'order.on-hold') {
             $order->status = 'WAITING';
             $order->status_at = now();
-        } elseif ($request->order_status_slug == 'Delivered') {
+        } elseif ($request->event == 'order.delivered') {
             $order->status = 'COMPLETED';
             $order->status_at = now();
-        } elseif ($request->order_status_slug == 'Payment_Invoice') {
+        } elseif ($request->event == 'order.paid') {
 
-        } elseif ($request->order_status_slug == 'Return') {
+        } elseif ($request->event == 'order.returned') {
             $order->status = 'RETURNED';
             $order->status_at = now();
             // TODO: add to stock
         }
 
         $order->save();
+
+        return response()->json(['message' => 'Webhook processed'], 202)
+            ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
     }
 }
