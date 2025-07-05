@@ -325,7 +325,7 @@ class CopyResourceToResellers implements ShouldQueue
             'App\Models\Option' => ['name'],
             'App\Models\Category' => ['slug', 'name'],
             'App\Models\Brand' => ['name', 'slug'],
-            'App\Models\Image' => ['url'],
+            'App\Models\Image' => ['path'],
         ];
 
         return $uniqueColumnsMappings[$modelClass] ?? ['id'];
