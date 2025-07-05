@@ -59,6 +59,75 @@ class CopyResourceToResellers implements ShouldQueue
     }
 
     /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        Log::info('Starting CopyResourceToResellers job', [
+            'table' => $this->table,
+            'modelId' => $this->model->id,
+        ]);
+
+        // ===== ONINDA DATABASE OPERATIONS (DEFAULT CONNECTION) =====
+
+        // Get all active resellers
+        $resellers = User::where('is_active', true)
+            ->whereNotNull('db_name')
+            ->where('db_name', '!=', '')
+            ->whereNotNull('db_username')
+            ->where('db_username', '!=', '')
+            ->inRandomOrder()
+            ->get();
+
+        foreach ($resellers as $reseller) {
+            try {
+                $this->idMap = [];
+
+                // Configure reseller database connection
+                $config = $reseller->getDatabaseConfig();
+                config(['database.connections.reseller' => $config]);
+
+                // Purge and reconnect to ensure fresh connection
+                DB::purge('reseller');
+                DB::reconnect('reseller');
+
+                // Test connection before proceeding
+                try {
+                    DB::connection('reseller')->getPdo();
+                } catch (\Exception $e) {
+                    Log::error('Failed to connect to reseller database', [
+                        'resellerId' => $reseller->id,
+                        'domain' => $reseller->domain,
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    continue;
+                }
+
+                // Get or create the resource
+                $newId = $this->getOrCreateResource();
+
+                // Clear reseller's cache
+                $reseller->clearResellerCache($this->table);
+
+                Log::info("Successfully copied {$this->table} {$this->model->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName().']');
+
+            } catch (\PDOException $e) {
+                Log::error("Database connection failed for reseller {$reseller->id}: ".$e->getMessage());
+
+                continue;
+            } catch (\Exception $e) {
+                Log::error("Failed to copy {$this->table} {$this->model->id} to reseller {$reseller->id}: ".$e->getMessage());
+
+                continue;
+            } finally {
+                // Always purge the connection to free up resources
+                DB::purge('reseller');
+            }
+        }
+    }
+
+    /**
      * Get or create a resource in reseller's database
      */
     protected function getOrCreateResource(): int
@@ -69,6 +138,8 @@ class CopyResourceToResellers implements ShouldQueue
         }
 
         $data = $this->model->getRawOriginal();
+
+        // ===== RESELLER DATABASE OPERATIONS =====
 
         // First check if the resource's ID exists in source_id column
         $existingBySourceId = DB::connection('reseller')
@@ -144,6 +215,8 @@ class CopyResourceToResellers implements ShouldQueue
         $insertData['source_id'] = $insertData['id'];
         unset($insertData['id']);
 
+        // ===== RESELLER DATABASE OPERATIONS =====
+
         // Insert the data and get the new auto-generated ID
         $newId = DB::connection('reseller')
             ->table($this->table)
@@ -183,6 +256,8 @@ class CopyResourceToResellers implements ShouldQueue
             return $this->idMap[$table][$sourceId];
         }
 
+        // ===== RESELLER DATABASE OPERATIONS =====
+
         // Query the reseller's database
         $resellerRecord = DB::connection('reseller')
             ->table($table)
@@ -214,6 +289,8 @@ class CopyResourceToResellers implements ShouldQueue
                 return null;
             }
 
+            // ===== ONINDA DATABASE OPERATIONS (DEFAULT CONNECTION) =====
+
             // Find the source record
             $sourceRecord = $modelClass::find($sourceId);
 
@@ -222,6 +299,8 @@ class CopyResourceToResellers implements ShouldQueue
 
                 return null;
             }
+
+            // ===== RESELLER DATABASE OPERATIONS =====
 
             // Check if a record with any unique identifier already exists
             $existingRecord = $this->findExistingRecordByUniqueColumns($table, $modelClass, $sourceRecord);
@@ -275,6 +354,8 @@ class CopyResourceToResellers implements ShouldQueue
             $insertData = $data;
             $insertData['source_id'] = $insertData['id'];
             unset($insertData['id']);
+
+            // ===== RESELLER DATABASE OPERATIONS =====
 
             // Insert the data
             $newId = DB::connection('reseller')
@@ -342,6 +423,8 @@ class CopyResourceToResellers implements ShouldQueue
             $uniqueValue = $sourceRecord->getAttribute($uniqueColumn);
 
             if ($uniqueValue) {
+                // ===== RESELLER DATABASE OPERATIONS =====
+
                 $existingRecord = DB::connection('reseller')
                     ->table($table)
                     ->where($uniqueColumn, $uniqueValue)
@@ -373,62 +456,5 @@ class CopyResourceToResellers implements ShouldQueue
         }
 
         return null;
-    }
-
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
-    {
-        // Get all active resellers
-        $resellers = User::where('is_active', true)
-            ->whereNotNull('db_name')
-            ->where('db_name', '!=', '')
-            ->whereNotNull('db_username')
-            ->where('db_username', '!=', '')
-            ->inRandomOrder()
-            ->get();
-
-        foreach ($resellers as $reseller) {
-            try {
-                $this->idMap = [];
-
-                // Configure reseller database connection with timeout
-                $config = $reseller->getDatabaseConfig();
-                $config['options'] = [
-                    \PDO::ATTR_TIMEOUT => 30, // 30 seconds connection timeout
-                    \PDO::ATTR_PERSISTENT => false, // Don't use persistent connections
-                ];
-
-                config(['database.connections.reseller' => $config]);
-
-                // Purge and reconnect to ensure fresh connection
-                DB::purge('reseller');
-                DB::reconnect('reseller');
-
-                // Test connection before proceeding
-                DB::connection('reseller')->getPdo();
-
-                // Get or create the resource
-                $newId = $this->getOrCreateResource();
-
-                // Clear reseller's cache
-                $reseller->clearResellerCache($this->table);
-
-                Log::info("Successfully copied {$this->table} {$this->model->id} to reseller {$reseller->id} [".DB::connection('reseller')->getDatabaseName().']');
-
-            } catch (\PDOException $e) {
-                Log::error("Database connection failed for reseller {$reseller->id}: ".$e->getMessage());
-
-                continue;
-            } catch (\Exception $e) {
-                Log::error("Failed to copy {$this->table} {$this->model->id} to reseller {$reseller->id}: ".$e->getMessage());
-
-                continue;
-            } finally {
-                // Always purge the connection to free up resources
-                DB::purge('reseller');
-            }
-        }
     }
 }

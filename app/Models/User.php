@@ -95,6 +95,20 @@ class User extends Authenticatable implements Wallet
             'prefix' => '',
             'strict' => true,
             'engine' => null,
+            'options' => [
+                // Connection timeout (how long to wait for initial connection)
+                \PDO::ATTR_TIMEOUT => 10,
+
+                // Don't use persistent connections for queue jobs
+                \PDO::ATTR_PERSISTENT => false,
+
+                // Set error mode to throw exceptions
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+
+                // MySQL specific options
+                \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
+                \PDO::MYSQL_ATTR_LOCAL_INFILE => false, // Security: disable local infile
+            ],
         ];
     }
 

@@ -35,8 +35,10 @@ class RemoveResourceFromResellers implements ShouldQueue
     {
         // Get all active resellers
         $resellers = User::where('is_active', true)
-            ->whereNotNull('db_password')
-            ->where('db_password', '!=', '')
+            ->whereNotNull('db_name')
+            ->where('db_name', '!=', '')
+            ->whereNotNull('db_username')
+            ->where('db_username', '!=', '')
             ->inRandomOrder()
             ->get();
 

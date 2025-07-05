@@ -22,14 +22,6 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        ProductCreated::class => [
-            ManageProductCategories::class,
-            ManageProductImages::class,
-        ],
-        ProductUpdated::class => [
-            ManageProductCategories::class,
-            ManageProductImages::class,
-        ],
     ];
 
     /**
