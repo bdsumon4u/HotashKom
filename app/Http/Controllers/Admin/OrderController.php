@@ -28,6 +28,7 @@ class OrderController extends Controller
      */
     public function index()
     {
+        abort_if(request()->user()->is('uploader'), 403);
         if (! request()->has('status')) {
             return redirect()->route('admin.orders.index', ['status' => 'PENDING']);
         }
@@ -37,6 +38,7 @@ class OrderController extends Controller
 
     public function create()
     {
+        abort_if(request()->user()->is('uploader'), 403);
         return $this->view();
     }
 
@@ -78,7 +80,7 @@ class OrderController extends Controller
 
     public function filter(Request $request)
     {
-        abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
         $_start = Carbon::parse(\request('start_d', date('Y-m-d')));
         $start = $_start->format('Y-m-d');
         $_end = Carbon::parse(\request('end_d'));
@@ -380,6 +382,7 @@ class OrderController extends Controller
 
     public function courier(Request $request)
     {
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
         $request->validate([
             'courier' => 'required',
             'order_id' => 'required|array',

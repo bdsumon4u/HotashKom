@@ -24,6 +24,8 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
 
     const SALESMAN = 2;
 
+    const UPLOADER = 3;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -62,13 +64,23 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
 
     public function is($role)
     {
+        if (is_array($role)) {
+            foreach ($role as $r) {
+                if ($this->is($r)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         if (! is_string($role)) {
             return parent::is($role);
         }
 
         return $this->role_id == static::ADMIN && $role === 'admin'
             || $this->role_id == static::MANAGER && $role === 'manager'
-            || $this->role_id == static::SALESMAN && $role === 'salesman';
+            || $this->role_id == static::SALESMAN && $role === 'salesman'
+            || $this->role_id == static::UPLOADER && $role === 'uploader';
     }
 
     /**

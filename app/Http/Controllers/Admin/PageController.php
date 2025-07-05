@@ -15,7 +15,7 @@ class PageController extends Controller
      */
     public function index()
     {
-        abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
 
         return $this->view([
             'pages' => Page::all(),
