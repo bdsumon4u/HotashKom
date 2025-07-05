@@ -122,6 +122,23 @@
         .select2 {
             width: 100% !important;
         }
+
+        /* Visual feedback for invalid drop targets */
+        .space.invalid-drop-target {
+            border-color: #dc3545 !important;
+            background-color: #f8d7da !important;
+        }
+
+        .space.valid-drop-target {
+            border-color: #28a745 !important;
+            background-color: #d4edda !important;
+        }
+
+        /* Disable pointer events for invalid drop targets */
+        .route.invalid-drop-target {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 @endpush
 
@@ -423,9 +440,66 @@
                 create: function(event, ui) {
                     // calcWidth($('#title0'));
                 },
+                start: function(event, ui) {
+                    var draggedItem = ui.item;
+                    var draggedId = draggedItem.attr('id').replace('space-item-', '');
+
+                    // Add visual feedback for valid/invalid drop targets
+                    $('.space').each(function() {
+                        var spaceId = $(this).attr('data-space');
+
+                        if (spaceId == draggedId) {
+                            $(this).addClass('invalid-drop-target');
+                        } else {
+                            // Check if this space is a descendant of the dragged item
+                            var isDescendant = false;
+                            draggedItem.find('.space').each(function() {
+                                if ($(this).attr('data-space') == spaceId) {
+                                    isDescendant = true;
+                                    return false;
+                                }
+                            });
+
+                            if (isDescendant) {
+                                $(this).addClass('invalid-drop-target');
+                            } else {
+                                $(this).addClass('valid-drop-target');
+                            }
+                        }
+                    });
+                },
+                stop: function(event, ui) {
+                    // Remove visual feedback
+                    $('.space').removeClass('invalid-drop-target valid-drop-target');
+                },
                 over: function(event, ui) {},
                 receive: function(event, ui) {
-                    // calcWidth($(this).siblings('.title'));
+                    var droppedItem = ui.item;
+                    var targetSpace = $(this);
+                    var droppedId = droppedItem.attr('id').replace('space-item-', '');
+                    var targetSpaceId = targetSpace.attr('data-space');
+
+                    // Prevent dropping a category into its own space
+                    if (droppedId == targetSpaceId) {
+                        $.notify('Cannot drop a category into itself.', 'error');
+                        $(this).sortable('cancel');
+                        return false;
+                    }
+
+                    // Prevent dropping a category into its descendants' space
+                    var isDescendant = false;
+                    droppedItem.find('.space').each(function() {
+                        if ($(this).attr('data-space') == targetSpaceId) {
+                            isDescendant = true;
+                            return false;
+                        }
+                    });
+
+                    if (isDescendant) {
+                        $.notify('Cannot drop a category into its descendants.', 'error');
+                        $(this).sortable('cancel');
+                        return false;
+                    }
                 },
                 update: function(event, ui) {
                     $('#space-0 .route').each(function(idx, el) {
@@ -438,6 +512,40 @@
 
             function reorder(idx, el) {
                 var parent_id = el.parent().attr('data-space');
+                var current_id = el.attr('id').replace('space-item-', '');
+
+                // Prevent circular reference: category cannot be its own parent
+                if (parent_id == current_id) {
+                    console.warn('Cannot make category its own parent. Reverting...');
+                    $.notify('Cannot make a category its own parent.', 'error');
+                    // Revert the sortable operation
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                    return false;
+                }
+
+                // Prevent circular reference: category cannot be parent of its descendants
+                if (parent_id != 0) {
+                    var isDescendant = false;
+                    el.find('.space').each(function() {
+                        if ($(this).attr('data-space') == current_id) {
+                            isDescendant = true;
+                            return false; // break the loop
+                        }
+                    });
+
+                    if (isDescendant) {
+                        console.warn('Cannot make category parent of its descendants. Reverting...');
+                        $.notify('Cannot make a category parent of its descendants.', 'error');
+                        // Revert the sortable operation
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                        return false;
+                    }
+                }
+
                 if (el.attr('data-parent') != parent_id) {
                     el.attr('data-parent', parent_id);
                     ($.inArray(el.attr('id'), updated) == -1) && updated.push(el.attr('id'))

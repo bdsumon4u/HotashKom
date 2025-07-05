@@ -47,7 +47,22 @@ class CategoryController extends Controller
 
             collect($data['categories'])
                 ->each(function ($data): void {
-                    Category::find($data['id'])->update($data);
+                    $category = Category::find($data['id']);
+
+                    // Prevent circular reference: category cannot be its own parent
+                    if (isset($data['parent_id']) && $data['parent_id'] == $category->id) {
+                        return; // Skip this update
+                    }
+
+                    // Prevent circular reference: category cannot be parent of its descendants
+                    if (isset($data['parent_id']) && $data['parent_id'] != 0) {
+                        $isDescendant = $this->isDescendant($category->id, $data['parent_id']);
+                        if ($isDescendant) {
+                            return; // Skip this update
+                        }
+                    }
+
+                    $category->update($data);
                 });
 
             cache()->forget('categories:nested');
@@ -66,6 +81,31 @@ class CategoryController extends Controller
         Category::create($data);
 
         return back()->with('success', 'Category Has Been Created.');
+    }
+
+    /**
+     * Check if a category is a descendant of another category
+     */
+    private function isDescendant(int $categoryId, int $potentialParentId): bool
+    {
+        $category = Category::find($categoryId);
+        if (!$category) {
+            return false;
+        }
+
+        // Check if the potential parent is in the ancestry chain
+        $current = $category;
+        while ($current->parent_id) {
+            if ($current->parent_id == $potentialParentId) {
+                return true;
+            }
+            $current = Category::find($current->parent_id);
+            if (!$current) {
+                break;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -98,6 +138,19 @@ class CategoryController extends Controller
             'slug' => 'required|unique:categories,slug,'.$category->id,
             'base_image' => 'nullable|integer',
         ]);
+
+        // Prevent circular reference: category cannot be its own parent
+        if (isset($data['parent_id']) && $data['parent_id'] == $category->id) {
+            return back()->withErrors(['parent_id' => 'A category cannot be its own parent.']);
+        }
+
+        // Prevent circular reference: category cannot be parent of its descendants
+        if (isset($data['parent_id']) && $data['parent_id'] != 0) {
+            $isDescendant = $this->isDescendant($category->id, $data['parent_id']);
+            if ($isDescendant) {
+                return back()->withErrors(['parent_id' => 'A category cannot be a parent of its descendants.']);
+            }
+        }
 
         $data['image_id'] = Arr::pull($data, 'base_image');
 
