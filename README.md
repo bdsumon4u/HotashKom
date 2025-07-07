@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}335}$$ 🔥 domains are live now
+These 🔥 $${\color{red}342}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-06 09:36:54 Asia/Dhaka**_
+_Last updated: **2025-07-07 09:35:54 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -434,3 +434,10 @@ _Last updated: **2025-07-06 09:36:54 Asia/Dhaka**_
 | 333 | [infinitebazar.com](http://infinitebazar.com) |
 | 334 | [buybelo.com](http://buybelo.com) |
 | 335 | [nadishaonlineshop.com](http://nadishaonlineshop.com) |
+| 336 | [adionlineshop.com](http://adionlineshop.com) |
+| 337 | [njonlineshopbd.com](http://njonlineshopbd.com) |
+| 338 | [janokbd.com](http://janokbd.com) |
+| 339 | [bduniqueshop.com](http://bduniqueshop.com) |
+| 340 | [afrinsmart.com](http://afrinsmart.com) |
+| 341 | [nihanuhamart.com](http://nihanuhamart.com) |
+| 342 | [mostvaly.com](http://mostvaly.com) |
