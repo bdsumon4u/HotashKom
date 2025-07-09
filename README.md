@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}346}$$ 🔥 domains are live now
+These 🔥 $${\color{red}355}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-08 09:22:36 Asia/Dhaka**_
+_Last updated: **2025-07-09 09:25:00 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -445,3 +445,12 @@ _Last updated: **2025-07-08 09:22:36 Asia/Dhaka**_
 | 344 | [swiftcartbd.com](http://swiftcartbd.com) |
 | 345 | [familybdcare.com](http://familybdcare.com) |
 | 346 | [chawapawa.com](http://chawapawa.com) |
+| 347 | [ahnafbdmart.com](http://ahnafbdmart.com) |
+| 348 | [smartebazar.com](http://smartebazar.com) |
+| 349 | [shohozmela.com](http://shohozmela.com) |
+| 350 | [bikroybdbazar.com](http://bikroybdbazar.com) |
+| 351 | [ponnobdmela.com](http://ponnobdmela.com) |
+| 352 | [aponghormart.com](http://aponghormart.com) |
+| 353 | [sahihat.com](http://sahihat.com) |
+| 354 | [amranmart24.com](http://amranmart24.com) |
+| 355 | [ssvaly.com](http://ssvaly.com) |
