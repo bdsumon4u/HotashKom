@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}355}$$ 🔥 domains are live now
+These 🔥 $${\color{red}356}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-10 09:24:45 Asia/Dhaka**_
+_Last updated: **2025-07-11 09:39:34 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -454,3 +454,4 @@ _Last updated: **2025-07-10 09:24:45 Asia/Dhaka**_
 | 353 | [sahihat.com](http://sahihat.com) |
 | 354 | [amranmart24.com](http://amranmart24.com) |
 | 355 | [ssvaly.com](http://ssvaly.com) |
+| 356 | [brightsmartshopbd.com](http://brightsmartshopbd.com) |
