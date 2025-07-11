@@ -22,21 +22,9 @@
 @section('content')
     <div class="block mt-1 checkout">
         <div class="container">
-            @if (auth()->user()?->is_verified)
             <x-form checkoutform :action="route('checkout')" method="POST">
                 <livewire:checkout />
             </x-form>
-            @else
-                <div class="alert alert-warning">
-                    <h4 class="alert-heading">Account Not Verified!</h4>
-                    <p>Your reseller account is not verified yet. To get verified:</p>
-                    <ol>
-                        <li>Pay 500 tk to bKash number: 01767677777</li>
-                        <li>Wait for admin verification</li>
-                        <li>For immediate verification, please call us</li>
-                    </ol>
-                </div>
-            @endif
         </div>
     </div>
 @endsection

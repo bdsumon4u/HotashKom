@@ -19,6 +19,8 @@ use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
+use function Illuminate\Support\defer;
+
 class Checkout extends Component
 {
     public ?Order $order = null;
@@ -87,27 +89,25 @@ class Checkout extends Component
         $area ??= $this->shipping;
         $shipping_cost = 0;
         if ($area) {
-            /*
-            if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
-            */
-            $shipping_cost = cart()->content()->max(function ($item) use ($area) {
-                if ($area == 'Inside Dhaka') {
-                    return $item->options->shipping_inside;
-                } else {
-                    return $item->options->shipping_outside;
-                }
-            });
-            /*
-            } else {
+            if (setting('show_option')->productwise_delivery_charge ?? false) {
                 $shipping_cost = cart()->content()->sum(function ($item) use ($area) {
+                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
                     if ($area == 'Inside Dhaka') {
-                        return $item->options->shipping_inside * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
+                        return $item->options->shipping_inside * $factor;
                     } else {
-                        return $item->options->shipping_outside * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
+                        return $item->options->shipping_outside * $factor;
+                    }
+                });
+            } else {
+                $shipping_cost = cart()->content()->max(function ($item) use ($area) {
+                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
+                    if ($area == 'Inside Dhaka') {
+                        return $item->options->shipping_inside * $factor;
+                    } else {
+                        return $item->options->shipping_outside * $factor;
                     }
                 });
             }
-            */
         }
 
         $freeDelivery = setting('free_delivery');
@@ -143,8 +143,7 @@ class Checkout extends Component
 
     public function updatedShipping(): void
     {
-        $this->retailDeliveryFee = $this->shippingCost();
-        cart()->addCost('deliveryFee', $this->retailDeliveryFee);
+        cart()->addCost('deliveryFee', $this->shippingCost($this->shipping));
     }
 
     public function cartUpdated(): void
@@ -193,7 +192,7 @@ class Checkout extends Component
 
     public function checkout()
     {
-        if (! auth('user')->check()) {
+        if (isOninda() && auth('user')->guest()) {
             $this->dispatch('notify', ['message' => 'Please login to add product to cart', 'type' => 'error']);
 
             return redirect()->route('user.login')->with('danger', 'Please login to add product to cart');
@@ -234,7 +233,7 @@ class Checkout extends Component
         }
 
         $this->order = DB::transaction(function () use ($data, &$order, $fraud) {
-            $products = Product::find(cart()->content()->pluck('id'))
+            $data['products'] = Product::find(cart()->content()->pluck('id'))
                 ->mapWithKeys(function (Product $product) use ($fraud) {
                     $id = $product->id;
                     $quantity = min(cart($id)->qty, $fraud->max_qty_per_product ?? 3);
@@ -249,25 +248,35 @@ class Checkout extends Component
                     return [$id => $productData];
                 })->filter()->toArray();
 
-            if (empty($products)) {
+            if (empty($data['products'])) {
                 return $this->dispatch('notify', ['message' => 'All products are out of stock.', 'type' => 'danger']);
             }
 
-            $data['products'] = json_encode($products, JSON_UNESCAPED_UNICODE);
             $user = $this->getUser($data);
             $oldOrders = $user->orders()->get();
             $status = data_get(config('app.orders', []), 0, 'PENDING'); // Default Status
 
             $oldOrders = Order::select(['id', 'admin_id', 'status'])->where('phone', $data['phone'])->get();
             $adminIds = $oldOrders->pluck('admin_id')->unique()->toArray();
-            $adminQ = Admin::where('role_id', Admin::SALESMAN)->where('is_active', true)->inRandomOrder();
-            if (count($adminIds) > 0) {
-                $data['admin_id'] = $adminQ->whereIn('id', $adminIds)->first()->id ?? $adminQ->first()->id ?? Admin::where('is_active', true)->inRandomOrder()->first()->id;
+
+            if (config('app.round_robin_order_receiving')) {
+                $adminQ = Admin::orderByRaw('CASE WHEN is_active = 1 THEN 0 ELSE 1 END, role_id desc, last_order_received_at asc');
+                if (count($adminIds) > 0) {
+                    $admin = $adminQ->whereIn('id', $adminIds)->first() ?? $adminQ->first();
+                } else {
+                    $admin = $adminQ->first();
+                }
             } else {
-                $data['admin_id'] = $adminQ->first()->id ?? Admin::where('is_active', true)->inRandomOrder()->first()->id;
+                $adminQ = Admin::where('role_id', Admin::SALESMAN)->where('is_active', true)->inRandomOrder();
+                if (count($adminIds) > 0) {
+                    $admin = $adminQ->whereIn('id', $adminIds)->first() ?? $adminQ->first() ?? Admin::where('is_active', true)->inRandomOrder()->first();
+                } else {
+                    $admin = $adminQ->first() ?? Admin::where('is_active', true)->inRandomOrder()->first();
+                }
             }
 
             $data += [
+                'admin_id' => $admin->id,
                 'user_id' => $user->id, // If User Logged In
                 'status' => $status,
                 'status_at' => now()->toDateTimeString(),
@@ -277,7 +286,7 @@ class Checkout extends Component
                     'is_fraud' => $oldOrders->whereIn('status', ['CANCELLED', 'RETURNED'])->count() > 0,
                     'is_repeat' => $oldOrders->count() > 0,
                     'shipping_area' => $data['shipping'],
-                    'shipping_cost' => $this->shippingCost(),
+                    'shipping_cost' => $this->shippingCost($data['shipping']),
                     'retail_delivery_fee' => $this->retailDeliveryFee,
                     'advanced' => $this->advanced,
                     'retail_discount' => $this->retailDiscount,
@@ -287,6 +296,8 @@ class Checkout extends Component
 
             $order = Order::create($data);
             $user->notify(new OrderPlaced($order));
+
+            defer(fn () => $admin->update(['last_order_received_at' => now()]));
 
             GoogleTagManagerFacade::flash([
                 'event' => 'purchase',
@@ -300,7 +311,7 @@ class Checkout extends Component
                         'item_category' => $product['category'],
                         'price' => $product['price'],
                         'quantity' => $product['quantity'],
-                    ], $products)),
+                    ], $data['products'])),
                 ],
             ]);
 

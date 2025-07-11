@@ -50,8 +50,8 @@ class LivewireCheckoutController extends Controller
                         'slug' => $cartItem['slug'],
                         'image' => $cartItem['image'],
                         'category' => $cartItem['category'],
-                        'shipping_inside' => $product->shipping_inside,
-                        'shipping_outside' => $product->shipping_outside,
+                        'shipping_inside' => $cartItem['shipping_inside'],
+                        'shipping_outside' => $cartItem['shipping_outside'],
                     ],
                 ]);
             }

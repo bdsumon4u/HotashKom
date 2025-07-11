@@ -116,7 +116,7 @@
                                                         method="POST">
                                                         @csrf
                                                         <div class="d-flex align-items-center">
-                                                            <h6 class="mr-2 mb-0">{{ $active->name }}</h6>
+                                                            <h6 class="mb-0 mr-2">{{ $active->name }}</h6>
                                                             <input type="text" class="mr-1 form-control" name="name"
                                                                 placeholder="Option Name">
                                                             @if ($active->name == 'Color')
@@ -168,7 +168,7 @@
                                                                                             method="PATCH">
                                                                                             <div
                                                                                                 class="d-flex align-items-center">
-                                                                                                <h6 class="mr-2 mb-0">
+                                                                                                <h6 class="mb-0 mr-2">
                                                                                                     {{ $active->name }}</h6>
                                                                                                 <input type="text"
                                                                                                     class="mr-1 form-control"

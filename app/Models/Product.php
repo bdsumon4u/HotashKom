@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Events\ProductCreated;
 use App\Jobs\RemoveResourceFromResellers;
 use App\Jobs\SyncProductStockWithResellers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\App;
 use Laravel\Scout\Searchable;
 use Nicolaslopezj\Searchable\SearchableTrait;
 
@@ -51,17 +53,21 @@ class Product extends Model
     {
         static::saved(function ($product): void {
             // Dispatch job to sync stock attributes if they were changed
-            if ($product->isDirty(['should_track', 'stock_count'])) {
+            if (isOninda() && $product->isDirty(['should_track', 'stock_count'])) {
                 SyncProductStockWithResellers::dispatch($product);
             }
         });
 
-        static::deleting(function ($product): void {
-            // Dispatch job to remove product from reseller databases
-            if (! $product->parent_id) { // not a variation
-                RemoveResourceFromResellers::dispatch($product->getTable(), $product->id);
+        static::deleting(function ($record): void {
+            if (!isOninda() && $record->source_id !== null) {
+                throw new \Exception('Cannot delete a resource that has been sourced.');
             }
-            $product->variations->each->delete();
+
+            // Dispatch job to remove product from reseller databases
+            if (! $record->parent_id && isOninda()) { // not a variation
+                RemoveResourceFromResellers::dispatch($record->getTable(), $record->id);
+            }
+            $record->variations->each->delete();
         });
 
         static::addGlobalScope('latest', function (Builder $builder): void {

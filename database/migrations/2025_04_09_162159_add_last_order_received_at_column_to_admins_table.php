@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->foreignId('source_id')->nullable()->after('id');
+        Schema::table('admins', function (Blueprint $table) {
+            $table->timestamp('last_order_received_at')->useCurrent()->after('remember_token');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('source_id');
+        Schema::table('admins', function (Blueprint $table) {
+            $table->dropColumn('last_order_received_at');
         });
     }
 };

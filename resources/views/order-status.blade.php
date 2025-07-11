@@ -56,8 +56,10 @@
                                     <thead>
                                         <tr>
                                             <th>Product</th>
-                                            <th>Buy</th>
-                                            <th>Sell</th>
+                                            <th>Buy Price</th>
+                                            @if(isOninda())
+                                            <th>Sell Price</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody class="card-table__body card-table__body--merge-rows">
@@ -68,9 +70,11 @@
                                                         href="{{ route('products.show', $product->slug) }}">{{ $product->name }}</a>
                                                     × {{ $product->quantity }}</td>
                                                 <td>{!! theMoney($product->quantity * $product->price) !!}</td>
+                                                @if(isOninda())
                                                 <td>{!! theMoney($amount = $product->quantity * $product->retail_price) !!}</td>
+                                                @php($retail += $amount)
+                                                @endif
                                             </tr>
-                                        @php($retail += $amount)
                                         @endforeach
                                     </tbody>
                                     <tbody class="card-table__body card-table__body--merge-rows">
@@ -78,33 +82,43 @@
                                         <tr>
                                             <th>Subtotal</th>
                                             <td>{!! theMoney($data['subtotal']) !!}</td>
+                                            @if(isOninda())
                                             <td>{!! theMoney($retail) !!}</td>
+                                            @endif
                                         </tr>
                                         @if ($data['advanced'])
                                             <tr>
                                                 <th>Advanced</th>
                                                 <td>{!! theMoney(0) !!}</td>
+                                                @if(isOninda())
                                                 <td>{!! theMoney($data['advanced']) !!}</td>
+                                                @endif
                                             </tr>
                                         @endif
                                         @if ($data['retail_discount'])
                                             <tr>
                                                 <th>Discount</th>
                                                 <td>{!! theMoney($data['discount'] ?? 0) !!}</td>
+                                                @if(isOninda())
                                                 <td>{!! theMoney($data['retail_discount']) !!}</td>
+                                                @endif
                                             </tr>
                                         @endif
                                         <tr>
                                             <th>Delivery Charge</th>
                                             <td>{!! theMoney($data['shipping_cost']) !!}</td>
+                                            @if(isOninda())
                                             <td>{!! theMoney($data['retail_delivery_fee']) !!}</td>
+                                            @endif
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th>Grand Total</th>
                                             <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] - ($data['discount'] ?? 0)) !!}</td>
+                                            @if(isOninda())
                                             <td>{!! theMoney($retail + $data['retail_delivery_fee'] - ($data['advanced'] ?? 0) - ($data['retail_discount'] ?? 0)) !!}</td>
+                                            @endif
                                         </tr>
                                     </tfoot>
                                 </table>

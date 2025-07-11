@@ -36,6 +36,11 @@ class ProductVariationController extends Controller
     public function store(Request $request, Product $product)
     {
         abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
+
+        if ($product->source_id !== null) {
+            return back()->with('danger', 'Cannot regenerate variations for a sourced product.');
+        }
+
         $attributes = collect($request->get('attributes'));
         $options = Option::find($attributes->flatten());
 

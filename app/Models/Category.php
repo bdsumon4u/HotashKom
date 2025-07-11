@@ -21,14 +21,20 @@ class Category extends Model
             // cache()->forget('catmenu:nestedwithparent');
 
             // Dispatch job to copy category to reseller databases
-            if ($category->wasRecentlyCreated) {
+            if (isOninda() && $category->wasRecentlyCreated) {
                 CopyResourceToResellers::dispatch($category);
             }
         });
 
         static::deleting(function ($category): void {
+            if (!isOninda() && $category->source_id !== null) {
+                throw new \Exception('Cannot delete a resource that has been sourced.');
+            }
+
             // Dispatch job to remove category from reseller databases
-            RemoveResourceFromResellers::dispatch($category->getTable(), $category->id);
+            if (isOninda()) {
+                RemoveResourceFromResellers::dispatch($category->getTable(), $category->id);
+            }
             $category->childrens->each->delete();
             // optional($category->categoryMenu)->delete();
             cache()->forget('categories:nested');

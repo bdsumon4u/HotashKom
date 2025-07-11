@@ -5,7 +5,9 @@
                 <th class="cart-table__column cart-table__column--image">Image</th>
                 <th class="cart-table__column cart-table__column--product">Product</th>
                 <th class="cart-table__column cart-table__column--price">Buy Price</th>
+                @if (isOninda())
                 <th class="cart-table__column cart-table__column--price">Sell Price</th>
+                @endif
                 <th class="cart-table__column cart-table__column--quantity">Quantity</th>
                 <th class="cart-table__column cart-table__column--total">Total</th>
                 <th class="cart-table__column cart-table__column--remove"></th>
@@ -23,6 +25,7 @@
                             class="cart-table__product-name">{{ $product->name }}</a>
                     </td>
                     <td class="cart-table__column cart-table__column--price" data-title="Price">TK {{ $product->price }}</td>
+                    @if (isOninda())
                     <td class="cart-table__column cart-table__column--price" data-title="Price">
                         <div class="input-group input-group-sm">
                             <input type="number" class="form-control form-control-sm" x-model="retail[{{$product->id}}].price" min="0" @focus="$event.target.select()" />
@@ -31,6 +34,7 @@
                             </div>
                         </div>
                     </td>
+                    @endif
                     <td class="cart-table__column cart-table__column--quantity" data-title="Quantity">
                         <div class="input-number product__quantity">
                             <input class="form-control input-number__input" type="number" min="1"

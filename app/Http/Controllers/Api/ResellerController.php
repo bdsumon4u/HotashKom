@@ -22,9 +22,9 @@ class ResellerController extends Controller
             ->addIndexColumn()
             ->editColumn('id', fn ($row): string => $row->id)
             ->editColumn('name', fn ($row): string => '<a href="'.route('admin.orders.index', ['user_id' => $row->id, 'status' => '']).'">'.$row->name.'</a>')
-            ->editColumn('shop_name', fn ($row): string => $row->shop_name)
-            ->editColumn('phone_number', fn ($row): string => $row->phone_number)
-            ->editColumn('bkash_number', fn ($row): string => $row->bkash_number)
+            ->editColumn('shop_name', fn ($row): string => $row->shop_name ?? '-')
+            ->editColumn('phone_number', fn ($row): string => $row->phone_number ?? '-')
+            ->editColumn('bkash_number', fn ($row): string => $row->bkash_number ?? '-')
             ->editColumn('balance', function ($row): string {
                 return '<a href="'.route('admin.transactions.index', ['user_id' => $row->id]).'" class="text-primary">'.$row->balance.'</a>';
             })
@@ -35,8 +35,8 @@ class ResellerController extends Controller
                     <a href="'.route('admin.resellers.edit', $row->id).'" class="btn btn-sm btn-primary">
                         <i class="fa fa-edit"></i>
                     </a>
-                    <button type="button" class="btn btn-sm '.($row->is_verified ? 'btn-danger' : 'btn-success').' toggle-verify" data-id="'.$row->id.'" data-verified="'.$row->is_verified.'">
-                        <i class="fa '.($row->is_verified ? 'fa-times' : 'fa-check').'"></i>
+                    <button type="button" class="btn btn-sm'.($row->is_verified ? 'btn-danger' : 'btn-success').' toggle-verify" data-id="'.$row->id.'" data-verified="'.$row->is_verified.'">
+                        <i class="fa'.($row->is_verified ? 'fa-times' : 'fa-check').'"></i>
                     </button>
                 </div>';
             })

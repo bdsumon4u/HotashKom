@@ -24,8 +24,6 @@ use Illuminate\Support\Facades\Session;
 // })->name('lang');
 
 Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class])->group(function (): void {
-    Route::get('auth', 'App\\Http\\Controllers\\User\\Auth\\LoginController@showLoginForm')->middleware('guest:user')->name('auth');
-
     Route::group(['as' => 'user.'], function (): void {
 
         Route::namespace('App\\Http\\Controllers\\User')->group(function (): void {

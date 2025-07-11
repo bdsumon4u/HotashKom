@@ -46,7 +46,7 @@
                         </div>
                         <div class="row d-none" style="row-gap: .25rem;">
                             <div class="col-auto pr-0 d-flex align-items-center" check-count></div>
-                            @if(request('status') != 'RETURNED')
+                            @unless(false && in_array(request('status'), ['CONFIRMED', 'INVOICED']))
                             <div class="col-auto px-1">
                                 <select name="status" id="status" onchange="changeStatus()" class="text-white form-control form-control-sm bg-primary">
                                     <option value="">Change Status</option>
@@ -56,33 +56,32 @@
                                             @case('WAITING')
                                                 @php $show = in_array(request('status'), ['PENDING', 'CANCELLED']) @endphp
                                                 @break
-                                        
+
                                             @case('CONFIRMED')
                                                 @php $show = in_array(request('status'), ['PENDING', 'WAITING', 'CANCELLED']) @endphp
                                                 @break
-                                        
+
                                             @case('CANCELLED')
                                                 @php $show = in_array(request('status'), ['PENDING', 'WAITING']) @endphp
                                                 @break
-                                        
-                                            @case('RETURNED')
-                                                @php $show = in_array(request('status'), ['COMPLETED']) @endphp
-                                                @break
+
                                             @case('COMPLETED')
+                                            @case('RETURNED')
                                             @case('LOST')
                                                 @php $show = in_array(request('status'), ['SHIPPING']) @endphp
                                                 @break
-                                        
+
                                             @default
-                                                
+
                                         @endswitch
-                                        @if($show)
+                                        @if($show || true)
                                         <option value="{{ $status }}">{{ $status }}</option>
                                         @endif
                                     @endforeach
                                 </select>
                             </div>
-                            @unless(request('status') == 'SHIPPING' || request('status') == 'COMPLETED')
+                            @endunless
+                            @unless(request('status') == 'SHIPPING')
                             <div class="col-auto px-1">
                                 <select name="courier" id="courier" onchange="changeCourier()" class="text-white form-control form-control-sm bg-primary">
                                     <option value="">Change Courier</option>
@@ -92,11 +91,13 @@
                                 </select>
                             </div>
                             @endunless
-                            @endif
                             <div class="col-auto pl-0 ml-auto">
                                 @if(request('status') == 'CONFIRMED')
                                 <button onclick="printSticker()" id="sticker" class="ml-1 btn btn-sm btn-primary">Print Sticker</button>
                                 <button onclick="printInvoice()" id="invoice" class="ml-1 btn btn-sm btn-primary">Print Invoice</button>
+                                @if(isReseller())
+                                <button onclick="forwardToOninda()" id="forward-to-oninda" class="ml-1 btn btn-sm btn-primary">Forward to Oninda</button>
+                                @endif
                                 @elseif(request('status') == 'INVOICED')
                                 <button onclick="courier()" id="courier" class="ml-1 btn btn-sm btn-primary">Send to Courier</button>
                                 @endif
@@ -114,6 +115,9 @@
                                     </th>
                                     @endif
                                     <th width="80">ID</th>
+                                    @if(isReseller())
+                                    <th width="80">Oninda</th>
+                                    @endif
                                     <th>Customer</th>
                                     <th>Products</th>
                                     <th width="10">Amount</th>
@@ -142,12 +146,14 @@
     <script src="{{asset('assets/js/product-list-custom.js')}}"></script>
 @endpush
 
+@php($parameters = array_merge(request()->query(), request('status') && auth()->user()->is('salesman') ? ['staff_id' => auth()->id()] : []))
+
 @push('scripts')
     <script>
         var checklist = new Set();
         function updateBulkMenu() {
             $('[name="check_all"]').prop('checked', true);
-            $(document).find('[name="order_id[]"]').each(function () {
+            $(document).find('[name="order_id[]"]:not([disabled])').each(function () {
                 if (checklist.has($(this).val())) {
                     $(this).prop('checked', true);
                 } else {
@@ -167,15 +173,15 @@
         }
         $('[name="check_all"]').on('change', function () {
             if ($(this).prop('checked')) {
-                $(document).find('[name="order_id[]"]').each(function () {
+                $(document).find('[name="order_id[]"]:not([disabled])').each(function () {
                     checklist.add($(this).val());
                 });
             } else {
-                $(document).find('[name="order_id[]"]').each(function () {
+                $(document).find('[name="order_id[]"]:not([disabled])').each(function () {
                     checklist.delete($(this).val());
                 });
             }
-            $('[name="order_id[]"]').prop('checked', $(this).prop('checked'));
+            $('[name="order_id[]"]:not([disabled])').prop('checked', $(this).prop('checked'));
             updateBulkMenu();
         });
 
@@ -215,12 +221,15 @@
             ],
             processing: true,
             serverSide: true,
-            ajax: "{!! route('api.orders', request()->query()) !!}",
+            ajax: "{!! route('api.orders', $parameters) !!}",
             columns: [
                 @if($bulk)
                 { data: 'checkbox', name: 'checkbox', sortable: false, searchable: false},
                 @endif
                 { data: 'id', name: 'id' },
+                @if(isReseller())
+                { data: 'oninda', name: 'oninda', sortable: false, searchable: false },
+                @endif
                 { data: 'customer', name: 'customer', sortable: false },
                 { data: 'products', name: 'products', sortable: false },
                 { data: 'amount', name: 'amount', sortable: false },
@@ -422,6 +431,30 @@
             window.open('{{ route('admin.orders.booking') }}?order_id=' + $('[name="order_id[]"]:checked').map(function () {
                 return $(this).val();
             }).get().join(','), '_self');
+        }
+
+        function forwardToOninda() {
+            if (checklist.size === 0) {
+                $.notify('Please select at least one order', 'warning');
+                return;
+            }
+
+            $.post({
+                url: '{{ route('admin.orders.forward-to-oninda') }}',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    order_id: Array.from(checklist),
+                },
+                success: function (response) {
+                    checklist.clear();
+                    updateBulkMenu();
+                    table.draw();
+                    $.notify('Orders are being forwarded to Oninda', 'success');
+                },
+                error: function (response) {
+                    $.notify(response?.responseJSON?.message || 'Failed to forward orders to Oninda', 'danger');
+                }
+            });
         }
     </script>
 

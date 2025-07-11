@@ -615,7 +615,7 @@
                 $(e.target).addClass('disabled')
                 var id = $(this).attr('data-id')
                 $.ajax({
-                    url: '{{route('admin.categories.destroy', 'id')}}'.replace('id', id),
+                    url: '{{route('admin.categories.destroy', ':id')}}'.replace(':id', id),
                     type: 'DELETE',
                     _method: 'DELETE',
                     complete: function() {

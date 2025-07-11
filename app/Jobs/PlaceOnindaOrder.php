@@ -120,8 +120,6 @@ class PlaceOnindaOrder implements ShouldQueue
                 }
 
                 $cartItem = (new ProductResource($onindaProduct))->toCartItem($product->quantity);
-                $cartItem['shipping_inside'] = $onindaProduct->shipping_inside;
-                $cartItem['shipping_outside'] = $onindaProduct->shipping_outside;
                 $cartItem['retail_price'] = $product->price;
 
                 return [$product->source_id => $cartItem];
@@ -129,6 +127,7 @@ class PlaceOnindaOrder implements ShouldQueue
 
             // Prepare order data for Oninda database
             $orderData = $this->prepareOrderData($resellerOrder, $mappedProducts);
+            $orderData['user_id'] = $reseller->id;
 
             // Create new order in Oninda database
             $onindaOrder = Order::create($orderData);
@@ -215,9 +214,8 @@ class PlaceOnindaOrder implements ShouldQueue
         unset($attributes['id']);
 
         // Override specific attributes
-        $attributes['user_id'] = $resellerOrder->user_id;
         $attributes['admin_id'] = $resellerOrder->admin_id;
-        $attributes['products'] = json_encode($mappedProducts, JSON_UNESCAPED_UNICODE);
+        $attributes['products'] = $mappedProducts;
 
         // Prepare order data
         $orderData = $resellerOrder->data ?? [];
@@ -230,18 +228,7 @@ class PlaceOnindaOrder implements ShouldQueue
         $orderData['retail_discount'] = $orderData['discount'] ?? 0;
 
         // Calculate Oninda shipping cost
-        $shippingCost = 0;
-        if (is_array($mappedProducts) || is_object($mappedProducts)) {
-            foreach ($mappedProducts as $product) {
-                if (($orderData['shipping_area'] ?? '') === 'Inside Dhaka') {
-                    $shippingCost = max($shippingCost, $product['shipping_inside'] ?? 0);
-                } else {
-                    $shippingCost = max($shippingCost, $product['shipping_outside'] ?? 0);
-                }
-            }
-        }
-
-        $orderData['shipping_cost'] = $shippingCost;
+        $orderData['shipping_cost'] = $resellerOrder->getShippingCost($mappedProducts, $orderData['subtotal'], $orderData['shipping_area']);
         $orderData['discount'] = 0;
 
         $attributes['data'] = $orderData;

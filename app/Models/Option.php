@@ -14,14 +14,20 @@ class Option extends Model
     {
         static::saved(function ($option): void {
             // Dispatch job to copy option to reseller databases
-            if ($option->wasRecentlyCreated) {
+            if (isOninda() && $option->wasRecentlyCreated) {
                 CopyResourceToResellers::dispatch($option);
             }
         });
 
         static::deleting(function ($option): void {
+            if (!isOninda() && $option->source_id !== null) {
+                throw new \Exception('Cannot delete a resource that has been sourced.');
+            }
+
             // Dispatch job to remove option from reseller databases
-            RemoveResourceFromResellers::dispatch($option->getTable(), $option->id);
+            if (isOninda()) {
+                RemoveResourceFromResellers::dispatch($option->getTable(), $option->id);
+            }
         });
     }
 

@@ -89,6 +89,10 @@ class RegisterController extends Controller
      */
     public function showRegistrationForm()
     {
+        if (! isOninda()) {
+            return redirect('/');
+        }
+
         return view('user.auth.register');
     }
 

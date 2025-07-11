@@ -134,12 +134,10 @@ class EditOrder extends Component
         }
 
         $productData = (new ProductResource($product))->toCartItem($quantity);
-        $productData['shipping_inside'] = $product->shipping_inside;
-        $productData['shipping_outside'] = $product->shipping_outside;
 
         $this->selectedProducts[$id] = $productData;
 
-        $this->updatedShippingArea('');
+        $this->updatedShippingArea($this->shipping_area);
 
         $this->search = '';
         $this->dispatch('notify', ['message' => 'Product added successfully.']);
@@ -153,7 +151,7 @@ class EditOrder extends Component
         $this->selectedProducts[$id]['quantity']++;
         $this->selectedProducts[$id]['total'] = $this->selectedProducts[$id]['quantity'] * $this->selectedProducts[$id]['price'];
 
-        $this->updatedShippingArea('');
+        $this->updatedShippingArea($this->shipping_area);
     }
 
     public function decreaseQuantity($id): void
@@ -168,26 +166,15 @@ class EditOrder extends Component
             unset($this->selectedProducts[$id]);
         }
 
-        $this->updatedShippingArea('');
+        $this->updatedShippingArea($this->shipping_area);
     }
 
     public function updatedShippingArea($value): void
     {
-        $shipping_cost = 0;
-        if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
-            $shipping_cost = setting('delivery_charge')->{$this->shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping_area, 0);
-        } else {
-            $shipping_cost = collect($this->selectedProducts)->sum(function ($item) {
-                $default = setting('delivery_charge')->{$this->shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping_area, 0);
-                if ($this->shipping_area === 'Inside Dhaka') {
-                    return ($item['shipping_inside'] ?? $default) * (setting('show_option')->quantitywise_delivery_charge ?? false ? $item['quantity'] : 1);
-                } else {
-                    return ($item['shipping_outside'] ?? $default) * (setting('show_option')->quantitywise_delivery_charge ?? false ? $item['quantity'] : 1);
-                }
-            });
-        }
-
-        $this->fill(['shipping_cost' => $shipping_cost, 'subtotal' => $this->order->getSubtotal($this->selectedProducts)]);
+        $this->fill([
+            'subtotal' => $subtotal = $this->order->getSubtotal($this->selectedProducts),
+            'shipping_cost' => $this->order->getShippingCost($this->selectedProducts, $subtotal, $value),
+        ]);
     }
 
     public function updateOrder()
@@ -201,7 +188,7 @@ class EditOrder extends Component
         $this->order
             ->fill($this->only($this->attrs))
             ->fill(['data' => $this->only($this->meta)])
-            ->fill(['products' => json_encode($this->selectedProducts, JSON_UNESCAPED_UNICODE)]);
+            ->fill(['products' => $this->selectedProducts]);
 
         if ($this->order->exists) {
             $confirming = false;

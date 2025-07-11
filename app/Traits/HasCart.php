@@ -21,14 +21,12 @@ trait HasCart
         $productData = (new ProductResource($product))->toCartItem($quantity);
         $productData['max'] = $maxQuantity;
         $productData['retail_price'] = $retailPrice;
-        $productData['shipping_inside'] = $product->shipping_inside;
-        $productData['shipping_outside'] = $product->shipping_outside;
 
         cart()->instance($instance)->add(
             $product->id,
             $product->var_name,
             $quantity,
-            $productData['price'],
+            $productData['price'], # this is the wholesale price
             $productData
         );
 

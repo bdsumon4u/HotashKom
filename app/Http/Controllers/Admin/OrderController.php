@@ -462,6 +462,55 @@ class OrderController extends Controller
         return back()->with('success', $order->getChanges() ? 'Order Updated.' : 'Not Updated.');
     }
 
+    public function forwardToOninda(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|array',
+        ]);
+
+        $orders = Order::whereIn('id', $request->order_id)
+            ->whereNull('source_id')
+            ->where('status', 'CONFIRMED')
+            ->get();
+
+        if ($orders->isEmpty()) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'No orders available to forward. All selected orders must be confirmed and not already forwarded to Oninda.'], 422);
+            } else {
+                return redirect()->back()->with('danger', 'No orders available to forward. All selected orders must be confirmed and not already forwarded to Oninda.');
+            }
+        }
+
+        $domain = parse_url(config('app.url'), PHP_URL_HOST);
+        $endpoint = config('app.oninda_url').'/api/reseller/orders/place';
+
+        // Set source_id = 0 to indicate processing state
+        DB::table('orders')->whereIntegerInRaw('id', $request->order_id)->update(['source_id' => 0]);
+
+        try {
+            // Make API call
+            Http::post($endpoint, [
+                'order_id' => $request->order_id,
+                'domain' => $domain,
+            ])->throw();
+        } catch (\Exception $e) {
+            // If API call fails, revert source_id to NULL
+            DB::table('orders')->whereIntegerInRaw('id', $request->order_id)->update(['source_id' => null]);
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Failed to forward orders to Oninda: '.$e->getMessage()], 500);
+            } else {
+                return redirect()->back()->with('danger', 'Failed to forward orders to Oninda: '.$e->getMessage());
+            }
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Orders are being forwarded to Oninda.']);
+        } else {
+            return redirect()->back()->with('success', 'Orders are being forwarded to Oninda.');
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *

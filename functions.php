@@ -190,8 +190,12 @@ function couriers()
     ]);
 }
 
-function cdn(string $url, int $w = 150, int $h = 150)
+function cdn(?string $url, int $w = 150, int $h = 150)
 {
+    if (! $url) {
+        return asset('https://placehold.co/600x600?text=No+Image');
+    }
+
     if (parse_url($url, PHP_URL_HOST) == 'placehold.co') {
         return $url;
     }
@@ -341,4 +345,19 @@ function deleteOrUpdateCart()
             'content' => serialize($content),
             'updated_at' => now(),
         ]);
+}
+
+function isOninda(): bool
+{
+    return config('app.oninda');
+}
+
+function isReseller(): bool
+{
+    static $reseller = null;
+    if ($reseller === null) {
+        $reseller = !empty(config('app.oninda_url'));
+    }
+
+    return $reseller;
 }

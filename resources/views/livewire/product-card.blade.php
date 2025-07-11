@@ -40,7 +40,7 @@
                 <span class="product-card__old-price">{!! theMoney($product->price) !!}</span>
             @endif
         </div>
-        @if(false)
+        @if(! isOninda())
         <div class="product-card__buttons">
             @php($available = !$product->should_track || $product->stock_count > 0)
             @php($show_option = setting('show_option'))

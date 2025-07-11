@@ -18,14 +18,20 @@ class Brand extends Model
             cache()->forget('brands');
 
             // Dispatch job to copy brand to reseller databases
-            if ($brand->wasRecentlyCreated) {
+            if (isOninda() && $brand->wasRecentlyCreated) {
                 CopyResourceToResellers::dispatch($brand);
             }
         });
 
         static::deleting(function ($brand): void {
+            if (!isOninda() && $brand->source_id !== null) {
+                throw new \Exception('Cannot delete a resource that has been sourced.');
+            }
+
             // Dispatch job to remove brand from reseller databases
-            RemoveResourceFromResellers::dispatch($brand->getTable(), $brand->id);
+            if (isOninda()) {
+                RemoveResourceFromResellers::dispatch($brand->getTable(), $brand->id);
+            }
             cache()->forget('brands');
         });
     }

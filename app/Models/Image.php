@@ -19,14 +19,20 @@ class Image extends Model
     {
         static::saved(function ($image): void {
             // Dispatch job to copy image to reseller databases
-            if ($image->wasRecentlyCreated) {
+            if (isOninda() && $image->wasRecentlyCreated) {
                 CopyResourceToResellers::dispatch($image);
             }
         });
 
         static::deleting(function ($image): void {
+            if (!isOninda() && $image->source_id !== null) {
+                throw new \Exception('Cannot delete a resource that has been sourced.');
+            }
+
             // Dispatch job to remove image from reseller databases
-            RemoveResourceFromResellers::dispatch($image->getTable(), $image->id);
+            if (isOninda()) {
+                RemoveResourceFromResellers::dispatch($image->getTable(), $image->id);
+            }
         });
     }
 
@@ -42,7 +48,13 @@ class Image extends Model
 
     public function src(): Attribute
     {
-        return Attribute::get(fn () => asset($this->path));
+        return Attribute::get(function () {
+            if ($this->source_id || !file_exists(public_path($this->path))) { // assuming public disk
+                return config('app.oninda_url') . $this->path;
+            }
+
+            return asset($this->path);
+        });
     }
 
     public function products()

@@ -77,6 +77,7 @@
                             <div class="input-number__sub" wire:click="decrement"></div>
                         </div>
                     </div>
+                    @if(isOninda())
                     <div class="pt-1 product__actions-item d-flex justify-content-between align-items-center border-top">
                         <div class="mr-2 font-weight-bold text-danger" style="white-space:nowrap;">Retail Price</div>
                         <div class="input-group input-group-sm">
@@ -87,9 +88,10 @@
                         </div>
                     </div>
                     <div class="mt-1 small text-muted">
-                        <i class="fa fa-info-circle"></i> Suggested retail price: 
+                        <i class="fa fa-info-circle"></i> Suggested retail price:
                         <strong>৳{{ number_format($selectedVar->selling_price * 1.2, 2) }} - ৳{{ number_format($selectedVar->selling_price * 1.3, 2) }}</strong>
                     </div>
+                    @endif
                     <div class="overflow-hidden product__actions">
                         @php($available = !$selectedVar->should_track || $selectedVar->stock_count > 0)
                         @php($show_option = setting('show_option'))
@@ -150,7 +152,7 @@
                                 </p>
                             @endif
                             <div class="mt-2">
-                                <p class="mb-0 mr-2 text-secondary d-inline-block">Categories:</p>
+                                <p class="mr-2 mb-0 text-secondary d-inline-block">Categories:</p>
                                 @foreach ($product->categories as $category)
                                     <a href="{{ route('categories.products', $category) }}"
                                         class="badge badge-primary">{{ $category->name }}</a>

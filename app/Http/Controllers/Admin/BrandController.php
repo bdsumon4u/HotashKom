@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Traits\PreventsSourcedResourceDeletion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 class BrandController extends Controller
 {
+    use PreventsSourcedResourceDeletion;
+
     /**
      * Display a listing of the resource.
      *
@@ -81,6 +84,11 @@ class BrandController extends Controller
     public function destroy(Brand $brand)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
+        if (($result = $this->preventSourcedResourceDeletion($brand)) !== true) {
+            return $result;
+        }
+
         $brand->delete();
 
         return redirect()

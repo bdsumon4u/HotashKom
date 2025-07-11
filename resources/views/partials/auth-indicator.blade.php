@@ -1,7 +1,7 @@
 @guest('user')
-    @if ($show_option->customer_login ?? false)
+    @if ($show_option->customer_login ?? isOninda())
         <div class="ml-2 indicator">
-            <a href="{{ auth('admin')->check() ? route('admin.home') : route('auth') }}" class="indicator__button">
+            <a href="{{ auth('admin')->check() ? route('admin.home') : route('user.login') }}" class="indicator__button">
                 <span class="indicator__area">
                     <svg width="20" height="20">
                         <path

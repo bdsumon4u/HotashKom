@@ -9,6 +9,7 @@ use App\Redx\Facade\Redx;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -27,6 +28,12 @@ class Order extends Model
     protected $attributes = [
         'status' => 'CONFIRMED',
         'data' => '{"subtotal":0,"shipping_cost":0,"retail_delivery_fee":0,"advanced":0,"discount":0,"retail_discount":0,"courier":"Other","city_id":"","area_id":"","weight":0.5}',
+    ];
+
+    protected $casts = [
+        'products' => 'array',
+        'data' => 'array',
+        'status_at' => 'datetime',
     ];
 
     protected static $logFillable = true;
@@ -99,6 +106,10 @@ class Order extends Model
         });
 
         static::updated(function (Order $order) {
+            if (! isOninda()) {
+                return;
+            }
+
             $status = Arr::get($order->getChanges(), 'status');
 
             // Dispatch job to sync status with resellers
@@ -232,6 +243,59 @@ class Order extends Model
         $products = (array) $products;
 
         return array_reduce($products, fn ($sum, $product) => $sum + ((array) $product)['total']) ?? 0;
+    }
+
+    public function getShippingCost($products, $subtotal = 0, ?string $shipping_area = null)
+    {
+        if (! $products instanceof Collection) {
+            $products = collect($products);
+        }
+
+        $this->isFreeDelivery = false;
+        $shipping_cost = 0;
+        if ($shipping_area) {
+            if (setting('show_option')->productwise_delivery_charge ?? false) {
+                $shipping_cost = $products->sum(function ($item) use ($shipping_area) {
+                $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
+                return $item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] * $factor;
+            }) ?? setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+            } else {
+                $shipping_cost = $products->max(function ($item) use ($shipping_area) {
+                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
+                    return $item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] * $factor;
+                }) ?? setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+            }
+        }
+
+        $freeDelivery = setting('free_delivery');
+
+        if (! ($freeDelivery->enabled ?? false)) {
+            return $shipping_cost;
+        }
+
+        if ($freeDelivery->for_all ?? false) {
+            if ($subtotal < $freeDelivery->min_amount) {
+                return $shipping_cost;
+            }
+            $quantity = $products->sum(fn ($product) => $product->quantity);
+            if ($quantity < $freeDelivery->min_quantity) {
+                return $shipping_cost;
+            }
+
+            $this->isFreeDelivery = true;
+
+            return 0;
+        }
+
+        foreach ((array) ($freeDelivery->products ?? []) as $id => $qty) {
+            if ($products->where('parent_id', $id)->where('quantity', '>=', $qty)->count()) {
+                $this->isFreeDelivery = true;
+
+                return 0;
+            }
+        }
+
+        return $shipping_cost;
     }
 
     public function getActivitylogOptions(): LogOptions

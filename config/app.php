@@ -2,6 +2,8 @@
 
 return [
 
+    'oninda' => env('APP_ONINDA', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -31,6 +33,8 @@ return [
     'increment' => ['PENDING', 'WAITING', 'RETURNED', 'CANCELLED'],
 
     'decrement' => ['CONFIRMED', 'INVOICED', 'SHIPPING', 'COMPLETED', 'LOST'],
+
+    'round_robin_order_receiving' => env('ROUND_ROBIN_ORDER_RECEIVING', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -70,6 +74,14 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Oninda URL
+    |--------------------------------------------------------------------------
+    */
+
+    'oninda_url' => env('ONINDA_URL'),
 
     /*
     |--------------------------------------------------------------------------

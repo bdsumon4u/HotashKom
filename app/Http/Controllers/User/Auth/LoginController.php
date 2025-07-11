@@ -98,6 +98,10 @@ class LoginController extends Controller
                 ->with('token:sent', 'An OTP has been sent to your mobile.');
         }
 
+        if (! isOninda()) {
+            return redirect('/');
+        }
+
         return view('user.auth.login');
     }
 
@@ -146,9 +150,14 @@ class LoginController extends Controller
      *
      * @return string|array
      */
-    public function loginType(): string
+    public function loginType(): array
     {
-        return 'phone_number';
+        return ['phone_number', 'email'];
+    }
+
+    public function isPhoneNumber($login)
+    {
+        return Str::startsWith($login, '01') || Str::startsWith($login, '+8801');
     }
 
     /**
@@ -160,14 +169,6 @@ class LoginController extends Controller
      */
     protected function attemptLogin(Request $request)
     {
-        // if ($request->get('password') == Cache::get('auth:'.$request->login)) {
-        //     $this->guard()->login(User::firstWhere('phone_number', $request->login), true);
-
-        //     return true;
-        // }
-
-        // return false;
-
         $phone = Str::replace(['-', ' '], '', $request->login);
         if (Str::startsWith($phone, '01')) {
             $phone = '+88'.$phone;

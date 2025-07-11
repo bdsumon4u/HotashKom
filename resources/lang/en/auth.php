@@ -14,7 +14,7 @@ return [
     */
 
     'failed' => 'No account found with the credentials.',
-    'incorrect' => 'Password may not be correct.',
+    'incorrect' => 'OTP/Password may not be correct.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 
 ];
