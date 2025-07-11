@@ -1,6 +1,6 @@
 <?php
 
-//German
+// German
 return [
     'Welcome' => 'Welkom',
     'Back' => 'Terug',

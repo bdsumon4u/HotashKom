@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 trait HasCart
 {
@@ -32,22 +33,33 @@ trait HasCart
 
         storeOrUpdateCart();
 
-        $this->dispatch('dataLayer', [
-            'event' => 'add_to_cart',
-            'ecommerce' => [
-                'currency' => 'BDT',
-                'value' => $retailPrice,
-                'items' => [
-                    [
-                        'item_id' => $product->id,
-                        'item_name' => $product->var_name,
-                        'item_category' => $product->category,
-                        'price' => $retailPrice,
-                        'quantity' => $quantity,
+        if (config('meta-pixel.meta_pixel')) {
+            $this->facebookService->trackAddToCart([
+                'id' => $this->product->id,
+                'name' => $this->product->name,
+                'price' => $this->product->selling_price,
+                'page_url' => route('products.show', $this->product->slug),
+            ], $this);
+        }
+
+        if (GoogleTagManagerFacade::isEnabled()) {
+            $this->dispatch('dataLayer', [
+                'event' => 'add_to_cart',
+                'ecommerce' => [
+                    'currency' => 'BDT',
+                    'value' => $retailPrice,
+                    'items' => [
+                        [
+                            'item_id' => $product->id,
+                            'item_name' => $product->var_name,
+                            'item_category' => $product->category,
+                            'price' => $retailPrice,
+                            'quantity' => $quantity,
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
+        }
 
         $this->dispatch('cartUpdated');
         $this->dispatch('notify', ['message' => 'Product added to cart']);

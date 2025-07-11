@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'meta_pixel' => env('META_PIXEL', ''),
+
     /*
      * The Meta pixel id, should be a code that looks something like "1202417153106158".
      */

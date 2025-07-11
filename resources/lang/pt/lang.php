@@ -1,6 +1,6 @@
 <?php
 
-//Portuguese
+// Portuguese
 return [
     'Welcome' => 'Bem-vinda',
     'Back' => 'Costas',

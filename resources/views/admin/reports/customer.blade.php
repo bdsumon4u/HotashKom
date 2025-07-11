@@ -95,7 +95,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $user->id }}</td>
                                         <td>
-                                            <a href="{{ route('admin.orders.index', ['user_id' => $user->id, 'status' => 'COMPLETED', 'start_d' => $start, 'end_d' => $end]) }}" target="_blank">{{ $user->name }}</a>
+                                            <a href="{{ route('admin.orders.index', ['user_id' => $user->id, 'status' => 'DELIVERED', 'start_d' => $start, 'end_d' => $end]) }}" target="_blank">{{ $user->name }}</a>
                                         </td>
                                         <td>{{ $user->phone_number }}</td>
                                         <td>{{ $user->order_count }}</td>

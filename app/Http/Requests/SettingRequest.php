@@ -37,7 +37,7 @@ class SettingRequest extends FormRequest
                 'company.address' => 'required',
                 'company.office_time' => 'required',
                 'company.gmap_ecode' => 'nullable',
-                'company.dev_text' => 'nullable',
+                'company.dev_name' => 'nullable',
                 'company.dev_link' => 'nullable',
                 'call_for_order' => 'required',
                 'social' => 'required|array',

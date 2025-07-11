@@ -1,6 +1,6 @@
 <?php
 
-//Simplified Chinese
+// Simplified Chinese
 return [
     'Welcome' => '欢迎',
     'Back' => '背部',

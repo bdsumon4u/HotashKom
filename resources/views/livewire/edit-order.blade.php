@@ -304,7 +304,7 @@
                             <td>
                                 <select wire:model="status" id="status" class="form-control" @disabled($order->status === 'RETURNED' || (isOninda() ? !$order->exists : !is_null($order->source_id)))>
                                     @foreach (config('app.orders', []) as $stat)
-                                        @if($order->status === 'COMPLETED')
+                                        @if($order->status === 'DELIVERED')
                                             <option value="{{ $stat }}" {{ $stat === 'RETURNED' ? '' : 'disabled' }}>{{ $stat }}</option>
                                         @else
                                             <option value="{{ $stat }}" {{ $stat === 'RETURNED' ? 'disabled' : '' }}>{{ $stat }}</option>
@@ -422,10 +422,6 @@
                             <tr>
                                 <th class="py-1">Phone</th>
                                 <td class="py-1">{{ $order->user->phone_number }}</td>
-                            </tr>
-                            <tr>
-                                <th class="py-1">Address</th>
-                                <td class="py-1">{{ $order->user->address }}</td>
                             </tr>
                             <tr>
                                 <th class="py-1">Balance</th>

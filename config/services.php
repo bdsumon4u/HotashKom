@@ -82,8 +82,10 @@ return [
     ],
 
     'courier_report' => [
+        'cheap' => env('CHEAP_COURIER_REPORT'),
         'url' => env('COURIER_REPORT_URL'),
         'key' => env('COURIER_REPORT_KEY'),
+        'expires' => env('COURIER_EXPIRES'),
     ],
 
     'imagekit' => [
@@ -96,5 +98,10 @@ return [
 
     'gumlet' => [
         'username' => env('GUMLET_USERNAME'),
+    ],
+
+    'facebook' => [
+        'access_token' => env('FACEBOOK_ACCESS_TOKEN'),
+        'test_event_code' => env('FACEBOOK_TEST_EVENT_CODE'),
     ],
 ];

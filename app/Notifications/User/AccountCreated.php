@@ -55,7 +55,7 @@ class AccountCreated extends Notification
      */
     public function toArray($notifiable): array
     {
-        $otp = Cache::remember('auth:'.$notifiable->phone_number, /*86400*/ 2 * 60, fn (): int => mt_rand(1000, 999999));
+        $otp = Cache::remember('auth:'.$notifiable->phone_number, /* 86400 */ 2 * 60, fn (): int => mt_rand(1000, 999999));
 
         return [
             'msg' => 'Dear '.$notifiable->name.', an account has been created for you at '.config('app.name').'. You can login using your phone number. Your access token is '.$otp.'.',

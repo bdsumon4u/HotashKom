@@ -1,6 +1,6 @@
 <?php
 
-//French
+// French
 return [
     'Welcome' => 'Bienvenue',
     'Back' => 'Arrière',

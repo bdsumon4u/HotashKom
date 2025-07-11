@@ -13,13 +13,13 @@
             src: url("fonts/Nikosh.ttf") format('truetype');
         }
 
-        @page { size: 10cm 6.2cm; margin: 2px; }
-        body { font-family: 'Nikosh', serif; font-size: 10px; margin: 0; padding: 0; }
+        @page { size: 10cm 6.2cm; margin: 0.25cm; }
+        body { font-family: 'Nikosh', serif; font-size: 9.75px; margin: 0; padding: 0; }
         .header img { max-height: 40px; }
         .title { font-weight: bold; }
         table { border-collapse: collapse; }
-        p, th, td { margin: 0; margin-bottom: -1px; }
-        .products th, .products td, .summary th, .summary td { border: 0.5px solid black; padding: 0.5px 2px; text-align: center; }
+        p, th, td { margin: 0; margin-bottom: -1.25px; }
+        .products th, .products td, .summary th, .summary td { border: 0.25px solid black; padding: 0.25px 2px; text-align: center; }
     </style>
 </head>
 <body>
@@ -35,7 +35,7 @@
                         <p><small>{{ $order->created_at->format('M d, Y') }}</small></p>
                     </td>
                     <td align="right">
-                        <img src="data:image/jpeg;base64, {{base64_encode(file_get_contents('https://barcode.tec-it.com/barcode.ashx?data='.$order->barcode.'&code=Code128'))}}" alt="Barcode">
+                        <img style="width: 150px;" src="data:image/jpeg;base64, {{base64_encode(file_get_contents('https://barcode.tec-it.com/barcode.ashx?data='.$order->barcode.'&code=Code128'))}}" alt="Barcode">
                     </td>
                 </tr>
             </table>
@@ -71,8 +71,8 @@
                             $path = str($product->image)->after('storage/')->prepend('app/public/');
                         @endphp
                         <div style="clear: both;">
-                            <img style="height: 40px; width: 40px; float: left; margin: 0;" src="data:image/jpeg;base64, {{base64_encode(file_get_contents(storage_path($path)))}}" alt="Barcode">
-                            <div style="min-height: 40px;">{{ $product->name }}</div>
+                            <img style="height: 36px; width: 36px; float: left; margin: 0;" src="data:image/jpeg;base64, {{base64_encode(file_get_contents(storage_path($path)))}}" alt="Image">
+                            <div style="min-height: 36px;">{{ $product->name }}</div>
                         </div>
                     </td>
                     <td>{{ $product->quantity }}</td>
@@ -105,7 +105,7 @@
                 </tr>
                 @endif
                 <tr>
-                    <td colspan="3"><strong>Total</strong></td>
+                    <td colspan="3"><strong>Condition</strong></td>
                     <td><strong>{{ $order->condition }}</strong></td>
                 </tr>
             </tbody>

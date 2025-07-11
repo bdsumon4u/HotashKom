@@ -123,14 +123,14 @@
                             <tr>
                                 <th style="white-space:nowrap;">Your Delivery Charge</th>
                                 <td>
-                                    <input type="number" @focus="$event.target.select()" x-model="retail_delivery"
+                                    <input type="number" @focus="$event.target.select()"
                                         step="10" class="form-control form-control-sm" x-model="retail_delivery" />
                                 </td>
                             </tr>
                             <tr>
                                 <th>Advanced</th>
                                 <td>
-                                    <input type="number" @focus="$event.target.select()" x-model="advanced"
+                                    <input type="number" @focus="$event.target.select()"
                                         step="10" class="form-control form-control-sm" x-model="advanced" />
                                 </td>
                             </tr>
@@ -153,7 +153,7 @@
                             @if (isOninda())
                             <tr>
                                 <th>Selling</th>
-                                <td x-text="format(subtotal + Number(retail_delivery) - Number(retailDiscount))"></td>
+                                <td x-text="format(subtotal + Number(retail_delivery) - Number(advanced) - Number(retailDiscount))"></td>
                             </tr>
                             @endif
                         </tfoot>
@@ -207,7 +207,7 @@
                             <tr>
                                 <th style="white-space:nowrap;font-size:14px;">Your Delivery Charge</th>
                                 <td>
-                                    <input type="number" @focus="$event.target.select()" x-model="retail_delivery"
+                                    <input type="number" @focus="$event.target.select()"
                                         step="10" class="form-control form-control-sm"
                                         x-model="retail_delivery" />
                                 </td>
@@ -215,7 +215,7 @@
                             <tr>
                                 <th style="font-size:14px;">Advanced</th>
                                 <td>
-                                    <input type="number" @focus="$event.target.select()" x-model="advanced"
+                                    <input type="number" @focus="$event.target.select()"
                                         step="10" class="form-control form-control-sm"
                                         x-model="advanced" />
                                 </td>
@@ -242,7 +242,7 @@
                             <tr>
                                 <th style="white-space:nowrap;font-size:18px;">Selling Total</th>
                                 <td style="font-size:14px;">
-                                    <span x-text="format(subtotal + Number(retail_delivery) - Number(retailDiscount))"></span>
+                                    <span x-text="format(subtotal + Number(retail_delivery) - Number(advanced) - Number(retailDiscount))"></span>
                                 </td>
                             </tr>
                             @endif

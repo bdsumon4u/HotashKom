@@ -122,7 +122,7 @@ if (! function_exists('pageRoutes')) {
                     ->middleware(ShortKodeMiddleware::class)
                     ->name('page');
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
         }
     }
 }

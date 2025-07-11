@@ -252,7 +252,7 @@
             // $(document).on('change', '.option-picker', function (ev) {
             //     var options = [];
             //     $(document).find('.option-picker:checked').each((_, item) => options.push(item.value));
-                
+
             //     $.get({
             //         url: '',
             //         data: {options},
@@ -340,7 +340,29 @@
             $(".widget-connect__button-activator-icon").click(function () {
                 $(this).toggleClass("active");
                 $(".widget-connect").toggleClass("active");
-                $("a.widget-connect__button").toggleClass("button-slide-out button-slide");        
+                $("a.widget-connect__button").toggleClass("button-slide-out button-slide");
+            });
+        });
+    </script>
+    <!-- Scripts -->
+    <script>
+        // Handle Facebook events
+        document.addEventListener('facebookEvent', function(event) {
+            // early return condition
+            if (event.detail.length === 0) {
+                return;
+            }
+
+            const { eventName, customData, eventId } = event.detail[0];
+
+            // Track event with fbq
+            fbq('track', eventName, customData, eventId);
+
+            // Log for debugging
+            console.log('Facebook Event Tracked:', {
+                eventName,
+                customData,
+                eventID: eventId
             });
         });
     </script>

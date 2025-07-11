@@ -20,6 +20,7 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         abort_if(request()->user()->is('uploader'), 403, 'You don\'t have permission.');
+
         return view('admin.reports.index', [
             'reports' => Report::latest()->paginate(10),
         ]);
@@ -147,7 +148,7 @@ class ReportController extends Controller
         $top = $request->get('top_by', 'order_amount');
 
         $query = User::withWhereHas('orders', function ($query) use ($type, $_start, $_end): void {
-            $query->where('status', 'COMPLETED')
+            $query->where('status', 'DELIVERED')
                 ->whereBetween($type, [
                     $_start->startOfDay()->toDateTimeString(),
                     $_end->endOfDay()->toDateTimeString(),

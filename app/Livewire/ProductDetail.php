@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Attribute;
 use App\Models\Product;
+use App\Services\FacebookPixelService;
 use App\Traits\HasCart;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -26,6 +27,13 @@ class ProductDetail extends Component
     public int $retailPrice = 0;
 
     public bool $showBrandCategory = false;
+
+    protected $facebookService;
+
+    public function boot(FacebookPixelService $facebookService)
+    {
+        $this->facebookService = $facebookService;
+    }
 
     public static function landing(Product $product): self
     {

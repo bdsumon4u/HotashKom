@@ -86,7 +86,7 @@ class Order extends Model
                 $order->fill(['data' => ['city_name' => current(array_filter($order->pathaoCityList(), fn ($c): bool => $c->city_id == ($order->data['city_id'] ?? '')))->city_name ?? 'N/A']]);
             }
 
-            if (false) {
+            if (false && empty($order->data['area_id'] ?? '')) {
                 $matches = [];
                 foreach ($order->pathaoAreaList() as $area) {
                     if ($match = $fuse->search($area->zone_name)) {
@@ -117,14 +117,14 @@ class Order extends Model
                 SyncOrderStatusWithReseller::dispatch($order->id);
             }
 
-            if (! in_array($status, ['COMPLETED', 'RETURNED'])) {
+            if (! in_array($status, ['DELIVERED', 'RETURNED'])) {
                 return;
             }
             $retail = collect($order->products)->sum(function ($product) {
                 return $product->retail_price * $product->quantity;
             });
 
-            if ($status == 'COMPLETED') {
+            if ($status == 'DELIVERED') {
                 $amount = $retail + $order->data['retail_delivery_fee'] - $order->data['advanced'] - $order->data['retail_discount']
                     - ($order->data['subtotal'] + $order->data['shipping_cost'] - $order->data['discount']);
                 $order->user->deposit($amount, [
@@ -256,12 +256,14 @@ class Order extends Model
         if ($shipping_area) {
             if (setting('show_option')->productwise_delivery_charge ?? false) {
                 $shipping_cost = $products->sum(function ($item) use ($shipping_area) {
-                $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
-                return $item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] * $factor;
-            }) ?? setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
+
+                    return $item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] * $factor;
+                }) ?? setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
             } else {
                 $shipping_cost = $products->max(function ($item) use ($shipping_area) {
                     $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
+
                     return $item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] * $factor;
                 }) ?? setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
             }

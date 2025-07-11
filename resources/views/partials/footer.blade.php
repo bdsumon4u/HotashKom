@@ -72,11 +72,13 @@
             </div>
             <div class="site-footer__bottom">
                 <div class="site-footer__copyright">
-                    Copyright 2020 - {{ date('Y') }} &copy; {{ $company->name ?? '' }}
+                    &copy; {{ $company->name ?? '' }}
                 </div>
+                @if(($name = $company->dev_name??'Hotash Tech') != '#' and ($link = $company->dev_link??'https://hotash.tech') != '#')
                 <div class="site-footer__payments">
                     Developed By <a href="{{$company->dev_link??'https://hotash.tech'}}" class="text-danger">{{$company->dev_name??'Hotash Tech'}}</a>
                 </div>
+                @endif
             </div>
         </div>
     </div>

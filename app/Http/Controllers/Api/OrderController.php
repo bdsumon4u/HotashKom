@@ -192,7 +192,7 @@ class OrderController extends Controller
             return '';
         }
 
-        if ($order->status === 'COMPLETED') {
+        if ($order->status === 'DELIVERED') {
             return $status !== 'RETURNED' ? 'disabled' : '';
         }
 

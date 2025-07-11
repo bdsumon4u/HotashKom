@@ -294,7 +294,7 @@ class ApiController extends Controller
             $order->status = 'WAITING';
             $order->status_at = now();
         } elseif ($request->event == 'order.delivered') {
-            $order->status = 'COMPLETED';
+            $order->status = 'DELIVERED';
             $order->status_at = now();
         } elseif ($request->event == 'order.paid') {
 

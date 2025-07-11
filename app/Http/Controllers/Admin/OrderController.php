@@ -265,11 +265,11 @@ class OrderController extends Controller
         }
 
         if ($error) {
-            return redirect()->back() //$this->invoices($request);
+            return redirect()->back() // $this->invoices($request);
                 ->withDanger('Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.');
         }
 
-        return redirect()->back() //$this->invoices($request);
+        return redirect()->back() // $this->invoices($request);
             ->withSuccess('Orders are sent to Courier.');
     }
 
@@ -284,7 +284,7 @@ class OrderController extends Controller
             'recipient_address' => $order->address ?? 'N/A',
             'recipient_phone' => $order->phone ?? '',
             'cod_amount' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0),
-            'note' => $order->note,
+            // 'note' => $order->note,
         ])->toJson();
 
         $response = Http::withHeaders([
@@ -328,7 +328,7 @@ class OrderController extends Controller
             // "recipient_area"      => "", // Find in Area method
             'delivery_type' => 48, // 48 for normal delivery or 12 for on demand delivery
             'item_type' => 2, // 1 for document, 2 for parcel
-            'special_instruction' => $order->note,
+            // 'special_instruction' => $order->note,
             'item_quantity' => 1, // item quantity
             'item_weight' => $order->data['weight'] ?? 0.5, // parcel weight
             'amount_to_collect' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0), // - $order->deliveryCharge, // amount to collect
@@ -359,7 +359,7 @@ class OrderController extends Controller
             // "customer_area"      => "", // Find in Area method
             // 'delivery_type' => 48, // 48 for normal delivery or 12 for on demand delivery
             // 'item_type' => 2, // 1 for document, 2 for parcel
-            'instruction' => $order->note,
+            // 'instruction' => $order->note,
             'is_closed_box' => false,
             'value' => 100,
             // 'item_quantity' => 1, // item quantity

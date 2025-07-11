@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
@@ -75,9 +76,14 @@ class EditOrder extends Component
 
     public function getCourierReportProperty()
     {
+        $expires = config('services.courier_report.expires');
+        if (! $expires || Carbon::parse($expires)->isPast()) {
+            return "API Expired";
+        }
+
         $report = cache()->remember(
             'courier:'.($this->order->phone ?? ''),
-            now()->addHour(),
+            now()->addHours(4),
             function () {
                 try {
                     return Http::retry(3, 100)

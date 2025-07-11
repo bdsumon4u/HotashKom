@@ -1,6 +1,6 @@
 <?php
 
-//English
+// English
 return [
     'Welcome' => 'Welcome',
     'Back' => 'Back',

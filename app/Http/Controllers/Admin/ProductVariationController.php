@@ -107,6 +107,7 @@ class ProductVariationController extends Controller
     public function update(Request $request, Product $product, Product $variation)
     {
         abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
+        $request->mergeIfMissing(['stock_count' => 0]);
         $validator = Validator::make($request->all(), [
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',

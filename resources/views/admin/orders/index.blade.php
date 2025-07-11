@@ -65,7 +65,7 @@
                                                 @php $show = in_array(request('status'), ['PENDING', 'WAITING']) @endphp
                                                 @break
 
-                                            @case('COMPLETED')
+                                            @case('DELIVERED')
                                             @case('RETURNED')
                                             @case('LOST')
                                                 @php $show = in_array(request('status'), ['SHIPPING']) @endphp
@@ -91,6 +91,16 @@
                                 </select>
                             </div>
                             @endunless
+                            @if(!auth()->user()->is('salesman'))
+                            <div class="col-auto px-1">
+                                <select name="staff" id="staff" onchange="changeStaff()" class="text-white form-control form-control-sm bg-primary">
+                                    <option value="">Change Staff</option>
+                                    @foreach(\App\Models\Admin::where('role_id', \App\Models\Admin::SALESMAN)->get() as $staff)
+                                    <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @endif
                             <div class="col-auto pl-0 ml-auto">
                                 @if(request('status') == 'CONFIRMED')
                                 <button onclick="printSticker()" id="sticker" class="ml-1 btn btn-sm btn-primary">Print Sticker</button>
@@ -109,7 +119,7 @@
                             <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
                                 <thead>
                                 <tr>
-                                    @if($bulk = true || request('status') && !in_array(request('status'), ['COMPLETED', 'RETURNED', 'LOST']))
+                                    @if($bulk = true || request('status') && !in_array(request('status'), ['DELIVERED', 'RETURNED', 'LOST']))
                                     <th style="max-width: 5%">
                                         <input type="checkbox" class="form-control" name="check_all" style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">
                                     </th>
