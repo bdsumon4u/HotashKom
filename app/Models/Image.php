@@ -6,6 +6,7 @@ use App\Jobs\CopyResourceToResellers;
 use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Image extends Model
 {
@@ -49,11 +50,16 @@ class Image extends Model
     public function src(): Attribute
     {
         return Attribute::get(function () {
-            if ($this->source_id || !file_exists(public_path($this->path))) { // assuming public disk
-                return config('app.oninda_url') . $this->path;
+            $encodedPath = Str::of($this->path)
+                ->dirname()
+                ->append('/')
+                ->append(rawurlencode(Str::of($this->path)->basename()));
+
+            if ($this->source_id || !file_exists(public_path($this->path))) {
+                return config('app.oninda_url') . $encodedPath;
             }
 
-            return asset($this->path);
+            return asset($encodedPath);
         });
     }
 

@@ -45,7 +45,7 @@ class ImageController extends Controller
     {
         return DataTables::of(request()->has('order') ? Image::query() : Image::latest('id'))
             ->addIndexColumn()
-            ->addColumn('preview', fn (Image $image): string => '<img class="select-image" src="'.cdn($image->path).'" width="100" height="120" data-id="'.$image->id.'" data-src="'.cdn($image->src).'" />')
+            ->addColumn('preview', fn (Image $image): string => '<img class="select-image" src="'.cdn($image->src).'" width="100" height="120" data-id="'.$image->id.'" data-src="'.cdn($image->src).'" />')
             ->editColumn('filename', fn (Image $image): string => '
                     <div>
                         <input type="text" value="'.$image->filename.'" class="mb-1 w-100" data-id="'.$image->id.'" onfocus="this.select()" disabled />
