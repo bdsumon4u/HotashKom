@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}358}$$ 🔥 domains are live now
+These 🔥 $${\color{red}362}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-14 09:43:49 Asia/Dhaka**_
+_Last updated: **2025-07-15 09:40:53 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -457,3 +457,7 @@ _Last updated: **2025-07-14 09:43:49 Asia/Dhaka**_
 | 356 | [brightsmartshopbd.com](http://brightsmartshopbd.com) |
 | 357 | [tiptopbazar.com](http://tiptopbazar.com) |
 | 358 | [proyojoniyoitem.com](http://proyojoniyoitem.com) |
+| 359 | [mapleemart.com](http://mapleemart.com) |
+| 360 | [citizeneffortltd.com](http://citizeneffortltd.com) |
+| 361 | [uniquevally.com](http://uniquevally.com) |
+| 362 | [rediomart.com](http://rediomart.com) |
