@@ -75,6 +75,13 @@
                             <span>Products</span>
                         </a>
                     </li>
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/purchases*') && !request()->is('admin/purchases/create*') ? 'active' : '' }}"
+                            href="{{ route('admin.purchases.index') }}">
+                            <i data-feather="shopping-bag"></i>
+                            <span>Purchases</span>
+                        </a>
+                    </li>
 
                     <li>
                         <a class="nav-link menu-title link-nav {{ request()->is('admin/attributes*') ? 'active' : '' }}"

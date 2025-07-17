@@ -74,7 +74,7 @@ class FacebookPixelService
             $firstName = $nameParts[0];
             if (count($nameParts) === 2) {
                 $lastName = $nameParts[1];
-            } else if (count($nameParts) > 2) {
+            } elseif (count($nameParts) > 2) {
                 $firstName .= ' '.$nameParts[1];
                 $lastName = implode(' ', array_slice($nameParts, 2));
             }

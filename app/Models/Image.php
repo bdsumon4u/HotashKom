@@ -26,7 +26,7 @@ class Image extends Model
         });
 
         static::deleting(function ($image): void {
-            if (!isOninda() && $image->source_id !== null) {
+            if (! isOninda() && $image->source_id !== null) {
                 throw new \Exception('Cannot delete a resource that has been sourced.');
             }
 
@@ -55,8 +55,8 @@ class Image extends Model
                 ->append('/')
                 ->append(rawurlencode(Str::of($this->path)->basename()));
 
-            if ($this->source_id || !file_exists(public_path($this->path))) {
-                return config('app.oninda_url') . $encodedPath;
+            if ($this->source_id || ! file_exists(public_path($this->path))) {
+                return config('app.oninda_url').$encodedPath;
             }
 
             return asset($encodedPath);

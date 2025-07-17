@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Events\ProductCreated;
 use App\Events\ProductUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;

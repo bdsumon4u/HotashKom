@@ -24,7 +24,7 @@ class Brand extends Model
         });
 
         static::deleting(function ($brand): void {
-            if (!isOninda() && $brand->source_id !== null) {
+            if (! isOninda() && $brand->source_id !== null) {
                 throw new \Exception('Cannot delete a resource that has been sourced.');
             }
 

@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use App\Events\ProductCreated;
 use App\Jobs\RemoveResourceFromResellers;
 use App\Jobs\SyncProductStockWithResellers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\App;
 use Laravel\Scout\Searchable;
 use Nicolaslopezj\Searchable\SearchableTrait;
 
@@ -20,8 +18,8 @@ class Product extends Model
     protected $with = ['images'];
 
     protected $fillable = [
-        'brand_id', 'name', 'slug', 'description', 'price', 'selling_price', 'suggested_price', 'wholesale', 'sku', 'source_id',
-        'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'shipping_inside', 'shipping_outside', 'delivery_text',
+        'brand_id', 'name', 'slug', 'description', 'price', 'average_purchase_price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
+        'source_id', 'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'shipping_inside', 'shipping_outside', 'delivery_text',
     ];
 
     /**
@@ -59,7 +57,7 @@ class Product extends Model
         });
 
         static::deleting(function ($record): void {
-            if (!isOninda() && $record->source_id !== null) {
+            if (! isOninda() && $record->source_id !== null) {
                 throw new \Exception('Cannot delete a resource that has been sourced.');
             }
 
@@ -165,6 +163,13 @@ class Product extends Model
     public function options()
     {
         return $this->belongsToMany(Option::class);
+    }
+
+    public function purchases()
+    {
+        return $this->belongsToMany(Purchase::class, 'product_purchase')
+            ->withPivot(['price', 'quantity', 'subtotal'])
+            ->withTimestamps();
     }
 
     protected function wholesale(): \Illuminate\Database\Eloquent\Casts\Attribute

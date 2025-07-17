@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductVariationController;
+use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ResellerController;
 use App\Http\Controllers\Admin\SettingController;
@@ -98,7 +99,9 @@ Route::group(['as' => 'admin.'], function (): void {
             'menus' => MenuController::class,
             'menu-items' => MenuItemController::class,
             'category-menus' => CategoryMenuController::class,
+            'purchases' => PurchaseController::class,
         ]);
+
     });
 });
 

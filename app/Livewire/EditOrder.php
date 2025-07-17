@@ -78,7 +78,7 @@ class EditOrder extends Component
     {
         $expires = config('services.courier_report.expires');
         if (! $expires || Carbon::parse($expires)->isPast()) {
-            return "API Expired";
+            return 'API Expired';
         }
 
         $report = cache()->remember(

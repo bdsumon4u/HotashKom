@@ -92,7 +92,7 @@ class CategoryController extends Controller
     private function isDescendant(int $categoryId, int $potentialParentId): bool
     {
         $category = Category::find($categoryId);
-        if (!$category) {
+        if (! $category) {
             return false;
         }
 
@@ -103,7 +103,7 @@ class CategoryController extends Controller
                 return true;
             }
             $current = Category::find($current->parent_id);
-            if (!$current) {
+            if (! $current) {
                 break;
             }
         }

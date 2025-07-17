@@ -3,10 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutRequest;
-use App\Models\User;
-use App\Notifications\User\AccountCreated;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class CheckoutController extends Controller

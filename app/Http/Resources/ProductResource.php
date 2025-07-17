@@ -40,7 +40,7 @@ class ProductResource extends JsonResource
     /**
      * Transform the product into a cart/order item array.
      *
-     * @param int $quantity The quantity of the product
+     * @param  int  $quantity  The quantity of the product
      * @return array<string, mixed>
      */
     public function toCartItem(int $quantity = 1): array

@@ -356,7 +356,7 @@ function isReseller(): bool
 {
     static $reseller = null;
     if ($reseller === null) {
-        $reseller = !empty(config('app.oninda_url'));
+        $reseller = ! empty(config('app.oninda_url'));
     }
 
     return $reseller;

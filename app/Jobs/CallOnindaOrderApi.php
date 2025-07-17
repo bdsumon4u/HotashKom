@@ -22,7 +22,7 @@ class CallOnindaOrderApi implements ShouldQueue
         $domain = parse_url(config('app.url'), PHP_URL_HOST);
         $endpoint = config('app.oninda_url').'/api/reseller/orders/place';
 
-        info('Calling Oninda order API: ' . $endpoint, $data = [
+        info('Calling Oninda order API: '.$endpoint, $data = [
             'order_id' => $this->orderId,
             'domain' => $domain,
         ]);

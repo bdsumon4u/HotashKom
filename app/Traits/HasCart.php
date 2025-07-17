@@ -27,7 +27,7 @@ trait HasCart
             $product->id,
             $product->var_name,
             $quantity,
-            $productData['price'], # this is the wholesale price
+            $productData['price'], // this is the wholesale price
             $productData
         );
 

@@ -70,6 +70,7 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
                     return true;
                 }
             }
+
             return false;
         }
 

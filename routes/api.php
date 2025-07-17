@@ -27,6 +27,9 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
     Route::get('images/multiple', [ImageController::class, 'multiple'])->name('images.multiple');
     Route::post('menu/{menu}/sort-items', [MenuItemSortController::class])->name('menu-items.sort');
     Route::get('orders', OrderController::class)->name('orders');
+    Route::get('purchases', \App\Http\Controllers\Api\PurchaseController::class)->name('purchases');
+    Route::get('purchases/products', [\App\Http\Controllers\Api\PurchaseController::class, 'getProducts'])->name('purchases.products');
+    Route::get('purchases/suppliers', [\App\Http\Controllers\Api\PurchaseController::class, 'getSuppliers'])->name('purchases.suppliers');
 
     Route::get('shop', [\App\Http\Controllers\ProductController::class, 'index']);
     Route::get('menus', [ApiController::class, 'menus']);
