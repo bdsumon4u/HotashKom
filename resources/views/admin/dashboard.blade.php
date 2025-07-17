@@ -223,6 +223,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="col-xl-4 xl-50 box-xl-12">
                 <div class="rounded-sm card">
                     <div class="p-4 card-header card-no-border">
                         <h5>Low Stock</h5>
@@ -258,6 +260,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="col-xl-4 xl-50 box-xl-12">
                 <div class="rounded-sm card">
                     <div class="p-3 card-header">
                         <h5>Staffs</h5>
@@ -276,16 +280,18 @@
                                         <td>
                                             <ul style="list-style: disc; padding-left: 1rem;">
                                                 @foreach ($staffs['online'] as $staff)
-                                                    <li class="@if ($staff->role_id == \App\Models\Admin::SALESMAN && !$staff->is_active) text-danger @endif">
-                                                        {{ $staff->name }}</li>
+                                                <li
+                                                    class="@if ($staff->role_id == \App\Models\Admin::SALESMAN && !$staff->is_active) text-danger @endif">
+                                                    {{ $staff->name }}</li>
                                                 @endforeach
                                             </ul>
                                         </td>
                                         <td>
                                             <ul style="list-style: disc; padding-left: 1rem;">
                                                 @foreach ($staffs['offline'] as $staff)
-                                                    <li class="@if ($staff->role_id == \App\Models\Admin::SALESMAN && !$staff->is_active) text-danger @endif">
-                                                        {{ $staff->name }}</li>
+                                                <li
+                                                    class="@if ($staff->role_id == \App\Models\Admin::SALESMAN && !$staff->is_active) text-danger @endif">
+                                                    {{ $staff->name }}</li>
                                                 @endforeach
                                             </ul>
                                         </td>
