@@ -99,23 +99,6 @@
                                     </div>
                                 </div>
 
-                                @if($user->api_token)
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="api_token">API Token</label>
-                                        <div class="input-group">
-                                            <x-input name="api_token" id="api_token" :value="$user->api_token" readonly />
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-secondary" onclick="copyApiToken()">
-                                                    Copy
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <small class="form-text text-muted">Use this token to authenticate your API requests</small>
-                                    </div>
-                                </div>
-                                @endif
-
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header">

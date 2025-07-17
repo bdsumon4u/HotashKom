@@ -19,8 +19,7 @@
                         <h5>Edit Reseller Information</h5>
                     </div>
                     <div class="p-3 card-body">
-                        <form id="editResellerForm" method="POST"
-                            action="{{ route('admin.resellers.update', $reseller->id) }}">
+                        <form method="POST" action="{{ route('admin.resellers.update', $reseller->id) }}">
                             @csrf
                             @method('PUT')
 
@@ -77,14 +76,26 @@
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="domain">Domain</label>
-                                        <input type="text" class="form-control @error('domain') is-invalid @enderror"
-                                            id="domain" name="domain" placeholder="e.g. myshop.com"
-                                            value="{{ old('domain', $reseller->domain) }}">
-                                        @error('domain')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <div class="form-group">
+                                                    <label for="domain">Domain</label>
+                                                    <input type="text" class="form-control @error('domain') is-invalid @enderror" id="domain" name="domain"
+                                                        placeholder="e.g. myshop.com" value="{{ old('domain', $reseller->domain) }}">
+                                                    @error('domain')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="order_prefix">Order Prefix</label>
+                                                <input type="text" class="form-control @error('order_prefix') is-invalid @enderror" id="order_prefix" name="order_prefix"
+                                                    placeholder="e.g. ORD" value="{{ old('order_prefix', $reseller->order_prefix) }}">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -157,37 +168,3 @@
         </div>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            $('#editResellerForm').on('submit', function(e) {
-                e.preventDefault();
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'PUT',
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        $.notify('Reseller updated successfully', 'success');
-                        setTimeout(function() {
-                            window.location.href =
-                                '{{ route('admin.resellers.index') }}';
-                        }, 1000);
-                    },
-                    error: function(xhr) {
-                        var errors = xhr.responseJSON.errors;
-                        if (errors) {
-                            Object.keys(errors).forEach(function(key) {
-                                var input = $('#' + key);
-                                input.addClass('is-invalid');
-                                input.next('.invalid-feedback').text(errors[key][0]);
-                            });
-                        }
-                        $.notify('Error updating reseller', 'error');
-                    }
-                });
-            });
-        });
-    </script>
-@endpush

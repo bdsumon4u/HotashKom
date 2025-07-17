@@ -37,10 +37,8 @@ class ResellerController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $reseller)
     {
-        $reseller = User::findOrFail($id);
-
         $validated = $request->mergeIfMissing([
             'is_verified' => 0,
             'is_active' => 0,
@@ -51,6 +49,7 @@ class ResellerController extends Controller
             'bkash_number' => 'required|string|max:255',
             'is_verified' => 'boolean',
             'is_active' => 'boolean',
+            'order_prefix' => 'nullable|string|max:255',
             'domain' => 'nullable|string|max:255|regex:/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/',
             'db_name' => 'nullable|string|max:255',
             'db_username' => 'nullable|string|max:255',
@@ -64,6 +63,6 @@ class ResellerController extends Controller
 
         $reseller->update($validated);
 
-        return response()->json(['message' => 'Reseller updated successfully']);
+        return back()->with('success', 'Reseller updated successfully');
     }
 }

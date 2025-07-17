@@ -10,7 +10,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class User extends Authenticatable implements Wallet
 {
@@ -24,7 +23,7 @@ class User extends Authenticatable implements Wallet
      */
     protected $fillable = [
         'name', 'shop_name', 'email', 'phone_number', 'bkash_number', 'address',
-        'website', 'api_token', 'domain', 'is_active', 'password', 'is_verified',
+        'website', 'order_prefix', 'domain', 'is_active', 'password', 'is_verified',
         'db_name', 'db_username', 'db_password',
     ];
 
@@ -34,16 +33,12 @@ class User extends Authenticatable implements Wallet
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token', 'api_token',
+        'password', 'remember_token',
         'db_password', // Hide database password
     ];
 
     public static function booted(): void
     {
-        static::creating(function ($user) {
-            $user->api_token = Str::random(60);
-        });
-
         static::updated(function (User $user) {
             if (Arr::get($user->getChanges(), 'is_verified')) {
                 $user->deposit(0, [

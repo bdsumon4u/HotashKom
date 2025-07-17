@@ -125,8 +125,8 @@
                                     </th>
                                     @endif
                                     <th width="80">ID</th>
-                                    @if(isReseller())
-                                    <th width="80">Oninda</th>
+                                    @if(isOninda() || isReseller())
+                                    <th width="80">Source</th>
                                     @endif
                                     <th>Customer</th>
                                     <th>Products</th>
@@ -237,8 +237,8 @@
                 { data: 'checkbox', name: 'checkbox', sortable: false, searchable: false},
                 @endif
                 { data: 'id', name: 'id' },
-                @if(isReseller())
-                { data: 'oninda', name: 'oninda', sortable: false, searchable: false },
+                @if(isOninda() || isReseller())
+                { data: 'source_id', name: 'source_id', sortable: true, searchable: true },
                 @endif
                 { data: 'customer', name: 'customer', sortable: false },
                 { data: 'products', name: 'products', sortable: false },

@@ -59,9 +59,14 @@ class OrderController extends Controller
             $orders->latest('id');
         });
 
+        if (isOninda()) {
+            $orders->leftJoin('users', 'orders.user_id', '=', 'users.id')
+                ->select('orders.*', 'users.domain', 'users.shop_name', 'users.order_prefix');
+        }
+
         $salesmans = Admin::where('role_id', Admin::SALESMAN)->get(['id', 'name'])->pluck('name', 'id');
 
-        return DataTables::of($orders)
+        $dt = DataTables::of($orders)
             ->addIndexColumn()
             ->setRowAttr([
                 'style' => function ($row) {
@@ -74,7 +79,24 @@ class OrderController extends Controller
                 },
             ])
             ->editColumn('id', fn ($row): string => '<a class="px-2 btn btn-light btn-sm text-nowrap" href="'.route('admin.orders.edit', $row->id).'">'.$row->id.'<i class="ml-1 fa fa-eye"></i></a>')
-            ->editColumn('oninda', fn ($row): string => '<a class="px-2 btn btn-light btn-sm text-nowrap" href="'.config('app.oninda_url').'/track-order?order='.($row->source_id).'">'.$row->source_id.'<i class="ml-1 fa fa-eye"></i></a>')
+            ->editColumn('source_id', function ($row): string {
+                if (! $row->source_id) {
+                    return '';
+                }
+
+                if (isOninda()) {
+                    $id = $row->order_prefix.$row->source_id;
+                    $url = request()->getScheme().'://'.$row->domain.'/track-order?order='.$row->source_id;
+                    return '<a target="_blank" title="'.$row->shop_name.'" class="px-2 btn btn-light btn-sm text-nowrap" href="'.$url.'">'.$id.'<i class="ml-1 fa fa-eye"></i></a>';
+                }
+
+                if (isReseller()) {
+                    $url = config('app.oninda_url').'/track-order?order='.$row->source_id;
+                    return '<a target="_blank" class="px-2 btn btn-light btn-sm text-nowrap" href="'.$url.'">'.$row->source_id.'<i class="ml-1 fa fa-eye"></i></a>';
+                }
+
+                return '';
+            })
             ->editColumn('created_at', fn ($row): string => "<div class='text-nowrap'>".$row->created_at->format('d-M-Y').'<br>'.$row->created_at->format('h:i A').'</div>')
             ->addColumn('amount', fn ($row): int => intval($row->data['subtotal']) + intval($row->data['shipping_cost']) - intval($row->data['discount'] ?? 0) - intval($row->data['advanced'] ?? 0))
             ->editColumn('status', function ($row) {
@@ -148,8 +170,25 @@ class OrderController extends Controller
             ->filterColumn('courier', function ($query, $keyword): void {
                 $query->where('data->courier', 'like', '%'.$keyword.'%')
                     ->orWhere('data->consignment_id', 'like', '%'.$keyword.'%');
-            })
-            ->editColumn('staff', function ($row) use ($salesmans) {
+            });
+
+            if (isOninda()) {
+                $dt = $dt->filterColumn('source_id', function ($query, $keyword): void {
+                    // Support search in the format PREFIX + ORDER_ID (digits at the end)
+                    if (preg_match('/^([^\d]+)(\d+)$/', $keyword, $matches)) {
+                        $prefix = $matches[1];
+                        $orderId = $matches[2];
+                        // If users table is joined (isOninda), filter by both prefix and source_id
+                        $query->where('users.order_prefix', $prefix)
+                            ->where('orders.source_id', $orderId);
+                    } else {
+                        // Fallback: search source_id as before
+                        $query->where('orders.source_id', 'like', "%$keyword%");
+                    }
+                });
+            }
+
+            $dt = $dt->editColumn('staff', function ($row) use ($salesmans) {
                 $return = '<select data-id="'.$row->id.'" onchange="changeStaff" class="staff-column form-control-sm">';
                 if (! isset($salesmans[$row->admin_id])) {
                     $return .= '<option value="'.$row->admin_id.'" selected '.$this->isDisabled($row).'>'.$row->admin->name.'</option>';
@@ -178,8 +217,9 @@ class OrderController extends Controller
 
                 return $actions;
             })
-            ->rawColumns(['checkbox', 'id', 'oninda', 'customer', 'products', 'status', 'courier', 'staff', 'created_at', 'actions'])
-            ->make(true);
+            ->rawColumns(['checkbox', 'id', 'source_id', 'customer', 'products', 'status', 'courier', 'staff', 'created_at', 'actions']);
+
+        return $dt->make(true);
     }
 
     private function isDisabled(Order $order, string $status = ''): string

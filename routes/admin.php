@@ -77,8 +77,8 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::get('/customers', CustomerController::class)->name('customers');
 
         Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
-        Route::get('resellers/{id}/edit', [ResellerController::class, 'edit'])->name('resellers.edit');
-        Route::put('resellers/{id}', [ResellerController::class, 'update'])->name('resellers.update');
+        Route::get('resellers/{reseller}/edit', [ResellerController::class, 'edit'])->name('resellers.edit');
+        Route::put('resellers/{reseller}', [ResellerController::class, 'update'])->name('resellers.update');
         Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
         Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
         Route::post('transactions/{id}/withdraw', [TransactionController::class, 'withdraw'])->name('transactions.withdraw');
