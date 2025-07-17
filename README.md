@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}362}$$ 🔥 domains are live now
+These 🔥 $${\color{red}363}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-16 09:39:07 Asia/Dhaka**_
+_Last updated: **2025-07-17 09:38:59 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -461,3 +461,4 @@ _Last updated: **2025-07-16 09:39:07 Asia/Dhaka**_
 | 360 | [citizeneffortltd.com](http://citizeneffortltd.com) |
 | 361 | [uniquevally.com](http://uniquevally.com) |
 | 362 | [rediomart.com](http://rediomart.com) |
+| 363 | [annaemart.com](http://annaemart.com) |
