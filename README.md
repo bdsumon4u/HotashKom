@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}363}$$ 🔥 domains are live now
+These 🔥 $${\color{red}370}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-17 09:38:59 Asia/Dhaka**_
+_Last updated: **2025-07-18 09:41:04 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -462,3 +462,10 @@ _Last updated: **2025-07-17 09:38:59 Asia/Dhaka**_
 | 361 | [uniquevally.com](http://uniquevally.com) |
 | 362 | [rediomart.com](http://rediomart.com) |
 | 363 | [annaemart.com](http://annaemart.com) |
+| 364 | [smarthubbd.com](http://smarthubbd.com) |
+| 365 | [digitaleshopbd.com](http://digitaleshopbd.com) |
+| 366 | [buyneedbd.com](http://buyneedbd.com) |
+| 367 | [jublymart.com](http://jublymart.com) |
+| 368 | [nafimart.com](http://nafimart.com) |
+| 369 | [sebaponno.com](http://sebaponno.com) |
+| 370 | [jabirmart.com](http://jabirmart.com) |
