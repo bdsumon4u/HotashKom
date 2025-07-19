@@ -60,7 +60,70 @@
                 <div class="card-body p-3">
                     <div class="invoice">
                         <div>
-                        @include('admin.orders.invoice')
+                        @php
+                            $settings = \App\Models\Setting::array();
+                            $defaultCompany = (object) ($settings['company'] ?? []);
+                            $defaultLogo = (object) ($settings['logo'] ?? []);
+
+                            if (!isOninda() || !(setting('show_option')->resellers_invoice ?? false)) {
+                                // Not Oninda app OR resellers_invoice is false - use current website's settings for header
+                                $companyName = $defaultCompany->name ?? '';
+                                $logoUrl = isset($defaultLogo->mobile) ? asset($defaultLogo->mobile) : null;
+                                $phoneNumber = $defaultCompany->phone ?? '';
+                                $address = $defaultCompany->address ?? '';
+
+                                // Get reseller's information for sender's section
+                                $user = $order->user;
+                                $senderName = ($user && $user->shop_name) ? $user->shop_name : ($defaultCompany->name ?? '');
+                                $senderPhone = ($user && $user->phone_number) ? $user->phone_number : ($defaultCompany->phone ?? '');
+                                $senderAddress = ($user && $user->address) ? $user->address : ($defaultCompany->address ?? '');
+                            } else {
+                                // Oninda app with resellers_invoice enabled
+                                $user = $order->user;
+                                $hasLogo = $user && $user->logo;
+                                $shopName = $user && $user->shop_name ? $user->shop_name : null;
+
+                                // Get pre-fetched reseller data
+                                $resellerInfo = $user ? ($resellerData[$user->id] ?? null) : null;
+                                $isResellerConnected = $resellerInfo && $resellerInfo['connected'];
+
+                                if ($isResellerConnected) {
+                                    // Use pre-fetched reseller database settings
+                                    $resellerCompany = $resellerInfo['company'];
+                                    $resellerLogo = $resellerInfo['logo'];
+
+                                    // Company name: reseller shop_name, fallback to reseller's company name, then current website
+                                    $companyName = $shopName ?? ($resellerCompany->name ?? ($defaultCompany->name ?? ''));
+
+                                    // Logo: reseller logo, fallback to reseller's logo, then current website logo
+                                    $logoUrl = $hasLogo ? asset('storage/' . $user->logo) : (isset($resellerLogo->mobile) ? asset($resellerLogo->mobile) : (isset($defaultLogo->mobile) ? asset($defaultLogo->mobile) : null));
+
+                                    // Phone and address: use reseller's from database, fallback to user fields, then current website
+                                    $phoneNumber = ($resellerCompany->phone ?? null) ?: (($user && $user->phone_number) ? $user->phone_number : ($defaultCompany->phone ?? ''));
+                                    $address = ($resellerCompany->address ?? null) ?: (($user && $user->address) ? $user->address : ($defaultCompany->address ?? ''));
+                                } else {
+                                    // Reseller not connected - use current approach
+                                    $companyName = $shopName ?? ($defaultCompany->name ?? '');
+                                    $logoUrl = $hasLogo ? asset('storage/' . $user->logo) : (isset($defaultLogo->mobile) && !$shopName ? asset($defaultLogo->mobile) : null);
+                                    $phoneNumber = ($user && $user->phone_number) ? $user->phone_number : ($defaultCompany->phone ?? '');
+                                    $address = ($user && $user->address) ? $user->address : ($defaultCompany->address ?? '');
+                                }
+
+                                // For resellers_invoice true, sender info is same as header info
+                                $senderName = $companyName;
+                                $senderPhone = $phoneNumber;
+                                $senderAddress = $address;
+                            }
+                        @endphp
+                        @include('admin.orders.invoice', [
+                            'companyName' => $companyName,
+                            'logoUrl' => $logoUrl,
+                            'phoneNumber' => $phoneNumber,
+                            'address' => $address,
+                            'senderName' => $senderName,
+                            'senderPhone' => $senderPhone,
+                            'senderAddress' => $senderAddress
+                        ])
                         </div>
                         <div class="col-sm-12 print-edit-buttons text-center mt-3">
                             <button class="btn btn btn-primary mr-2" type="button" onclick="myFunction()">Print</button>

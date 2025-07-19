@@ -24,7 +24,7 @@ class User extends Authenticatable implements Wallet
     protected $fillable = [
         'name', 'shop_name', 'email', 'phone_number', 'bkash_number', 'address',
         'website', 'order_prefix', 'domain', 'is_active', 'password', 'is_verified',
-        'db_name', 'db_username', 'db_password',
+        'db_name', 'db_username', 'db_password', 'logo',
     ];
 
     /**
@@ -105,6 +105,14 @@ class User extends Authenticatable implements Wallet
                 \PDO::MYSQL_ATTR_LOCAL_INFILE => false, // Security: disable local infile
             ],
         ];
+    }
+
+    /**
+     * Get the full URL for the user's logo.
+     */
+    public function getLogoUrlAttribute()
+    {
+        return $this->logo ? asset('storage/'.$this->logo) : null;
     }
 
     /**

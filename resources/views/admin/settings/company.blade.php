@@ -1,7 +1,7 @@
 <div class="tab-pane active" id="item-1" role="tabpanel">
     <div class="row">
         <div class="col-sm-12">
-            <h4><small class="border-bottom mb-1">Logo</small></h4>
+            <h4><small class="mb-1 border-bottom">Logo</small></h4>
         </div>
     </div>
 
@@ -46,7 +46,7 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <h4><small class="border-bottom mb-1">Info</small></h4>
+            <h4><small class="mb-1 border-bottom">Info</small></h4>
         </div>
     </div>
 

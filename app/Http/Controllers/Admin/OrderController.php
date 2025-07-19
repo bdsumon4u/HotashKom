@@ -51,6 +51,38 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
+        $order->load('user');
+
+        // Get reseller data if applicable
+        $resellerData = [];
+        if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $order->user && $order->user->db_username && $order->user->db_password) {
+            // Reseller is connected - fetch from their database
+            try {
+                $resellerConfig = $order->user->getDatabaseConfig();
+                config(['database.connections.reseller' => $resellerConfig]);
+                DB::purge('reseller');
+                DB::reconnect('reseller');
+
+                $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
+                $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
+
+                $resellerData[$order->user->id] = [
+                    'company' => json_decode($resellerCompany ?? '{}'),
+                    'logo' => json_decode($resellerLogo ?? '{}'),
+                    'connected' => true,
+                ];
+
+                DB::purge('reseller');
+            } catch (\Exception $e) {
+                // If database connection fails, mark as not connected
+                $resellerData[$order->user->id] = [
+                    'company' => null,
+                    'logo' => null,
+                    'connected' => false,
+                ];
+            }
+        }
+
         return $this->view([
             'orders' => Order::with('admin')
                 // ->where('user_id', $order->user_id)
@@ -58,6 +90,7 @@ class OrderController extends Controller
                 ->where('id', '!=', $order->id)
                 ->orderBy('id', 'desc')
                 ->get(),
+            'resellerData' => $resellerData,
         ]);
     }
 
@@ -159,6 +192,51 @@ class OrderController extends Controller
         ]);
     }
 
+    /**
+     * Fetch reseller data for given orders
+     */
+    private function fetchResellerData($orders): array
+    {
+        $uniqueResellers = $orders->pluck('user')->filter()->unique('id');
+        $resellerData = [];
+
+        foreach ($uniqueResellers as $reseller) {
+            if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $reseller->db_name && $reseller->db_username) {
+                try {
+                    $resellerConfig = $reseller->getDatabaseConfig();
+                    config(['database.connections.reseller' => $resellerConfig]);
+                    DB::purge('reseller');
+                    DB::reconnect('reseller');
+
+                    $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
+                    $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
+
+                    $resellerData[$reseller->id] = [
+                        'company' => json_decode($resellerCompany ?? '{}'),
+                        'logo' => json_decode($resellerLogo ?? '{}'),
+                        'connected' => true,
+                    ];
+
+                    DB::purge('reseller');
+                } catch (\Exception $e) {
+                    $resellerData[$reseller->id] = [
+                        'company' => null,
+                        'logo' => null,
+                        'connected' => false,
+                    ];
+                }
+            } else {
+                $resellerData[$reseller->id] = [
+                    'company' => null,
+                    'logo' => null,
+                    'connected' => false,
+                ];
+            }
+        }
+
+        return $resellerData;
+    }
+
     public function invoices(Request $request)
     {
         $request->validate(['order_id' => 'required']);
@@ -166,9 +244,52 @@ class OrderController extends Controller
         $order_ids = array_map('trim', $order_ids);
         $order_ids = array_filter($order_ids);
 
-        $orders = Order::whereIn('id', $order_ids)->get();
+        // Eager load user relationship
+        $orders = Order::with('user')->whereIn('id', $order_ids)->get();
 
-        return view('admin.orders.invoices', compact('orders'));
+        // Get unique resellers
+        $uniqueResellers = $orders->pluck('user')->filter()->unique('id');
+        $resellerData = [];
+
+        // Fetch reseller data once per unique reseller
+        foreach ($uniqueResellers as $reseller) {
+            if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $reseller->db_name && $reseller->db_username) {
+                // Reseller is connected - fetch from their database
+                try {
+                    $resellerConfig = $reseller->getDatabaseConfig();
+                    config(['database.connections.reseller' => $resellerConfig]);
+                    DB::purge('reseller');
+                    DB::reconnect('reseller');
+
+                    $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
+                    $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
+
+                    $resellerData[$reseller->id] = [
+                        'company' => json_decode($resellerCompany ?? '{}'),
+                        'logo' => json_decode($resellerLogo ?? '{}'),
+                        'connected' => true,
+                    ];
+
+                    DB::purge('reseller');
+                } catch (\Exception $e) {
+                    // If database connection fails, mark as not connected
+                    $resellerData[$reseller->id] = [
+                        'company' => null,
+                        'logo' => null,
+                        'connected' => false,
+                    ];
+                }
+            } else {
+                // Reseller not connected or not applicable
+                $resellerData[$reseller->id] = [
+                    'company' => null,
+                    'logo' => null,
+                    'connected' => false,
+                ];
+            }
+        }
+
+        return view('admin.orders.invoices', compact('orders', 'resellerData'));
     }
 
     public function stickers(Request $request)
@@ -178,10 +299,11 @@ class OrderController extends Controller
         $order_ids = array_map('trim', $order_ids);
         $order_ids = array_filter($order_ids);
 
-        $orders = Order::whereIn('id', $order_ids)->get();
+        $orders = Order::with('user')->whereIn('id', $order_ids)->get();
+        $resellerData = $this->fetchResellerData($orders);
 
         // Load PDF view
-        $pdf = Pdf::loadView('admin.orders.stickers', compact('orders'))
+        $pdf = Pdf::loadView('admin.orders.stickers', compact('orders', 'resellerData'))
             ->setOption([
                 // 'fontDir' => public_path('/fonts'),
                 // 'fontCache' => public_path('/fonts'),

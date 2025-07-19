@@ -23,9 +23,16 @@ class ProfileController extends Controller
             'email' => 'nullable',
             'phone_number' => 'required',
             'address' => 'nullable',
+            'shop_name' => 'nullable',
+            'domain' => 'nullable',
+            'logo' => 'nullable|image|max:2048',
         ]);
 
-        auth('user')->user()->update($data);
+        $user = auth('user')->user();
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('reseller-logos', 'public');
+        }
+        $user->update($data);
 
         return back()->withSuccess('Profile Updated.');
     }

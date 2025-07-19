@@ -33,7 +33,7 @@
                             </div>
                         @endunless
 
-                        <x-form method="POST" :action="route('user.profile')">
+                        <x-form method="POST" :action="route('user.profile')" has-files>
                             @php($user = auth()->user())
                             <div class="row no-gutters">
                                 <div class="col-md-6">
@@ -99,42 +99,20 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h6 class="mb-0">Database Configuration</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="db_name">Database Name</label>
-                                                        <x-input name="db_name" id="db_name" placeholder="Database Name"
-                                                            :value="$user->db_name" />
-                                                        <x-error field="db_name" />
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="db_username">Database Username</label>
-                                                        <x-input name="db_username" id="db_username" placeholder="Database Username"
-                                                            :value="$user->db_username" />
-                                                        <x-error field="db_username" />
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <div class="form-group">
-                                                        <label for="db_password">Database Password</label>
-                                                        <x-input type="password" name="db_password" id="db_password"
-                                                            placeholder="Database Password" />
-                                                        <x-error field="db_password" />
-                                                        <small class="form-text text-muted">Leave blank if you don't want to change the password</small>
-                                                    </div>
-                                                </div>
+                                <!-- Logo Upload Section -->
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="logo">Reseller Logo (optional)</label>
+                                        @if($user->logo)
+                                            <div class="mb-2">
+                                                <img id="logo-preview" src="{{ asset('storage/' . $user->logo) }}" alt="Reseller Logo" style="max-height: 80px;">
                                             </div>
-                                        </div>
+                                        @else
+                                            <img id="logo-preview" src="" alt="Reseller Logo" style="max-height: 80px; display: none;">
+                                        @endif
+                                        <input type="file" name="logo" id="logo" class="form-control-file">
+                                        <x-error field="logo" />
+                                        <small class="form-text text-muted">Upload your shop logo. This will appear on your invoices.</small>
                                     </div>
                                 </div>
 
@@ -158,5 +136,19 @@ function copyApiToken() {
     document.execCommand('copy');
     alert('API token copied to clipboard!');
 }
+
+// Logo preview
+$(document).ready(function() {
+    $('#logo').change(function() {
+        var input = this;
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#logo-preview').attr('src', e.target.result).show();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    });
+});
 </script>
 @endpush

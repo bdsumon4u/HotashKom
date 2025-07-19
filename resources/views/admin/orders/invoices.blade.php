@@ -54,6 +54,7 @@
   </head>
   <body class="light-only" main-theme-layout="ltr">
     @foreach ($orders as $order)
+        @php(require resource_path('views/admin/orders/reseller-info.php'))
         <div class="invoice {{ ['page-break bt', 'pb-2', 'bt pb-2'][$loop->iteration % 3] }}">
             <div>
                 <div>
@@ -61,19 +62,24 @@
                         <div class="col-5">
                             <div class="media">
                                 <div class="media-left">
-                                    <img class="media-object" src="{{asset($logo->mobile)}}" alt="{{$company->name}}" style="max-width: 100%; max-height: 54px;">
+                                    @if($logoUrl)
+                                        <img class="media-object" src="{{ $logoUrl }}" alt="{{ $companyName }}" style="max-width: 100%; max-height: 54px;">
+                                    @endif
                                 </div>
                                 <div class="media-body m-l-20">
-                                    <h4 class="media-heading">{{ $company->name }}</h4>
-                                    <p class="m-0"><span class="digits">{{ $company->phone }}</span></p>
-                                    <p class="m-0">{{ $company->address }}</p>
+                                    <h4 class="media-heading">{{ $companyName }}</h4>
+                                    <p class="m-0"><span class="digits">{{ $phoneNumber }}</span></p>
+                                    <p class="m-0">{{ $address }}</p>
                                 </div>
                             </div>
                             <!-- End Info-->
                         </div>
                         <div class="col-3">
                             <div class="text-md-right">
-                                <h3>Invoice #<span class="digits counter">{{ $order->id }}</span></h3>
+                                <h3 class="mb-0">Invoice #<span class="digits counter">{{ $order->id }}</span></h3>
+                                @if(isOninda() && $order->source_id)
+                                    <strong>Source ID: #{{ $order->user->order_prefix.$order->source_id }}</strong><br>
+                                @endif
                                 <p>
                                     Ordered At: {{ $order->created_at->format('M') }}<span class="digits"> {{ $order->created_at->format('d, Y') }}</span>
                                     {{--                                            <br> Invoiced At: {{ date('M') }}<span class="digits"> {{ date('d, Y') }}</span>--}}
@@ -88,10 +94,10 @@
                         </div>
                     </div>
                 </div>
-                <hr>
+                <hr class="my-2">
                 <!-- End InvoiceTop-->
                 <div class="row">
-                    <div class="col-7">
+                    <div class="col-4">
                         <div class="media">
                             <div class="media-body m-l-20">
                                 <h6 class="mb-0">Customer Information:</h6>
@@ -101,10 +107,35 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-4">
+
+                    </div>
+                    @if(isOninda() && !(setting('show_option')->resellers_invoice ?? false))
+                    <div class="col-4">
+                        <div class="media">
+                            <div class="media-body m-l-20">
+                                <h6 class="mb-0">Sender's Information:</h6>
+                                <div class="media-heading">Name: {{ $senderName }}</div>
+                                <div>Phone: {{ $senderPhone }}</div>
+                                <div>Address: {{ $senderAddress }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                @if(isOninda() && (setting('show_option')->resellers_invoice ?? false))
+                <div class="row">
+                    <div class="col-12">
                         <span class="text-danger">{{$order->note ?? null}}</span>
                     </div>
                 </div>
+                @else
+                <div class="row">
+                    <div class="col-12">
+                        <span class="text-danger">{{$order->note ?? null}}</span>
+                    </div>
+                </div>
+                @endif
                 <!-- End Invoice Mid-->
                 <div>
                     <div class="table-responsive invoice-table" id="table">
@@ -130,15 +161,15 @@
                                     </td>
                                     @endunless
                                     <td>{{ $product->name }}</td>
-                                    <td>{{ $product->retail_price }}</td>
+                                    <td>{{ isOninda() ? $product->retail_price : $product->selling_price }}</td>
                                     <td>{{ $product->quantity }}</td>
-                                    <td>{{ $amount = $product->quantity * $product->retail_price }}</td>
+                                    <td>{{ $amount = $product->quantity * (isOninda() ? $product->retail_price : $product->selling_price) }}</td>
                                 </tr>
                             @php($retail += $amount)
                             @endforeach
                             <tr>
                                 <th class="py-1" rowspan="5" colspan="{{(setting('show_option')->hide_invoice_image ?? false)?2:3}}" style="text-align: center; vertical-align: middle; font-size: 24px;">
-                                    <span style="font-weight: 400;">Condition</span>: TK. {{ $retail + $order->data['retail_delivery_fee'] - ($order->data['retail_discount'] ?? 0) - ($order->data['advanced'] ?? 0) }}
+                                    <span style="font-weight: 400;">Condition</span>: TK. {{ $retail + (isOninda() ? $order->data['retail_delivery_fee'] : $order->data['shipping_cost']) - (isOninda() ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)) - ($order->data['advanced'] ?? 0) }}
                                 </th>
                             </tr>
                             <tr>
@@ -151,11 +182,11 @@
                             </tr>
                             <tr>
                                 <th class="py-1">Delivery</th>
-                                <th class="py-1">{{ $order->data['retail_delivery_fee'] }}</th>
+                                <th class="py-1">{{ isOninda() ? $order->data['retail_delivery_fee'] : $order->data['shipping_cost'] }}</th>
                             </tr>
                             <tr>
                                 <th class="py-1">Discount</th>
-                                <th class="py-1">{{ $order->data['retail_discount'] ?? 0 }}</th>
+                                <th class="py-1">{{ isOninda() ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0) }}</th>
                             </tr>
                             </tbody>
                         </table>

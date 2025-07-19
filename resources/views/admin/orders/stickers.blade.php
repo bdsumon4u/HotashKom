@@ -24,12 +24,23 @@
 </head>
 <body>
     @foreach ($orders as $order)
+    @php require resource_path('views/admin/orders/reseller-info.php') @endphp
     <div class="invoice-container" @unless($loop->last) style="page-break-after:always;" @endunless>
         <div class="header">
             <table width="100%">
                 <tr>
                     <td align="left">
-                        <img src="{{ public_path($logo->mobile) }}" alt="Logo">
+                        @if($logoUrl)
+                            @if(str_starts_with($logoUrl, 'http'))
+                                {{-- External URL (reseller's domain) - convert to data URI for PDF --}}
+                                <img src="data:image/jpeg;base64, {{base64_encode(file_get_contents($logoUrl))}}" alt="Logo">
+                            @else
+                                {{-- Local URL - convert to public path for PDF --}}
+                                <img src="{{ public_path(str_replace(asset(''), '', $logoUrl)) }}" alt="Logo">
+                            @endif
+                        @else
+                            <img src="{{ public_path($logo->mobile) }}" alt="Logo">
+                        @endif
                     </td>
                     <td align="center">
                         <p><small>{{ $order->created_at->format('M d, Y') }}</small></p>
@@ -42,9 +53,9 @@
             <table width="100%">
                 <tr>
                     <td align="left">
-                        <p class="title">{{ $company->name }}</p>
-                        <p>{{ $company->phone }}</p>
-                        <p>{{ $company->address }}</p>
+                        <p class="title">{{ $companyName }}</p>
+                        <p>{{ $phoneNumber }}</p>
+                        <p>{{ $address }}</p>
                     </td>
                     <td align="right">
                         <p>{{ $order->name }}</p>
@@ -76,8 +87,8 @@
                         </div>
                     </td>
                     <td>{{ $product->quantity }}</td>
-                    <td>{{ $product->price }}</td>
-                    <td>{{ $product->quantity * $product->price }}</td>
+                    <td>{{ isOninda() ? $product->retail_price : $product->selling_price }}</td>
+                    <td>{{ $product->quantity * (isOninda() ? $product->retail_price : $product->selling_price) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -96,9 +107,9 @@
                 @endif
                 <tr>
                     <td colspan="3"><strong>Delivery</strong></td>
-                    <td>{{ $order->data['shipping_cost'] }}</td>
+                    <td>{{ isOninda() ? $order->data['retail_delivery_fee'] : $order->data['shipping_cost'] }}</td>
                 </tr>
-                @if($discount = $order->data['discount'] ?? 0)
+                @if($discount = (isOninda() ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)))
                 <tr>
                     <td colspan="3"><strong>Discount</strong></td>
                     <td>{{ $discount }}</td>

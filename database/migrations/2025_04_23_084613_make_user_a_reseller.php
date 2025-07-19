@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('shop_name')->after('name');
+            $table->string('logo')->nullable()->after('shop_name');
             $table->string('bkash_number')->after('phone_number');
             $table->boolean('is_verified')->default(false);
         });
@@ -25,6 +26,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('shop_name');
+            $table->dropColumn('logo');
             $table->dropColumn('bkash_number');
             $table->dropColumn('is_verified');
         });
