@@ -38,6 +38,10 @@ class Checkout extends Component
 
     public $note = '';
 
+    public $city_id = '';
+
+    public $area_id = '';
+
     protected $listeners = ['updateField'];
 
     public $retail = [];
@@ -67,10 +71,24 @@ class Checkout extends Component
         // $this->updatedShipping(); // doesn't work.
     }
 
+    public function updatedCityId($value): void
+    {
+        longCookie('city_id', $value);
+
+        // Reset area_id when city changes
+        $this->area_id = '';
+        longCookie('area_id', '');
+    }
+
+    public function updatedAreaId($value): void
+    {
+        longCookie('area_id', $value);
+    }
+
     public function remove($id): void
     {
         cart()->remove($id);
-        $this->cartUpdated();
+        // $this->cartUpdated();
     }
 
     public function increaseQuantity($id): void
@@ -78,7 +96,7 @@ class Checkout extends Component
         $item = cart()->get($id);
         if ($item->qty < $item->options->max || $item->options->max === -1) {
             cart()->update($id, $item->qty + 1);
-            $this->cartUpdated();
+            // $this->cartUpdated();
         }
     }
 
@@ -87,7 +105,7 @@ class Checkout extends Component
         $item = cart()->get($id);
         if ($item->qty > 1) {
             cart()->update($id, $item->qty - 1);
-            $this->cartUpdated();
+            // $this->cartUpdated();
         }
     }
 
@@ -151,7 +169,9 @@ class Checkout extends Component
 
     public function updatedShipping(): void
     {
-        cart()->addCost('deliveryFee', $this->shippingCost($this->shipping));
+        if (! cart()->getCost('deliveryFee')) {
+            cart()->addCost('deliveryFee', $this->shippingCost($this->shipping));
+        }
     }
 
     public function cartUpdated(): void
@@ -193,9 +213,11 @@ class Checkout extends Component
             $this->address = Cookie::get('address', '');
             $this->note = Cookie::get('note', '');
             $this->retailDiscount = Cookie::get('retail_discount', 0);
+            $this->city_id = Cookie::get('city_id', '');
+            $this->area_id = Cookie::get('area_id', '');
         }
 
-        $this->cartUpdated();
+        // $this->cartUpdated();
     }
 
     public function checkout()
@@ -214,14 +236,22 @@ class Checkout extends Component
             $this->phone = '+88'.$this->phone;
         }
 
-        $data = $this->validate([
+        $validationRules = [
             'name' => 'required',
             'phone' => $hidePrefix ? 'required|regex:/^\+8801\d{9}$/' : 'required|regex:/^1\d{9}$/',
             'address' => 'required',
             'note' => 'nullable',
             'shipping' => 'required',
             'retailDiscount' => 'nullable|numeric|min:0',
-        ]);
+        ];
+
+        // Add validation for city and area if Pathao is enabled and user_selects_city_area is checked
+        if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false)) {
+            $validationRules['city_id'] = 'required';
+            $validationRules['area_id'] = 'required';
+        }
+
+        $data = $this->validate($validationRules);
 
         if (! $hidePrefix) {
             $data['phone'] = '+880'.$data['phone'];
@@ -283,23 +313,32 @@ class Checkout extends Component
                 }
             }
 
+            $orderData = [
+                'courier' => 'Other',
+                'is_fraud' => $oldOrders->whereIn('status', ['CANCELLED', 'RETURNED'])->count() > 0,
+                'is_repeat' => $oldOrders->count() > 0,
+                'shipping_area' => $data['shipping'],
+                'shipping_cost' => $this->shippingCost($data['shipping']),
+                'retail_delivery_fee' => $this->retailDeliveryFee,
+                'advanced' => $this->advanced,
+                'retail_discount' => $this->retailDiscount,
+                'subtotal' => cart()->subtotal(),
+            ];
+
+            // Add city and area data if Pathao is enabled and user_selects_city_area is checked
+            if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false)) {
+                $orderData['city_id'] = $this->city_id;
+                $orderData['area_id'] = $this->area_id;
+                $orderData['courier'] = 'Pathao';
+            }
+
             $data += [
                 'admin_id' => $admin->id,
                 'user_id' => $user->id, // If User Logged In
                 'status' => $status,
                 'status_at' => now()->toDateTimeString(),
                 // Additional Data
-                'data' => [
-                    'courier' => 'Other',
-                    'is_fraud' => $oldOrders->whereIn('status', ['CANCELLED', 'RETURNED'])->count() > 0,
-                    'is_repeat' => $oldOrders->count() > 0,
-                    'shipping_area' => $data['shipping'],
-                    'shipping_cost' => $this->shippingCost($data['shipping']),
-                    'retail_delivery_fee' => $this->retailDeliveryFee,
-                    'advanced' => $this->advanced,
-                    'retail_discount' => $this->retailDiscount,
-                    'subtotal' => cart()->subtotal(),
-                ],
+                'data' => $orderData,
             ];
 
             $order = Order::create($data);
@@ -391,8 +430,14 @@ class Checkout extends Component
 
     public function render()
     {
+        // Create a temporary Order instance to use its Pathao methods
+        $tempOrder = new \App\Models\Order;
+        $this->cartUpdated();
+
         return view('livewire.checkout', [
             'user' => optional(auth('user')->user()),
+            'pathaoCities' => collect($tempOrder->pathaoCityList()),
+            'pathaoAreas' => collect($tempOrder->pathaoAreaList($this->city_id)),
         ]);
     }
 }

@@ -18,7 +18,6 @@
                         </div>
                         <div class="form-group col-md-9">
                             <x-input name="name" wire:model="name"
-                                @blur="$wire.updateField('name', $event.target.value)"
                                 place-holder="এখানে কাস্টমারের নাম লিখুন।" placeholder="Type customer's name here." />
                             <x-error field="name" />
                         </div>
@@ -35,7 +34,6 @@
                                     </div>
                                 @endunless
                                 <x-input type="tel" name="phone" wire:model="phone"
-                                    @blur="$wire.updateField('phone', $event.target.value)"
                                     place-holder="কাস্টমারের ফোন নম্বর লিখুন।" placeholder="Type customer's phone number." />
                                 <x-error field="phone" />
                             </div>
@@ -77,7 +75,6 @@
                         </div>
                         <div class="form-group col-md-9">
                             <x-textarea name="address" wire:model="address"
-                                @blur="$wire.updateField('address', $event.target.value)"
                                 place-holder="এখানে কাস্টমারের পুরো ঠিকানা লিখুন।"
                                 placeholder="Type customer's address here."></x-textarea>
                             <x-error field="address" />
@@ -90,12 +87,45 @@
                             </div>
                             <div class="form-group col-md-9">
                                 <x-textarea name="note" wire:model="note"
-                                    @blur="$wire.updateField('note', $event.target.value)"
                                     placeholder="আপনি চাইলে কোন নোট লিখতে পারেন।"></x-textarea>
                                 <x-error field="note" />
                             </div>
                         </div>
                     @endunless
+
+                    @if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false))
+                        <div class="form-row">
+                            <div class="m-0 form-group col-md-3">
+                                <label>সিটি: <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="form-group col-md-9">
+                                <select class="form-control @error('city_id') is-invalid @enderror" wire:model.live="city_id">
+                                    <option value="">সিটি নির্বাচন করুন</option>
+                                    @foreach ($pathaoCities as $city)
+                                        <option value="{{ $city->city_id }}">{{ $city->city_name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-error field="city_id" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="m-0 form-group col-md-3">
+                                <label>এলাকা: <span class="text-danger">*</span></label>
+                            </div>
+                            <div class="form-group col-md-9">
+                                <div wire:loading.class="d-flex" wire:target="city_id" class="d-none h-100 align-items-center">
+                                    এলাকা লোড হচ্ছে...
+                                </div>
+                                <select wire:loading.remove wire:target="city_id" class="form-control @error('area_id') is-invalid @enderror" wire:model.live="area_id">
+                                    <option value="">এলাকা নির্বাচন করুন</option>
+                                    @foreach ($pathaoAreas as $area)
+                                        <option value="{{ $area->zone_id }}">{{ $area->zone_name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-error field="area_id" />
+                            </div>
+                        </div>
+                    @endif
                 </div>
                 <div class="card-divider d-md-none"></div>
                 <div class="card-body d-md-none">
@@ -138,7 +168,6 @@
                                 <th>Discount (TK)</th>
                                 <td>
                                     <input type="number" @focus="$event.target.select()" wire:model="retailDiscount"
-                                        @blur="$wire.updateField('retailDiscount', $event.target.value)"
                                         step="10" min="0" class="form-control form-control-sm" />
                                     <x-error field="retailDiscount" />
                                 </td>
@@ -224,7 +253,6 @@
                                 <th style="font-size:14px;">Discount (TK)</th>
                                 <td>
                                     <input type="number" @focus="$event.target.select()" wire:model="retailDiscount"
-                                        @blur="$wire.updateField('retailDiscount', $event.target.value)"
                                         step="10" min="0" class="form-control form-control-sm" />
                                     <x-error field="retailDiscount" />
                                 </td>
