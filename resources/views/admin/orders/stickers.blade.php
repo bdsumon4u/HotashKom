@@ -87,8 +87,8 @@
                         </div>
                     </td>
                     <td>{{ $product->quantity }}</td>
-                    <td>{{ isOninda() ? $product->retail_price : $product->selling_price }}</td>
-                    <td>{{ $product->quantity * (isOninda() ? $product->retail_price : $product->selling_price) }}</td>
+                    <td>{{ isOninda() ? $product->retail_price : $product->price }}</td>
+                    <td>{{ $product->quantity * (isOninda() ? $product->retail_price : $product->price) }}</td>
                 </tr>
                 @endforeach
             </tbody>

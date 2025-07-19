@@ -95,9 +95,9 @@
                             <img src="{{ asset($product->image) }}" alt="Image" width="70" height="60">
                         </td>
                         <td>{{ $product->name }}</td>
-                        <td>{{ isOninda() ? $product->retail_price : $product->selling_price }}</td>
+                        <td>{{ isOninda() ? $product->retail_price : $product->price }}</td>
                         <td>{{ $product->quantity }}</td>
-                        <td>{{ $amount = $product->quantity * (isOninda() ? $product->retail_price : $product->selling_price) }}</td>
+                        <td>{{ $amount = $product->quantity * (isOninda() ? $product->retail_price : $product->price) }}</td>
                     </tr>
                 @php($retail += $amount)
                 @endforeach
