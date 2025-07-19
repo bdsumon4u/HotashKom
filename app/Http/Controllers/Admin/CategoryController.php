@@ -23,7 +23,7 @@ class CategoryController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
 
         return $this->view([
-            'categories' => Category::nested(),
+            'categories' => Category::nested(enabledOnly: false),
         ]);
     }
 
@@ -59,7 +59,7 @@ class CategoryController extends Controller
 
                     // Prevent circular reference: category cannot be parent of its descendants
                     if (isset($data['parent_id']) && $data['parent_id'] != 0) {
-                        $isDescendant = $this->isDescendant($category->id, $data['parent_id']);
+                        $isDescendant = $this->isDescendant($category, $data['parent_id']);
                         if ($isDescendant) {
                             return; // Skip this update
                         }
@@ -77,6 +77,7 @@ class CategoryController extends Controller
             'name' => 'required|unique:categories',
             'slug' => 'required|unique:categories',
             'base_image' => 'nullable|integer',
+            'is_enabled' => 'boolean',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
@@ -87,23 +88,24 @@ class CategoryController extends Controller
     }
 
     /**
-     * Check if a category is a descendant of another category
+     * Check if a potential parent is a descendant of the current category
+     * This prevents circular references where a category could become its own ancestor
      */
-    private function isDescendant(int $categoryId, int $potentialParentId): bool
+    private function isDescendant(Category $category, int $potentialParentId): bool
     {
-        $category = Category::find($categoryId);
-        if (! $category) {
+        // Check if the potential parent is a descendant of the current category
+        $potentialParent = Category::find($potentialParentId);
+        if (! $potentialParent) {
             return false;
         }
 
-        // Check if the potential parent is in the ancestry chain
-        $current = $category;
+        // Traverse up the potential parent's ancestry chain
+        $current = $potentialParent;
         while ($current->parent_id) {
-            if ($current->parent_id == $potentialParentId) {
-                return true;
+            if ($current->parent_id == $category->id) {
+                return true; // The potential parent is a descendant of the current category
             }
-            $current = Category::find($current->parent_id);
-            if (! $current) {
+            if (! $current = Category::find($current->parent_id)) {
                 break;
             }
         }
@@ -140,6 +142,7 @@ class CategoryController extends Controller
             'name' => 'required|unique:categories,name,'.$category->id,
             'slug' => 'required|unique:categories,slug,'.$category->id,
             'base_image' => 'nullable|integer',
+            'is_enabled' => 'boolean',
         ]);
 
         // Prevent circular reference: category cannot be its own parent
@@ -149,7 +152,7 @@ class CategoryController extends Controller
 
         // Prevent circular reference: category cannot be parent of its descendants
         if (isset($data['parent_id']) && $data['parent_id'] != 0) {
-            $isDescendant = $this->isDescendant($category->id, $data['parent_id']);
+            $isDescendant = $this->isDescendant($category, $data['parent_id']);
             if ($isDescendant) {
                 return back()->withErrors(['parent_id' => 'A category cannot be a parent of its descendants.']);
             }

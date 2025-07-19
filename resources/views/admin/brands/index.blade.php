@@ -77,13 +77,13 @@
                                     <div class="p-3 card-header">
                                         <ul class="nav nav-tabs" role="tablist">
                                             <li class="nav-item">
-                                                <a class="nav-link active" data-toggle="tab" href="#create-brand"
+                                                <a class="nav-link @unless (request('active_id')) active @endunless" data-toggle="tab" href="#create-brand"
                                                     role="tab" aria-controls="create-brand"
                                                     aria-selected="false">Create</a>
                                             </li>
                                             @if (request('active_id'))
                                                 <li class="nav-item">
-                                                    <a class="nav-link" data-toggle="tab" href="#edit-brand" role="tab"
+                                                    <a class="nav-link active" data-toggle="tab" href="#edit-brand" role="tab"
                                                         aria-controls="edit-brand" aria-selected="false">Edit</a>
                                                 </li>
                                                 <li class="ml-auto nav-item">
@@ -104,7 +104,7 @@
                                         @endif
                                         @php $active = \App\Models\Brand::find(request('active_id')) @endphp
                                         <div class="tab-content">
-                                            <div class="tab-pane active" id="create-brand" role="tabpanel">
+                                            <div class="tab-pane @unless (request('active_id')) active @endunless" id="create-brand" role="tabpanel">
                                                 <p class="text-info">Create Brand</p>
                                                 <form action="{{ route('admin.brands.store') }}" method="post">
                                                     @csrf
@@ -154,12 +154,20 @@
                                                             <small class="text-danger">{{ $message }}</small>
                                                         @enderror
                                                     </div>
+                                                    <div class="form-group">
+                                                        <div class="checkbox checkbox-secondary">
+                                                            <input type="hidden" name="is_enabled" value="0">
+                                                            <x-checkbox id="create-is-enabled" name="is_enabled" value="1"
+                                                                :checked="old('is_enabled', true)" />
+                                                            <label for="create-is-enabled" class="m-0">Enable Brand</label>
+                                                        </div>
+                                                    </div>
                                                     <button type="submit" class="ml-auto btn btn-sm btn-success d-block"><i
                                                             class="fa fa-check"></i> Submit</button>
                                                 </form>
                                             </div>
                                             @if (request('active_id'))
-                                                <div class="tab-pane" id="edit-brand" role="tabpanel">
+                                                <div class="tab-pane active" id="edit-brand" role="tabpanel">
                                                     <p class="text-info">Edit Brand</p>
                                                     <form
                                                         action="{{ route('admin.brands.update', request('active_id', 0)) }}"
@@ -215,6 +223,14 @@
                                                             @error('base_image')
                                                                 <small class="text-danger">{{ $message }}</small>
                                                             @enderror
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="checkbox checkbox-secondary">
+                                                                <input type="hidden" name="is_enabled" value="0">
+                                                                <x-checkbox id="edit-is-enabled" name="is_enabled" value="1"
+                                                                    :checked="old('is_enabled', $active->is_enabled)" />
+                                                                <label for="edit-is-enabled" class="m-0">Enable Brand</label>
+                                                            </div>
                                                         </div>
                                                         <button type="submit"
                                                             class="ml-auto btn btn-sm btn-success d-block"><i

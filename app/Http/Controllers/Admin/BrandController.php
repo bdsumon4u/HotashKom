@@ -46,6 +46,7 @@ class BrandController extends Controller
             'name' => 'required|unique:brands',
             'slug' => 'required|unique:brands',
             'base_image' => 'nullable|integer',
+            'is_enabled' => 'boolean',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
@@ -67,6 +68,7 @@ class BrandController extends Controller
             'name' => 'required|unique:brands,name,'.$brand->id,
             'slug' => 'required|unique:brands,slug,'.$brand->id,
             'base_image' => 'nullable|integer',
+            'is_enabled' => 'boolean',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');

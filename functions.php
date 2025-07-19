@@ -44,12 +44,14 @@ if (! function_exists('categories')) {
     {
         // Load categories with images only
         $categoriesWithImages = Category::with('image')
+            ->where('is_enabled', true)
             ->whereHas('image') // Only categories that have images
             ->inRandomOrder()
             ->get();
 
         // Load categories without images and eager load their product images
         $categoriesWithoutImages = Category::with('products.images')
+            ->where('is_enabled', true)
             ->whereDoesntHave('image') // Only categories without images
             ->inRandomOrder()
             ->get();
@@ -76,15 +78,16 @@ if (! function_exists('categories')) {
 if (! function_exists('brands')) {
     function brands()
     {
-        return collect(collect());
         // Load brands with images only
         $brandsWithImages = Brand::with('image')
+            ->where('is_enabled', true)
             ->whereHas('image') // Only brands that have images
             ->inRandomOrder()
             ->get();
 
         // Load brands without images and eager load their product images
         $brandsWithoutImages = Brand::with('products.images')
+            ->where('is_enabled', true)
             ->whereDoesntHave('image') // Only brands without images
             ->inRandomOrder()
             ->get();

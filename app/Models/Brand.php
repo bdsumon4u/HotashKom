@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Brand extends Model
 {
     protected $fillable = [
-        'image_id', 'name', 'slug',
+        'image_id', 'name', 'slug', 'is_enabled',
     ];
 
     public static function booted(): void
@@ -38,7 +38,7 @@ class Brand extends Model
 
     public static function cached()
     {
-        return cache()->rememberForever('brands', fn () => Brand::all());
+        return cache()->rememberForever('brands', fn () => Brand::where('is_enabled', true)->get());
     }
 
     public function image()

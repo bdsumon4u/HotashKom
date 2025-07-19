@@ -167,13 +167,13 @@
                                     <div class="p-3 card-header">
                                         <ul class="nav nav-tabs" role="tablist">
                                             <li class="nav-item">
-                                                <a class="nav-link active" data-toggle="tab" href="#create-category"
+                                                <a class="nav-link @unless (request('active_id')) active @endunless" data-toggle="tab" href="#create-category"
                                                     role="tab" aria-controls="create-category"
                                                     aria-selected="false">Create</a>
                                             </li>
                                             @if (request('active_id'))
                                                 <li class="nav-item">
-                                                    <a class="nav-link" data-toggle="tab" href="#edit-category"
+                                                    <a class="nav-link active" data-toggle="tab" href="#edit-category"
                                                         role="tab" aria-controls="edit-category"
                                                         aria-selected="false">Edit</a>
                                                 </li>
@@ -195,7 +195,7 @@
                                         @endif
                                         @php $active = \App\Models\Category::find(request('active_id')) @endphp
                                         <div class="tab-content">
-                                            <div class="tab-pane active" id="create-category" role="tabpanel">
+                                            <div class="tab-pane @unless (request('active_id')) active @endunless" id="create-category" role="tabpanel">
                                                 <p class="text-info">Create
                                                     <strong>{{ $active ? 'Child' : 'Root' }}</strong> Category</p>
                                                 <form action="{{ route('admin.categories.store') }}" method="post">
@@ -252,13 +252,21 @@
                                                             <small class="text-danger">{{ $message }}</small>
                                                         @enderror
                                                     </div>
+                                                    <div class="form-group">
+                                                        <div class="checkbox checkbox-secondary">
+                                                            <input type="hidden" name="is_enabled" value="0">
+                                                            <x-checkbox id="create-is-enabled" name="is_enabled" value="1"
+                                                                :checked="old('is_enabled', true)" />
+                                                            <label for="create-is-enabled" class="m-0">Enable Category</label>
+                                                        </div>
+                                                    </div>
                                                     <button type="submit"
                                                         class="ml-auto btn btn-sm btn-success d-block"><i
                                                             class="fa fa-check"></i> Create</button>
                                                 </form>
                                             </div>
                                             @if (request('active_id'))
-                                                <div class="tab-pane" id="edit-category" role="tabpanel">
+                                                <div class="tab-pane active" id="edit-category" role="tabpanel">
                                                     <p class="text-info">Edit Category</p>
                                                     <form
                                                         action="{{ route('admin.categories.update', request('active_id', 0)) }}"
@@ -320,6 +328,14 @@
                                                             @error('base_image')
                                                                 <small class="text-danger">{{ $message }}</small>
                                                             @enderror
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="checkbox checkbox-secondary">
+                                                                <input type="hidden" name="is_enabled" value="0">
+                                                                <x-checkbox id="edit-is-enabled" name="is_enabled" value="1"
+                                                                    :checked="old('is_enabled', $active->is_enabled)" />
+                                                                <label for="edit-is-enabled" class="m-0">Enable Category</label>
+                                                            </div>
                                                         </div>
                                                         <button type="submit"
                                                             class="ml-auto btn btn-sm btn-success d-block"><i
