@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSectionProductController;
 use App\Http\Controllers\OrderTrackController;
 use App\Http\Controllers\ProductController;
+use App\Http\Middleware\EnsureResellerIsVerified;
 use App\Http\Middleware\GoogleTagManagerMiddleware;
 use Hotash\FacebookPixel\MetaPixelMiddleware;
 use Hotash\LaravelMultiUi\Facades\MultiUi;
@@ -52,7 +53,15 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
             Route::middleware('auth:user')->group(function () {
                 Route::match(['get', 'post'], 'profile', 'ProfileController')->name('profile');
                 Route::get('orders', 'OrderController')->name('orders');
+
+                // Payment routes for account verification
+                Route::get('payment/verification', 'PaymentController@showPaymentForm')->name('payment.verification');
+                Route::post('payment/apply-coupon', 'PaymentController@applyCoupon')->name('payment.apply-coupon');
+                Route::post('payment/create', 'PaymentController@createPayment')->name('payment.create');
             });
+
+            // bKash callback route (no auth required)
+            Route::get('bkash/callback', 'BkashCallbackController@callback')->name('bkash.callback');
 
             Route::get('transactions', 'TransactionController@index')->name('transactions');
         });
@@ -71,7 +80,7 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
 
     Route::view('/cart', 'cart')->name('cart');
-    Route::match(['get', 'post'], '/checkout', CheckoutController::class)->name('checkout');
+    Route::match(['get', 'post'], '/checkout', CheckoutController::class)->name('checkout')->middleware(EnsureResellerIsVerified::class);
     Route::get('/thank-you', OrderTrackController::class)->name('thank-you');
     Route::match(['get', 'post'], 'track-order', OrderTrackController::class)->name('track-order');
 

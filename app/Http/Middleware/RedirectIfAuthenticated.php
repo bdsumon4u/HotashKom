@@ -20,6 +20,10 @@ class RedirectIfAuthenticated
         if (Auth::guard($guard)->check()) {
             $upper = strtoupper(str_replace(['_', '-'], '', $guard));
 
+            if ($upper === 'USER') {
+                return redirect('/profile');
+            }
+
             return $upper === 'WEB' || $upper == null
                 ? redirect('/')
                 : redirect($guard.'/dashboard');

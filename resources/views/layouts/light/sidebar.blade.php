@@ -107,6 +107,16 @@
                         </a>
                     </li>
 
+                    @if (isOninda())
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/coupons*') ? 'active' : '' }}"
+                            href="{{ route('admin.coupons.index') }}">
+                            <i data-feather="tag"> </i>
+                            <span>Coupons</span>
+                        </a>
+                    </li>
+                    @endif
+
                     <li>
                         <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.images.index' ? 'active' : '' }}"
                             href="{{ route('admin.images.index') }}">

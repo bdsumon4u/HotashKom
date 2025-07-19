@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CategoryMenuController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\HomeSectionController;
@@ -82,6 +83,11 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
         Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
         Route::post('transactions/{id}/withdraw', [TransactionController::class, 'withdraw'])->name('transactions.withdraw');
+
+        // Coupon additional routes
+        Route::get('coupons/generate-code', [CouponController::class, 'generateCode'])->name('coupons.generate-code');
+        Route::post('coupons/{coupon}/toggle-status', [CouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
+
         Route::resources([
             'staffs' => StaffController::class,
             'slides' => SlideController::class,
@@ -100,6 +106,7 @@ Route::group(['as' => 'admin.'], function (): void {
             'menu-items' => MenuItemController::class,
             'category-menus' => CategoryMenuController::class,
             'purchases' => PurchaseController::class,
+            'coupons' => CouponController::class,
         ]);
 
     });
