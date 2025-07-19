@@ -427,6 +427,7 @@ class OrderController extends Controller
 
             $order->update([
                 'status' => 'SHIPPING',
+                'shipped_at' => now()->toDateTimeString(),
                 'status_at' => now()->toDateTimeString(),
                 'data' => [
                     'consignment_id' => $item['consignment_id'],
@@ -462,6 +463,7 @@ class OrderController extends Controller
 
         $order->update([
             'status' => 'SHIPPING',
+            'shipped_at' => now()->toDateTimeString(),
             'status_at' => now()->toDateTimeString(),
             'data' => [
                 'consignment_id' => $data->consignment_id,
@@ -496,6 +498,7 @@ class OrderController extends Controller
 
         $order->update([
             'status' => 'SHIPPING',
+            'shipped_at' => now()->toDateTimeString(),
             'status_at' => now()->toDateTimeString(),
             'data' => [
                 'consignment_id' => $data->tracking_id,
@@ -526,6 +529,9 @@ class OrderController extends Controller
 
         $data['status'] = $request->status;
         $data['status_at'] = now()->toDateTimeString();
+        if ($request->status == 'SHIPPING') {
+            $data['shipped_at'] = now()->toDateTimeString();
+        }
         $orders = Order::whereIn('id', $request->order_id)->where('status', '!=', $request->status)->get();
 
         $orders->each->update($data);

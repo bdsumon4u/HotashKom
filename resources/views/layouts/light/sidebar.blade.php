@@ -189,6 +189,14 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.reports.shipment' ? 'active' : '' }}"
+                            href="{{ route('admin.reports.shipment') }}">
+                            <i data-feather="truck"> </i>
+                            <span>Shipment</span>
+                        </a>
+                    </li>
+
                     <li class="sidebar-title">
                         <h6>Users</h6>
                     </li>

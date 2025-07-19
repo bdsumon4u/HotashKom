@@ -1,0 +1,241 @@
+@extends('layouts.light.master')
+
+@section('title', 'Shipment Report')
+
+@section('breadcrumb-title')
+    <h3>Shipment Report</h3>
+@endsection
+
+@section('breadcrumb-items')
+    <li class="breadcrumb-item">Reports</li>
+    <li class="breadcrumb-item active">Shipment</li>
+@endsection
+
+@section('breadcrumb-right')
+    <div class="theme-form m-t-10">
+        <div style="max-width: 250px; margin-left: auto;">
+            <div class="input-group">
+                <input class="form-control" id="reportrange" type="text">
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('content')
+<div class="mb-5 container-fluid">
+
+    <!-- Summary Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card o-hidden">
+                <div class="card-body">
+                    <div class="d-flex static-top-widget">
+                        <div class="align-self-center">
+                            <i data-feather="truck" class="font-primary"></i>
+                        </div>
+                        <div class="ml-2 flex-grow-1">
+                            <span class="font-roboto">Total Shipped</span>
+                            <h4 class="font-roboto">{{ $report['total_shipped'] }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card o-hidden">
+                <div class="card-body">
+                    <div class="d-flex static-top-widget">
+                        <div class="align-self-center">
+                            <i data-feather="clock" class="font-warning"></i>
+                        </div>
+                        <div class="ml-2 flex-grow-1">
+                            <span class="font-roboto">In Shipping</span>
+                            <h4 class="font-roboto">{{ $report['status_breakdown']['SHIPPING'] ?? 0 }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card o-hidden">
+                <div class="card-body">
+                    <div class="d-flex static-top-widget">
+                        <div class="align-self-center">
+                            <i data-feather="check-circle" class="font-success"></i>
+                        </div>
+                        <div class="ml-2 flex-grow-1">
+                            <span class="font-roboto">Delivered</span>
+                            <h4 class="font-roboto">{{ $report['status_breakdown']['DELIVERED'] ?? 0 }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card o-hidden">
+                <div class="card-body">
+                    <div class="d-flex static-top-widget">
+                        <div class="align-self-center">
+                            <i data-feather="rotate-ccw" class="font-danger"></i>
+                        </div>
+                        <div class="ml-2 flex-grow-1">
+                            <span class="font-roboto">Returned</span>
+                            <h4 class="font-roboto">{{ $report['status_breakdown']['RETURNED'] ?? 0 }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Breakdown Chart -->
+    <div class="row">
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Status Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($report['status_breakdown'] as $status => $count)
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-{{ $status === 'DELIVERED' ? 'success' : ($status === 'SHIPPING' ? 'warning' : ($status === 'RETURNED' ? 'danger' : 'secondary')) }}">
+                                            {{ $status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $count }}</td>
+                                    <td>{{ $report['total_shipped'] > 0 ? round(($count / $report['total_shipped']) * 100, 1) : 0 }}%</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courier Breakdown -->
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Courier Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Courier</th>
+                                    <th>Total</th>
+                                    <th>Delivered</th>
+                                    <th>In Shipping</th>
+                                    <th>Returned</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($report['courier_breakdown'] as $courier => $data)
+                                <tr>
+                                    <td>{{ $courier }}</td>
+                                    <td>{{ $data['total'] }}</td>
+                                    <td class="text-success">{{ $data['delivered'] }}</td>
+                                    <td class="text-warning">{{ $data['shipping'] }}</td>
+                                    <td class="text-danger">{{ $data['returned'] }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Breakdown -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Daily Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Total Shipped</th>
+                                    <th>Delivered</th>
+                                    <th>In Shipping</th>
+                                    <th>Returned</th>
+                                    <th>Cancelled</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($report['daily_breakdown'] as $date => $data)
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('admin.orders.index', ['shipped_at' => $date, 'status' => '']) }}"
+                                           class="text-primary font-weight-bold">
+                                            {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}
+                                        </a>
+                                    </td>
+                                    <td>{{ $data['total'] }}</td>
+                                    <td class="text-success">{{ $data['delivered'] }}</td>
+                                    <td class="text-warning">{{ $data['shipping'] }}</td>
+                                    <td class="text-danger">{{ $data['returned'] }}</td>
+                                    <td class="text-secondary">{{ $data['cancelled'] }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+@endsection
+
+@push('css')
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/daterange-picker.css') }}">
+    <style>
+        .daterangepicker {
+            border: 2px solid #d7d7d7 !important;
+        }
+    </style>
+@endpush
+
+@push('js')
+    <script src="{{ asset('assets/js/datepicker/daterange-picker/moment.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datepicker/daterange-picker/daterangepicker.js') }}"></script>
+    <script src="{{ asset('assets/js/datepicker/daterange-picker/daterange-picker.custom.js') }}"></script>
+    <script>
+        window._start = moment('{{ $start }}');
+        window._end = moment('{{ $end }}');
+        window.reportRangeCB = function(start, end) {
+            window._start = start;
+            window._end = end;
+            refresh();
+        };
+
+        function refresh() {
+            window.location = "{!! route('admin.reports.shipment', [
+                'start_d' => '_start',
+                'end_d' => '_end',
+            ]) !!}".replace('_start', window._start.format('YYYY-MM-DD'))
+                .replace('_end', window._end.format('YYYY-MM-DD'));
+        }
+    </script>
+@endpush

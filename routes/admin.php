@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ResellerController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\ShipmentReportController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TransactionController;
@@ -63,6 +64,7 @@ Route::group(['as' => 'admin.'], function (): void {
             ->name('password.change');
         Route::any('settings', SettingController::class)->name('settings');
         Route::get('/reports/stock', [ReportController::class, 'stock'])->name('reports.stock');
+        Route::get('/reports/shipment', [ShipmentReportController::class, 'index'])->name('reports.shipment');
         Route::get('/reports/filter', [OrderController::class, 'filter'])->name('orders.filter');
         Route::get('/reports/customer', [ReportController::class, 'customer'])->name('reports.customer');
         Route::get('/orders/pathao-csv', [OrderController::class, 'csv'])->name('orders.pathao-csv');

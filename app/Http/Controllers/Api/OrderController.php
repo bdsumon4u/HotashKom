@@ -52,6 +52,15 @@ class OrderController extends Controller
             ]);
         }
 
+        if ($request->shipped_at) {
+            $shippedDate = Carbon::parse($request->shipped_at);
+            $orders->whereNotNull('shipped_at')
+                ->whereBetween('shipped_at', [
+                    $shippedDate->startOfDay()->toDateTimeString(),
+                    $shippedDate->endOfDay()->toDateTimeString(),
+                ]);
+        }
+
         $orders = $orders->when($request->role_id == Admin::SALESMAN, function ($orders): void {
             $orders->where('admin_id', request('admin_id'));
         });
@@ -87,11 +96,13 @@ class OrderController extends Controller
                 if (isOninda()) {
                     $id = $row->order_prefix.$row->source_id;
                     $url = request()->getScheme().'://'.$row->domain.'/track-order?order='.$row->source_id;
+
                     return '<a target="_blank" title="'.$row->shop_name.'" class="px-2 btn btn-light btn-sm text-nowrap" href="'.$url.'">'.$id.'<i class="ml-1 fa fa-eye"></i></a>';
                 }
 
                 if (isReseller()) {
                     $url = config('app.oninda_url').'/track-order?order='.$row->source_id;
+
                     return '<a target="_blank" class="px-2 btn btn-light btn-sm text-nowrap" href="'.$url.'">'.$row->source_id.'<i class="ml-1 fa fa-eye"></i></a>';
                 }
 
@@ -172,33 +183,33 @@ class OrderController extends Controller
                     ->orWhere('data->consignment_id', 'like', '%'.$keyword.'%');
             });
 
-            if (isOninda()) {
-                $dt = $dt->filterColumn('source_id', function ($query, $keyword): void {
-                    // Support search in the format PREFIX + ORDER_ID (digits at the end)
-                    if (preg_match('/^([^\d]+)(\d+)$/', $keyword, $matches)) {
-                        $prefix = $matches[1];
-                        $orderId = $matches[2];
-                        // If users table is joined (isOninda), filter by both prefix and source_id
-                        $query->where('users.order_prefix', $prefix)
-                            ->where('orders.source_id', $orderId);
-                    } else {
-                        // Fallback: search source_id as before
-                        $query->where('orders.source_id', 'like', "%$keyword%");
-                    }
-                });
+        if (isOninda()) {
+            $dt = $dt->filterColumn('source_id', function ($query, $keyword): void {
+                // Support search in the format PREFIX + ORDER_ID (digits at the end)
+                if (preg_match('/^([^\d]+)(\d+)$/', $keyword, $matches)) {
+                    $prefix = $matches[1];
+                    $orderId = $matches[2];
+                    // If users table is joined (isOninda), filter by both prefix and source_id
+                    $query->where('users.order_prefix', $prefix)
+                        ->where('orders.source_id', $orderId);
+                } else {
+                    // Fallback: search source_id as before
+                    $query->where('orders.source_id', 'like', "%$keyword%");
+                }
+            });
+        }
+
+        $dt = $dt->editColumn('staff', function ($row) use ($salesmans) {
+            $return = '<select data-id="'.$row->id.'" onchange="changeStaff" class="staff-column form-control-sm">';
+            if (! isset($salesmans[$row->admin_id])) {
+                $return .= '<option value="'.$row->admin_id.'" selected '.$this->isDisabled($row).'>'.$row->admin->name.'</option>';
+            }
+            foreach ($salesmans as $id => $name) {
+                $return .= '<option value="'.$id.'" '.($id == $row->admin_id ? 'selected' : '').' '.$this->isDisabled($row).'>'.$name.'</option>';
             }
 
-            $dt = $dt->editColumn('staff', function ($row) use ($salesmans) {
-                $return = '<select data-id="'.$row->id.'" onchange="changeStaff" class="staff-column form-control-sm">';
-                if (! isset($salesmans[$row->admin_id])) {
-                    $return .= '<option value="'.$row->admin_id.'" selected '.$this->isDisabled($row).'>'.$row->admin->name.'</option>';
-                }
-                foreach ($salesmans as $id => $name) {
-                    $return .= '<option value="'.$id.'" '.($id == $row->admin_id ? 'selected' : '').' '.$this->isDisabled($row).'>'.$name.'</option>';
-                }
-
-                return $return.'</select>';
-            })
+            return $return.'</select>';
+        })
             ->filterColumn('created_at', function ($query, $keyword): void {
                 if (str_contains($keyword, ' - ')) {
                     [$start, $end] = explode(' - ', $keyword);
