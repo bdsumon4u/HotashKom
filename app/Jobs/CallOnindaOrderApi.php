@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class CallOnindaOrderApi implements ShouldQueue
@@ -23,10 +24,14 @@ class CallOnindaOrderApi implements ShouldQueue
         $endpoint = config('app.oninda_url').'/api/reseller/orders/place';
 
         info('Calling Oninda order API: '.$endpoint, $data = [
-            'order_id' => $this->orderId,
+            'order_id' => [$this->orderId],
             'domain' => $domain,
         ]);
 
-        Http::post($endpoint, $data)->throw();
+        try {
+            Http::post($endpoint, $data)->throw();
+        } catch (\Exception $e) {
+            DB::table('orders')->whereIntegerInRaw('id', [$this->orderId])->update(['source_id' => null]);
+        }
     }
 }

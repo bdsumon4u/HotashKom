@@ -4,6 +4,8 @@ return [
 
     'oninda' => env('APP_ONINDA', false),
 
+    'instant_order_forwarding' => env('INSTANT_ORDER_FORWARDING', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

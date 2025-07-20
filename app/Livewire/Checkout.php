@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Http\Resources\ProductResource;
+use App\Jobs\CallOnindaOrderApi;
 use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Product;
@@ -333,6 +334,7 @@ class Checkout extends Component
             }
 
             $data += [
+                'source_id' => config('app.instant_order_forwarding') ? 0 : null,
                 'admin_id' => $admin->id,
                 'user_id' => $user->id, // If User Logged In
                 'status' => $status,
@@ -401,6 +403,10 @@ class Checkout extends Component
 
         // Undefined index email.
         // $data['email'] && Mail::to($data['email'])->queue(new OrderPlaced($order));
+
+        if (config('app.instant_order_forwarding')) {
+            CallOnindaOrderApi::dispatch($this->order->id);
+        }
 
         cart()->destroy();
         session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Recieved. Thanks For Your Order.');
