@@ -597,6 +597,14 @@ class OrderController extends Controller
             'order_id' => 'required|array',
         ]);
 
+        if (config('app.demo')) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Demo mode doesn\'t allow this operation.'], 422);
+            } else {
+                return redirect()->back()->with('danger', 'Demo mode doesn\'t allow this operaton.');
+            }
+        }
+
         $orders = Order::whereIn('id', $request->order_id)
             ->whereNull('source_id')
             ->where('status', 'CONFIRMED')
