@@ -13,12 +13,6 @@
                                 style="font-size: 2.5rem; font-weight: bold; color: #ffb200; letter-spacing: 2px; font-family: 'Noto Sans Bengali', sans-serif;">{{ config('app.name') }}</span>
                             <h4 class="mb-0 font-weight-bold" style="color: #ffb200;">Become a Reseller!</h4>
                             <p class="mt-2 mb-0 text-muted">Register to start your journey</p>
-                            <div class="mb-4 text-center alert alert-warning" style="font-size: 1rem;">
-                                Registration korar por <strong>01666666666</strong> number a <strong>500 tk</strong>
-                                bkash payment korun.<br>
-                                Verification er jonno amra apnake call korbo, wait korun.<br>
-                                Othoba payment korar por amader k call korun.
-                            </div>
                         </div>
                     </div>
                     <div class="p-4 bg-white col-md-8 p-md-5 d-flex align-items-center">
