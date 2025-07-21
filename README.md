@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}370}$$ 🔥 domains are live now
+These 🔥 $${\color{red}374}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-20 09:48:27 Asia/Dhaka**_
+_Last updated: **2025-07-21 09:47:11 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -469,3 +469,7 @@ _Last updated: **2025-07-20 09:48:27 Asia/Dhaka**_
 | 368 | [nafimart.com](http://nafimart.com) |
 | 369 | [sebaponno.com](http://sebaponno.com) |
 | 370 | [jabirmart.com](http://jabirmart.com) |
+| 371 | [alfamartbd.com](http://alfamartbd.com) |
+| 372 | [anandahut.com](http://anandahut.com) |
+| 373 | [khajera.com](http://khajera.com) |
+| 374 | [mrfmart.com](http://mrfmart.com) |
