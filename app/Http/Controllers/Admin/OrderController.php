@@ -396,6 +396,24 @@ class OrderController extends Controller
             ->withSuccess('Orders are sent to Courier.');
     }
 
+    /**
+     * Calculate the collection amount (COD/amount_to_collect/cash_collection_amount) for an order.
+     *
+     * @param  \App\Models\Order  $order
+     * @return int|float
+     */
+    private function calculateOrderCollectionAmount($order)
+    {
+        $retail = array_reduce((array) $order->products, function ($sum, $product) {
+            return $sum + ($product[isOninda() ? 'retail_price' : 'price'] ?? 0) * ($product['quantity'] ?? 1);
+        }, 0);
+        $deliveryFee = $order->data[isOninda() ? 'retail_delivery_fee' : 'shipping_cost'] ?? 0;
+        $discount = $order->data[isOninda() ? 'retail_discount' : 'discount'] ?? 0;
+        $advanced = $order->data['advanced'] ?? 0;
+
+        return $retail + $deliveryFee - $discount - $advanced;
+    }
+
     private function steadFast($order_ids): int
     {
         if (! (($SteadFast = setting('SteadFast'))->enabled ?? false)) {
@@ -406,7 +424,7 @@ class OrderController extends Controller
             'recipient_name' => $order->name ?? 'N/A',
             'recipient_address' => $order->address ?? 'N/A',
             'recipient_phone' => $order->phone ?? '',
-            'cod_amount' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0),
+            'cod_amount' => $this->calculateOrderCollectionAmount($order),
             // 'note' => $order->note,
         ])->toJson();
 
@@ -455,7 +473,7 @@ class OrderController extends Controller
             // 'special_instruction' => $order->note,
             'item_quantity' => 1, // item quantity
             'item_weight' => $order->data['weight'] ?? 0.5, // parcel weight
-            'amount_to_collect' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0), // - $order->deliveryCharge, // amount to collect
+            'amount_to_collect' => $this->calculateOrderCollectionAmount($order), // amount to collect
             // "item_description"    => $this->getProductsDetails($order->id), // product details
         ];
 
@@ -489,7 +507,7 @@ class OrderController extends Controller
             'value' => 100,
             // 'item_quantity' => 1, // item quantity
             'parcel_weight' => $order->data['weight'] ?? 500, // parcel weight
-            'cash_collection_amount' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0), // - $order->deliveryCharge, // amount to collect
+            'cash_collection_amount' => $this->calculateOrderCollectionAmount($order), // amount to collect
             // "item_description"    => $this->getProductsDetails($order->id), // product details
             'parcel_details_json' => [],
         ];
