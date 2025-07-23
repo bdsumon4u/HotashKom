@@ -21,27 +21,6 @@
                             </div>
                         @endif
 
-                        @unless (auth()->user()->is_verified)
-                            <div class="alert alert-warning">
-                                <h4 class="alert-heading">Account Not Verified!</h4>
-                                <p>Your reseller account is not verified yet. To get verified:</p>
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <ol>
-                                            <li>Pay verification fee using bKash payment</li>
-                                            <li>Your account will be automatically verified</li>
-                                            <li>You can apply coupons for discounts</li>
-                                        </ol>
-                                    </div>
-                                    <div class="text-right col-md-4">
-                                        <a href="{{ route('user.payment.verification') }}" class="d-flex btn btn-primary align-items-center justify-content-center">
-                                            <i class="fa fa-credit-card"></i> Verify Account
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        @endunless
-
                         <x-form method="POST" :action="route('user.profile')" has-files>
                             @php($user = auth()->user())
                             <div class="row no-gutters">

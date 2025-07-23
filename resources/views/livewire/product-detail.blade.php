@@ -14,10 +14,16 @@
                 </strong>
             </div>
         </div>
+        @php($show_option = setting('show_option'))
+        @php($guest_can_see_price = (bool)($show_option->guest_can_see_price ?? false))
         <div
             class="product__prices mb-1 {{ ($selling = $selectedVar->getPrice($quantity)) == $selectedVar->price ? '' : 'has-special' }}">
             Price:
-            @if ($selling == $selectedVar->price)
+            @if(isOninda() && auth('user')->guest() && !$guest_can_see_price)
+                <span class="product-card__new-price text-danger">Login to see price</span>
+            @elseif(isOninda() && !auth('user')->user()->is_verified && !$guest_can_see_price)
+                <span class="product-card__new-price text-danger">Verify account to see price</span>
+            @elseif ($selling == $selectedVar->price)
                 {!! theMoney($selectedVar->price) !!}
             @else
                 <span class="product-card__new-price">{!! theMoney($selling) !!}</span>
@@ -94,7 +100,6 @@
                     @endif
                     <div class="overflow-hidden product__actions">
                         @php($available = !$selectedVar->should_track || $selectedVar->stock_count > 0)
-                        @php($show_option = setting('show_option'))
                         <div class="product__buttons @if ($show_option->product_detail_buttons_inline ?? false) d-lg-inline-flex @endif w-100"
                             @if ($show_option->product_detail_buttons_inline ?? false) style="gap: .5rem;" @endif>
                             @if ($show_option->product_detail_order_now ?? false)

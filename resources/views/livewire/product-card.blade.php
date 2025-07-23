@@ -32,8 +32,14 @@
                     Stock</span>
             @endif
         </div>
+        @php($show_option = setting('show_option'))
+        @php($guest_can_see_price = (bool)($show_option->guest_can_see_price ?? false))
         <div class="product-card__prices {{ $product->selling_price == $product->price ? '' : 'has-special' }}">
-            @if ($product->selling_price == $product->price)
+            @if(isOninda() && auth('user')->guest() && !$guest_can_see_price)
+                <span class="product-card__new-price text-danger">Login to see price</span>
+            @elseif(isOninda() && !auth()->user('user')->is_verified && !$guest_can_see_price)
+                <small class="product-card__new-price text-danger">Verify account to see price</small>
+            @elseif ($product->selling_price == $product->price)
                 {!! theMoney($product->price) !!}
             @else
                 <span class="product-card__new-price">{!! theMoney($product->selling_price) !!}</span>
@@ -43,7 +49,6 @@
         @if(! isOninda())
         <div class="product-card__buttons">
             @php($available = !$product->should_track || $product->stock_count > 0)
-            @php($show_option = setting('show_option'))
             @if (($show_option->product_grid_button ?? false) == 'add_to_cart')
                 <button wire:click="addToCart" class="btn btn-primary product-card__addtocart" type="button"
                     {{ $available ? '' : 'disabled' }}>

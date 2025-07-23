@@ -181,6 +181,12 @@
                         :checked="($show_option->resellers_invoice ?? false)" />
                     <label for="resellers-invoice" class="my-1">Reseller's Invoice</label>
                 </div>
+                <div class="checkbox checkbox-secondary">
+                    <input type="hidden" name="show_option[guest_can_see_price]" value="0">
+                    <x-checkbox id="guest-can-see-price" name="show_option[guest_can_see_price]" value="1"
+                        :checked="($show_option->guest_can_see_price ?? false)" />
+                    <label for="guest-can-see-price" class="my-1">Guest Price</label>
+                </div>
                 @endif
             </div>
         </div>
