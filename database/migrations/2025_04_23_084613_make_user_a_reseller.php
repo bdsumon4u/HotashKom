@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('shop_name')->after('name');
+            $table->string('shop_name')->nullable()->after('name');
             $table->string('logo')->nullable()->after('shop_name');
-            $table->string('bkash_number')->after('phone_number');
+            $table->string('bkash_number')->nullable()->after('phone_number');
             $table->boolean('is_verified')->default(false);
         });
     }
