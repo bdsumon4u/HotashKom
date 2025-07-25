@@ -35,7 +35,13 @@
     </div>
 </div><!-- .block-features / end -->
 @endif
-
+@if(isOninda())
+<div class="block">
+    <div class="container">
+        <x-reseller-verification-alert />
+    </div>
+</div>
+@endif
 @if(($show_option = setting('show_option'))->category_carousel ?? false)
 <div class="block block-products-carousel" data-layout="grid-cat">
     <div class="container">

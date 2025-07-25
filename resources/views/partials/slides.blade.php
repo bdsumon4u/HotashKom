@@ -1,5 +1,10 @@
 @push('styles')
 <style>
+    @if(!(setting('show_option')->category_dropdown ?? false))
+    .block-slideshow--layout--with-departments .block-slideshow__body {
+        margin-left: 0;
+    }
+    @endif
     .block-slideshow__body .owl-carousel .owl-nav {
         /* position: absolute; */
         height: 100%;
