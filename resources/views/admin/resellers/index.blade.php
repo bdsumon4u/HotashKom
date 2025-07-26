@@ -88,7 +88,7 @@
                 }
             }],
             columnDefs: [
-                
+
             ],
             processing: true,
             serverSide: true,
@@ -162,7 +162,7 @@
                 });
             },
             order: [
-                // [1, 'desc']
+                [5, 'desc'] // Sort by balance column (index 5) in descending order
             ],
             pageLength: 50,
         });

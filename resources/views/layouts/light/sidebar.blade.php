@@ -218,10 +218,20 @@
                     </li>
                     @if (isOninda())
                     <li>
-                        <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.resellers.index' ? 'active' : '' }}"
+                        <a class="nav-link d-flex menu-title link-nav {{ Route::currentRouteName() == 'admin.resellers.index' ? 'active' : '' }}"
                             href="{{ route('admin.resellers.index') }}">
                             <i data-feather="users"> </i>
                             <span>Resellers</span>
+                            @php
+                                $pendingAmount = cache()->remember('pending_withdrawal_amount', 300, function () {
+                                    return abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
+                                        ->where('confirmed', false)
+                                        ->sum('amount'));
+                                });
+                            @endphp
+                            <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
+                                {{ number_format($pendingAmount, 0) }} tk
+                            </span>
                         </a>
                     </li>
                     @endif

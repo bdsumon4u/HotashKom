@@ -311,13 +311,13 @@
                     <div class="p-3 card-body">
                         @if($pendingWithdrawalAmount > 0)
                             <div class="text-center">
-                                <h3 class="text-warning mb-2">{{ number_format($pendingWithdrawalAmount, 2) }} tk</h3>
-                                <p class="text-muted mb-0">Total pending withdrawal amount</p>
+                                <h3 class="mb-2 text-warning">{{ number_format($pendingWithdrawalAmount, 2) }} tk</h3>
+                                <p class="mb-0 text-muted">Total pending withdrawal amount</p>
                                 <small class="text-muted">Click on reseller balance in resellers list to process withdrawals</small>
                             </div>
                         @else
-                            <div class="text-center text-muted py-3">
-                                <i class="fa fa-check-circle fa-2x mb-2"></i>
+                            <div class="py-3 text-center text-muted">
+                                <i class="mb-2 fa fa-check-circle fa-2x"></i>
                                 <p>No pending withdrawal requests</p>
                             </div>
                         @endif

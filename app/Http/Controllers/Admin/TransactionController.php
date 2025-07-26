@@ -95,24 +95,6 @@ class TransactionController extends Controller
     }
 
     /**
-     * Get pending withdrawal requests.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function pendingWithdrawals()
-    {
-        $pendingWithdrawals = \App\Models\User::whereHas('wallet.transactions', function ($query) {
-            $query->where('type', 'withdraw')
-                ->where('confirmed', false);
-        })->with(['wallet.transactions' => function ($query) {
-            $query->where('type', 'withdraw')
-                ->where('confirmed', false);
-        }])->get();
-
-        return response()->json($pendingWithdrawals);
-    }
-
-    /**
      * Delete a pending withdrawal request.
      *
      * @return \Illuminate\Http\Response
@@ -135,6 +117,9 @@ class TransactionController extends Controller
 
         // Delete the unconfirmed transaction
         $transaction->delete();
+
+        // Clear pending withdrawal cache
+        cache()->forget('pending_withdrawal_amount');
 
         return response()->json(['message' => 'Withdrawal request deleted successfully']);
     }
@@ -170,6 +155,9 @@ class TransactionController extends Controller
 
         // Confirm the transaction
         $user->confirm($transaction);
+
+        // Clear pending withdrawal cache
+        cache()->forget('pending_withdrawal_amount');
 
         return response()->json(['message' => 'Withdrawal confirmed successfully']);
     }

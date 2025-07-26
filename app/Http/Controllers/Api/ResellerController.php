@@ -53,8 +53,10 @@ class ResellerController extends Controller
                 $query->where('bkash_number', 'like', '%'.$keyword.'%');
             })
             ->orderColumn('balance', function ($query, $order) {
-                $query->join('wallets', 'users.id', '=', 'wallets.holder_id')
-                    ->where('wallets.slug', 'default')
+                $query->leftJoin('wallets', function ($join) {
+                    $join->on('users.id', '=', 'wallets.holder_id')
+                        ->where('wallets.slug', 'default');
+                })
                     ->orderBy('wallets.balance', $order);
             })
             ->rawColumns(['name', 'balance', 'actions'])
