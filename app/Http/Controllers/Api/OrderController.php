@@ -119,7 +119,7 @@ class OrderController extends Controller
 
                 return $return.'</select>';
             })
-            ->addColumn('checkbox', fn ($row): string => '<input type="checkbox" class="form-control" name="order_id[]" value="'.$row->id.' '.$this->isDisabled($row).' " style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">')
+            ->addColumn('checkbox', fn ($row): string => '<input type="checkbox" class="form-control" name="order_id[]" value="'.$row->id.'" '.$this->isDisabled($row).' style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">')
             ->editColumn('customer', fn ($row): string => "
                     <div>
                         <div><i class='mr-1 fa fa-user'></i>{$row->name}</div>
