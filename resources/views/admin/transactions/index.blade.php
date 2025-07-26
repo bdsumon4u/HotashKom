@@ -59,7 +59,9 @@
                                     <th>Type</th>
                                     <th>Amount</th>
                                     <th>Date</th>
+                                    <th>Status</th>
                                     <th>Meta</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                         </table>
@@ -80,7 +82,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="withdrawForm" method="POST" action="{{ route('admin.transactions.withdraw', $user->id) }}">
+                <form id="withdrawForm" method="POST" action="{{ route('admin.transactions.withdraw', $user) }}">
                     @csrf
                     <div class="modal-body">
                         <div class="form-group">
@@ -98,6 +100,39 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Withdraw</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Withdraw Modal -->
+    <div class="modal fade" id="confirmWithdrawModal" tabindex="-1" role="dialog" aria-labelledby="confirmWithdrawModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmWithdrawModalLabel">Confirm Withdrawal</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="confirmWithdrawForm" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="confirm-amount">Amount (tk)</label>
+                            <input type="number" class="form-control" id="confirm-amount" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-trx-id">Trx ID</label>
+                            <input type="text" class="form-control" id="confirm-trx-id" name="trx_id" required>
+                        </div>
+                        <input type="hidden" id="transaction-id" name="transaction_id">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Confirm Withdrawal</button>
                     </div>
                 </form>
             </div>
@@ -129,9 +164,9 @@
             processing: true,
             serverSide: true,
             ajax: {
-                url: "{{ route('admin.transactions.index') }}",
+                url: "{{ route('admin.transactions.index', $user) }}",
                 data: function(d) {
-                    d.user_id = "{{ $user->id }}";
+                    // No need to pass user_id since we're using route-model binding
                 }
             },
             columns: [{
@@ -153,8 +188,18 @@
                     name: 'created_at'
                 },
                 {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
                     data: 'meta',
                     name: 'meta'
+                },
+                {
+                    data: 'actions',
+                    name: 'actions',
+                    orderable: false,
+                    searchable: false
                 }
             ],
             order: [
@@ -182,6 +227,67 @@
                 },
                 error: function(xhr) {
                     $.notify(xhr.responseJSON.message || 'Error processing withdrawal', 'error');
+                }
+            });
+        });
+
+        // Handle confirm withdraw button click
+        $(document).on('click', '.confirm-withdraw', function() {
+            var transactionId = $(this).data('id');
+            var amount = $(this).data('amount');
+
+            $('#transaction-id').val(transactionId);
+            $('#confirm-amount').val(amount);
+            $('#confirmWithdrawModal').modal('show');
+        });
+
+        // Handle delete withdraw button click
+        $(document).on('click', '.delete-withdraw', function() {
+            var transactionId = $(this).data('id');
+            var amount = $(this).data('amount');
+
+            if (confirm('Are you sure you want to delete this withdrawal request for ' + amount + ' tk?')) {
+                $.ajax({
+                    url: "{{ route('admin.transactions.delete-withdraw', $user) }}",
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        transaction_id: transactionId
+                    },
+                    success: function(response) {
+                        table.ajax.reload();
+                        $.notify(response.message, 'success');
+                        // Reload page to update balance
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    },
+                    error: function(xhr) {
+                        $.notify(xhr.responseJSON.message || 'Error deleting withdrawal request', 'error');
+                    }
+                });
+            }
+        });
+
+        // Handle confirm withdraw form submission
+        $('#confirmWithdrawForm').on('submit', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "{{ route('admin.transactions.confirm-withdraw', $user) }}",
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#confirmWithdrawModal').modal('hide');
+                    table.ajax.reload();
+                    $.notify(response.message, 'success');
+                    // Reload page to update balance
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                },
+                error: function(xhr) {
+                    $.notify(xhr.responseJSON.message || 'Error confirming withdrawal', 'error');
                 }
             });
         });

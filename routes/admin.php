@@ -82,9 +82,11 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
         Route::get('resellers/{reseller}/edit', [ResellerController::class, 'edit'])->name('resellers.edit');
         Route::put('resellers/{reseller}', [ResellerController::class, 'update'])->name('resellers.update');
-        Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
-        Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
-        Route::post('transactions/{id}/withdraw', [TransactionController::class, 'withdraw'])->name('transactions.withdraw');
+        Route::get('transactions/{user}', [TransactionController::class, 'index'])->name('transactions.index');
+        Route::get('transactions/pending-withdrawals', [TransactionController::class, 'pendingWithdrawals'])->name('transactions.pending-withdrawals');
+        Route::post('transactions/{user}/withdraw', [TransactionController::class, 'withdraw'])->name('transactions.withdraw');
+        Route::post('transactions/{user}/confirm-withdraw', [TransactionController::class, 'confirmWithdraw'])->name('transactions.confirm-withdraw');
+        Route::delete('transactions/{user}/delete-withdraw', [TransactionController::class, 'deleteWithdraw'])->name('transactions.delete-withdraw');
 
         // Coupon additional routes
         Route::get('coupons/generate-code', [CouponController::class, 'generateCode'])->name('coupons.generate-code');

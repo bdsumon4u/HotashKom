@@ -26,7 +26,7 @@ class ResellerController extends Controller
             ->editColumn('phone_number', fn ($row): string => $row->phone_number ?? '-')
             ->editColumn('bkash_number', fn ($row): string => $row->bkash_number ?? '-')
             ->editColumn('balance', function ($row): string {
-                return '<a href="'.route('admin.transactions.index', ['user_id' => $row->id]).'" class="text-primary">'.$row->balance.'</a>';
+                return '<a href="'.route('admin.transactions.index', $row->id).'" class="text-primary">'.$row->balance.'</a>';
             })
             ->editColumn('orders_count', fn ($row): string => $row->orders_count)
             ->editColumn('is_verified', fn ($row): string => $row->is_verified ? 'Yes' : 'No')

@@ -14,6 +14,14 @@
         th:focus {
             outline: none;
         }
+
+        table.dataTable thead .sorting:before, table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:before,
+        table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:before, table.dataTable thead
+        .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead
+        .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:before, table.dataTable thead
+        .sorting_desc_disabled:after {
+            bottom: 12px;
+        }
     </style>
 @endpush
 
@@ -27,8 +35,13 @@
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Transaction History</h5>
-                            <div>
-                                <strong>Balance:</strong> {{ number_format(auth('user')->user()->balance, 2) }} tk
+                            <div class="d-flex align-items-center">
+                                <div class="mr-3">
+                                    <strong>Balance:</strong> {{ number_format(auth('user')->user()->balance, 2) }} tk
+                                </div>
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#withdrawRequestModal">
+                                    Request Withdraw
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -41,6 +54,7 @@
                                         <th>Type</th>
                                         <th>Amount</th>
                                         <th>Date</th>
+                                        <th>Status</th>
                                         <th>Details</th>
                                     </tr>
                                 </thead>
@@ -48,6 +62,34 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Request Modal -->
+    <div class="modal fade" id="withdrawRequestModal" tabindex="-1" role="dialog" aria-labelledby="withdrawRequestModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="withdrawRequestModalLabel">Request Withdrawal</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="withdrawRequestForm">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="amount">Amount (tk)</label>
+                            <input type="number" class="form-control" id="amount" name="amount" min="1" max="{{ auth('user')->user()->balance }}" step="0.01" required>
+                            <small class="form-text text-muted">Available balance: {{ number_format(auth('user')->user()->balance, 2) }} tk</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit Request</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -94,6 +136,10 @@
                     name: 'created_at'
                 },
                 {
+                    data: 'status',
+                    name: 'status'
+                },
+                {
                     data: 'meta',
                     name: 'meta',
                 }
@@ -102,6 +148,29 @@
                 [3, 'desc']
             ],
             pageLength: 50,
+        });
+
+        // Handle withdraw request form submission
+        $('#withdrawRequestForm').on('submit', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: "{{ route('user.withdraw.request') }}",
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#withdrawRequestModal').modal('hide');
+                    table.ajax.reload();
+                    $.notify(response.message, 'success');
+                    // Reload page to update balance
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                },
+                error: function(xhr) {
+                    $.notify(xhr.responseJSON.message || 'Error processing request', 'error');
+                }
+            });
         });
     </script>
 @endpush

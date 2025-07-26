@@ -58,12 +58,14 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
                 Route::get('payment/verification', 'PaymentController@showPaymentForm')->name('payment.verification');
                 Route::post('payment/apply-coupon', 'PaymentController@applyCoupon')->name('payment.apply-coupon');
                 Route::post('payment/create', 'PaymentController@createPayment')->name('payment.create');
+
+                // Transaction routes
+                Route::get('transactions', 'TransactionController@index')->name('transactions');
+                Route::post('withdraw-request', 'TransactionController@withdrawRequest')->name('withdraw.request');
             });
 
             // bKash callback route (no auth required)
             Route::get('bkash/callback', 'BkashCallbackController@callback')->name('bkash.callback');
-
-            Route::get('transactions', 'TransactionController@index')->name('transactions');
         });
 
     });

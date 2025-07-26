@@ -14,10 +14,9 @@ class TransactionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, User $user)
     {
         if ($request->ajax()) {
-            $user = User::findOrFail($request->user_id);
             $transactions = $user->wallet->transactions();
 
             return DataTables::of($transactions)
@@ -27,8 +26,18 @@ class TransactionController extends Controller
                         '<span class="badge badge-success">Deposit</span>' :
                         '<span class="badge badge-danger">Withdraw</span>';
                 })
+                ->editColumn('amount', function ($row) {
+                    return number_format($row->amount, 2);
+                })
                 ->editColumn('created_at', function ($row) {
                     return $row->created_at->format('d M Y, h:i A');
+                })
+                ->addColumn('status', function ($row) {
+                    if ($row->confirmed) {
+                        return '<span class="badge badge-success">Confirmed</span>';
+                    } else {
+                        return '<span class="badge badge-warning">Pending</span>';
+                    }
                 })
                 ->addColumn('meta', function ($row) {
                     $meta = $row->meta;
@@ -44,12 +53,19 @@ class TransactionController extends Controller
 
                     return $title;
                 })
+                ->addColumn('actions', function ($row) {
+                    if (! $row->confirmed && $row->type === 'withdraw') {
+                        return '<div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-primary confirm-withdraw" data-id="'.$row->id.'" data-amount="'.$row->amount.'">Confirm</button>
+                            <button type="button" class="btn btn-sm btn-danger delete-withdraw" data-id="'.$row->id.'" data-amount="'.$row->amount.'">Delete</button>
+                        </div>';
+                    }
 
-                ->rawColumns(['type', 'meta'])
+                    return '';
+                })
+                ->rawColumns(['type', 'meta', 'status', 'actions'])
                 ->make(true);
         }
-
-        $user = User::findOrFail($request->user_id);
 
         return view('admin.transactions.index', compact('user'));
     }
@@ -57,17 +73,14 @@ class TransactionController extends Controller
     /**
      * Handle the withdrawal request.
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function withdraw(Request $request, $id)
+    public function withdraw(Request $request, User $user)
     {
         $request->validate([
             'amount' => 'required|numeric|min:1',
             'trx_id' => 'required|string|max:255',
         ]);
-
-        $user = User::findOrFail($id);
 
         if ($request->amount > $user->balance) {
             return response()->json(['message' => 'Insufficient balance'], 422);
@@ -79,5 +92,85 @@ class TransactionController extends Controller
         ]);
 
         return response()->json(['message' => 'Withdrawal successful']);
+    }
+
+    /**
+     * Get pending withdrawal requests.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function pendingWithdrawals()
+    {
+        $pendingWithdrawals = \App\Models\User::whereHas('wallet.transactions', function ($query) {
+            $query->where('type', 'withdraw')
+                ->where('confirmed', false);
+        })->with(['wallet.transactions' => function ($query) {
+            $query->where('type', 'withdraw')
+                ->where('confirmed', false);
+        }])->get();
+
+        return response()->json($pendingWithdrawals);
+    }
+
+    /**
+     * Delete a pending withdrawal request.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteWithdraw(Request $request, User $user)
+    {
+        $request->validate([
+            'transaction_id' => 'required|integer',
+        ]);
+
+        $transaction = $user->wallet->transactions()
+            ->where('type', 'withdraw')
+            ->where('confirmed', false)
+            ->where('id', $request->transaction_id)
+            ->first();
+
+        if (! $transaction) {
+            return response()->json(['message' => 'Transaction not found'], 404);
+        }
+
+        // Delete the unconfirmed transaction
+        $transaction->delete();
+
+        return response()->json(['message' => 'Withdrawal request deleted successfully']);
+    }
+
+    /**
+     * Confirm a pending withdrawal request.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function confirmWithdraw(Request $request, User $user)
+    {
+        $request->validate([
+            'trx_id' => 'required|string|max:255',
+            'transaction_id' => 'required|integer',
+        ]);
+
+        $transaction = $user->wallet->transactions()
+            ->where('type', 'withdraw')
+            ->where('confirmed', false)
+            ->where('id', $request->transaction_id)
+            ->first();
+
+        if (! $transaction) {
+            return response()->json(['message' => 'Transaction not found'], 404);
+        }
+
+        // Update transaction meta with trx_id and admin_id
+        $meta = $transaction->meta;
+        $meta['trx_id'] = $request->trx_id;
+        $meta['admin_id'] = auth('admin')->id();
+        $transaction->meta = $meta;
+        $transaction->save();
+
+        // Confirm the transaction
+        $user->confirm($transaction);
+
+        return response()->json(['message' => 'Withdrawal confirmed successfully']);
     }
 }

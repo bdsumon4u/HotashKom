@@ -4,15 +4,18 @@ namespace App\Models;
 
 use App\Notifications\User\ResetPassword;
 use App\Notifications\User\VerifyEmail;
+use Bavix\Wallet\Interfaces\Confirmable;
 use Bavix\Wallet\Interfaces\Wallet;
+use Bavix\Wallet\Traits\CanConfirm;
 use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
-class User extends Authenticatable implements Wallet
+class User extends Authenticatable implements Wallet, Confirmable
 {
+    use CanConfirm;
     use HasWallet;
     use Notifiable;
 

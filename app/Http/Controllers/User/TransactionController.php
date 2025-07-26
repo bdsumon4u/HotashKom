@@ -45,10 +45,43 @@ class TransactionController extends Controller
 
                     return $title;
                 })
-                ->rawColumns(['type', 'meta'])
+                ->addColumn('status', function ($row) {
+                    if ($row->confirmed) {
+                        return '<span class="badge badge-success">Confirmed</span>';
+                    } else {
+                        return '<span class="badge badge-warning">Pending</span>';
+                    }
+                })
+                ->rawColumns(['type', 'meta', 'status'])
                 ->make(true);
         }
 
         return view('user.transactions');
+    }
+
+    /**
+     * Request a withdrawal.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function withdrawRequest(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        $user = auth('user')->user();
+
+        if ($request->amount > $user->balance) {
+            return response()->json(['message' => 'Insufficient balance'], 422);
+        }
+
+        // Create withdraw request with pending status
+        $user->wallet->withdraw($request->amount, [
+            'reason' => 'Withdraw Request',
+            'status' => 'pending',
+        ], false); // false for not confirmed
+
+        return response()->json(['message' => 'Withdrawal request submitted successfully']);
     }
 }
