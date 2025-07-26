@@ -306,6 +306,8 @@
                                     @foreach (config('app.orders', []) as $stat)
                                         @if($order->status === 'DELIVERED')
                                             <option value="{{ $stat }}" {{ $stat === 'RETURNED' ? '' : 'disabled' }}>{{ $stat }}</option>
+                                        @elseif($order->status === 'SHIPPING')
+                                            <option value="{{ $stat }}">{{ $stat }}</option>
                                         @else
                                             <option value="{{ $stat }}" {{ $stat === 'RETURNED' ? 'disabled' : '' }}>{{ $stat }}</option>
                                         @endif

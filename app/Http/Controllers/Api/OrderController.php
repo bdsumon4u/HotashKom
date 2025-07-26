@@ -247,6 +247,10 @@ class OrderController extends Controller
             return $status !== 'RETURNED' ? 'disabled' : '';
         }
 
+        if ($order->status === 'SHIPPING') {
+            return ''; // Allow any status transition from SHIPPING
+        }
+
         return $status === 'RETURNED' ? 'disabled' : '';
     }
 }
