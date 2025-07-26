@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
-class User extends Authenticatable implements Wallet, Confirmable
+class User extends Authenticatable implements Confirmable, Wallet
 {
     use CanConfirm;
     use HasWallet;

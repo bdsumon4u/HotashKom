@@ -302,6 +302,28 @@
                     </div>
                 </div>
             </div>
+            <div class="col-xl-4 xl-50 box-xl-12">
+                <div class="rounded-sm card">
+                    <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                        <h5>Pending Withdrawals</h5>
+                        <span class="badge badge-warning">{{ number_format($pendingWithdrawalAmount, 2) }} tk</span>
+                    </div>
+                    <div class="p-3 card-body">
+                        @if($pendingWithdrawalAmount > 0)
+                            <div class="text-center">
+                                <h3 class="text-warning mb-2">{{ number_format($pendingWithdrawalAmount, 2) }} tk</h3>
+                                <p class="text-muted mb-0">Total pending withdrawal amount</p>
+                                <small class="text-muted">Click on reseller balance in resellers list to process withdrawals</small>
+                            </div>
+                        @else
+                            <div class="text-center text-muted py-3">
+                                <i class="fa fa-check-circle fa-2x mb-2"></i>
+                                <p>No pending withdrawal requests</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

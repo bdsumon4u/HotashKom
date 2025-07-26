@@ -98,6 +98,11 @@ class HomeController extends Controller
         $inactiveProducts = Product::whereIsActive(0)->whereNull('parent_id')->get();
         $lowStockProducts = Product::whereShouldTrack(1)->where('stock_count', '<', 10)->get();
 
-        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProducts', 'lowStockProducts', 'start', 'end'));
+        // Get total pending withdrawal amount
+        $pendingWithdrawalAmount = \Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
+            ->where('confirmed', false)
+            ->sum('amount');
+
+        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProducts', 'lowStockProducts', 'start', 'end', 'pendingWithdrawalAmount'));
     }
 }

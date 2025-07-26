@@ -36,6 +36,9 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <strong>Wallet Transactions</strong>&nbsp;<small>for {{ $user->name }}</small>
+                            @if($user->bkash_number)
+                                <br><span class="text-info"><strong>bKash:</strong> {{ $user->bkash_number }}</span>
+                            @endif
                         </div>
                         <div>
                             <div class="d-flex align-items-center">
@@ -85,6 +88,11 @@
                 <form id="withdrawForm" method="POST" action="{{ route('admin.transactions.withdraw', $user) }}">
                     @csrf
                     <div class="modal-body">
+                        @if($user->bkash_number)
+                            <div class="alert alert-info">
+                                <strong>bKash Number:</strong> {{ $user->bkash_number }}
+                            </div>
+                        @endif
                         <div class="form-group">
                             <label for="amount">Amount (tk)</label>
                             <input type="number" class="form-control" id="amount" name="amount" min="1"
@@ -120,6 +128,11 @@
                 <form id="confirmWithdrawForm" method="POST">
                     @csrf
                     <div class="modal-body">
+                        @if($user->bkash_number)
+                            <div class="alert alert-info">
+                                <strong>bKash Number:</strong> {{ $user->bkash_number }}
+                            </div>
+                        @endif
                         <div class="form-group">
                             <label for="confirm-amount">Amount (tk)</label>
                             <input type="number" class="form-control" id="confirm-amount" readonly>
