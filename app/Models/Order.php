@@ -122,19 +122,37 @@ class Order extends Model
             if (! in_array($status, ['DELIVERED', 'RETURNED'])) {
                 return;
             }
-            $retail = collect($order->products)->sum(function ($product) {
-                return $product->retail_price * $product->quantity;
-            });
 
-            if ($status == 'DELIVERED') {
-                $amount = $retail + $order->data['retail_delivery_fee'] - $order->data['advanced'] - $order->data['retail_discount']
-                    - ($order->data['subtotal'] + $order->data['shipping_cost'] - $order->data['discount']);
-                $order->user->deposit($amount, [
+            $retail = collect($order->products)->sum(fn ($product) => $product->retail_price * $product->quantity);
+            $shippingCost = $order->data['shipping_cost'] ?? 0; // Oninda's delivery fee
+            $retailDeliveryFee = $order->data['retail_delivery_fee'] ?? 0; // Reseller's delivery fee charged to customer
+            $advanced = $order->data['advanced'] ?? 0;
+            $retailDiscount = $order->data['retail_discount'] ?? 0;
+            $subtotal = $order->data['subtotal'] ?? 0;
+            $discount = $order->data['discount'] ?? 0;
+
+            $calculateCommission = function () use ($retail, $retailDeliveryFee, $advanced, $retailDiscount, $subtotal, $shippingCost, $discount) {
+                // Commission = (retail + retail_delivery_fee) - advanced - retail_discount - (subtotal + shipping_cost - discount)
+                return $retail
+                    + $retailDeliveryFee
+                    - $advanced
+                    - $retailDiscount
+                    - ($subtotal + $shippingCost - $discount);
+            };
+
+            if ($status === 'DELIVERED') {
+                $order->user->deposit($calculateCommission(), [
                     'reason' => 'Order #'.$order->id.' is '.$status,
                     'order_id' => $order->id,
                 ]);
-            } elseif ($status == 'RETURNED') {
-                $order->user->forceWithdraw($retail + $order->data['advanced'] - $order->data['retail_delivery_fee'], [
+            } elseif ($status === 'RETURNED') {
+                $withdrawAmount = $shippingCost;
+                if ($order->getOriginal('status') === 'DELIVERED') {
+                    // Withdraw commission (what was paid on delivery) and Oninda's delivery fee
+                    $withdrawAmount += $calculateCommission();
+                }
+
+                $order->user->forceWithdraw($withdrawAmount, [
                     'reason' => 'Order #'.$order->id.' is '.$status,
                     'order_id' => $order->id,
                 ]);
