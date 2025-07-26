@@ -216,7 +216,7 @@
                             <span>Customers</span>
                         </a>
                     </li>
-
+                    @if (isOninda())
                     <li>
                         <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.resellers.index' ? 'active' : '' }}"
                             href="{{ route('admin.resellers.index') }}">
@@ -224,7 +224,7 @@
                             <span>Resellers</span>
                         </a>
                     </li>
-
+                    @endif
                     <li class="sidebar-title">
                         <h6>Settings</h6>
                     </li>
