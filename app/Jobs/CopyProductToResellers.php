@@ -629,7 +629,7 @@ class CopyProductToResellers implements ShouldQueue
     protected function getUniqueValue(string $column, string $value): string
     {
         $baseValue = $value;
-        $suffix = '-oninda';
+        $suffix = '-wholesaler';
         $i = 1;
         $newValue = $baseValue;
 

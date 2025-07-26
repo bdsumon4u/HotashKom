@@ -106,7 +106,7 @@
                                 <button onclick="printSticker()" id="sticker" class="ml-1 btn btn-sm btn-primary">Print Sticker</button>
                                 <button onclick="printInvoice()" id="invoice" class="ml-1 btn btn-sm btn-primary">Print Invoice</button>
                                 @if(isReseller())
-                                <button onclick="forwardToOninda()" id="forward-to-oninda" class="ml-1 btn btn-sm btn-primary">Forward to Oninda</button>
+                                <button onclick="forwardToOninda()" id="forward-to-oninda" class="ml-1 btn btn-sm btn-primary">Forward to Wholesaler</button>
                                 @endif
                                 @elseif(request('status') == 'INVOICED')
                                 <button onclick="courier()" id="courier" class="ml-1 btn btn-sm btn-primary">Send to Courier</button>
@@ -459,10 +459,10 @@
                     checklist.clear();
                     updateBulkMenu();
                     table.draw();
-                    $.notify('Orders are being forwarded to Oninda', 'success');
+                    $.notify('Orders are being forwarded to the the Wholesaler', 'success');
                 },
                 error: function (response) {
-                    $.notify(response?.responseJSON?.message || 'Failed to forward orders to Oninda', 'danger');
+                    $.notify(response?.responseJSON?.message || 'Failed to forward orders to the Wholesaler', 'danger');
                 }
             });
         }

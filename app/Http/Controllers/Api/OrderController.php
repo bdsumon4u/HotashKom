@@ -236,7 +236,7 @@ class OrderController extends Controller
     private function isDisabled(Order $order, string $status = ''): string
     {
         if (config('app.oninda_url') && $order->source_id) {
-            return 'disabled title="This order is managed by Oninda"';
+            return 'disabled title="This order is managed by the Wholesaler"';
         }
 
         if (! $status) {

@@ -31,6 +31,7 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'source_id' => 'integer',
         'products' => 'array',
         'data' => 'array',
         'status_at' => 'datetime',

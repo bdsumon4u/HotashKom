@@ -43,19 +43,18 @@ class PlaceOnindaOrder implements ShouldQueue
             }
 
             // Check if order already exists in Oninda database
-            if ($reseller->orders()->where('source_id', $this->orderId)->exists()) {
+            $existingOnindaOrder = $reseller->orders()->where('source_id', $this->orderId)->first();
+            if ($existingOnindaOrder) {
                 Log::info("Order {$this->orderId} already placed on Oninda");
+
+                $this->configureResellerDatabaseConnection($reseller);
+                $this->updateResellerOrderSourceId($this->orderId, $existingOnindaOrder->id);
 
                 return;
             }
 
             // Configure reseller database connection
-            $resellerConfig = $reseller->getDatabaseConfig();
-            config(['database.connections.reseller' => $resellerConfig]);
-
-            // Purge and reconnect to ensure fresh connection
-            DB::purge('reseller');
-            DB::reconnect('reseller');
+            $this->configureResellerDatabaseConnection($reseller);
 
             // Test reseller connection
             try {
@@ -142,9 +141,7 @@ class PlaceOnindaOrder implements ShouldQueue
 
                 info('updating source_id in reseller database', ['resellerOrderId' => $resellerOrder->id, 'onindaOrderId' => $onindaOrder->id]);
                 // Update source_id in reseller's database
-                DB::connection('reseller')->table('orders')
-                    ->where('id', $resellerOrder->id)
-                    ->update(['source_id' => $onindaOrder->id]);
+                $this->updateResellerOrderSourceId($resellerOrder->id, $onindaOrder->id);
                 info('source_id updated in reseller database', ['resellerOrderId' => $resellerOrder->id, 'onindaOrderId' => $onindaOrder->id]);
 
                 // ===== ONINDA DATABASE OPERATIONS (DEFAULT CONNECTION) =====
@@ -234,5 +231,21 @@ class PlaceOnindaOrder implements ShouldQueue
         $attributes['data'] = $orderData;
 
         return $attributes;
+    }
+
+    private function configureResellerDatabaseConnection($reseller): void
+    {
+        $resellerConfig = $reseller->getDatabaseConfig();
+        config(['database.connections.reseller' => $resellerConfig]);
+        DB::purge('reseller');
+        DB::reconnect('reseller');
+    }
+
+    private function updateResellerOrderSourceId(int $resellerOrderId, int $onindaOrderId): void
+    {
+        DB::connection('reseller')->table('orders')
+            ->where('id', $resellerOrderId)
+            ->update(['source_id' => $onindaOrderId]);
+        Log::info("Updated source_id in reseller database for order {$resellerOrderId} to Oninda order id {$onindaOrderId}");
     }
 }

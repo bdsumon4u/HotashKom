@@ -31,7 +31,7 @@
                                 <form id="forward-to-oninda-form" method="POST" action="{{ route('admin.orders.forward-to-oninda') }}" style="display:inline;">
                                     @csrf
                                     <input type="hidden" name="order_id[]" value="{{ $order->id }}">
-                                    <button type="submit" class="ml-1 btn btn-sm btn-primary">Forward to Oninda</button>
+                                    <button type="submit" class="ml-1 btn btn-sm btn-primary">Forward to Wholesaler</button>
                                 </form>
                             @endif
                         </div>
@@ -40,11 +40,11 @@
                         <div class="container-fluid">
                             @if($order->source_id === 0)
                             <div class="alert alert-warning">
-                                This order is on queue to be forwarded to Oninda. Editing is restricted.
+                                This order is on queue to be forwarded to the Wholesaler. Editing is restricted.
                             </div>
                             @elseif($order->source_id && ! isOninda())
                             <div class="alert alert-warning">
-                                This order is managed by Oninda. Editing is restricted.
+                                This order is managed by the Wholesaler. Editing is restricted.
                             </div>
                             @endif
 

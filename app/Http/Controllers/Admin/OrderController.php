@@ -630,13 +630,13 @@ class OrderController extends Controller
 
         if ($orders->isEmpty()) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'No orders available to forward. All selected orders must be confirmed and not already forwarded to Oninda.'], 422);
+                return response()->json(['message' => 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.'], 422);
             } else {
-                return redirect()->back()->with('danger', 'No orders available to forward. All selected orders must be confirmed and not already forwarded to Oninda.');
+                return redirect()->back()->with('danger', 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.');
             }
         }
 
-        $domain = parse_url(config('app.url'), PHP_URL_HOST);
+        $domain = preg_replace('/^www\./', '', parse_url(config('app.url'), PHP_URL_HOST));
         $endpoint = config('app.oninda_url').'/api/reseller/orders/place';
 
         // Set source_id = 0 to indicate processing state
@@ -653,16 +653,16 @@ class OrderController extends Controller
             DB::table('orders')->whereIntegerInRaw('id', $request->order_id)->update(['source_id' => null]);
 
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Failed to forward orders to Oninda: '.$e->getMessage()], 500);
+                return response()->json(['message' => 'Failed to forward orders to the Wholesaler: '.$e->getMessage()], 500);
             } else {
-                return redirect()->back()->with('danger', 'Failed to forward orders to Oninda: '.$e->getMessage());
+                return redirect()->back()->with('danger', 'Failed to forward orders to the Wholesaler: '.$e->getMessage());
             }
         }
 
         if ($request->expectsJson()) {
-            return response()->json(['message' => 'Orders are being forwarded to Oninda.']);
+            return response()->json(['message' => 'Orders are being forwarded to the Wholesaler.']);
         } else {
-            return redirect()->back()->with('success', 'Orders are being forwarded to Oninda.');
+            return redirect()->back()->with('success', 'Orders are being forwarded to the Wholesaler.');
         }
     }
 
