@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}367}$$ 🔥 domains are live now
+These 🔥 $${\color{red}369}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-27 09:49:44 Asia/Dhaka**_
+_Last updated: **2025-07-28 09:48:38 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -466,3 +466,5 @@ _Last updated: **2025-07-27 09:49:44 Asia/Dhaka**_
 | 365 | [3stargallery.com](http://3stargallery.com) |
 | 366 | [bikroybajar.com](http://bikroybajar.com) |
 | 367 | [mienterpriseltd.com](http://mienterpriseltd.com) |
+| 368 | [auroraemart.com](http://auroraemart.com) |
+| 369 | [neoprotidin.com](http://neoprotidin.com) |
