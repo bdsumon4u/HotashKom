@@ -95,15 +95,15 @@
                             <img src="{{ asset($product->image) }}" alt="Image" width="70" height="60">
                         </td>
                         <td>{{ $product->name }}</td>
-                        <td>{{ isOninda() ? $product->retail_price : $product->price }}</td>
+                        <td>{{ (isOninda() && config('app.resell')) ? ($product->retail_price ?? $product->price) : $product->price }}</td>
                         <td>{{ $product->quantity }}</td>
-                        <td>{{ $amount = $product->quantity * (isOninda() ? $product->retail_price : $product->price) }}</td>
+                        <td>{{ $amount = $product->quantity * ((isOninda() && config('app.resell')) ? ($product->retail_price ?? $product->price) : $product->price) }}</td>
                     </tr>
                 @php($retail += $amount)
                 @endforeach
                 <tr>
                     <th class="py-1" rowspan="5" colspan="3" style="text-align: center; vertical-align: middle; font-size: 24px;">
-                        <span style="font-weight: 400;">Condition</span>: TK. {{ $retail + (isOninda() ? $order->data['retail_delivery_fee'] : $order->data['shipping_cost']) - (isOninda() ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)) - ($order->data['advanced'] ?? 0) }}
+                        <span style="font-weight: 400;">Condition</span>: TK. {{ $retail + ((isOninda() && config('app.resell')) ? ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost']) : $order->data['shipping_cost']) - ((isOninda() && config('app.resell')) ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)) - ($order->data['advanced'] ?? 0) }}
                     </th>
                 </tr>
                 <tr>
@@ -116,11 +116,11 @@
                 </tr>
                 <tr>
                     <th class="py-1">Delivery</th>
-                    <th class="py-1">{{ isOninda() ? $order->data['retail_delivery_fee'] : $order->data['shipping_cost'] }}</th>
+                    <th class="py-1">{{ (isOninda() && config('app.resell')) ? ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost']) : $order->data['shipping_cost'] }}</th>
                 </tr>
                 <tr>
                     <th class="py-1">Discount</th>
-                    <th class="py-1">{{ isOninda() ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0) }}</th>
+                    <th class="py-1">{{ (isOninda() && config('app.resell')) ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0) }}</th>
                 </tr>
                 </tbody>
             </table>

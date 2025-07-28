@@ -6,6 +6,8 @@ return [
 
     'oninda' => env('APP_ONINDA', false),
 
+    'resell' => env('APP_RESELL', true),
+
     'verification_fee' => env('APP_VERIFICATION_FEE', 1000),
 
     'instant_order_forwarding' => env('INSTANT_ORDER_FORWARDING', false),

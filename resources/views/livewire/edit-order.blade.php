@@ -8,20 +8,20 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <x-label for="name">Name</x-label> <span class="text-danger">*</span>
-                        <x-input name="name" wire:model="name" placeholder="Type your name here" :disabled="isOninda() ? !$order->exists : !is_null($order->source_id)" />
+                        <x-input name="name" wire:model="name" placeholder="Type your name here" :disabled="isReseller() && !is_null($order->source_id)" />
                         <x-error field="name" />
                     </div>
                     <div class="form-group col-md-6">
                         <x-label for="phone">Phone</x-label> <span class="text-danger">*</span>
                         <x-input type="tel" name="phone" wire:model="phone"
-                            placeholder="Type your phone number here" :disabled="isOninda() ? !$order->exists : !is_null($order->source_id)" />
+                            placeholder="Type your phone number here" :disabled="isReseller() && !is_null($order->source_id)" />
                         <x-error field="phone" />
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-12">
                         <x-label for="email">Email Address</x-label>
-                        <x-input type="email" name="email" wire:model="email" placeholder="Email Address" :disabled="isOninda() ? !$order->exists : !is_null($order->source_id)" />
+                        <x-input type="email" name="email" wire:model="email" placeholder="Email Address" :disabled="isReseller() && !is_null($order->source_id)" />
                         <x-error field="email" />
                     </div>
                 </div>
@@ -30,13 +30,13 @@
                     <div class="form-control h-auto @error('shipping_area') is-invalid @enderror">
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input" id="inside-dhaka" name="shipping"
-                                wire:model.live="shipping_area" value="Inside Dhaka" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                                wire:model.live="shipping_area" value="Inside Dhaka" @disabled(isReseller() && !is_null($order->source_id))>
                             <label class="custom-control-label" for="inside-dhaka">Inside
                                 Dhaka</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input" id="outside-dhaka" name="shipping"
-                                wire:model.live="shipping_area" value="Outside Dhaka" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                                wire:model.live="shipping_area" value="Outside Dhaka" @disabled(isReseller() && !is_null($order->source_id))>
                             <label class="custom-control-label" for="outside-dhaka">Outside
                                 Dhaka</label>
                         </div>
@@ -45,7 +45,7 @@
                 </div>
                 <div class="form-group">
                     <x-label for="address">Address</x-label> <span class="text-danger">*</span>
-                    <x-input name="address" wire:model="address" placeholder="Enter Correct Address" :disabled="isOninda() ? !$order->exists : !is_null($order->source_id)" />
+                    <x-input name="address" wire:model="address" placeholder="Enter Correct Address" :disabled="isReseller() && !is_null($order->source_id)" />
                     <x-error field="address" />
                 </div>
                 <div class="form-group">
@@ -54,7 +54,7 @@
                         @foreach (couriers() as $provider)
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" class="custom-control-input" id="{{ $provider }}"
-                                    wire:model.live="courier" value="{{ $provider }}" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                                    wire:model.live="courier" value="{{ $provider }}" @disabled(isReseller() && !is_null($order->source_id))>
                                 <label class="custom-control-label"
                                     for="{{ $provider }}">{{ $provider }}</label>
                             </div>
@@ -65,7 +65,7 @@
                 <div Pathao class="form-row @if ($courier != 'Pathao') d-none @endif">
                     <div class="form-group col-md-4">
                         <label for="">City</label>
-                        <select class="form-control" wire:model.live="city_id" :disabled="isOninda() ? !$order->exists : !is_null($order->source_id)">
+                        <select class="form-control" wire:model.live="city_id" :disabled="isReseller() && !is_null($order->source_id)">
                             <option value="" selected>Select City</option>
                             @foreach ($order->pathaoCityList() as $city)
                                 <option value="{{ $city->city_id }}">
@@ -80,7 +80,7 @@
                         <div wire:loading.class="d-flex" wire:target="city_id" class="d-none h-100 align-items-center">
                             Loading Area...
                         </div>
-                        <select wire:loading.remove wire:target="city_id" class="form-control" wire:model="area_id" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                        <select wire:loading.remove wire:target="city_id" class="form-control" wire:model="area_id" @disabled(isReseller() && !is_null($order->source_id))>
                             <option value="" selected>Select Area</option>
                             @foreach ($order->pathaoAreaList($city_id) as $area)
                                 <option value="{{ $area->zone_id }}">
@@ -92,13 +92,13 @@
                     </div>
                     <div class="col-md-4">
                         <label for="weight">Weight</label>
-                        <input type="number" wire:model="weight" class="form-control" placeholder="Weight in KG" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                        <input type="number" wire:model="weight" class="form-control" placeholder="Weight in KG" @disabled(isReseller() && !is_null($order->source_id))>
                     </div>
                 </div>
                 <div Redx class="form-row @if ($courier != 'Redx') d-none @endif">
                     <div class="form-group col-md-6">
                         <label for="">Area</label>
-                        <select selector class="form-control" wire:model="area_id" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                        <select selector class="form-control" wire:model="area_id" @disabled(isReseller() && !is_null($order->source_id))>
                             <option value="" selected>Select Area</option>
                             @foreach ($order->redxAreaList() as $area)
                                 <option value="{{ $area->id }}" {{ $area->id == $area_id ? 'selected' : '' }}>
@@ -110,7 +110,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="weight">Weight</label>
-                        <input type="number" wire:model="weight" class="form-control" placeholder="Weight in grams" :disabled="isOninda() ? !$order->exists : !is_null($order->source_id)">
+                        <input type="number" wire:model="weight" class="form-control" placeholder="Weight in grams" :disabled="isReseller() && !is_null($order->source_id)">
                     </div>
                 </div>
             </div>
@@ -122,7 +122,7 @@
             <div class="p-3 card-body">
                 <div class="px-3 row">
                     <input type="search" wire:model.live.debounce.250ms="search" id="search"
-                        placeholder="Search Product" class="col-md-6 form-control" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                        placeholder="Search Product" class="col-md-6 form-control" @disabled(isReseller() && !is_null($order->source_id))>
 
                     @if (session()->has('error'))
                         <strong class="col-md-6 text-danger d-flex align-items-center">{{ session('error') }}</strong>
@@ -223,7 +223,7 @@
 
                                         @if ($available = !$selectedVar->should_track || $selectedVar->stock_count > 0)
                                             <button type="button" class="btn btn-primary"
-                                                wire:click="addProduct({{ $selectedVar }})" :disabled="isOninda() ? !$order->exists : !is_null($order->source_id)">Add to Order</button>
+                                                wire:click="addProduct({{ $selectedVar }})" :disabled="isReseller() && !is_null($order->source_id)">Add to Order</button>
                                         @endif
                                     </td>
                                 </tr>
@@ -240,12 +240,12 @@
                                             href="{{ route('products.show', $product['slug']) }}">{{ $product['name'] }}</a>
 
                                         <div class="mt-2 d-flex flex-column">
-                                            @if(isOninda())
+                                            @if(isOninda() && config('app.resell'))
                                             <div class="text-nowrap">
-                                                Unit Price: {{ $product['price'] }} (buy); {{ $product['retail_price'] }} (sell)
+                                                Unit Price: {{ $product['price'] }} (buy); {{ $product['retail_price'] ?? $product['price'] }} (sell)
                                             </div>
                                             <div class="text-nowrap">
-                                                Total Price: {{ $product['price'] * $product['quantity'] }} (buy); {{ $amount = $product['retail_price'] * $product['quantity'] }} (sell)
+                                                Total Price: {{ $product['price'] * $product['quantity'] }} (buy); {{ $amount = ($product['retail_price'] ?? $product['price']) * $product['quantity'] }} (sell)
                                             </div>
                                             @else
                                             <div class="text-nowrap">
@@ -260,15 +260,15 @@
                                                 class="form-control input-number__input"
                                                 name="quantity[{{ $product['id'] }}]"
                                                 value="{{ old('quantity.' . $product['id'], $product['quantity']) }}"
-                                                min="1" readonly style="border-radius: 2px;" :disabled="isOninda() ? !$order->exists : !is_null($order->source_id)">
+                                                min="1" readonly style="border-radius: 2px;" :disabled="isReseller() && !is_null($order->source_id)">
                                             <div class="input-number__add"
-                                                @unless(isOninda() ? !$order->exists : !is_null($order->source_id))
+                                                @unless(isReseller() && !is_null($order->source_id))
                                                 wire:click="increaseQuantity({{ $product['id'] }})"
                                                 @endunless
                                             >
                                             </div>
                                             <div class="input-number__sub"
-                                                @unless(isOninda() ? !$order->exists : !is_null($order->source_id))
+                                                @unless(isReseller() && !is_null($order->source_id))
                                                 wire:click="decreaseQuantity({{ $product['id'] }})"
                                                 @endunless
                                             >
@@ -302,7 +302,7 @@
                         <tr>
                             <th style="vertical-align: middle;">Order Status</th>
                             <td>
-                                <select wire:model="status" id="status" class="form-control" @disabled($order->status === 'RETURNED' || (isOninda() ? !$order->exists : !is_null($order->source_id)))>
+                                <select wire:model="status" id="status" class="form-control" @disabled($order->status === 'RETURNED' || isReseller() && !is_null($order->source_id))>
                                     @foreach (config('app.orders', []) as $stat)
                                         @if($order->status === 'DELIVERED')
                                             <option value="{{ $stat }}" {{ $stat === 'RETURNED' ? '' : 'disabled' }}>{{ $stat }}</option>
@@ -315,7 +315,7 @@
                                 </select>
                             </td>
                         </tr>
-                        @if (isOninda())
+                        @if (isOninda() && config('app.resell'))
                         <tr>
                             <th style="vertical-align: middle;">Subtotal</th>
                             <td class="checkout-subtotal">{!! theMoney($subtotal) !!} (buy)<br>{!! theMoney($retail) !!} (sell)</td>
@@ -335,7 +335,7 @@
                         <tr>
                             <th style="font-size: 12px; white-space: nowrap;">Reseller Delivery Charge</th>
                             <td>
-                                {!! theMoney($order->data['retail_delivery_fee']) !!}
+                                {!! theMoney($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost']) !!}
                             </td>
                         </tr>
                         @else
@@ -346,7 +346,7 @@
                         <tr>
                             <th style="vertical-align: middle;">Advanced</th>
                             <td>
-                                <input type="text" class="form-control" style="height: auto; padding: 2px 8px;" wire:model.live.debounce.500ms="advanced" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                                <input type="text" class="form-control" style="height: auto; padding: 2px 8px;" wire:model.live.debounce.500ms="advanced" @disabled(isReseller() || !is_null($order->source_id))>
                             </td>
                         </tr>
                         @endif
@@ -354,8 +354,8 @@
                             <th style="font-size:14px;white-space:nowrap;vertical-align:middle;">Our Delivery Charge</th>
                             <td class="shipping">
                                 <input class="shipping form-control" style="height: auto; padding: 2px 8px;"
-                                    type="text" wire:model.live.debounce.500ms="shipping_cost"
-                                    class="form-control" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                                    type="text" wire:model.live.debounce.500ms="{{ (isOninda() && config('app.resell')) ? 'retail_delivery_fee' : 'shipping_cost' }}"
+                                    class="form-control" @disabled(isReseller() || !is_null($order->source_id))>
                             </td>
                         </tr>
                     </tbody>
@@ -364,15 +364,15 @@
                             <th style="font-size:14px;white-space:nowrap;vertical-align:middle;">Our Discount</th>
                             <td>
                                 <input style="height: auto; padding: 2px 8px;" type="text"
-                                    wire:model.live.debounce.500ms="discount" class="form-control" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>
+                                    wire:model.live.debounce.500ms="discount" class="form-control" @disabled(isReseller() || !is_null($order->source_id))>
                             </td>
                         </tr>
-                        @if(isOninda())
+                        @if(isOninda() && config('app.resell'))
                         <tr>
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
                                 <strong>{!! theMoney($subtotal + $shipping_cost - $discount) !!}</strong> (buy)<br>
-                                <strong>{!! theMoney($retail + $order->data['retail_delivery_fee'] - $advanced - ($order->data['retail_discount'] ?? 0)) !!}</strong> (sell)
+                                <strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $shipping_cost) - $advanced - ($order->data['retail_discount'] ?? 0)) !!}</strong> (sell)
                             </td>
                         </tr>
                         @else
@@ -387,7 +387,7 @@
                             <th>Note <small>(Optional)</small></th>
                             <td>
                                 <div class="form-group">
-                                    <x-textarea name="note" wire:model="note" rows="4" :disabled="isOninda() ? !$order->exists : !is_null($order->source_id)" />
+                                    <x-textarea name="note" wire:model="note" rows="4" :disabled="isReseller() && !is_null($order->source_id)" />
                                     <x-error field="note" />
                                 </div>
                             </td>
@@ -395,7 +395,7 @@
                     </tfoot>
                 </table>
                 <button type="submit" wire:click="updateOrder"
-                    class="btn btn-primary btn-xl btn-block" @disabled(isOninda() ? !$order->exists : !is_null($order->source_id))>Update</button>
+                    class="btn btn-primary btn-xl btn-block" @disabled(isReseller() && !is_null($order->source_id))>Update</button>
             </div>
         </div>
         @if ($order->exists)
@@ -420,6 +420,10 @@
                             <tr>
                                 <th class="py-1">Name</th>
                                 <td class="py-1">{{ $order->user->name }}</td>
+                            </tr>
+                            <tr>
+                                <th class="py-1">Shop</th>
+                                <td class="py-1">{{ $order->user->shop_name ?? 'Walk-in Customer' }}</td>
                             </tr>
                             <tr>
                                 <th class="py-1">Phone</th>

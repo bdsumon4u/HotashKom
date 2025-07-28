@@ -20,7 +20,7 @@ class EditOrder extends Component
     ];
 
     private array $meta = [
-        'discount', 'advanced', 'shipping_area', 'shipping_cost',
+        'discount', 'advanced', 'retail_discount', 'retail_delivery_fee', 'shipping_area', 'shipping_cost',
         'subtotal', 'courier', 'city_id', 'area_id', 'weight',
         // 'area_name', 'is_fraud', 'is_repeat',
     ];
@@ -51,6 +51,8 @@ class EditOrder extends Component
     public int $advanced = 0;
 
     public int $retail_discount = 0;
+
+    public int $retail_delivery_fee = 0;
 
     #[Validate('required')]
     public string $shipping_area = '';
@@ -181,6 +183,9 @@ class EditOrder extends Component
             'subtotal' => $subtotal = $this->order->getSubtotal($this->selectedProducts),
             'shipping_cost' => $this->order->getShippingCost($this->selectedProducts, $subtotal, $value),
         ]);
+        if (isOninda() && ! config('app.resell')) {
+            $this->fill(['retail_delivery_fee' => $this->shipping_cost]);
+        }
     }
 
     public function updateOrder()
@@ -189,6 +194,10 @@ class EditOrder extends Component
 
         if (empty($this->selectedProducts)) {
             return session()->flash('error', 'Please add products to the order.');
+        }
+
+        if (isOninda() && ! config('app.resell')) {
+            $this->fill(['retail_discount' => $this->discount]);
         }
 
         $this->order
@@ -234,8 +243,23 @@ class EditOrder extends Component
             return $user;
         }
 
-        // $user->notify(new AccountCreated());
+        // For Oninda environment, create a walk-in customer
+        if (isOninda()) {
+            return User::query()->firstOrCreate(
+                ['phone_number' => '+8800000000000'],
+                array_merge([
+                    'name' => 'Walk-in Reseller',
+                    'email' => 'walkin@hotash.tech',
+                    'shop_name' => 'Walk-in Store',
+                ], [
+                    'email_verified_at' => now(),
+                    'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+                    'remember_token' => Str::random(10),
+                ])
+            );
+        }
 
+        // For non-Oninda environment, create regular user
         return User::query()->firstOrCreate(
             ['phone_number' => $this->order->phone],
             array_merge([

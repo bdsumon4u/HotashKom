@@ -57,7 +57,7 @@
                                         <tr>
                                             <th>Product</th>
                                             <th>Buy Price</th>
-                                            @if(isOninda())
+                                            @if(isOninda() && config('app.resell'))
                                             <th>Sell Price</th>
                                             @endif
                                         </tr>
@@ -70,7 +70,7 @@
                                                         href="{{ route('products.show', $product->slug) }}">{{ $product->name }}</a>
                                                     × {{ $product->quantity }}</td>
                                                 <td>{!! theMoney($product->quantity * $product->price) !!}</td>
-                                                @if(isOninda())
+                                                @if(isOninda() && config('app.resell'))
                                                 <td>{!! theMoney($amount = $product->quantity * $product->retail_price) !!}</td>
                                                 @php($retail += $amount)
                                                 @endif
@@ -82,7 +82,7 @@
                                         <tr>
                                             <th>Subtotal</th>
                                             <td>{!! theMoney($data['subtotal']) !!}</td>
-                                            @if(isOninda())
+                                            @if(isOninda() && config('app.resell'))
                                             <td>{!! theMoney($retail) !!}</td>
                                             @endif
                                         </tr>
@@ -90,7 +90,7 @@
                                             <tr>
                                                 <th>Advanced</th>
                                                 <td>{!! theMoney(0) !!}</td>
-                                                @if(isOninda())
+                                                @if(isOninda() && config('app.resell'))
                                                 <td>{!! theMoney($data['advanced']) !!}</td>
                                                 @endif
                                             </tr>
@@ -99,7 +99,7 @@
                                             <tr>
                                                 <th>Discount</th>
                                                 <td>{!! theMoney($data['discount'] ?? 0) !!}</td>
-                                                @if(isOninda())
+                                                @if(isOninda() && config('app.resell'))
                                                 <td>{!! theMoney($data['retail_discount']) !!}</td>
                                                 @endif
                                             </tr>
@@ -107,7 +107,7 @@
                                         <tr>
                                             <th>Delivery Charge</th>
                                             <td>{!! theMoney($data['shipping_cost']) !!}</td>
-                                            @if(isOninda())
+                                            @if(isOninda() && config('app.resell'))
                                             <td>{!! theMoney($data['retail_delivery_fee']) !!}</td>
                                             @endif
                                         </tr>
@@ -116,7 +116,7 @@
                                         <tr>
                                             <th>Grand Total</th>
                                             <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] - ($data['discount'] ?? 0)) !!}</td>
-                                            @if(isOninda())
+                                            @if(isOninda() && config('app.resell'))
                                             <td>{!! theMoney($retail + $data['retail_delivery_fee'] - ($data['advanced'] ?? 0) - ($data['retail_discount'] ?? 0)) !!}</td>
                                             @endif
                                         </tr>

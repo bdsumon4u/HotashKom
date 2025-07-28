@@ -87,8 +87,8 @@
                         </div>
                     </td>
                     <td>{{ $product->quantity }}</td>
-                    <td>{{ isOninda() ? $product->retail_price : $product->price }}</td>
-                    <td>{{ $product->quantity * (isOninda() ? $product->retail_price : $product->price) }}</td>
+                    <td>{{ (isOninda() && config('app.resell')) ? ($product->retail_price ?? $product->price) : $product->price }}</td>
+                    <td>{{ $product->quantity * ((isOninda() && config('app.resell')) ? ($product->retail_price ?? $product->price) : $product->price) }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -107,9 +107,9 @@
                 @endif
                 <tr>
                     <td colspan="3"><strong>Delivery</strong></td>
-                    <td>{{ isOninda() ? $order->data['retail_delivery_fee'] : $order->data['shipping_cost'] }}</td>
+                    <td>{{ (isOninda() && config('app.resell')) ? ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost']) : $order->data['shipping_cost'] }}</td>
                 </tr>
-                @if($discount = (isOninda() ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)))
+                @if($discount = ((isOninda() && config('app.resell')) ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)))
                 <tr>
                     <td colspan="3"><strong>Discount</strong></td>
                     <td>{{ $discount }}</td>
