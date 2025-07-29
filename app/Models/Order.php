@@ -278,14 +278,14 @@ class Order extends Model
                 $shipping_cost = $products->sum(function ($item) use ($shipping_area) {
                     $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
 
-                    return $item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] * $factor;
-                }) ?? setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+                    return ($item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
+                }) ?: setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
             } else {
                 $shipping_cost = $products->max(function ($item) use ($shipping_area) {
                     $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
 
-                    return $item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] * $factor;
-                }) ?? setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+                    return ($item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
+                }) ?: setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
             }
         }
 
