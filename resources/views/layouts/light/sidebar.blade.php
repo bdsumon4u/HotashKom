@@ -107,7 +107,7 @@
                         </a>
                     </li>
 
-                    @if (isOninda())
+                    @if (isOninda() && config('app.resell'))
                     <li>
                         <a class="nav-link menu-title link-nav {{ request()->is('admin/coupons*') ? 'active' : '' }}"
                             href="{{ route('admin.coupons.index') }}">
@@ -222,6 +222,7 @@
                             href="{{ route('admin.resellers.index') }}">
                             <i data-feather="users"> </i>
                             <span>Resellers</span>
+                            @if(config('app.resell'))
                             @php
                                 $pendingAmount = cache()->remember('pending_withdrawal_amount', 300, function () {
                                     return abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
@@ -232,6 +233,7 @@
                             <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
                                 {{ number_format($pendingAmount, 0) }} tk
                             </span>
+                            @endif
                         </a>
                     </li>
                     @endif

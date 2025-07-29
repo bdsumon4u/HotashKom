@@ -302,6 +302,7 @@
                     </div>
                 </div>
             </div>
+            @if(config('app.resell'))
             <div class="col-xl-4 xl-50 box-xl-12">
                 <div class="rounded-sm card">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center">
@@ -324,6 +325,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 @endsection
