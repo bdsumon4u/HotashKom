@@ -121,7 +121,18 @@
                                 </div>
                                 <div class="p-3 card-body">
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="db_host">Database Host</label>
+                                                <input type="text" class="form-control @error('db_host') is-invalid @enderror" id="db_host"
+                                                    name="db_host" value="{{ old('db_host', $reseller->db_host) }}">
+                                                @error('db_host')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="db_name">Database Name</label>
                                                 <input type="text" class="form-control @error('db_name') is-invalid @enderror" id="db_name"
@@ -132,7 +143,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-md-6">
+                                        <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="db_username">Database Username</label>
                                                 <input type="text" class="form-control @error('db_username') is-invalid @enderror" id="db_username"
@@ -143,7 +154,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-md-12">
+                                        <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="db_password">Database Password</label>
                                                 <input type="password" class="form-control @error('db_password') is-invalid @enderror"

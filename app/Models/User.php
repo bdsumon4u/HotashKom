@@ -83,7 +83,7 @@ class User extends Authenticatable implements Confirmable, Wallet
     {
         return [
             'driver' => 'mysql',
-            'host' => config('database.connections.mysql.host'),
+            'host' => $this->db_host ?? $this->domain ?? config('database.connections.mysql.host'),
             'port' => config('database.connections.mysql.port'),
             'database' => $this->db_name,
             'username' => $this->db_username,

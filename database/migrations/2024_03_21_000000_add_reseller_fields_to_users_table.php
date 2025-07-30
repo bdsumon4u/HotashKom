@@ -17,7 +17,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(false)->after('order_prefix');
 
             // Database configuration
-            $table->string('db_name')->nullable()->after('is_active');
+            $table->string('db_host')->nullable()->after('is_active');
+            $table->string('db_name')->nullable()->after('db_host');
             $table->string('db_username')->nullable()->after('db_name');
             $table->string('db_password')->nullable()->after('db_username');
         });

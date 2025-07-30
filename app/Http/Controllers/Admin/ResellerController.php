@@ -51,6 +51,7 @@ class ResellerController extends Controller
             'is_active' => 'boolean',
             'order_prefix' => 'nullable|string|max:255',
             'domain' => 'nullable|string|max:255',
+            'db_host' => 'nullable|string|max:255',
             'db_name' => 'nullable|string|max:255',
             'db_username' => 'nullable|string|max:255',
             'db_password' => 'nullable|string|min:6',
