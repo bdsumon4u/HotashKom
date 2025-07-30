@@ -50,7 +50,7 @@ class ResellerController extends Controller
             'is_verified' => 'boolean',
             'is_active' => 'boolean',
             'order_prefix' => 'nullable|string|max:255',
-            'domain' => 'nullable|string|max:255|regex:/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/',
+            'domain' => 'nullable|string|max:255',
             'db_name' => 'nullable|string|max:255',
             'db_username' => 'nullable|string|max:255',
             'db_password' => 'nullable|string|min:6',
