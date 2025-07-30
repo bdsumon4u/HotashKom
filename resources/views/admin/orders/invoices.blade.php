@@ -54,7 +54,7 @@
   </head>
   <body class="light-only" main-theme-layout="ltr">
     @foreach ($orders as $order)
-        @php(require resource_path('views/admin/orders/reseller-info.php'))
+        @php require resource_path('views/admin/orders/reseller-info.php') @endphp
         <div class="invoice {{ ['page-break bt', 'pb-2', 'bt pb-2'][$loop->iteration % 3] }}">
             <div>
                 <div>
@@ -202,23 +202,24 @@
         window.onload = function () {
             window.print();
         };
-        window.onfocus = function() {
-            window.close();
-        };
         window.onafterprint = function() {
-            if (confirm('Update status to INVOCED?')) {
-                $.post({
+            if (confirm('Update status to INVOICED?')) {
+                $.ajax({
                     url: '{{ route('admin.orders.status') }}',
+                    method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
                         order_id: {!! json_encode(explode(',', request('order_id'))) !!},
                         status: 'INVOICED',
                     },
                     success: function (response) {
+                        console.log('Status updated successfully');
                         window.location.href = '{{ route('admin.orders.index', ['status' => 'INVOICED']) }}';
                     },
-                    complete: function () {
-
+                    error: function (xhr, status, error) {
+                        console.error('Error updating status:', error);
+                        alert('Failed to update status. Please try again.');
+                        window.close();
                     }
                 });
             } else {
