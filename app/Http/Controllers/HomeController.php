@@ -14,6 +14,8 @@ class HomeController extends Controller
      */
     public function __invoke(Request $request)
     {
+        abort_if(isOninda() && !config('app.resell'), 403);
+
         if (GoogleTagManagerFacade::isEnabled()) {
             GoogleTagManagerFacade::set([
                 'event' => 'page_view',
