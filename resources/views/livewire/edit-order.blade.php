@@ -346,7 +346,7 @@
                         <tr>
                             <th style="vertical-align: middle;">Advanced</th>
                             <td>
-                                <input type="text" class="form-control" style="height: auto; padding: 2px 8px;" wire:model.live.debounce.500ms="advanced" @disabled(isReseller() || !is_null($order->source_id))>
+                                <input type="text" class="form-control" style="height: auto; padding: 2px 8px;" wire:model.live.debounce.500ms="advanced" @disabled(isReseller())>
                             </td>
                         </tr>
                         @endif
@@ -355,7 +355,7 @@
                             <td class="shipping">
                                 <input class="shipping form-control" style="height: auto; padding: 2px 8px;"
                                     type="text" wire:model.live.debounce.500ms="{{ (isOninda() && config('app.resell')) ? 'retail_delivery_fee' : 'shipping_cost' }}"
-                                    class="form-control" @disabled(isReseller() || !is_null($order->source_id))>
+                                    class="form-control" @disabled(isReseller())>
                             </td>
                         </tr>
                     </tbody>
@@ -364,7 +364,7 @@
                             <th style="font-size:14px;white-space:nowrap;vertical-align:middle;">Our Discount</th>
                             <td>
                                 <input style="height: auto; padding: 2px 8px;" type="text"
-                                    wire:model.live.debounce.500ms="discount" class="form-control" @disabled(isReseller() || !is_null($order->source_id))>
+                                    wire:model.live.debounce.500ms="discount" class="form-control" @disabled(isReseller())>
                             </td>
                         </tr>
                         @if(isOninda() && config('app.resell'))
