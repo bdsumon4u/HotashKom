@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}370}$$ 🔥 domains are live now
+These 🔥 $${\color{red}374}$$ 🔥 domains are live now
 
-_Last updated: **2025-07-30 09:46:05 Asia/Dhaka**_
+_Last updated: **2025-07-31 09:44:28 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -469,3 +469,7 @@ _Last updated: **2025-07-30 09:46:05 Asia/Dhaka**_
 | 368 | [sunnahshop24.com](http://sunnahshop24.com) |
 | 369 | [auroraemart.com](http://auroraemart.com) |
 | 370 | [neoprotidin.com](http://neoprotidin.com) |
+| 371 | [tabashopping.com](http://tabashopping.com) |
+| 372 | [chintaoff.com](http://chintaoff.com) |
+| 373 | [rowshonenterprise.com](http://rowshonenterprise.com) |
+| 374 | [qualitymartbd.com](http://qualitymartbd.com) |
