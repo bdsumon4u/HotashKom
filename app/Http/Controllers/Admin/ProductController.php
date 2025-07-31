@@ -22,7 +22,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return $this->view();
+        $stats = \App\Models\Product::stockStatistics();
+
+        return $this->view($stats);
     }
 
     /**

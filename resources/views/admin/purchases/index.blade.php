@@ -14,7 +14,7 @@
 <div class="container-fluid">
     <!-- Stock Summary Cards -->
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="text-white rounded-sm shadow-sm card bg-primary">
                 <div class="px-3 py-2 card-body">
                     <div class="d-flex justify-content-between">
@@ -29,27 +29,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="text-white rounded-sm shadow-sm card bg-success">
-                <div class="px-3 py-2 card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h6 class="mb-0">{{ number_format($totalStockValue) }}</h6>
-                            <small>Total Stock Value</small>
-                        </div>
-                        <div class="align-self-center">
-                            <i data-feather="dollar-sign" class="feather-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="text-white rounded-sm shadow-sm card bg-info">
                 <div class="px-3 py-2 card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h6 class="mb-0">{{ number_format($totalPurchaseValue) }}</h6>
+                            <h6 class="mb-0">{!!$totalPurchaseValue!!}</h6>
                             <small>Total Purchase Value</small>
                         </div>
                         <div class="align-self-center">
@@ -58,17 +43,16 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="text-white rounded-sm shadow-sm card bg-warning">
+        </div><div class="col-md-4">
+            <div class="text-white rounded-sm shadow-sm card bg-success">
                 <div class="px-3 py-2 card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h6 class="mb-0">{{ number_format($totalPurchaseRecords) }}</h6>
-                            <small>Total Purchase Records</small>
+                            <h6 class="mb-0">{!!$totalSellValue!!}</h6>
+                            <small>Total Sell Value</small>
                         </div>
                         <div class="align-self-center">
-                            <i data-feather="list" class="feather-2x"></i>
+                            <i data-feather="dollar-sign" class="feather-2x"></i>
                         </div>
                     </div>
                 </div>
@@ -91,7 +75,7 @@
                 <table class="table table-striped" id="purchases-table">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>ID</th>
                             <th>Date</th>
                             <th>Products</th>
                             <th>Subtotal</th>
@@ -124,7 +108,7 @@ $(document).ready(function() {
             url: '{{ route("api.purchases") }}',
         },
         columns: [
-            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'id', name: 'id'},
             {data: 'formatted_date', name: 'purchase_date'},
             {data: 'products_count', name: 'products_count'},
             {data: 'formatted_amount', name: 'total_amount'},

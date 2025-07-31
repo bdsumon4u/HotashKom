@@ -133,18 +133,13 @@ class PurchaseCreate extends Component
 
     public function getTotalProperty()
     {
-        return collect($this->items)->sum(function ($item) {
-            return $item['price'] * $item['quantity'];
-        });
+        return collect($this->items)->sum(fn ($item) => (float) ($item['price'] ?? 0) * (float) ($item['quantity'] ?? 0));
     }
 
     public function save()
     {
         $this->validate();
         $adminId = Auth::guard('admin')->id();
-        $totalAmount = collect($this->items)->sum(function ($item) {
-            return $item['price'] * $item['quantity'];
-        });
         $purchase = Purchase::create([
             'admin_id' => $adminId,
             'purchase_date' => $this->purchase_date,
@@ -152,14 +147,14 @@ class PurchaseCreate extends Component
             'supplier_phone' => $this->supplier_phone,
             'notes' => $this->notes,
             'invoice_number' => $this->invoice_number,
-            'total_amount' => $totalAmount,
+            'total_amount' => $this->total,
         ]);
         $attachData = [];
         foreach ($this->items as $item) {
             $attachData[$item['product_id']] = [
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'subtotal' => $item['price'] * $item['quantity'],
+                'price' => $item['price'] ?? 0,
+                'quantity' => $item['quantity'] ?? 0,
+                'subtotal' => (float) ($item['price'] ?? 0) * (float) ($item['quantity'] ?? 0),
             ];
         }
         $purchase->products()->attach($attachData);
@@ -175,6 +170,7 @@ class PurchaseCreate extends Component
             $newAvg = $newStock > 0 ? $newTotalCost / $newStock : $purchasePrice;
             $product->stock_count = $newStock;
             $product->average_purchase_price = $newAvg;
+            $product->should_track = 1;
             $product->save();
             if ($product->parent_id) {
                 $parentProductIds[] = $product->parent_id;
@@ -203,6 +199,7 @@ class PurchaseCreate extends Component
                     $totalCost += $variantStock * $variantAvg;
                 }
                 if ($totalStock > 0) {
+                    $parent->should_track = 1;
                     $parent->average_purchase_price = $totalCost / $totalStock;
                 } else {
                     $parent->average_purchase_price = null;

@@ -253,4 +253,22 @@ class Product extends Model
     {
         return $this->is_active;
     }
+
+    public static function stockStatistics(): array
+    {
+        $products = static::where('should_track', true)->get();
+        $totalStockCount = $products->sum('stock_count');
+        $totalPurchaseValue = $products->sum(function ($product) {
+            return ($product->stock_count ?? 0) * ($product->average_purchase_price ?? 0);
+        });
+        $totalSellValue = $products->sum(function ($product) {
+            return ($product->stock_count ?? 0) * ($product->selling_price ?? 0);
+        });
+
+        return [
+            'totalStockCount' => $totalStockCount,
+            'totalPurchaseValue' => theMoney($totalPurchaseValue),
+            'totalSellValue' => theMoney($totalSellValue),
+        ];
+    }
 }

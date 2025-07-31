@@ -131,10 +131,12 @@ class ReportController extends Controller
     public function stock(Request $request)
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
+        $products = Product::with('parent')->whereShouldTrack(true)->orderBy('stock_count')->where('stock_count', '>', 0)->get();
+        $stats = Product::stockStatistics();
 
-        return view('admin.reports.stock', [
-            'products' => Product::with('parent')->whereShouldTrack(true)->orderBy('stock_count')->get(),
-        ]);
+        return view('admin.reports.stock', array_merge([
+            'products' => $products,
+        ], $stats));
     }
 
     public function customer(Request $request)

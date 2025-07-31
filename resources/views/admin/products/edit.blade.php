@@ -192,13 +192,24 @@
                                                         <x-error field="selling_price" />
                                                     </div>
                                                 </div>
-                                                <div class="col-md-12">
+                                                @if(isOninda())
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="purchase-price-{{$variation->id}}">Average Purchase Price</label>
+                                                        <x-input id="purchase-price-{{$variation->id}}" name="purchase_price" :value="$variation->purchase_price" />
+                                                        <x-error field="purchase_price" />
+                                                    </div>
+                                                </div>
+                                                @if(config('app.resell'))
+                                                <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="suggested-price-{{$variation->id}}">Suggested Retail Price</label>
                                                         <x-input id="suggested-price-{{$variation->id}}" name="suggested_price" :value="$variation->suggested_price" />
                                                         <x-error field="suggested_price" />
                                                     </div>
                                                 </div>
+                                                @endif
+                                                @endif
                                             </div>
                                             <div class="shadow-sm card rounded-0">
                                                 <div class="p-1 card-header">
@@ -290,7 +301,7 @@
     $(document).ready(function () {
         $('.add-wholesale').click(function (e) {
             e.preventDefault();
-            
+
             $(this).closest('.card').find('.card-body').append(`
                 <div class="mb-1 form-group">
                     <div class="input-group">

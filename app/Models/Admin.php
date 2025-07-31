@@ -13,6 +13,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Spatie\Activitylog\Traits\CausesActivity;
 
+/**
+ * @method bool is(string|array $role) Check if the admin has the specified role(s)
+ */
 class Admin extends Authenticatable implements FilamentUser, HasTenants
 {
     use CausesActivity;

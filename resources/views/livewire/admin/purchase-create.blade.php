@@ -65,14 +65,14 @@
                                 @endforeach
                             </td>
                             <td>
-                                <input type="number" step="0.01" class="form-control" wire:model.lazy="items.{{ $index }}.price" min="0.01">
+                                <input type="text" step="0.01" class="form-control" wire:model.lazy="items.{{ $index }}.price" min="0.01">
                                 @error('items.'.$index.'.price') <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
                             <td>
-                                <input type="number" class="form-control" wire:model.lazy="items.{{ $index }}.quantity" min="1">
+                                <input type="text" class="form-control" wire:model.lazy="items.{{ $index }}.quantity" min="1">
                                 @error('items.'.$index.'.quantity') <span class="text-danger">{{ $message }}</span> @enderror
                             </td>
-                            <td>{{ number_format($item['price'] * $item['quantity'], 2) }}</td>
+                            <td>{{ number_format((float) ($item['price'] ?? 0) * (float) ($item['quantity'] ?? 0), 2) }}</td>
                             <td><button type="button" class="btn btn-danger btn-sm" wire:click="removeItem({{ $index }})">Remove</button></td>
                         </tr>
                     @empty

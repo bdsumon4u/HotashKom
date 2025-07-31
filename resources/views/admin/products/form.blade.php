@@ -90,13 +90,24 @@
                     <x-error field="selling_price" />
                 </div>
             </div>
-            <div class="col-md-12">
+            @if(isOninda())
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="average_purchase_price">Average Purchase Price</label>
+                    <x-input name="average_purchase_price" :value="$product->average_purchase_price" />
+                    <x-error field="average_purchase_price" />
+                </div>
+            </div>
+            @if(config('app.resell'))
+            <div class="col-md-6">
                 <div class="form-group">
                     <label for="suggested_price">Suggested Retail Price</label>
                     <x-input name="suggested_price" :value="$product->suggested_price" />
                     <x-error field="suggested_price" />
                 </div>
             </div>
+            @endif
+            @endif
         </div>
         <div class="shadow-sm card rounded-0">
             <div class="p-1 card-header">

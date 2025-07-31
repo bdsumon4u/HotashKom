@@ -17,23 +17,10 @@ class ProductController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $user = auth('admin')->user();
-        $isAdmin = $user && $user->is('admin');
-
         $select = [
             'products.*',
             DB::raw('COALESCE((SELECT NULLIF(SUM(v.stock_count), 0) FROM products v WHERE v.parent_id = products.id), products.stock_count) as stock'),
         ];
-        if ($isAdmin) {
-            $select[] = DB::raw('(
-                SELECT
-                    CASE WHEN SUM(pp.quantity) > 0
-                        THEN ROUND(SUM(pp.price * pp.quantity) / SUM(pp.quantity), 2)
-                        ELSE 0 END
-                FROM product_purchase pp
-                WHERE pp.product_id = products.id
-            ) as average_purchase_price');
-        }
 
         $query = Product::query()
             ->whereNull('parent_id')
@@ -43,13 +30,41 @@ class ProductController extends Controller
         $dt = DataTables::eloquent($query)
             ->addIndexColumn()
             ->addColumn('image', fn (Product $product): string => '<img src="'.asset(optional($product->base_image)->src).'" width="100" height="100" />')
-            ->editColumn('name', fn (Product $product): string => '<a href="'.route('products.show', $product).'" target="_blank">'.$product->name.'</a>')
-            ->addColumn('price', fn (Product $product): string => $product->price == $product->selling_price
-                ? '<p>'.theMoney($product->price).'</p>'
-                : '<del style="color: #ff0000;">'.theMoney($product->price).'</del><br><ins style="text-decoration: none;">'.theMoney($product->selling_price).'</ins>')
+            ->editColumn('name', function (Product $product): string {
+                $variationCount = $product->variations->count();
+                $variationLabel = $variationCount > 0 ? ' <span class="badge badge-secondary">'.$variationCount.' variation'.($variationCount > 1 ? 's' : '').'</span>' : '';
+
+                return '<a href="'.route('products.show', $product).'" target="_blank">'.$product->name.'</a>'.$variationLabel;
+            })
+            ->addColumn('price', function (Product $product): string {
+                $averagePurchasePrice = $product->average_purchase_price ?? 0;
+                $priceHtml = '';
+                if ($averagePurchasePrice > 0) {
+                    $priceHtml .= '<span style="font-size: 13px; color: #888;">Purchase: <strong>'.theMoney($averagePurchasePrice).'</strong></span><hr style="margin: 2px 0;">';
+                }
+                if ($product->price == $product->selling_price) {
+                    $priceHtml .= '<p>Sell: '.theMoney($product->price).'</p>';
+                } else {
+                    $priceHtml .= '<del style="color: #ff0000;">Old Sell: '.theMoney($product->price).'</del><br><ins style="text-decoration: none;">New Sell: '.theMoney($product->selling_price).'</ins>';
+                }
+
+                return $priceHtml;
+            })
             ->addColumn('stock', function (Product $product) {
                 if ($product->should_track) {
-                    return '<span class="text-'.($product->stock ? 'success' : 'danger').'">'.$product->stock.' In Stock</span>';
+                    $stock = $product->stock;
+                    $stockText = '<span class="text-'.($stock ? 'success' : 'danger').'">'.$stock.' In Stock</span>';
+
+                    $averagePurchasePrice = $product->average_purchase_price ?? 0;
+                    $sellingPrice = $product->selling_price ?? 0;
+
+                    $totalPurchaseValue = $stock * $averagePurchasePrice;
+                    $totalSaleValue = $stock * $sellingPrice;
+
+                    $purchaseValueText = '<br><small>Buy: <strong>'.theMoney($totalPurchaseValue).'</strong></small>';
+                    $saleValueText = '<br><small>Sell: <strong>'.theMoney($totalSaleValue).'</strong></small>';
+
+                    return $stockText.$purchaseValueText.$saleValueText;
                 } else {
                     return '<span class="text-success">In Stock</span>';
                 }
@@ -68,14 +83,6 @@ class ProductController extends Controller
             ->orderColumn('price', function ($query, $direction) {
                 $query->orderBy('selling_price', $direction);
             });
-
-        if ($isAdmin) {
-            $dt = $dt
-                ->addColumn('average_purchase_price', function (Product $product) {
-                    return $product->average_purchase_price !== null ? number_format($product->average_purchase_price, 2) : '-';
-                })
-                ->orderColumn('average_purchase_price', 'average_purchase_price $1');
-        }
 
         return $dt->make(true);
     }

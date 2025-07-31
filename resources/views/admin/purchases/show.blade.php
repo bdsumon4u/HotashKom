@@ -100,7 +100,7 @@
                                     <tr>
                                         <td>
                                             <a href="{{ route('admin.products.edit', $productPurchase->product) }}" target="_blank">
-                                                {{ $productPurchase->product->name }}
+                                                {{ $productPurchase->product->var_name }}
                                             </a>
                                         </td>
                                         <td>{{ $productPurchase->product->sku }}</td>

@@ -19,8 +19,6 @@ class PurchaseController extends Controller
     {
         $query = Purchase::with(['productPurchases.product', 'admin']);
 
-        // Remove all filters: search, product_filter, date_from, date_to, supplier_filter
-
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('products_count', function ($purchase) {
@@ -28,6 +26,9 @@ class PurchaseController extends Controller
             })
             ->addColumn('formatted_date', function ($purchase) {
                 return $purchase->purchase_date ? $purchase->purchase_date->format('d M Y') : '-';
+            })
+            ->filterColumn('formatted_date', function ($query, $keyword) {
+                // Date search is handled in the filter() method
             })
             ->addColumn('formatted_amount', function ($purchase) {
                 return number_format($purchase->total_amount ?? 0, 2).' BDT';
@@ -44,6 +45,22 @@ class PurchaseController extends Controller
                 </a>';
             })
             ->rawColumns(['actions'])
+            ->filter(function ($query) use ($request) {
+                $searchValue = $request->input('search.value');
+                if ($searchValue) {
+                    $date = \DateTime::createFromFormat('d M Y', $searchValue);
+                    if ($date) {
+                        $query->whereDate('purchase_date', $date->format('Y-m-d'));
+                    } else {
+                        $query->where(function ($q) use ($searchValue) {
+                            $q->where('supplier_name', 'like', "%{$searchValue}%")
+                                ->orWhereHas('admin', function ($adminQuery) use ($searchValue) {
+                                    $adminQuery->where('name', 'like', "%{$searchValue}%");
+                                });
+                        });
+                    }
+                }
+            })
             ->make(true);
     }
 
