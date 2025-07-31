@@ -429,10 +429,12 @@
                                 <th class="py-1">Phone</th>
                                 <td class="py-1">{{ $order->user->phone_number }}</td>
                             </tr>
+                            @if(config('app.resell'))
                             <tr>
                                 <th class="py-1">Balance</th>
                                 <td class="py-1">{{ $order->user->balance }}</td>
                             </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
