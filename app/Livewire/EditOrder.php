@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Http\Resources\ProductResource;
+use App\Jobs\CallOnindaOrderApi;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -202,8 +203,11 @@ class EditOrder extends Component
 
         $this->order
             ->fill($this->only($this->attrs))
-            ->fill(['data' => $this->only($this->meta)])
-            ->fill(['products' => $this->selectedProducts]);
+            ->fill(['data' => array_merge($this->only($this->meta), [
+                'purchase_cost' => $this->order->getPurchaseCost($this->selectedProducts),
+            ])])
+            ->fill(['products' => $this->selectedProducts])
+            ->fill(['source_id' => config('app.instant_order_forwarding') ? 0 : null]);
 
         if ($this->order->exists) {
             $confirming = false;
@@ -215,6 +219,10 @@ class EditOrder extends Component
             }
 
             $this->order->save();
+
+            if (config('app.instant_order_forwarding') && !config('app.demo')) {
+                CallOnindaOrderApi::dispatch($this->order->id);
+            }
 
             if ($confirming && ($user = $this->order->user)) {
                 $user->notify(new OrderConfirmed($this->order));
