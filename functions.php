@@ -104,7 +104,7 @@ if (! function_exists('brands')) {
             }
 
             // Set the image_src property with a fallback placeholder
-            $brand->image_src = asset($image->path ?? 'https://placehold.co/600x600?text=No+Product');
+            $brand->image_src = cdn($image->src ?? 'https://placehold.co/600x600?text=No+Product');
 
             return $brand;
         });
