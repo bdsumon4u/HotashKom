@@ -467,16 +467,9 @@
                         if (spaceId == draggedId) {
                             $(this).addClass('invalid-drop-target');
                         } else {
-                            // Check if this space is a descendant of the dragged item
-                            var isDescendant = false;
-                            draggedItem.find('.space').each(function() {
-                                if ($(this).attr('data-space') == spaceId) {
-                                    isDescendant = true;
-                                    return false;
-                                }
-                            });
-
-                            if (isDescendant) {
+                            // Use improved descendant check
+                            var isDesc = isDescendant(draggedItem, spaceId);
+                            if (isDesc) {
                                 $(this).addClass('invalid-drop-target');
                             } else {
                                 $(this).addClass('valid-drop-target');
@@ -502,16 +495,9 @@
                         return false;
                     }
 
-                    // Prevent dropping a category into its descendants' space
-                    var isDescendant = false;
-                    droppedItem.find('.space').each(function() {
-                        if ($(this).attr('data-space') == targetSpaceId) {
-                            isDescendant = true;
-                            return false;
-                        }
-                    });
-
-                    if (isDescendant) {
+                    // Prevent dropping a category into its descendants' space (recursive)
+                    var isDesc = isDescendant(droppedItem, targetSpaceId);
+                    if (isDesc) {
                         $.notify('Cannot drop a category into its descendants.', 'error');
                         $(this).sortable('cancel');
                         return false;
@@ -541,17 +527,10 @@
                     return false;
                 }
 
-                // Prevent circular reference: category cannot be parent of its descendants
+                // Prevent circular reference: category cannot be parent of its descendants (recursive)
                 if (parent_id != 0) {
-                    var isDescendant = false;
-                    el.find('.space').each(function() {
-                        if ($(this).attr('data-space') == current_id) {
-                            isDescendant = true;
-                            return false; // break the loop
-                        }
-                    });
-
-                    if (isDescendant) {
+                    var isDesc = isDescendant(el, parent_id);
+                    if (isDesc) {
                         console.warn('Cannot make category parent of its descendants. Reverting...');
                         $.notify('Cannot make a category parent of its descendants.', 'error');
                         // Revert the sortable operation
@@ -645,5 +624,27 @@
                 $($(this).data('target')).val(slugify($(this).val()));
             });
         });
+
+        // Add this helper function near the top of your script section
+        function isDescendant(draggedItem, targetSpaceId) {
+            var found = false;
+            // Recursively check all nested .space elements
+            draggedItem.find('.route').each(function() {
+                var childSpace = $(this).find('.space').first();
+                if (childSpace.length) {
+                    var childSpaceId = childSpace.attr('data-space');
+                    if (childSpaceId == targetSpaceId) {
+                        found = true;
+                        return false;
+                    }
+                    // Recursively check deeper descendants
+                    if (isDescendant($(this), targetSpaceId)) {
+                        found = true;
+                        return false;
+                    }
+                }
+            });
+            return found;
+        }
     </script>
 @endpush
