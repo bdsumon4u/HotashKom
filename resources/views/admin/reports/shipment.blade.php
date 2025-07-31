@@ -50,7 +50,7 @@
                         </div>
                         <div class="ml-2 flex-grow-1">
                             <span class="font-roboto">Shipping</span>
-                            <h4 class="font-roboto">{{ $report['status_breakdown']['SHIPPING']['total'] ?? 0 }}</h4>
+                            <h4 class="font-roboto">{{ $report['status_breakdown']['SHIPPING']['count'] ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                         </div>
                         <div class="ml-2 flex-grow-1">
                             <span class="font-roboto">Delivered</span>
-                            <h4 class="font-roboto">{{ $report['status_breakdown']['DELIVERED']['total'] ?? 0 }}</h4>
+                            <h4 class="font-roboto">{{ $report['status_breakdown']['DELIVERED']['count'] ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                         </div>
                         <div class="ml-2 flex-grow-1">
                             <span class="font-roboto">Returned</span>
-                            <h4 class="font-roboto">{{ $report['status_breakdown']['RETURNED']['total'] ?? 0 }}</h4>
+                            <h4 class="font-roboto">{{ $report['status_breakdown']['RETURNED']['count'] ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
