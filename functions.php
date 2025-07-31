@@ -68,7 +68,7 @@ if (! function_exists('categories')) {
             }
 
             // Set the image_src property with a fallback placeholder
-            $category->image_src = asset($image->path ?? 'https://placehold.co/600x600?text=No+Product');
+            $category->image_src = cdn($image->src ?? 'https://placehold.co/600x600?text=No+Product');
 
             return $category;
         });
