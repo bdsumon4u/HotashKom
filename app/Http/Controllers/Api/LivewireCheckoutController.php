@@ -46,6 +46,7 @@ class LivewireCheckoutController extends Controller
                     'qty' => $cartItem['quantity'],
                     'price' => $cartItem['price'],
                     'options' => [
+                        'purchase_price' => $cartItem['purchase_price'],
                         'parent_id' => $cartItem['parent_id'],
                         'slug' => $cartItem['slug'],
                         'image' => $cartItem['image'],

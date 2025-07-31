@@ -324,6 +324,9 @@ class Checkout extends Component
                 'advanced' => $this->advanced,
                 'retail_discount' => $this->retailDiscount,
                 'subtotal' => cart()->subtotal(),
+                'purchase_cost' => cart()->content()->sum(function ($item) {
+                    return ($item->options->purchase_price ?? $item->options->price) * $item->qty;
+                }),
             ];
 
             // Add city and area data if Pathao is enabled and user_selects_city_area is checked

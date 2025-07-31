@@ -90,7 +90,6 @@
                     <x-error field="selling_price" />
                 </div>
             </div>
-            @if(isOninda())
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="average_purchase_price">Average Purchase Price</label>
@@ -98,7 +97,7 @@
                     <x-error field="average_purchase_price" />
                 </div>
             </div>
-            @if(config('app.resell'))
+            @if(isOninda() && config('app.resell'))
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="suggested_price">Suggested Retail Price</label>
@@ -106,7 +105,6 @@
                     <x-error field="suggested_price" />
                 </div>
             </div>
-            @endif
             @endif
         </div>
         <div class="shadow-sm card rounded-0">

@@ -35,30 +35,71 @@ class ShipmentReportController extends Controller
         $totalShipped = $orders->count();
 
         $statusBreakdown = $orders->groupBy('status')->map(function ($group) {
-            return $group->count();
-        });
+            $totalSubtotal = $group->sum(function ($order) {
+                return $order->data['subtotal'] ?? 0;
+            });
+
+            $totalPurchaseCost = $group->sum(function ($order) {
+                return $order->data['purchase_cost'] ?? $order->data['subtotal'] ?? 0;
+            });
+
+            return [
+                'count' => $group->count(),
+                'total_subtotal' => $totalSubtotal,
+                'total_purchase_cost' => $totalPurchaseCost,
+            ];
+        })->all();
+
+        // Ensure keys for SHIPPING, DELIVERED, RETURNED always exist
+        foreach (['SHIPPING', 'DELIVERED', 'RETURNED'] as $status) {
+            if (! isset($statusBreakdown[$status])) {
+                $statusBreakdown[$status] = [
+                    'count' => 0,
+                    'total_subtotal' => 0,
+                    'total_purchase_cost' => 0,
+                ];
+            }
+        }
 
         $dailyBreakdown = $orders->groupBy(function ($order) {
             return $order->shipped_at->format('Y-m-d');
         })->map(function ($group) {
+            $totalSubtotal = $group->sum(function ($order) {
+                return $order->data['subtotal'] ?? 0;
+            });
+
+            $totalPurchaseCost = $group->sum(function ($order) {
+                return $order->data['purchase_cost'] ?? $order->data['subtotal'] ?? 0;
+            });
+
             return [
                 'total' => $group->count(),
                 'shipping' => $group->where('status', 'SHIPPING')->count(),
                 'delivered' => $group->where('status', 'DELIVERED')->count(),
                 'returned' => $group->where('status', 'RETURNED')->count(),
-                'cancelled' => $group->where('status', 'CANCELLED')->count(),
+                'total_subtotal' => $totalSubtotal,
+                'total_purchase_cost' => $totalPurchaseCost,
             ];
         });
 
         $courierBreakdown = $orders->groupBy(function ($order) {
             return $order->data['courier'] ?? 'Other';
         })->map(function ($group) {
+            $totalSubtotal = $group->sum(function ($order) {
+                return $order->data['subtotal'] ?? 0;
+            });
+
+            $totalPurchaseCost = $group->sum(function ($order) {
+                return $order->data['purchase_cost'] ?? $order->data['subtotal'] ?? 0;
+            });
+
             return [
                 'total' => $group->count(),
                 'shipping' => $group->where('status', 'SHIPPING')->count(),
                 'delivered' => $group->where('status', 'DELIVERED')->count(),
                 'returned' => $group->where('status', 'RETURNED')->count(),
-                'cancelled' => $group->where('status', 'CANCELLED')->count(),
+                'total_subtotal' => $totalSubtotal,
+                'total_purchase_cost' => $totalPurchaseCost,
             ];
         });
 

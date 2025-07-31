@@ -256,13 +256,15 @@ class Product extends Model
 
     public static function stockStatistics(): array
     {
-        $products = static::where('should_track', true)->get();
+        $products = static::where('should_track', true)->where('stock_count', '>', 0)->get([
+            'id', 'stock_count', 'average_purchase_price', 'selling_price',
+        ]);
         $totalStockCount = $products->sum('stock_count');
         $totalPurchaseValue = $products->sum(function ($product) {
-            return ($product->stock_count ?? 0) * ($product->average_purchase_price ?? 0);
+            return $product->stock_count * ($product->average_purchase_price ?? $product->selling_price);
         });
         $totalSellValue = $products->sum(function ($product) {
-            return ($product->stock_count ?? 0) * ($product->selling_price ?? 0);
+            return $product->stock_count * $product->selling_price;
         });
 
         return [

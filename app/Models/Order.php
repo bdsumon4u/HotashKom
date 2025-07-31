@@ -265,6 +265,19 @@ class Order extends Model
         return array_reduce($products, fn ($sum, $product) => $sum + ((array) $product)['total']) ?? 0;
     }
 
+    public function getPurchaseCost($products)
+    {
+        $products = (array) $products;
+
+        return array_reduce($products, function ($sum, $product) {
+            $product = (array) $product;
+            $purchasePrice = $product['purchase_price'] ?? $product['selling_price'];
+            $quantity = $product['quantity'];
+
+            return $sum + ($purchasePrice * $quantity);
+        }, 0);
+    }
+
     public function getShippingCost($products, $subtotal = 0, ?string $shipping_area = null)
     {
         if (! $products instanceof Collection) {

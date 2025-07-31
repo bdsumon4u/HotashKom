@@ -228,6 +228,9 @@ class PlaceOnindaOrder implements ShouldQueue
         $orderData['shipping_cost'] = $resellerOrder->getShippingCost($mappedProducts, $orderData['subtotal'], $orderData['shipping_area']);
         $orderData['discount'] = 0;
 
+        // Purchase cost
+        $orderData['purchase_cost'] = $resellerOrder->getPurchaseCost($mappedProducts);
+
         $attributes['data'] = $orderData;
 
         return $attributes;

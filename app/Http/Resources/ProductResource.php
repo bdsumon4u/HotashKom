@@ -55,6 +55,7 @@ class ProductResource extends JsonResource
             'category' => $this->resource->category,
             'quantity' => $quantity,
             'price' => $price = $this->resource->getPrice($quantity),
+            'purchase_price' => $this->resource->average_purchase_price ?? 0,
             'retail_price' => $price,
             'total' => $price * $quantity,
             'shipping_inside' => $this->resource->shipping_inside,

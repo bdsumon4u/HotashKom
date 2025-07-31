@@ -49,8 +49,8 @@
                             <i data-feather="clock" class="font-warning"></i>
                         </div>
                         <div class="ml-2 flex-grow-1">
-                            <span class="font-roboto">In Shipping</span>
-                            <h4 class="font-roboto">{{ $report['status_breakdown']['SHIPPING'] ?? 0 }}</h4>
+                            <span class="font-roboto">Shipping</span>
+                            <h4 class="font-roboto">{{ $report['status_breakdown']['SHIPPING']['total'] ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
@@ -65,7 +65,7 @@
                         </div>
                         <div class="ml-2 flex-grow-1">
                             <span class="font-roboto">Delivered</span>
-                            <h4 class="font-roboto">{{ $report['status_breakdown']['DELIVERED'] ?? 0 }}</h4>
+                            <h4 class="font-roboto">{{ $report['status_breakdown']['DELIVERED']['total'] ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                         </div>
                         <div class="ml-2 flex-grow-1">
                             <span class="font-roboto">Returned</span>
-                            <h4 class="font-roboto">{{ $report['status_breakdown']['RETURNED'] ?? 0 }}</h4>
+                            <h4 class="font-roboto">{{ $report['status_breakdown']['RETURNED']['total'] ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
@@ -102,19 +102,23 @@
                                 <tr>
                                     <th>Status</th>
                                     <th>Count</th>
-                                    <th>Percentage</th>
+                                    <th>Purchase</th>
+                                    <th>Subtotal</th>
+                                    <th>Percent</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($report['status_breakdown'] as $status => $count)
+                                @foreach($report['status_breakdown'] as $status => $data)
                                 <tr>
                                     <td>
                                         <span class="badge badge-{{ $status === 'DELIVERED' ? 'success' : ($status === 'SHIPPING' ? 'warning' : ($status === 'RETURNED' ? 'danger' : 'secondary')) }}">
                                             {{ $status }}
                                         </span>
                                     </td>
-                                    <td>{{ $count }}</td>
-                                    <td>{{ $report['total_shipped'] > 0 ? round(($count / $report['total_shipped']) * 100, 1) : 0 }}%</td>
+                                    <td>{{ $data['count'] }}</td>
+                                    <td>{!! theMoney($data['total_purchase_cost']) !!}</td>
+                                    <td>{!! theMoney($data['total_subtotal']) !!}</td>
+                                    <td>{{ $report['total_shipped'] > 0 ? round(($data['count'] / $report['total_shipped']) * 100, 1) : 0 }}%</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -137,8 +141,10 @@
                                 <tr>
                                     <th>Courier</th>
                                     <th>Total</th>
+                                    <th>Purchase</th>
+                                    <th>Subtotal</th>
                                     <th>Delivered</th>
-                                    <th>In Shipping</th>
+                                    <th>Shipping</th>
                                     <th>Returned</th>
                                 </tr>
                             </thead>
@@ -147,6 +153,8 @@
                                 <tr>
                                     <td>{{ $courier }}</td>
                                     <td>{{ $data['total'] }}</td>
+                                    <td>{!! theMoney($data['total_purchase_cost']) !!}</td>
+                                    <td>{!! theMoney($data['total_subtotal']) !!}</td>
                                     <td class="text-success">{{ $data['delivered'] }}</td>
                                     <td class="text-warning">{{ $data['shipping'] }}</td>
                                     <td class="text-danger">{{ $data['returned'] }}</td>
@@ -174,10 +182,11 @@
                                 <tr>
                                     <th>Date</th>
                                     <th>Total Shipped</th>
+                                    <th>Purchase</th>
+                                    <th>Subtotal</th>
+                                    <th>Shipping</th>
                                     <th>Delivered</th>
-                                    <th>In Shipping</th>
                                     <th>Returned</th>
-                                    <th>Cancelled</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -190,10 +199,11 @@
                                         </a>
                                     </td>
                                     <td>{{ $data['total'] }}</td>
-                                    <td class="text-success">{{ $data['delivered'] }}</td>
+                                    <td>{!! theMoney($data['total_purchase_cost']) !!}</td>
+                                    <td>{!! theMoney($data['total_subtotal']) !!}</td>
                                     <td class="text-warning">{{ $data['shipping'] }}</td>
+                                    <td class="text-success">{{ $data['delivered'] }}</td>
                                     <td class="text-danger">{{ $data['returned'] }}</td>
-                                    <td class="text-secondary">{{ $data['cancelled'] }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
