@@ -221,9 +221,9 @@ class OrderController extends Controller
             })
             ->addColumn('actions', function (Order $order) {
                 $actions = '<div class="btn-group">';
-                if (! $order->source_id) {
+                // if (isOninda() || ! $order->source_id) { // allow for every platform
                     $actions .= '<a href="'.route('admin.orders.destroy', $order).'" data-action="delete" class="btn btn-sm btn-danger">Delete</a>';
-                }
+                // }
                 $actions .= '</div>';
 
                 return $actions;
