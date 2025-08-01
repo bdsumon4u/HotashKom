@@ -110,7 +110,7 @@ class PlaceOnindaOrder implements ShouldQueue
             // Get products from Oninda database
             $onindaProducts = Product::whereIn('id', $sourceIds)->get();
 
-            info('onindaProducts', ['onindaProducts' => $onindaProducts]);
+            // info('onindaProducts', ['onindaProducts' => $onindaProducts]);
             // Map products from Oninda database
             $mappedProducts = collect($products)->mapWithKeys(function ($product) use ($onindaProducts) {
                 $onindaProduct = $onindaProducts->firstWhere('id', $product->source_id);
