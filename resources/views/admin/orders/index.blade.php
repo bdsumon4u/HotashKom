@@ -134,7 +134,7 @@
                                     <th width="10">Status</th>
                                     <th>Courier</th>
                                     <th>Staff</th>
-                                    <th width="150">DateTime</th>
+                                    <th style="white-space: nowrap; min-width: 150px;">Date and Time</th>
                                     @if(auth()->user()->is('admin'))
                                     <th width="10">Action</th>
                                     @endif
@@ -205,28 +205,21 @@
             // aoColumns: [{ "bSortable": false }, null, null, { "sType": "numeric" }, { "sType": "date" }, null, { "bSortable": false}],
             dom: 'lBftip',
             buttons: [
-                    @foreach(config('app.orders', []) as $status)
+                @foreach(config('app.orders', []) as $status)
                 {
                     text: '{{ $status }}',
                     className: 'px-1 py-1 {{ request('status') == $status ? 'btn-secondary' : '' }}',
                     action: function ( e, dt, node, config ) {
                         window.location = '{!! request()->fullUrlWithQuery(['status' => $status]) !!}'
                     }
-                },@endforeach
+                },
+                @endforeach
                 {
                     text: 'All',
                     className: 'px-1 py-1 {{ request('status') == '' ? 'btn-secondary' : '' }}',
                     action: function ( e, dt, node, config ) {
                         window.location = '{!! request()->fullUrlWithQuery(['status' => '']) !!}'
                     }
-                },
-            ],
-            columnDefs: [
-                {
-                    type: 'num',
-                    orderable: false,
-                    searchable: false,
-                    targets: @if(auth()->user()->is('admin')) -5 @else -6 @endif
                 },
             ],
             processing: true,
@@ -248,7 +241,7 @@
                 { data: 'staff', name: 'admin.name', sortable: false },
                 { data: 'created_at', name: 'created_at' },
                 @if(auth()->user()->is('admin'))
-                { data: 'actions' },
+                { data: 'actions', searchable: false, orderable: false },
                 @endif
             ],
             initComplete: function (settings, json) {
@@ -262,11 +255,26 @@
                     var th = $(this.header()).parents('thead').find('tr').eq(1).find('th').eq(i);
                     $(th).empty();
 
-                    if ($.inArray(i, [0, 4, 7, 9]) === -1) {
+                    var forbidden = [0]
+                    @if(isOninda()||isReseller())
+                        forbidden.push(5);
+                        dateTimeColumn = 9;
+                        @if(auth()->user()->is('admin'))
+                            forbidden.push(10);
+                        @endif
+                    @else
+                        forbidden.push(4);
+                        dateTimeColumn = 8;
+                        @if(auth()->user()->is('admin'))
+                            forbidden.push(9);
+                        @endif
+                    @endif
+
+                    if ($.inArray(i, forbidden) === -1) {
                         var column = this;
                         var input = document.createElement("input");
                         input.classList.add('form-control', 'border-primary');
-                        if (i === 8) {
+                        if (i === dateTimeColumn) {
                             $(input).appendTo($(th)).on('apply.daterangepicker', function (ev, picker) {
                                 column.search(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD')).draw();
                             }).daterangepicker({

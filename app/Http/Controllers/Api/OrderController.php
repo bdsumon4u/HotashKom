@@ -24,29 +24,29 @@ class OrderController extends Controller
 
         $orders = Order::with('admin');
         if (strtolower($request->type) === 'online') {
-            $orders->where('type', Order::ONLINE);
+            $orders->where('orders.type', Order::ONLINE);
         } elseif (strtolower($request->type) === 'manual') {
-            $orders->where('type', Order::MANUAL);
+            $orders->where('orders.type', Order::MANUAL);
         }
 
         if ($request->user_id) {
-            $orders->where('user_id', $request->user_id);
+            $orders->where('orders.user_id', $request->user_id);
         }
 
         if ($request->phone) {
-            $orders->where('phone', $request->phone);
+            $orders->where('orders.phone', $request->phone);
         }
 
         if ($request->status) {
-            $orders->where('status', $request->status);
+            $orders->where('orders.status', $request->status);
         }
 
         if ($request->staff_id) {
-            $orders->where('admin_id', $request->staff_id);
+            $orders->where('orders.admin_id', $request->staff_id);
         }
 
         if ($request->has('start_d') && $request->has('end_d')) {
-            $orders->whereBetween(request('date_type', 'status_at'), [
+            $orders->whereBetween('orders.'.request('date_type', 'status_at'), [
                 $_start->startOfDay()->toDateTimeString(),
                 $_end->endOfDay()->toDateTimeString(),
             ]);
@@ -54,18 +54,18 @@ class OrderController extends Controller
 
         if ($request->shipped_at) {
             $shippedDate = Carbon::parse($request->shipped_at);
-            $orders->whereNotNull('shipped_at')
-                ->whereBetween('shipped_at', [
+            $orders->whereNotNull('orders.shipped_at')
+                ->whereBetween('orders.shipped_at', [
                     $shippedDate->startOfDay()->toDateTimeString(),
                     $shippedDate->endOfDay()->toDateTimeString(),
                 ]);
         }
 
         $orders = $orders->when($request->role_id == Admin::SALESMAN, function ($orders): void {
-            $orders->where('admin_id', request('admin_id'));
+            $orders->where('orders.admin_id', request('admin_id'));
         });
         $orders = $orders->when(! $request->has('order'), function ($orders): void {
-            $orders->latest('id');
+            $orders->latest('orders.id');
         });
 
         if (isOninda()) {
@@ -174,26 +174,37 @@ class OrderController extends Controller
                 return $return.'<div style="white-space: nowrap; display: none;">Tracking Code: <a href="https://www.steadfast.com.bd/?tracking_code=" target="_blank"></a></div>';
             })
             ->filterColumn('customer', function ($query, $keyword): void {
-                $query->where('name', 'like', '%'.$keyword.'%')
-                    ->orWhere('phone', 'like', '%'.$keyword.'%')
-                    ->orWhere('address', 'like', '%'.$keyword.'%');
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('orders.name', 'like', '%'.$keyword.'%')
+                        ->orWhere('orders.phone', 'like', '%'.$keyword.'%')
+                        ->orWhere('orders.address', 'like', '%'.$keyword.'%');
+                });
+            })
+            ->filterColumn('products', function ($query, $keyword): void {
+                $query->where('orders.products', 'like', '%'.$keyword.'%');
             })
             ->filterColumn('courier', function ($query, $keyword): void {
-                $query->where('data->courier', 'like', '%'.$keyword.'%')
-                    ->orWhere('data->consignment_id', 'like', '%'.$keyword.'%');
+                $query->where('orders.data->courier', 'like', '%'.$keyword.'%')
+                    ->orWhere('orders.data->consignment_id', 'like', '%'.$keyword.'%');
             });
 
         if (isOninda()) {
             $dt = $dt->filterColumn('source_id', function ($query, $keyword): void {
-                // Support search in the format PREFIX + ORDER_ID (digits at the end)
+                // Handle cases: only prefix, only order_id, or both
                 if (preg_match('/^([^\d]+)(\d+)$/', $keyword, $matches)) {
+                    // Both prefix and order_id present
                     $prefix = $matches[1];
                     $orderId = $matches[2];
-                    // If users table is joined (isOninda), filter by both prefix and source_id
                     $query->where('users.order_prefix', $prefix)
                         ->where('orders.source_id', $orderId);
+                } elseif (preg_match('/^[^\d]+$/', $keyword)) {
+                    // Only prefix present
+                    $query->where('users.order_prefix', $keyword);
+                } elseif (preg_match('/^\d+$/', $keyword)) {
+                    // Only order_id present
+                    $query->where('orders.source_id', $keyword);
                 } else {
-                    // Fallback: search source_id as before
+                    // Fallback: partial match
                     $query->where('orders.source_id', 'like', "%$keyword%");
                 }
             });
@@ -213,7 +224,7 @@ class OrderController extends Controller
             ->filterColumn('created_at', function ($query, $keyword): void {
                 if (str_contains($keyword, ' - ')) {
                     [$start, $end] = explode(' - ', $keyword);
-                    $query->whereBetween('created_at', [
+                    $query->whereBetween('orders.created_at', [
                         Carbon::parse($start)->startOfDay(),
                         Carbon::parse($end)->endOfDay(),
                     ]);
@@ -222,7 +233,7 @@ class OrderController extends Controller
             ->addColumn('actions', function (Order $order) {
                 $actions = '<div class="btn-group">';
                 // if (isOninda() || ! $order->source_id) { // allow for every platform
-                    $actions .= '<a href="'.route('admin.orders.destroy', $order).'" data-action="delete" class="btn btn-sm btn-danger">Delete</a>';
+                $actions .= '<a href="'.route('admin.orders.destroy', $order).'" data-action="delete" class="btn btn-sm btn-danger">Delete</a>';
                 // }
                 $actions .= '</div>';
 
