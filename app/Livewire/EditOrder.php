@@ -206,8 +206,7 @@ class EditOrder extends Component
             ->fill(['data' => array_merge($this->only($this->meta), [
                 'purchase_cost' => $this->order->getPurchaseCost($this->selectedProducts),
             ])])
-            ->fill(['products' => $this->selectedProducts])
-            ->fill(['source_id' => config('app.instant_order_forwarding') ? 0 : null]);
+            ->fill(['products' => $this->selectedProducts]);
 
         if ($this->order->exists) {
             $confirming = false;
@@ -235,6 +234,7 @@ class EditOrder extends Component
                 'admin_id' => auth('admin')->id(),
                 'type' => Order::MANUAL,
                 'status_at' => now()->toDateTimeString(),
+                'source_id' => config('app.instant_order_forwarding') ? 0 : null,
             ])->save();
 
             session()->flash('success', 'Order created successfully.');
