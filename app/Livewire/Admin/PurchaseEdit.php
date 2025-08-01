@@ -6,11 +6,12 @@ use App\Models\Product;
 use App\Models\ProductPurchase;
 use App\Models\Purchase;
 use App\Services\PurchaseStockService;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
-class PurchaseCreate extends Component
+class PurchaseEdit extends Component
 {
+    public Purchase $purchase;
+
     public $search = '';
 
     public $products = [];
@@ -47,9 +48,29 @@ class PurchaseCreate extends Component
         'items.*.quantity' => 'required|integer|min:1',
     ];
 
-    public function mount()
+    public function mount(Purchase $purchase)
     {
-        $this->purchase_date = now()->toDateString();
+        $this->purchase = $purchase;
+        $this->purchase_date = $purchase->purchase_date->toDateString();
+        $this->supplier_name = $purchase->supplier_name;
+        $this->supplier_phone = $purchase->supplier_phone;
+        $this->notes = $purchase->notes;
+        $this->invoice_number = $purchase->invoice_number;
+
+        // Load existing items
+        foreach ($purchase->productPurchases as $productPurchase) {
+            $product = $productPurchase->product;
+            $this->items[] = [
+                'product_id' => $product->id,
+                'name' => $product->parent ? ($product->parent->name.' ['.$product->name.']') : $product->name,
+                'sku' => $product->sku,
+                'options' => $product->options->pluck('name')->toArray(),
+                'price' => $productPurchase->price,
+                'quantity' => $productPurchase->quantity,
+                'selling_price' => $product->selling_price,
+                'stock_count' => $product->stock_count,
+            ];
+        }
     }
 
     public function updatedSearch($value)
@@ -140,10 +161,27 @@ class PurchaseCreate extends Component
     public function save()
     {
         $this->validate();
-        $adminId = Auth::guard('admin')->id();
 
-        $purchase = Purchase::create([
-            'admin_id' => $adminId,
+        // Store old items for comparison (before any changes)
+        $oldItems = $this->purchase->productPurchases->map(function ($pp) {
+            return [
+                'product_id' => $pp->product_id,
+                'price' => (float) $pp->price,
+                'quantity' => (int) $pp->quantity,
+            ];
+        })->toArray();
+
+        // Format new items for comparison
+        $newItems = collect($this->items)->map(function ($item) {
+            return [
+                'product_id' => (int) $item['product_id'],
+                'price' => (float) ($item['price'] ?? 0),
+                'quantity' => (int) ($item['quantity'] ?? 0),
+            ];
+        })->toArray();
+
+        // Update purchase record
+        $this->purchase->update([
             'purchase_date' => $this->purchase_date,
             'supplier_name' => $this->supplier_name,
             'supplier_phone' => $this->supplier_phone,
@@ -152,6 +190,10 @@ class PurchaseCreate extends Component
             'total_amount' => $this->total,
         ]);
 
+        // Remove old product associations
+        $this->purchase->products()->detach();
+
+        // Add new product associations
         $attachData = [];
         foreach ($this->items as $item) {
             $attachData[$item['product_id']] = [
@@ -160,20 +202,20 @@ class PurchaseCreate extends Component
                 'subtotal' => (float) ($item['price'] ?? 0) * (float) ($item['quantity'] ?? 0),
             ];
         }
-        $purchase->products()->attach($attachData);
+        $this->purchase->products()->attach($attachData);
 
-        // Use service to apply stock changes
+        // Use service to update stock changes with proper old and new data
         $stockService = new PurchaseStockService;
-        $stockService->applyStockChanges($purchase);
+        $stockService->updateStockChanges($this->purchase, $oldItems, $newItems);
 
-        session()->flash('success', 'Purchase record created successfully!');
+        session()->flash('success', 'Purchase record updated successfully!');
 
         return redirect()->route('admin.purchases.index');
     }
 
     public function render()
     {
-        return view('livewire.admin.purchase-create', [
+        return view('livewire.admin.purchase-edit', [
             'products' => $this->products,
             'items' => $this->items,
             'total' => $this->total,

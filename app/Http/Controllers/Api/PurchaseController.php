@@ -40,9 +40,19 @@ class PurchaseController extends Controller
                 return $purchase->admin ? $purchase->admin->name : '-';
             })
             ->addColumn('actions', function ($purchase) {
-                return '<a target="_blank" href="'.route('admin.purchases.show', $purchase).'" class="btn btn-sm btn-info">
+                $buttons = '<div class="btn-group" role="group">';
+                $buttons .= '<a target="_blank" href="'.route('admin.purchases.show', $purchase).'" class="btn btn-sm btn-info" title="View">
                     <i class="fa fa-eye"></i>
                 </a>';
+                $buttons .= '<a href="'.route('admin.purchases.edit', $purchase).'" class="btn btn-sm btn-warning" title="Edit">
+                    <i class="fa fa-edit"></i>
+                </a>';
+                $buttons .= '<button type="button" class="btn btn-sm btn-danger" title="Delete" onclick="confirmDelete('.$purchase->id.')">
+                    <i class="fa fa-trash"></i>
+                </button>';
+                $buttons .= '</div>';
+
+                return $buttons;
             })
             ->rawColumns(['actions'])
             ->filter(function ($query) use ($request) {
