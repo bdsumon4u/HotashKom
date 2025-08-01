@@ -71,9 +71,16 @@ class TransactionController extends Controller
         ]);
 
         $user = auth('user')->user();
+        $availableBalance = $user->getAvailableBalance();
 
-        if ($request->amount > $user->balance) {
-            return response()->json(['message' => 'Insufficient balance'], 422);
+        if ($request->amount > $availableBalance) {
+            $pendingAmount = $user->getPendingWithdrawalAmount();
+            $message = 'Insufficient available balance. ';
+            if ($pendingAmount > 0) {
+                $message .= "You have {$pendingAmount} tk in pending withdrawals.";
+            }
+
+            return response()->json(['message' => $message], 422);
         }
 
         // Create withdraw request with pending status

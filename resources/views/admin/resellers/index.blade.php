@@ -39,7 +39,11 @@
             <div class="orders-table">
                 <div class="shadow-sm card rounded-0">
                     <div class="p-3 card-header">
-                        <strong>All</strong>&nbsp;<small>Resellers</small>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>All</strong>&nbsp;<small>Resellers</small>
+                            </div>
+                        </div>
                     </div>
                     <div class="p-3 card-body">
                         <div class="table-responsive">

@@ -75,6 +75,39 @@ class User extends Authenticatable implements Confirmable, Wallet
     }
 
     /**
+     * Get the total amount of pending withdrawals for this user.
+     */
+    public function getPendingWithdrawalAmount(): float
+    {
+        return abs($this->wallet->transactions()
+            ->where('type', 'withdraw')
+            ->where('confirmed', false)
+            ->sum('amount'));
+    }
+
+    /**
+     * Get the available balance (total balance minus pending withdrawals).
+     */
+    public function getAvailableBalance(): float
+    {
+        return $this->balance - $this->getPendingWithdrawalAmount();
+    }
+
+    /**
+     * Check if the user can withdraw the specified amount.
+     */
+    public function canWithdraw(int|string $amount, bool $allowZero = false): bool
+    {
+        $availableBalance = $this->getAvailableBalance();
+
+        if ($allowZero && $availableBalance == 0) {
+            return true;
+        }
+
+        return $amount <= $availableBalance;
+    }
+
+    /**
      * Get the database configuration for this reseller.
      *
      * @return array

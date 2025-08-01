@@ -26,7 +26,15 @@ class ResellerController extends Controller
             ->editColumn('phone_number', fn ($row): string => $row->phone_number ?? '-')
             ->editColumn('bkash_number', fn ($row): string => $row->bkash_number ?? '-')
             ->editColumn('balance', function ($row): string {
-                return '<a href="'.route('admin.transactions.index', $row->id).'" class="text-primary">'.$row->balance.'</a>';
+                $availableBalance = $row->getAvailableBalance();
+                $pendingAmount = $row->getPendingWithdrawalAmount();
+
+                $balanceText = number_format($availableBalance, 2);
+                if ($pendingAmount > 0) {
+                    $balanceText .= ' <small class="text-warning">(+'.theMoney($pendingAmount).')</small>';
+                }
+
+                return '<a href="'.route('admin.transactions.index', $row->id).'" class="text-primary">'.$balanceText.'</a>';
             })
             ->editColumn('orders_count', fn ($row): string => $row->orders_count)
             ->editColumn('is_verified', fn ($row): string => $row->is_verified ? 'Yes' : 'No')
@@ -35,8 +43,8 @@ class ResellerController extends Controller
                     <a href="'.route('admin.resellers.edit', $row->id).'" class="btn btn-sm btn-primary">
                         <i class="fa fa-edit"></i>
                     </a>
-                    <button type="button" class="btn btn-sm'.($row->is_verified ? 'btn-danger' : 'btn-success').' toggle-verify" data-id="'.$row->id.'" data-verified="'.$row->is_verified.'">
-                        <i class="fa'.($row->is_verified ? 'fa-times' : 'fa-check').'"></i>
+                    <button type="button" class="btn btn-sm'.($row->is_verified ? ' btn-danger' : ' btn-success').' toggle-verify" data-id="'.$row->id.'" data-verified="'.$row->is_verified.'">
+                        <i class="fa'.($row->is_verified ? ' fa-times' : ' fa-check').'"></i>
                     </button>
                 </div>';
             })
@@ -53,10 +61,18 @@ class ResellerController extends Controller
                 $query->where('bkash_number', 'like', '%'.$keyword.'%');
             })
             ->orderColumn('balance', function ($query, $order) {
+                // Prioritize resellers with pending withdrawals first, then sort by balance
                 $query->leftJoin('wallets', function ($join) {
                     $join->on('users.id', '=', 'wallets.holder_id')
                         ->where('wallets.slug', 'default');
                 })
+                    ->orderByRaw('EXISTS(
+                    SELECT 1
+                    FROM transactions
+                    WHERE transactions.payable_id = users.id
+                    AND transactions.type = "withdraw"
+                    AND transactions.confirmed = 0
+                ) DESC')
                     ->orderBy('wallets.balance', $order);
             })
             ->rawColumns(['name', 'balance', 'actions'])

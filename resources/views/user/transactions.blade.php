@@ -37,7 +37,11 @@
                             <h5 class="mb-0">Transaction History</h5>
                             <div class="d-flex align-items-center">
                                 <div class="mr-3">
-                                    <strong>Balance:</strong> {{ number_format(auth('user')->user()->balance, 2) }} tk
+                                    <strong>Available Balance:</strong> {{ number_format(auth('user')->user()->getAvailableBalance(), 2) }} tk
+                                    @if(auth('user')->user()->getPendingWithdrawalAmount() > 0)
+                                        <br><small class="text-muted">Total Balance: {{ number_format(auth('user')->user()->balance, 2) }} tk</small>
+                                        <br><small class="text-warning">Pending Withdrawals: {{ number_format(auth('user')->user()->getPendingWithdrawalAmount(), 2) }} tk</small>
+                                    @endif
                                 </div>
                                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#withdrawRequestModal">
                                     Request Withdraw
@@ -81,8 +85,11 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="amount">Amount (tk)</label>
-                            <input type="number" class="form-control" id="amount" name="amount" min="1" max="{{ auth('user')->user()->balance }}" step="0.01" required>
-                            <small class="form-text text-muted">Available balance: {{ number_format(auth('user')->user()->balance, 2) }} tk</small>
+                            <input type="number" class="form-control" id="amount" name="amount" min="1" max="{{ auth('user')->user()->getAvailableBalance() }}" step="0.01" required>
+                            <small class="form-text text-muted">Available balance: {{ number_format(auth('user')->user()->getAvailableBalance(), 2) }} tk</small>
+                            @if(auth('user')->user()->getPendingWithdrawalAmount() > 0)
+                                <br><small class="form-text text-warning">You have {{ number_format(auth('user')->user()->getPendingWithdrawalAmount(), 2) }} tk in pending withdrawals</small>
+                            @endif
                         </div>
                     </div>
                     <div class="modal-footer">

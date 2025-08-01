@@ -82,8 +82,16 @@ class TransactionController extends Controller
             'trx_id' => 'required|string|max:255',
         ]);
 
-        if ($request->amount > $user->balance) {
-            return response()->json(['message' => 'Insufficient balance'], 422);
+        $availableBalance = $user->getAvailableBalance();
+
+        if ($request->amount > $availableBalance) {
+            $pendingAmount = $user->getPendingWithdrawalAmount();
+            $message = 'Insufficient available balance. ';
+            if ($pendingAmount > 0) {
+                $message .= "User has {$pendingAmount} tk in pending withdrawals.";
+            }
+
+            return response()->json(['message' => $message], 422);
         }
 
         $user->wallet->withdraw($request->amount, [
