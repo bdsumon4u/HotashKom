@@ -271,7 +271,7 @@ class Order extends Model
 
         return array_reduce($products, function ($sum, $product) {
             $product = (array) $product;
-            $purchasePrice = $product['purchase_price'] ?? $product['selling_price'];
+            $purchasePrice = $product['purchase_price'] ?? $product['price'];
             $quantity = $product['quantity'];
 
             return $sum + ($purchasePrice * $quantity);
