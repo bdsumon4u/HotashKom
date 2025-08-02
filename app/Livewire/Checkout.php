@@ -325,7 +325,7 @@ class Checkout extends Component
                 'retail_discount' => $this->retailDiscount,
                 'subtotal' => cart()->subtotal(),
                 'purchase_cost' => cart()->content()->sum(function ($item) {
-                    return ($item->options->purchase_price ?? $item->options->price) * $item->qty;
+                    return ($item->options->purchase_price ?: $item->options->price) * $item->qty;
                 }),
             ];
 

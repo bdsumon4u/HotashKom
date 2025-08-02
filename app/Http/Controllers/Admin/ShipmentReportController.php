@@ -40,7 +40,7 @@ class ShipmentReportController extends Controller
             });
 
             $totalPurchaseCost = $group->sum(function ($order) {
-                return $order->data['purchase_cost'] ?? $order->data['subtotal'] ?? 0;
+                return $order->data['purchase_cost'] ?: $order->data['subtotal'] ?? 0;
             });
 
             return [
@@ -69,7 +69,7 @@ class ShipmentReportController extends Controller
             });
 
             $totalPurchaseCost = $group->sum(function ($order) {
-                return $order->data['purchase_cost'] ?? $order->data['subtotal'] ?? 0;
+                return $order->data['purchase_cost'] ?: $order->data['subtotal'] ?? 0;
             });
 
             return [
@@ -90,7 +90,7 @@ class ShipmentReportController extends Controller
             });
 
             $totalPurchaseCost = $group->sum(function ($order) {
-                return $order->data['purchase_cost'] ?? $order->data['subtotal'] ?? 0;
+                return $order->data['purchase_cost'] ?: $order->data['subtotal'] ?? 0;
             });
 
             return [
