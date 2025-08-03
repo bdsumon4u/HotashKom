@@ -28,7 +28,7 @@
     <div class="row">
         <div class="col-xl-3 col-md-6">
             <div class="card o-hidden">
-                <div class="card-body">
+                <div class="p-3 card-body">
                     <div class="d-flex static-top-widget">
                         <div class="align-self-center">
                             <i data-feather="truck" class="font-primary"></i>
@@ -43,7 +43,7 @@
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="card o-hidden">
-                <div class="card-body">
+                <div class="p-3 card-body">
                     <div class="d-flex static-top-widget">
                         <div class="align-self-center">
                             <i data-feather="clock" class="font-warning"></i>
@@ -58,7 +58,7 @@
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="card o-hidden">
-                <div class="card-body">
+                <div class="p-3 card-body">
                     <div class="d-flex static-top-widget">
                         <div class="align-self-center">
                             <i data-feather="check-circle" class="font-success"></i>
@@ -73,7 +73,7 @@
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="card o-hidden">
-                <div class="card-body">
+                <div class="p-3 card-body">
                     <div class="d-flex static-top-widget">
                         <div class="align-self-center">
                             <i data-feather="rotate-ccw" class="font-danger"></i>
@@ -91,11 +91,11 @@
     <!-- Status Breakdown Chart -->
     <div class="row">
         <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
+            <div class="shadow-sm rounded-0 card">
+                <div class="p-3 card-header">
                     <h5>Status Breakdown</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-3 card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
@@ -104,6 +104,7 @@
                                     <th>Count</th>
                                     <th>Purchase</th>
                                     <th>Subtotal</th>
+                                    <th>Profit</th>
                                     <th>Percent</th>
                                 </tr>
                             </thead>
@@ -118,6 +119,9 @@
                                     <td>{{ $data['count'] }}</td>
                                     <td>{!! theMoney($data['total_purchase_cost']) !!}</td>
                                     <td>{!! theMoney($data['total_subtotal']) !!}</td>
+                                    <td class="{{ ($data['total_subtotal'] - $data['total_purchase_cost']) >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {!! theMoney($data['total_subtotal'] - $data['total_purchase_cost']) !!}
+                                    </td>
                                     <td>{{ $report['total_shipped'] > 0 ? round(($data['count'] / $report['total_shipped']) * 100, 1) : 0 }}%</td>
                                 </tr>
                                 @endforeach
@@ -130,11 +134,11 @@
 
         <!-- Courier Breakdown -->
         <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
+            <div class="shadow-sm rounded-0 card">
+                <div class="p-3 card-header">
                     <h5>Courier Breakdown</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-3 card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
@@ -143,6 +147,7 @@
                                     <th>Total</th>
                                     <th>Purchase</th>
                                     <th>Subtotal</th>
+                                    <th>Profit</th>
                                     <th>Delivered</th>
                                     <th>Shipping</th>
                                     <th>Returned</th>
@@ -155,6 +160,9 @@
                                     <td>{{ $data['total'] }}</td>
                                     <td>{!! theMoney($data['total_purchase_cost']) !!}</td>
                                     <td>{!! theMoney($data['total_subtotal']) !!}</td>
+                                    <td class="{{ ($data['total_subtotal'] - $data['total_purchase_cost']) >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {!! theMoney($data['total_subtotal'] - $data['total_purchase_cost']) !!}
+                                    </td>
                                     <td class="text-success">{{ $data['delivered'] }}</td>
                                     <td class="text-warning">{{ $data['shipping'] }}</td>
                                     <td class="text-danger">{{ $data['returned'] }}</td>
@@ -171,11 +179,11 @@
     <!-- Daily Breakdown -->
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+            <div class="shadow-sm rounded-0 card">
+                <div class="p-3 card-header">
                     <h5>Daily Breakdown</h5>
                 </div>
-                <div class="card-body">
+                <div class="p-3 card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
@@ -184,6 +192,7 @@
                                     <th>Total Shipped</th>
                                     <th>Purchase</th>
                                     <th>Subtotal</th>
+                                    <th>Profit</th>
                                     <th>Shipping</th>
                                     <th>Delivered</th>
                                     <th>Returned</th>
@@ -201,6 +210,9 @@
                                     <td>{{ $data['total'] }}</td>
                                     <td>{!! theMoney($data['total_purchase_cost']) !!}</td>
                                     <td>{!! theMoney($data['total_subtotal']) !!}</td>
+                                    <td class="{{ ($data['total_subtotal'] - $data['total_purchase_cost']) >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {!! theMoney($data['total_subtotal'] - $data['total_purchase_cost']) !!}
+                                    </td>
                                     <td class="text-warning">{{ $data['shipping'] }}</td>
                                     <td class="text-success">{{ $data['delivered'] }}</td>
                                     <td class="text-danger">{{ $data['returned'] }}</td>
@@ -214,6 +226,47 @@
         </div>
     </div>
 
+    <!-- Shipped Products List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="shadow-sm rounded-0 card">
+                <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                    <h5>Shipped Products</h5>
+                    <div>
+                        <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => 'ALL'])) }}"
+                           class="btn btn-sm {{ request('product_status', 'ALL') == 'ALL' ? 'btn-primary' : 'btn-outline-primary' }}">
+                            ALL
+                        </a>
+                        <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => 'SHIPPING'])) }}"
+                           class="btn btn-sm {{ request('product_status') == 'SHIPPING' ? 'btn-warning' : 'btn-outline-warning' }}">
+                            SHIPPING
+                        </a>
+                        <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => 'DELIVERED'])) }}"
+                           class="btn btn-sm {{ request('product_status') == 'DELIVERED' ? 'btn-success' : 'btn-outline-success' }}">
+                            DELIVERED
+                        </a>
+                        <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => 'RETURNED'])) }}"
+                           class="btn btn-sm {{ request('product_status') == 'RETURNED' ? 'btn-danger' : 'btn-outline-danger' }}">
+                            RETURNED
+                        </a>
+                    </div>
+                </div>
+                <div class="p-3 card-body">
+                    @if(!empty($shippedProductsData['products']))
+                        @include('admin.reports.filtered', [
+                            'products' => $shippedProductsData['products'],
+                            'productInOrders' => $shippedProductsData['productInOrders']
+                        ])
+                    @else
+                        <div class="py-4 text-center text-muted">
+                            <i class="mb-2 fa fa-box fa-2x"></i>
+                            <p>No shipped products found for the selected date range</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\ProductReportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,12 +16,28 @@ class ShipmentReportController extends Controller
      */
     public function index(Request $request)
     {
-        $start = Carbon::parse($request->get('start_d', now()))->format('Y-m-d');
-        $end = Carbon::parse($request->get('end_d', now()))->format('Y-m-d');
+        $start = Carbon::parse($request->get('start_d', now()));
+        $end = Carbon::parse($request->get('end_d', now()));
 
-        $report = $this->generateReport($start, $end);
+        $report = $this->generateReport($start->format('Y-m-d'), $end->format('Y-m-d'));
 
-        return view('admin.reports.shipment', compact('report', 'start', 'end'));
+        // Generate shipped products report for the selected date range
+        $productStatus = $request->get('product_status', 'ALL');
+        $statuses = $productStatus === 'ALL' ? ['SHIPPING', 'DELIVERED', 'RETURNED'] : [$productStatus];
+
+        $shippedProductsData = (new ProductReportService)->generateProductsReport(
+            $start,
+            $end,
+            $statuses,
+            'shipped_at'
+        );
+
+        return view('admin.reports.shipment', compact(
+            'report',
+            'start',
+            'end',
+            'shippedProductsData'
+        ));
     }
 
     /**
@@ -40,7 +57,7 @@ class ShipmentReportController extends Controller
             });
 
             $totalPurchaseCost = $group->sum(function ($order) {
-                return $order->data['purchase_cost'] ?: $order->data['subtotal'] ?? 0;
+                return (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0);
             });
 
             return [
@@ -69,7 +86,7 @@ class ShipmentReportController extends Controller
             });
 
             $totalPurchaseCost = $group->sum(function ($order) {
-                return $order->data['purchase_cost'] ?: $order->data['subtotal'] ?? 0;
+                return (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0);
             });
 
             return [
@@ -90,7 +107,7 @@ class ShipmentReportController extends Controller
             });
 
             $totalPurchaseCost = $group->sum(function ($order) {
-                return $order->data['purchase_cost'] ?: $order->data['subtotal'] ?? 0;
+                return (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0);
             });
 
             return [

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\ProductReportService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -35,25 +36,17 @@ class HomeController extends Controller
             $orderQ->where('admin_id', request('staff_id'));
         }
 
-        $productInOrders[] = [];
+        // Use the service to generate products report
+        $productsData = (new ProductReportService())->generateProductsReport(
+            $_start,
+            $_end,
+            ['CONFIRMED', 'INVOICED', 'SHIPPING'],
+            request('date_type', 'status_at'),
+            request('staff_id')
+        );
 
-        $products = (clone $orderQ)->get()
-            ->whereIn('status', ['CONFIRMED', 'INVOICED', 'SHIPPING'])
-            ->flatMap(function ($order) use (&$productInOrders) {
-                $products = json_decode(json_encode($order->products, JSON_UNESCAPED_UNICODE), true);
-
-                foreach ($products as $product) {
-                    $productInOrders[$product['name']][$order->id] = 1 + ($productInOrders[$product['name']][$order->id] ?? 0);
-                }
-
-                return $products;
-            })
-            ->groupBy('id')->mapWithKeys(fn ($item, $id) => [$id => [
-                'name' => $item->random()['name'],
-                'slug' => $item->random()['slug'],
-                'quantity' => $item->sum('quantity'),
-                'total' => $item->sum('total'),
-            ]])->sortByDesc('quantity')->toArray();
+        $products = $productsData['products'];
+        $productInOrders = $productsData['productInOrders'];
 
         $data = (clone $orderQ)
             ->selectRaw($totalSQL)

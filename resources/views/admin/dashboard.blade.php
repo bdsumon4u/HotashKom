@@ -175,7 +175,17 @@
                         <small>CONFIRMED+INVOICED+SHIPPING</small>
                     </div>
                     <div class="p-3 card-body">
-                        @include('admin.reports.filtered')
+                        @if(!empty($products))
+                            @include('admin.reports.filtered', [
+                                'products' => $products,
+                                'productInOrders' => $productInOrders
+                            ])
+                        @else
+                            <div class="text-center py-4 text-muted">
+                                <i class="fa fa-box fa-2x mb-2"></i>
+                                <p>No processing products found for the selected date range</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -223,45 +233,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-xl-4 xl-50 box-xl-12">
-                <div class="rounded-sm card">
-                    <div class="p-4 card-header card-no-border">
-                        <h5>Low Stock</h5>
-                    </div>
-                    <div class="p-3 card-body">
-                        <div class="our-product">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <tbody class="f-w-500">
-                                        @foreach ($lowStockProducts as $product)
-                                            <tr>
-                                                <td class="pl-2">
-                                                    <div class="media">
-                                                        <img class="img-fluid m-r-15 rounded-circle"
-                                                            src="{{ asset(optional($product->base_image)->src) }}"
-                                                            width="42" height="42" alt="">
-                                                        <div class="media-body">
-                                                            <a
-                                                                href="{{ route('admin.products.edit', $product->parent_id ?? $product->id) }}">{{ $product->var_name }}</a>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <p class="text-nowrap">{{ $product->sku }}</p>
-                                                    <p class="font-weight-bold">Stock:
-                                                        <span>{{ $product->stock_count }}</span></p>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-4 xl-50 box-xl-12">
                 <div class="rounded-sm card">
                     <div class="p-3 card-header">
                         <h5>Staffs</h5>
@@ -302,8 +273,43 @@
                     </div>
                 </div>
             </div>
-            @if(isOninda() && config('app.resell'))
             <div class="col-xl-4 xl-50 box-xl-12">
+                <div class="rounded-sm card">
+                    <div class="p-4 card-header card-no-border">
+                        <h5>Low Stock</h5>
+                    </div>
+                    <div class="p-3 card-body">
+                        <div class="our-product">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody class="f-w-500">
+                                        @foreach ($lowStockProducts as $product)
+                                            <tr>
+                                                <td class="pl-2">
+                                                    <div class="media">
+                                                        <img class="img-fluid m-r-15 rounded-circle"
+                                                            src="{{ asset(optional($product->base_image)->src) }}"
+                                                            width="42" height="42" alt="">
+                                                        <div class="media-body">
+                                                            <a
+                                                                href="{{ route('admin.products.edit', $product->parent_id ?? $product->id) }}">{{ $product->var_name }}</a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <p class="text-nowrap">{{ $product->sku }}</p>
+                                                    <p class="font-weight-bold">Stock:
+                                                        <span>{{ $product->stock_count }}</span></p>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @if(isOninda() && config('app.resell'))
                 <div class="rounded-sm card">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center">
                         <h5>Pending Withdrawals</h5>
@@ -311,21 +317,21 @@
                     </div>
                     <div class="p-3 card-body">
                         @if($pendingWithdrawalAmount > 0)
-                            <div class="text-center">
-                                <h3 class="mb-2 text-warning">{{ number_format($pendingWithdrawalAmount, 2) }} tk</h3>
-                                <p class="mb-0 text-muted">Total pending withdrawal amount</p>
-                                <small class="text-muted">Click on reseller balance in resellers list to process withdrawals</small>
-                            </div>
+                        <div class="text-center">
+                            <h3 class="mb-2 text-warning">{{ number_format($pendingWithdrawalAmount, 2) }} tk</h3>
+                            <p class="mb-0 text-muted">Total pending withdrawal amount</p>
+                            <small class="text-muted">Click on reseller balance in resellers list to process withdrawals</small>
+                        </div>
                         @else
-                            <div class="py-3 text-center text-muted">
-                                <i class="mb-2 fa fa-check-circle fa-2x"></i>
-                                <p>No pending withdrawal requests</p>
-                            </div>
+                        <div class="py-3 text-center text-muted">
+                            <i class="mb-2 fa fa-check-circle fa-2x"></i>
+                            <p>No pending withdrawal requests</p>
+                        </div>
                         @endif
                     </div>
                 </div>
+                @endif
             </div>
-            @endif
         </div>
     </div>
 @endsection
