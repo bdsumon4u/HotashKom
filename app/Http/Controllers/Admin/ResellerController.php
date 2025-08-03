@@ -42,12 +42,13 @@ class ResellerController extends Controller
         $validated = $request->mergeIfMissing([
             'is_verified' => 0,
             'is_active' => 0,
-        ])->validate([
+        ])->validate(array_merge([
             'name' => 'required|string|max:255',
             'shop_name' => 'required|string|max:255',
             'phone_number' => 'required|string|max:255',
             'bkash_number' => 'required|string|max:255',
             'is_verified' => 'boolean',
+        ], config('app.demo') ? [] : [
             'is_active' => 'boolean',
             'order_prefix' => 'nullable|string|max:255',
             'domain' => 'nullable|string|max:255',
@@ -55,7 +56,7 @@ class ResellerController extends Controller
             'db_name' => 'nullable|string|max:255',
             'db_username' => 'nullable|string|max:255',
             'db_password' => 'nullable|string|min:6',
-        ]);
+        ]));
 
         // Only update database password if provided
         if (empty($validated['db_password'])) {
