@@ -54,6 +54,20 @@
                                     </div>
                                 </div>
                                 <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        <label for="email">Email Address</label>
+                                        <input id="email" type="email"
+                                            class="form-control @error('email') is-invalid @enderror"
+                                            name="email" value="{{ old('email') }}" required
+                                            autocomplete="email" placeholder="Enter your email address">
+                                        @error('email')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="form-row">
                                     <div class="form-group col-md-6">
                                         <label for="phone_number">Phone Number</label>
                                         <input id="phone_number" type="text"

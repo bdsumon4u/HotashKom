@@ -5,6 +5,7 @@
 @section('content')
     <div class="container py-4">
         <div class="row justify-content-center">
+            @include('user.layouts.sidebar')
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header"><h5>Order History</h5></div>

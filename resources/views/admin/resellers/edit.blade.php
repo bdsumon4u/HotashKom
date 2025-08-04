@@ -51,6 +51,17 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
+                                        <label for="email">Email Address</label>
+                                        <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                            id="email" name="email" value="{{ old('email', $reseller->email) }}" required>
+                                        @error('email')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
                                         <label for="phone_number">Phone Number</label>
                                         <input type="text" class="form-control @error('phone_number') is-invalid @enderror"
                                             id="phone_number" name="phone_number"
@@ -60,7 +71,9 @@
                                         @enderror
                                     </div>
                                 </div>
+                            </div>
 
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="bkash_number">bKash Number</label>
@@ -70,6 +83,18 @@
                                         @error('bkash_number')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="new_password">New Password</label>
+                                        <input type="password" class="form-control @error('new_password') is-invalid @enderror"
+                                            id="new_password" name="new_password" placeholder="Leave blank to keep current password">
+                                        @error('new_password')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <small class="form-text text-muted">Leave blank to keep the current password</small>
                                     </div>
                                 </div>
                             </div>

@@ -30,7 +30,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected $redirectTo = '/profile';
 
     /**
      * Create a new controller instance.
@@ -54,7 +54,7 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'shop_name' => ['required', 'string', 'max:255'],
-            // 'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone_number' => ['required', 'string', 'regex:/^\+8801\d{9}$/', 'unique:users'],
             'bkash_number' => ['required', 'string', 'regex:/^\+8801\d{9}$/', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -75,7 +75,7 @@ class RegisterController extends Controller
         return User::create([
             'name' => $data['name'],
             'shop_name' => $data['shop_name'],
-            // 'email' => $data['email'],
+            'email' => $data['email'],
             'phone_number' => $data['phone_number'],
             'bkash_number' => $data['bkash_number'],
             'password' => Hash::make($data['password']),

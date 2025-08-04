@@ -25,7 +25,7 @@ class RedirectIfAuthenticated
             }
 
             return $upper === 'WEB' || $upper == null
-                ? redirect('/')
+                ? redirect('/profile')
                 : redirect($guard.'/dashboard');
         }
 
