@@ -10,6 +10,10 @@
 
 @include('partials.slides')
 
+@if(isOninda() && config('app.resell') && auth('user')->guest())
+@include('partials.auth-forms')
+@endif
+
 <!-- .block-features -->
 @if(($services = setting('services'))->enabled ?? false)
 <div class="block block-features block-features--layout--classic d-none d-md-block">
