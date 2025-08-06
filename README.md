@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}381}$$ 🔥 domains are live now
+These 🔥 $${\color{red}387}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-05 09:50:14 Asia/Dhaka**_
+_Last updated: **2025-08-06 09:47:30 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -480,3 +480,9 @@ _Last updated: **2025-08-05 09:50:14 Asia/Dhaka**_
 | 379 | [alimemart.com](http://alimemart.com) |
 | 380 | [rahmanemart.com](http://rahmanemart.com) |
 | 381 | [rtbdmart.com](http://rtbdmart.com) |
+| 382 | [nayemtrustedshop.com](http://nayemtrustedshop.com) |
+| 383 | [jnjenterprise.com](http://jnjenterprise.com) |
+| 384 | [muktadirmart.com](http://muktadirmart.com) |
+| 385 | [atozebazar.com](http://atozebazar.com) |
+| 386 | [joldikinun.com](http://joldikinun.com) |
+| 387 | [sohozbazar24.com](http://sohozbazar24.com) |
