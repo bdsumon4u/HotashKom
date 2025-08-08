@@ -45,6 +45,7 @@
                <div>
                     <a href="{{ route('admin.home-sections.create') }}" class="btn btn-primary">Product Section</a>
                     <a href="{{ route('admin.home-sections.create', ['banner' => true]) }}" class="btn btn-primary">Banner Section</a>
+                    <a href="{{ route('admin.home-sections.create', ['content' => true]) }}" class="btn btn-primary">Content Section</a>
                </div>
            </div>
             <div class="p-3 card-body">

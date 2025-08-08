@@ -107,6 +107,9 @@
 
                                 <div class="mb-0 form-group">
                                     <button type="submit" class="btn btn-primary">Save</button>
+                                    @if(isOninda() && config('app.resell'))
+                                        <a href="{{ route('reseller.dashboard') }}" class="btn btn-success ml-2">Go to Reseller Panel</a>
+                                    @endif
                                 </div>
                             </div>
                         </x-form>

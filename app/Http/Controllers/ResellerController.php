@@ -1,0 +1,235 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Models\Order;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+final class ResellerController extends Controller
+{
+    public function dashboard()
+    {
+        $user = Auth::guard('user')->user();
+
+        $totalOrders = Order::where('user_id', $user->id)->count();
+        $totalSales = Order::where('user_id', $user->id)
+            ->whereIn('status', ['CONFIRMED', 'INVOICED', 'SHIPPING', 'DELIVERED'])
+            ->sum('data->subtotal');
+        $availableBalance = $user->getAvailableBalance();
+
+        $recentOrders = Order::where('user_id', $user->id)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $recentTransactions = $user->wallet->transactions()
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('reseller.dashboard', compact(
+            'totalOrders',
+            'totalSales',
+            'availableBalance',
+            'recentOrders',
+            'recentTransactions'
+        ));
+    }
+
+    public function orders(Request $request)
+    {
+        if ($request->ajax()) {
+            $user = Auth::guard('user')->user();
+            $query = Order::where('user_id', $user->id);
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            $orders = $query->latest()->paginate(25);
+
+            return response()->json([
+                'draw' => $request->draw,
+                'recordsTotal' => $orders->total(),
+                'recordsFiltered' => $orders->total(),
+                'data' => $orders->map(function ($order) {
+                    // Calculate total from subtotal, shipping cost, discount, and advanced
+                    $subtotal = $order->data['subtotal'] ?? 0;
+                    $shippingCost = $order->data['shipping_cost'] ?? 0;
+                    $discount = $order->data['discount'] ?? 0;
+                    $advanced = $order->data['advanced'] ?? 0;
+                    $total = $subtotal + $shippingCost - $discount - $advanced;
+
+                    // Format customer information with icons
+                    $customer = "<div>
+                        <div><i class='mr-1 fa fa-user'></i>{$order->name}</div>
+                        <div><i class='mr-1 fa fa-phone'></i><a href='tel:{$order->phone}'>{$order->phone}</a></div>
+                        <div><i class='mr-1 fa fa-map-marker'></i>{$order->address}</div>".
+                        ($order->note ? "<div class='text-danger'><i class='mr-1 fa fa-sticky-note-o'></i>{$order->note}</div>" : '').
+                        '</div>';
+
+                    // Format products information
+                    $products = '<ul style="list-style: none; padding-left: 1rem;">';
+                    if ($order->products) {
+                        $productsArray = is_array($order->products) ? $order->products : (array) $order->products;
+                        if (! empty($productsArray)) {
+                            foreach ($productsArray as $productId => $product) {
+                                $product = (array) $product;
+                                $products .= "<li>{$product['quantity']} x <a class='text-underline' href='".route('products.show', $product['slug'])."' target='_blank'>{$product['name']}</a></li>";
+                            }
+                        } else {
+                            $products .= '<li>No products found</li>';
+                        }
+                    } else {
+                        $products .= '<li>No products found</li>';
+                    }
+                    $products .= '</ul>';
+
+                    return [
+                        'id' => $order->id,
+                        'created_at' => $order->created_at->format('d-M-Y h:i A'),
+                        'customer' => $customer,
+                        'products' => $products,
+                        'status' => $order->status,
+                        'subtotal' => theMoney($subtotal),
+                        'total' => theMoney($total),
+                        'actions' => $order->id, // Pass order ID for actions column
+                    ];
+                }),
+            ]);
+        }
+
+        $user = Auth::guard('user')->user();
+        $query = Order::where('user_id', $user->id);
+
+        // Get filtered total based on status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $totalOrders = $query->count();
+
+        return view('reseller.orders', compact('totalOrders'));
+    }
+
+    public function showOrder(Order $order)
+    {
+        $user = Auth::guard('user')->user();
+
+        if ($order->user_id !== $user->id) {
+            abort(403);
+        }
+
+        return view('reseller.order-show', compact('order'));
+    }
+
+    public function editOrder(Order $order)
+    {
+        $user = Auth::guard('user')->user();
+
+        if ($order->user_id !== $user->id) {
+            abort(403, 'You can only edit your own orders.');
+        }
+
+        // Check if order status allows editing
+        if (! in_array($order->status, ['PENDING', 'CONFIRMED'])) {
+            abort(403, 'You can only edit orders with PENDING or CONFIRMED status.');
+        }
+
+        return view('reseller.order-edit', compact('order'));
+    }
+
+    public function cancelOrder(Order $order)
+    {
+        $user = Auth::guard('user')->user();
+
+        if ($order->user_id !== $user->id) {
+            abort(403, 'You can only cancel your own orders.');
+        }
+
+        // Check if order status allows cancellation
+        if (! in_array($order->status, ['PENDING', 'CONFIRMED'])) {
+            abort(403, 'You can only cancel orders with PENDING or CONFIRMED status.');
+        }
+
+        // Update order status to CANCELLED
+        $order->update([
+            'status' => 'CANCELLED',
+            'status_at' => now()->toDateTimeString(),
+        ]);
+
+        return redirect()->route('reseller.orders.show', $order)
+            ->with('success', 'Order cancelled successfully.');
+    }
+
+    public function transactions(Request $request)
+    {
+        if ($request->ajax()) {
+            $user = Auth::guard('user')->user();
+            $transactions = $user->wallet->transactions()->latest()->paginate(50);
+
+            return response()->json([
+                'draw' => $request->draw,
+                'recordsTotal' => $transactions->total(),
+                'recordsFiltered' => $transactions->total(),
+                'data' => $transactions->map(function ($transaction, $index) {
+                    return [
+                        'DT_RowIndex' => $index + 1,
+                        'type' => ucfirst($transaction->type),
+                        'amount' => number_format((float) $transaction->amount, 2).' tk',
+                        'created_at' => $transaction->created_at->format('d-M-Y H:i'),
+                        'status' => $transaction->confirmed ? 'COMPLETED' : 'PENDING',
+                        'meta' => $transaction->meta['reason'] ?? '-',
+                    ];
+                }),
+            ]);
+        }
+
+        return view('reseller.transactions');
+    }
+
+    public function profile()
+    {
+        return view('reseller.profile');
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::guard('user')->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'shop_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,'.$user->id,
+            'phone_number' => 'required|string|max:20',
+            'bkash_number' => 'required|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'domain' => 'nullable|string|max:255|unique:users,domain,'.$user->id,
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user->fill($request->only([
+            'name', 'shop_name', 'email', 'phone_number',
+            'bkash_number', 'address', 'domain',
+        ]));
+
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($user->logo && Storage::disk('public')->exists($user->logo)) {
+                Storage::disk('public')->delete($user->logo);
+            }
+
+            $logoPath = $request->file('logo')->store('reseller-logos', 'public');
+            $user->logo = $logoPath;
+        }
+
+        $user->save();
+
+        return redirect()->route('reseller.profile')
+            ->with('success', 'Profile updated successfully!');
+    }
+}

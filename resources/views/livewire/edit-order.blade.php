@@ -354,7 +354,7 @@
                             <th style="font-size:14px;white-space:nowrap;vertical-align:middle;">Our Delivery Charge</th>
                             <td class="shipping">
                                 <input class="shipping form-control" style="height: auto; padding: 2px 8px;"
-                                    type="text" wire:model.live.debounce.500ms="{{ (isOninda() && config('app.resell')) ? 'retail_delivery_fee' : 'shipping_cost' }}"
+                                    type="text" wire:model.live.debounce.500ms="{{ (!isOninda() || config('app.resell')) ? 'shipping_cost' : 'retail_delivery_fee' }}"
                                     class="form-control" @disabled(isReseller() && !is_null($order->source_id))>
                             </td>
                         </tr>
@@ -369,10 +369,19 @@
                         </tr>
                         @if(isOninda() && config('app.resell'))
                         <tr>
+                            <th style="font-size:14px;white-space:nowrap;vertical-align:middle;">Packaging Charge</th>
+                            <td>
+                                <input style="height: auto; padding: 2px 8px;" type="text"
+                                    wire:model.live.debounce.500ms="packaging_charge" class="form-control" placeholder="25">
+                            </td>
+                        </tr>
+                        @endif
+                        @if(isOninda() && config('app.resell'))
+                        <tr>
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
                                 <strong>{!! theMoney($subtotal + $shipping_cost - $discount) !!}</strong> (buy)<br>
-                                <strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $shipping_cost) - $advanced - ($order->data['retail_discount'] ?? 0)) !!}</strong> (sell)
+                                <strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $shipping_cost) - $advanced - ($order->data['retail_discount'] ?? 0) - ($order->data['packaging_charge'] ?? 25)) !!}</strong> (sell)
                             </td>
                         </tr>
                         @else

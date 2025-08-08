@@ -27,7 +27,7 @@ class Order extends Model
 
     protected $attributes = [
         'status' => 'CONFIRMED',
-        'data' => '{"subtotal":0,"shipping_cost":0,"retail_delivery_fee":0,"advanced":0,"discount":0,"retail_discount":0,"courier":"Other","city_id":"","area_id":"","weight":0.5}',
+        'data' => '{"subtotal":0,"shipping_cost":0,"retail_delivery_fee":0,"advanced":0,"discount":0,"retail_discount":0,"courier":"Other","city_id":"","area_id":"","weight":0.5,"packaging_charge":25}',
     ];
 
     protected $casts = [
@@ -130,14 +130,16 @@ class Order extends Model
             $retailDiscount = $order->data['retail_discount'] ?? 0;
             $subtotal = $order->data['subtotal'] ?? 0;
             $discount = $order->data['discount'] ?? 0;
+            $packagingCharge = $order->data['packaging_charge'] ?? 25; // Packaging charge
 
-            $calculateCommission = function () use ($retail, $retailDeliveryFee, $advanced, $retailDiscount, $subtotal, $shippingCost, $discount) {
-                // Commission = (retail + retail_delivery_fee) - advanced - retail_discount - (subtotal + shipping_cost - discount)
+            $calculateCommission = function () use ($retail, $retailDeliveryFee, $advanced, $retailDiscount, $subtotal, $shippingCost, $discount, $packagingCharge) {
+                // Commission = (retail + retail_delivery_fee) - advanced - retail_discount - (subtotal + shipping_cost - discount) - packaging_charge
                 return $retail
                     + $retailDeliveryFee
                     - $advanced
                     - $retailDiscount
-                    - ($subtotal + $shippingCost - $discount);
+                    - ($subtotal + $shippingCost - $discount)
+                    - $packagingCharge;
             };
 
             if ($status === 'DELIVERED') {
@@ -146,9 +148,9 @@ class Order extends Model
                     'order_id' => $order->id,
                 ]);
             } elseif ($status === 'RETURNED') {
-                $withdrawAmount = $shippingCost;
+                $withdrawAmount = $shippingCost + $packagingCharge; // Charge shipping cost and packaging fee
                 if ($order->getOriginal('status') === 'DELIVERED') {
-                    // Withdraw commission (what was paid on delivery) and Oninda's delivery fee
+                    // Withdraw commission (what was paid on delivery) and Oninda's delivery fee and packaging charge
                     $withdrawAmount += $calculateCommission();
                 }
 
@@ -262,7 +264,11 @@ class Order extends Model
     {
         $products = (array) $products;
 
-        return array_reduce($products, fn ($sum, $product) => $sum + ((array) $product)['total']) ?? 0;
+        return array_reduce($products, function ($sum, $product) {
+            $product = (array) $product;
+
+            return $sum + ($product['total'] ?? 0);
+        }, 0);
     }
 
     public function getPurchaseCost($products)
@@ -271,8 +277,8 @@ class Order extends Model
 
         return array_reduce($products, function ($sum, $product) {
             $product = (array) $product;
-            $purchasePrice = $product['purchase_price'] ?: $product['price'];
-            $quantity = $product['quantity'];
+            $purchasePrice = $product['purchase_price'] ?? $product['price'] ?? 0;
+            $quantity = $product['quantity'] ?? 0;
 
             return $sum + ($purchasePrice * $quantity);
         }, 0);
@@ -289,13 +295,15 @@ class Order extends Model
         if ($shipping_area) {
             if (setting('show_option')->productwise_delivery_charge ?? false) {
                 $shipping_cost = $products->sum(function ($item) use ($shipping_area) {
-                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
+                    $item = (array) $item;
+                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? ($item['quantity'] ?? 1) : 1;
 
                     return ($item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
                 }) ?: setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
             } else {
                 $shipping_cost = $products->max(function ($item) use ($shipping_area) {
-                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
+                    $item = (array) $item;
+                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? ($item['quantity'] ?? 1) : 1;
 
                     return ($item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
                 }) ?: setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
@@ -312,7 +320,11 @@ class Order extends Model
             if ($subtotal < $freeDelivery->min_amount) {
                 return $shipping_cost;
             }
-            $quantity = $products->sum(fn ($product) => $product->quantity);
+            $quantity = $products->sum(function ($product) {
+                $product = (array) $product;
+
+                return $product['quantity'] ?? 0;
+            });
             if ($quantity < $freeDelivery->min_quantity) {
                 return $shipping_cost;
             }
@@ -340,7 +352,7 @@ class Order extends Model
             ->useLogName('orders')
             ->dontSubmitEmptyLogs()
             ->dontLogIfAttributesChangedOnly(['status_at', 'updated_at'])
-            ->logOnly(['admin_id', 'name', 'phone', 'address', 'status', 'status_at', 'products', 'note', 'data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal']);
+            ->logOnly(['admin_id', 'name', 'phone', 'address', 'status', 'status_at', 'products', 'note', 'data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal', 'data->packaging_charge']);
     }
 
     public function pathaoCityList()

@@ -33,7 +33,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/profile';
+    protected $redirectTo = '/reseller/dashboard';
 
     /**
      * Where to redirect users after logout.

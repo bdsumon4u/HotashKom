@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSectionProductController;
 use App\Http\Controllers\OrderTrackController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ResellerController;
 use App\Http\Middleware\EnsureResellerIsVerified;
 use App\Http\Middleware\GoogleTagManagerMiddleware;
 use Hotash\FacebookPixel\MetaPixelMiddleware;
@@ -68,6 +69,20 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
             Route::get('bkash/callback', 'BkashCallbackController@callback')->name('bkash.callback');
         });
 
+    });
+
+    // Reseller Panel Routes (outside user group but with auth middleware)
+    Route::middleware('auth:user')->group(function () {
+        Route::prefix('reseller')->name('reseller.')->group(function () {
+            Route::get('dashboard', [ResellerController::class, 'dashboard'])->name('dashboard');
+            Route::get('orders', [ResellerController::class, 'orders'])->name('orders');
+            Route::get('orders/{order}', [ResellerController::class, 'showOrder'])->name('orders.show');
+            Route::get('orders/{order}/edit', [ResellerController::class, 'editOrder'])->name('orders.edit');
+            Route::post('orders/{order}/cancel', [ResellerController::class, 'cancelOrder'])->name('orders.cancel');
+            Route::get('transactions', [ResellerController::class, 'transactions'])->name('transactions');
+            Route::get('profile', [ResellerController::class, 'profile'])->name('profile');
+            Route::post('profile', [ResellerController::class, 'updateProfile'])->name('profile');
+        });
     });
 
     Route::get('/categories', [ApiController::class, 'categories'])->name('categories');

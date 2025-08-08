@@ -3,27 +3,21 @@
 namespace App\Livewire;
 
 use App\Http\Resources\ProductResource;
-use App\Jobs\CallOnindaOrderApi;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
-use App\Notifications\User\OrderConfirmed;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-class EditOrder extends Component
+class ResellerEditOrder extends Component
 {
     private array $attrs = [
-        'name', 'phone', 'email', 'address', 'note', 'status',
+        'name', 'phone', 'email', 'address', 'note',
     ];
 
     private array $meta = [
         'discount', 'advanced', 'retail_discount', 'retail_delivery_fee', 'shipping_area', 'shipping_cost',
-        'subtotal', 'courier', 'city_id', 'area_id', 'weight', 'packaging_charge',
-        // 'area_name', 'is_fraud', 'is_repeat',
+        'subtotal', 'courier', 'city_id', 'area_id', 'weight',
     ];
 
     public Order $order;
@@ -42,9 +36,6 @@ class EditOrder extends Component
     public ?string $address = '';
 
     public ?string $note = '';
-
-    #[Validate('required')]
-    public string $status = 'CONFIRMED';
 
     // Meta Data
     public int $discount = 0;
@@ -71,44 +62,13 @@ class EditOrder extends Component
     #[Validate('numeric')]
     public float $weight = 0.5;
 
-    public int $packaging_charge = 25;
-
     public array $selectedProducts = [];
 
     public $search;
 
     public $options = [];
 
-    public function getCourierReportProperty()
-    {
-        $expires = config('services.courier_report.expires');
-        if (! $expires || Carbon::parse($expires)->isPast()) {
-            return 'API Expired';
-        }
-
-        $report = cache()->remember(
-            'courier:'.($this->order->phone ?? ''),
-            now()->addHours(4),
-            function () {
-                try {
-                    return Http::retry(3, 100)
-                        ->withToken(config('services.courier_report.key'))
-                        ->post(config('services.courier_report.url'), [
-                            'phone' => $this->order->phone ?? '',
-                        ])
-                        ->json();
-                } catch (\Exception $e) {
-                    return $e->getMessage();
-                }
-            },
-        );
-
-        if (is_string($report)) {
-            cache()->forget('courier:'.($this->order->phone ?? ''));
-        }
-
-        return $report;
-    }
+    public bool $canCancel = false;
 
     protected function prepareForValidation($attributes): array
     {
@@ -121,12 +81,27 @@ class EditOrder extends Component
 
     public function mount(Order $order): void
     {
-        $this->order = $order; // Initialize before access
+        // Check if reseller can edit this order
+        $user = auth('user')->user();
+
+        if ($order->user_id !== $user->id) {
+            abort(403, 'You can only edit your own orders.');
+        }
+
+        // Check if order status allows editing
+        if (! in_array($order->status, ['PENDING', 'CONFIRMED'])) {
+            abort(403, 'You can only edit orders with PENDING or CONFIRMED status.');
+        }
+
+        $this->order = $order;
         $this->fill($this->order->only($this->attrs) + $this->order->data);
 
         foreach (json_decode(json_encode($this->order->products), true) ?? [] as $product) {
             $this->selectedProducts[$product['id']] = $product;
         }
+
+        // Set canCancel property
+        $this->canCancel = in_array($this->order->status, ['PENDING', 'CONFIRMED']);
     }
 
     public function addProduct(Product $product)
@@ -184,11 +159,8 @@ class EditOrder extends Component
     {
         $this->fill([
             'subtotal' => $subtotal = $this->order->getSubtotal($this->selectedProducts),
-            'shipping_cost' => $this->order->getShippingCost($this->selectedProducts, $subtotal, $value),
+            'retail_delivery_fee' => $this->order->getShippingCost($this->selectedProducts, $subtotal, $value),
         ]);
-        if (isOninda() && ! config('app.resell')) {
-            $this->fill(['retail_delivery_fee' => $this->shipping_cost]);
-        }
     }
 
     public function updateOrder()
@@ -199,10 +171,6 @@ class EditOrder extends Component
             return session()->flash('error', 'Please add products to the order.');
         }
 
-        if (isOninda() && ! config('app.resell')) {
-            $this->fill(['retail_discount' => $this->discount]);
-        }
-
         $this->order
             ->fill($this->only($this->attrs))
             ->fill(['data' => array_merge($this->only($this->meta), [
@@ -210,77 +178,36 @@ class EditOrder extends Component
             ])])
             ->fill(['products' => $this->selectedProducts]);
 
-        if ($this->order->exists) {
-            $confirming = false;
-            if ($this->order->status != $this->status) {
-                $confirming = $this->status === 'CONFIRMED';
-                $this->order->forceFill([
-                    'status_at' => now()->toDateTimeString(),
-                ]);
-            }
+        $this->order->save();
 
-            $this->order->save();
+        session()->flash('success', 'Order updated successfully.');
 
-            if (config('app.instant_order_forwarding') && ! config('app.demo')) {
-                CallOnindaOrderApi::dispatch($this->order->id);
-            }
-
-            if ($confirming && ($user = $this->order->user)) {
-                $user->notify(new OrderConfirmed($this->order));
-            }
-
-            session()->flash('success', 'Order updated successfully.');
-        } else {
-            $this->order->fill([
-                'user_id' => $this->getUser()->id,
-                'admin_id' => auth('admin')->id(),
-                'type' => Order::MANUAL,
-                'status_at' => now()->toDateTimeString(),
-                'source_id' => config('app.instant_order_forwarding') ? 0 : null,
-            ])->save();
-
-            session()->flash('success', 'Order created successfully.');
-
-            return redirect()->route('admin.orders.edit', $this->order);
-        }
-
-        return redirect()->route('admin.orders.edit', $this->order);
+        return redirect()->route('reseller.orders.show', $this->order);
     }
 
-    private function getUser()
+    public function cancelOrder()
     {
-        if ($user = auth('user')->user()) {
-            return $user;
+        // Check if reseller can cancel this order
+        $user = auth('user')->user();
+
+        if ($this->order->user_id !== $user->id) {
+            return session()->flash('error', 'You can only cancel your own orders.');
         }
 
-        // For Oninda environment, create a walk-in customer
-        if (isOninda()) {
-            return User::query()->firstOrCreate(
-                ['phone_number' => '+8800000000000'],
-                array_merge([
-                    'name' => 'Walk-in Reseller',
-                    'email' => 'walkin@hotash.tech',
-                    'shop_name' => 'Walk-in Store',
-                ], [
-                    'email_verified_at' => now(),
-                    'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-                    'remember_token' => Str::random(10),
-                ])
-            );
+        // Check if order status allows cancellation
+        if (! in_array($this->order->status, ['PENDING', 'CONFIRMED'])) {
+            return session()->flash('error', 'You can only cancel orders with PENDING or CONFIRMED status.');
         }
 
-        // For non-Oninda environment, create regular user
-        return User::query()->firstOrCreate(
-            ['phone_number' => $this->order->phone],
-            array_merge([
-                'name' => $this->order->name,
-                'email' => $this->order->email,
-            ], [
-                'email_verified_at' => now(),
-                'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-                'remember_token' => Str::random(10),
-            ])
-        );
+        // Update order status to CANCELLED
+        $this->order->update([
+            'status' => 'CANCELLED',
+            'status_at' => now()->toDateTimeString(),
+        ]);
+
+        session()->flash('success', 'Order cancelled successfully.');
+
+        return redirect()->route('reseller.orders.show', $this->order);
     }
 
     public function render()
@@ -302,7 +229,7 @@ class EditOrder extends Component
             }
         }
 
-        return view('livewire.edit-order', [
+        return view('livewire.reseller-edit-order', [
             'products' => $products,
         ]);
     }

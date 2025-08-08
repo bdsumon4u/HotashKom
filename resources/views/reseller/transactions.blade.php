@@ -1,20 +1,27 @@
-@extends('layouts.yellow.master')
+@extends('layouts.reseller.master')
 
-@push('styles')
+@section('title', 'Transactions')
+
+@section('breadcrumb-title')
+    <h3>Transactions</h3>
+@endsection
+
+@section('breadcrumb-items')
+    <li class="breadcrumb-item">Transactions</li>
+@endsection
+
+@push('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/datatables.css') }}">
     <style>
         .dt-buttons.btn-group {
             margin: .25rem 1rem 1rem 1rem;
         }
-
         .dt-buttons.btn-group .btn {
             font-size: 12px;
         }
-
         th:focus {
             outline: none;
         }
-
         table.dataTable thead .sorting:before, table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:before,
         table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:before, table.dataTable thead
         .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:before, table.dataTable thead
@@ -25,17 +32,14 @@
     </style>
 @endpush
 
-@section('title', 'Transaction History')
-
 @section('content')
-    <div class="container py-4">
-        <div class="row justify-content-center">
-            @include('user.layouts.sidebar')
-            <div class="col-md-8">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Transaction History</h5>
+                            <h5>Transaction History</h5>
                             <div class="d-flex align-items-center">
                                 <div class="mr-3">
                                     <strong>Available Balance:</strong> {{ number_format(auth('user')->user()->getAvailableBalance(), 2) }} tk
@@ -47,9 +51,6 @@
                                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#withdrawRequestModal">
                                     Request Withdraw
                                 </button>
-                                @if(isOninda() && config('app.resell'))
-                                    <a href="{{ route('reseller.dashboard') }}" class="btn btn-success btn-sm ml-2">Reseller Panel</a>
-                                @endif
                             </div>
                         </div>
                     </div>
@@ -127,7 +128,7 @@
             }],
             processing: true,
             serverSide: true,
-            ajax: "{{ route('user.transactions') }}",
+            ajax: "{{ route('reseller.transactions') }}",
             columns: [{
                     data: 'DT_RowIndex',
                     name: 'DT_RowIndex',
@@ -148,7 +149,14 @@
                 },
                 {
                     data: 'status',
-                    name: 'status'
+                    name: 'status',
+                    render: function(data) {
+                        let badgeClass = 'badge-info';
+                        if (data === 'COMPLETED') badgeClass = 'badge-success';
+                        else if (data === 'PENDING') badgeClass = 'badge-warning';
+                        else if (data === 'FAILED' || data === 'CANCELLED') badgeClass = 'badge-danger';
+                        return '<span class="badge ' + badgeClass + '">' + data + '</span>';
+                    }
                 },
                 {
                     data: 'meta',

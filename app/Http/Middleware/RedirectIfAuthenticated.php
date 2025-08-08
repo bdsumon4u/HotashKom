@@ -21,11 +21,11 @@ class RedirectIfAuthenticated
             $upper = strtoupper(str_replace(['_', '-'], '', $guard));
 
             if ($upper === 'USER') {
-                return redirect('/profile');
+                return redirect('/reseller/dashboard');
             }
 
             return $upper === 'WEB' || $upper == null
-                ? redirect('/profile')
+                ? redirect('/reseller/dashboard')
                 : redirect($guard.'/dashboard');
         }
 
