@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}387}$$ 🔥 domains are live now
+These 🔥 $${\color{red}390}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-07 09:47:29 Asia/Dhaka**_
+_Last updated: **2025-08-08 09:47:05 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -486,3 +486,6 @@ _Last updated: **2025-08-07 09:47:29 Asia/Dhaka**_
 | 385 | [atozebazar.com](http://atozebazar.com) |
 | 386 | [joldikinun.com](http://joldikinun.com) |
 | 387 | [sohozbazar24.com](http://sohozbazar24.com) |
+| 388 | [bikroyebazar.com](http://bikroyebazar.com) |
+| 389 | [oxenbd.com](http://oxenbd.com) |
+| 390 | [kotusoo.com](http://kotusoo.com) |
