@@ -258,6 +258,9 @@ class CopyProductToResellers implements ShouldQueue
             // Product already exists with this source_id, use existing ID
             $newProductId = $existingBySourceId->id;
             $this->idMap['products'][$this->product->id] = $newProductId;
+
+            // Clean up any existing duplicate relationships before inserting new ones
+            $this->cleanupDuplicateRelationships($newProductId);
         } else {
             // Check if product with same slug already exists
             $existingBySlug = DB::connection('reseller')
@@ -273,6 +276,9 @@ class CopyProductToResellers implements ShouldQueue
                     ->update(['source_id' => $this->product->id]);
                 $newProductId = $existingBySlug->id;
                 $this->idMap['products'][$this->product->id] = $newProductId;
+
+                // Clean up any existing duplicate relationships before inserting new ones
+                $this->cleanupDuplicateRelationships($newProductId);
             } else {
                 // Generate unique SKU only (no slug modification needed)
                 $productData['sku'] = $this->getUniqueValue('sku', $productData['sku']);
@@ -389,19 +395,28 @@ class CopyProductToResellers implements ShouldQueue
             'optionIds' => $optionIds,
         ]);
 
-        // Insert category relationships
+        // Insert category relationships with duplicate prevention
         foreach ($categoryIds as $categoryId) {
             try {
-                DB::connection('reseller')
+                // Use insertOrIgnore to handle unique constraints
+                $inserted = DB::connection('reseller')
                     ->table('category_product')
-                    ->insert([
+                    ->insertOrIgnore([
                         'product_id' => $newProductId,
                         'category_id' => $categoryId,
                     ]);
-                Log::info('Category relationship inserted', [
-                    'productId' => $newProductId,
-                    'categoryId' => $categoryId,
-                ]);
+
+                if ($inserted) {
+                    Log::info('Category relationship inserted', [
+                        'productId' => $newProductId,
+                        'categoryId' => $categoryId,
+                    ]);
+                } else {
+                    Log::info('Category relationship already exists, skipped', [
+                        'productId' => $newProductId,
+                        'categoryId' => $categoryId,
+                    ]);
+                }
             } catch (\Exception $e) {
                 Log::error('Failed to insert category relationship', [
                     'productId' => $newProductId,
@@ -411,23 +426,33 @@ class CopyProductToResellers implements ShouldQueue
             }
         }
 
-        // Insert image relationships
+        // Insert image relationships with duplicate prevention
         foreach ($imageIds as $image) {
             try {
-                DB::connection('reseller')
+                // Use insertOrIgnore to handle unique constraints
+                $inserted = DB::connection('reseller')
                     ->table('image_product')
-                    ->insert([
+                    ->insertOrIgnore([
                         'product_id' => $newProductId,
                         'image_id' => $image['id'],
                         'img_type' => $image['img_type'],
                         'order' => $image['order'],
                     ]);
-                Log::info('Image relationship inserted', [
-                    'productId' => $newProductId,
-                    'imageId' => $image['id'],
-                    'imgType' => $image['img_type'],
-                    'order' => $image['order'],
-                ]);
+
+                if ($inserted) {
+                    Log::info('Image relationship inserted', [
+                        'productId' => $newProductId,
+                        'imageId' => $image['id'],
+                        'imgType' => $image['img_type'],
+                        'order' => $image['order'],
+                    ]);
+                } else {
+                    Log::info('Image relationship already exists, skipped', [
+                        'productId' => $newProductId,
+                        'imageId' => $image['id'],
+                        'imgType' => $image['img_type'],
+                    ]);
+                }
             } catch (\Exception $e) {
                 Log::error('Failed to insert image relationship', [
                     'productId' => $newProductId,
@@ -437,19 +462,28 @@ class CopyProductToResellers implements ShouldQueue
             }
         }
 
-        // Insert option relationships
+        // Insert option relationships with duplicate prevention
         foreach ($optionIds as $optionId) {
             try {
-                DB::connection('reseller')
+                // Use insertOrIgnore to handle unique constraints
+                $inserted = DB::connection('reseller')
                     ->table('option_product')
-                    ->insert([
+                    ->insertOrIgnore([
                         'product_id' => $newProductId,
                         'option_id' => $optionId,
                     ]);
-                Log::info('Option relationship inserted', [
-                    'productId' => $newProductId,
-                    'optionId' => $optionId,
-                ]);
+
+                if ($inserted) {
+                    Log::info('Option relationship inserted', [
+                        'productId' => $newProductId,
+                        'optionId' => $optionId,
+                    ]);
+                } else {
+                    Log::info('Option relationship already exists, skipped', [
+                        'productId' => $newProductId,
+                        'optionId' => $optionId,
+                    ]);
+                }
             } catch (\Exception $e) {
                 Log::error('Failed to insert option relationship', [
                     'productId' => $newProductId,
@@ -462,6 +496,128 @@ class CopyProductToResellers implements ShouldQueue
         Log::info('Product relationships insertion completed', [
             'newProductId' => $newProductId,
         ]);
+    }
+
+    /**
+     * Clean up duplicate relationships in the reseller's database for a given product.
+     */
+    private function cleanupDuplicateRelationships(int $newProductId): void
+    {
+        try {
+            // Clean up duplicate category relationships
+            $duplicateCategories = DB::connection('reseller')
+                ->table('category_product')
+                ->select('category_id')
+                ->where('product_id', $newProductId)
+                ->groupBy('category_id')
+                ->havingRaw('COUNT(*) > 1')
+                ->get();
+
+            foreach ($duplicateCategories as $duplicate) {
+                // Keep the first record, delete the rest
+                $recordsToDelete = DB::connection('reseller')
+                    ->table('category_product')
+                    ->where('product_id', $newProductId)
+                    ->where('category_id', $duplicate->category_id)
+                    ->orderBy('id')
+                    ->skip(1)
+                    ->get(['id']);
+
+                if ($recordsToDelete->isNotEmpty()) {
+                    DB::connection('reseller')
+                        ->table('category_product')
+                        ->whereIn('id', $recordsToDelete->pluck('id'))
+                        ->delete();
+
+                    Log::info('Deleted duplicate category relationships', [
+                        'productId' => $newProductId,
+                        'categoryId' => $duplicate->category_id,
+                        'deletedCount' => $recordsToDelete->count(),
+                    ]);
+                }
+            }
+
+            // Clean up duplicate image relationships
+            $duplicateImages = DB::connection('reseller')
+                ->table('image_product')
+                ->select('image_id', 'img_type')
+                ->where('product_id', $newProductId)
+                ->groupBy('image_id', 'img_type')
+                ->havingRaw('COUNT(*) > 1')
+                ->get();
+
+            foreach ($duplicateImages as $duplicate) {
+                // Keep the first record, delete the rest
+                $recordsToDelete = DB::connection('reseller')
+                    ->table('image_product')
+                    ->where('product_id', $newProductId)
+                    ->where('image_id', $duplicate->image_id)
+                    ->where('img_type', $duplicate->img_type)
+                    ->orderBy('id')
+                    ->skip(1)
+                    ->get(['id']);
+
+                if ($recordsToDelete->isNotEmpty()) {
+                    DB::connection('reseller')
+                        ->table('image_product')
+                        ->whereIn('id', $recordsToDelete->pluck('id'))
+                        ->delete();
+
+                    Log::info('Deleted duplicate image relationships', [
+                        'productId' => $newProductId,
+                        'imageId' => $duplicate->image_id,
+                        'imgType' => $duplicate->img_type,
+                        'deletedCount' => $recordsToDelete->count(),
+                    ]);
+                }
+            }
+
+            // Clean up duplicate option relationships
+            $duplicateOptions = DB::connection('reseller')
+                ->table('option_product')
+                ->select('option_id')
+                ->where('product_id', $newProductId)
+                ->groupBy('option_id')
+                ->havingRaw('COUNT(*) > 1')
+                ->get();
+
+            foreach ($duplicateOptions as $duplicate) {
+                // Keep the first record, delete the rest
+                $recordsToDelete = DB::connection('reseller')
+                    ->table('option_product')
+                    ->where('product_id', $newProductId)
+                    ->where('option_id', $duplicate->option_id)
+                    ->orderBy('id')
+                    ->skip(1)
+                    ->get(['id']);
+
+                if ($recordsToDelete->isNotEmpty()) {
+                    DB::connection('reseller')
+                        ->table('option_product')
+                        ->whereIn('id', $recordsToDelete->pluck('id'))
+                        ->delete();
+
+                    Log::info('Deleted duplicate option relationships', [
+                        'productId' => $newProductId,
+                        'optionId' => $duplicate->option_id,
+                        'deletedCount' => $recordsToDelete->count(),
+                    ]);
+                }
+            }
+
+            Log::info('Duplicate relationships cleaned up for product', [
+                'productId' => $newProductId,
+                'duplicateCategories' => $duplicateCategories->count(),
+                'duplicateImages' => $duplicateImages->count(),
+                'duplicateOptions' => $duplicateOptions->count(),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to cleanup duplicate relationships', [
+                'productId' => $newProductId,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**
