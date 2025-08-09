@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}390}$$ 🔥 domains are live now
+These 🔥 $${\color{red}394}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-08 09:47:05 Asia/Dhaka**_
+_Last updated: **2025-08-09 09:23:17 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -489,3 +489,7 @@ _Last updated: **2025-08-08 09:47:05 Asia/Dhaka**_
 | 388 | [bikroyebazar.com](http://bikroyebazar.com) |
 | 389 | [oxenbd.com](http://oxenbd.com) |
 | 390 | [kotusoo.com](http://kotusoo.com) |
+| 391 | [kroybaraka.com](http://kroybaraka.com) |
+| 392 | [shopnohut.com](http://shopnohut.com) |
+| 393 | [absmartshop.com](http://absmartshop.com) |
+| 394 | [rawjaa.com](http://rawjaa.com) |
