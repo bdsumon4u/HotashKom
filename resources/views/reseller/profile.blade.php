@@ -37,7 +37,7 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ route('reseller.profile') }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('reseller.profile.update') }}" enctype="multipart/form-data">
                             @csrf
                             @php($user = auth()->user())
                             <div class="row">

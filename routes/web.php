@@ -81,7 +81,7 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
             Route::post('orders/{order}/cancel', [ResellerController::class, 'cancelOrder'])->name('orders.cancel');
             Route::get('transactions', [ResellerController::class, 'transactions'])->name('transactions');
             Route::get('profile', [ResellerController::class, 'profile'])->name('profile');
-            Route::post('profile', [ResellerController::class, 'updateProfile'])->name('profile');
+            Route::post('profile', [ResellerController::class, 'updateProfile'])->name('profile.update');
         });
     });
 
