@@ -179,11 +179,24 @@ final class ResellerController extends Controller
                 'data' => $transactions->map(function ($transaction, $index) {
                     return [
                         'DT_RowIndex' => $index + 1,
-                        'type' => ucfirst($transaction->type),
+                        'type' => $transaction->type === 'deposit'
+                            ? '<span class="badge badge-success">Deposit</span>'
+                            : '<span class="badge badge-danger">Withdraw</span>',
                         'amount' => number_format((float) $transaction->amount, 2).' tk',
                         'created_at' => $transaction->created_at->format('d-M-Y H:i'),
                         'status' => $transaction->confirmed ? 'COMPLETED' : 'PENDING',
-                        'meta' => $transaction->meta['reason'] ?? '-',
+                        'meta' => (function ($meta) {
+                            if (isset($meta['trx_id']) && isset($meta['admin_id'])) {
+                                return '<span class="text-muted">Trx ID: ' . e($meta['trx_id']) . ' by staff #' . e($meta['admin_id']) . '</span>';
+                            }
+
+                            $title = $meta['reason'] ?? 'N/A';
+                            if ($id = $meta['order_id'] ?? false) {
+                                return '<a target="_blank" href="' . route('reseller.orders.show', $id) . '">' . e($title) . '</a>';
+                            }
+
+                            return e($title);
+                        })($transaction->meta),
                     ];
                 }),
             ]);
