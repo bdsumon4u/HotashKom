@@ -191,6 +191,11 @@ class EditOrder extends Component
         }
     }
 
+    public function updatedPackagingCharge($value)
+    {
+        $this->order->fill(['data' => array_merge($this->order->data, ['packaging_charge' => $value])]);
+    }
+
     public function updateOrder()
     {
         $this->validate();

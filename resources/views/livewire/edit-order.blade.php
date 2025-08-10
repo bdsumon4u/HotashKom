@@ -65,7 +65,7 @@
                 <div Pathao class="form-row @if ($courier != 'Pathao') d-none @endif">
                     <div class="form-group col-md-4">
                         <label for="">City</label>
-                        <select class="form-control" wire:model.live="city_id" :disabled="isReseller() && !is_null($order->source_id)">
+                        <select class="form-control" wire:model.live="city_id" @disabled(isReseller() && !is_null($order->source_id))>
                             <option value="" selected>Select City</option>
                             @foreach ($order->pathaoCityList() as $city)
                                 <option value="{{ $city->city_id }}">
@@ -110,7 +110,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="weight">Weight</label>
-                        <input type="number" wire:model="weight" class="form-control" placeholder="Weight in grams" :disabled="isReseller() && !is_null($order->source_id)">
+                        <input type="number" wire:model="weight" class="form-control" placeholder="Weight in grams" @disabled(isReseller() && !is_null($order->source_id))>
                     </div>
                 </div>
             </div>
@@ -223,7 +223,7 @@
 
                                         @if ($available = !$selectedVar->should_track || $selectedVar->stock_count > 0)
                                             <button type="button" class="btn btn-primary"
-                                                wire:click="addProduct({{ $selectedVar }})" :disabled="isReseller() && !is_null($order->source_id)">Add to Order</button>
+                                                wire:click="addProduct({{ $selectedVar }})" @disabled(isReseller() && !is_null($order->source_id))>Add to Order</button>
                                         @endif
                                     </td>
                                 </tr>
@@ -260,7 +260,7 @@
                                                 class="form-control input-number__input"
                                                 name="quantity[{{ $product['id'] }}]"
                                                 value="{{ old('quantity.' . $product['id'], $product['quantity']) }}"
-                                                min="1" readonly style="border-radius: 2px;" :disabled="isReseller() && !is_null($order->source_id)">
+                                                min="1" readonly style="border-radius: 2px;" @disabled(isReseller() && !is_null($order->source_id))>
                                             <div class="input-number__add"
                                                 @unless(isReseller() && !is_null($order->source_id))
                                                 wire:click="increaseQuantity({{ $product['id'] }})"
@@ -380,8 +380,8 @@
                         <tr>
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
-                                <strong>{!! theMoney($subtotal + $shipping_cost - $discount) !!}</strong> (buy)<br>
-                                <strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $shipping_cost) - $advanced - ($order->data['retail_discount'] ?? 0) - ($order->data['packaging_charge'] ?? 25)) !!}</strong> (sell)
+                                <strong>{!! theMoney($subtotal + $shipping_cost + ($order->data['packaging_charge'] ?? 25) - $discount) !!}</strong> (buy)<br>
+                                <strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $shipping_cost) - $advanced - ($order->data['retail_discount'] ?? 0)) !!}</strong> (sell)
                             </td>
                         </tr>
                         @else

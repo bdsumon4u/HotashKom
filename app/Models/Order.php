@@ -143,10 +143,20 @@ class Order extends Model
             };
 
             if ($status === 'DELIVERED') {
-                $order->user->deposit($calculateCommission(), [
-                    'reason' => 'Order #'.$order->id.' is '.$status,
-                    'order_id' => $order->id,
-                ]);
+                $amount = $calculateCommission();
+                if ($amount < 0) {
+                    $order->user->forceWithdraw(-$amount, [
+                        'reason' => 'Order #'.$order->id.' is '.$status,
+                        'order_id' => $order->id,
+                    ]);
+
+                    return;
+                } else {
+                    $order->user->deposit($amount, [
+                        'reason' => 'Order #'.$order->id.' is '.$status,
+                        'order_id' => $order->id,
+                    ]);
+                }
             } elseif ($status === 'RETURNED') {
                 $withdrawAmount = $shippingCost + $packagingCharge; // Charge shipping cost and packaging fee
                 if ($order->getOriginal('status') === 'DELIVERED') {

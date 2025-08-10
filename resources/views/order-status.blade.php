@@ -95,15 +95,23 @@
                                                 @endif
                                             </tr>
                                         @endif
-                                        @if ($data['retail_discount'])
-                                            <tr>
-                                                <th>Discount</th>
-                                                <td>{!! theMoney($data['discount'] ?? 0) !!}</td>
-                                                @if(isOninda() && config('app.resell'))
-                                                <td>{!! theMoney($data['retail_discount']) !!}</td>
-                                                @endif
-                                            </tr>
+                                                                                @if ($data['retail_discount'])
+                                        <tr>
+                                            <th>Discount</th>
+                                            <td>{!! theMoney($data['discount'] ?? 0) !!}</td>
+                                            @if(isOninda() && config('app.resell'))
+                                            <td>{!! theMoney($data['retail_discount']) !!}</td>
+                                            @endif
+                                        </tr>
                                         @endif
+                                        @if(isOninda() && config('app.resell'))
+                                        <tr>
+                                            <th>Packaging Charge</th>
+                                            <td>{!! theMoney($data['packaging_charge'] ?? 25) !!}</td>
+                                            <td>{!! theMoney(0) !!}</td>
+                                        </tr>
+                                        @endif
+                                        <!-- Packaging Charge -->
                                         <tr>
                                             <th>Delivery Charge</th>
                                             <td>{!! theMoney($data['shipping_cost']) !!}</td>
@@ -115,7 +123,7 @@
                                     <tfoot>
                                         <tr>
                                             <th>Grand Total</th>
-                                            <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] - ($data['discount'] ?? 0)) !!}</td>
+                                            <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] + ($data['packaging_charge'] ?? 25) - ($data['discount'] ?? 0)) !!}</td>
                                             @if(isOninda() && config('app.resell'))
                                             <td>{!! theMoney($retail + $data['retail_delivery_fee'] - ($data['advanced'] ?? 0) - ($data['retail_discount'] ?? 0)) !!}</td>
                                             @endif

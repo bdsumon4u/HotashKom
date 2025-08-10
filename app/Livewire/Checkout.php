@@ -407,7 +407,7 @@ class Checkout extends Component
         // Undefined index email.
         // $data['email'] && Mail::to($data['email'])->queue(new OrderPlaced($order));
 
-        if (config('app.instant_order_forwarding') && !config('app.demo')) {
+        if (config('app.instant_order_forwarding') && ! config('app.demo')) {
             CallOnindaOrderApi::dispatch($this->order->id);
         }
 

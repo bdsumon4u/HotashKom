@@ -210,12 +210,16 @@
                                         <td>{!! theMoney($order->data['shipping_cost'] ?? 0) !!}</td>
                                     </tr>
                                     <tr>
+                                        <td><strong>Packaging Charge:</strong></td>
+                                        <td>{!! theMoney($order->data['packaging_charge'] ?? 25) !!}</td>
+                                    </tr>
+                                    <tr>
                                         <td><strong>Discount:</strong></td>
                                         <td>{!! theMoney($order->data['discount'] ?? 0) !!}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Total:</strong></td>
-                                        <td><strong>{!! theMoney(($order->data['subtotal'] ?? 0) + ($order->data['shipping_cost'] ?? 0) - ($order->data['discount'] ?? 0)) !!}</strong></td>
+                                        <td><strong>{!! theMoney(($order->data['subtotal'] ?? 0) + ($order->data['shipping_cost'] ?? 0) + ($order->data['packaging_charge'] ?? 25) - ($order->data['discount'] ?? 0)) !!}</strong></td>
                                     </tr>
                                 </table>
                             </div>
@@ -224,7 +228,7 @@
                                 <table class="table table-sm table-borderless">
                                     <tr>
                                         <td><strong>Subtotal:</strong></td>
-                                        <td>{!! theMoney($order->data['subtotal'] ?? 0) !!}</td>
+                                        <td>{!! theMoney($retail = collect($order->products ?? [])->sum(function($product) { return ($product->retail_price ?? $product->price ?? 0) * ($product->quantity ?? 0); })) !!}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Delivery Fee:</strong></td>
@@ -240,7 +244,7 @@
                                     </tr>
                                     <tr>
                                         <td><strong>Grand Total:</strong></td>
-                                        <td><strong>{!! theMoney(($order->data['subtotal'] ?? 0) + ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0) - ($order->data['retail_discount'] ?? 0) - ($order->data['advanced'] ?? 0)) !!}</strong></td>
+                                        <td><strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0) - ($order->data['retail_discount'] ?? 0) - ($order->data['advanced'] ?? 0)) !!}</strong></td>
                                     </tr>
                                 </table>
                             </div>
@@ -279,28 +283,40 @@
                                         <thead>
                                             <tr>
                                                 <th>Product</th>
-                                                <th>Price</th>
+                                                <th>Buy Price</th>
+                                                <th>Sell Price</th>
                                                 <th>Quantity</th>
-                                                <th>Total</th>
+                                                <th>Buy Total</th>
+                                                <th>Sell Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @if($order->products && !empty($order->products))
                                                 @foreach($order->products as $product)
+                                                    @php
+                                                        $buyPrice = $product->price ?? 0;
+                                                        $sellPrice = $product->retail_price ?? 0;
+                                                        $quantity = $product->quantity ?? 0;
+                                                        $buyTotal = $buyPrice * $quantity;
+                                                        $sellTotal = $sellPrice * $quantity;
+                                                    @endphp
                                                     <tr>
                                                         <td>{{ $product->name ?? 'N/A' }}</td>
-                                                        <td>{!! theMoney($product->price ?? 0) !!}</td>
-                                                        <td>{{ $product->quantity ?? 0 }}</td>
-                                                        <td>{!! theMoney($product->total ?? 0) !!}</td>
+                                                        <td>{!! theMoney($buyPrice) !!}</td>
+                                                        <td>{!! theMoney($sellPrice) !!}</td>
+                                                        <td>{{ $quantity }}</td>
+                                                        <td>{!! theMoney($buyTotal) !!}</td>
+                                                        <td>{!! theMoney($sellTotal) !!}</td>
                                                     </tr>
                                                 @endforeach
                                                 <tr class="table-active">
-                                                    <td colspan="3" class="text-right"><strong>Subtotal:</strong></td>
+                                                    <td colspan="5" class="text-right"><strong>Subtotal:</strong></td>
                                                     <td><strong>{!! theMoney($order->data['subtotal'] ?? 0) !!}</strong></td>
+                                                    <td><strong>{!! theMoney($retail) !!}</strong></td>
                                                 </tr>
                                             @else
                                                 <tr>
-                                                    <td colspan="4" class="text-center">No products found</td>
+                                                    <td colspan="7" class="text-center">No products found</td>
                                                 </tr>
                                             @endif
                                         </tbody>
@@ -350,8 +366,8 @@
                             ])
                         </div>
 
-                        <div class="col-sm-12 print-edit-buttons text-center mt-3">
-                            <button class="btn btn-primary mr-2" type="button" onclick="myFunction()">Print Invoice</button>
+                        <div class="mt-3 text-center col-sm-12 print-edit-buttons">
+                            <button class="mr-2 btn btn-primary" type="button" onclick="myFunction()">Print Invoice</button>
                         </div>
                     </div>
                 </div>

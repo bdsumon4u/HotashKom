@@ -151,6 +151,12 @@
                         </tr>
                         @endif
                         @if (isOninda())
+                        @if(config('app.resell'))
+                        <tr>
+                            <th style="white-space:nowrap;">Packaging Charge</th>
+                            <td>{!! theMoney($order->data['packaging_charge'] ?? 25) !!}</td>
+                        </tr>
+                        @endif
                         <tr>
                             <th style="white-space:nowrap;">Your Delivery Charge</th>
                             <td>
@@ -178,7 +184,7 @@
                     <tfoot class="checkout__totals-footer">
                         <tr>
                             <th>Buying</th>
-                            <td>{!! theMoney(cart()->total()) !!}</td>
+                            <td>{!! theMoney(cart()->total() + ($order->data['packaging_charge'] ?? 25)) !!}</td>
                         </tr>
                         @if (isOninda())
                         <tr>
@@ -236,6 +242,12 @@
                         </tr>
                         @endif
                         @if (isOninda())
+                        @if(config('app.resell'))
+                        <tr>
+                            <th style="white-space:nowrap;font-size:14px;">Packaging Charge</th>
+                            <td>{!! theMoney($order->data['packaging_charge'] ?? 25) !!}</td>
+                        </tr>
+                        @endif
                         <tr>
                             <th style="white-space:nowrap;font-size:14px;">Your Delivery Charge</th>
                             <td>
@@ -264,7 +276,7 @@
                         <tr>
                             <th style="white-space:nowrap;font-size:18px;">Buying Total</th>
                             <td style="font-size:14px;">
-                                <span>{!! theMoney(cart()->total()) !!}</span>
+                                <span>{!! theMoney(cart()->total() + ($order->data['packaging_charge'] ?? 25)) !!}</span>
                             </td>
                         </tr>
                         @if (isOninda())
@@ -316,17 +328,17 @@
 @push('scripts')
 <script>
     document.addEventListener('alpine:init', () => {
-            Alpine.data('sumPrices', () => ({
-                retail: @entangle('retail'),
-                advanced: @entangle('advanced'),
-                retail_delivery: @entangle('retailDeliveryFee'),
-                retailDiscount: @entangle('retailDiscount'),
-                get subtotal() {
-                    if (!this.retail || typeof this.retail !== 'object') return 0;
-                    return Object.values(this.retail).reduce((a, b) => a + b.price * b.quantity, 0);
-                },
-                format(price) { return 'TK ' + price.toLocaleString('en-US', { maximumFractionDigits: 0 }) },
-            }));
+                    Alpine.data('sumPrices', () => ({
+            retail: @entangle('retail'),
+            advanced: @entangle('advanced'),
+            retail_delivery: @entangle('retailDeliveryFee'),
+            retailDiscount: @entangle('retailDiscount'),
+            get subtotal() {
+                if (!this.retail || typeof this.retail !== 'object') return 0;
+                return Object.values(this.retail).reduce((a, b) => a + b.price * b.quantity, 0);
+            },
+            format(price) { return 'TK ' + price.toLocaleString('en-US', { maximumFractionDigits: 0 }) },
+        }));
         });
 </script>
 @endpush
