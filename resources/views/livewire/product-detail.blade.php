@@ -95,7 +95,7 @@
                     </div>
                     <div class="mt-1 small text-muted">
                         <i class="fa fa-info-circle"></i> Suggested retail price:
-                        <strong>৳{{ number_format($selectedVar->selling_price * 1.2, 2) }} - ৳{{ number_format($selectedVar->selling_price * 1.3, 2) }}</strong>
+                        <strong>৳{{ number_format($selectedVar->selling_price * 1.3, 2) }} - ৳{{ number_format($selectedVar->selling_price * 1.5, 2) }}</strong>
                     </div>
                     @endif
                     <div class="overflow-hidden product__actions">

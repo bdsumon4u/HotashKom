@@ -85,7 +85,7 @@ class ProductDetail extends Component
         }
         $this->options = $this->selectedVar->options->pluck('id', 'attribute_id')->toArray();
         $this->maxQuantity = $this->selectedVar->should_track ? min($this->selectedVar->stock_count, $maxPerProduct) : $maxPerProduct;
-        $this->retailPrice = (int) ($this->selectedVar->selling_price * 1.25);
+        $this->retailPrice = (int) ($this->selectedVar->selling_price * 1.4);
     }
 
     public function deliveryText($freeDelivery)
