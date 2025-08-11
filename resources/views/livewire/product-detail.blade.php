@@ -14,8 +14,8 @@
                 </strong>
             </div>
         </div>
-        @php($show_option = setting('show_option'))
-        @php($guest_can_see_price = (bool)($show_option->guest_can_see_price ?? false))
+        @php $show_option = setting('show_option') @endphp
+        @php $guest_can_see_price = (bool)($show_option->guest_can_see_price ?? false) @endphp
         <div
             class="product__prices mb-1 {{ ($selling = $selectedVar->getPrice($quantity)) == $selectedVar->price ? '' : 'has-special' }}">
             Price:
@@ -99,7 +99,7 @@
                     </div>
                     @endif
                     <div class="overflow-hidden product__actions">
-                        @php($available = !$selectedVar->should_track || $selectedVar->stock_count > 0)
+                        @php $available = !$selectedVar->should_track || $selectedVar->stock_count > 0 @endphp
                         <div class="product__buttons @if ($show_option->product_detail_buttons_inline ?? false) d-lg-inline-flex @endif w-100"
                             @if ($show_option->product_detail_buttons_inline ?? false) style="gap: .5rem;" @endif>
                             @if ($show_option->product_detail_order_now ?? false)
@@ -139,6 +139,25 @@
                             </a>
                         @endif
                     @endforeach
+                </div>
+                @php
+                    $company = setting('company');
+                    $phone = preg_replace('/[^\d]/', '', $company->whatsapp ?? '');
+                    $phone = strlen($phone) == 11 ? '88' . $phone : $phone;
+                    $messenger = $company->messenger ?? '';
+                @endphp
+                <div class="gap-2 mt-2 d-flex justify-content-center">
+                    @if(strlen($messenger) > 13)
+                    <a href="{{$messenger}}" target="_blank" rel="noopener"
+                        class="btn btn-outline-primary d-flex align-items-center" style="min-width: 140px;">
+                        <i class="mr-2 fab fa-facebook-messenger"></i> Messenger
+                    </a>
+                    @endif
+                    <a href="https://api.whatsapp.com/send?phone={{ $phone }}&text=Hello+%0D%0AI+am+interested+in+ordering+%22{{ $product->name }}%22.%0D%0A%0D%0A{{ url()->current() }}"
+                        target="_blank" rel="noopener"
+                        class="btn btn-outline-success d-flex align-items-center" style="min-width: 140px;">
+                        <i class="mr-2 fab fa-whatsapp"></i> WhatsApp
+                    </a>
                 </div>
                 @if (($free_delivery->enabled ?? false) && $deliveryText)
                     <div class="mt-2 text-center border font-weight-bold">
