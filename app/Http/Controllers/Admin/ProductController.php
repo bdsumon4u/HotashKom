@@ -109,7 +109,9 @@ class ProductController extends Controller
 
         event(new ProductUpdated($product, $data));
 
-        return redirect()->action([static::class, 'index'])->with('success', 'Product Has Been Updated. Check <a href="'.route('products.show', $product).'" target="_blank">Product</a>');
+        return redirect()
+            ->action([static::class, 'index'])
+            ->with('success', 'Product Has Been Updated. <a href="'.route('products.show', $product).'" target="_blank">View the Product</a> or <a href="'.route('admin.products.edit', $product).'">Edit the Product</a> again.');
     }
 
     /**
