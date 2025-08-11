@@ -155,7 +155,7 @@ class Checkout extends Component
 
         $freeDelivery = setting('free_delivery');
 
-        if (! ($freeDelivery->enabled ?? false)) {
+        if (! ((bool) ($freeDelivery->enabled ?? false)) || ($freeDelivery->enabled ?? false) == 'false') {
             return $shipping_cost;
         }
 
