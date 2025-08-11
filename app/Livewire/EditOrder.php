@@ -188,7 +188,13 @@ class EditOrder extends Component
         ]);
         if (isOninda() && ! config('app.resell')) {
             $this->fill(['retail_delivery_fee' => $this->shipping_cost]);
+            $this->updatedRetailDeliveryFee($this->shipping_cost);
         }
+    }
+
+    public function updatedRetailDeliveryFee($value)
+    {
+        $this->order->fill(['data' => array_merge($this->order->data, ['retail_delivery_fee' => $value])]);
     }
 
     public function updatedPackagingCharge($value)

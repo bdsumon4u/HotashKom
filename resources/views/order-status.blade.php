@@ -123,9 +123,11 @@
                                     <tfoot>
                                         <tr>
                                             <th>Grand Total</th>
-                                            <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] + ($data['packaging_charge'] ?? 25) - ($data['discount'] ?? 0)) !!}</td>
                                             @if(isOninda() && config('app.resell'))
+                                            <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] + ($data['packaging_charge'] ?? 25) - ($data['discount'] ?? 0)) !!}</td>
                                             <td>{!! theMoney($retail + $data['retail_delivery_fee'] - ($data['advanced'] ?? 0) - ($data['retail_discount'] ?? 0)) !!}</td>
+                                            @else
+                                            <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] - ($data['discount'] ?? 0)) !!}</td>
                                             @endif
                                         </tr>
                                     </tfoot>

@@ -209,17 +209,19 @@
                                         <td><strong>Shipping Cost:</strong></td>
                                         <td>{!! theMoney($order->data['shipping_cost'] ?? 0) !!}</td>
                                     </tr>
+                                    @if(isOninda() && config('app.resell'))
                                     <tr>
                                         <td><strong>Packaging Charge:</strong></td>
                                         <td>{!! theMoney($order->data['packaging_charge'] ?? 25) !!}</td>
                                     </tr>
+                                    @endif
                                     <tr>
                                         <td><strong>Discount:</strong></td>
                                         <td>{!! theMoney($order->data['discount'] ?? 0) !!}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Total:</strong></td>
-                                        <td><strong>{!! theMoney(($order->data['subtotal'] ?? 0) + ($order->data['shipping_cost'] ?? 0) + ($order->data['packaging_charge'] ?? 25) - ($order->data['discount'] ?? 0)) !!}</strong></td>
+                                        <td><strong>{!! theMoney(($order->data['subtotal'] ?? 0) + ($order->data['shipping_cost'] ?? 0) + (isOninda() && config('app.resell') ? ($order->data['packaging_charge'] ?? 25) : 0) - ($order->data['discount'] ?? 0)) !!}</strong></td>
                                     </tr>
                                 </table>
                             </div>
@@ -242,9 +244,15 @@
                                         <td><strong>Advanced:</strong></td>
                                         <td>{!! theMoney($order->data['advanced'] ?? 0) !!}</td>
                                     </tr>
+                                    @if(isOninda() && config('app.resell'))
+                                    <tr>
+                                        <td><strong>Packaging Charge:</strong></td>
+                                        <td>{!! theMoney($order->data['packaging_charge'] ?? 25) !!}</td>
+                                    </tr>
+                                    @endif
                                     <tr>
                                         <td><strong>Grand Total:</strong></td>
-                                        <td><strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0) - ($order->data['retail_discount'] ?? 0) - ($order->data['advanced'] ?? 0)) !!}</strong></td>
+                                        <td><strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0) + (isOninda() && config('app.resell') ? ($order->data['packaging_charge'] ?? 25) : 0) - ($order->data['retail_discount'] ?? 0) - ($order->data['advanced'] ?? 0)) !!}</strong></td>
                                     </tr>
                                 </table>
                             </div>

@@ -249,7 +249,7 @@
                                             </div>
                                             @else
                                             <div class="text-nowrap">
-                                                Total Price: {{ $amount = $product['price'] * $product['quantity'] }}
+                                                Total Price: {{ $amount = ($product[isOninda() ? 'retail_price' : 'price'] ?? $product['price']) * $product['quantity'] }}
                                             </div>
                                             @endif
                                         </div>
@@ -341,7 +341,11 @@
                         @else
                         <tr>
                             <th>Subtotal</th>
+                            @if(isOninda())
+                            <td class="checkout-subtotal">{!! theMoney($retail) !!}</td>
+                            @else
                             <td class="checkout-subtotal">{!! theMoney($subtotal) !!}</td>
+                            @endif
                         </tr>
                         <tr>
                             <th style="vertical-align: middle;">Advanced</th>
@@ -388,7 +392,11 @@
                         <tr>
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
+                                @if(isOninda())
+                                <strong>{!! theMoney($retail + $order->data['retail_delivery_fee'] - $advanced - ($order->data['discount'] ?? 0)) !!}</strong>
+                                @else
                                 <strong>{!! theMoney($subtotal + $shipping_cost - $discount - $advanced) !!}</strong>
+                                @endif
                             </td>
                         </tr>
                         @endif
