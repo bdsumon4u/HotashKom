@@ -178,10 +178,7 @@ class CategoryController extends Controller
             return $result;
         }
 
-        DB::transaction(function () use ($category): void {
-            $category->childrens()->delete();
-            $category->delete();
-        });
+        $category->delete();
 
         return redirect()->route('admin.categories.index')->with('success', 'Category Has Been Deleted.');
     }

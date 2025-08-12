@@ -18,8 +18,6 @@ class Category extends Model
             cache()->forget('categories:nested:');
             cache()->forget('categories:nested:1');
             cache()->forget('homesections');
-            // cache()->forget('catmenu:nested');
-            // cache()->forget('catmenu:nestedwithparent');
 
             // Dispatch job to copy category to reseller databases
             if (isOninda() && $category->wasRecentlyCreated) {
@@ -37,11 +35,12 @@ class Category extends Model
                 RemoveResourceFromResellers::dispatch($category->getTable(), $category->id);
             }
             $category->childrens->each->delete();
-            // optional($category->categoryMenu)->delete();
-            cache()->forget('categories:nested');
+        });
+
+        static::deleted(function ($category): void {
+            cache()->forget('categories:nested:');
+            cache()->forget('categories:nested:1');
             cache()->forget('homesections');
-            // cache()->forget('catmenu:nested');
-            // cache()->forget('catmenu:nestedwithparent');
         });
     }
 
