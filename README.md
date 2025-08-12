@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}396}$$ 🔥 domains are live now
+These 🔥 $${\color{red}400}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-11 09:46:33 Asia/Dhaka**_
+_Last updated: **2025-08-12 09:20:34 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -495,3 +495,7 @@ _Last updated: **2025-08-11 09:46:33 Asia/Dhaka**_
 | 394 | [arishshop.com](http://arishshop.com) |
 | 395 | [naturalhealth24.com](http://naturalhealth24.com) |
 | 396 | [dhakapet.com](http://dhakapet.com) |
+| 397 | [nobinhat.com](http://nobinhat.com) |
+| 398 | [morurjahaj.com](http://morurjahaj.com) |
+| 399 | [rokomaripoint.com](http://rokomaripoint.com) |
+| 400 | [thikana24.com](http://thikana24.com) |
