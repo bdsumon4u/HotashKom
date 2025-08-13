@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}400}$$ 🔥 domains are live now
+These 🔥 $${\color{red}402}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-12 09:20:34 Asia/Dhaka**_
+_Last updated: **2025-08-13 09:23:08 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -499,3 +499,5 @@ _Last updated: **2025-08-12 09:20:34 Asia/Dhaka**_
 | 398 | [morurjahaj.com](http://morurjahaj.com) |
 | 399 | [rokomaripoint.com](http://rokomaripoint.com) |
 | 400 | [thikana24.com](http://thikana24.com) |
+| 401 | [krishanbd.com](http://krishanbd.com) |
+| 402 | [sylban.com](http://sylban.com) |
