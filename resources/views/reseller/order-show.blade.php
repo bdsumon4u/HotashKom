@@ -374,8 +374,15 @@
                             ])
                         </div>
 
-                        <div class="mt-3 text-center col-sm-12 print-edit-buttons">
-                            <button class="mr-2 btn btn-primary" type="button" onclick="myFunction()">Print Invoice</button>
+                        <div class="gap-2 mt-3 text-center col-sm-12 print-edit-buttons d-flex justify-content-center">
+                            @if(in_array($order->status, ['PENDING', 'CONFIRMED']))
+                                <a href="{{ route('reseller.orders.edit', $order->id) }}" class="mr-2 btn btn-warning">
+                                    Edit Order
+                                </a>
+                            @endif
+                            <button class="btn btn-primary" type="button" onclick="myFunction()">
+                                Print Invoice
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -280,8 +280,8 @@
                         Update Order
                     </button>
                     @if($canCancel)
-                        <button type="button" class="btn btn-danger" wire:click="cancelOrder"
-                                onclick="return confirm('Are you sure you want to cancel this order? This action cannot be undone.')">
+                        <button type="button" class="btn btn-danger"
+                            onclick="if (confirm('Are you sure you want to cancel this order? This action cannot be undone.')) { Livewire.find('{{ $this->getId() }}').call('cancelOrder'); }">
                             Cancel Order
                         </button>
                     @endif
