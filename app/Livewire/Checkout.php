@@ -223,7 +223,7 @@ class Checkout extends Component
             $this->retailDeliveryFee = $this->shippingCost($shipping);
         }
 
-        if ($user = auth('user')->user()) {
+        if ((!isOninda() || !config('app.resell')) && $user = auth('user')->user()) {
             $this->name = $user->name;
             if ($user->phone_number) {
                 $this->phone = Str::after($user->phone_number, '+880');
@@ -231,7 +231,7 @@ class Checkout extends Component
             $this->address = $user->address ?? '';
             $this->note = $user->note ?? '';
             $this->retailDiscount = $user->discount ?? 0;
-        } else {
+        } else if ($this->fillFromCookie()) {
             $this->name = Cookie::get('name', '');
             $this->shipping = Cookie::get('shipping', $shipping ?? '');
             $this->phone = Cookie::get('phone', '');
@@ -438,7 +438,7 @@ class Checkout extends Component
         cart()->destroy();
         session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Recieved. Thanks For Your Order.');
 
-        return redirect()->route('thank-you', [
+        return redirect()->route($this->getRedirectRoute(), [
             'order' => optional($this->order)->getKey(),
         ]);
     }
@@ -472,5 +472,15 @@ class Checkout extends Component
             'pathaoCities' => collect($tempOrder->pathaoCityList()),
             'pathaoAreas' => collect($tempOrder->pathaoAreaList($this->city_id)),
         ]);
+    }
+
+    protected function fillFromCookie()
+    {
+        return true;
+    }
+
+    protected function getRedirectRoute()
+    {
+        return 'thank-you';
     }
 }

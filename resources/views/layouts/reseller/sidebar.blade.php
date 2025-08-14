@@ -32,6 +32,14 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('reseller/products*') ? 'active' : '' }}"
+                            href="{{ route('reseller.products') }}">
+                            <i data-feather="package"> </i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+
                     <li class="sidebar-title">
                         <h6>Reseller Panel</h6>
                     </li>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\BrandProductController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\HomeController;
@@ -75,6 +76,7 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::middleware('auth:user')->group(function () {
         Route::prefix('reseller')->name('reseller.')->group(function () {
             Route::get('dashboard', [ResellerController::class, 'dashboard'])->name('dashboard');
+            Route::get('products', [ResellerController::class, 'products'])->name('products');
             Route::get('orders', [ResellerController::class, 'orders'])->name('orders');
             Route::get('orders/{order}', [ResellerController::class, 'showOrder'])->name('orders.show');
             Route::get('orders/{order}/edit', [ResellerController::class, 'editOrder'])->name('orders.edit');
@@ -82,6 +84,8 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
             Route::get('transactions', [ResellerController::class, 'transactions'])->name('transactions');
             Route::get('profile', [ResellerController::class, 'profile'])->name('profile');
             Route::post('profile', [ResellerController::class, 'updateProfile'])->name('profile.update');
+            Route::match(['GET', 'POST'], 'checkout', [ResellerController::class, 'checkout'])->name('checkout');
+            Route::get('thank-you', [ResellerController::class, 'thankYou'])->name('thank-you');
         });
     });
 

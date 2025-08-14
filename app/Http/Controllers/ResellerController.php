@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -38,6 +39,70 @@ final class ResellerController extends Controller
             'recentOrders',
             'recentTransactions'
         ));
+    }
+
+    public function products(Request $request)
+    {
+        $query = Product::with(['variations.options', 'images', 'brand', 'categories'])
+            ->whereNull('parent_id')
+            ->where('is_active', 1);
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('sku', $search);
+            });
+        }
+
+        $products = $query->latest()->paginate(20);
+
+        return view('reseller.products', compact('products'));
+    }
+
+    public function checkout(Request $request)
+    {
+        $user = Auth::guard('user')->user();
+
+        // Handle POST request (form submission)
+        if ($request->isMethod('post')) {
+            return $this->processCheckout($request, $user);
+        }
+
+        // Handle GET request (display checkout form)
+        return view('reseller.checkout');
+    }
+
+    private function processCheckout(Request $request, $user)
+    {
+        // Validate the request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|regex:/^1\d{9}$/',
+            'address' => 'required|string',
+            'shipping' => 'required|in:Inside Dhaka,Outside Dhaka',
+            'note' => 'nullable|string',
+        ]);
+
+        // Process the checkout using the existing checkout logic
+        // For now, redirect to the main checkout with the form data
+        return redirect()->route('checkout')->with([
+            'reseller_checkout_data' => $request->all(),
+        ]);
+    }
+
+    public function thankYou(Request $request)
+    {
+        if (! $request->has('order')) {
+            return view('track-order');
+        }
+        $order = Order::where(['id' => $request->order])->first();
+        if (! $order instanceof Order) {
+            return back()->withDanger('Invalid Tracking Info Or Order Record Was Deleted.');
+        }
+
+        return view('reseller.thank-you', compact('order'));
     }
 
     public function orders(Request $request)

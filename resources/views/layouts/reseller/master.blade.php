@@ -36,12 +36,19 @@
       .product__quantity {
         width: 120px;
       }
+      .cart-table__column {
+        padding: 10px;
+      }
+      .cart-table__column.cart-table__column--price,
+      .cart-table__column.cart-table__column--total {
+        min-width: 120px;
+      }
       .input-number__input {
         -moz-appearance: textfield;
         display: block;
         width: 100%;
         min-width: 88px;
-        padding: 0 35px 0px 45px;
+        padding: 0 35px 0px 35px;
         text-align: center;
       }
       .input-number__add, .input-number__sub {
@@ -95,6 +102,11 @@
           visibility: visible !important;
           opacity: 1 !important;
         }
+      }
+
+      .checkout__totals-subtotals th,
+      .checkout__totals-subtotals td {
+        padding: 4px 0;
       }
     </style>
     @stack('styles')
@@ -157,6 +169,13 @@
     @stack('scripts')
     @livewireScripts
     <script>
+      $(window).on('notify', function (ev) {
+          for (let item of ev.detail) {
+              $.notify(item.message, {
+                  type: item.type ?? 'info',
+              });
+          }
+      });
       $(document).on('click', '#sidebar-toggler', function (ev) {
         console.log(ev);
         ev.preventDefault();

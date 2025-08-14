@@ -25,7 +25,7 @@ trait HasCart
 
         cart()->instance($instance)->add(
             $product->id,
-            $product->var_name,
+            $product->varName,
             $quantity,
             $productData['price'], // this is the wholesale price
             $productData
@@ -51,7 +51,7 @@ trait HasCart
                     'items' => [
                         [
                             'item_id' => $product->id,
-                            'item_name' => $product->var_name,
+                            'item_name' => $product->varName,
                             'item_category' => $product->category,
                             'price' => $retailPrice,
                             'quantity' => $quantity,

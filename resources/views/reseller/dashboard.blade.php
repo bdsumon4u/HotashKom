@@ -113,15 +113,13 @@
                                 <div class="ecommerce-widgets media">
                                     <div class="media-body">
                                         <p class="mb-2 f-w-500 font-roboto">Available Balance</p>
-                                        <h4 class="mb-0 f-w-500 f-26">{{ number_format($availableBalance ?? 0, 2) }} tk</h4>
+                                        <h4 class="mb-0 f-w-500 f-26"><span class="counter">{{ number_format($availableBalance ?? 0, 2) }}</span> tk</h4>
                                     </div>
                                     <div class="ecommerce-box light-bg-warning"><i class="fa fa-wallet" aria-hidden="true"></i></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
             <div class="col-xl-5 box-col-12 xl-50">
                 <div class="row dash-chart">
@@ -161,6 +159,29 @@
                                     </table>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Continue Shopping Section -->
+            <div class="mt-4 col-12">
+                <div class="card">
+                    <div class="text-center card-body">
+                        <h5 class="card-title">Ready to place an order?</h5>
+                        <p class="card-text">Browse our product catalog and add items to your cart</p>
+                        <div class="gap-2 d-flex justify-content-center">
+                            <a href="{{ route('reseller.products') }}" class="btn btn-primary">
+                                <i class="mr-2 fa fa-shopping-bag"></i>Browse Products
+                            </a>
+                            @if(cart()->count() > 0)
+                                <a href="{{ route('reseller.checkout') }}" class="btn btn-outline-primary">
+                                    <i class="mr-2 fa fa-shopping-cart"></i>View Cart ({{ cart()->count() }})
+                                </a>
+                                <a href="{{ route('checkout') }}" class="btn btn-success">
+                                    <i class="mr-2 fa fa-credit-card"></i>Checkout
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>

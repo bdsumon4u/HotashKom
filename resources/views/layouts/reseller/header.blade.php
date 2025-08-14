@@ -1,5 +1,5 @@
 <div class="page-main-header">
-  <div class="main-header-right row m-0">
+  <div class="m-0 main-header-right row">
     <div class="main-header-left">
       <div class="logo-wrapper">
         <a href="{{ route('reseller.dashboard') }}">
@@ -8,15 +8,22 @@
       </div>
       <button class="toggle-nav toggler-sidebar" id="sidebar-toggler" style="padding:2px 10px;border:none;background:none;"><i class="status_toggle middle" data-feather="grid"> </i></button>
     </div>
-    <div class="left-menu-header col horizontal-wrapper pl-0">
+    <div class="pl-0 left-menu-header col horizontal-wrapper">
       <ul class="horizontal-menu">
         <li class=""><a class="nav-link text-nowrap" href="{{ route('/') }}" target="_blank">View Store</a></li>
       </ul>
     </div>
     <div class="nav-right col-8 pull-right right-menu">
-      <ul class="nav-menus mr-0">
+      <ul class="mr-0 nav-menus">
         <li class="maximize"><a class="text-dark" href="#!" onclick="javascript:toggleFullScreen()"><i data-feather="maximize"></i></a></li>
-        <li class="profile-nav onhover-dropdown p-0">
+
+        <!-- Cart Indicator -->
+        <a href="{{ route('reseller.checkout') }}" class="mx-3 text-dark">
+            <i data-feather="shopping-cart"></i>
+            <livewire:cart-count />
+        </a>
+
+        <li class="p-0 profile-nav onhover-dropdown">
           <div class="media profile-media">
             <img class="b-r-10" src="{{ asset('assets/images/dashboard/profile.jpg') }}" alt="">
             <div class="media-body">
