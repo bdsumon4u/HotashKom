@@ -83,6 +83,7 @@
                            <th>Name</th>
                            <th>Price</th>
                            <th>Stock</th>
+                           <th>Status</th>
                            <th width="10">Action</th>
                         </tr>
                      </thead>
@@ -104,6 +105,7 @@ $(function() {
         {data: 'name', name: 'name'},
         {data: 'price', name: 'price', orderable: true, searchable: false},
         {data: 'stock', name: 'stock', orderable: true, searchable: false},
+        {data: 'status', name: 'status', orderable: true, searchable: false},
         {data: 'actions', name: 'actions', orderable: false, searchable: false}
     ];
     $('#product-table').DataTable({

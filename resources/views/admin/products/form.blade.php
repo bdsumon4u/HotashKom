@@ -177,6 +177,24 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <div class="checkbox checkbox-warning">
+                                <x-checkbox name="hot_sale" value="1" :checked="!!$product->hot_sale" />
+                                <x-label for="hot_sale" />
+                                <x-error field="hot_sale" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <div class="checkbox checkbox-info">
+                                <x-checkbox name="new_arrival" value="1" :checked="!!$product->new_arrival" />
+                                <x-label for="new_arrival" />
+                                <x-error field="new_arrival" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">

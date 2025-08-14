@@ -30,12 +30,35 @@
             <div class="mb-4 shadow-sm card rounded-0">
                 <div class="p-3 card-body">
                     <form method="GET" action="{{ route('reseller.products') }}" class="row g-3">
-                        <div class="col-md-8">
+                        <div class="col-md-6">
                             <input type="text" name="search" class="form-control search-box"
                                    placeholder="Search by name, SKU, or description"
                                    value="{{ request('search') }}">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2 col-6">
+                            <div class="my-2 form-check filter-checkbox">
+                                <input type="checkbox" class="form-check-input" id="hot_sale" name="hot_sale" value="1" {{ request('hot_sale')
+                                    ? 'checked' : '' }}>
+                                <label class="form-check-label" for="hot_sale">
+                                    <span class="badge badge-warning">
+                                        <i class="mr-1 fa fa-fire"></i>Hot Sale
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 col-6">
+                            <div class="my-2 form-check filter-checkbox">
+                                <input type="checkbox" class="form-check-input" id="new_arrival" name="new_arrival" value="1" {{
+                                    request('new_arrival') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="new_arrival">
+                                    <span class="badge badge-info">
+                                        <i class="mr-1 fa fa-star"></i>New Arrival
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="mr-2 fa fa-search"></i>Search
                             </button>
@@ -57,6 +80,20 @@
 
                     <div class="px-2 mb-2 col-lg-3 col-md-4 col-sm-6">
                         <div class="product-card">
+                            <!-- Product Status Badges -->
+                            <div class="product-badges">
+                                @if($product->hot_sale)
+                                    <span class="badge badge-warning position-absolute" style="top: 10px; left: 10px; z-index: 1;">
+                                        <i class="mr-1 fa fa-fire"></i>Hot Sale
+                                    </span>
+                                @endif
+                                @if($product->new_arrival)
+                                    <span class="badge badge-info position-absolute" style="top: 10px; right: 10px; z-index: 1;">
+                                        <i class="mr-1 fa fa-star"></i>New
+                                    </span>
+                                @endif
+                            </div>
+
                             <img src="{{ asset(optional($selectedVar->baseImage)->src ?? 'assets/images/no-image.png') }}"
                                  alt="{{ $product->name }}" class="product-image">
 
@@ -138,11 +175,36 @@
     /* height: 100%; */
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .product-card:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     transform: translateY(-2px);
+}
+
+.product-badges {
+    position: relative;
+}
+
+.product-badges .badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.product-badges .badge-warning {
+    background: linear-gradient(45deg, #ffc107, #ff8f00);
+    color: #fff;
+    border: none;
+}
+
+.product-badges .badge-info {
+    background: linear-gradient(45deg, #17a2b8, #0d6efd);
+    color: #fff;
+    border: none;
 }
 
 .product-image {
@@ -207,6 +269,32 @@
     border-color: #007bff;
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
 }
+
+.form-check-input:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.form-check-label {
+    cursor: pointer;
+    user-select: none;
+}
+
+.form-check-label .badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+}
+
+.filter-checkbox .form-check-input:checked + .form-check-label .badge {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.filter-checkbox .form-check-input:not(:checked) + .form-check-label .badge {
+    background-color: #e9ecef;
+    border-color: #e9ecef;
+    color: #6c757d;
+}
 </style>
 
 <script>
@@ -215,11 +303,31 @@ document.addEventListener('DOMContentLoaded', function() {
     let searchTimeout;
     const searchInput = document.querySelector('.search-box');
 
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            this.closest('form').submit();
-        }, 500);
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.closest('form').submit();
+            }, 500);
+        });
+    }
+
+    // Auto-submit filter form when checkboxes change
+    const filterCheckboxes = document.querySelectorAll('input[name="hot_sale"], input[name="new_arrival"]');
+    filterCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            // Add a small delay to prevent rapid submissions
+            setTimeout(() => {
+                this.closest('form').submit();
+            }, 100);
+        });
+    });
+
+    // Debug: Log current filter state
+    console.log('Current filters:', {
+        hot_sale: '{{ request("hot_sale") }}',
+        new_arrival: '{{ request("new_arrival") }}',
+        search: '{{ request("search") }}'
     });
 });
 </script>

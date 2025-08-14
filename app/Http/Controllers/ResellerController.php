@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 final class ResellerController extends Controller
@@ -55,6 +56,27 @@ final class ResellerController extends Controller
                     ->orWhere('sku', $search);
             });
         }
+
+        // Filter by hot sale
+        if ($request->filled('hot_sale')) {
+            $query->where('hot_sale', $request->hot_sale);
+        }
+
+        // Filter by new arrival
+        if ($request->filled('new_arrival')) {
+            $query->where('new_arrival', $request->new_arrival);
+        }
+
+        // Debug: Log the query and filters
+        \Log::info('Reseller products query', [
+            'filters' => [
+                'search' => $request->search,
+                'hot_sale' => $request->hot_sale,
+                'new_arrival' => $request->new_arrival,
+            ],
+            'sql' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+        ]);
 
         $products = $query->latest()->paginate(20);
 

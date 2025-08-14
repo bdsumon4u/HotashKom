@@ -19,7 +19,19 @@ class Product extends Model
 
     protected $fillable = [
         'brand_id', 'name', 'slug', 'description', 'price', 'average_purchase_price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
-        'source_id', 'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'shipping_inside', 'shipping_outside', 'delivery_text',
+        'source_id', 'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'hot_sale', 'new_arrival', 'shipping_inside', 'shipping_outside', 'delivery_text',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_active' => 'boolean',
+        'hot_sale' => 'boolean',
+        'new_arrival' => 'boolean',
+        'should_track' => 'boolean',
     ];
 
     /**
@@ -216,6 +228,7 @@ class Product extends Model
         if (is_string($price) && preg_match('/^\s*(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*$/', $price, $matches)) {
             $low = (float) $matches[1];
             $high = (float) $matches[2];
+
             return (int) round(($low + $high) / 2);
         }
 
@@ -229,7 +242,7 @@ class Product extends Model
     public function suggestedRetailPrice(): string
     {
         if ($this->suggested_price) {
-            return '৳' . $this->suggested_price;
+            return '৳'.$this->suggested_price;
         }
 
         return sprintf('৳%d - ৳%d', round($this->selling_price * 1.3), round($this->selling_price * 1.5));

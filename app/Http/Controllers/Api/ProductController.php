@@ -69,12 +69,31 @@ class ProductController extends Controller
                     return '<span class="text-success">In Stock</span>';
                 }
             })
+            ->addColumn('status', function (Product $product): string {
+                $statusHtml = '';
+
+                if ($product->is_active) {
+                    $statusHtml .= '<span class="badge badge-success">Active</span>';
+                } else {
+                    $statusHtml .= '<span class="badge badge-danger">Inactive</span>';
+                }
+
+                if ($product->hot_sale) {
+                    $statusHtml .= ' <span class="badge badge-warning">Hot Sale</span>';
+                }
+
+                if ($product->new_arrival) {
+                    $statusHtml .= ' <span class="badge badge-info">New Arrival</span>';
+                }
+
+                return $statusHtml;
+            })
             ->addColumn('actions', fn (Product $product): string => '<div>
                     <a href="'.route('admin.products.edit', $product).'" class="btn btn-sm btn-block btn-primary">Edit</a>
                     <a target="_blank" href="/landing/'.$product->id.'" class="btn btn-sm btn-block btn-info">Landing</a>
                     <a href="'.route('admin.products.destroy', $product).'" data-action="delete" class="btn btn-sm btn-block btn-danger">Delete</a>
                 </div>')
-            ->rawColumns(['image', 'name', 'price', 'stock', 'actions'])
+            ->rawColumns(['image', 'name', 'price', 'stock', 'status', 'actions'])
             ->orderColumn('stock', function ($query, $direction) {
                 $query->orderByRaw(
                     "should_track DESC, stock $direction"
@@ -82,6 +101,11 @@ class ProductController extends Controller
             })
             ->orderColumn('price', function ($query, $direction) {
                 $query->orderBy('selling_price', $direction);
+            })
+            ->orderColumn('status', function ($query, $direction) {
+                $query->orderBy('is_active', $direction === 'desc' ? 'asc' : 'desc')
+                    ->orderBy('hot_sale', $direction === 'desc' ? 'asc' : 'desc')
+                    ->orderBy('new_arrival', $direction === 'desc' ? 'asc' : 'desc');
             });
 
         return $dt->make(true);
