@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}402}$$ 🔥 domains are live now
+These 🔥 $${\color{red}403}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-13 09:23:08 Asia/Dhaka**_
+_Last updated: **2025-08-14 09:27:18 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -501,3 +501,4 @@ _Last updated: **2025-08-13 09:23:08 Asia/Dhaka**_
 | 400 | [thikana24.com](http://thikana24.com) |
 | 401 | [krishanbd.com](http://krishanbd.com) |
 | 402 | [sylban.com](http://sylban.com) |
+| 403 | [kulsummart.com](http://kulsummart.com) |
