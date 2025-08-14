@@ -46,11 +46,6 @@ class MoneyRequestController extends Controller
                     <small class="text-muted">'.($user->shop_name ?? 'N/A').'</small>
                 </div>';
             })
-            ->editColumn('phone', function ($row): string {
-                $user = $row->payable;
-
-                return $user ? ($user->phone_number ?? 'N/A') : 'N/A';
-            })
             ->editColumn('bkash', function ($row): string {
                 $user = $row->payable;
 

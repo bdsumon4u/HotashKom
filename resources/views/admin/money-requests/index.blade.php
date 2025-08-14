@@ -77,7 +77,6 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Reseller</th>
-                                        <th>Phone</th>
                                         <th>bKash</th>
                                         <th>Amount</th>
                                         <th>Requested At</th>
@@ -169,7 +168,6 @@
                 columns: [
                     {data: 'id', name: 'id'},
                     {data: 'reseller', name: 'reseller'},
-                    {data: 'phone', name: 'phone'},
                     {data: 'bkash', name: 'bkash'},
                     {data: 'amount', name: 'amount'},
                     {data: 'requested_at', name: 'requested_at'},
