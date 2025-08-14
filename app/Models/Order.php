@@ -322,7 +322,7 @@ class Order extends Model
 
         $freeDelivery = setting('free_delivery');
 
-        if (! ($freeDelivery->enabled ?? false)) {
+        if (! ($freeDelivery->enabled ?? false) || ($freeDelivery->enabled ?? false) == 'false') {
             return $shipping_cost;
         }
 

@@ -30,6 +30,21 @@
                 <span class="product-card__old-price">{!! theMoney($selectedVar->price) !!}</span>
             @endif
         </div>
+        @if(isOninda())
+        <div class="px-3 py-2 pt-1 product__actions-item d-flex justify-content-between align-items-center" style="border: 3px double #000;">
+            <div class="mr-2 font-weight-bold text-danger" style="white-space:nowrap;">Retail Price</div>
+            <div class="input-group input-group-sm">
+                <input type="number" class="form-control form-control-sm" wire:model="retailPrice" min="0" @focus="$event.target.select()" required>
+                <div class="input-group-append">
+                    <span class="input-group-text">৳</span>
+                </div>
+            </div>
+        </div>
+        <div class="mt-1 small text-muted">
+            <i class="fa fa-info-circle"></i> Suggested retail price:
+            <strong>{{ $selectedVar->suggestedRetailPrice() }}</strong>
+        </div>
+        @endif
 
         @foreach ($attributes as $attribute)
             <div class="mb-1 form-group product__option d-flex align-items-center" style="column-gap: .5rem;">
@@ -83,21 +98,6 @@
                             <div class="input-number__sub" wire:click="decrement"></div>
                         </div>
                     </div>
-                    @if(isOninda())
-                    <div class="pt-1 product__actions-item d-flex justify-content-between align-items-center border-top">
-                        <div class="mr-2 font-weight-bold text-danger" style="white-space:nowrap;">Retail Price</div>
-                        <div class="input-group input-group-sm">
-                            <input type="number" class="form-control form-control-sm" wire:model="retailPrice" min="0" @focus="$event.target.select()" required>
-                            <div class="input-group-append">
-                                <span class="input-group-text">৳</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-1 small text-muted">
-                        <i class="fa fa-info-circle"></i> Suggested retail price:
-                        <strong>৳{{ number_format($selectedVar->selling_price * 1.3, 2) }} - ৳{{ number_format($selectedVar->selling_price * 1.5, 2) }}</strong>
-                    </div>
-                    @endif
                     <div class="overflow-hidden product__actions">
                         @php $available = !$selectedVar->should_track || $selectedVar->stock_count > 0 @endphp
                         <div class="product__buttons @if ($show_option->product_detail_buttons_inline ?? false) d-lg-inline-flex @endif w-100"

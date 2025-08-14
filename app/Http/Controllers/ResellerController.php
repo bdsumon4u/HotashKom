@@ -187,12 +187,12 @@ final class ResellerController extends Controller
                         'status' => $transaction->confirmed ? 'COMPLETED' : 'PENDING',
                         'meta' => (function ($meta) {
                             if (isset($meta['trx_id']) && isset($meta['admin_id'])) {
-                                return '<span class="text-muted">Trx ID: ' . e($meta['trx_id']) . ' by staff #' . e($meta['admin_id']) . '</span>';
+                                return '<span class="text-muted">Trx ID: '.e($meta['trx_id']).' by staff #'.e($meta['admin_id']).'</span>';
                             }
 
                             $title = $meta['reason'] ?? 'N/A';
                             if ($id = $meta['order_id'] ?? false) {
-                                return '<a target="_blank" href="' . route('reseller.orders.show', $id) . '">' . e($title) . '</a>';
+                                return '<a target="_blank" href="'.route('reseller.orders.show', $id).'">'.e($title).'</a>';
                             }
 
                             return e($title);
@@ -223,11 +223,14 @@ final class ResellerController extends Controller
             'address' => 'nullable|string|max:500',
             'domain' => 'nullable|string|max:255|unique:users,domain,'.$user->id,
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'inside_dhaka_shipping' => 'nullable|integer|min:0|max:999999',
+            'outside_dhaka_shipping' => 'nullable|integer|min:0|max:999999',
         ]);
 
         $user->fill($request->only([
             'name', 'shop_name', 'email', 'phone_number',
             'bkash_number', 'address', 'domain',
+            'inside_dhaka_shipping', 'outside_dhaka_shipping',
         ]));
 
         if ($request->hasFile('logo')) {

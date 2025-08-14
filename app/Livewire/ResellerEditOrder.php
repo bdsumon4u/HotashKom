@@ -53,6 +53,8 @@ class ResellerEditOrder extends Component
 
     public int $subtotal = 0;
 
+    public int $sell_subtotal = 0;
+
     public string $courier = 'Other';
 
     public string $city_id = '';
@@ -97,11 +99,22 @@ class ResellerEditOrder extends Component
         $this->fill($this->order->only($this->attrs) + $this->order->data);
 
         foreach (json_decode(json_encode($this->order->products), true) ?? [] as $product) {
+            // Ensure retail_price is set (default to price if not set)
+            if (! isset($product['retail_price'])) {
+                $product['retail_price'] = $product['price'];
+            }
+
+            // Calculate total using retail price
+            $product['total'] = $product['quantity'] * $product['price'];
+
             $this->selectedProducts[$product['id']] = $product;
         }
 
         // Set canCancel property
         $this->canCancel = in_array($this->order->status, ['PENDING', 'CONFIRMED']);
+
+        // Calculate initial subtotal
+        $this->recalculateSubtotal();
     }
 
     public function addProduct(Product $product)
@@ -121,9 +134,15 @@ class ResellerEditOrder extends Component
 
         $productData = (new ProductResource($product))->toCartItem($quantity);
 
+        $productData['retail_price'] = $product->retailPrice();
+
+        // Calculate total using retail price
+        $productData['total'] = $quantity * $productData['price'];
+
         $this->selectedProducts[$id] = $productData;
 
         $this->updatedShippingArea($this->shipping_area);
+        $this->recalculateSubtotal();
 
         $this->search = '';
         $this->dispatch('notify', ['message' => 'Product added successfully.']);
@@ -138,6 +157,7 @@ class ResellerEditOrder extends Component
         $this->selectedProducts[$id]['total'] = $this->selectedProducts[$id]['quantity'] * $this->selectedProducts[$id]['price'];
 
         $this->updatedShippingArea($this->shipping_area);
+        $this->recalculateSubtotal();
     }
 
     public function decreaseQuantity($id): void
@@ -153,14 +173,56 @@ class ResellerEditOrder extends Component
         }
 
         $this->updatedShippingArea($this->shipping_area);
+        $this->recalculateSubtotal();
     }
 
     public function updatedShippingArea($value): void
     {
+        /** @var User $reseller */
+        $reseller = auth('user')->user();
+        $subtotal = $this->order->getSubtotal($this->selectedProducts);
+        $this->shipping_cost = $this->order->getShippingCost($this->selectedProducts, $this->subtotal, $value);
         $this->fill([
-            'subtotal' => $subtotal = $this->order->getSubtotal($this->selectedProducts),
-            'retail_delivery_fee' => $this->order->getShippingCost($this->selectedProducts, $subtotal, $value),
+            'subtotal' => $subtotal,
+            'shipping_cost' => $this->shipping_cost,
+            'retail_delivery_fee' => $reseller->getShippingCost($this->shipping_area) ?: $this->shipping_cost,
         ]);
+    }
+
+    private function recalculateSubtotal(): void
+    {
+        $retailSubtotal = 0;
+        foreach ($this->selectedProducts as $product) {
+            $retailPrice = $product['retail_price'] ?? $product['price'];
+            $retailSubtotal += $retailPrice * $product['quantity'];
+        }
+
+        $this->subtotal = $this->order->getSubtotal($this->selectedProducts);
+        $this->sell_subtotal = $retailSubtotal;
+    }
+
+    public function updated($property): void
+    {
+        // Handle retail price updates for specific products
+        if (preg_match('/^selectedProducts\.(\d+)\.retail_price$/', $property, $matches)) {
+            $productId = (int) $matches[1];
+            $this->handleRetailPriceUpdate($productId);
+        }
+    }
+
+    private function handleRetailPriceUpdate($productId): void
+    {
+        if (! isset($this->selectedProducts[$productId])) {
+            return;
+        }
+
+        $product = $this->selectedProducts[$productId];
+
+        // Recalculate the total for this product
+        $this->selectedProducts[$productId]['total'] = $product['quantity'] * $product['price'];
+
+        // Recalculate the subtotal
+        $this->recalculateSubtotal();
     }
 
     public function updateOrder()

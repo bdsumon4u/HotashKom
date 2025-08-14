@@ -125,7 +125,8 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-12">
+                                <!-- Bottom Section - Split into two columns -->
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="domain">Domain</label>
                                         <input type="text" class="form-control @error('domain') is-invalid @enderror"
@@ -138,10 +139,8 @@
                                         @enderror
                                         <small class="form-text text-muted">Your custom domain for your shop</small>
                                     </div>
-                                </div>
 
-                                <!-- Logo Upload Section -->
-                                <div class="col-md-12">
+                                    <!-- Logo Upload Section -->
                                     <div class="form-group">
                                         <label for="logo">Reseller Logo (optional)</label>
                                         @if($user->logo)
@@ -161,11 +160,63 @@
                                     </div>
                                 </div>
 
+                                <!-- Right Column - Shipping Costs -->
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="px-4 py-3 shadow-sm rounded-0 card-header">
+                                            <h6 class="mb-0">Shipping Cost Settings</h6>
+                                        </div>
+                                        <div class="p-4 shadow-sm card-body rounded-0">
+                                            <div class="form-group">
+                                                <label for="inside_dhaka_shipping">Inside Dhaka Shipping Cost</label>
+                                                <div class="input-group">
+                                                                                                    <input type="text" class="form-control @error('inside_dhaka_shipping') is-invalid @enderror"
+                                                       name="inside_dhaka_shipping" id="inside_dhaka_shipping"
+                                                       placeholder="0" min="0" step="1"
+                                                       value="{{ old('inside_dhaka_shipping', $user->inside_dhaka_shipping ?? 0) }}">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">TK</span>
+                                                    </div>
+                                                </div>
+                                                @error('inside_dhaka_shipping')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                                <small class="form-text text-muted">Shipping cost for orders within Dhaka city</small>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="outside_dhaka_shipping">Outside Dhaka Shipping Cost</label>
+                                                <div class="input-group">
+                                                                                                    <input type="text" class="form-control @error('outside_dhaka_shipping') is-invalid @enderror"
+                                                       name="outside_dhaka_shipping" id="outside_dhaka_shipping"
+                                                       placeholder="0" min="0" step="1"
+                                                       value="{{ old('outside_dhaka_shipping', $user->outside_dhaka_shipping ?? 0) }}">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">TK</span>
+                                                    </div>
+                                                </div>
+                                                @error('outside_dhaka_shipping')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                                <small class="form-text text-muted">Shipping cost for orders outside Dhaka city</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
                                 <div class="col-md-12">
-                                    <div class="form-group mb-0">
+                                    <div class="mb-0 form-group">
                                         <button type="submit" class="btn btn-primary">Save Changes</button>
                                     </div>
                                 </div>
+                            </div>
                             </div>
                         </form>
                     </div>

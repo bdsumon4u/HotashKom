@@ -106,13 +106,12 @@
                 </div>
                 <div class="my-2 table-responsive">
                     <table class="table table-bordered table-hover">
-                        <thead>
-                            <tr>
-                                <th>Image</th>
-                                <th>Name</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
+                                                    <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
                         <tbody>
                             @foreach ($products as $product)
                                 @php
@@ -148,33 +147,63 @@
                                 @endphp
                                 <tr>
                                     <td>
-                                        <img src="{{ asset(optional($selectedVar->base_image)->src) }}"
-                                            width="100" height="100" alt="">
-                                    </td>
-                                    <td>
-                                        <a class="mb-2 d-block"
-                                            href="{{ route('products.show', $selectedVar->slug) }}">{{ $product->name }}</a>
+                                        <div class="d-flex align-items-start">
+                                            <img src="{{ asset(optional($selectedVar->base_image)->src) }}"
+                                                width="80" height="80" alt=""
+                                                class="mr-1 rounded" style="object-fit: cover;">
+                                            <div class="flex-grow-1">
+                                                <a class="mb-2 d-block fw-bold text-decoration-none" href="{{ route('products.show', $selectedVar->slug) }}">
+                                                    {{ $product->name }}
+                                                </a>
 
-                                        @foreach ($attributes as $attribute)
-                                            <div class="mb-2 form-group product__option">
-                                                <label class="product__option-label">{{ $attribute->name }}</label>
-                                                <div class="input-radio-label">
-                                                    <div class="input-radio-label__list">
-                                                        @foreach ($optionGroup[$attribute->id] as $option)
-                                                            <label>
-                                                                <input type="radio"
-                                                                    wire:model.live="options.{{ $product->id }}.{{ $attribute->id }}"
-                                                                    value="{{ $option->id }}"
-                                                                    class="option-picker">
-                                                                <span>{{ $option->name }}</span>
-                                                            </label>
-                                                        @endforeach
+                                                @foreach ($attributes as $attribute)
+                                                    <div class="mb-2 form-group product__option">
+                                                        <label class="product__option-label small text-muted">{{ $attribute->name }}</label>
+                                                        <div class="input-radio-label">
+                                                            <div class="input-radio-label__list">
+                                                                @foreach ($optionGroup[$attribute->id] as $option)
+                                                                    <label>
+                                                                        <input type="radio"
+                                                                            wire:model.live="options.{{ $product->id }}.{{ $attribute->id }}"
+                                                                            value="{{ $option->id }}"
+                                                                            class="option-picker">
+                                                                        <span>{{ $option->name }}</span>
+                                                                    </label>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                @endforeach
+
+                                            <div class="mb-2">
+                                                <span class="small text-muted">Suggested Retail Price:</span>
+                                                <span class="fw-bold">
+                                                    {{ $selectedVar->suggestedRetailPrice() }}
+                                                </span>
                                             </div>
-                                        @endforeach
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>
+                                        <div class="mb-2 w-100">Availability:
+                                            <strong>
+                                                @if (!$selectedVar->should_track)
+                                                <span class="text-success">In Stock</span>
+                                                @else
+                                                <span class="text-{{ $selectedVar->stock_count ? 'success' : 'danger' }}">{{ $selectedVar->stock_count }}
+                                                    In Stock</span>
+                                                @endif
+                                            </strong>
+                                        </div>
+                                        <div class="mb-2 {{ $selectedVar->selling_price == $selectedVar->price ? '' : 'has-special' }}">
+                                            Price:
+                                            @if ($selectedVar->selling_price == $selectedVar->price)
+                                            {!! theMoney($selectedVar->price) !!}
+                                            @else
+                                            <span class="font-weight-bold">{!! theMoney($selectedVar->selling_price) !!}</span>
+                                            <del class="text-danger">{!! theMoney($selectedVar->price) !!}</del>
+                                            @endif
+                                        </div>
                                         <button type="button" class="btn btn-primary btn-sm" wire:click="addProduct({{ $product->id }})">
                                             Add to Order
                                         </button>
@@ -192,11 +221,8 @@
                         <table class="table table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th>Image</th>
-                                    <th>Name</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Total</th>
+                                    <th>Product</th>
+                                    <th>Pricing & Quantity</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -204,28 +230,56 @@
                                 @foreach ($selectedProducts as $id => $product)
                                     <tr>
                                         <td>
-                                            <img src="{{ asset($product['image'] ?? 'assets/images/no-image.png') }}"
-                                                width="50" height="50" alt="{{ $product['name'] }}">
-                                        </td>
-                                        <td>
-                                            <a class="mb-2 d-block"
-                                                href="{{ route('products.show', $product['slug']) }}">{{ $product['name'] }}</a>
-                                        </td>
-                                        <td>
-                                            <div class="input-number product__quantity">
-                                                <input type="number" id="quantity-{{ $id }}"
-                                                    class="form-control input-number__input"
-                                                    name="quantity[{{ $id }}]"
-                                                    value="{{ $product['quantity'] }}"
-                                                    min="1" readonly style="border-radius: 2px;">
-                                                <div class="input-number__add" wire:click="increaseQuantity({{ $id }})">
-                                                </div>
-                                                <div class="input-number__sub" wire:click="decreaseQuantity({{ $id }})">
+                                            <div class="d-flex align-items-start">
+                                                <img src="{{ asset($product['image'] ?? 'assets/images/no-image.png') }}"
+                                                    width="60" height="60" alt="{{ $product['name'] }}"
+                                                    class="mr-1 rounded" style="object-fit: cover;">
+                                                <div class="flex-grow-1">
+                                                    <a class="d-block fw-bold text-decoration-none" href="{{ route('products.show', $product['slug']) }}">
+                                                        {{ $product['name'] }}
+                                                    </a>
+                                                    <hr class="my-1 border border-primary w-100">
+                                                    <div>
+                                                        <label class="mb-1 form-label text-muted">Buy Price</label>
+                                                        <div class="text-dark fw-bold">{!! theMoney($product['price']) !!}</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{!! theMoney($product['price']) !!}</td>
-                                        <td>{!! theMoney($product['total']) !!}</td>
+                                        <td>
+                                            <div class="gap-3 d-flex flex-column">
+                                                <div>
+                                                    <label class="mb-1 form-label small text-muted">Quantity</label>
+                                                    <div class="input-number product__quantity d-inline-block">
+                                                        <input type="number" id="quantity-{{ $id }}"
+                                                            class="form-control form-control-sm input-number__input"
+                                                            name="quantity[{{ $id }}]"
+                                                            value="{{ $product['quantity'] }}"
+                                                            min="1" readonly style="border-radius: 2px;">
+                                                        <div class="input-number__add" wire:click="increaseQuantity({{ $id }})">
+                                                        </div>
+                                                        <div class="input-number__sub" wire:click="decreaseQuantity({{ $id }})">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr class="my-1 border border-primary w-100">
+                                                <div>
+                                                    <label class="mb-1 form-label small text-muted">Selling Price</label>
+                                                    <input type="number"
+                                                        class="form-control form-control-sm"
+                                                        @focus="$event.target.select()"
+                                                        wire:model.live.debounce.500ms="selectedProducts.{{ $id }}.retail_price"
+                                                        min="0"
+                                                        step="0.01"
+                                                        style="width: 120px;">
+                                                </div>
+                                                <hr class="my-1 border border-primary w-100">
+                                                <div>
+                                                    <label class="mb-1 form-label text-muted">Sell Total</label>
+                                                    <div class="fw-bold text-success">{!! theMoney($selectedProducts[$id]['retail_price']*$product['quantity']) !!}</div>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td>
                                             <button type="button" class="btn btn-danger btn-sm" wire:click="decreaseQuantity({{ $id }})">
                                                 <i class="fa fa-trash"></i>
@@ -251,29 +305,79 @@
                     <x-input name="note" wire:model="note" placeholder="Add a note to this order" />
                     <x-error field="note" />
                 </div>
+
+                <!-- Subtotal Row -->
                 <div class="form-group">
-                    <label for="retail_discount">Discount</label>
-                    <input type="text" wire:model.live.debounce.500ms="retail_discount" class="form-control" placeholder="Discount amount">
-                    <x-error field="retail_discount" />
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label for="buy_subtotal" class="form-label small text-muted">Buy Subtotal</label>
+                            <input type="text" value="{{ $subtotal }}" class="form-control form-control-sm" readonly>
+                        </div>
+                        <div class="col-6">
+                            <label for="sell_subtotal" class="form-label small text-muted">Sell Subtotal</label>
+                            <input type="text" value="{{ $sell_subtotal }}" class="form-control form-control-sm" readonly>
+                            <x-error field="sell_subtotal" />
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Discount Row -->
                 <div class="form-group">
-                    <label for="advanced">Advanced</label>
-                    <input type="text" wire:model.live.debounce.500ms="advanced" class="form-control" placeholder="Advanced amount">
-                    <x-error field="advanced" />
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label for="buy_discount" class="form-label small text-muted">Buy Discount</label>
+                            <input type="text" value="0" class="form-control form-control-sm" readonly>
+                        </div>
+                        <div class="col-6">
+                            <label for="retail_discount" class="form-label small text-muted">Sell Discount</label>
+                            <input type="text" wire:model.live.debounce.500ms="retail_discount" class="form-control form-control-sm" placeholder="0">
+                            <x-error field="retail_discount" />
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Packaging & Advanced Row -->
                 <div class="form-group">
-                    <label for="retail_delivery_fee">Shipping Cost</label>
-                    <input type="text" wire:model.live.debounce.500ms="retail_delivery_fee" class="form-control">
-                    <x-error field="retail_delivery_fee" />
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label for="packaging_charge" class="form-label small text-muted">Packaging Charge</label>
+                            <input type="text" value="{{ $order->data['packaging_charge'] ?? 25 }}" class="form-control form-control-sm" readonly>
+                        </div>
+                        <div class="col-6">
+                            <label for="advanced" class="form-label small text-muted">Advanced</label>
+                            <input type="text" wire:model.live.debounce.500ms="advanced" class="form-control form-control-sm" placeholder="0">
+                            <x-error field="advanced" />
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Shipping Row -->
                 <div class="form-group">
-                    <label for="subtotal">Subtotal</label>
-                    <input type="text" wire:model="subtotal" class="form-control" readonly>
-                    <x-error field="subtotal" />
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label for="buy_shipping" class="form-label small text-muted">Buy Shipping</label>
+                            <input type="text" value="{{ $shipping_cost }}" class="form-control form-control-sm" readonly>
+                        </div>
+                        <div class="col-6">
+                            <label for="retail_delivery_fee" class="form-label small text-muted">Sell Shipping</label>
+                            <input type="text" wire:model.live.debounce.500ms="retail_delivery_fee" class="form-control form-control-sm" placeholder="0">
+                            <x-error field="retail_delivery_fee" />
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Total Row -->
                 <div class="form-group">
-                    <label for="total">Total</label>
-                    <input type="text" value="{{ $subtotal + $retail_delivery_fee - $retail_discount - $advanced }}" class="form-control" readonly>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label for="buy_total" class="form-label small text-muted">Buy Total</label>
+                            <input type="text" value="{{ $subtotal + ($order->data['shipping_cost'] ?? 0) + ($order->data['packaging_charge'] ?? 25) }}" class="form-control form-control-sm" readonly>
+                        </div>
+                        <div class="col-6">
+                            <label for="sell_total" class="form-label small text-muted">Sell Total</label>
+                            <input type="text" value="{{ $sell_subtotal + $retail_delivery_fee - $retail_discount - $advanced }}" class="form-control form-control-sm" readonly>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <button type="button" class="btn btn-primary" wire:click="updateOrder">

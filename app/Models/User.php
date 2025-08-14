@@ -28,6 +28,7 @@ class User extends Authenticatable implements Confirmable, Wallet
         'name', 'shop_name', 'email', 'phone_number', 'bkash_number', 'address',
         'website', 'order_prefix', 'domain', 'is_active', 'password', 'is_verified',
         'db_name', 'db_username', 'db_password', 'logo',
+        'inside_dhaka_shipping', 'outside_dhaka_shipping',
     ];
 
     /**
@@ -152,6 +153,26 @@ class User extends Authenticatable implements Confirmable, Wallet
     }
 
     /**
+     * Get shipping cost based on shipping area.
+     */
+    public function getShippingCost(string $shippingArea): int
+    {
+        return match ($shippingArea) {
+            'Inside Dhaka' => (int) ($this->inside_dhaka_shipping ?? 0),
+            'Outside Dhaka' => (int) ($this->outside_dhaka_shipping ?? 0),
+            default => 0,
+        };
+    }
+
+    /**
+     * Check if user has custom shipping costs set.
+     */
+    public function hasCustomShippingCosts(): bool
+    {
+        return ($this->inside_dhaka_shipping > 0) || ($this->outside_dhaka_shipping > 0);
+    }
+
+    /**
      * The attributes that should be cast to native types.
      */
     protected function casts(): array
@@ -159,6 +180,8 @@ class User extends Authenticatable implements Confirmable, Wallet
         return [
             'email_verified_at' => 'datetime',
             'is_active' => 'boolean',
+            'inside_dhaka_shipping' => 'integer',
+            'outside_dhaka_shipping' => 'integer',
         ];
     }
 

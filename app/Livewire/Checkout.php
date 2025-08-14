@@ -189,6 +189,12 @@ class Checkout extends Component
         if (! cart()->getCost('deliveryFee')) {
             cart()->addCost('deliveryFee', $this->shippingCost($this->shipping));
         }
+
+        if (isOninda() && config('app.resell')) {
+            /** @var User $reseller */
+            $reseller = auth('user')->user();
+            $this->retailDeliveryFee = $reseller->getShippingCost($this->shipping) ?: cart()->getCost('deliveryFee');
+        }
     }
 
     public function cartUpdated(): void
@@ -210,9 +216,11 @@ class Checkout extends Component
         $default_area = setting('default_area');
         if ($default_area->inside ?? false) {
             $shipping = 'Inside Dhaka';
+            $this->retailDeliveryFee = $this->shippingCost($shipping);
         }
         if ($default_area->outside ?? false) {
             $shipping = 'Outside Dhaka';
+            $this->retailDeliveryFee = $this->shippingCost($shipping);
         }
 
         if ($user = auth('user')->user()) {

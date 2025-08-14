@@ -209,6 +209,32 @@ class Product extends Model
         return $price;
     }
 
+    public function retailPrice(): int
+    {
+        $price = $this->suggested_price;
+
+        if (is_string($price) && preg_match('/^\s*(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*$/', $price, $matches)) {
+            $low = (float) $matches[1];
+            $high = (float) $matches[2];
+            return (int) round(($low + $high) / 2);
+        }
+
+        if (is_numeric($price) && $price > 0) {
+            return (int) round($price);
+        }
+
+        return (int) round($this->selling_price * 1.4);
+    }
+
+    public function suggestedRetailPrice(): string
+    {
+        if ($this->suggested_price) {
+            return '৳' . $this->suggested_price;
+        }
+
+        return sprintf('৳%d - ৳%d', round($this->selling_price * 1.3), round($this->selling_price * 1.5));
+    }
+
     protected function baseImage(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {

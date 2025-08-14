@@ -244,15 +244,9 @@
                                         <td><strong>Advanced:</strong></td>
                                         <td>{!! theMoney($order->data['advanced'] ?? 0) !!}</td>
                                     </tr>
-                                    @if(isOninda() && config('app.resell'))
-                                    <tr>
-                                        <td><strong>Packaging Charge:</strong></td>
-                                        <td>{!! theMoney($order->data['packaging_charge'] ?? 25) !!}</td>
-                                    </tr>
-                                    @endif
                                     <tr>
                                         <td><strong>Grand Total:</strong></td>
-                                        <td><strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0) + (isOninda() && config('app.resell') ? ($order->data['packaging_charge'] ?? 25) : 0) - ($order->data['retail_discount'] ?? 0) - ($order->data['advanced'] ?? 0)) !!}</strong></td>
+                                        <td><strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0) - ($order->data['retail_discount'] ?? 0) - ($order->data['advanced'] ?? 0)) !!}</strong></td>
                                     </tr>
                                 </table>
                             </div>
@@ -318,13 +312,13 @@
                                                     </tr>
                                                 @endforeach
                                                 <tr class="table-active">
-                                                    <td colspan="5" class="text-right"><strong>Subtotal:</strong></td>
+                                                    <td colspan="4" class="text-right"><strong>Subtotal:</strong></td>
                                                     <td><strong>{!! theMoney($order->data['subtotal'] ?? 0) !!}</strong></td>
                                                     <td><strong>{!! theMoney($retail) !!}</strong></td>
                                                 </tr>
                                             @else
                                                 <tr>
-                                                    <td colspan="7" class="text-center">No products found</td>
+                                                    <td colspan="6" class="text-center">No products found</td>
                                                 </tr>
                                             @endif
                                         </tbody>
