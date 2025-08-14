@@ -42,6 +42,8 @@ class ProductRequest extends FormRequest
             'should_track' => 'sometimes|integer',
             'stock_count' => 'nullable|required_if:should_track,1|integer',
             'is_active' => 'sometimes|boolean',
+            'hot_sale' => 'sometimes|boolean',
+            'new_arrival' => 'sometimes|boolean',
             'base_image' => 'required|integer',
             'additional_images' => 'sometimes|array',
             'desc_img' => 'required|boolean',
@@ -63,6 +65,8 @@ class ProductRequest extends FormRequest
     {
         $data = parent::all() + [
             'is_active' => 0,
+            'hot_sale' => 0,
+            'new_arrival' => 0,
         ];
 
         $data['brand_id'] = $data['brand'];
