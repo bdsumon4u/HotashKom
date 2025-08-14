@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\MenuItemController;
+use App\Http\Controllers\Admin\MoneyRequestController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\ProductController;
@@ -82,6 +83,14 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
         Route::get('resellers/{reseller}/edit', [ResellerController::class, 'edit'])->name('resellers.edit');
         Route::put('resellers/{reseller}', [ResellerController::class, 'update'])->name('resellers.update');
+
+        // Money Requests Routes
+        Route::get('money-requests', [MoneyRequestController::class, 'index'])->name('money-requests.index');
+        Route::get('money-requests/data', [MoneyRequestController::class, 'data'])->name('money-requests.data');
+        Route::post('money-requests/confirm', [MoneyRequestController::class, 'confirm'])->name('money-requests.confirm');
+        Route::post('money-requests/delete', [MoneyRequestController::class, 'deleteRequest'])->name('money-requests.delete');
+        Route::get('money-requests/summary', [MoneyRequestController::class, 'summary'])->name('money-requests.summary');
+
         Route::get('transactions/{user}', [TransactionController::class, 'index'])->name('transactions.index');
         Route::post('transactions/{user}/withdraw', [TransactionController::class, 'withdraw'])->name('transactions.withdraw');
         Route::post('transactions/{user}/confirm-withdraw', [TransactionController::class, 'confirmWithdraw'])->name('transactions.confirm-withdraw');

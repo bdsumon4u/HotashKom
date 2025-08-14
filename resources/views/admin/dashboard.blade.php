@@ -312,20 +312,27 @@
                 @if(isOninda() && config('app.resell'))
                 <div class="rounded-sm card">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center">
-                        <h5>Pending Withdrawals</h5>
-                        <span class="badge badge-warning">{{ number_format($pendingWithdrawalAmount, 2) }} tk</span>
+                        <h5>Money Requests</h5>
+                        <a href="{{ route('admin.money-requests.index') }}" class="btn btn-sm btn-primary">
+                            <i class="fa fa-eye mr-1"></i>View All
+                        </a>
                     </div>
                     <div class="p-3 card-body">
                         @if($pendingWithdrawalAmount > 0)
                         <div class="text-center">
                             <h3 class="mb-2 text-warning">{{ number_format($pendingWithdrawalAmount, 2) }} tk</h3>
                             <p class="mb-0 text-muted">Total pending withdrawal amount</p>
-                            <small class="text-muted">Click on reseller balance in resellers list to process withdrawals</small>
+                            <a href="{{ route('admin.money-requests.index') }}" class="btn btn-warning btn-sm mt-2">
+                                <i class="fa fa-dollar-sign mr-1"></i>Process Requests
+                            </a>
                         </div>
                         @else
                         <div class="py-3 text-center text-muted">
                             <i class="mb-2 fa fa-check-circle fa-2x"></i>
                             <p>No pending withdrawal requests</p>
+                            <a href="{{ route('admin.money-requests.index') }}" class="btn btn-outline-info btn-sm mt-2">
+                                <i class="fa fa-eye mr-1"></i>View Money Requests
+                            </a>
                         </div>
                         @endif
                     </div>

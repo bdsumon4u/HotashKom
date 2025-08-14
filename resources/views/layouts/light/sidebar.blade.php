@@ -222,6 +222,30 @@
                             href="{{ route('admin.resellers.index') }}">
                             <i data-feather="users"> </i>
                             <span>Resellers</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link d-flex menu-title link-nav {{ request()->is('admin/resellers*') && request('status') == 'pending' ? 'active' : '' }}"
+                            href="{{ route('admin.resellers.index', ['status' => 'pending']) }}">
+                            <i data-feather="user-check"> </i>
+                            <span>Pending Resellers</span>
+                            @if(config('app.resell'))
+                            @php
+                                $pendingResellersCount = \App\Models\User::where('is_verified', false)->count();
+                            @endphp
+                            @if($pendingResellersCount > 0)
+                            <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
+                                {{ $pendingResellersCount }}
+                            </span>
+                            @endif
+                            @endif
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link d-flex menu-title link-nav {{ request()->is('admin/money-requests*') ? 'active' : '' }}"
+                            href="{{ route('admin.money-requests.index') }}">
+                            <i data-feather="dollar-sign"> </i>
+                            <span>Money Requests</span>
                             @if(config('app.resell'))
                             @php
                                 $pendingAmount = cache()->remember('pending_withdrawal_amount', 300, function () {
@@ -230,9 +254,11 @@
                                         ->sum('amount'));
                                 });
                             @endphp
+                            @if($pendingAmount > 0)
                             <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
                                 {{ number_format($pendingAmount, 0) }} tk
                             </span>
+                            @endif
                             @endif
                         </a>
                     </li>

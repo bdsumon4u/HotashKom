@@ -14,9 +14,15 @@ class ResellerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.resellers.index');
+        $status = $request->query('status');
+
+        if ($status === 'pending') {
+            return view('admin.resellers.index', compact('status'));
+        }
+
+        return view('admin.resellers.index', compact('status'));
     }
 
     /**

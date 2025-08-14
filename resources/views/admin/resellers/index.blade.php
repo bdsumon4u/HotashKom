@@ -31,6 +31,9 @@
 
 @section('breadcrumb-items')
     <li class="breadcrumb-item">Resellers</li>
+    @if(isset($status) && $status === 'pending')
+    <li class="breadcrumb-item active">Pending</li>
+    @endif
 @endsection
 
 @section('content')
@@ -41,7 +44,12 @@
                     <div class="p-3 card-header">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <strong>All</strong>&nbsp;<small>Resellers</small>
+                                @if(isset($status) && $status === 'pending')
+                                    <strong>Pending</strong>&nbsp;<small>Resellers</small>
+                                    <small class="text-muted ml-2">(Non-verified resellers)</small>
+                                @else
+                                    <strong>All</strong>&nbsp;<small>Resellers</small>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -55,9 +63,11 @@
                                         <th>Shop</th>
                                         <th>Phone</th>
                                         <th>bKash</th>
+                                        @if(!isset($status) || $status !== 'pending')
                                         <th>Balance</th>
                                         <th>Orders</th>
                                         <th>Verified?</th>
+                                        @endif
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -96,7 +106,14 @@
             ],
             processing: true,
             serverSide: true,
-            ajax: "{{ route('api.resellers') }}",
+            ajax: {
+                url: "{{ route('api.resellers') }}",
+                data: function(d) {
+                    @if(isset($status) && $status === 'pending')
+                    d.status = 'pending';
+                    @endif
+                }
+            },
             columns: [
                 {
                     data: 'id',
@@ -118,6 +135,7 @@
                     data: 'bkash_number',
                     name: 'bkash_number'
                 },
+                @if(!isset($status) || $status !== 'pending')
                 {
                     data: 'balance',
                     name: 'balance',
@@ -132,6 +150,7 @@
                     data: 'is_verified',
                     name: 'is_verified'
                 },
+                @endif
                 {
                     data: 'actions',
                     name: 'actions',
@@ -149,7 +168,13 @@
                     var th = $(this.header()).parents('thead').find('tr').eq(1).find('th').eq(i);
                     $(th).empty();
 
-                    if ($.inArray(i, [7, 8]) === -1) {
+                    @if(!isset($status) || $status !== 'pending')
+                    // For all resellers view - exclude balance, orders, verified, and actions columns
+                    if ($.inArray(i, [5, 6, 7, 8]) === -1) {
+                    @else
+                    // For pending resellers view - exclude actions column only
+                    if ($.inArray(i, [5]) === -1) {
+                    @endif
                         var column = this;
                         var input = document.createElement("input");
                         input.classList.add('form-control', 'border-primary');
@@ -166,7 +191,11 @@
                 });
             },
             order: [
-                [5, 'desc'] // Sort by balance column (index 5) in descending order
+                @if(isset($status) && $status === 'pending')
+                [0, 'desc'] // Sort by ID column (index 0) in descending order for pending resellers
+                @else
+                [5, 'desc'] // Sort by balance column (index 5) in descending order for all resellers
+                @endif
             ],
             pageLength: 50,
         });
