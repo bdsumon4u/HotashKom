@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}403}$$ 🔥 domains are live now
+These 🔥 $${\color{red}407}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-15 09:24:43 Asia/Dhaka**_
+_Last updated: **2025-08-16 09:18:15 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -502,3 +502,7 @@ _Last updated: **2025-08-15 09:24:43 Asia/Dhaka**_
 | 401 | [krishanbd.com](http://krishanbd.com) |
 | 402 | [sylban.com](http://sylban.com) |
 | 403 | [kulsummart.com](http://kulsummart.com) |
+| 404 | [nittoponno24.com](http://nittoponno24.com) |
+| 405 | [elecbd.com](http://elecbd.com) |
+| 406 | [buynestsk.online](http://buynestsk.online) |
+| 407 | [clicknbuysk.online](http://clicknbuysk.online) |
