@@ -68,7 +68,7 @@
 </style>
 @endpush
 <div class="block block-slideshow -block-slideshow--layout--with-departments">
-    <div id="slideshow-container" class="container" style="margin-left: 30px; margin-right: 30px;">
+    <div id="slideshow-container" class="container">
         <div class="block-slideshow__body">
             <div class="owl-carousel">
                 @foreach(slides() as $slide)

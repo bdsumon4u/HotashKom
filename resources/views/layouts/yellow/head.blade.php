@@ -3883,4 +3883,57 @@
             pointer-events: none;
         }
     </style>
+    <style>
+        .mobile-element-cart .navbar-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Reduce Horizontal Spacing */
+        .container {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+
+        .container-fluid {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+
+        /* Reduce spacing in main content areas */
+        .site-content .container {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+
+        /* Reduce spacing in product grids */
+        .products-grid-modern {
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        /* Reduce spacing in cart table */
+        .cart__table {
+            margin-left: -5px;
+            margin-right: -5px;
+        }
+
+        /* Mobile specific spacing reduction */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+
+            .container-fluid {
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+
+            .site-content .container {
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+        }
+    </style>
 </head>
