@@ -343,6 +343,36 @@
             setTimeout(reinitializeUIComponents, 150);
         });
 
+        // Listen for layout-changed event
+        window.addEventListener('layout-changed', function(event) {
+            setTimeout(updateExternalPreview, 100);
+            setTimeout(reinitializeUIComponents, 150);
+
+            // Show notification about layout change
+            if (event.detail && event.detail.layout) {
+                const layoutName = event.detail.layout.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                $.notify({
+                    icon: 'fa fa-magic',
+                    message: `Layout changed to: ${layoutName}`
+                }, {
+                    type: 'info',
+                    delay: 2000,
+                    allow_dismiss: true,
+                    z_index: 9999,
+                    animate: {
+                        enter: 'animated fadeInDown',
+                        exit: 'animated fadeOutUp'
+                    }
+                });
+            }
+        });
+
+        // Listen for widths-normalized event
+        window.addEventListener('widths-normalized', function(event) {
+            setTimeout(updateExternalPreview, 100);
+            setTimeout(reinitializeUIComponents, 150);
+        });
+
         // Listen for input changes to update preview
         $('body').on('input change', 'input[name^="data[columns]"], select[name^="data[columns]"]', function() {
             setTimeout(updateExternalPreview, 100);

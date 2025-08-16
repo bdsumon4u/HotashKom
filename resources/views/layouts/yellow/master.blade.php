@@ -9,9 +9,9 @@
 
     <div id="page" class="site-wrapper">
         @include('layouts.yellow.header')
-        <div id="main-content" class="-site-content" style="margin-top: 60px;">
+        <div id="main-content" class="site-content">
             <div class="-container">
-                <div class="row ">
+                <div class="row">
                     <div id="primary" class="content-area col-md-12">
                         @yield('content')
                     </div>
@@ -60,7 +60,7 @@
             </ul>
         </div>
         <div class="mobile-topbar">
-            <div class="kapee-social icons-default icons-shape-circle icons-size-default ">
+            <div class="kapee-social icons-default icons-shape-circle icons-size-default">
                 @foreach($social ?? [] as $item => $data)
                 @if(($link = $data->link ?? false) && $link != '#')
                 <a href="{{ url($link ?? '#') }}" target="_blank" class="social-{{$item}}">
@@ -803,7 +803,7 @@
                 </div>
             </div>
             <div class="chaty-whatsapp-footer">
-                <form action="https://wa.me/8801825181840" target="_blank" class="whatsapp-chaty-form "
+                <form action="https://wa.me/8801825181840" target="_blank" class="whatsapp-chaty-form"
                     data-widget="0" data-channel="Whatsapp">
                     <div class="chaty-whatsapp-data">
                         <div class="chaty-whatsapp-field"><input name="text" type="text"

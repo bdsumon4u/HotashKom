@@ -112,6 +112,9 @@ final class BannerSection extends Component
             foreach ($this->columns as $i => $column) {
                 $this->columns[$i]['width'] = max(1, floor(($column['width'] / $totalWidth) * 12));
             }
+
+            // Dispatch event to reinitialize UI components after width normalization
+            $this->dispatch('widths-normalized', ['totalWidth' => $this->getTotalWidth()]);
         }
     }
 
@@ -226,6 +229,9 @@ final class BannerSection extends Component
                 ];
                 break;
         }
+
+        // Dispatch event to reinitialize UI components after layout change
+        $this->dispatch('layout-changed', ['layout' => $layout, 'columns' => count($this->columns)]);
     }
 
     public function render()

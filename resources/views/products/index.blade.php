@@ -64,7 +64,7 @@
         </div>
     </article>
     @else
-    <div class="products product-style-1 row grid-view products-wrap grid-columns-4 ">
+    <div class="products product-style-1 row grid-view products-wrap grid-columns-4">
         @foreach($products as $product)
         <div
             class="col-xl-4 col-lg-3 col-md-4 col-sm-6 col-12 product type-product post-15946 status-publish first instock product_cat-shoes-2023 has-post-thumbnail shipping-taxable product-type-simple">
