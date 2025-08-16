@@ -3432,6 +3432,7 @@
         .cart-btn:hover {
             background: #f5f5f5;
             border-color: #ccc;
+            color: #000;
         }
 
         .buy-now-btn {
@@ -3456,6 +3457,20 @@
             border-color: #ccc;
             color: #333;
             text-decoration: none;
+        }
+
+        /* Disabled button states */
+        .cart-btn:disabled,
+        .buy-now-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .cart-btn:disabled:hover,
+        .buy-now-btn:disabled:hover {
+            background: #fff;
+            border-color: #ddd;
+            color: #666;
         }
 
         /* Products Grid Modern Layout */
@@ -3524,5 +3539,7 @@
                 gap: 1rem;
             }
         }
+
+        /* Product Card Button Styles - Original Design */
     </style>
 </head>

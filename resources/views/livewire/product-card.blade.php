@@ -35,17 +35,15 @@
             @php($available = !$product->should_track || $product->stock_count > 0)
             @php($show_option = setting('show_option'))
 
-            @if (($show_option->product_grid_button ?? false) == 'add_to_cart')
-                <button wire:click="addToCart" class="cart-btn" title="Add to Cart" {{ $available ? '' : 'disabled' }}>
-                    <i class="fa fa-shopping-cart"></i>
-                </button>
-            @endif
+            {{-- Always show Add to Cart button (small square) --}}
+            <button wire:click="addToCart" class="cart-btn" title="Add to Cart" {{ $available ? '' : 'disabled' }}>
+                <i class="fa fa-shopping-cart"></i>
+            </button>
 
-            @if (($show_option->product_grid_button ?? false) == 'order_now')
-                <a href="{{ route('products.show', $product) }}" class="buy-now-btn">
-                    Buy Now <i class="fa fa-arrow-right"></i>
-                </a>
-            @endif
+            {{-- Always show Buy Now button (large rectangular) --}}
+            <button wire:click="orderNow" class="buy-now-btn" {{ $available ? '' : 'disabled' }}>
+                Buy Now <i class="fa fa-arrow-right"></i>
+            </button>
         </div>
     </div>
 </div>
