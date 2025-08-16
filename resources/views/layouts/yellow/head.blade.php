@@ -3540,6 +3540,193 @@
             }
         }
 
-        /* Product Card Button Styles - Original Design */
+        /* Floating Cart Counter Styles */
+        .floating-cart-counter {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 9999;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .floating-cart-counter:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .floating-cart-counter:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .cart-counter-icon {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2370F4, #1a66ff);
+            border-radius: 5%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(35, 112, 244, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .cart-counter-icon:hover {
+            box-shadow: 0 6px 25px rgba(35, 112, 244, 0.4);
+            background: linear-gradient(135deg, #1a66ff, #0d4bcc);
+        }
+
+        .cart-counter-icon i {
+            color: white;
+            font-size: 24px;
+        }
+
+        .cart-count-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* Cart count update animation */
+        .cart-count-updated {
+            animation: cartCountPulse 0.3s ease-in-out;
+        }
+
+        @keyframes cartCountPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* Hide cart counter when cart is empty */
+        .floating-cart-counter.cart-empty .cart-count-badge {
+            display: none;
+        }
+
+        /* Empty cart state styling */
+        .floating-cart-counter.cart-empty .cart-counter-icon {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            box-shadow: 0 4px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .floating-cart-counter.cart-empty .cart-counter-icon:hover {
+            background: linear-gradient(135deg, #5a6268, #495057);
+            box-shadow: 0 6px 25px rgba(108, 117, 125, 0.4);
+        }
+
+        .cart-counter-tooltip {
+            position: absolute;
+            right: 70px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .cart-counter-tooltip::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-left: 6px solid #333;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+        }
+
+        .floating-cart-counter:hover .cart-counter-tooltip {
+            opacity: 1;
+            visibility: visible;
+            right: 50px;
+        }
+
+                /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .floating-cart-counter {
+                display: none; /* Hide floating cart counter on mobile */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .floating-cart-counter {
+                display: none; /* Hide floating cart counter on mobile */
+            }
+        }
+
+        /* Mobile Cart Button Styles */
+        .mobile-element-cart .navbar-icon {
+            position: relative;
+        }
+
+        .mobile-element-cart .mobile-cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+        }
+
+        .mobile-element-cart.cart-empty .mobile-cart-count {
+            display: none;
+        }
+
+        /* Cart count update animation for mobile */
+        .mobile-cart-count.cart-count-updated {
+            animation: cartCountPulse 0.3s ease-in-out;
+        }
+
+        /* Ensure mobile cart button styling is consistent */
+        .mobile-element-cart a {
+            color: inherit;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .mobile-element-cart .navbar-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .mobile-element-cart .navbar-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
     </style>
 </head>

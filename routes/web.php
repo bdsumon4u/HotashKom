@@ -36,6 +36,11 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
 
     Route::view('/cart', 'cart')->name('cart');
+    Route::get('/api/cart-count', function () {
+        $cartCount = count(session('cart', []));
+
+        return response()->json(['count' => $cartCount]);
+    })->name('api.cart-count');
     Route::match(['get', 'post'], '/checkout', CheckoutController::class)->name('checkout');
     Route::get('/thank-you', OrderTrackController::class)->name('thank-you');
     Route::match(['get', 'post'], 'track-order', OrderTrackController::class)->name('track-order');

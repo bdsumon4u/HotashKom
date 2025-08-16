@@ -15,7 +15,7 @@
             <tr class="cart-table__row" data-id="{{$product['id']}}">
                 <td class="cart-table__column cart-table__column--image">
                     <a href="{{route('products.show', $product['slug'])}}">
-                        <img src="{{asset($product['image'])}}" alt=""></a>
+                        <img src="{{asset($product['image'])}}" alt="" width="150" height="150"></a>
                     </td>
                 <td class="cart-table__column cart-table__column--product">
                     <a href="{{route('products.show', $product['slug'])}}" class="cart-table__product-name">{{$product['name']}}</a>
@@ -38,7 +38,7 @@
                 </td>
             </tr>
             @empty
-            <tr class="bg-danger"><td colspan="6" class="text-center py-2">No Items In Cart.</td></tr>
+            <tr class="bg-danger"><td colspan="6" class="py-2 text-center">No Items In Cart.</td></tr>
             @endforelse
         </tbody>
     </table>

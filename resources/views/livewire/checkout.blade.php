@@ -100,13 +100,10 @@
                 </table>
                 <div class="checkout__agree form-group">
                     <div class="form-check">
-                        <span class="form-check-input input-check">
+                        <span class="mt-0 form-check-input input-check">
                             <span class="input-check__body">
                                 <input class="input-check__input" type="checkbox" id="checkout-terms-mobile" checked>
                                 <span class="input-check__box"></span>
-                                <svg class="input-check__icon" width="9px" height="7px">
-                                    <use xlink:href="{{ asset('strokya/images/sprite.svg#check-9x7') }}"></use>
-                                </svg>
                             </span>
                         </span>
                         <label class="form-check-label" for="checkout-terms-mobile">I agree to the <span class="text-info" target="_blank" href="javascript:void(0);">terms and conditions</span>*</label>
