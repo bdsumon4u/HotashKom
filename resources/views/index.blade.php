@@ -99,8 +99,8 @@
 ])
 @if ($section->type == 'banner')
 @php($pseudoColumns = (array)$section->data->columns)
-<div class="block block-banner" style="overflow: hidden;">
-    <div class="container-fluid">
+<div class="block block-banner" style="overflow: hidden; margin-bottom: 30px;">
+    <div class="container" style="margin-left: 30px; margin-right: 30px;">
         <div class="row">
             @foreach($pseudoColumns['width'] as $i => $width)
             <div class="col-md-{{$width}} mb-3">
@@ -114,6 +114,7 @@
                         class="border img-fluid w-100"
                         src="{{ asset($pseudoColumns['image'][$i]) }}"
                         alt="Image"
+                        style="max-height: 400px; object-fit: cover;"
                     >
                 </a>
             </div>
