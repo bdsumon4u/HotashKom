@@ -259,8 +259,13 @@
                                         <button type="button" class="dropdown-item" wire:click="setLayout('third')">
                                             <i class="mr-2 fa fa-th"></i>Third (4+4+4)
                                         </button>
-                                        <button type="button" class="dropdown-item" wire:click="setLayout('asymmetric')">
-                                            <i class="mr-2 fa fa-th-list"></i>Asymmetric (8+4)
+                                        <div class="dropdown-divider"></div>
+                                        <h6 class="dropdown-header">Asymmetric Layouts</h6>
+                                        <button type="button" class="dropdown-item" wire:click="setLayout('asymmetric-8-4')">
+                                            <i class="mr-2 fa fa-th-list"></i>Large + Small (8+4)
+                                        </button>
+                                        <button type="button" class="dropdown-item" wire:click="setLayout('asymmetric-4-8')">
+                                            <i class="mr-2 fa fa-th-list fa-flip-horizontal"></i>Small + Large (4+8)
                                         </button>
                                     </div>
                                 </div>

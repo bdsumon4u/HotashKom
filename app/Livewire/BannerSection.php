@@ -44,18 +44,27 @@ final class BannerSection extends Component
             'link' => '',
             'categories' => [],
         ];
+
+        // Dispatch event to reinitialize UI components
+        $this->dispatch('column-added', ['count' => count($this->columns)]);
     }
 
     public function removeColumn(int $index): void
     {
         unset($this->columns[$index]);
         $this->columns = array_values($this->columns);
+
+        // Dispatch event to reinitialize UI components
+        $this->dispatch('column-removed', ['count' => count($this->columns)]);
     }
 
     public function removeImage(int $index): void
     {
         if (isset($this->columns[$index])) {
             $this->columns[$index]['image'] = null;
+
+            // Force a re-render by dispatching an event
+            $this->dispatch('image-removed', ['index' => $index]);
         }
     }
 
@@ -161,7 +170,44 @@ final class BannerSection extends Component
                     ],
                 ];
                 break;
+            case 'asymmetric-8-4':
+                $this->columns = [
+                    [
+                        'image' => null,
+                        'width' => 8,
+                        'animation' => 'fade-right',
+                        'link' => '',
+                        'categories' => [],
+                    ],
+                    [
+                        'image' => null,
+                        'width' => 4,
+                        'animation' => 'fade-left',
+                        'link' => '',
+                        'categories' => [],
+                    ],
+                ];
+                break;
+            case 'asymmetric-4-8':
+                $this->columns = [
+                    [
+                        'image' => null,
+                        'width' => 4,
+                        'animation' => 'fade-right',
+                        'link' => '',
+                        'categories' => [],
+                    ],
+                    [
+                        'image' => null,
+                        'width' => 8,
+                        'animation' => 'fade-left',
+                        'link' => '',
+                        'categories' => [],
+                    ],
+                ];
+                break;
             case 'asymmetric':
+                // Keep the old asymmetric for backward compatibility
                 $this->columns = [
                     [
                         'image' => null,

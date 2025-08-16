@@ -40,13 +40,29 @@
             trigger: 'hover'
         });
 
+        // Add form validation before submission
+        $('form').on('submit', function(e) {
+            if ($('.banner-builder').length > 0) {
+                if (!validateBannerImages()) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+
         // Enable keyboard shortcuts
         $(document).keydown(function(e) {
             if (e.ctrlKey || e.metaKey) {
                 switch(String.fromCharCode(e.which).toLowerCase()) {
                     case 's':
                         e.preventDefault();
-                        $('form').submit();
+                        if ($('.banner-builder').length > 0) {
+                            if (validateBannerImages()) {
+                                $('form').submit();
+                            }
+                        } else {
+                            $('form').submit();
+                        }
                         break;
                     case 'n':
                         e.preventDefault();
@@ -100,7 +116,7 @@
         }, 100);
     }
 
-    // Function to reinitialize Select2
+            // Function to reinitialize Select2
     function reinitializeSelect2() {
         setTimeout(function() {
             $('select[multiple]').each(function() {
@@ -126,6 +142,100 @@
                 }
             });
         }, 100);
+    }
+
+    // Function to reinitialize tooltips
+    function reinitializeTooltips() {
+        setTimeout(function() {
+            $('[title]').tooltip('dispose').tooltip({
+                placement: 'auto',
+                container: 'body',
+                trigger: 'hover'
+            });
+        }, 100);
+    }
+
+    // Function to reinitialize both tooltips and Select2
+    function reinitializeUIComponents() {
+        reinitializeTooltips();
+        reinitializeSelect2();
+    }
+
+    // Function to validate banner images before form submission
+    function validateBannerImages() {
+        const livewireComponent = window.Livewire.find(document.querySelector('[wire\\:id]').getAttribute('wire:id'));
+
+        if (!livewireComponent || !livewireComponent.columns || livewireComponent.columns.length === 0) {
+            showValidationError('Please add at least one banner column.');
+            return false;
+        }
+
+        const columnsWithoutImages = [];
+        livewireComponent.columns.forEach((column, index) => {
+            if (!column.image) {
+                columnsWithoutImages.push(index + 1);
+            }
+        });
+
+        if (columnsWithoutImages.length > 0) {
+            const columnText = columnsWithoutImages.length === 1 ? 'column' : 'columns';
+            const columnNumbers = columnsWithoutImages.join(', ');
+            showValidationError(`Please select images for banner ${columnText}: ${columnNumbers}`);
+            return false;
+        }
+
+        return true;
+    }
+
+    // Function to show validation error
+    function showValidationError(message) {
+        // Highlight columns without images
+        highlightMissingImages();
+
+        $.notify({
+            icon: 'fa fa-exclamation-triangle',
+            message: message
+        }, {
+            type: 'danger',
+            delay: 5000,
+            allow_dismiss: true,
+            z_index: 9999,
+            animate: {
+                enter: 'animated shake fadeInDown',
+                exit: 'animated fadeOutUp'
+            }
+        });
+    }
+
+    // Function to highlight columns without images
+    function highlightMissingImages() {
+        const livewireComponent = window.Livewire.find(document.querySelector('[wire\\:id]').getAttribute('wire:id'));
+
+        if (livewireComponent && livewireComponent.columns) {
+            $('.banner-column-card').each(function(index) {
+                const $card = $(this);
+                const column = livewireComponent.columns[index];
+
+                if (!column || !column.image) {
+                    $card.addClass('border-danger')
+                         .find('.image-upload-placeholder')
+                         .addClass('border-danger bg-danger text-white')
+                         .find('.text-muted')
+                         .removeClass('text-muted')
+                         .addClass('text-white');
+
+                    // Remove highlight after 3 seconds
+                    setTimeout(() => {
+                        $card.removeClass('border-danger')
+                             .find('.image-upload-placeholder')
+                             .removeClass('border-danger bg-danger text-white')
+                             .find('.text-white:not(.text-muted)')
+                             .removeClass('text-white')
+                             .addClass('text-muted');
+                    }, 3000);
+                }
+            });
+        }
     }
 
         // Enhanced image picker integration
@@ -198,19 +308,10 @@
 
         // Initialize preview functionality
     $(document).ready(function() {
-                // Listen for Livewire updates to refresh preview
+                        // Listen for Livewire updates to refresh preview
         window.addEventListener('livewire:update', function() {
             updateExternalPreview();
-
-            // Reinitialize tooltips after Livewire update
-            $('[title]').tooltip('dispose').tooltip({
-                placement: 'auto',
-                container: 'body',
-                trigger: 'hover'
-            });
-
-            // Reinitialize Select2 after Livewire update
-            reinitializeSelect2();
+            reinitializeUIComponents();
         });
 
                 // Also listen for more specific Livewire events
@@ -221,7 +322,25 @@
         // Listen for custom image-updated event
         window.addEventListener('image-updated', function(event) {
             setTimeout(updateExternalPreview, 100);
-            reinitializeSelect2();
+            setTimeout(reinitializeUIComponents, 150);
+        });
+
+        // Listen for custom image-removed event
+        window.addEventListener('image-removed', function(event) {
+            setTimeout(updateExternalPreview, 100);
+            setTimeout(reinitializeUIComponents, 150);
+        });
+
+        // Listen for column-added event
+        window.addEventListener('column-added', function(event) {
+            setTimeout(updateExternalPreview, 100);
+            setTimeout(reinitializeUIComponents, 150);
+        });
+
+        // Listen for column-removed event
+        window.addEventListener('column-removed', function(event) {
+            setTimeout(updateExternalPreview, 100);
+            setTimeout(reinitializeUIComponents, 150);
         });
 
         // Listen for input changes to update preview
@@ -229,9 +348,9 @@
             setTimeout(updateExternalPreview, 100);
         });
 
-        // Initial preview update and Select2 initialization
+        // Initial preview update and UI component initialization
         setTimeout(updateExternalPreview, 500);
-        setTimeout(reinitializeSelect2, 600);
+        setTimeout(reinitializeUIComponents, 600);
 
         // Ensure our image picker handler is set up after everything else
         setTimeout(function() {
@@ -256,9 +375,9 @@
                     if (livewireComponent && livewireComponent.columns && columnIndex >= 0) {
                         // Call the Livewire method to update the image
                         livewireComponent.call('updateImage', columnIndex, imageSrc).then(() => {
-                            // After Livewire updates, update external preview and reinitialize Select2
+                            // After Livewire updates, update external preview and reinitialize UI components
                             setTimeout(updateExternalPreview, 100);
-                            setTimeout(reinitializeSelect2, 200);
+                            setTimeout(reinitializeUIComponents, 200);
                         });
                     }
 

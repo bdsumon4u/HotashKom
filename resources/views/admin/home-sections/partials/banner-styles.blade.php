@@ -222,6 +222,19 @@
         color: white;
     }
 
+    .dropdown-header {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6c757d !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 8px 16px 4px 16px;
+    }
+
+    .dropdown-divider {
+        margin: 4px 0;
+    }
+
     /* Tooltip improvements */
     .tooltip {
         z-index: 9999;
@@ -250,6 +263,29 @@
 
     .tooltip.bs-tooltip-right .arrow::before {
         border-right-color: rgba(0, 0, 0, 0.9);
+    }
+
+    /* Validation error highlighting */
+    .banner-column-card.border-danger {
+        border-color: #dc3545 !important;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .image-upload-placeholder.border-danger {
+        border-color: #dc3545 !important;
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.8; }
+        100% { opacity: 1; }
     }
 </style>
 @endpush
