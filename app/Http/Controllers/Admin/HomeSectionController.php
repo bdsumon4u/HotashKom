@@ -108,7 +108,7 @@ class HomeSectionController extends Controller
         $homeSection->categories()->sync($categories);
         cache()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
 
-        return redirect()->route('admin.home-sections.index')->with('success', 'Section Has Been Updated.');
+        return back()->with('success', 'Section Has Been Updated.');
     }
 
     /**
