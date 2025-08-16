@@ -447,7 +447,7 @@ body.rtl{
 }
 .site-content{
     padding-bottom: 30px;
-	padding-top: 70px;
+	padding-top: 80px;
 }
 h1,
 h2,
@@ -13022,6 +13022,10 @@ div.wcfm-collapse-content h2{
 	.title-size-large .title{
 		font-size: 54px;
 	}
+
+    .site-content{
+        padding-top: 60px;
+    }
 
 	/* Footer */
 	.site-footer .footer-main {
