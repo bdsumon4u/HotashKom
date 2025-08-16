@@ -1,0 +1,88 @@
+<IfModule mod_headers.c>
+    # Apply CORS headers only to API requests
+    RewriteCond %{REQUEST_URI} ^/api/ [NC]
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    Header set Access-Control-Max-Age "86400"
+    
+    # Allow credentials (optional)
+    # Header set Access-Control-Allow-Credentials "true"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews
+    </IfModule>
+    <FilesMatch "\.(eot|otf|ttf|woff|woff2)$">
+        Header always set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+
+    RewriteEngine On
+    
+    # If the request is for the API or a specific resource, apply CORS headers
+    RewriteCond %{REQUEST_URI} ^/api/ [NC]
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    Header set Access-Control-Max-Age "86400"
+
+    # Allow credentials if required (optional)
+    # Header set Access-Control-Allow-Credentials "true"
+    
+    # Handle OPTIONS preflight request
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    
+    
+    RewriteCond %{HTTP_HOST} !^www\. [NC]
+    RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
+    
+    RewriteCond %{REQUEST_FILENAME} -d [OR]
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ ^$1 [N]
+    RewriteCond %{REQUEST_URI} (\.\w+$) [NC]
+    RewriteRule ^(.*)$ public/$1
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ public/index.php
+    
+
+# Redirect HTTP to HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+</IfModule>
+# BEGIN cPanel-generated php ini directives, do not edit
+# Manual editing of this file may result in unexpected behavior.
+# To make changes to this file, use the cPanel MultiPHP INI Editor (Home >> Software >> MultiPHP INI Editor)
+# For more information, read our documentation (https://go.cpanel.net/EA4ModifyINI)
+<IfModule php8_module>
+    php_flag display_errors On
+    php_value max_execution_time 80
+    php_value max_input_time 80
+    php_value max_input_vars 1000
+    php_value memory_limit 100M
+    php_value post_max_size 50M
+    php_value session.gc_maxlifetime 1440
+    php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
+    php_value upload_max_filesize 10M
+    php_flag zlib.output_compression Off
+</IfModule>
+<IfModule lsapi_module>
+    php_flag display_errors On
+    php_value max_execution_time 80
+    php_value max_input_time 80
+    php_value max_input_vars 1000
+    php_value memory_limit 100M
+    php_value post_max_size 50M
+    php_value session.gc_maxlifetime 1440
+    php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
+    php_value upload_max_filesize 10M
+    php_flag zlib.output_compression Off
+</IfModule>
+# END cPanel-generated php ini directives, do not edit
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php82” package as the default “PHP” programming language.
+<IfModule mime_module>
+    AddHandler application/x-httpd-alt-php82 .php .php8 .phtml
+</IfModule>

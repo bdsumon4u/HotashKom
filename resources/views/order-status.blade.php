@@ -2,7 +2,7 @@
 
 @title('Order Status')
 
-@content
+@section('content')
     <div class="block mt-4">
         <div class="container">
             <div class="row justify-content-center">
@@ -94,4 +94,4 @@
             </div>
         </div>
     </div>
-@endcontent
+@endsection

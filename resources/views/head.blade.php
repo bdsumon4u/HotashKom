@@ -2350,7 +2350,7 @@
     <link rel="alternate" type="text/xml+oembed"
         href="https://maroonedbd.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fmaroonedbd.com%2F&amp;format=xml">
     <meta name="framework" content="Redux 4.1.23">
-    
+
     <script>
         document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
     </script>
@@ -2387,7 +2387,7 @@
         content="Powered by Slider Revolution 6.3.1 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.">
     <script type="text/javascript">
         function setREVStartSize(e) {
-            //window.requestAnimationFrame(function() {				 
+            //window.requestAnimationFrame(function() {
             window.RSIW = window.RSIW === undefined ? window.innerWidth : window.RSIW;
             window.RSIH = window.RSIH === undefined ? window.innerHeight : window.RSIH;
             try {
@@ -3236,11 +3236,11 @@
         }
 
         #chaty-widget-0 .chaty-widget {
-            bottom: 25px
+            bottom: 50px
         }
 
         #chaty-widget-0 .chaty-widget {
-            right: 25px;
+            right: 50px;
             left: auto;
         }
 

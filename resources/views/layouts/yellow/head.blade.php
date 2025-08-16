@@ -768,7 +768,7 @@
         .kapee-tour.tour-classic .nav-tabs .nav-link,.kapee-accordion[class*="accordion-icon-"] .card-title a:after,
         .woocommerce table.wishlist_table tr td.product-remove a:before,
         .slick-slider button.slick-arrow,
-        
+
         .mobile-menu-wrapper ul.mobile-main-menu li.menu-item-has-children>.menu-toggle {
             color: #555
         }
@@ -977,7 +977,7 @@
         .kapee-accordion.accordion-pills .card-header a:not(.collapsed),
         .kapee-accordion.accordion-pills .card-header a:not(.collapsed):after,
         .kapee-social.icons-theme-colour a:hover,
-        
+
         .slick-slider .slick-arrow:hover,
         .kapee-button .btn-style-outline.btn-color-primary:hover,
         .mobile-menu-header a,
@@ -1054,7 +1054,7 @@
         .kapee-tour.tour-pills .nav-tabs .nav-link.active,
         .kapee-accordion.accordion-pills .card-header a:not(.collapsed),
         .kapee-social.icons-theme-colour a:hover,
-        
+
         .slick-slider .slick-arrow:hover,
         .kapee-button .btn-style-flat.btn-color-primary,
         .kapee-button .btn-style-outline.btn-color-primary:hover,
@@ -1108,7 +1108,7 @@
         .kapee-tour.tour-classic .nav-tabs .nav-link.active,
         .kapee-tour.tour-classic .nav-tabs+.tab-content .tab-pane,
         .slick-slider button.slick-arrow,
-        
+
         .kapee-canvas-sidebar,
         .mobile-menu-wrapper,
         .kapee-mobile-navbar {
@@ -1131,7 +1131,7 @@
         }
 
         .woocommerce .widget_price_filter .price_slider_wrapper .ui-widget-content,
-        
+
 
         .portfolio-post-loop .post-thumbnail:after {
             background-color: rgba(0, 0, 0, .4)
@@ -1566,10 +1566,6 @@
             border-right-width: 1px;
             border-style: solid;
             border-color: #e9e9e9
-        }
-
-        .header-main {
-            min-height: 100px
         }
 
         .header-main .search-field,
@@ -2311,7 +2307,7 @@
     <script type="text/javascript"
         src="/wp-content/cache/busting/1/wp-content/plugins/woocommerce/assets/js/jquery-blockui/jquery.blockUI.min-2.7.0-wc.6.4.0.js"
         id="jquery-blockui-js"></script>
-    
+
     <script>
         document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
     </script>
@@ -2348,7 +2344,7 @@
         content="Powered by Slider Revolution 6.3.1 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.">
     <script type="text/javascript">
         function setREVStartSize(e) {
-            //window.requestAnimationFrame(function() {				 
+            //window.requestAnimationFrame(function() {
             window.RSIW = window.RSIW === undefined ? window.innerWidth : window.RSIW;
             window.RSIH = window.RSIH === undefined ? window.innerHeight : window.RSIH;
             try {
@@ -3197,11 +3193,11 @@
         }
 
         #chaty-widget-0 .chaty-widget {
-            bottom: 25px
+            bottom: 50px
         }
 
         #chaty-widget-0 .chaty-widget {
-            right: 25px;
+            right: 50px;
             left: auto;
         }
 

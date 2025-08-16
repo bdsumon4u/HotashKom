@@ -9,7 +9,7 @@
 
     <div id="page" class="site-wrapper">
         @include('layouts.yellow.header')
-        <div id="main-content" class="-site-content">
+        <div id="main-content" class="-site-content" style="margin-top: 60px;">
             <div class="-container">
                 <div class="row ">
                     <div id="primary" class="content-area col-md-12">

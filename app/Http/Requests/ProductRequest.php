@@ -20,6 +20,9 @@ class ProductRequest extends FormRequest
     {
         $sku = $this->get('sku');
         $this->merge(['sku' => strtoupper($sku)]);
+        if ($this->desc_img == 'on') {
+            $this->desc_img = true;
+        }
     }
 
     /**
