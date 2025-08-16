@@ -18,11 +18,10 @@
                 </div>
                 <div class="header-col header-col-right col-lg-3 col-xl-3 d-none d-lg-flex d-xl-flex">
                     <div class="kapee-ajax-search ajax-search-style-1 ajax-search-square">
-                        <form method="get" class="searchform" action="/api/search-product"> <input
-                                type="search" class="search-field" name="s" value=""
+                        <form method="get" class="searchform" action="/shop"> <input
+                                type="search" class="search-field" name="search" value=""
                                 placeholder="Search for products, categories, brands, sku..." autocomplete="off">
                             <button type="submit" class="search-submit">Search</button>
-                            <input type="hidden" name="post_type" value="product">
                         </form>
                         <div class="search-results-wrapper woocommerce">
                             <div class="autocomplete-suggestions"
@@ -44,11 +43,10 @@
                 </div>
                 <div class="header-col header-col-center col-7 justify-content-center d-flex d-lg-none d-xl-none">
                     <div class="kapee-ajax-search ajax-search-style-1 ajax-search-square">
-                        <form method="get" class="searchform" action="/api/search-product"> <input
-                                type="search" class="search-field" name="s" value=""
+                        <form method="get" class="searchform" action="/shop"> <input
+                                type="search" class="search-field" name="search" value=""
                                 placeholder="Search for products, categories, brands, sku..." autocomplete="off">
                             <button type="submit" class="search-submit">Search</button>
-                            <input type="hidden" name="post_type" value="product">
                         </form>
                         <div class="search-results-wrapper woocommerce">
                             <div class="autocomplete-suggestions"
