@@ -67,9 +67,7 @@
                                     <i class="mr-1 fa fa-image"></i>Image
                                 </label>
                                 <div class="image-preview-wrapper">
-                                    <img src="{{asset($column['image'])}}" alt="Banner Image" class="rounded border img-fluid"
-                                         onerror="console.log('Image failed to load:', this.src); this.style.border='2px solid red';"
-                                         onload="console.log('Image loaded successfully:', this.src);">
+                                                                        <img src="{{asset($column['image'])}}" alt="Banner Image" class="rounded border img-fluid">
                                     <div class="image-overlay">
                                         <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#single-picker" title="Change Image">
                                             <i class="fa fa-edit"></i>

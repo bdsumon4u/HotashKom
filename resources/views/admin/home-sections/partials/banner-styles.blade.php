@@ -221,5 +221,35 @@
         background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
         color: white;
     }
+
+    /* Tooltip improvements */
+    .tooltip {
+        z-index: 9999;
+    }
+
+    .tooltip-inner {
+        background-color: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+        max-width: 200px;
+    }
+
+    .tooltip.bs-tooltip-top .arrow::before {
+        border-top-color: rgba(0, 0, 0, 0.9);
+    }
+
+    .tooltip.bs-tooltip-bottom .arrow::before {
+        border-bottom-color: rgba(0, 0, 0, 0.9);
+    }
+
+    .tooltip.bs-tooltip-left .arrow::before {
+        border-left-color: rgba(0, 0, 0, 0.9);
+    }
+
+    .tooltip.bs-tooltip-right .arrow::before {
+        border-right-color: rgba(0, 0, 0, 0.9);
+    }
 </style>
 @endpush

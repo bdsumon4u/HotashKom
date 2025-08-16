@@ -30,8 +30,12 @@
             updatePreview();
         });
 
-        // Initialize tooltips
-        $('[title]').tooltip();
+        // Initialize tooltips with proper positioning
+        $('[title]').tooltip({
+            placement: 'auto',
+            container: 'body',
+            trigger: 'hover'
+        });
 
         // Enable keyboard shortcuts
         $(document).keydown(function(e) {
@@ -114,7 +118,6 @@
         const livewireComponent = window.Livewire.find(document.querySelector('[wire\\:id]').getAttribute('wire:id'));
         if (livewireComponent && livewireComponent.columns && livewireComponent.columns.length > 0) {
             const columns = livewireComponent.columns;
-            console.log('Updating external preview with columns:', columns); // Debug log
             let previewHtml = '';
 
             columns.forEach((column, i) => {
@@ -132,18 +135,11 @@
                         imagePath = '/' + imagePath;
                     }
 
-                    previewHtml += `
+                                        previewHtml += `
                         <div class="position-relative">
-                            <img src="${imagePath}" alt="Banner ${i+1}" class="rounded img-fluid w-100"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                            <img src="${imagePath}" alt="Banner ${i+1}" class="rounded img-fluid w-100" />
                             <div class="preview-overlay">
                                 <small class="badge badge-dark badge-sm">${width}</small>
-                            </div>
-                            <div class="text-white rounded banner-placeholder d-flex align-items-center justify-content-center bg-warning" style="display: none; min-height: 100px;">
-                                <div class="text-center">
-                                    <i class="mb-1 fa fa-exclamation-triangle"></i>
-                                    <br><small>Image Error</small>
-                                </div>
                             </div>
                         </div>
                     `;
@@ -173,23 +169,23 @@
     $(document).ready(function() {
         // Listen for Livewire updates to refresh preview
         window.addEventListener('livewire:update', function() {
-            console.log('Livewire component updated'); // Debug log
             updateExternalPreview();
+
+            // Reinitialize tooltips after Livewire update
+            $('[title]').tooltip('dispose').tooltip({
+                placement: 'auto',
+                container: 'body',
+                trigger: 'hover'
+            });
         });
 
-        // Also listen for more specific Livewire events
-        document.addEventListener('livewire:init', function() {
-            console.log('Livewire initialized'); // Debug log
-        });
-
+                // Also listen for more specific Livewire events
         document.addEventListener('livewire:navigated', function() {
-            console.log('Livewire navigated'); // Debug log
             updateExternalPreview();
         });
 
         // Listen for custom image-updated event
         window.addEventListener('image-updated', function(event) {
-            console.log('Image updated event received:', event.detail); // Debug log
             setTimeout(updateExternalPreview, 100);
         });
 
