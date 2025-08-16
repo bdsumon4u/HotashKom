@@ -7,8 +7,11 @@
 <script src="https://cdn.jsdelivr.net/gh/livewire/sortable@v1.x.x/dist/livewire-sortable.js"></script>
 <script>
     $(document).ready(function(){
-        $('[selector]').select2({
-            // tags: true,
+        // Initialize Select2 for category dropdowns
+        $('select[multiple]').select2({
+            placeholder: 'Select categories...',
+            allowClear: true,
+            width: '100%'
         });
     });
 </script>
@@ -97,6 +100,34 @@
         }, 100);
     }
 
+    // Function to reinitialize Select2
+    function reinitializeSelect2() {
+        setTimeout(function() {
+            $('select[multiple]').each(function() {
+                const $select = $(this);
+                let selectedValues = [];
+
+                // Preserve selected values if Select2 was already initialized
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    selectedValues = $select.val() || [];
+                    $select.select2('destroy');
+                }
+
+                // Reinitialize with preserved values
+                $select.select2({
+                    placeholder: 'Select categories...',
+                    allowClear: true,
+                    width: '100%'
+                });
+
+                // Restore selected values
+                if (selectedValues.length > 0) {
+                    $select.val(selectedValues).trigger('change');
+                }
+            });
+        }, 100);
+    }
+
         // Enhanced image picker integration
     let currentImageTarget = null;
 
@@ -167,7 +198,7 @@
 
         // Initialize preview functionality
     $(document).ready(function() {
-        // Listen for Livewire updates to refresh preview
+                // Listen for Livewire updates to refresh preview
         window.addEventListener('livewire:update', function() {
             updateExternalPreview();
 
@@ -177,6 +208,9 @@
                 container: 'body',
                 trigger: 'hover'
             });
+
+            // Reinitialize Select2 after Livewire update
+            reinitializeSelect2();
         });
 
                 // Also listen for more specific Livewire events
@@ -187,6 +221,7 @@
         // Listen for custom image-updated event
         window.addEventListener('image-updated', function(event) {
             setTimeout(updateExternalPreview, 100);
+            reinitializeSelect2();
         });
 
         // Listen for input changes to update preview
@@ -194,8 +229,9 @@
             setTimeout(updateExternalPreview, 100);
         });
 
-        // Initial preview update
+        // Initial preview update and Select2 initialization
         setTimeout(updateExternalPreview, 500);
+        setTimeout(reinitializeSelect2, 600);
 
         // Ensure our image picker handler is set up after everything else
         setTimeout(function() {
@@ -220,8 +256,9 @@
                     if (livewireComponent && livewireComponent.columns && columnIndex >= 0) {
                         // Call the Livewire method to update the image
                         livewireComponent.call('updateImage', columnIndex, imageSrc).then(() => {
-                            // After Livewire updates, update external preview
+                            // After Livewire updates, update external preview and reinitialize Select2
                             setTimeout(updateExternalPreview, 100);
+                            setTimeout(reinitializeSelect2, 200);
                         });
                     }
 
