@@ -1,40 +1,52 @@
 <div class="block block-products-carousel" data-layout="grid-{{ $cols ?? 5 }}">
     <div class="container">
-        <div class="block-header">
-            <h3 class="block-header__title" style="padding: 0.375rem 1rem;">
-                @isset($section)
-                    <a href="{{ route('home-sections.products', $section) }}">{{ $title }}</a>
-                @else
-                    {{ $title }}
-                @endisset
-            </h3>
-            <div class="block-header__divider"></div>
-            <div class="block-header__arrows-list">
-                <button class="block-header__arrow block-header__arrow--left" type="button">
-                    <svg width="7px" height="11px">
-                        <use xlink:href="{{ asset('strokya/images/sprite.svg#arrow-rounded-left-7x11') }}"></use>
-                    </svg>
-                </button>
-                <button class="block-header__arrow block-header__arrow--right" type="button">
-                    <svg width="7px" height="11px">
-                        <use xlink:href="{{ asset('strokya/images/sprite.svg#arrow-rounded-right-7x11') }}"></use>
-                    </svg>
-                </button>
-            </div>
+        <div class="section-title">
+            <h2>{{ $title }}</h2>
         </div>
-        <div class="block-products-carousel__slider">
-            <div class="block-products-carousel__preloader"></div>
-            <div class="owl-carousel">
-                @foreach($products->chunk($rows ?? 2) as $products)
-                <div class="block-products-carousel__column">
-                    @foreach($products as $product)
-                    <div class="block-products-carousel__cell">
-                        <livewire:product-card :product="$product" :key="$product->id" />
+
+        <div class="products-grid-modern" data-cols="{{ $cols ?? 3 }}">
+            @foreach($products as $product)
+                <div class="product-card-enhanced">
+                    <div class="product-image-container">
+                        <a href="{{route('products.show', $product)}}">
+                            <img src="{{asset($product->base_image->src)}}"
+                                 alt="{{$product->name}}"
+                                 loading="lazy">
+                        </a>
+
+                        @if($product->price != $product->selling_price)
+                            @php($percent = round((($product->price - $product->selling_price) * 100) / $product->price, 0, PHP_ROUND_HALF_UP))
+                            <div class="product-badge-sale">
+                                {{$percent}}% OFF
+                            </div>
+                        @endif
                     </div>
-                    @endforeach
+
+                    <div class="product-info-enhanced">
+                        <h3 class="product-title-enhanced">
+                            <a href="{{route('products.show', $product)}}">{{$product->name}}</a>
+                        </h3>
+
+                        <div class="product-price-enhanced {{ $product->selling_price == $product->price ? '' : 'has-special' }}">
+                            @if ($product->selling_price == $product->price)
+                                {!! theMoney($product->price) !!}
+                            @else
+                                <span class="product-price-new">{!! theMoney($product->selling_price) !!}</span>
+                                <span class="product-price-old">{!! theMoney($product->price) !!}</span>
+                            @endif
+                        </div>
+
+                        <div class="product-actions-enhanced">
+                            <button class="cart-btn" title="Add to Cart">
+                                <i class="fa fa-shopping-cart"></i>
+                            </button>
+                            <a href="{{route('products.show', $product)}}" class="buy-now-btn">
+                                Buy Now <i class="fa fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                @endforeach
-            </div>
+            @endforeach
         </div>
     </div>
 </div>

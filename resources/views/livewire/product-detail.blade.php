@@ -21,7 +21,7 @@
                 {!! theMoney($selectedVar->price) !!}
             @else
                 <span class="product-card__new-price">{!! theMoney($selling) !!}</span>
-                <span class="product-card__old-price">{!! theMoney($selectedVar->price) !!}</span>
+                <del class="product-card__old-price" style="color: #dc3545 !important; margin-left: 10px; font-weight: normal;">{!! theMoney($selectedVar->price) !!}</del>
             @endif
         </div>
 
@@ -67,14 +67,14 @@
                 <div class="mb-1 form-group product__option">
                     {{-- <label class="product__option-label" for="product-quantity">Quantity</label> --}}
                     <div
-                        class="pt-1 product__actions-item d-flex justify-content-between align-items-center border-top">
+                        class="pt-1 product__actions-item d-flex justify-content-between align-items-center">
                         <big>Quantity</big>
-                        <div class="input-number product__quantity">
+                        <div class="input-number product__quantity" style="display: flex; align-items: center; border: 1px solid #ced4da; border-radius: 4px; overflow: hidden;">
+                            <div class="input-number__sub" wire:click="decrement" style="background: #f8f9fa; border: none; padding: 8px 12px; cursor: pointer; font-size: 16px; font-weight: bold; color: #6c757d; transition: all 0.2s ease; min-width: 35px; display: flex; align-items: center; justify-content: center; user-select: none; border-right: 1px solid #ced4da;">-</div>
                             <input id="product-quantity" class="input-number__input form-control"
                                 wire:model.live="quantity" type="number" min="1" max="{{ $maxQuantity }}"
-                                value="1" readonly style="border: 2px solid">
-                            <div class="input-number__add" wire:click="increment"></div>
-                            <div class="input-number__sub" wire:click="decrement"></div>
+                                value="1" readonly style="border: none; text-align: center; width: 50px; padding: 8px 4px; font-weight: 500; background: white;">
+                            <div class="input-number__add" wire:click="increment" style="background: #f8f9fa; border: none; padding: 8px 12px; cursor: pointer; font-size: 16px; font-weight: bold; color: #6c757d; transition: all 0.2s ease; min-width: 35px; display: flex; align-items: center; justify-content: center; user-select: none; border-left: 1px solid #ced4da;">+</div>
                         </div>
                     </div>
                     <div class="overflow-hidden product__actions">
@@ -86,8 +86,9 @@
                                 <div class="product__actions-item product__actions-item--ordernow"
                                     @if ($show_option->product_detail_buttons_inline ?? false) style="flex: 1;" @endif>
                                     <button type="button" wire:click="orderNow"
-                                        class="btn btn-primary product__ordernow btn-lg btn-block"
-                                        {{ $available ? '' : 'disabled' }}>
+                                        class="btn btn-success product__ordernow btn-lg btn-block"
+                                        {{ $available ? '' : 'disabled' }}
+                                        style="background: #28a745; border: 1px solid #28a745; border-radius: 4px; font-weight: 500; padding: 12px 24px; transition: all 0.2s ease;">
                                         {!! $show_option->order_now_icon ?? null !!}
                                         <span class="ml-1">{{ $show_option->order_now_text ?? '' }}</span>
                                     </button>
@@ -98,7 +99,8 @@
                                     @if ($show_option->product_detail_buttons_inline ?? false) style="flex: 1;" @endif>
                                     <button type="button" wire:click="addToCart"
                                         class="btn btn-primary product__addtocart btn-lg btn-block"
-                                        {{ $available ? '' : 'disabled' }}>
+                                        {{ $available ? '' : 'disabled' }}
+                                        style="background: #007bff; border: 1px solid #007bff; border-radius: 4px; font-weight: 500; padding: 12px 24px; transition: all 0.2s ease;">
                                         {!! $show_option->add_to_cart_icon ?? null !!}
                                         <span class="ml-1">{{ $show_option->add_to_cart_text ?? '' }}</span>
                                     </button>
@@ -137,7 +139,7 @@
                                 </p>
                             @endif
                             <div class="mt-2">
-                                <p class="mb-0 mr-2 text-secondary d-inline-block">Categories:</p>
+                                <p class="mr-2 mb-0 text-secondary d-inline-block">Categories:</p>
                                 @foreach ($product->categories as $category)
                                     <a href="{{ route('categories.products', $category) }}"
                                         class="badge badge-primary">{{ $category->name }}</a>

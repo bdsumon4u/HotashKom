@@ -1,4 +1,3 @@
-@dump($errors->all())
 <div class="row">
     <div class="col-sm-12">
         <h4><small class="mb-1 border-bottom">General</small></h4>
