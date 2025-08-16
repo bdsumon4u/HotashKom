@@ -139,6 +139,56 @@
         });
     </script>
 
+    <!-- JavaScript for Quantity Selector Enhancement -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enhance quantity selector functionality
+            function enhanceQuantitySelectors() {
+                const quantityInputs = document.querySelectorAll('.input-number__input');
+
+                quantityInputs.forEach(input => {
+                    const container = input.closest('.input-number');
+                    const addBtn = container.querySelector('.input-number__add');
+                    const subBtn = container.querySelector('.input-number__sub');
+
+                    if (addBtn && subBtn) {
+                        // Ensure buttons are clickable
+                        addBtn.style.pointerEvents = 'auto';
+                        subBtn.style.pointerEvents = 'auto';
+
+                        // Add visual feedback
+                        addBtn.addEventListener('click', function() {
+                            this.style.transform = 'scale(0.95)';
+                            setTimeout(() => {
+                                this.style.transform = 'scale(1)';
+                            }, 150);
+                        });
+
+                        subBtn.addEventListener('click', function() {
+                            this.style.transform = 'scale(0.95)';
+                            setTimeout(() => {
+                                this.style.transform = 'scale(1)';
+                            }, 150);
+                        });
+                    }
+                });
+            }
+
+            // Run enhancement when page loads
+            enhanceQuantitySelectors();
+
+            // Run enhancement after Livewire updates
+            document.addEventListener('livewire:load', function() {
+                enhanceQuantitySelectors();
+            });
+
+            // Run enhancement after cart updates
+            document.addEventListener('cartUpdated', function() {
+                setTimeout(enhanceQuantitySelectors, 100);
+            });
+        });
+    </script>
+
     <div id="mobile-menu-wrapper" class="mobile-menu-wrapper">
         <div class="mobile-menu-header"> <a class="customer-signinup" href="/">Login
                 &amp; Signup</a></div>

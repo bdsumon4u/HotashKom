@@ -3728,5 +3728,159 @@
             font-size: 12px;
             font-weight: 500;
         }
+
+        /* Quantity Selector Styles for Cart Table */
+        .input-number {
+            display: block;
+            width: 100%;
+            position: relative;
+            max-width: 120px;
+        }
+
+        .input-number__input {
+            -moz-appearance: textfield;
+            display: block;
+            width: 100%;
+            min-width: 88px;
+            padding: 0 35px 0;
+            text-align: center;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            height: 38px;
+            font-size: 14px;
+        }
+
+        .input-number__input::-webkit-inner-spin-button,
+        .input-number__input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .input-number__add,
+        .input-number__sub {
+            position: absolute;
+            height: 100%;
+            width: 34px;
+            top: 0;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border: 1px solid #ced4da;
+            color: #495057;
+        }
+
+        .input-number__add:hover,
+        .input-number__sub:hover {
+            opacity: 1;
+            background: #e9ecef;
+            color: #212529;
+        }
+
+        .input-number__sub {
+            left: 0;
+            border-right: 1px solid #ced4da;
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .input-number__add {
+            right: 0;
+            border-left: 1px solid #ced4da;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        /* Plus and minus symbols */
+        .input-number__add::after,
+        .input-number__add::before,
+        .input-number__sub::before {
+            display: block;
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            background: currentColor;
+        }
+
+        .input-number__add::before,
+        .input-number__sub::before {
+            width: 10px;
+            height: 2px;
+        }
+
+        .input-number__add::after {
+            width: 2px;
+            height: 10px;
+        }
+
+        /* Cart table specific quantity styling */
+        .cart-table__column--quantity .input-number {
+            width: 120px;
+            margin: 0 auto;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .cart-table__column--quantity .input-number {
+                width: 100px;
+            }
+
+            .input-number__input {
+                padding: 0 30px 0;
+                font-size: 13px;
+            }
+
+            .input-number__add,
+            .input-number__sub {
+                width: 30px;
+            }
+        }
+
+        /* Additional quantity selector improvements */
+        .input-number__add:active,
+        .input-number__sub:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+
+        .input-number__input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* Ensure quantity selector is properly positioned in cart table */
+        .cart-table__column--quantity {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .cart-table__column--quantity .input-number {
+            display: inline-block;
+        }
+
+        /* Make sure the buttons are always visible */
+        .input-number__add,
+        .input-number__sub {
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        /* Disabled state for buttons */
+        .input-number__add.disabled,
+        .input-number__sub.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
     </style>
 </head>
