@@ -26,4 +26,9 @@ class ResellerCheckout extends Checkout
     {
         return 'reseller.thank-you';
     }
+
+    protected function getDefaultStatus()
+    {
+        return 'CONFIRMED';
+    }
 }

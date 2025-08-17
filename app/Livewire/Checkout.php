@@ -317,7 +317,7 @@ class Checkout extends Component
 
             $user = $this->getUser($data);
             $oldOrders = $user->orders()->get();
-            $status = data_get(config('app.orders', []), 0, 'PENDING'); // Default Status
+            $status = $this->getDefaultStatus();
 
             $oldOrders = Order::select(['id', 'admin_id', 'status'])->where('phone', $data['phone'])->get();
             $adminIds = $oldOrders->pluck('admin_id')->unique()->toArray();
@@ -482,5 +482,10 @@ class Checkout extends Component
     protected function getRedirectRoute()
     {
         return 'thank-you';
+    }
+
+    protected function getDefaultStatus()
+    {
+        return data_get(config('app.orders', []), 0, 'PENDING'); // Default Status
     }
 }
