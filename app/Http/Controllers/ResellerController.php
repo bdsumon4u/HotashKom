@@ -249,7 +249,7 @@ final class ResellerController extends Controller
             'status_at' => now()->toDateTimeString(),
         ]);
 
-        return redirect()->route('reseller.orders.show', $order)
+        return redirect()->route('reseller.orders')
             ->with('success', 'Order cancelled successfully.');
     }
 

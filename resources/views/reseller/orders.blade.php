@@ -289,6 +289,14 @@
                             buttons += ' <a href="' + "{{ route('reseller.orders.edit', ':id') }}".replace(':id', data) + '" class="btn btn-warning btn-sm btn-block">Edit</a>';
                         }
 
+                        // Add Cancel button for orders that can be cancelled (PENDING, CONFIRMED)
+                        if (row.status === 'PENDING' || row.status === 'CONFIRMED') {
+                            buttons += ' <form class="btn-block" method="POST" action="' + "{{ route('reseller.orders.cancel', ':id') }}".replace(':id', data) + '" style="display: inline;" onsubmit="return confirm(\'Are you sure you want to cancel this order?\')">' +
+                                '{{ csrf_field() }}' +
+                                '<button type="submit" class="btn btn-danger btn-sm btn-block">Cancel</button>' +
+                                '</form>';
+                        }
+
                         return buttons + '</div>';
                     }
                 }
