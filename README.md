@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}405}$$ 🔥 domains are live now
+These 🔥 $${\color{red}408}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-19 09:13:59 Asia/Dhaka**_
+_Last updated: **2025-08-20 09:12:13 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -504,3 +504,6 @@ _Last updated: **2025-08-19 09:13:59 Asia/Dhaka**_
 | 403 | [buynestsk.online](http://buynestsk.online) |
 | 404 | [clicknbuysk.online](http://clicknbuysk.online) |
 | 405 | [narravolve.store](http://narravolve.store) |
+| 406 | [ezyshop24.com](http://ezyshop24.com) |
+| 407 | [parvezshopbd.com](http://parvezshopbd.com) |
+| 408 | [sostashodai.com](http://sostashodai.com) |
