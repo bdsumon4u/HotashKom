@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}408}$$ 🔥 domains are live now
+These 🔥 $${\color{red}413}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-20 09:12:13 Asia/Dhaka**_
+_Last updated: **2025-08-21 09:11:11 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -507,3 +507,8 @@ _Last updated: **2025-08-20 09:12:13 Asia/Dhaka**_
 | 406 | [ezyshop24.com](http://ezyshop24.com) |
 | 407 | [parvezshopbd.com](http://parvezshopbd.com) |
 | 408 | [sostashodai.com](http://sostashodai.com) |
+| 409 | [ahnafbd.com](http://ahnafbd.com) |
+| 410 | [kroybari.com](http://kroybari.com) |
+| 411 | [kashfulemart.com](http://kashfulemart.com) |
+| 412 | [litonshop.com](http://litonshop.com) |
+| 413 | [minabellabd.com](http://minabellabd.com) |
