@@ -176,11 +176,27 @@ final class ResellerController extends Controller
                     }
                     $products .= '</ul>';
 
+                    // Courier tracking link parts
+                    $courier = $order->data['courier'] ?? null;
+                    $consignmentId = $order->data['consignment_id'] ?? null;
+                    $trackingUrl = '';
+                    if ($courier && $consignmentId) {
+                        if ($courier === 'Pathao') {
+                            $trackingUrl = 'https://merchant.pathao.com/tracking?consignment_id='.$consignmentId.'&phone='.\Illuminate\Support\Str::after($order->phone, '+88');
+                        } elseif ($courier === 'Redx') {
+                            $trackingUrl = 'https://redx.com.bd/track-global-parcel/?trackingId='.$consignmentId;
+                        } elseif ($courier === 'SteadFast') {
+                            $trackingUrl = 'https://www.steadfast.com.bd/user/consignment/'.$consignmentId;
+                        }
+                    }
+
                     return [
                         'id' => $order->id,
                         'created_at' => $order->created_at->format('d-M-Y h:i A'),
                         'customer' => $customer,
                         'products' => $products,
+                        'consignment_id' => $consignmentId,
+                        'tracking_url' => $trackingUrl,
                         'status' => $order->status,
                         'subtotal' => theMoney($subtotal),
                         'total' => theMoney($total),
