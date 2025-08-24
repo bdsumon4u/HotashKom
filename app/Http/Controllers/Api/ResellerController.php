@@ -73,17 +73,21 @@ class ResellerController extends Controller
         });
 
         $dataTable = $dataTable
+            ->filterColumn('id', function ($query, $keyword): void {
+                $query->whereRaw('CAST(users.id AS CHAR) REGEXP ?', [$keyword]);
+            })
             ->filterColumn('name', function ($query, $keyword): void {
-                $query->where('name', 'like', '%'.$keyword.'%');
+                $query->where('users.name', 'like', '%'.$keyword.'%')
+                    ->orWhere('users.email', 'like', '%'.$keyword.'%');
             })
             ->filterColumn('shop_name', function ($query, $keyword): void {
-                $query->where('shop_name', 'like', '%'.$keyword.'%');
+                $query->where('users.shop_name', 'like', '%'.$keyword.'%');
             })
             ->filterColumn('phone_number', function ($query, $keyword): void {
-                $query->where('phone_number', 'like', '%'.$keyword.'%');
+                $query->where('users.phone_number', 'like', '%'.$keyword.'%');
             })
             ->filterColumn('bkash_number', function ($query, $keyword): void {
-                $query->where('bkash_number', 'like', '%'.$keyword.'%');
+                $query->where('users.bkash_number', 'like', '%'.$keyword.'%');
             });
 
         // Add conditional sorting for non-pending view

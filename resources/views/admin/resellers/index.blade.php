@@ -46,7 +46,7 @@
                             <div>
                                 @if(isset($status) && $status === 'pending')
                                     <strong>Pending</strong>&nbsp;<small>Resellers</small>
-                                    <small class="text-muted ml-2">(Non-verified resellers)</small>
+                                    <small class="ml-2 text-muted">(Non-verified resellers)</small>
                                 @else
                                     <strong>All</strong>&nbsp;<small>Resellers</small>
                                 @endif
@@ -144,7 +144,9 @@
                 },
                 {
                     data: 'orders_count',
-                    name: 'orders_count'
+                    name: 'orders_count',
+                    sortable: true,
+                    searchable: false,
                 },
                 {
                     data: 'is_verified',
