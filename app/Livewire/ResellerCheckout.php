@@ -17,6 +17,18 @@ class ResellerCheckout extends Checkout
         ]);
     }
 
+    public function checkout()
+    {
+        // Check if user is verified before proceeding with checkout
+        if (isOninda() && (! auth('user')->user() || ! auth('user')->user()->is_verified)) {
+            $this->dispatch('notify', ['message' => 'Please verify your account to place an order', 'type' => 'error']);
+
+            return redirect()->route('user.payment.verification')->with('danger', 'Please verify your account to place an order');
+        }
+
+        return parent::checkout();
+    }
+
     protected function fillFromCookie()
     {
         return false;

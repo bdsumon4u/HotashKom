@@ -76,6 +76,13 @@ class ResellerProductCard extends Component
 
     public function addToCart(): void
     {
+        // Check if user is verified
+        if (isOninda() && (! auth('user')->user() || ! auth('user')->user()->is_verified)) {
+            $this->dispatch('notify', ['message' => 'Please verify your account to add products to cart', 'type' => 'error']);
+
+            return;
+        }
+
         $this->validate();
 
         if ($this->retailPrice <= 0) {

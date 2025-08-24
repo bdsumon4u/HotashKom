@@ -108,9 +108,13 @@
                             </div>
 
                             <div class="product-price">
-                                {!! theMoney($selectedVar->selling_price) !!}
-                                @if($selectedVar->selling_price != $selectedVar->price)
-                                    <del class="text-muted">{!! theMoney($selectedVar->price) !!}</del>
+                                @if(isOninda() && (!auth('user')->user() || !auth('user')->user()->is_verified))
+                                    <span class="text-warning">Verify account to see price</span>
+                                @else
+                                    {!! theMoney($selectedVar->selling_price) !!}
+                                    @if($selectedVar->selling_price != $selectedVar->price)
+                                        <del class="text-muted">{!! theMoney($selectedVar->price) !!}</del>
+                                    @endif
                                 @endif
                             </div>
 

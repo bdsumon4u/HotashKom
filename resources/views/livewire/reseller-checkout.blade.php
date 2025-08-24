@@ -1,5 +1,16 @@
 <div x-data="sumPrices" class="mb-5 row">
-    @if (session()->has('error'))
+    @if(isOninda() && (!auth('user')->user() || !auth('user')->user()->is_verified))
+    <div class="col-12">
+        <div class="py-5 text-center">
+            <i class="mb-3 fa fa-lock fa-3x text-warning"></i>
+            <h4 class="text-warning">Account Verification Required</h4>
+            <p class="text-muted">You need to verify your account before you can place orders.</p>
+            <a href="{{ route('user.payment.verification') }}" class="btn btn-warning">
+                <i class="mr-2 fa fa-credit-card"></i>Verify Account Now
+            </a>
+        </div>
+    </div>
+    @elseif (session()->has('error'))
     <div class="col-12">
         <div class="py-5 text-center text-danger">
             <h4>{{ session('error') }}</h4>

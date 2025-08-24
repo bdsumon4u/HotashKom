@@ -61,6 +61,7 @@
 
 @section('content')
     <div class="mb-5 container-fluid">
+        <x-reseller-verification-alert />
         <div class="row size-column">
             <div class="col-xl-7 box-col-12 xl-100">
                 <div class="row dash-chart">
