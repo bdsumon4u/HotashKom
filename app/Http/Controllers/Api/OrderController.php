@@ -109,7 +109,7 @@ class OrderController extends Controller
                 return '';
             })
             ->editColumn('created_at', fn ($row): string => "<div class='text-nowrap'>".$row->created_at->format('d-M-Y').'<br>'.$row->created_at->format('h:i A').'</div>')
-            ->addColumn('amount', fn ($row): int => intval($row->data['subtotal']) + intval($row->data['shipping_cost']) - intval($row->data['discount'] ?? 0) - intval($row->data['advanced'] ?? 0))
+            ->addColumn('amount', fn ($row): int => $row->condition)
             ->editColumn('status', function ($row) {
                 $return = '<select data-id="'.$row->id.'" onchange="changeStatus" class="status-column form-control-sm">';
                 foreach (config('app.orders', []) as $status) {

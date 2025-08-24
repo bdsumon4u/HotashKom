@@ -211,7 +211,7 @@
                 @endif
                 <tr>
                     <td colspan="3"><strong>Condition</strong></td>
-                    <td><strong>{{ $retail + ((isOninda() && config('app.resell')) ? ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost']) : $order->data['shipping_cost']) - ((isOninda() && config('app.resell')) ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)) - ($order->data['advanced'] ?? 0) }}</strong></td>
+                    <td><strong>{{ $order->condition }}</strong></td>
                 </tr>
             </tbody>
         </table>

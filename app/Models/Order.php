@@ -257,7 +257,28 @@ class Order extends Model
 
     public function condition(): Attribute
     {
-        return Attribute::get(fn (): int => intval($this->data['subtotal']) + intval($this->data['shipping_cost']) - intval($this->data['advanced'] ?? 0) - intval($this->data['discount'] ?? 0));
+        return Attribute::get(function (): int {
+            $retail = 0;
+            foreach ((array) $this->products as $product) {
+                $retail += ($product->quantity ?? 0) * (
+                    (isOninda() && config('app.resell'))
+                        ? ($product->retail_price ?? $product->price ?? 0)
+                        : ($product->price ?? 0)
+                );
+            }
+
+            $deliveryFee = (isOninda() && config('app.resell'))
+                ? ($this->data['retail_delivery_fee'] ?? $this->data['shipping_cost'] ?? 0)
+                : ($this->data['shipping_cost'] ?? 0);
+
+            $discount = (isOninda() && config('app.resell'))
+                ? ($this->data['retail_discount'] ?? 0)
+                : ($this->data['discount'] ?? 0);
+
+            $advanced = $this->data['advanced'] ?? 0;
+
+            return $retail + $deliveryFee - $discount - $advanced;
+        });
     }
 
     public function user()
