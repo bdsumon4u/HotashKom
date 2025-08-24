@@ -163,6 +163,7 @@
                 </tr>
             </thead>
             <tbody>
+                @php $retail = 0 @endphp
                 @foreach ($order->products as $product)
                 <tr>
                     <td>
@@ -180,8 +181,9 @@
                     </td>
                     <td>{{ $product->quantity }}</td>
                     <td>{{ (isOninda() && config('app.resell')) ? ($product->retail_price ?? $product->price) : $product->price }}</td>
-                    <td>{{ $product->quantity * ((isOninda() && config('app.resell')) ? ($product->retail_price ?? $product->price) : $product->price) }}</td>
+                    <td>{{ $amount = $product->quantity * ((isOninda() && config('app.resell')) ? ($product->retail_price ?? $product->price) : $product->price) }}</td>
                 </tr>
+                @php $retail += $amount @endphp
                 @endforeach
             </tbody>
         </table>
@@ -189,7 +191,7 @@
             <tbody>
                 <tr>
                     <td colspan="3"><strong>Subtotal</strong></td>
-                    <td>{{ $order->data['subtotal'] }}</td>
+                    <td>{{ $retail }}</td>
                 </tr>
                 @if($advanced = $order->data['advanced'] ?? 0)
                 <tr>
@@ -209,7 +211,7 @@
                 @endif
                 <tr>
                     <td colspan="3"><strong>Condition</strong></td>
-                    <td><strong>{{ $order->condition }}</strong></td>
+                    <td><strong>{{ $retail + ((isOninda() && config('app.resell')) ? ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost']) : $order->data['shipping_cost']) - ((isOninda() && config('app.resell')) ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)) - ($order->data['advanced'] ?? 0) }}</strong></td>
                 </tr>
             </tbody>
         </table>
