@@ -26,17 +26,30 @@
     @php
         // Helper function to safely load remote images with fallback
         function safeLoadRemoteImage($url, $fallbackPath = null) {
-            try {
-                if (str_starts_with($url, 'http')) {
-                    return "data:image/jpeg;base64, " . base64_encode(file_get_contents($url));
-                } else {
-                    // Local path - check if file exists
-                    $localPath = public_path(str_replace(asset(''), '', $url));
-                    return file_exists($localPath) ? $localPath : $fallbackPath;
-                }
-            } catch (Exception $e) {
+            if (!$url) {
                 return $fallbackPath;
             }
+
+            try {
+                if (str_starts_with($url, 'http')) {
+                    // Remote URL - convert to data URI for PDF
+                    $imageContent = file_get_contents($url);
+                    if ($imageContent !== false) {
+                        return "data:image/jpeg;base64, " . base64_encode($imageContent);
+                    }
+                } else {
+                    // Local path - check if file exists and is a file
+                    $localPath = public_path(str_replace(asset(''), '', $url));
+                    if (file_exists($localPath) && is_file($localPath)) {
+                        return $localPath;
+                    }
+                }
+            } catch (Exception $e) {
+                // Log error for debugging (optional)
+                // error_log("Failed to load image from URL: " . $url . " - " . $e->getMessage());
+            }
+
+            return $fallbackPath;
         }
 
         // Helper function to safely load storage images with fallback
@@ -60,6 +73,26 @@
                 return $fallbackHtml;
             }
         }
+
+        // Helper function to safely load fallback logo
+        function safeLoadFallbackLogo($logoPath) {
+            if (!$logoPath) {
+                return null;
+            }
+
+            $fullPath = public_path($logoPath);
+
+            // Check if path exists and is a file (not a directory)
+            if (file_exists($fullPath) && is_file($fullPath)) {
+                try {
+                    return "data:image/jpeg;base64, " . base64_encode(file_get_contents($fullPath));
+                } catch (Exception $e) {
+                    return null;
+                }
+            }
+
+            return null;
+        }
     @endphp
 
     @foreach ($orders as $order)
@@ -70,9 +103,24 @@
                 <tr>
                     <td align="left">
                         @php
-                            $logoImage = safeLoadRemoteImage($logoUrl ?? null, public_path($logo->mobile));
+                            // First try to load the reseller logo (could be remote or local)
+                            $logoImage = safeLoadRemoteImage($logoUrl ?? null, null);
+
+                            // If no reseller logo, try the fallback logo
+                            if (!$logoImage) {
+                                $logoImage = safeLoadFallbackLogo($logo->mobile ?? null);
+                            }
+
+                            // If still no logo, we'll show company name
                         @endphp
-                        <img src="{{ $logoImage }}" alt="Logo">
+                        @if($logoImage)
+                            <img src="{{ $logoImage }}" alt="Logo">
+                        @else
+                            {{-- No logo available - show company name instead --}}
+                            <div style="font-size: 12px; font-weight: bold; color: #333; min-height: 40px; display: flex; align-items: center;">
+                                {{ $companyName ?? 'Company Logo' }}
+                            </div>
+                        @endif
                     </td>
                     <td align="center">
                         <p><small>{{ $order->created_at->format('M d, Y') }}</small></p>
