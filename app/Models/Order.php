@@ -283,6 +283,32 @@ class Order extends Model
         });
     }
 
+    /**
+     * Get retail amounts for the order with fallbacks for old orders
+     */
+    public function getRetailAmounts(): array
+    {
+        $retailSubtotal = 0;
+        foreach ((array) $this->products as $product) {
+            $quantity = (int) ($product->quantity ?? 0);
+            // Fallback: if retail_price is not available, use wholesale price
+            $retailPrice = (float) ($product->retail_price ?? $product->price ?? 0);
+            $retailSubtotal += $quantity * $retailPrice;
+        }
+
+        // Fallback: if retail_delivery_fee is not available, use shipping_cost
+        $retailDeliveryFee = (float) ($this->data['retail_delivery_fee'] ?? $this->data['shipping_cost'] ?? 0);
+        // Fallback: if retail_discount is not available, use discount or 0
+        $retailDiscount = (float) ($this->data['retail_discount'] ?? $this->data['discount'] ?? 0);
+        $retailTotal = $retailSubtotal + $retailDeliveryFee - $retailDiscount;
+
+        return [
+            'retail_subtotal' => $retailSubtotal,
+            'retail_delivery_fee' => $retailDeliveryFee,
+            'retail_total' => $retailTotal,
+        ];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

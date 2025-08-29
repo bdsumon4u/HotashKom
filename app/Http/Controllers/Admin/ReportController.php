@@ -37,10 +37,17 @@ class ReportController extends Controller
         if (request()->has('code')) {
             $code = ltrim(str_replace('-', '', request('code')), '0');
             if ($order = Order::find($code)) {
-                return $order;
+                // Only add retail amounts when isOninda() is true
+                if (isOninda()) {
+                    $retailAmounts = $order->getRetailAmounts();
+                    $order->setAttribute('retail_amounts', $retailAmounts);
+                }
+
+                // Return JSON response for AJAX requests
+                return response()->json($order);
             }
 
-            return null;
+            return response()->json(null, 404);
         }
 
         return view('admin.reports.scanning');

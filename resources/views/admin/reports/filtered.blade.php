@@ -1,3 +1,9 @@
+@if(isOninda() && !config('app.resell'))
+    <div class="alert alert-info mb-3">
+        <i class="fa fa-info-circle mr-2"></i>
+        <strong>Note:</strong> This report displays retail amounts (end customer pricing) as configured for this platform.
+    </div>
+@endif
 <div class="table-responsive">
     <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
         <thead>

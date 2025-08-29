@@ -37,7 +37,7 @@ class HomeController extends Controller
         }
 
         // Use the service to generate products report
-        $productsData = (new ProductReportService())->generateProductsReport(
+        $productsData = (new ProductReportService)->generateProductsReport(
             $_start,
             $_end,
             ['CONFIRMED', 'INVOICED', 'SHIPPING'],
@@ -74,6 +74,11 @@ class HomeController extends Controller
             $amounts[$status] = $data->total_amount ?? 0;
         }
 
+        // If retail pricing is enabled, recalculate amounts using retail pricing
+        if (isOninda() && ! config('app.resell')) {
+            $this->recalculateAmountsWithRetailPricing($orderQ, $amounts);
+        }
+
         $query = DB::table('admins')
             ->select('admins.id', 'admins.name', 'admins.email', 'admins.role_id', 'admins.is_active', DB::raw('MAX(sessions.last_activity) as last_activity'))
             ->leftJoin('sessions', 'sessions.userable_id', '=', 'admins.id')
@@ -99,5 +104,36 @@ class HomeController extends Controller
         });
 
         return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProducts', 'lowStockProducts', 'start', 'end', 'pendingWithdrawalAmount'));
+    }
+
+    /**
+     * Recalculate order amounts using retail pricing when retail pricing is enabled
+     */
+    private function recalculateAmountsWithRetailPricing($orderQ, &$amounts): void
+    {
+        // Get all orders for recalculation
+        $allOrders = (clone $orderQ)->get();
+
+        // Reset amounts
+        $amounts = array_fill_keys(array_keys($amounts), 0);
+
+        foreach ($allOrders as $order) {
+            $retailAmounts = $order->getRetailAmounts();
+            // Fallback: if retail_total is not available, use wholesale total
+            $totalAmount = $retailAmounts['retail_total'] ?? $order->data['subtotal'] + $order->data['shipping_cost'] - ($order->data['discount'] ?? 0);
+
+            // Add to total
+            $amounts['Total'] += $totalAmount;
+
+            // Add to type-specific totals
+            if ($order->type === Order::ONLINE) {
+                $amounts['Online'] += $totalAmount;
+            } elseif ($order->type === Order::MANUAL) {
+                $amounts['Manual'] += $totalAmount;
+            }
+
+            // Add to status-specific totals
+            $amounts[$order->status] += $totalAmount;
+        }
     }
 }

@@ -48,12 +48,12 @@
 @endpush
 
 @section('content')
-<div class="row mb-5">
-    <div class="col-md-12 mx-auto">
+<div class="mb-5 row">
+    <div class="mx-auto col-md-12">
         <div class="reports-table">
-            <div id="section-to-print" class="card rounded-0 shadow-sm">
-                <div class="card-header p-3">
-                    <div class="table-responsive border border-danger" style="display: none;">
+            <div id="section-to-print" class="shadow-sm card rounded-0">
+                <div class="p-3 card-header">
+                    <div class="border table-responsive border-danger" style="display: none;">
                         <strong class="p-2 text-danger">Duplicate Orders</strong>
                         <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
                             <thead>
@@ -72,14 +72,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
                     </div>
                     <form id="search-form" action="" class="mt-2">
                         <div class="row">
-                            <div class="col pr-1">
-                                <input type="text" name="code" id="search" class="form-control form-control">
+                            <div class="pr-1 col">
+                                <input type="text" name="code" id="search" class="form-control">
                             </div>
                             <div class="col-auto px-1">
                                 <button type="button" onclick="window.print()" class="btn btn-primary">Print</button>
@@ -90,7 +90,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="card-body p-1">
+                <div class="p-1 card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
                             <thead>
@@ -109,12 +109,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <div class="card-footer p-1">
+                <div class="p-1 card-footer">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
                             <thead>
@@ -125,7 +125,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
                     </div>
@@ -138,6 +138,11 @@
 
 @push('scripts')
     <script>
+                        // Configuration for pricing logic
+        var isOninda = {{ isOninda() ? 'true' : 'false' }};
+
+        console.log('Scanning report initialized - isOninda:', isOninda);
+
         function cardPrint() {
             var printContents = document.getElementById('section-to-print').innerHTML;
             var originalContents = document.body.innerHTML;
@@ -155,11 +160,40 @@
         var uniqueness = [];
         var duplicates = [];
         var subtotal = shipping = total = quantity = amount = 0;
+
+        function getOrderAmount(order, field) {
+            // Use retail amounts when available (retail pricing is enabled)
+            // Otherwise fall back to wholesale amounts (original behavior)
+            if (order.retail_amounts && order.retail_amounts.retail_subtotal !== undefined) {
+                switch(field) {
+                    case 'subtotal':
+                        return order.retail_amounts.retail_subtotal || order.data.subtotal;
+                    case 'shipping_cost':
+                        return order.retail_amounts.retail_delivery_fee || order.data.shipping_cost;
+                    default:
+                        return order.data[field];
+                }
+            }
+            // Use wholesale amounts when retail amounts not available
+            return order.data[field];
+        }
         $('#search-form').on('submit', function (ev) {
             ev.preventDefault();
             var code = $('#search').blur().val();
 
-            $.get('{{route('admin.reports.create')}}', {code:code}, scanned);
+            $.get('{{route('admin.reports.create')}}', {code:code})
+                .done(function(response) {
+                    console.log('Order data received:', response);
+                    scanned(response);
+                })
+                .fail(function(xhr, status, error) {
+                    console.error('Error fetching order:', error);
+                    if (xhr.status === 404) {
+                        alert('Order not found with code: ' + code);
+                    } else {
+                        alert('Error fetching order: ' + error);
+                    }
+                });
 
             return false;
         });
@@ -215,9 +249,10 @@
         }
 
         function scanned(order) {
+            console.log('scanned function called with:', order);
             $('#search').focus().val('');
             if (! order || uniqueness.includes(order.id)) {
-                console.log('Order not found');
+                console.log('Order not found or already exists');
                 return;
             }
             uniqueness.push(order.id);
@@ -233,18 +268,18 @@
                         <td>${order.note ?? 'N/A'}</td>
                         <td>${order.data.courier ?? 'N/A'}</td>
                         <td>${order.status}</td>
-                        <td>${order.data.subtotal}</td>
-                        <td>${order.data.shipping_cost}</td>
-                        <td>${parseInt(order.data.subtotal)+parseInt(order.data.shipping_cost)}</td>
+                                            <td>${getOrderAmount(order, 'subtotal')}</td>
+                    <td>${getOrderAmount(order, 'shipping_cost')}</td>
+                    <td>${parseInt(getOrderAmount(order, 'subtotal'))+parseInt(getOrderAmount(order, 'shipping_cost'))}</td>
                         <td style="width: 225px;">
                             <div class="d-flex justify-content-center">
-                                <button type="button" onclick="keep(${order.id})" class="btn btn-primary btn-sm mr-1">Keep</button>
-                                <button type="button" onclick="remove(${order.id})" class="d-none btn btn-danger btn-sm ml-1">Remove</button>
+                                <button type="button" onclick="keep(${order.id})" class="mr-1 btn btn-primary btn-sm">Keep</button>
+                                <button type="button" onclick="remove(${order.id})" class="ml-1 d-none btn btn-danger btn-sm">Remove</button>
                             </div>
                         </td>
                     </tr>
                 `;
-                
+
                 $('.card-header table tbody').prepend(tr);
             } else manageOrder(order);
             phones.push(order.phone);
@@ -280,9 +315,9 @@
         }
 
         function manageOrder(order) {
-            subtotal += parseInt(order.data.subtotal);
-            shipping += parseInt(order.data.shipping_cost);
-            total += parseInt(order.data.subtotal)+parseInt(order.data.shipping_cost);
+            subtotal += parseInt(getOrderAmount(order, 'subtotal'));
+            shipping += parseInt(getOrderAmount(order, 'shipping_cost'));
+            total += parseInt(getOrderAmount(order, 'subtotal'))+parseInt(getOrderAmount(order, 'shipping_cost'));
 
             var tr = `
                 <tr data-id="${order.id}" class="${phones.includes(order.phone) ? 'border border-danger' : ''}">
@@ -294,9 +329,9 @@
                     <td>${order.note ?? 'N/A'}</td>
                     <td>${order.data.courier ?? 'N/A'}</td>
                     <td>${order.status}</td>
-                    <td>${order.data.subtotal}</td>
-                    <td>${order.data.shipping_cost}</td>
-                    <td>${parseInt(order.data.subtotal)+parseInt(order.data.shipping_cost)}</td>
+                    <td>${getOrderAmount(order, 'subtotal')}</td>
+                    <td>${getOrderAmount(order, 'shipping_cost')}</td>
+                    <td>${parseInt(getOrderAmount(order, 'subtotal'))+parseInt(getOrderAmount(order, 'shipping_cost'))}</td>
                 </tr>
             `;
             $('.card-body table tbody').prepend(tr);
@@ -323,17 +358,21 @@
                 var tr = $('.card-footer table tbody tr[data-id="'+product.id+'"]');
 
                 quantity += parseInt(product.quantity);
-                amount += parseInt(product.total);
+                // Use retail price when available (retail pricing is enabled), otherwise use wholesale price
+                var productTotal = (isOninda && product.retail_price && product.retail_price > 0) ?
+                    (product.retail_price * (product.quantity || 1)) :
+                    (product.total || 0);
+                amount += parseInt(productTotal);
 
                 if (tr.length) {
                     tr.find('td:nth-child(2)').text(parseInt(tr.find('td:nth-child(2)').text()) + parseInt(product.quantity));
-                    tr.find('td:nth-child(3)').text(parseInt(tr.find('td:nth-child(3)').text()) + parseInt(product.total));
+                    tr.find('td:nth-child(3)').text(parseInt(tr.find('td:nth-child(3)').text()) + parseInt(productTotal));
                 } else {
                     var tr = `
                         <tr data-id="${product.id}">
                             <td><a target="_blank" href="{{route('products.show', '')}}/${product.slug}">${product.name}</a></td>
                             <td>${product.quantity}</td>
-                            <td>${product.total}</td>
+                            <td>${productTotal}</td>
                         </tr>
                     `;
 
