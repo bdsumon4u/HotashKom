@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}419}$$ 🔥 domains are live now
+These 🔥 $${\color{red}424}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-28 09:06:13 Asia/Dhaka**_
+_Last updated: **2025-08-29 09:06:17 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -518,3 +518,8 @@ _Last updated: **2025-08-28 09:06:13 Asia/Dhaka**_
 | 417 | [khayerbazar.com](http://khayerbazar.com) |
 | 418 | [anaseshop.com](http://anaseshop.com) |
 | 419 | [nittoponnomela.com](http://nittoponnomela.com) |
+| 420 | [iqbalonlinemart.com](http://iqbalonlinemart.com) |
+| 421 | [trustedbdmart.com](http://trustedbdmart.com) |
+| 422 | [kingofcomputersolution.com](http://kingofcomputersolution.com) |
+| 423 | [nittoponnobazar.com](http://nittoponnobazar.com) |
+| 424 | [shopwisebd.com](http://shopwisebd.com) |
