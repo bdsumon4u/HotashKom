@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}424}$$ 🔥 domains are live now
+These 🔥 $${\color{red}425}$$ 🔥 domains are live now
 
-_Last updated: **2025-08-29 09:06:17 Asia/Dhaka**_
+_Last updated: **2025-08-30 09:00:38 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -523,3 +523,4 @@ _Last updated: **2025-08-29 09:06:17 Asia/Dhaka**_
 | 422 | [kingofcomputersolution.com](http://kingofcomputersolution.com) |
 | 423 | [nittoponnobazar.com](http://nittoponnobazar.com) |
 | 424 | [shopwisebd.com](http://shopwisebd.com) |
+| 425 | [clickvaly.com](http://clickvaly.com) |
