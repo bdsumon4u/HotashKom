@@ -52,26 +52,26 @@ class HomeController extends Controller
             ->selectRaw($totalSQL)
             ->first();
         $orders['Total'] = $data->order_count;
-        $amounts['Total'] = $data->total_amount;
+        $amounts['Total'] = (float) ($data->total_amount ?? 0);
 
         $data = (clone $orderQ)->where('type', Order::ONLINE)
             ->selectRaw($totalSQL)
             ->first();
         $orders['Online'] = $data->order_count;
-        $amounts['Online'] = $data->total_amount;
+        $amounts['Online'] = (float) ($data->total_amount ?? 0);
 
         $data = (clone $orderQ)->where('type', Order::MANUAL)
             ->selectRaw($totalSQL)
             ->first();
         $orders['Manual'] = $data->order_count;
-        $amounts['Manual'] = $data->total_amount;
+        $amounts['Manual'] = (float) ($data->total_amount ?? 0);
 
         foreach (config('app.orders', []) as $status) {
             $data = (clone $orderQ)->where('status', $status)
                 ->selectRaw($totalSQL)
                 ->first();
             $orders[$status] = $data->order_count ?? 0;
-            $amounts[$status] = $data->total_amount ?? 0;
+            $amounts[$status] = (float) ($data->total_amount ?? 0);
         }
 
         // If retail pricing is enabled, recalculate amounts using retail pricing
@@ -120,7 +120,10 @@ class HomeController extends Controller
         foreach ($allOrders as $order) {
             $retailAmounts = $order->getRetailAmounts();
             // Fallback: if retail_total is not available, use wholesale total
-            $totalAmount = $retailAmounts['retail_total'] ?? $order->data['subtotal'] + $order->data['shipping_cost'] - ($order->data['discount'] ?? 0);
+            $totalAmount = $retailAmounts['retail_total'] ?? (float) ($order->data['subtotal'] ?? 0) + (float) ($order->data['shipping_cost'] ?? 0) - (float) ($order->data['discount'] ?? 0);
+
+            // Ensure totalAmount is numeric
+            $totalAmount = (float) $totalAmount;
 
             // Add to total
             $amounts['Total'] += $totalAmount;

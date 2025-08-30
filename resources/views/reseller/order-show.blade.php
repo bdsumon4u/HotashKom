@@ -221,7 +221,7 @@
                                     </tr>
                                     <tr>
                                         <td><strong>Total:</strong></td>
-                                        <td><strong>{!! theMoney(($order->data['subtotal'] ?? 0) + ($order->data['shipping_cost'] ?? 0) + (isOninda() && config('app.resell') ? ($order->data['packaging_charge'] ?? 25) : 0) - ($order->data['discount'] ?? 0)) !!}</strong></td>
+                                        <td><strong>{!! theMoney((float) ($order->data['subtotal'] ?? 0) + (float) ($order->data['shipping_cost'] ?? 0) + (isOninda() && config('app.resell') ? (float) ($order->data['packaging_charge'] ?? 25) : 0) - (float) ($order->data['discount'] ?? 0)) !!}</strong></td>
                                     </tr>
                                 </table>
                             </div>
@@ -246,7 +246,7 @@
                                     </tr>
                                     <tr>
                                         <td><strong>Grand Total:</strong></td>
-                                        <td><strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0) - ($order->data['retail_discount'] ?? 0) - ($order->data['advanced'] ?? 0)) !!}</strong></td>
+                                        <td><strong>{!! theMoney((float) $retail + (float) ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0) - (float) ($order->data['retail_discount'] ?? 0) - (float) ($order->data['advanced'] ?? 0)) !!}</strong></td>
                                     </tr>
                                 </table>
                             </div>
@@ -313,7 +313,7 @@
                                                 @endforeach
                                                 <tr class="table-active">
                                                     <td colspan="4" class="text-right"><strong>Subtotal:</strong></td>
-                                                    <td><strong>{!! theMoney($order->data['subtotal'] ?? 0) !!}</strong></td>
+                                                    <td><strong>{!! theMoney((float) ($order->data['subtotal'] ?? 0)) !!}</strong></td>
                                                     <td><strong>{!! theMoney($retail) !!}</strong></td>
                                                 </tr>
                                             @else

@@ -81,7 +81,7 @@
                                         @php($data = $order->data)
                                         <tr>
                                             <th>Subtotal</th>
-                                            <td>{!! theMoney($data['subtotal']) !!}</td>
+                                                                                            <td>{!! theMoney((float) ($data['subtotal'] ?? 0)) !!}</td>
                                             @if(isOninda() && config('app.resell'))
                                             <td>{!! theMoney($retail) !!}</td>
                                             @endif
@@ -91,7 +91,7 @@
                                                 <th>Advanced</th>
                                                 <td>{!! theMoney(0) !!}</td>
                                                 @if(isOninda() && config('app.resell'))
-                                                <td>{!! theMoney($data['advanced']) !!}</td>
+                                                <td>{!! theMoney((float) ($data['advanced'] ?? 0)) !!}</td>
                                                 @endif
                                             </tr>
                                         @endif
@@ -100,7 +100,7 @@
                                             <th>Discount</th>
                                             <td>{!! theMoney($data['discount'] ?? 0) !!}</td>
                                             @if(isOninda() && config('app.resell'))
-                                            <td>{!! theMoney($data['retail_discount']) !!}</td>
+                                                                                            <td>{!! theMoney((float) ($data['retail_discount'] ?? 0)) !!}</td>
                                             @endif
                                         </tr>
                                         @endif
@@ -114,9 +114,9 @@
                                         <!-- Packaging Charge -->
                                         <tr>
                                             <th>Delivery Charge</th>
-                                            <td>{!! theMoney($data['shipping_cost']) !!}</td>
+                                                                                            <td>{!! theMoney((float) ($data['shipping_cost'] ?? 0)) !!}</td>
                                             @if(isOninda() && config('app.resell'))
-                                            <td>{!! theMoney($data['retail_delivery_fee']) !!}</td>
+                                                                                            <td>{!! theMoney((float) ($data['retail_delivery_fee'] ?? 0)) !!}</td>
                                             @endif
                                         </tr>
                                     </tbody>
@@ -124,10 +124,10 @@
                                         <tr>
                                             <th>Grand Total</th>
                                             @if(isOninda() && config('app.resell'))
-                                            <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] + ($data['packaging_charge'] ?? 25) - ($data['discount'] ?? 0)) !!}</td>
-                                            <td>{!! theMoney($retail + $data['retail_delivery_fee'] - ($data['advanced'] ?? 0) - ($data['retail_discount'] ?? 0)) !!}</td>
+                                            <td>{!! theMoney((float) ($data['subtotal'] ?? 0) + (float) ($data['shipping_cost'] ?? 0) + (float) ($data['packaging_charge'] ?? 25) - (float) ($data['discount'] ?? 0)) !!}</td>
+                                            <td>{!! theMoney((float) $retail + (float) ($data['retail_delivery_fee'] ?? 0) - (float) ($data['advanced'] ?? 0) - (float) ($data['retail_discount'] ?? 0)) !!}</td>
                                             @else
-                                            <td>{!! theMoney($data['subtotal'] + $data['shipping_cost'] - ($data['discount'] ?? 0)) !!}</td>
+                                            <td>{!! theMoney((float) ($data['subtotal'] ?? 0) + (float) ($data['shipping_cost'] ?? 0) - (float) ($data['discount'] ?? 0)) !!}</td>
                                             @endif
                                         </tr>
                                     </tfoot>

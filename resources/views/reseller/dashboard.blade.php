@@ -100,7 +100,7 @@
                                 <div class="ecommerce-widgets media">
                                     <div class="media-body">
                                         <p class="mb-2 f-w-500 font-roboto">Total Sales</p>
-                                        <h4 class="mb-0 f-w-500 f-26">{{ number_format($totalSales ?? 0, 2) }} tk</h4>
+                                        <h4 class="mb-0 f-w-500 f-26">{{ number_format((float) ($totalSales ?? 0), 2) }} tk</h4>
                                     </div>
                                     <div class="ecommerce-box light-bg-success"><i class="fa fa-money-bill" aria-hidden="true"></i></div>
                                 </div>
@@ -114,7 +114,7 @@
                                 <div class="ecommerce-widgets media">
                                     <div class="media-body">
                                         <p class="mb-2 f-w-500 font-roboto">Available Balance</p>
-                                        <h4 class="mb-0 f-w-500 f-26"><span class="counter">{{ number_format($availableBalance ?? 0, 2) }}</span> tk</h4>
+                                        <h4 class="mb-0 f-w-500 f-26"><span class="counter">{{ number_format((float) ($availableBalance ?? 0), 2) }}</span> tk</h4>
                                     </div>
                                     <div class="ecommerce-box light-bg-warning"><i class="fa fa-wallet" aria-hidden="true"></i></div>
                                 </div>
@@ -149,7 +149,7 @@
                                                     <td><a href="{{ route('reseller.orders.show', $order->id) }}">#{{ $order->id }}</a></td>
                                                     <td>{{ $order->created_at->format('d-M-Y') }}</td>
                                                     <td><span class="badge badge-{{ $order->status == 'PENDING' ? 'warning' : ($order->status == 'CONFIRMED' ? 'success' : 'info') }}">{{ $order->status }}</span></td>
-                                                    <td>{{ number_format($order->data['subtotal'] ?? 0, 2) }} tk</td>
+                                                    <td>{{ number_format((float) ($order->data['subtotal'] ?? 0), 2) }} tk</td>
                                                 </tr>
                                             @empty
                                                 <tr>

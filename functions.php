@@ -5,7 +5,6 @@ use App\Http\Middleware\ShortKodeMiddleware;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\HomeSection;
-use App\Models\Image;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
@@ -142,6 +141,11 @@ if (! function_exists('setting')) {
 if (! function_exists('theMoney')) {
     function theMoney($amount, $decimals = null, $currency = 'TK')
     {
+        // Ensure amount is numeric to prevent number_format errors
+        if (! is_numeric($amount)) {
+            $amount = (float) ($amount ?? 0);
+        }
+
         return $currency.'&nbsp;<span>'.number_format($amount, $decimals).'</span>';
     }
 }

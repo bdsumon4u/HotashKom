@@ -53,8 +53,8 @@ final readonly class ProductReportService
             ->mapWithKeys(fn ($item, $name) => [$name => [
                 'name' => $name,
                 'slug' => $item->first()['slug'] ?? '',
-                'quantity' => $item->sum('quantity'),
-                'total' => $item->sum(function ($product) {
+                'quantity' => (int) $item->sum('quantity'),
+                'total' => (float) $item->sum(function ($product) {
                     // Use retail amounts when retail pricing is enabled
                     if (isOninda() && ! config('app.resell')) {
                         // Fallback: if retail_price is not available, use wholesale total
@@ -66,7 +66,7 @@ final readonly class ProductReportService
                     // Otherwise use wholesale amounts (original behavior)
                     return $product['total'];
                 }),
-                'purchase_cost' => $item->sum(function ($product) {
+                'purchase_cost' => (float) $item->sum(function ($product) {
                     return ((isset($product['purchase_price']) && $product['purchase_price']) ? $product['purchase_price'] : $product['price']) * $product['quantity'];
                 }),
             ]])

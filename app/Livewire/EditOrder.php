@@ -47,20 +47,26 @@ class EditOrder extends Component
     public string $status = 'CONFIRMED';
 
     // Meta Data
-    public int $discount = 0;
+    #[Validate('numeric|min:0')]
+    public $discount = 0;
 
-    public int $advanced = 0;
+    #[Validate('numeric|min:0')]
+    public $advanced = 0;
 
-    public int $retail_discount = 0;
+    #[Validate('numeric|min:0')]
+    public $retail_discount = 0;
 
-    public int $retail_delivery_fee = 0;
+    #[Validate('numeric|min:0')]
+    public $retail_delivery_fee = 0;
 
     #[Validate('required')]
     public string $shipping_area = '';
 
-    public int $shipping_cost = 0;
+    #[Validate('numeric|min:0')]
+    public $shipping_cost = 0;
 
-    public int $subtotal = 0;
+    #[Validate('numeric|min:0')]
+    public $subtotal = 0;
 
     public string $courier = 'Other';
 
@@ -68,10 +74,11 @@ class EditOrder extends Component
 
     public string $area_id = '';
 
-    #[Validate('numeric')]
-    public float $weight = 0.5;
+    #[Validate('numeric|min:0')]
+    public $weight = 0.5;
 
-    public int $packaging_charge = 25;
+    #[Validate('numeric|min:0')]
+    public $packaging_charge = 25;
 
     public array $selectedProducts = [];
 
@@ -121,8 +128,24 @@ class EditOrder extends Component
 
     public function mount(Order $order): void
     {
-        $this->order = $order; // Initialize before access
-        $this->fill($this->order->only($this->attrs) + $this->order->data);
+        $this->order = $order;
+        $this->fill($this->order->only($this->attrs));
+
+        // Cast meta data to proper types
+        $this->discount = (int) ($this->order->data['discount'] ?? 0);
+        $this->advanced = (int) ($this->order->data['advanced'] ?? 0);
+        $this->retail_discount = (int) ($this->order->data['retail_discount'] ?? 0);
+        $this->retail_delivery_fee = (int) ($this->order->data['retail_delivery_fee'] ?? 0);
+        $this->shipping_cost = (int) ($this->order->data['shipping_cost'] ?? 0);
+        $this->subtotal = (int) ($this->order->data['subtotal'] ?? 0);
+        $this->packaging_charge = (int) ($this->order->data['packaging_charge'] ?? 25);
+        $this->weight = (float) ($this->order->data['weight'] ?? 0.5);
+
+        // Handle string properties
+        $this->shipping_area = $this->order->data['shipping_area'] ?? '';
+        $this->courier = $this->order->data['courier'] ?? 'Other';
+        $this->city_id = $this->order->data['city_id'] ?? '';
+        $this->area_id = $this->order->data['area_id'] ?? '';
 
         foreach (json_decode(json_encode($this->order->products), true) ?? [] as $product) {
             $this->selectedProducts[$product['id']] = $product;

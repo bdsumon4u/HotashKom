@@ -326,7 +326,7 @@
                     <div class="p-3 card-body">
                         @if($pendingWithdrawalAmount > 0)
                         <div class="text-center">
-                            <h3 class="mb-2 text-warning">{{ number_format($pendingWithdrawalAmount, 2) }} tk</h3>
+                                                            <h3 class="mb-2 text-warning">{{ number_format((float) $pendingWithdrawalAmount, 2) }} tk</h3>
                             <p class="mb-0 text-muted">Total pending withdrawal amount</p>
                             <a href="{{ route('admin.money-requests.index') }}" class="mt-2 btn btn-warning btn-sm">
                                 <i class="mr-1 fa fa-dollar-sign"></i>Process Requests
