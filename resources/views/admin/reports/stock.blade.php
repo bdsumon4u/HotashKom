@@ -126,16 +126,16 @@
                                             </div>
                                         </td>
                                         <td>{{$product->stock_count}}</td>
-                                        <td>{!!theMoney($product->average_purchase_price*$product->stock_count)!!}</td>
-                                        <td>{!!theMoney($product->selling_price*$product->stock_count)!!}</td>
+                                        <td>{!!theMoney((float) ($product->average_purchase_price ?? 0) * (int) ($product->stock_count ?? 0))!!}</td>
+                                        <td>{!!theMoney((float) ($product->selling_price ?? 0) * (int) ($product->stock_count ?? 0))!!}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                             <tbody>
                                 <tr>
                                     <td colspan="3" class="text-right">Total</td>
-                                    <td>{!!theMoney($products->sum(fn ($product) => $product->average_purchase_price * $product->stock_count))!!}</td>
-                                    <td>{!!theMoney($products->sum(fn ($product) => $product->selling_price * $product->stock_count))!!}</td>
+                                    <td>{!!theMoney($products->sum(fn ($product) => (float) ($product->average_purchase_price ?? 0) * (int) ($product->stock_count ?? 0)))!!}</td>
+                                    <td>{!!theMoney($products->sum(fn ($product) => (float) ($product->selling_price ?? 0) * (int) ($product->stock_count ?? 0)))!!}</td>
                                 </tr>
                             </tbody>
                         </table>

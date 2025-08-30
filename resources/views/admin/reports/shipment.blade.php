@@ -119,8 +119,8 @@
                                     <td>{{ $data['count'] }}</td>
                                     <td>{!! theMoney($data['total_purchase_cost']) !!}</td>
                                     <td>{!! theMoney($data['total_subtotal']) !!}</td>
-                                    <td class="{{ ($data['total_subtotal'] - $data['total_purchase_cost']) >= 0 ? 'text-success' : 'text-danger' }}">
-                                        {!! theMoney($data['total_subtotal'] - $data['total_purchase_cost']) !!}
+                                    <td class="{{ ((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {!! theMoney((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) !!}
                                     </td>
                                     <td>{{ $report['total_shipped'] > 0 ? round(($data['count'] / $report['total_shipped']) * 100, 1) : 0 }}%</td>
                                 </tr>
@@ -160,8 +160,8 @@
                                     <td>{{ $data['total'] }}</td>
                                     <td>{!! theMoney($data['total_purchase_cost']) !!}</td>
                                     <td>{!! theMoney($data['total_subtotal']) !!}</td>
-                                    <td class="{{ ($data['total_subtotal'] - $data['total_purchase_cost']) >= 0 ? 'text-success' : 'text-danger' }}">
-                                        {!! theMoney($data['total_subtotal'] - $data['total_purchase_cost']) !!}
+                                    <td class="{{ ((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {!! theMoney((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) !!}
                                     </td>
                                     <td class="text-success">{{ $data['delivered'] }}</td>
                                     <td class="text-warning">{{ $data['shipping'] }}</td>
@@ -210,8 +210,8 @@
                                     <td>{{ $data['total'] }}</td>
                                     <td>{!! theMoney($data['total_purchase_cost']) !!}</td>
                                     <td>{!! theMoney($data['total_subtotal']) !!}</td>
-                                    <td class="{{ ($data['total_subtotal'] - $data['total_purchase_cost']) >= 0 ? 'text-success' : 'text-danger' }}">
-                                        {!! theMoney($data['total_subtotal'] - $data['total_purchase_cost']) !!}
+                                    <td class="{{ ((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) >= 0 ? 'text-success' : 'text-danger' }}">
+                                        {!! theMoney((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) !!}
                                     </td>
                                     <td class="text-warning">{{ $data['shipping'] }}</td>
                                     <td class="text-success">{{ $data['delivered'] }}</td>

@@ -300,7 +300,7 @@
                                         <td>{!! theMoney($product->quantity * $product->price) !!}</td>
                                         @if(isOninda() && config('app.resell'))
                                         <td>{!! theMoney($amount = $product->quantity * $product->retail_price) !!}</td>
-                                        @php($retail += $amount)
+                                        @php($retail += (float) $amount)
                                         @endif
                                     </tr>
                                     @endforeach

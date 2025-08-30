@@ -276,7 +276,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @php($retail += $amount)
+                            @php($retail += (float) $amount)
                             @endforeach
                         </tbody>
                     </table>
@@ -384,8 +384,8 @@
                         <tr>
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
-                                <strong>{!! theMoney($subtotal + $shipping_cost + ($order->data['packaging_charge'] ?? 25) - $discount) !!}</strong> (buy)<br>
-                                <strong>{!! theMoney($retail + ($order->data['retail_delivery_fee'] ?? $shipping_cost) - $advanced - ($order->data['retail_discount'] ?? 0)) !!}</strong> (sell)
+                                <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost + (float) ($order->data['packaging_charge'] ?? 25) - (float) $discount) !!}</strong> (buy)<br>
+                                <strong>{!! theMoney((float) $retail + (float) ($order->data['retail_delivery_fee'] ?? $shipping_cost) - (float) $advanced - (float) ($order->data['retail_discount'] ?? 0)) !!}</strong> (sell)
                             </td>
                         </tr>
                         @else
@@ -393,9 +393,9 @@
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
                                 @if(isOninda())
-                                <strong>{!! theMoney($retail + $order->data['retail_delivery_fee'] - $advanced - ($order->data['discount'] ?? 0)) !!}</strong>
+                                <strong>{!! theMoney((float) $retail + (float) ($order->data['retail_delivery_fee'] ?? 0) - (float) $advanced - (float) ($order->data['discount'] ?? 0)) !!}</strong>
                                 @else
-                                <strong>{!! theMoney($subtotal + $shipping_cost - $discount - $advanced) !!}</strong>
+                                <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost - (float) $discount - (float) $advanced) !!}</strong>
                                 @endif
                             </td>
                         </tr>
