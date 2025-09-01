@@ -23,12 +23,193 @@
         .datatable thead th.sorting {
             background-image: none !important;
         }
+
+                                /* Print styles */
+        @media print {
+            html, body {
+                height: 100vh;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden;
+            }
+
+                        .main-nav {
+                display: none !important;
+                width: 0 !important;
+            }
+
+            .page-main-header {
+                display: none !important;
+                width: 0 !important;
+            }
+
+            .print-edit-buttons,
+            .footer {
+                display: none !important;
+            }
+
+            .page-body {
+                font-size: 16px;
+                margin-top: 0 !important;
+                margin-left: 0 !important;
+                page-break-after: always;
+            }
+
+            .page-body p {
+                font-size: 14px !important;
+            }
+
+            /* Hide DataTable elements */
+            .dt-buttons,
+            .dataTables_paginate,
+            .dataTables_info,
+            .dataTables_filter,
+            .dataTables_length,
+            .card-header .d-flex,
+            .no-print {
+                display: none !important;
+            }
+
+            /* Hide Actions column */
+            .table th:last-child,
+            .table td:last-child,
+            #money-requests-table th:last-child,
+            #money-requests-table td:last-child,
+            .dataTable th:last-child,
+            .dataTable td:last-child {
+                display: none !important;
+            }
+
+            /* Remove any horizontal lines or borders at the top */
+            hr,
+            .hr,
+            [class*="border-top"],
+            [class*="border-bottom"],
+            .border-top,
+            .border-bottom {
+                display: none !important;
+                border: none !important;
+            }
+
+            /* Reset page body for printing */
+            .page-body {
+                font-size: 16px;
+                margin-top: 0 !important;
+                margin-left: 0 !important;
+                page-break-after: always;
+            }
+
+            .page-body p {
+                font-size: 14px !important;
+            }
+
+            /* Container adjustments */
+            .container-fluid {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            /* Style the card for printing */
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .card-body {
+                padding: 10px 0 !important;
+            }
+
+            /* Table styles for printing */
+            .table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+
+            .table th,
+            .table td {
+                border: 1px solid #000 !important;
+                padding: 8px !important;
+                text-align: left !important;
+            }
+
+            .table thead th {
+                background-color: #f8f9fa !important;
+                font-weight: bold !important;
+            }
+
+            /* Print header styles */
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+            }
+
+            .print-header h1 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: bold;
+            }
+
+            .print-header .date {
+                font-size: 14px;
+                color: #666;
+                margin-top: 5px;
+            }
+
+                        /* Ensure only the card content is visible */
+            .row {
+                margin: 0 !important;
+            }
+
+            .col-sm-12 {
+                padding: 0 !important;
+            }
+
+            /* Hide specific navigation and layout elements */
+            .main-nav,
+            .sidebar-wrapper,
+            .sidebar,
+            .main-header,
+            .page-header,
+            .page-title,
+            .breadcrumb,
+            footer,
+            .footer,
+            .main-footer,
+            .dt-buttons,
+            .dataTables_paginate,
+            .dataTables_info,
+            .dataTables_filter,
+            .dataTables_length,
+            .card-header .d-flex,
+            .no-print,
+            /* Additional header selectors */
+            header,
+            .header,
+            .top-header,
+            .navbar,
+            .navbar-header,
+            .navbar-nav,
+            .nav-header,
+            .page-header-wrapper,
+            .main-header-wrapper,
+            /* Hide Actions column */
+            .table th:last-child,
+            .table td:last-child {
+                display: none !important;
+                width: 0 !important;
+            }
+        }
     </style>
 @endpush
 
 @section('content')
     <div class="container-fluid">
-        <div class="page-title">
+        <div class="page-title no-print">
             <div class="row">
                 <div class="col-6">
                     <h3>Money Requests</h3>
@@ -48,6 +229,12 @@
     </div>
 
     <div class="container-fluid">
+        <!-- Print Header (hidden on screen, visible when printing) -->
+        <div class="print-header" style="display: none;">
+            <h1>Money Requests Report</h1>
+            <div class="date">Generated on: {{ now()->format('F j, Y \a\t g:i A') }}</div>
+        </div>
+
         <div class="row">
             <div class="col-sm-12">
                 <div class="shadow-sm card rounded-0">
@@ -66,6 +253,11 @@
                                 <div class="text-right">
                                     <div class="mb-0 h5 text-success" id="today-requests">0</div>
                                     <small class="text-muted">Today</small>
+                                </div>
+                                <div class="ml-3">
+                                    <button type="button" class="btn btn-primary btn-sm" id="printButton">
+                                        <i class="fa fa-print"></i> Print Report
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -281,6 +473,28 @@
             setInterval(function() {
                 table.ajax.reload(null, false);
             }, 60000);
+
+                                                            // Handle print button click
+            $('#printButton').on('click', function() {
+                // Show print header
+                $('.print-header').show();
+
+                // Hide elements that shouldn't be printed (simplified like show.blade.php)
+                $('.main-nav, .page-main-header, .footer, .card-header .d-flex, .dt-buttons, .dataTables_paginate, .dataTables_info, .dataTables_filter, .dataTables_length').addClass('no-print');
+
+                // Hide Actions column
+                $('.table th:last-child, .table td:last-child, #money-requests-table th:last-child, #money-requests-table td:last-child, .dataTable th:last-child, .dataTable td:last-child').addClass('no-print');
+
+                // Print the page
+                window.print();
+
+                // Hide print header and remove no-print classes after printing
+                setTimeout(function() {
+                    $('.print-header').hide();
+                    $('.main-nav, .page-main-header, .footer, .card-header .d-flex, .dt-buttons, .dataTables_paginate, .dataTables_info, .dataTables_filter, .dataTables_length').removeClass('no-print');
+                    $('.table th:last-child, .table td:last-child, #money-requests-table th:last-child, #money-requests-table td:last-child, .dataTable th:last-child, .dataTable td:last-child').removeClass('no-print');
+                }, 1000);
+            });
         });
     </script>
 @endpush
