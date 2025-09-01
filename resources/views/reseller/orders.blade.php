@@ -308,7 +308,7 @@
             order: [
                 [1, 'desc']
             ],
-            pageLength: 25,
+            pageLength: 50,
         });
     </script>
 @endpush

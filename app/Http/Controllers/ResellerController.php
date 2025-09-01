@@ -137,12 +137,20 @@ final class ResellerController extends Controller
                 $query->where('status', $request->status);
             }
 
-            $orders = $query->latest()->paginate(25);
+            // Get pagination parameters from DataTables
+            $length = $request->input('length', 50);
+            $start = $request->input('start', 0);
+
+            // Get total count for pagination
+            $totalRecords = $query->count();
+
+            // Get paginated results
+            $orders = $query->latest()->skip($start)->take($length)->get();
 
             return response()->json([
                 'draw' => $request->draw,
-                'recordsTotal' => $orders->total(),
-                'recordsFiltered' => $orders->total(),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $totalRecords,
                 'data' => $orders->map(function ($order) {
                     // Calculate total from subtotal, shipping cost, discount, and advanced
                     $subtotal = $order->data['subtotal'] ?? 0;
