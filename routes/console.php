@@ -32,3 +32,9 @@ Artisan::command('resellers:cleanup-duplicates {--product-id= : Clean up duplica
     $this->info('Cleanup job dispatched successfully!');
     $this->info('Check the logs for progress and results.');
 })->purpose('Clean up duplicate relationships in reseller databases');
+
+// Schedule Oninda order API dispatch every 30 minutes
+Schedule::command('oninda:dispatch-orders')
+    ->everyThirtyMinutes()
+    ->withoutOverlapping()
+    ->runInBackground();
