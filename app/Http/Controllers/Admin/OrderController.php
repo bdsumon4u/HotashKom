@@ -405,11 +405,11 @@ class OrderController extends Controller
     private function calculateOrderCollectionAmount($order)
     {
         $retail = array_reduce((array) $order->products, function ($sum, $product) {
-            return $sum + ($product->{(isOninda() && config('app.resell')) ? 'retail_price' : 'price'} ?? 0) * ($product->quantity ?? 1);
+            return $sum + (float) ($product->{(isOninda() && config('app.resell')) ? 'retail_price' : 'price'} ?? 0) * (int) ($product->quantity ?? 1);
         }, 0);
-        $deliveryFee = $order->data[(isOninda() && config('app.resell')) ? 'retail_delivery_fee' : 'shipping_cost'] ?? 0;
-        $discount = $order->data[(isOninda() && config('app.resell')) ? 'retail_discount' : 'discount'] ?? 0;
-        $advanced = $order->data['advanced'] ?? 0;
+        $deliveryFee = (float) ($order->data[(isOninda() && config('app.resell')) ? 'retail_delivery_fee' : 'shipping_cost'] ?? 0);
+        $discount = (float) ($order->data[(isOninda() && config('app.resell')) ? 'retail_discount' : 'discount'] ?? 0);
+        $advanced = (float) ($order->data['advanced'] ?? 0);
 
         return $retail + $deliveryFee - $discount - $advanced;
     }

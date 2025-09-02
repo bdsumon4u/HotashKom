@@ -153,10 +153,10 @@ final class ResellerController extends Controller
                 'recordsFiltered' => $totalRecords,
                 'data' => $orders->map(function ($order) {
                     // Calculate total from subtotal, shipping cost, discount, and advanced
-                    $subtotal = $order->data['subtotal'] ?? 0;
-                    $shippingCost = $order->data['shipping_cost'] ?? 0;
-                    $discount = $order->data['discount'] ?? 0;
-                    $advanced = $order->data['advanced'] ?? 0;
+                    $subtotal = (float) ($order->data['subtotal'] ?? 0);
+                    $shippingCost = (float) ($order->data['shipping_cost'] ?? 0);
+                    $discount = (float) ($order->data['discount'] ?? 0);
+                    $advanced = (float) ($order->data['advanced'] ?? 0);
                     $total = $subtotal + $shippingCost - $discount - $advanced;
 
                     // Format customer information with icons

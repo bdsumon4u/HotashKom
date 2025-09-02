@@ -125,14 +125,14 @@ class Order extends Model
                 return;
             }
 
-            $retail = collect($order->products)->sum(fn ($product) => $product->retail_price * $product->quantity);
-            $shippingCost = $order->data['shipping_cost'] ?? 0; // Oninda's delivery fee
-            $retailDeliveryFee = $order->data['retail_delivery_fee'] ?? 0; // Reseller's delivery fee charged to customer
-            $advanced = $order->data['advanced'] ?? 0;
-            $retailDiscount = $order->data['retail_discount'] ?? 0;
-            $subtotal = $order->data['subtotal'] ?? 0;
-            $discount = $order->data['discount'] ?? 0;
-            $packagingCharge = $order->data['packaging_charge'] ?? 25; // Packaging charge
+            $retail = collect($order->products)->sum(fn ($product) => (float) $product->retail_price * (int) $product->quantity);
+            $shippingCost = (float) ($order->data['shipping_cost'] ?? 0); // Oninda's delivery fee
+            $retailDeliveryFee = (float) ($order->data['retail_delivery_fee'] ?? 0); // Reseller's delivery fee charged to customer
+            $advanced = (float) ($order->data['advanced'] ?? 0);
+            $retailDiscount = (float) ($order->data['retail_discount'] ?? 0);
+            $subtotal = (float) ($order->data['subtotal'] ?? 0);
+            $discount = (float) ($order->data['discount'] ?? 0);
+            $packagingCharge = (float) ($order->data['packaging_charge'] ?? 25); // Packaging charge
 
             $calculateCommission = function () use ($retail, $retailDeliveryFee, $advanced, $retailDiscount, $subtotal, $shippingCost, $discount, $packagingCharge) {
                 // Commission = (retail + retail_delivery_fee) - advanced - retail_discount - (subtotal + shipping_cost - discount) - packaging_charge
