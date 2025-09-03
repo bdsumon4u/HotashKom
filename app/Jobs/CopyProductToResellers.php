@@ -246,6 +246,9 @@ class CopyProductToResellers implements ShouldQueue
         $productData['source_id'] = $productData['id'];
         unset($productData['id']);
 
+        // Ensure reseller selling price equals retail price
+        $productData['selling_price'] = $this->product->retailPrice();
+
         // ===== RESELLER DATABASE OPERATIONS =====
 
         // Check if product already exists by source_id first
@@ -341,6 +344,9 @@ class CopyProductToResellers implements ShouldQueue
             $varData['source_id'] = $varData['id'];
             unset($varData['id']);
 
+            // Ensure reseller variation selling price equals retail price
+            $varData['selling_price'] = $this->calculateRetailPrice($variation->suggested_price, $variation->selling_price);
+
             // ===== RESELLER DATABASE OPERATIONS =====
 
             // Check if variation already exists by source_id first
@@ -376,6 +382,30 @@ class CopyProductToResellers implements ShouldQueue
                     ->insert($varData);
             }
         }
+    }
+
+    /**
+     * Calculate retail price based on suggested_price or fallback to 1.4x selling_price
+     */
+    private function calculateRetailPrice($suggestedPrice, $sellingPrice): int
+    {
+        $price = $suggestedPrice;
+
+        if (is_string($price)) {
+            $price = trim($price);
+            if ($price !== '' && preg_match('/^\s*(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*$/', $price, $matches)) {
+                $low = (float) $matches[1];
+                $high = (float) $matches[2];
+
+                return (int) round(($low + $high) / 2);
+            }
+        }
+
+        if (is_numeric($price) && $price > 0) {
+            return (int) round((float) $price);
+        }
+
+        return (int) round(((float) $sellingPrice) * 1.4);
     }
 
     /**
