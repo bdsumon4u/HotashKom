@@ -40,7 +40,7 @@ class ProductDetail extends Component
         $component = new self;
         $component->product = $product;
         $component->mount();
-        $component->addToCart($component->selectedVar, $component->quantity, 'landing');
+        $component->addToCart('landing');
 
         return $component;
     }
