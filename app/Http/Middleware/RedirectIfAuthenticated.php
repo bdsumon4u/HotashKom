@@ -20,8 +20,12 @@ class RedirectIfAuthenticated
         if (Auth::guard($guard)->check()) {
             $upper = strtoupper(str_replace(['_', '-'], '', $guard));
 
+            if ($upper === 'USER') {
+                return redirect('/reseller/dashboard');
+            }
+
             return $upper === 'WEB' || $upper == null
-                ? redirect('/')
+                ? redirect('/reseller/dashboard')
                 : redirect($guard.'/dashboard');
         }
 

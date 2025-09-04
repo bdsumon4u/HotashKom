@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Http\Resources\ProductResource;
+use App\Jobs\CallOnindaOrderApi;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -19,8 +21,8 @@ class EditOrder extends Component
     ];
 
     private array $meta = [
-        'discount', 'advanced', 'shipping_area', 'shipping_cost',
-        'subtotal', 'courier', 'city_id', 'area_id', 'weight',
+        'discount', 'advanced', 'retail_discount', 'retail_delivery_fee', 'shipping_area', 'shipping_cost',
+        'subtotal', 'courier', 'city_id', 'area_id', 'weight', 'packaging_charge',
         // 'area_name', 'is_fraud', 'is_repeat',
     ];
 
@@ -45,16 +47,26 @@ class EditOrder extends Component
     public string $status = 'CONFIRMED';
 
     // Meta Data
-    public int $discount = 0;
+    #[Validate('numeric|min:0')]
+    public $discount = 0;
 
-    public int $advanced = 0;
+    #[Validate('numeric|min:0')]
+    public $advanced = 0;
+
+    #[Validate('numeric|min:0')]
+    public $retail_discount = 0;
+
+    #[Validate('numeric|min:0')]
+    public $retail_delivery_fee = 0;
 
     #[Validate('required')]
     public string $shipping_area = '';
 
-    public int $shipping_cost = 0;
+    #[Validate('numeric|min:0')]
+    public $shipping_cost = 0;
 
-    public int $subtotal = 0;
+    #[Validate('numeric|min:0')]
+    public $subtotal = 0;
 
     public string $courier = 'Other';
 
@@ -62,8 +74,11 @@ class EditOrder extends Component
 
     public string $area_id = '';
 
-    #[Validate('numeric')]
-    public float $weight = 0.5;
+    #[Validate('numeric|min:0')]
+    public $weight = 0.5;
+
+    #[Validate('numeric|min:0')]
+    public $packaging_charge = 25;
 
     public array $selectedProducts = [];
 
@@ -75,7 +90,7 @@ class EditOrder extends Component
     {
         $expires = config('services.courier_report.expires');
         if (! $expires || Carbon::parse($expires)->isPast()) {
-            return "API Expired";
+            return 'API Expired';
         }
 
         $report = cache()->remember(
@@ -113,8 +128,24 @@ class EditOrder extends Component
 
     public function mount(Order $order): void
     {
-        $this->order = $order; // Initialize before access
-        $this->fill($this->order->only($this->attrs) + $this->order->data);
+        $this->order = $order;
+        $this->fill($this->order->only($this->attrs));
+
+        // Cast meta data to proper types
+        $this->discount = (int) ($this->order->data['discount'] ?? 0);
+        $this->advanced = (int) ($this->order->data['advanced'] ?? 0);
+        $this->retail_discount = (int) ($this->order->data['retail_discount'] ?? 0);
+        $this->retail_delivery_fee = (int) ($this->order->data['retail_delivery_fee'] ?? 0);
+        $this->shipping_cost = (int) ($this->order->data['shipping_cost'] ?? 0);
+        $this->subtotal = (int) ($this->order->data['subtotal'] ?? 0);
+        $this->packaging_charge = (int) ($this->order->data['packaging_charge'] ?? 25);
+        $this->weight = (float) ($this->order->data['weight'] ?? 0.5);
+
+        // Handle string properties
+        $this->shipping_area = $this->order->data['shipping_area'] ?? '';
+        $this->courier = $this->order->data['courier'] ?? 'Other';
+        $this->city_id = $this->order->data['city_id'] ?? '';
+        $this->area_id = $this->order->data['area_id'] ?? '';
 
         foreach (json_decode(json_encode($this->order->products), true) ?? [] as $product) {
             $this->selectedProducts[$product['id']] = $product;
@@ -131,28 +162,16 @@ class EditOrder extends Component
 
         $quantity = 1;
         $id = $product->id;
-        // Manage Stock
-        if ($product->should_track) {
-            if ($product->stock_count <= 0) {
-                return session()->flash('error', 'Out of Stock.');
-            }
-            $quantity = $product->stock_count >= $quantity ? $quantity : $product->stock_count;
-            $product->decrement('stock_count', $quantity);
+
+        if ($product->should_track && $product->stock_count <= 0) {
+            return session()->flash('error', 'Out of Stock.');
         }
 
-        $this->selectedProducts[$id] = [
-            'id' => $id,
-            'name' => $product->var_name,
-            'slug' => $product->slug,
-            'image' => optional($product->base_image)->src,
-            'price' => $selling = $product->getPrice($quantity),
-            'quantity' => $quantity,
-            'total' => $quantity * $selling,
-            'shipping_inside' => $product->shipping_inside,
-            'shipping_outside' => $product->shipping_outside,
-        ];
+        $productData = (new ProductResource($product))->toCartItem($quantity);
 
-        $this->updatedShippingArea('');
+        $this->selectedProducts[$id] = $productData;
+
+        $this->updatedShippingArea($this->shipping_area);
 
         $this->search = '';
         $this->dispatch('notify', ['message' => 'Product added successfully.']);
@@ -166,7 +185,7 @@ class EditOrder extends Component
         $this->selectedProducts[$id]['quantity']++;
         $this->selectedProducts[$id]['total'] = $this->selectedProducts[$id]['quantity'] * $this->selectedProducts[$id]['price'];
 
-        $this->updatedShippingArea('');
+        $this->updatedShippingArea($this->shipping_area);
     }
 
     public function decreaseQuantity($id): void
@@ -181,26 +200,29 @@ class EditOrder extends Component
             unset($this->selectedProducts[$id]);
         }
 
-        $this->updatedShippingArea('');
+        $this->updatedShippingArea($this->shipping_area);
     }
 
     public function updatedShippingArea($value): void
     {
-        $shipping_cost = 0;
-        if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
-            $shipping_cost = setting('delivery_charge')->{$this->shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping_area, 0);
-        } else {
-            $shipping_cost = collect($this->selectedProducts)->sum(function ($item) {
-                $default = setting('delivery_charge')->{$this->shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? config('services.shipping.'.$this->shipping_area, 0);
-                if ($this->shipping_area === 'Inside Dhaka') {
-                    return ($item['shipping_inside'] ?? $default) * (setting('show_option')->quantitywise_delivery_charge ?? false ? $item['quantity'] : 1);
-                } else {
-                    return ($item['shipping_outside'] ?? $default) * (setting('show_option')->quantitywise_delivery_charge ?? false ? $item['quantity'] : 1);
-                }
-            });
+        $this->fill([
+            'subtotal' => $subtotal = $this->order->getSubtotal($this->selectedProducts),
+            'shipping_cost' => $this->order->getShippingCost($this->selectedProducts, $subtotal, $value),
+        ]);
+        if (isOninda() && ! config('app.resell')) {
+            $this->fill(['retail_delivery_fee' => $this->shipping_cost]);
+            $this->updatedRetailDeliveryFee($this->shipping_cost);
         }
+    }
 
-        $this->fill(['shipping_cost' => $shipping_cost, 'subtotal' => $this->order->getSubtotal($this->selectedProducts)]);
+    public function updatedRetailDeliveryFee($value)
+    {
+        $this->order->fill(['data' => array_merge($this->order->data, ['retail_delivery_fee' => $value])]);
+    }
+
+    public function updatedPackagingCharge($value)
+    {
+        $this->order->fill(['data' => array_merge($this->order->data, ['packaging_charge' => $value])]);
     }
 
     public function updateOrder()
@@ -211,10 +233,16 @@ class EditOrder extends Component
             return session()->flash('error', 'Please add products to the order.');
         }
 
+        if (isOninda() && ! config('app.resell')) {
+            $this->fill(['retail_discount' => $this->discount]);
+        }
+
         $this->order
             ->fill($this->only($this->attrs))
-            ->fill(['data' => $this->only($this->meta)])
-            ->fill(['products' => json_encode($this->selectedProducts, JSON_UNESCAPED_UNICODE)]);
+            ->fill(['data' => array_merge($this->only($this->meta), [
+                'purchase_cost' => $this->order->getPurchaseCost($this->selectedProducts),
+            ])])
+            ->fill(['products' => $this->selectedProducts]);
 
         if ($this->order->exists) {
             $confirming = false;
@@ -227,6 +255,10 @@ class EditOrder extends Component
 
             $this->order->save();
 
+            if (config('app.instant_order_forwarding') && ! config('app.demo')) {
+                CallOnindaOrderApi::dispatch($this->order->id);
+            }
+
             if ($confirming && ($user = $this->order->user)) {
                 $user->notify(new OrderConfirmed($this->order));
             }
@@ -238,6 +270,7 @@ class EditOrder extends Component
                 'admin_id' => auth('admin')->id(),
                 'type' => Order::MANUAL,
                 'status_at' => now()->toDateTimeString(),
+                'source_id' => config('app.instant_order_forwarding') ? 0 : null,
             ])->save();
 
             session()->flash('success', 'Order created successfully.');
@@ -254,8 +287,23 @@ class EditOrder extends Component
             return $user;
         }
 
-        // $user->notify(new AccountCreated());
+        // For Oninda environment, create a walk-in customer
+        if (isOninda()) {
+            return User::query()->firstOrCreate(
+                ['phone_number' => '+8800000000000'],
+                array_merge([
+                    'name' => 'Walk-in Reseller',
+                    'email' => 'walkin@hotash.tech',
+                    'shop_name' => 'Walk-in Store',
+                ], [
+                    'email_verified_at' => now(),
+                    'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+                    'remember_token' => Str::random(10),
+                ])
+            );
+        }
 
+        // For non-Oninda environment, create regular user
         return User::query()->firstOrCreate(
             ['phone_number' => $this->order->phone],
             array_merge([

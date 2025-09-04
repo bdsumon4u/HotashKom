@@ -90,6 +90,22 @@
                     <x-error field="selling_price" />
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="average_purchase_price">Average Purchase Price</label>
+                    <x-input name="average_purchase_price" :value="$product->average_purchase_price" />
+                    <x-error field="average_purchase_price" />
+                </div>
+            </div>
+            @if(isOninda() && config('app.resell'))
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="suggested_price">Suggested Retail Price</label>
+                    <x-input name="suggested_price" :value="$product->suggested_price" />
+                    <x-error field="suggested_price" />
+                </div>
+            </div>
+            @endif
         </div>
         <div class="shadow-sm card rounded-0">
             <div class="p-1 card-header">
@@ -158,6 +174,24 @@
                                 <x-checkbox name="is_active" value="1" :checked="!!$product->is_active" />
                                 <x-label for="is_active" />
                                 <x-error field="is_active" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <div class="checkbox checkbox-warning">
+                                <x-checkbox name="hot_sale" value="1" :checked="!!$product->hot_sale" />
+                                <x-label for="hot_sale" />
+                                <x-error field="hot_sale" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <div class="checkbox checkbox-info">
+                                <x-checkbox name="new_arrival" value="1" :checked="!!$product->new_arrival" />
+                                <x-label for="new_arrival" />
+                                <x-error field="new_arrival" />
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Composer executable script that uses the specified Composer binary
+# Usage: ./composer [command] [options]
+
+COMPOSER_BINARY="/opt/cpanel/composer/bin/composer"
+PHP_SCRIPT="./php"
+
+# Check if the Composer binary exists
+if [ ! -f "$COMPOSER_BINARY" ]; then
+    echo "Error: Composer binary not found at $COMPOSER_BINARY"
+    exit 1
+fi
+
+# Check if the Composer binary is executable
+if [ ! -x "$COMPOSER_BINARY" ]; then
+    echo "Error: Composer binary is not executable at $COMPOSER_BINARY"
+    exit 1
+fi
+
+# Check if our PHP script exists
+if [ ! -f "$PHP_SCRIPT" ]; then
+    echo "Error: PHP script not found at $PHP_SCRIPT"
+    exit 1
+fi
+
+# Check if our PHP script is executable
+if [ ! -x "$PHP_SCRIPT" ]; then
+    echo "Error: PHP script is not executable at $PHP_SCRIPT"
+    exit 1
+fi
+
+# Use our PHP script to run the Composer binary
+exec "$PHP_SCRIPT" "$COMPOSER_BINARY" "$@"

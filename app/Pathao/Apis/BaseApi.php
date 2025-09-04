@@ -41,7 +41,7 @@ class BaseApi
         if (config('pathao.sandbox') == true) {
             $this->baseUrl = 'https://hermes-api.p-stageenv.xyz';
         } else {
-            $this->baseUrl = 'https://api-hermes.pathaointernal.com';
+            $this->baseUrl = 'https://api-hermes.pathao.com';
         }
     }
 

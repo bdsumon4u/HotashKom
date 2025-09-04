@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\RemoveProductVariationsFromResellers;
 use App\Models\Option;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -35,18 +36,31 @@ class ProductVariationController extends Controller
     public function store(Request $request, Product $product)
     {
         abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
+
+        if ($product->source_id !== null) {
+            return back()->with('danger', 'Cannot regenerate variations for a sourced product.');
+        }
+
         $attributes = collect($request->get('attributes'));
         $options = Option::find($attributes->flatten());
 
         DB::transaction(function () use ($attributes, $product, $options): void {
-            $product->variations()->delete();
-            $variations = collect($attributes->first())->crossJoin(...$attributes->splice(1));
+            try {
+                // Delete all existing variations first
+                $product->variations()->delete();
 
-            $variations->each(function ($items, $i) use ($product, $options): void {
-                $name = $options->filter(fn ($item): bool => in_array($item->id, $items))->pluck('name')->join('-');
-                $sku = $product->sku.'('.implode('-', $items).')';
-                $slug = $product->slug.'('.implode('-', $items).')';
-                if (! $variation = $product->variations()->firstWhere('sku', $sku)) {
+                // Delete variations from reseller databases
+                RemoveProductVariationsFromResellers::dispatch($product->id);
+
+                $variations = collect($attributes->first())->crossJoin(...$attributes->splice(1));
+                $newVariations = collect();
+
+                $variations->each(function ($items, $i) use ($product, $options, $newVariations): void {
+                    $name = $options->filter(fn ($item): bool => in_array($item->id, $items))->pluck('name')->join('-');
+                    $sku = $product->sku.'('.implode('-', $items).')';
+                    $slug = $product->slug.'('.implode('-', $items).')';
+
+                    // Create new variation
                     $variation = $product->replicate();
                     $variation->forceFill([
                         'name' => $name,
@@ -55,9 +69,15 @@ class ProductVariationController extends Controller
                         'parent_id' => $product->id,
                     ]);
                     $variation->save();
-                }
-                $variation->options()->sync($items);
-            });
+
+                    // Sync options
+                    $variation->options()->sync($items);
+                    $newVariations->push($variation);
+                });
+
+            } catch (\Exception $e) {
+                throw $e;
+            }
         });
 
         return back()->withSuccess('Check your variations.');
@@ -91,6 +111,7 @@ class ProductVariationController extends Controller
         $validator = Validator::make($request->all(), [
             'price' => 'required|numeric',
             'selling_price' => 'required|numeric',
+            'suggested_price' => 'nullable',
             'wholesale.quantity' => 'sometimes|array',
             'wholesale.price' => 'sometimes|array',
             'wholesale.quantity.*' => 'required|integer|gt:1',

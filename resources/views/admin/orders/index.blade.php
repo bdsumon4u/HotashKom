@@ -65,7 +65,7 @@
                                                 @php $show = in_array(request('status'), ['PENDING', 'WAITING']) @endphp
                                                 @break
 
-                                            @case('COMPLETED')
+                                            @case('DELIVERED')
                                             @case('RETURNED')
                                             @case('LOST')
                                                 @php $show = in_array(request('status'), ['SHIPPING']) @endphp
@@ -103,10 +103,13 @@
                             @endif
                             <div class="col-auto pl-0 ml-auto">
                                 @if(request('status') == 'CONFIRMED')
-                                <button onclick="printSticker()" id="sticker" class="ml-1 btn btn-sm btn-primary">Print Sticker</button>
-                                <button onclick="printInvoice()" id="invoice" class="ml-1 btn btn-sm btn-primary">Print Invoice</button>
+                                    <button onclick="printSticker()" id="sticker" class="ml-1 btn btn-sm btn-primary">Print Sticker</button>
+                                    <button onclick="printInvoice()" id="invoice" class="ml-1 btn btn-sm btn-primary">Print Invoice</button>
+                                    @if(isReseller())
+                                    <button onclick="forwardToOninda()" id="forward-to-oninda" class="ml-1 btn btn-sm btn-primary">Forward to Wholesaler</button>
+                                    @endif
                                 @elseif(request('status') == 'INVOICED')
-                                <button onclick="courier()" id="courier" class="ml-1 btn btn-sm btn-primary">Send to Courier</button>
+                                    <button onclick="courier()" id="courier" class="ml-1 btn btn-sm btn-primary">Send to Courier</button>
                                 @endif
                             </div>
                         </div>
@@ -116,19 +119,22 @@
                             <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
                                 <thead>
                                 <tr>
-                                    @if($bulk = true || request('status') && !in_array(request('status'), ['COMPLETED', 'RETURNED', 'LOST']))
+                                    @if($bulk = true || request('status') && !in_array(request('status'), ['DELIVERED', 'RETURNED', 'LOST']))
                                     <th style="max-width: 5%">
                                         <input type="checkbox" class="form-control" name="check_all" style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">
                                     </th>
                                     @endif
                                     <th width="80">ID</th>
+                                    @if(isOninda() || isReseller())
+                                    <th width="80">Source</th>
+                                    @endif
                                     <th>Customer</th>
                                     <th>Products</th>
                                     <th width="10">Amount</th>
                                     <th width="10">Status</th>
                                     <th>Courier</th>
                                     <th>Staff</th>
-                                    <th width="150">DateTime</th>
+                                    <th style="white-space: nowrap; min-width: 150px;">Date and Time</th>
                                     @if(auth()->user()->is('admin'))
                                     <th width="10">Action</th>
                                     @endif
@@ -157,7 +163,7 @@
         var checklist = new Set();
         function updateBulkMenu() {
             $('[name="check_all"]').prop('checked', true);
-            $(document).find('[name="order_id[]"]').each(function () {
+            $(document).find('[name="order_id[]"]:not([disabled])').each(function () {
                 if (checklist.has($(this).val())) {
                     $(this).prop('checked', true);
                 } else {
@@ -177,15 +183,15 @@
         }
         $('[name="check_all"]').on('change', function () {
             if ($(this).prop('checked')) {
-                $(document).find('[name="order_id[]"]').each(function () {
+                $(document).find('[name="order_id[]"]:not([disabled])').each(function () {
                     checklist.add($(this).val());
                 });
             } else {
-                $(document).find('[name="order_id[]"]').each(function () {
+                $(document).find('[name="order_id[]"]:not([disabled])').each(function () {
                     checklist.delete($(this).val());
                 });
             }
-            $('[name="order_id[]"]').prop('checked', $(this).prop('checked'));
+            $('[name="order_id[]"]:not([disabled])').prop('checked', $(this).prop('checked'));
             updateBulkMenu();
         });
 
@@ -199,28 +205,21 @@
             // aoColumns: [{ "bSortable": false }, null, null, { "sType": "numeric" }, { "sType": "date" }, null, { "bSortable": false}],
             dom: 'lBftip',
             buttons: [
-                    @foreach(config('app.orders', []) as $status)
+                @foreach(config('app.orders', []) as $status)
                 {
                     text: '{{ $status }}',
                     className: 'px-1 py-1 {{ request('status') == $status ? 'btn-secondary' : '' }}',
                     action: function ( e, dt, node, config ) {
                         window.location = '{!! request()->fullUrlWithQuery(['status' => $status]) !!}'
                     }
-                },@endforeach
+                },
+                @endforeach
                 {
                     text: 'All',
                     className: 'px-1 py-1 {{ request('status') == '' ? 'btn-secondary' : '' }}',
                     action: function ( e, dt, node, config ) {
                         window.location = '{!! request()->fullUrlWithQuery(['status' => '']) !!}'
                     }
-                },
-            ],
-            columnDefs: [
-                {
-                    type: 'num',
-                    orderable: false,
-                    searchable: false,
-                    targets: @if(auth()->user()->is('admin')) -5 @else -6 @endif
                 },
             ],
             processing: true,
@@ -231,6 +230,9 @@
                 { data: 'checkbox', name: 'checkbox', sortable: false, searchable: false},
                 @endif
                 { data: 'id', name: 'id' },
+                @if(isOninda() || isReseller())
+                { data: 'source_id', name: 'source_id', sortable: true, searchable: true },
+                @endif
                 { data: 'customer', name: 'customer', sortable: false },
                 { data: 'products', name: 'products', sortable: false },
                 { data: 'amount', name: 'amount', sortable: false },
@@ -239,7 +241,7 @@
                 { data: 'staff', name: 'admin.name', sortable: false },
                 { data: 'created_at', name: 'created_at' },
                 @if(auth()->user()->is('admin'))
-                { data: 'actions' },
+                { data: 'actions', searchable: false, orderable: false },
                 @endif
             ],
             initComplete: function (settings, json) {
@@ -253,11 +255,26 @@
                     var th = $(this.header()).parents('thead').find('tr').eq(1).find('th').eq(i);
                     $(th).empty();
 
-                    if ($.inArray(i, [0, 4, 7, 9]) === -1) {
+                    var forbidden = [0]
+                    @if(isOninda()||isReseller())
+                        forbidden.push(5);
+                        dateTimeColumn = 9;
+                        @if(auth()->user()->is('admin'))
+                            forbidden.push(10);
+                        @endif
+                    @else
+                        forbidden.push(4);
+                        dateTimeColumn = 8;
+                        @if(auth()->user()->is('admin'))
+                            forbidden.push(9);
+                        @endif
+                    @endif
+
+                    if ($.inArray(i, forbidden) === -1) {
                         var column = this;
                         var input = document.createElement("input");
                         input.classList.add('form-control', 'border-primary');
-                        if (i === 8) {
+                        if (i === dateTimeColumn) {
                             $(input).appendTo($(th)).on('apply.daterangepicker', function (ev, picker) {
                                 column.search(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD')).draw();
                             }).daterangepicker({
@@ -373,6 +390,8 @@
             });
         }
 
+        $(document).on('change', '.staff-column', changeStaff);
+
         function changeStaff() {
             $('[name="staff"]').prop('disabled', true);
 
@@ -400,7 +419,10 @@
                 complete: function () {
                     $('[name="staff"]').prop('disabled', false);
                     $('[name="staff"]').val('');
-                }
+                },
+                error: function (response) {
+                    $.notify(response?.responseJSON?.message || 'Staff update failed.', {type: 'danger'});
+                },
             });
         }
 
@@ -427,6 +449,30 @@
             window.open('{{ route('admin.orders.booking') }}?order_id=' + $('[name="order_id[]"]:checked').map(function () {
                 return $(this).val();
             }).get().join(','), '_self');
+        }
+
+        function forwardToOninda() {
+            if (checklist.size === 0) {
+                $.notify('Please select at least one order', 'warning');
+                return;
+            }
+
+            $.post({
+                url: '{{ route('admin.orders.forward-to-oninda') }}',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    order_id: Array.from(checklist),
+                },
+                success: function (response) {
+                    checklist.clear();
+                    updateBulkMenu();
+                    table.draw();
+                    $.notify('Orders are being forwarded to the the Wholesaler', 'success');
+                },
+                error: function (response) {
+                    $.notify(response?.responseJSON?.message || 'Failed to forward orders to the Wholesaler', 'danger');
+                }
+            });
         }
     </script>
 

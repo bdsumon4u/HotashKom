@@ -41,6 +41,12 @@ class HomeSectionRequest extends FormRequest
                 ]),
             ]);
         }
+
+        if ($this->get('content')) {
+            $this->merge([
+                'type' => 'content',
+            ]);
+        }
     }
 
     /**
@@ -53,10 +59,16 @@ class HomeSectionRequest extends FormRequest
             'type' => 'required',
             'items' => 'nullable|array',
             'categories' => 'nullable|array',
-            'data.rows' => 'required|integer',
-            'data.cols' => 'required|integer',
-            'data.source' => 'nullable',
         ];
+
+        // Only require rows/cols for product sections (not content or banner)
+        if (! $this->get('content') && ! $this->get('banner') && $this->get('type') != 'content' && $this->get('type') != 'banner') {
+            $rules += [
+                'data.rows' => 'required|integer',
+                'data.cols' => 'required|integer',
+                'data.source' => 'nullable',
+            ];
+        }
 
         if ($this->get('banner')) {
             $rules += [
@@ -66,6 +78,12 @@ class HomeSectionRequest extends FormRequest
                 'data.columns.link.*' => 'nullable|string',
                 'data.columns.width.*' => 'required|numeric',
                 'data.columns.categories.*' => 'nullable|array',
+            ];
+        }
+
+        if ($this->get('content') || $this->get('type') == 'content') {
+            $rules += [
+                'data.page_id' => 'required|exists:pages,id',
             ];
         }
 

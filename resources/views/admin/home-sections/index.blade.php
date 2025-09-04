@@ -45,6 +45,7 @@
                <div>
                     <a href="{{ route('admin.home-sections.create') }}" class="btn btn-primary">Product Section</a>
                     <a href="{{ route('admin.home-sections.create', ['banner' => true]) }}" class="btn btn-primary">Banner Section</a>
+                    <a href="{{ route('admin.home-sections.create', ['content' => true]) }}" class="btn btn-primary">Content Section</a>
                </div>
            </div>
             <div class="p-3 card-body">
@@ -78,12 +79,12 @@
 // placeholder: ....,
                 tolerance:'intersect',
                 create:function(event,ui){
-                    
+
                 },
                 over:function(event,ui){
                 },
                 receive:function(event, ui){
-                    
+
                 },
                 update:function (event, ui) {
                     $('#space-0 .route').each(function(idx, el) {
@@ -96,7 +97,7 @@
                             orders[$(el).data('id')] = idx+1;
                         }
                     });
-                    
+
                     $.ajax({
                         url: '{{route('admin.home-sections.index')}}',
                         type: 'GET',
@@ -136,7 +137,7 @@
                     $(e.target).addClass('disabled')
                     var id = $(this).attr('data-id')
                     $.ajax({
-                        url: '{{route('admin.home-sections.destroy', 'id')}}'.replace('id', id),
+                        url: '{{route('admin.home-sections.destroy', ':id')}}'.replace(':id', id),
                         type: 'DELETE',
                         _method: 'DELETE',
                         complete: function () {

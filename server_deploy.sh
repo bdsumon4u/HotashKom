@@ -7,7 +7,7 @@ echo "Deploying application ..."
 if [ "$1" = "--dev" ]; then
     branch="dev"
 else
-    branch="master"
+    branch="wholesale"
 fi
 
 # Enter maintenance mode

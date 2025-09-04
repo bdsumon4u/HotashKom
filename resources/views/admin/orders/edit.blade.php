@@ -27,10 +27,35 @@
                         <div>
                             <a href="{{ route('admin.orders.invoices', ['order_id' => $order->id]) }}" class="ml-1 btn btn-sm btn-primary">Invoice</a>
                             <a href="{{ route('admin.orders.booking', ['order_id' => $order->id]) }}" class="ml-1 btn btn-sm btn-primary">Send to Courier</a>
+                            @if($order->status == 'CONFIRMED' && ! isOninda() && is_null($order->source_id))
+                                <form id="forward-to-oninda-form" method="POST" action="{{ route('admin.orders.forward-to-oninda') }}" style="display:inline;">
+                                    @csrf
+                                    <input type="hidden" name="order_id[]" value="{{ $order->id }}">
+                                    <button type="submit" class="ml-1 btn btn-sm btn-primary">Forward to Wholesaler</button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                     <div class="p-3 card-body">
-                        <livewire:edit-order :order="$order" />
+                        <div class="container-fluid">
+                            @if($order->source_id === 0)
+                            <div class="alert alert-warning">
+                                This order is on queue to be forwarded to the Wholesaler. Editing is restricted.
+                            </div>
+                            @elseif($order->source_id && ! isOninda())
+                            <div class="alert alert-warning">
+                                This order is managed by the Wholesaler. Editing is restricted.
+                            </div>
+                            @endif
+
+                            <div class="mb-5 row">
+                                <div class="col-sm-12">
+                                    <div class="orders-table">
+                                        <livewire:edit-order :order="$order" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="shadow-sm card rounded-0">
@@ -83,7 +108,6 @@
 @push('js')
     <script src="{{asset('assets/js/select2/select2.full.min.js')}}"></script>
     <script src="{{asset('assets/js/select2/select2-custom.js')}}"></script>
-    <script src="{{ asset('assets/js/prism/prism.min.js') }}"></script>
 @endpush
 
 @push('scripts')

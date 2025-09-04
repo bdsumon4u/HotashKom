@@ -137,19 +137,19 @@
                     <input type="hidden" name="show_option[topbar_phone]" value="0">
                     <x-checkbox id="show-topbar-phone" name="show_option[topbar_phone]" value="1"
                         :checked="!!($show_option->topbar_phone ?? false)" />
-                    <label for="show-topbar-phone" class="my-1">`Topbar Phone` Option</label>
+                    <label for="show-topbar-phone" class="my-1">`Topbar Phone`</label>
                 </div>
                 <div class="checkbox checkbox-secondary">
                     <input type="hidden" name="show_option[track_order]" value="0">
                     <x-checkbox id="show-track-order" name="show_option[track_order]" value="1"
                         :checked="!!($show_option->track_order ?? false)" />
-                    <label for="show-track-order" class="my-1">`Track Order` Option</label>
+                    <label for="show-track-order" class="my-1">`Track Order`</label>
                 </div>
                 <div class="checkbox checkbox-secondary">
                     <input type="hidden" name="show_option[customer_login]" value="0">
                     <x-checkbox id="show-customer-login" name="show_option[customer_login]" value="1"
                         :checked="!!($show_option->customer_login ?? false)" />
-                    <label for="show-customer-login" class="my-1">`Customer Login` Option</label>
+                    <label for="show-customer-login" class="my-1">`Customer Login`</label>
                 </div>
                 <div class="checkbox checkbox-secondary">
                     <input type="hidden" name="services[enabled]" value="0">
@@ -172,8 +172,22 @@
                     <input type="hidden" name="show_option[hide_invoice_image]" value="1">
                     <x-checkbox id="hide-invoice-image" name="show_option[hide_invoice_image]" value="0"
                         :checked="!($show_option->hide_invoice_image ?? false)" />
-                    <label for="hide-invoice-image" class="my-1">Show IMAGE on INVOICE</label>
+                    <label for="hide-invoice-image" class="my-1">IMAGE on INVOICE</label>
                 </div>
+                @if (isOninda())
+                <div class="checkbox checkbox-secondary">
+                    <input type="hidden" name="show_option[resellers_invoice]" value="0">
+                    <x-checkbox id="resellers-invoice" name="show_option[resellers_invoice]" value="1"
+                        :checked="($show_option->resellers_invoice ?? false)" />
+                    <label for="resellers-invoice" class="my-1">Reseller's Invoice</label>
+                </div>
+                <div class="checkbox checkbox-secondary">
+                    <input type="hidden" name="show_option[guest_can_see_price]" value="0">
+                    <x-checkbox id="guest-can-see-price" name="show_option[guest_can_see_price]" value="1"
+                        :checked="($show_option->guest_can_see_price ?? false)" />
+                    <label for="guest-can-see-price" class="my-1">Guest Price</label>
+                </div>
+                @endif
             </div>
         </div>
     </div>

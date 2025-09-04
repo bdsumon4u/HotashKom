@@ -14,6 +14,7 @@ class CartController extends Controller
      */
     public function index(Request $request)
     {
+        abort_if($request->user()->is('uploader'), 403);
         if (! ($last = cache('last_cart_cleanup_at')) || $last->addHour()->isPast()) {
             $last ??= now();
             $carts = DB::table('shopping_cart')->where('updated_at', '>=', $last)->get()->keyBy('phone');

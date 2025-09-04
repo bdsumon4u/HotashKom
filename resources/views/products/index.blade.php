@@ -62,7 +62,7 @@
         <div class="container">
             <div class="row">
                 <div class="col">
-                    <div class="products-view__pagination pt-0">
+                    <div class="pt-0 products-view__pagination">
                         <!-- <ul class="pagination justify-content-center">
                             <li class="page-item disabled">
                                 <a class="page-link page-link--with-arrow" href="#" aria-label="Previous">

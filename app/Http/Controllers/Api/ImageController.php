@@ -45,17 +45,17 @@ class ImageController extends Controller
     {
         return DataTables::of(request()->has('order') ? Image::query() : Image::latest('id'))
             ->addIndexColumn()
-            ->addColumn('preview', fn (Image $image): string => '<img class="select-image" src="'.cdn($image->path).'" width="100" height="120" data-id="'.$image->id.'" data-src="'.asset($image->path).'" />')
+            ->addColumn('preview', fn (Image $image): string => '<img class="select-image" src="'.cdn($image->src).'" width="100" height="120" data-id="'.$image->id.'" data-src="'.cdn($image->src).'" />')
             ->editColumn('filename', fn (Image $image): string => '
                     <div>
                         <input type="text" value="'.$image->filename.'" class="mb-1 w-100" data-id="'.$image->id.'" onfocus="this.select()" disabled />
                         <div class="d-flex">
                             <button class="mr-1 input-group-append btn btn-sm btn-primary d-flex align-items-center img-rename" rename="'.$image->id.'"><i class="mr-1 fa fa-pencil-square-o"></i> <span>Rename</span></button>
-                            <button class="ml-1 input-group-append btn btn-sm btn-primary d-flex align-items-center" data-clip="'.asset($image->path).'"><i class="mr-1 fa fa-clipboard"></i> <span>Copy Link</span></button>
+                            <button class="ml-1 input-group-append btn btn-sm btn-primary d-flex align-items-center" data-clip="'.cdn($image->src).'"><i class="mr-1 fa fa-clipboard"></i> <span>Copy Link</span></button>
                         </div>
                     </div>
                 ')
-            ->addColumn('action', fn (Image $image): string => '<button class="p-1 select-image d-flex justify-content-center align-items-center text-dark" data-id="'.$image->id.'" data-src="'.cdn($image->path).'">
+            ->addColumn('action', fn (Image $image): string => '<button class="p-1 select-image d-flex justify-content-center align-items-center text-dark" data-id="'.$image->id.'" data-src="'.cdn($image->src).'">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                 </button>')
             ->rawColumns(['preview', 'filename', 'action']);

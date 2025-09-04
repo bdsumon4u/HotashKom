@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Traits\PreventsSourcedResourceDeletion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
+    use PreventsSourcedResourceDeletion;
+
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +23,7 @@ class CategoryController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
 
         return $this->view([
-            'categories' => Category::nested(),
+            'categories' => Category::nested(enabledOnly: false),
         ]);
     }
 
@@ -47,7 +50,22 @@ class CategoryController extends Controller
 
             collect($data['categories'])
                 ->each(function ($data): void {
-                    Category::find($data['id'])->update($data);
+                    $category = Category::find($data['id']);
+
+                    // Prevent circular reference: category cannot be its own parent
+                    if (isset($data['parent_id']) && $data['parent_id'] == $category->id) {
+                        return; // Skip this update
+                    }
+
+                    // Prevent circular reference: category cannot be parent of its descendants
+                    if (isset($data['parent_id']) && $data['parent_id'] != 0) {
+                        $isDescendant = $this->isDescendant($category, $data['parent_id']);
+                        if ($isDescendant) {
+                            return; // Skip this update
+                        }
+                    }
+
+                    $category->update($data);
                 });
 
             cache()->forget('categories:nested');
@@ -59,6 +77,7 @@ class CategoryController extends Controller
             'name' => 'required|unique:categories',
             'slug' => 'required|unique:categories',
             'base_image' => 'nullable|integer',
+            'is_enabled' => 'boolean',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
@@ -66,6 +85,32 @@ class CategoryController extends Controller
         Category::create($data);
 
         return back()->with('success', 'Category Has Been Created.');
+    }
+
+    /**
+     * Check if a potential parent is a descendant of the current category
+     * This prevents circular references where a category could become its own ancestor
+     */
+    private function isDescendant(Category $category, int $potentialParentId): bool
+    {
+        // Check if the potential parent is a descendant of the current category
+        $potentialParent = Category::find($potentialParentId);
+        if (! $potentialParent) {
+            return false;
+        }
+
+        // Traverse up the potential parent's ancestry chain
+        $current = $potentialParent;
+        while ($current->parent_id) {
+            if ($current->parent_id == $category->id) {
+                return true; // The potential parent is a descendant of the current category
+            }
+            if (! $current = Category::find($current->parent_id)) {
+                break;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -97,7 +142,21 @@ class CategoryController extends Controller
             'name' => 'required|unique:categories,name,'.$category->id,
             'slug' => 'required|unique:categories,slug,'.$category->id,
             'base_image' => 'nullable|integer',
+            'is_enabled' => 'boolean',
         ]);
+
+        // Prevent circular reference: category cannot be its own parent
+        if (isset($data['parent_id']) && $data['parent_id'] == $category->id) {
+            return back()->withErrors(['parent_id' => 'A category cannot be its own parent.']);
+        }
+
+        // Prevent circular reference: category cannot be parent of its descendants
+        if (isset($data['parent_id']) && $data['parent_id'] != 0) {
+            $isDescendant = $this->isDescendant($category, $data['parent_id']);
+            if ($isDescendant) {
+                return back()->withErrors(['parent_id' => 'A category cannot be a parent of its descendants.']);
+            }
+        }
 
         $data['image_id'] = Arr::pull($data, 'base_image');
 
@@ -114,10 +173,12 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
-        DB::transaction(function () use ($category): void {
-            $category->childrens()->delete();
-            $category->delete();
-        });
+
+        if (($result = $this->preventSourcedResourceDeletion($category)) !== true) {
+            return $result;
+        }
+
+        $category->delete();
 
         return redirect()->route('admin.categories.index')->with('success', 'Category Has Been Deleted.');
     }

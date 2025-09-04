@@ -37,7 +37,7 @@
             <x-error field="BDWebs[sender_id]" />
         </div>
     </div>
-    <div class="form-row">
+    <div class="form-row d-none">
         <div class="col-md-auto">
             <div class="checkbox checkbox-secondary">
                 <input type="hidden" name="show_option[admin_otp]" value="0">
@@ -47,7 +47,7 @@
             </div>
         </div>
     </div>
-    <div class="form-row border-top border-bottom mt-2 pt-2 mb-4">
+    <div class="pt-2 mt-2 mb-4 form-row border-top border-bottom">
         <div class="col-md-10">
             <div class="form-group">
                 <label for="">OTP Template</label>

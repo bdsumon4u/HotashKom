@@ -27,6 +27,9 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
     Route::get('images/multiple', [ImageController::class, 'multiple'])->name('images.multiple');
     Route::post('menu/{menu}/sort-items', [MenuItemSortController::class])->name('menu-items.sort');
     Route::get('orders', OrderController::class)->name('orders');
+    Route::get('purchases', \App\Http\Controllers\Api\PurchaseController::class)->name('purchases');
+    Route::get('purchases/products', [\App\Http\Controllers\Api\PurchaseController::class, 'getProducts'])->name('purchases.products');
+    Route::get('purchases/suppliers', [\App\Http\Controllers\Api\PurchaseController::class, 'getSuppliers'])->name('purchases.suppliers');
 
     Route::get('shop', [\App\Http\Controllers\ProductController::class, 'index']);
     Route::get('menus', [ApiController::class, 'menus']);
@@ -47,4 +50,9 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
     Route::post('pathao-webhook', [ApiController::class, 'pathaoWebhook']);
     Route::post('checkout', LivewireCheckoutController::class);
     Route::get('orders/{order}', [ApiController::class, 'order']);
+    Route::get('resellers', App\Http\Controllers\Api\ResellerController::class)->name('resellers');
+    Route::put('resellers/{id}', [App\Http\Controllers\Api\ResellerController::class, 'update'])->name('resellers.update');
+    Route::post('resellers/{id}/toggle-verify', [App\Http\Controllers\Api\ResellerController::class, 'toggleVerify'])->name('resellers.toggle-verify');
+    Route::post('reseller/orders/place', [App\Http\Controllers\Api\ResellerOrderController::class, 'placeOrder'])
+        ->name('api.reseller.orders.place');
 });

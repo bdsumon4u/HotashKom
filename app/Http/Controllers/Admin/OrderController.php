@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exports\PathaoExport;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use App\Models\Product;
 use App\Notifications\User\OrderConfirmed;
@@ -27,6 +28,7 @@ class OrderController extends Controller
      */
     public function index()
     {
+        abort_if(request()->user()->is('uploader'), 403);
         if (! request()->has('status')) {
             return redirect()->route('admin.orders.index', ['status' => 'PENDING']);
         }
@@ -36,6 +38,8 @@ class OrderController extends Controller
 
     public function create()
     {
+        abort_if(request()->user()->is('uploader'), 403);
+
         return $this->view();
     }
 
@@ -47,6 +51,38 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
+        $order->load('user');
+
+        // Get reseller data if applicable
+        $resellerData = [];
+        if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $order->user && $order->user->db_username && $order->user->db_password) {
+            // Reseller is connected - fetch from their database
+            try {
+                $resellerConfig = $order->user->getDatabaseConfig();
+                config(['database.connections.reseller' => $resellerConfig]);
+                DB::purge('reseller');
+                DB::reconnect('reseller');
+
+                $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
+                $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
+
+                $resellerData[$order->user->id] = [
+                    'company' => json_decode($resellerCompany ?? '{}'),
+                    'logo' => json_decode($resellerLogo ?? '{}'),
+                    'connected' => true,
+                ];
+
+                DB::purge('reseller');
+            } catch (\Exception $e) {
+                // If database connection fails, mark as not connected
+                $resellerData[$order->user->id] = [
+                    'company' => null,
+                    'logo' => null,
+                    'connected' => false,
+                ];
+            }
+        }
+
         return $this->view([
             'orders' => Order::with('admin')
                 // ->where('user_id', $order->user_id)
@@ -54,6 +90,7 @@ class OrderController extends Controller
                 ->where('id', '!=', $order->id)
                 ->orderBy('id', 'desc')
                 ->get(),
+            'resellerData' => $resellerData,
         ]);
     }
 
@@ -77,7 +114,7 @@ class OrderController extends Controller
 
     public function filter(Request $request)
     {
-        abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
         $_start = Carbon::parse(\request('start_d', date('Y-m-d')));
         $start = $_start->format('Y-m-d');
         $_end = Carbon::parse(\request('end_d'));
@@ -155,6 +192,51 @@ class OrderController extends Controller
         ]);
     }
 
+    /**
+     * Fetch reseller data for given orders
+     */
+    private function fetchResellerData($orders): array
+    {
+        $uniqueResellers = $orders->pluck('user')->filter()->unique('id');
+        $resellerData = [];
+
+        foreach ($uniqueResellers as $reseller) {
+            if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $reseller->db_name && $reseller->db_username) {
+                try {
+                    $resellerConfig = $reseller->getDatabaseConfig();
+                    config(['database.connections.reseller' => $resellerConfig]);
+                    DB::purge('reseller');
+                    DB::reconnect('reseller');
+
+                    $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
+                    $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
+
+                    $resellerData[$reseller->id] = [
+                        'company' => json_decode($resellerCompany ?? '{}'),
+                        'logo' => json_decode($resellerLogo ?? '{}'),
+                        'connected' => true,
+                    ];
+
+                    DB::purge('reseller');
+                } catch (\Exception $e) {
+                    $resellerData[$reseller->id] = [
+                        'company' => null,
+                        'logo' => null,
+                        'connected' => false,
+                    ];
+                }
+            } else {
+                $resellerData[$reseller->id] = [
+                    'company' => null,
+                    'logo' => null,
+                    'connected' => false,
+                ];
+            }
+        }
+
+        return $resellerData;
+    }
+
     public function invoices(Request $request)
     {
         $request->validate(['order_id' => 'required']);
@@ -162,9 +244,52 @@ class OrderController extends Controller
         $order_ids = array_map('trim', $order_ids);
         $order_ids = array_filter($order_ids);
 
-        $orders = Order::whereIn('id', $order_ids)->get();
+        // Eager load user relationship
+        $orders = Order::with('user')->whereIn('id', $order_ids)->get();
 
-        return view('admin.orders.invoices', compact('orders'));
+        // Get unique resellers
+        $uniqueResellers = $orders->pluck('user')->filter()->unique('id');
+        $resellerData = [];
+
+        // Fetch reseller data once per unique reseller
+        foreach ($uniqueResellers as $reseller) {
+            if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $reseller->db_name && $reseller->db_username) {
+                // Reseller is connected - fetch from their database
+                try {
+                    $resellerConfig = $reseller->getDatabaseConfig();
+                    config(['database.connections.reseller' => $resellerConfig]);
+                    DB::purge('reseller');
+                    DB::reconnect('reseller');
+
+                    $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
+                    $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
+
+                    $resellerData[$reseller->id] = [
+                        'company' => json_decode($resellerCompany ?? '{}'),
+                        'logo' => json_decode($resellerLogo ?? '{}'),
+                        'connected' => true,
+                    ];
+
+                    DB::purge('reseller');
+                } catch (\Exception $e) {
+                    // If database connection fails, mark as not connected
+                    $resellerData[$reseller->id] = [
+                        'company' => null,
+                        'logo' => null,
+                        'connected' => false,
+                    ];
+                }
+            } else {
+                // Reseller not connected or not applicable
+                $resellerData[$reseller->id] = [
+                    'company' => null,
+                    'logo' => null,
+                    'connected' => false,
+                ];
+            }
+        }
+
+        return view('admin.orders.invoices', compact('orders', 'resellerData'));
     }
 
     public function stickers(Request $request)
@@ -174,10 +299,11 @@ class OrderController extends Controller
         $order_ids = array_map('trim', $order_ids);
         $order_ids = array_filter($order_ids);
 
-        $orders = Order::whereIn('id', $order_ids)->get();
+        $orders = Order::with('user')->whereIn('id', $order_ids)->get();
+        $resellerData = $this->fetchResellerData($orders);
 
         // Load PDF view
-        $pdf = Pdf::loadView('admin.orders.stickers', compact('orders'))
+        $pdf = Pdf::loadView('admin.orders.stickers', compact('orders', 'resellerData'))
             ->setOption([
                 // 'fontDir' => public_path('/fonts'),
                 // 'fontCache' => public_path('/fonts'),
@@ -270,6 +396,24 @@ class OrderController extends Controller
             ->withSuccess('Orders are sent to Courier.');
     }
 
+    /**
+     * Calculate the collection amount (COD/amount_to_collect/cash_collection_amount) for an order.
+     *
+     * @param  \App\Models\Order  $order
+     * @return int|float
+     */
+    private function calculateOrderCollectionAmount($order)
+    {
+        $retail = array_reduce((array) $order->products, function ($sum, $product) {
+            return $sum + (float) ($product->{(isOninda() && config('app.resell')) ? 'retail_price' : 'price'} ?? 0) * (int) ($product->quantity ?? 1);
+        }, 0);
+        $deliveryFee = (float) ($order->data[(isOninda() && config('app.resell')) ? 'retail_delivery_fee' : 'shipping_cost'] ?? 0);
+        $discount = (float) ($order->data[(isOninda() && config('app.resell')) ? 'retail_discount' : 'discount'] ?? 0);
+        $advanced = (float) ($order->data['advanced'] ?? 0);
+
+        return $retail + $deliveryFee - $discount - $advanced;
+    }
+
     private function steadFast($order_ids): int
     {
         if (! (($SteadFast = setting('SteadFast'))->enabled ?? false)) {
@@ -280,7 +424,7 @@ class OrderController extends Controller
             'recipient_name' => $order->name ?? 'N/A',
             'recipient_address' => $order->address ?? 'N/A',
             'recipient_phone' => $order->phone ?? '',
-            'cod_amount' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0),
+            'cod_amount' => $this->calculateOrderCollectionAmount($order),
             // 'note' => $order->note,
         ])->toJson();
 
@@ -301,6 +445,7 @@ class OrderController extends Controller
 
             $order->update([
                 'status' => 'SHIPPING',
+                'shipped_at' => now()->toDateTimeString(),
                 'status_at' => now()->toDateTimeString(),
                 'data' => [
                     'consignment_id' => $item['consignment_id'],
@@ -328,7 +473,7 @@ class OrderController extends Controller
             // 'special_instruction' => $order->note,
             'item_quantity' => 1, // item quantity
             'item_weight' => $order->data['weight'] ?? 0.5, // parcel weight
-            'amount_to_collect' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0), // - $order->deliveryCharge, // amount to collect
+            'amount_to_collect' => $this->calculateOrderCollectionAmount($order), // amount to collect
             // "item_description"    => $this->getProductsDetails($order->id), // product details
         ];
 
@@ -336,6 +481,7 @@ class OrderController extends Controller
 
         $order->update([
             'status' => 'SHIPPING',
+            'shipped_at' => now()->toDateTimeString(),
             'status_at' => now()->toDateTimeString(),
             'data' => [
                 'consignment_id' => $data->consignment_id,
@@ -361,7 +507,7 @@ class OrderController extends Controller
             'value' => 100,
             // 'item_quantity' => 1, // item quantity
             'parcel_weight' => $order->data['weight'] ?? 500, // parcel weight
-            'cash_collection_amount' => intval($order->data['shipping_cost']) + intval($order->data['subtotal']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0), // - $order->deliveryCharge, // amount to collect
+            'cash_collection_amount' => $this->calculateOrderCollectionAmount($order), // amount to collect
             // "item_description"    => $this->getProductsDetails($order->id), // product details
             'parcel_details_json' => [],
         ];
@@ -370,6 +516,7 @@ class OrderController extends Controller
 
         $order->update([
             'status' => 'SHIPPING',
+            'shipped_at' => now()->toDateTimeString(),
             'status_at' => now()->toDateTimeString(),
             'data' => [
                 'consignment_id' => $data->tracking_id,
@@ -379,6 +526,7 @@ class OrderController extends Controller
 
     public function courier(Request $request)
     {
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
         $request->validate([
             'courier' => 'required',
             'order_id' => 'required|array',
@@ -399,6 +547,9 @@ class OrderController extends Controller
 
         $data['status'] = $request->status;
         $data['status_at'] = now()->toDateTimeString();
+        if ($request->status == 'SHIPPING') {
+            $data['shipped_at'] = now()->toDateTimeString();
+        }
         $orders = Order::whereIn('id', $request->order_id)->where('status', '!=', $request->status)->get();
 
         $orders->each->update($data);
@@ -441,15 +592,7 @@ class OrderController extends Controller
                         }
                     }
                     if ($quantity > 0) {
-                        return [
-                            'id' => $product->id,
-                            'name' => $product->name,
-                            'slug' => $product->slug,
-                            'image' => optional($product->base_image)->src,
-                            'price' => $selling = $product->getPrice($quantity),
-                            'quantity' => $quantity,
-                            'total' => $quantity * $selling,
-                        ];
+                        return (new ProductResource($product))->toCartItem($quantity);
                     }
                 }
             })->filter(function ($product) {
@@ -466,6 +609,63 @@ class OrderController extends Controller
         return back()->with('success', $order->getChanges() ? 'Order Updated.' : 'Not Updated.');
     }
 
+    public function forwardToOninda(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|array',
+        ]);
+
+        if (config('app.demo')) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Demo mode doesn\'t allow this operation.'], 422);
+            } else {
+                return redirect()->back()->with('danger', 'Demo mode doesn\'t allow this operaton.');
+            }
+        }
+
+        $orders = Order::whereIn('id', $request->order_id)
+            ->whereNull('source_id')
+            ->where('status', 'CONFIRMED')
+            ->get();
+
+        if ($orders->isEmpty()) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.'], 422);
+            } else {
+                return redirect()->back()->with('danger', 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.');
+            }
+        }
+
+        $domain = preg_replace('/^www\./', '', parse_url(config('app.url'), PHP_URL_HOST));
+        $endpoint = config('app.oninda_url').'/api/reseller/orders/place';
+
+        // Set source_id = 0 to indicate processing state
+        DB::table('orders')->whereIntegerInRaw('id', $request->order_id)->update(['source_id' => 0]);
+
+        try {
+            // Make API call
+            Http::post($endpoint, [
+                'order_id' => $request->order_id,
+                'domain' => $domain,
+            ])->throw();
+        } catch (\Exception $e) {
+            // If API call fails, revert source_id to NULL
+            DB::table('orders')->whereIntegerInRaw('id', $request->order_id)->update(['source_id' => null]);
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Failed to forward orders to the Wholesaler: '.$e->getMessage()], 500);
+            } else {
+                return redirect()->back()->with('danger', 'Failed to forward orders to the Wholesaler: '.$e->getMessage());
+            }
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Orders are being forwarded to the Wholesaler.']);
+        } else {
+            return redirect()->back()->with('success', 'Orders are being forwarded to the Wholesaler.');
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -477,9 +677,19 @@ class OrderController extends Controller
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
         $products = is_array($order->products) ? $order->products : get_object_vars($order->products);
         array_map(function ($product) {
-            if ($product = Product::find($product->id)) {
-                $product->should_track && $product->increment('stock_count', intval($product->quantity));
+            if (! $product = Product::find($product->id)) {
+                return null;
             }
+
+            if (! $product->should_track) {
+                return null;
+            }
+
+            if (! in_array($product->status, config('app.decrement'))) {
+                return null;
+            }
+
+            $product->increment('stock_count', intval($product->quantity));
 
             return null;
         }, $products);

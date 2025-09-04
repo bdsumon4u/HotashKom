@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\ProductReportService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -35,50 +36,47 @@ class HomeController extends Controller
             $orderQ->where('admin_id', request('staff_id'));
         }
 
-        $productInOrders[] = [];
+        // Use the service to generate products report
+        $productsData = (new ProductReportService)->generateProductsReport(
+            $_start,
+            $_end,
+            ['CONFIRMED', 'INVOICED', 'SHIPPING'],
+            request('date_type', 'status_at'),
+            request('staff_id')
+        );
 
-        $products = (clone $orderQ)->get()
-            ->whereIn('status', ['CONFIRMED', 'INVOICED', 'SHIPPING'])
-            ->flatMap(function ($order) use (&$productInOrders) {
-                $products = json_decode(json_encode($order->products, JSON_UNESCAPED_UNICODE), true);
-
-                foreach ($products as $product) {
-                    $productInOrders[$product['name']][$order->id] = 1 + ($productInOrders[$product['name']][$order->id] ?? 0);
-                }
-
-                return $products;
-            })
-            ->groupBy('id')->mapWithKeys(fn ($item, $id) => [$id => [
-                'name' => $item->random()['name'],
-                'slug' => $item->random()['slug'],
-                'quantity' => $item->sum('quantity'),
-                'total' => $item->sum('total'),
-            ]])->sortByDesc('quantity')->toArray();
+        $products = $productsData['products'];
+        $productInOrders = $productsData['productInOrders'];
 
         $data = (clone $orderQ)
             ->selectRaw($totalSQL)
             ->first();
         $orders['Total'] = $data->order_count;
-        $amounts['Total'] = $data->total_amount;
+        $amounts['Total'] = (float) ($data->total_amount ?? 0);
 
         $data = (clone $orderQ)->where('type', Order::ONLINE)
             ->selectRaw($totalSQL)
             ->first();
         $orders['Online'] = $data->order_count;
-        $amounts['Online'] = $data->total_amount;
+        $amounts['Online'] = (float) ($data->total_amount ?? 0);
 
         $data = (clone $orderQ)->where('type', Order::MANUAL)
             ->selectRaw($totalSQL)
             ->first();
         $orders['Manual'] = $data->order_count;
-        $amounts['Manual'] = $data->total_amount;
+        $amounts['Manual'] = (float) ($data->total_amount ?? 0);
 
         foreach (config('app.orders', []) as $status) {
             $data = (clone $orderQ)->where('status', $status)
                 ->selectRaw($totalSQL)
                 ->first();
             $orders[$status] = $data->order_count ?? 0;
-            $amounts[$status] = $data->total_amount ?? 0;
+            $amounts[$status] = (float) ($data->total_amount ?? 0);
+        }
+
+        // If retail pricing is enabled, recalculate amounts using retail pricing
+        if (isOninda() && ! config('app.resell')) {
+            $this->recalculateAmountsWithRetailPricing($orderQ, $amounts);
         }
 
         $query = DB::table('admins')
@@ -98,6 +96,47 @@ class HomeController extends Controller
         $inactiveProducts = Product::whereIsActive(0)->whereNull('parent_id')->get();
         $lowStockProducts = Product::whereShouldTrack(1)->where('stock_count', '<', 10)->get();
 
-        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProducts', 'lowStockProducts', 'start', 'end'));
+        // Get total pending withdrawal amount
+        $pendingWithdrawalAmount = cache()->remember('pending_withdrawal_amount', 300, function () {
+            return abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
+                ->where('confirmed', false)
+                ->sum('amount'));
+        });
+
+        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProducts', 'lowStockProducts', 'start', 'end', 'pendingWithdrawalAmount'));
+    }
+
+    /**
+     * Recalculate order amounts using retail pricing when retail pricing is enabled
+     */
+    private function recalculateAmountsWithRetailPricing($orderQ, &$amounts): void
+    {
+        // Get all orders for recalculation
+        $allOrders = (clone $orderQ)->get();
+
+        // Reset amounts
+        $amounts = array_fill_keys(array_keys($amounts), 0);
+
+        foreach ($allOrders as $order) {
+            $retailAmounts = $order->getRetailAmounts();
+            // Fallback: if retail_total is not available, use wholesale total
+            $totalAmount = $retailAmounts['retail_total'] ?? (float) ($order->data['subtotal'] ?? 0) + (float) ($order->data['shipping_cost'] ?? 0) - (float) ($order->data['discount'] ?? 0);
+
+            // Ensure totalAmount is numeric
+            $totalAmount = (float) $totalAmount;
+
+            // Add to total
+            $amounts['Total'] += $totalAmount;
+
+            // Add to type-specific totals
+            if ($order->type === Order::ONLINE) {
+                $amounts['Online'] += $totalAmount;
+            } elseif ($order->type === Order::MANUAL) {
+                $amounts['Manual'] += $totalAmount;
+            }
+
+            // Add to status-specific totals
+            $amounts[$order->status] += $totalAmount;
+        }
     }
 }

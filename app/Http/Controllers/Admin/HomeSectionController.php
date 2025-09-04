@@ -42,9 +42,17 @@ class HomeSectionController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
 
+        $view = '';
+        if (request('banner')) {
+            $view = 'banner-create';
+        } elseif (request('content')) {
+            $view = 'content-create';
+        }
+
         return $this->view([
             'categories' => Category::nested(),
-        ], request('banner') ? 'banner-create' : '');
+            'pages' => \App\Models\Page::all(),
+        ], $view);
     }
 
     /**
@@ -56,7 +64,7 @@ class HomeSectionController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
 
-        $data = $request->validationData();
+        $data = $request->validated();
         $categories = Arr::pull($data, 'categories');
         $homeSection = HomeSection::create($data);
         if ($categories) {
@@ -84,10 +92,18 @@ class HomeSectionController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
 
+        $view = '';
+        if ($homeSection->type == 'banner') {
+            $view = 'banner-edit';
+        } elseif ($homeSection->type == 'content') {
+            $view = 'content-edit';
+        }
+
         return $this->view([
             'section' => $homeSection,
             'categories' => Category::nested(),
-        ], $homeSection->type == 'banner' ? 'banner-edit' : '');
+            'pages' => \App\Models\Page::all(),
+        ], $view);
     }
 
     /**

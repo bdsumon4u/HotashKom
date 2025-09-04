@@ -36,4 +36,31 @@ class ProductResource extends JsonResource
             'availability' => $this->resource->should_track ? $this->resource->stock_count : 'In Stock',
         ]);
     }
+
+    /**
+     * Transform the product into a cart/order item array.
+     *
+     * @param  int  $quantity  The quantity of the product
+     * @return array<string, mixed>
+     */
+    public function toCartItem(int $quantity = 1): array
+    {
+        return [
+            'id' => $this->resource->id,
+            'source_id' => $this->resource->source_id,
+            'parent_id' => $this->resource->parent_id ?? $this->resource->id,
+            'name' => $this->resource->varName,
+            'slug' => $this->resource->slug,
+            'sku' => $this->resource->sku,
+            'image' => optional($this->resource->baseImage)->src,
+            'category' => $this->resource->category,
+            'quantity' => $quantity,
+            'price' => $price = $this->resource->getPrice($quantity),
+            'purchase_price' => $this->resource->average_purchase_price ?? 0,
+            'retail_price' => $price,
+            'total' => $price * $quantity,
+            'shipping_inside' => $this->resource->shipping_inside,
+            'shipping_outside' => $this->resource->shipping_outside,
+        ];
+    }
 }

@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Traits\PreventsSourcedResourceDeletion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
 class BrandController extends Controller
 {
+    use PreventsSourcedResourceDeletion;
+
     /**
      * Display a listing of the resource.
      *
@@ -43,6 +46,7 @@ class BrandController extends Controller
             'name' => 'required|unique:brands',
             'slug' => 'required|unique:brands',
             'base_image' => 'nullable|integer',
+            'is_enabled' => 'boolean',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
@@ -64,6 +68,7 @@ class BrandController extends Controller
             'name' => 'required|unique:brands,name,'.$brand->id,
             'slug' => 'required|unique:brands,slug,'.$brand->id,
             'base_image' => 'nullable|integer',
+            'is_enabled' => 'boolean',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
@@ -81,6 +86,11 @@ class BrandController extends Controller
     public function destroy(Brand $brand)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
+        if (($result = $this->preventSourcedResourceDeletion($brand)) !== true) {
+            return $result;
+        }
+
         $brand->delete();
 
         return redirect()

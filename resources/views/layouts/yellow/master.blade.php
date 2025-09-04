@@ -224,6 +224,9 @@
         <!-- site__body -->
         <div class="site__body">
             <div class="container">
+                @if(!request()->routeIs('/'))
+                <x-reseller-verification-alert />
+                @endif
                 <x-alert-box class="mt-2 row" />
             </div>
             @yield('content')
@@ -274,7 +277,7 @@
                 } else {
                     $('.site__header.position-fixed .topbar').show();
                 }
-                if (scrollTop > 200) {
+                if (scrollTop > 100) {
                     // $('.site-header').addClass('sticky');
                     // $('.site-header__phone').removeClass('d-none');
                     $('.departments').removeClass('departments--opened departments--fixed');

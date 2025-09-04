@@ -2,30 +2,45 @@
 
 namespace App\Models;
 
+use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
     protected $fillable = [
-        'parent_id', 'image_id', 'name', 'slug', 'order',
+        'parent_id', 'image_id', 'name', 'slug', 'order', 'is_enabled',
     ];
 
     public static function booted(): void
     {
         static::saved(function ($category): void {
-            cache()->forget('categories:nested');
+            cache()->forget('categories:nested:');
+            cache()->forget('categories:nested:1');
             cache()->forget('homesections');
-            // cache()->forget('catmenu:nested');
-            // cache()->forget('catmenu:nestedwithparent');
+
+            // Dispatch job to copy category to reseller databases
+            if (isOninda() && $category->wasRecentlyCreated) {
+                CopyResourceToResellers::dispatch($category);
+            }
         });
 
         static::deleting(function ($category): void {
+            if (! isOninda() && $category->source_id !== null) {
+                throw new \Exception('Cannot delete a resource that has been sourced.');
+            }
+
+            // Dispatch job to remove category from reseller databases
+            if (isOninda()) {
+                RemoveResourceFromResellers::dispatch($category->getTable(), $category->id);
+            }
             $category->childrens->each->delete();
-            // optional($category->categoryMenu)->delete();
-            cache()->forget('categories:nested');
+        });
+
+        static::deleted(function ($category): void {
+            cache()->forget('categories:nested:');
+            cache()->forget('categories:nested:1');
             cache()->forget('homesections');
-            // cache()->forget('catmenu:nested');
-            // cache()->forget('catmenu:nestedwithparent');
         });
     }
 
@@ -44,11 +59,12 @@ class Category extends Model
         return $this->belongsTo(Image::class);
     }
 
-    public static function nested($count = 0)
+    public static function nested($count = 0, $enabledOnly = true)
     {
         $query = self::whereNull('parent_id')
-            ->with(['childrens' => function ($category): void {
-                $category->with('childrens')->orderBy('order');
+            ->when($enabledOnly, fn ($query) => $query->where('is_enabled', true))
+            ->with(['childrens' => function ($category) use ($enabledOnly): void {
+                $category->when($enabledOnly, fn ($query) => $query->where('is_enabled', true))->with('childrens')->orderBy('order');
             }])
             ->withCount('childrens')
             ->orderBy('order');
@@ -58,7 +74,7 @@ class Category extends Model
             return $query->get();
         }
 
-        return cache()->rememberForever('categories:nested', fn () => $query->get());
+        return cache()->rememberForever('categories:nested:'.$enabledOnly, fn () => $query->get());
     }
 
     public function products()

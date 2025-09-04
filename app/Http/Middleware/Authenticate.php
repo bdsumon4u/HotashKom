@@ -18,7 +18,7 @@ class Authenticate extends Middleware
 
     protected $redirectAdminTo = '/';
 
-    protected $redirectUserTo = '/auth';
+    protected $redirectUserTo = '/login';
 
     /**
      * Handle an unauthenticated user.

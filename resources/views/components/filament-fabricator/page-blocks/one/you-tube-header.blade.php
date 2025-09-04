@@ -1,75 +1,196 @@
 @aware(['page'])
-<div class="elementor-element elementor-element-52addff e-flex e-con-boxed e-con e-parent"
-    data-id="52addff" data-element_type="container"
-    data-settings="{&quot;background_background&quot;:&quot;classic&quot;,&quot;shape_divider_bottom&quot;:&quot;wave-brush&quot;}">
-    <div class="e-con-inner">
-        <div class="elementor-shape elementor-shape-bottom" data-negative="false">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 283.5 27.8" preserveAspectRatio="none">
-                <path class="elementor-shape-fill"
-                    d="M283.5,9.7c0,0-7.3,4.3-14,4.6c-6.8,0.3-12.6,0-20.9-1.5c-11.3-2-33.1-10.1-44.7-5.7	s-12.1,4.6-18,7.4c-6.6,3.2-20,9.6-36.6,9.3C131.6,23.5,99.5,7.2,86.3,8c-1.4,0.1-6.6,0.8-10.5,2c-3.8,1.2-9.4,3.8-17,4.7	c-3.2,0.4-8.3,1.1-14.2,0.9c-1.5-0.1-6.3-0.4-12-1.6c-5.7-1.2-11-3.1-15.8-3.7C6.5,9.2,0,10.8,0,10.8V0h283.5V9.7z M260.8,11.3	c-0.7-1-2-0.4-4.3-0.4c-2.3,0-6.1-1.2-5.8-1.1c0.3,0.1,3.1,1.5,6,1.9C259.7,12.2,261.4,12.3,260.8,11.3z M242.4,8.6	c0,0-2.4-0.2-5.6-0.9c-3.2-0.8-10.3-2.8-15.1-3.5c-8.2-1.1-15.8,0-15.1,0.1c0.8,0.1,9.6-0.6,17.6,1.1c3.3,0.7,9.3,2.2,12.4,2.7	C239.9,8.7,242.4,8.6,242.4,8.6z M185.2,8.5c1.7-0.7-13.3,4.7-18.5,6.1c-2.1,0.6-6.2,1.6-10,2c-3.9,0.4-8.9,0.4-8.8,0.5	c0,0.2,5.8,0.8,11.2,0c5.4-0.8,5.2-1.1,7.6-1.6C170.5,14.7,183.5,9.2,185.2,8.5z M199.1,6.9c0.2,0-0.8-0.4-4.8,1.1	c-4,1.5-6.7,3.5-6.9,3.7c-0.2,0.1,3.5-1.8,6.6-3C197,7.5,199,6.9,199.1,6.9z M283,6c-0.1,0.1-1.9,1.1-4.8,2.5s-6.9,2.8-6.7,2.7	c0.2,0,3.5-0.6,7.4-2.5C282.8,6.8,283.1,5.9,283,6z M31.3,11.6c0.1-0.2-1.9-0.2-4.5-1.2s-5.4-1.6-7.8-2C15,7.6,7.3,8.5,7.7,8.6	C8,8.7,15.9,8.3,20.2,9.3c2.2,0.5,2.4,0.5,5.7,1.6S31.2,11.9,31.3,11.6z M73,9.2c0.4-0.1,3.5-1.6,8.4-2.6c4.9-1.1,8.9-0.5,8.9-0.8	c0-0.3-1-0.9-6.2-0.3S72.6,9.3,73,9.2z M71.6,6.7C71.8,6.8,75,5.4,77.3,5c2.3-0.3,1.9-0.5,1.9-0.6c0-0.1-1.1-0.2-2.7,0.2	C74.8,5.1,71.4,6.6,71.6,6.7z M93.6,4.4c0.1,0.2,3.5,0.8,5.6,1.8c2.1,1,1.8,0.6,1.9,0.5c0.1-0.1-0.8-0.8-2.4-1.3	C97.1,4.8,93.5,4.2,93.6,4.4z M65.4,11.1c-0.1,0.3,0.3,0.5,1.9-0.2s2.6-1.3,2.2-1.2s-0.9,0.4-2.5,0.8C65.3,10.9,65.5,10.8,65.4,11.1	z M34.5,12.4c-0.2,0,2.1,0.8,3.3,0.9c1.2,0.1,2,0.1,2-0.2c0-0.3-0.1-0.5-1.6-0.4C36.6,12.8,34.7,12.4,34.5,12.4z M152.2,21.1	c-0.1,0.1-2.4-0.3-7.5-0.3c-5,0-13.6-2.4-17.2-3.5c-3.6-1.1,10,3.9,16.5,4.1C150.5,21.6,152.3,21,152.2,21.1z" />
-                <path class="elementor-shape-fill"
-                    d="M269.6,18c-0.1-0.1-4.6,0.3-7.2,0c-7.3-0.7-17-3.2-16.6-2.9c0.4,0.3,13.7,3.1,17,3.3	C267.7,18.8,269.7,18,269.6,18z" />
-                <path class="elementor-shape-fill"
-                    d="M227.4,9.8c-0.2-0.1-4.5-1-9.5-1.2c-5-0.2-12.7,0.6-12.3,0.5c0.3-0.1,5.9-1.8,13.3-1.2	S227.6,9.9,227.4,9.8z" />
-                <path class="elementor-shape-fill"
-                    d="M204.5,13.4c-0.1-0.1,2-1,3.2-1.1c1.2-0.1,2,0,2,0.3c0,0.3-0.1,0.5-1.6,0.4	C206.4,12.9,204.6,13.5,204.5,13.4z" />
-                <path class="elementor-shape-fill"
-                    d="M201,10.6c0-0.1-4.4,1.2-6.3,2.2c-1.9,0.9-6.2,3.1-6.1,3.1c0.1,0.1,4.2-1.6,6.3-2.6	S201,10.7,201,10.6z" />
-                <path class="elementor-shape-fill"
-                    d="M154.5,26.7c-0.1-0.1-4.6,0.3-7.2,0c-7.3-0.7-17-3.2-16.6-2.9c0.4,0.3,13.7,3.1,17,3.3	C152.6,27.5,154.6,26.8,154.5,26.7z" />
-                <path class="elementor-shape-fill"
-                    d="M41.9,19.3c0,0,1.2-0.3,2.9-0.1c1.7,0.2,5.8,0.9,8.2,0.7c4.2-0.4,7.4-2.7,7-2.6	c-0.4,0-4.3,2.2-8.6,1.9c-1.8-0.1-5.1-0.5-6.7-0.4S41.9,19.3,41.9,19.3z" />
-                <path class="elementor-shape-fill"
-                    d="M75.5,12.6c0.2,0.1,2-0.8,4.3-1.1c2.3-0.2,2.1-0.3,2.1-0.5c0-0.1-1.8-0.4-3.4,0	C76.9,11.5,75.3,12.5,75.5,12.6z" />
-                <path class="elementor-shape-fill"
-                    d="M15.6,13.2c0-0.1,4.3,0,6.7,0.5c2.4,0.5,5,1.9,5,2c0,0.1-2.7-0.8-5.1-1.4	C19.9,13.7,15.7,13.3,15.6,13.2z" />
-            </svg>
-        </div>
-        <div class="elementor-element elementor-element-ce07d60 e-flex e-con-boxed e-con e-child"
-            data-id="ce07d60" data-element_type="container">
-            <div class="e-con-inner">
-                <div class="elementor-element elementor-element-6bf11de elementor-widget__width-initial elementor-headline--style-highlight elementor-widget elementor-widget-animated-headline"
-                    data-id="6bf11de" data-element_type="widget"
-                    data-settings="{&quot;highlighted_text&quot;:&quot; \u09b2\u09be\u09b2 \u099a\u09be\u09b2&quot;,&quot;headline_style&quot;:&quot;highlight&quot;,&quot;marker&quot;:&quot;circle&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;highlight_animation_duration&quot;:1200,&quot;highlight_iteration_delay&quot;:8000}"
-                    data-widget_type="animated-headline.default">
-                    <div class="elementor-widget-container">
-                        <h3 class="elementor-headline elementor-headline-plain-text elementor-headline-text-wrapper">
-                            {!! $headline !!}
-                        </h3>
-                    </div>
+
+<style>
+.youtube-header-section {
+    position: relative;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 0 6rem 0;
+    overflow: hidden;
+}
+
+.youtube-header-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 283.5 27.8' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' d='M283.5,9.7c0,0-7.3,4.3-14,4.6c-6.8,0.3-12.6,0-20.9-1.5c-11.3-2-33.1-10.1-44.7-5.7s-12.1,4.6-18,7.4c-6.6,3.2-20,9.6-36.6,9.3C131.6,23.5,99.5,7.2,86.3,8c-1.4,0.1-6.6,0.8-10.5,2c-3.8,1.2-9.4,3.8-17,4.7c-3.2,0.4-8.3,1.1-14.2,0.9c-1.5-0.1-6.3-0.4-12-1.6c-5.7-1.2-11-3.1-15.8-3.7C6.5,9.2,0,10.8,0,10.8V0h283.5V9.7z'/%3E%3C/svg%3E") no-repeat center bottom;
+    background-size: cover;
+}
+
+.youtube-header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.youtube-header-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.youtube-header-headline {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.youtube-header-headline .highlight {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    display: inline-block;
+}
+
+.youtube-header-headline .highlight::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    border-radius: 2px;
+    animation: highlightPulse 2s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+    0%, 100% { opacity: 0.7; transform: scaleX(1); }
+    50% { opacity: 1; transform: scaleX(1.05); }
+}
+
+.youtube-header-description {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    opacity: 0.95;
+}
+
+.youtube-header-video {
+    margin: 2rem 0;
+}
+
+.youtube-header-video-container {
+    position: relative;
+    width: 100%;
+    /* max-width: 600px; */
+    margin: 0 auto;
+    padding-bottom: 56.25%;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.youtube-header-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.youtube-header-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+    padding: 1.25rem 2.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.youtube-header-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(255, 107, 107, 0.6);
+    color: white;
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    .youtube-header-section {
+        padding: 3rem 0 5rem 0;
+    }
+
+    .youtube-header-headline {
+        font-size: 2.25rem;
+    }
+
+    .youtube-header-description {
+        font-size: 1.125rem;
+    }
+
+    .youtube-header-button {
+        padding: 1rem 2rem;
+        font-size: 1.125rem;
+    }
+}
+</style>
+
+<section class="youtube-header-section">
+    <div class="youtube-header-container">
+        <div class="youtube-header-content">
+            <!-- Animated Headline -->
+            @if($headline ?? false)
+                <h3 class="youtube-header-headline">
+                    {!! $headline !!}
+                </h3>
+            @endif
+
+            <!-- Description -->
+            @if($description ?? false)
+                <div class="youtube-header-description">
+                    {!! $description !!}
                 </div>
-                <div class="elementor-element elementor-element-d7f836e elementor-widget__width-initial elementor-widget elementor-widget-text-editor"
-                    data-id="d7f836e" data-element_type="widget" data-widget_type="text-editor.default">
-                    <div class="elementor-widget-container">
-                        {!! $description !!}
-                    </div>
-                </div>
-                @isset($youtubeLink)
-                <div class="elementor-element elementor-element-fef2488 elementor-widget elementor-widget-video"
-                    data-id="fef2488" data-element_type="widget"
-                    data-settings='{"youtube_url":"{{$youtubeLink}}","autoplay":"yes","play_on_mobile":"yes","video_type":"youtube","controls":"yes"}'
-                    data-widget_type="video.default">
-                    <div class="elementor-widget-container">
-                        <div class="elementor-wrapper elementor-open-inline">
-                            <div class="elementor-video"></div>
+            @endif
+
+            <!-- YouTube Video -->
+            @if($youtubeLink ?? false)
+                <div class="youtube-header-video">
+                    @php
+                        // Extract video ID from YouTube URL
+                        $videoId = '';
+                        if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $youtubeLink, $matches)) {
+                            $videoId = $matches[1];
+                        }
+                    @endphp
+
+                    @if($videoId)
+                        <div class="youtube-header-video-container">
+                            <iframe
+                                class="youtube-header-iframe"
+                                src="https://www.youtube.com/embed/{{ $videoId }}?rel=0&modestbranding=1&autoplay=1&play_on_mobile=1"
+                                title="YouTube video player"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen>
+                            </iframe>
                         </div>
-                    </div>
-                </div>
-                @endisset
-                <div class="elementor-element elementor-element-896d874 elementor-align-center elementor-widget__width-initial elementor-widget elementor-widget-button"
-                    data-id="896d874" data-element_type="widget" data-widget_type="button.default">
-                    <div class="elementor-widget-container">
-                        <div class="elementor-button-wrapper">
-                            <a class="elementor-button elementor-button-link elementor-size-lg"
-                                href="#order">
-                                <span class="elementor-button-content-wrapper">
-                                    <span class="elementor-button-text">অর্ডার করতে চাই</span>
-                                </span>
-                            </a>
+                    @else
+                        <div style="padding: 2rem; background: rgba(255, 255, 255, 0.1); border-radius: 1rem; color: rgba(255, 255, 255, 0.8);">
+                            <p>Invalid YouTube URL provided</p>
                         </div>
-                    </div>
+                    @endif
                 </div>
-            </div>
+            @endif
+
+            <!-- Order Button -->
+            <a href="#order" class="youtube-header-button">
+                অর্ডার করতে চাই
+            </a>
         </div>
     </div>
-</div>
+</section>

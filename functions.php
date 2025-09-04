@@ -5,7 +5,6 @@ use App\Http\Middleware\ShortKodeMiddleware;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\HomeSection;
-use App\Models\Image;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
@@ -44,12 +43,14 @@ if (! function_exists('categories')) {
     {
         // Load categories with images only
         $categoriesWithImages = Category::with('image')
+            ->where('is_enabled', true)
             ->whereHas('image') // Only categories that have images
             ->inRandomOrder()
             ->get();
 
         // Load categories without images and eager load their product images
         $categoriesWithoutImages = Category::with('products.images')
+            ->where('is_enabled', true)
             ->whereDoesntHave('image') // Only categories without images
             ->inRandomOrder()
             ->get();
@@ -66,7 +67,7 @@ if (! function_exists('categories')) {
             }
 
             // Set the image_src property with a fallback placeholder
-            $category->image_src = asset($image->path ?? 'https://placehold.co/600x600?text=No+Product');
+            $category->image_src = cdn($image->src ?? 'https://placehold.co/600x600?text=No+Product');
 
             return $category;
         });
@@ -76,15 +77,16 @@ if (! function_exists('categories')) {
 if (! function_exists('brands')) {
     function brands()
     {
-        return collect(collect());
         // Load brands with images only
         $brandsWithImages = Brand::with('image')
+            ->where('is_enabled', true)
             ->whereHas('image') // Only brands that have images
             ->inRandomOrder()
             ->get();
 
         // Load brands without images and eager load their product images
         $brandsWithoutImages = Brand::with('products.images')
+            ->where('is_enabled', true)
             ->whereDoesntHave('image') // Only brands without images
             ->inRandomOrder()
             ->get();
@@ -101,7 +103,7 @@ if (! function_exists('brands')) {
             }
 
             // Set the image_src property with a fallback placeholder
-            $brand->image_src = asset($image->path ?? 'https://placehold.co/600x600?text=No+Product');
+            $brand->image_src = cdn($image->src ?? 'https://placehold.co/600x600?text=No+Product');
 
             return $brand;
         });
@@ -139,6 +141,11 @@ if (! function_exists('setting')) {
 if (! function_exists('theMoney')) {
     function theMoney($amount, $decimals = null, $currency = 'TK')
     {
+        // Ensure amount is numeric to prevent number_format errors
+        if (! is_numeric($amount)) {
+            $amount = (float) ($amount ?? 0);
+        }
+
         return $currency.'&nbsp;<span>'.number_format($amount, $decimals).'</span>';
     }
 }
@@ -190,8 +197,12 @@ function couriers()
     ]);
 }
 
-function cdn(string $url, int $w = 150, int $h = 150)
+function cdn(?string $url, int $w = 150, int $h = 150)
 {
+    if (! $url) {
+        return asset('https://placehold.co/600x600?text=No+Image');
+    }
+
     if (parse_url($url, PHP_URL_HOST) == 'placehold.co') {
         return $url;
     }
@@ -341,4 +352,19 @@ function deleteOrUpdateCart()
             'content' => serialize($content),
             'updated_at' => now(),
         ]);
+}
+
+function isOninda(): bool
+{
+    return config('app.oninda');
+}
+
+function isReseller(): bool
+{
+    static $reseller = null;
+    if ($reseller === null) {
+        $reseller = ! empty(config('app.oninda_url'));
+    }
+
+    return $reseller;
 }

@@ -19,6 +19,8 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
+        abort_if(request()->user()->is('uploader'), 403, 'You don\'t have permission.');
+
         return view('admin.reports.index', [
             'reports' => Report::latest()->paginate(10),
         ]);
@@ -31,13 +33,21 @@ class ReportController extends Controller
      */
     public function create()
     {
+        abort_if(request()->user()->is('uploader'), 403, 'You don\'t have permission.');
         if (request()->has('code')) {
             $code = ltrim(str_replace('-', '', request('code')), '0');
             if ($order = Order::find($code)) {
-                return $order;
+                // Only add retail amounts when isOninda() is true
+                if (isOninda()) {
+                    $retailAmounts = $order->getRetailAmounts();
+                    $order->setAttribute('retail_amounts', $retailAmounts);
+                }
+
+                // Return JSON response for AJAX requests
+                return response()->json($order);
             }
 
-            return null;
+            return response()->json(null, 404);
         }
 
         return view('admin.reports.scanning');
@@ -127,16 +137,18 @@ class ReportController extends Controller
 
     public function stock(Request $request)
     {
-        abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
+        $products = Product::with('parent')->whereShouldTrack(true)->orderBy('stock_count')->where('stock_count', '>', 0)->get();
+        $stats = Product::stockStatistics();
 
-        return view('admin.reports.stock', [
-            'products' => Product::with('parent')->whereShouldTrack(true)->orderBy('stock_count')->get(),
-        ]);
+        return view('admin.reports.stock', array_merge([
+            'products' => $products,
+        ], $stats));
     }
 
     public function customer(Request $request)
     {
-        abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
         $_start = Carbon::parse(\request('start_d', date('Y-m-d')));
         $start = $_start->format('Y-m-d');
         $_end = Carbon::parse(\request('end_d'));
@@ -145,7 +157,7 @@ class ReportController extends Controller
         $top = $request->get('top_by', 'order_amount');
 
         $query = User::withWhereHas('orders', function ($query) use ($type, $_start, $_end): void {
-            $query->where('status', 'COMPLETED')
+            $query->where('status', 'DELIVERED')
                 ->whereBetween($type, [
                     $_start->startOfDay()->toDateTimeString(),
                     $_end->endOfDay()->toDateTimeString(),

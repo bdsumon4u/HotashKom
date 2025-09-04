@@ -5,10 +5,14 @@ namespace App\Livewire;
 use App\Models\Attribute;
 use App\Models\Product;
 use App\Services\FacebookPixelService;
+use App\Traits\HasCart;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class ProductDetail extends Component
 {
+    use HasCart;
+
     public Product $product;
 
     public Product $selectedVar;
@@ -18,6 +22,9 @@ class ProductDetail extends Component
     public int $maxQuantity = 0;
 
     public int $quantity = 1;
+
+    #[Validate('required|numeric|min:0')]
+    public int $retailPrice = 0;
 
     public bool $showBrandCategory = false;
 
@@ -63,43 +70,7 @@ class ProductDetail extends Component
 
     public function addToCart($instance = 'default')
     {
-        session(['kart' => $instance]);
-        if ($instance == 'landing') {
-            cart()->destroy();
-        }
-        cart()->instance($instance)->add(
-            $this->selectedVar->id,
-            $this->selectedVar->var_name,
-            $quantity = min($this->quantity, $this->maxQuantity),
-            $this->selectedVar->getPrice($quantity),
-            [
-                'parent_id' => $this->selectedVar->parent_id ?? $this->selectedVar->id,
-                'slug' => $this->selectedVar->slug,
-                'image' => optional($this->selectedVar->base_image)->path,
-                'category' => $this->product->category,
-                'max' => $this->maxQuantity,
-                'shipping_inside' => $this->selectedVar->shipping_inside,
-                'shipping_outside' => $this->selectedVar->shipping_outside,
-            ],
-        );
-
-        storeOrUpdateCart();
-
-        if (config('meta-pixel.meta_pixel')) {
-            $this->facebookService->trackAddToCart([
-                'id' => $this->selectedVar->id,
-                'name' => $this->selectedVar->var_name,
-                'price' => $this->selectedVar->getPrice($quantity),
-                'page_url' => route('products.show', $this->product->slug),
-            ], $this);
-        }
-
-        $this->dispatch('cartUpdated');
-        $this->dispatch('notify', ['message' => 'Product added to cart']);
-
-        if ($instance != 'default' && $instance != 'landing') {
-            return redirect()->route('checkout');
-        }
+        return $this->addToKart($this->selectedVar, $this->quantity, $instance, $this->retailPrice);
     }
 
     public function mount(): void
@@ -114,6 +85,7 @@ class ProductDetail extends Component
         }
         $this->options = $this->selectedVar->options->pluck('id', 'attribute_id')->toArray();
         $this->maxQuantity = $this->selectedVar->should_track ? min($this->selectedVar->stock_count, $maxPerProduct) : $maxPerProduct;
+        $this->retailPrice = $this->selectedVar->retailPrice();
     }
 
     public function deliveryText($freeDelivery)

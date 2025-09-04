@@ -126,7 +126,7 @@ add_ssh_host_to_known_hosts
 connect_to_target || {
     # Check if the public key is installed on the target server
     check_public_key_installed
-
+    
     # If the public key is not installed, prompt the user to add it
     if [ $? -ne 0 ]; then
         echo

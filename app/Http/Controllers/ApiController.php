@@ -23,7 +23,9 @@ class ApiController extends Controller
             longCookie($field, $value);
         }
 
-        storeOrUpdateCart($data['phone'], $data['name']);
+        if (isset($data['phone']) && isset($data['name'])) {
+            storeOrUpdateCart($data['phone'], $data['name']);
+        }
     }
 
     public function storageLink()

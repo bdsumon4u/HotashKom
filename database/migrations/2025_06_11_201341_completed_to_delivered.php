@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            DB::statement('UPDATE orders SET status = "DELIVERED" WHERE status = "COMPLETED"');
+            DB::statement('UPDATE orders SET status = "DELIVERED" WHERE status = "DELIVERED"');
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            DB::statement('UPDATE orders SET status = "COMPLETED" WHERE status = "DELIVERED"');
+            DB::statement('UPDATE orders SET status = "DELIVERED" WHERE status = "DELIVERED"');
         });
     }
 };

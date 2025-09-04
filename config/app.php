@@ -2,6 +2,16 @@
 
 return [
 
+    'demo' => env('APP_DEMO', false),
+
+    'oninda' => env('APP_ONINDA', false),
+
+    'resell' => env('APP_RESELL', true),
+
+    'verification_fee' => env('APP_VERIFICATION_FEE', 1000),
+
+    'instant_order_forwarding' => env('INSTANT_ORDER_FORWARDING', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -27,6 +37,10 @@ return [
         'LOST',
         'CANCELLED',
     ],
+
+    'increment' => ['PENDING', 'WAITING', 'RETURNED', 'CANCELLED'],
+
+    'decrement' => ['CONFIRMED', 'INVOICED', 'SHIPPING', 'DELIVERED', 'LOST'],
 
     'round_robin_order_receiving' => env('ROUND_ROBIN_ORDER_RECEIVING', false),
 
@@ -68,6 +82,14 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Oninda URL
+    |--------------------------------------------------------------------------
+    */
+
+    'oninda_url' => env('ONINDA_URL'),
 
     /*
     |--------------------------------------------------------------------------

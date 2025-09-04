@@ -33,7 +33,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/';
+    protected $redirectTo = '/reseller/dashboard';
 
     /**
      * Where to redirect users after logout.
@@ -66,6 +66,11 @@ class LoginController extends Controller
     public function showLoginForm(Request $request)
     {
         if ($phone = $request->get('login')) {
+            $phone = Str::replace(['-', ' '], '', $phone);
+            if (Str::startsWith($phone, '01')) {
+                $phone = '+88'.$phone;
+            }
+            $request->merge(['login' => $phone]);
             // If the class is using the ThrottlesLogins trait, we can automatically throttle
             // the login attempts for this application. We'll key this by the login field and
             // the IP address of the client making these requests into this application.
@@ -93,11 +98,21 @@ class LoginController extends Controller
                 ->with('token:sent', 'An OTP has been sent to your mobile.');
         }
 
-        return view('auth');
+        if (! isOninda()) {
+            return redirect('/');
+        }
+
+        return view('user.auth.login');
     }
 
     public function resendOTP(Request $request)
     {
+        $phone = Str::replace(['-', ' '], '', $request->phone);
+        if (Str::startsWith($phone, '01')) {
+            $phone = '+88'.$phone;
+        }
+        $request->merge(['phone' => $phone]);
+
         $user = $this->getUser($request->login);
         $this->sendOTP($user);
 
@@ -135,9 +150,14 @@ class LoginController extends Controller
      *
      * @return string|array
      */
-    public function loginType(): string
+    public function loginType(): array
     {
-        return 'phone_number';
+        return ['phone_number', 'email'];
+    }
+
+    public function isPhoneNumber($login)
+    {
+        return Str::startsWith($login, '01') || Str::startsWith($login, '+8801');
     }
 
     /**
@@ -149,13 +169,11 @@ class LoginController extends Controller
      */
     protected function attemptLogin(Request $request)
     {
-        if ($request->get('password') == Cache::get('auth:'.$request->login)) {
-            $this->guard()->login(User::firstWhere('phone_number', $request->login), true);
-
-            return true;
+        $phone = Str::replace(['-', ' '], '', $request->login);
+        if (Str::startsWith($phone, '01')) {
+            $phone = '+88'.$phone;
         }
-
-        return false;
+        $request->merge(['login' => $phone, 'phone_number' => $phone]);
 
         return $this->guard()->attempt(
             $this->credentials($request), $request->filled('remember')

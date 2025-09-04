@@ -169,13 +169,29 @@
                     @endforeach
                 </div>
 
+                @if(isOninda() && !config('app.resell'))
+                    <div class="mb-3 alert alert-info">
+                        <i class="mr-2 fa fa-info-circle"></i>
+                        <strong>Note:</strong> Dashboard amounts and product reports display retail pricing (end customer amounts) as configured for this platform.
+                    </div>
+                @endif
                 <div class="shadow-sm card rounded-0">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center">
                         <strong>Processing Products</strong>
                         <small>CONFIRMED+INVOICED+SHIPPING</small>
                     </div>
                     <div class="p-3 card-body">
-                        @include('admin.reports.filtered')
+                        @if(!empty($products))
+                            @include('admin.reports.filtered', [
+                                'products' => $products,
+                                'productInOrders' => $productInOrders
+                            ])
+                        @else
+                            <div class="py-4 text-center text-muted">
+                                <i class="mb-2 fa fa-box fa-2x"></i>
+                                <p>No processing products found for the selected date range</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -224,6 +240,47 @@
                     </div>
                 </div>
                 <div class="rounded-sm card">
+                    <div class="p-3 card-header">
+                        <h5>Staffs</h5>
+                    </div>
+                    <div class="p-3 card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ONLINE</th>
+                                        <th>OFFLINE</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="f-w-500">
+                                    <tr>
+                                        <td>
+                                            <ul style="list-style: disc; padding-left: 1rem;">
+                                                @foreach ($staffs['online'] as $staff)
+                                                <li
+                                                    class="@if ($staff->role_id == \App\Models\Admin::SALESMAN && !$staff->is_active) text-danger @endif">
+                                                    {{ $staff->name }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </td>
+                                        <td>
+                                            <ul style="list-style: disc; padding-left: 1rem;">
+                                                @foreach ($staffs['offline'] as $staff)
+                                                <li
+                                                    class="@if ($staff->role_id == \App\Models\Admin::SALESMAN && !$staff->is_active) text-danger @endif">
+                                                    {{ $staff->name }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 xl-50 box-xl-12">
+                <div class="rounded-sm card">
                     <div class="p-4 card-header card-no-border">
                         <h5>Low Stock</h5>
                     </div>
@@ -258,43 +315,35 @@
                         </div>
                     </div>
                 </div>
+                @if(isOninda() && config('app.resell'))
                 <div class="rounded-sm card">
-                    <div class="p-3 card-header">
-                        <h5>Staffs</h5>
+                    <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                        <h5>Money Requests</h5>
+                        <a href="{{ route('admin.money-requests.index') }}" class="btn btn-sm btn-primary">
+                            <i class="mr-1 fa fa-eye"></i>View All
+                        </a>
                     </div>
                     <div class="p-3 card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>ONLINE</th>
-                                        <th>OFFLINE</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="f-w-500">
-                                    <tr>
-                                        <td>
-                                            <ul style="list-style: disc; padding-left: 1rem;">
-                                                @foreach ($staffs['online'] as $staff)
-                                                    <li class="@if ($staff->role_id == \App\Models\Admin::SALESMAN && !$staff->is_active) text-danger @endif">
-                                                        {{ $staff->name }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </td>
-                                        <td>
-                                            <ul style="list-style: disc; padding-left: 1rem;">
-                                                @foreach ($staffs['offline'] as $staff)
-                                                    <li class="@if ($staff->role_id == \App\Models\Admin::SALESMAN && !$staff->is_active) text-danger @endif">
-                                                        {{ $staff->name }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        @if($pendingWithdrawalAmount > 0)
+                        <div class="text-center">
+                                                            <h3 class="mb-2 text-warning">{{ number_format((float) $pendingWithdrawalAmount, 2) }} tk</h3>
+                            <p class="mb-0 text-muted">Total pending withdrawal amount</p>
+                            <a href="{{ route('admin.money-requests.index') }}" class="mt-2 btn btn-warning btn-sm">
+                                <i class="mr-1 fa fa-dollar-sign"></i>Process Requests
+                            </a>
                         </div>
+                        @else
+                        <div class="py-3 text-center text-muted">
+                            <i class="mb-2 fa fa-check-circle fa-2x"></i>
+                            <p>No pending withdrawal requests</p>
+                            <a href="{{ route('admin.money-requests.index') }}" class="mt-2 btn btn-outline-info btn-sm">
+                                <i class="mr-1 fa fa-eye"></i>View Money Requests
+                            </a>
+                        </div>
+                        @endif
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>

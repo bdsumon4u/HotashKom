@@ -1,5 +1,10 @@
 @push('styles')
 <style>
+    @if(!(setting('show_option')->category_dropdown ?? false))
+    .block-slideshow--layout--with-departments .block-slideshow__body {
+        margin-left: 0;
+    }
+    @endif
     .block-slideshow__body .owl-carousel .owl-nav {
         /* position: absolute; */
         height: 100%;
@@ -75,9 +80,9 @@
                         @foreach(slides() as $slide)
                         <a class="block-slideshow__slide" href="{{ $slide->btn_href ?? '#' }}">
                             <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop"
-                                style="background-image: url({{ cdn($slide->desktop_src, 840, 395) }}); background-position: center;"></div>
+                                style="background-image: url({{ cdn(asset($slide->desktop_src), 840, 395) }}); background-position: center;"></div>
                             <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile"
-                                style="background-image: url({{ cdn($slide->mobile_src, 360, 180) }}); background-position: center;"></div>
+                                style="background-image: url({{ cdn(asset($slide->mobile_src), 360, 180) }}); background-position: center;"></div>
                             <div class="block-slideshow__slide-content">
                                 <div class="block-slideshow__slide-title">{!! $slide->title !!}</div>
                                 <div class="block-slideshow__slide-text">{!! $slide->text !!}</div>

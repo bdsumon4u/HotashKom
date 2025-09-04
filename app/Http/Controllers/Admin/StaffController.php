@@ -82,7 +82,7 @@ class StaffController extends Controller
     public function edit(Admin $staff)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
-        abort_if($staff->email == 'support@cyber32.com' && request()->user()->email != 'support@cyber32.com', 403, 'You don\'t have permission.');
+        abort_if($staff->email == 'support@hotash.tech' && request()->user()->email != 'support@hotash.tech', 403, 'You don\'t have permission.');
 
         return $this->view([
             'admin' => $staff,
@@ -102,7 +102,7 @@ class StaffController extends Controller
     public function update(Request $request, Admin $staff)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
-        abort_if($staff->email == 'support@cyber32.com' && request()->user()->email != 'support@cyber32.com', 403, 'You don\'t have permission.');
+        abort_if($staff->email == 'support@hotash.tech' && request()->user()->email != 'support@hotash.tech', 403, 'You don\'t have permission.');
         $data = $request->validate([
             'name' => 'required',
             'email' => 'required|unique:admins,email,'.$staff->id,

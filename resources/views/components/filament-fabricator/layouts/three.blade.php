@@ -19,17 +19,17 @@
         media='all' />
     <link rel='stylesheet' id='elementor-post-7-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/uploads/elementor/css/post-7.css?ver=1736836498') }}' media='all' />
-    
+
     <link rel='stylesheet' id='wcf-frontend-global-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/frontend.css?ver=2.0.12') }}' media='all' />
-    
+
     <link rel='stylesheet' id='swiper-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=8.4.5') }}'
         media='all' />
     <link rel='stylesheet' id='e-swiper-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/css/conditionals/e-swiper.min.css?ver=3.25.9') }}'
         media='all' />
-    
+
     <link rel='stylesheet' id='widget-image-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=3.25.9') }}'
         media='all' />
@@ -59,11 +59,11 @@
     <link rel='stylesheet' id='wcf-checkout-template-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/checkout-template.css?ver=2.0.12') }}'
         media='all' />
-    
+
     <link rel='stylesheet' id='wcf-pro-checkout-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows-pro/assets/css/checkout-styles.css?ver=2.0.10') }}'
         media='all' />
-    
+
     <link rel='stylesheet' id='google-fonts-1-css'
         href='https://fonts.googleapis.com/css?family=Roboto%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CRoboto+Slab%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CHind+Siliguri%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CAnek+Bangla%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CMontserrat%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&#038;display=swap&#038;ver=6.7.1'
         media='all' />
@@ -77,7 +77,7 @@
 </head>
 
 <body
-    class="cartflows_step-template cartflows_step-template-cartflows-canvas single single-cartflows_step postid-154 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12  cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-154 cartflows-canvas">
+    class="cartflows_step-template cartflows_step-template-cartflows-canvas single single-cartflows_step postid-154 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12 cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-154 cartflows-canvas">
 
 
     <div class="cartflows-container">
@@ -120,21 +120,21 @@
                     </div>
                 </div>
             </section>
-            
+
             <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
 
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
             <livewire:fabricator.checkout :product="$page->product" />
         </div>
     </div>
 
 
-    
+
     <script
         src="{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/js/flexslider/jquery.flexslider.min.js?ver=2.7.2-wc.9.4.2') }}"
         id="flexslider-js" defer data-wp-strategy="defer"></script>
@@ -148,11 +148,11 @@
     </script>
     <script id="elementor-pro-frontend-js-before">
         var ElementorProFrontendConfig = {
-            "ajaxurl": "https:\/\/demo.orioit.com\/wp-admin\/admin-ajax.php",
+            "ajaxurl": "",
             "nonce": "e020cc32a2",
             "urls": {
-                "assets": "https:\/\/demo.orioit.com\/wp-content\/plugins\/elementor-pro\/assets\/",
-                "rest": "https:\/\/demo.orioit.com\/wp-json\/"
+                "assets": "{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor-pro/assets/') }}",
+                "rest": "{{ asset('assets/demo.orioit.com/wp-json/') }}"
             },
             "settings": {
                 "lazy_load_background_images": true
@@ -233,8 +233,8 @@
             },
             "woocommerce": {
                 "menu_cart": {
-                    "cart_page_url": "https:\/\/demo.orioit.com",
-                    "checkout_page_url": "https:\/\/demo.orioit.com",
+                    "cart_page_url": "{{ asset('assets/demo.orioit.com/') }}",
+                    "checkout_page_url": "{{ asset('assets/demo.orioit.com/') }}",
                     "fragments_nonce": "7d7f529b9d"
                 },
                 "productAddedToCart": true
@@ -244,7 +244,7 @@
                 "app_id": ""
             },
             "lottie": {
-                "defaultAnimationUrl": "https:\/\/demo.orioit.com\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"
+                "defaultAnimationUrl": "{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor-pro/modules/lottie/assets/animations/default.json') }}"
             }
         };
     </script>
@@ -356,9 +356,9 @@
                 "launchpad-checklist": true
             },
             "urls": {
-                "assets": "https:\/\/demo.orioit.com\/wp-content\/plugins\/elementor\/assets\/",
-                "ajaxurl": "https:\/\/demo.orioit.com\/wp-admin\/admin-ajax.php",
-                "uploadUrl": "https:\/\/demo.orioit.com\/wp-content\/uploads"
+                "assets": "{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/') }}",
+                "ajaxurl": "{{ asset('assets/demo.orioit.com/wp-admin/admin-ajax.php') }}",
+                "uploadUrl": "{{ asset('assets/demo.orioit.com/wp-content/uploads') }}"
             },
             "nonces": {
                 "floatingButtonsClickTracking": "b90916dce7"
@@ -460,7 +460,7 @@
     <script
         src="{{ asset('assets/demo.orioit.com/wp-content/plugins/elementskit-lite/widgets/init/assets/js/animate-circle.min.js?ver=3.3.2') }}"
         id="animate-circle-js"></script>
-    
+
 </body>
 
 </html>

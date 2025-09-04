@@ -62,6 +62,7 @@ class ComposerServiceProvider extends ServiceProvider
             'user.layouts.master',
             'layouts.light.master',
             'layouts.yellow.master',
+            'layouts.reseller.master',
             'layouts.errors.master',
         ];
         View::composer($settingsPages, function ($view): void {

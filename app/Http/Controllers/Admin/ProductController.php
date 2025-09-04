@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Events\ProductCreated;
 use App\Events\ProductUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
@@ -10,9 +9,12 @@ use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Traits\PreventsSourcedResourceDeletion;
 
 class ProductController extends Controller
 {
+    use PreventsSourcedResourceDeletion;
+
     /**
      * Display a listing of the resource.
      *
@@ -20,7 +22,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return $this->view();
+        $stats = \App\Models\Product::stockStatistics();
+
+        return $this->view($stats);
     }
 
     /**
@@ -48,7 +52,12 @@ class ProductController extends Controller
     {
         abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validationData();
-        event(new ProductCreated($product = Product::create($data), $data));
+
+        // Create the product
+        $product = Product::create($data);
+
+        // Handle relationships and dispatch copy job
+        $this->handleProductRelationships($product, $data);
 
         return redirect()->action([static::class, 'edit'], $product)->with('success', 'Product Has Been Created.');
     }
@@ -89,6 +98,9 @@ class ProductController extends Controller
         $data = $request->validationData();
         $product->update($data);
 
+        // Handle relationships and dispatch copy job
+        $this->handleProductRelationships($product, $data);
+
         // if ($product->getChanges()) {
         //     session()->flash('success', 'Product Updated');
         // } else {
@@ -97,7 +109,9 @@ class ProductController extends Controller
 
         event(new ProductUpdated($product, $data));
 
-        return redirect()->action([static::class, 'index'])->with('success', 'Product Has Been Updated. Check <a href="'.route('products.show', $product).'" target="_blank">Product</a>');
+        return redirect()
+            ->action([static::class, 'index'])
+            ->with('success', 'Product Has Been Updated. <a href="'.route('products.show', $product).'" target="_blank">View the Product</a> or <a href="'.route('admin.products.edit', $product).'">Edit the Product</a> again.');
     }
 
     /**
@@ -108,10 +122,45 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
+        if (($result = $this->preventSourcedResourceDeletion($product)) !== true) {
+            return $result;
+        }
+
         $product->delete();
 
         return request()->ajax()
             ? true
             : back()->with('success', 'Product Has Been Deleted.');
+    }
+
+    /**
+     * Handle product relationships and dispatch copy job
+     */
+    private function handleProductRelationships(Product $product, array $data): void
+    {
+        // Handle categories
+        if (isset($data['categories'])) {
+            $product->categories()->sync($data['categories']);
+        }
+
+        // Handle images
+        if (isset($data['base_image'])) {
+            $order = 0;
+            $images = [$data['base_image'] => ['img_type' => 'base']];
+
+            if (isset($data['additional_images'])) {
+                foreach ($data['additional_images'] as $additional_image) {
+                    if ($additional_image != $data['base_image']) {
+                        $images[$additional_image] = ['img_type' => 'additional', 'order' => ++$order];
+                    }
+                }
+            }
+
+            $product->images()->sync($images);
+        }
+
+        // Dispatch copy job after all relationships are established
+        \App\Jobs\CopyProductToResellers::dispatch($product);
     }
 }

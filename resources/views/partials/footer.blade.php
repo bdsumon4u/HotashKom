@@ -74,9 +74,9 @@
                 <div class="site-footer__copyright">
                     &copy; {{ $company->name ?? '' }}
                 </div>
-                @if(($name = $company->dev_name??'Cyber 32') != '#' and ($link = $company->dev_link??'https://cyber32.com') != '#')
+                @if(($name = $company->dev_name??'Hotash Tech') != '#' and ($link = $company->dev_link??'https://hotash.tech') != '#')
                 <div class="site-footer__payments">
-                    Developed By <a href="{{$link}}" class="text-danger">{{$name}}</a>
+                    Developed By <a href="{{$company->dev_link??'https://hotash.tech'}}" class="text-danger">{{$company->dev_name??'Hotash Tech'}}</a>
                 </div>
                 @endif
             </div>

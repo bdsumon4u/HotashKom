@@ -122,6 +122,23 @@
         .select2 {
             width: 100% !important;
         }
+
+        /* Visual feedback for invalid drop targets */
+        .space.invalid-drop-target {
+            border-color: #dc3545 !important;
+            background-color: #f8d7da !important;
+        }
+
+        .space.valid-drop-target {
+            border-color: #28a745 !important;
+            background-color: #d4edda !important;
+        }
+
+        /* Disable pointer events for invalid drop targets */
+        .route.invalid-drop-target {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 @endpush
 
@@ -150,13 +167,13 @@
                                     <div class="p-3 card-header">
                                         <ul class="nav nav-tabs" role="tablist">
                                             <li class="nav-item">
-                                                <a class="nav-link active" data-toggle="tab" href="#create-category"
+                                                <a class="nav-link @unless (request('active_id')) active @endunless" data-toggle="tab" href="#create-category"
                                                     role="tab" aria-controls="create-category"
                                                     aria-selected="false">Create</a>
                                             </li>
                                             @if (request('active_id'))
                                                 <li class="nav-item">
-                                                    <a class="nav-link" data-toggle="tab" href="#edit-category"
+                                                    <a class="nav-link active" data-toggle="tab" href="#edit-category"
                                                         role="tab" aria-controls="edit-category"
                                                         aria-selected="false">Edit</a>
                                                 </li>
@@ -178,7 +195,7 @@
                                         @endif
                                         @php $active = \App\Models\Category::find(request('active_id')) @endphp
                                         <div class="tab-content">
-                                            <div class="tab-pane active" id="create-category" role="tabpanel">
+                                            <div class="tab-pane @unless (request('active_id')) active @endunless" id="create-category" role="tabpanel">
                                                 <p class="text-info">Create
                                                     <strong>{{ $active ? 'Child' : 'Root' }}</strong> Category</p>
                                                 <form action="{{ route('admin.categories.store') }}" method="post">
@@ -235,13 +252,21 @@
                                                             <small class="text-danger">{{ $message }}</small>
                                                         @enderror
                                                     </div>
+                                                    <div class="form-group">
+                                                        <div class="checkbox checkbox-secondary">
+                                                            <input type="hidden" name="is_enabled" value="0">
+                                                            <x-checkbox id="create-is-enabled" name="is_enabled" value="1"
+                                                                :checked="old('is_enabled', true)" />
+                                                            <label for="create-is-enabled" class="m-0">Enable Category</label>
+                                                        </div>
+                                                    </div>
                                                     <button type="submit"
                                                         class="ml-auto btn btn-sm btn-success d-block"><i
                                                             class="fa fa-check"></i> Create</button>
                                                 </form>
                                             </div>
                                             @if (request('active_id'))
-                                                <div class="tab-pane" id="edit-category" role="tabpanel">
+                                                <div class="tab-pane active" id="edit-category" role="tabpanel">
                                                     <p class="text-info">Edit Category</p>
                                                     <form
                                                         action="{{ route('admin.categories.update', request('active_id', 0)) }}"
@@ -303,6 +328,14 @@
                                                             @error('base_image')
                                                                 <small class="text-danger">{{ $message }}</small>
                                                             @enderror
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="checkbox checkbox-secondary">
+                                                                <input type="hidden" name="is_enabled" value="0">
+                                                                <x-checkbox id="edit-is-enabled" name="is_enabled" value="1"
+                                                                    :checked="old('is_enabled', $active->is_enabled)" />
+                                                                <label for="edit-is-enabled" class="m-0">Enable Category</label>
+                                                            </div>
                                                         </div>
                                                         <button type="submit"
                                                             class="ml-auto btn btn-sm btn-success d-block"><i
@@ -423,9 +456,52 @@
                 create: function(event, ui) {
                     // calcWidth($('#title0'));
                 },
+                start: function(event, ui) {
+                    var draggedItem = ui.item;
+                    var draggedId = draggedItem.attr('id').replace('space-item-', '');
+
+                    // Add visual feedback for valid/invalid drop targets
+                    $('.space').each(function() {
+                        var spaceId = $(this).attr('data-space');
+
+                        if (spaceId == draggedId) {
+                            $(this).addClass('invalid-drop-target');
+                        } else {
+                            // Use improved descendant check
+                            var isDesc = isDescendant(draggedItem, spaceId);
+                            if (isDesc) {
+                                $(this).addClass('invalid-drop-target');
+                            } else {
+                                $(this).addClass('valid-drop-target');
+                            }
+                        }
+                    });
+                },
+                stop: function(event, ui) {
+                    // Remove visual feedback
+                    $('.space').removeClass('invalid-drop-target valid-drop-target');
+                },
                 over: function(event, ui) {},
                 receive: function(event, ui) {
-                    // calcWidth($(this).siblings('.title'));
+                    var droppedItem = ui.item;
+                    var targetSpace = $(this);
+                    var droppedId = droppedItem.attr('id').replace('space-item-', '');
+                    var targetSpaceId = targetSpace.attr('data-space');
+
+                    // Prevent dropping a category into its own space
+                    if (droppedId == targetSpaceId) {
+                        $.notify('Cannot drop a category into itself.', 'error');
+                        $(this).sortable('cancel');
+                        return false;
+                    }
+
+                    // Prevent dropping a category into its descendants' space (recursive)
+                    var isDesc = isDescendant(droppedItem, targetSpaceId);
+                    if (isDesc) {
+                        $.notify('Cannot drop a category into its descendants.', 'error');
+                        $(this).sortable('cancel');
+                        return false;
+                    }
                 },
                 update: function(event, ui) {
                     $('#space-0 .route').each(function(idx, el) {
@@ -438,6 +514,33 @@
 
             function reorder(idx, el) {
                 var parent_id = el.parent().attr('data-space');
+                var current_id = el.attr('id').replace('space-item-', '');
+
+                // Prevent circular reference: category cannot be its own parent
+                if (parent_id == current_id) {
+                    console.warn('Cannot make category its own parent. Reverting...');
+                    $.notify('Cannot make a category its own parent.', 'error');
+                    // Revert the sortable operation
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                    return false;
+                }
+
+                // Prevent circular reference: category cannot be parent of its descendants (recursive)
+                if (parent_id != 0) {
+                    var isDesc = isDescendant(el, parent_id);
+                    if (isDesc) {
+                        console.warn('Cannot make category parent of its descendants. Reverting...');
+                        $.notify('Cannot make a category parent of its descendants.', 'error');
+                        // Revert the sortable operation
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                        return false;
+                    }
+                }
+
                 if (el.attr('data-parent') != parent_id) {
                     el.attr('data-parent', parent_id);
                     ($.inArray(el.attr('id'), updated) == -1) && updated.push(el.attr('id'))
@@ -507,7 +610,7 @@
                 $(e.target).addClass('disabled')
                 var id = $(this).attr('data-id')
                 $.ajax({
-                    url: '{{route('admin.categories.destroy', 'id')}}'.replace('id', id),
+                    url: '{{route('admin.categories.destroy', ':id')}}'.replace(':id', id),
                     type: 'DELETE',
                     _method: 'DELETE',
                     complete: function() {
@@ -521,5 +624,27 @@
                 $($(this).data('target')).val(slugify($(this).val()));
             });
         });
+
+        // Add this helper function near the top of your script section
+        function isDescendant(draggedItem, targetSpaceId) {
+            var found = false;
+            // Recursively check all nested .space elements
+            draggedItem.find('.route').each(function() {
+                var childSpace = $(this).find('.space').first();
+                if (childSpace.length) {
+                    var childSpaceId = childSpace.attr('data-space');
+                    if (childSpaceId == targetSpaceId) {
+                        found = true;
+                        return false;
+                    }
+                    // Recursively check deeper descendants
+                    if (isDescendant($(this), targetSpaceId)) {
+                        found = true;
+                        return false;
+                    }
+                }
+            });
+            return found;
+        }
     </script>
 @endpush

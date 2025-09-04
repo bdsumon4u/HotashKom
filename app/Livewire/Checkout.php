@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Http\Resources\ProductResource;
+use App\Jobs\CallOnindaOrderApi;
 use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Product;
@@ -15,6 +17,7 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
@@ -36,7 +39,21 @@ class Checkout extends Component
 
     public $note = '';
 
+    public $city_id = '';
+
+    public $area_id = '';
+
     protected $listeners = ['updateField'];
+
+    public $retail = [];
+
+    public $retailDeliveryFee = 0;
+
+    #[Validate('required|numeric|min:0')]
+    public $advanced = 0;
+
+    #[Validate('nullable|numeric|min:0')]
+    public $retailDiscount = 0;
 
     protected $facebookService;
 
@@ -55,18 +72,40 @@ class Checkout extends Component
         // $this->updatedShipping(); // doesn't work.
     }
 
+    public function updatedCityId($value): void
+    {
+        longCookie('city_id', $value);
+
+        // Reset area_id when city changes
+        $this->area_id = '';
+        longCookie('area_id', '');
+    }
+
+    public function updatedAreaId($value): void
+    {
+        longCookie('area_id', $value);
+    }
+
     public function remove($id): void
     {
         cart()->remove($id);
-        $this->cartUpdated();
+        // $this->cartUpdated();
     }
 
     public function increaseQuantity($id): void
     {
         $item = cart()->get($id);
         if ($item->qty < $item->options->max || $item->options->max === -1) {
+            $qty = $item->qty + 1;
+            $content = cart()->content();
+            $product = Product::find($item->id);
+            $item->price = $price = $product->getPrice($qty);
+            $item->options->retail_price = $price;
+            $content->put($item->rowId, $item);
+            // session()->put(cart()->currentInstance(), $content);
+
             cart()->update($id, $item->qty + 1);
-            $this->cartUpdated();
+            // $this->cartUpdated();
         }
     }
 
@@ -74,8 +113,16 @@ class Checkout extends Component
     {
         $item = cart()->get($id);
         if ($item->qty > 1) {
-            cart()->update($id, $item->qty - 1);
-            $this->cartUpdated();
+            $qty = $item->qty - 1;
+            $content = cart()->content();
+            $product = Product::find($item->id);
+            $item->price = $price = $product->getPrice($qty);
+            $item->options->retail_price = $price;
+            $content->put($item->rowId, $item);
+            // session()->put(cart()->currentInstance(), $content);
+
+            cart()->update($id, $qty);
+            // $this->cartUpdated();
         }
     }
 
@@ -85,32 +132,30 @@ class Checkout extends Component
         $area ??= $this->shipping;
         $shipping_cost = 0;
         if ($area) {
-            /*
-            if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
-            */
-            $shipping_cost = cart()->content()->max(function ($item) use ($area) {
-                if ($area == 'Inside Dhaka') {
-                    return $item->options->shipping_inside;
-                } else {
-                    return $item->options->shipping_outside;
-                }
-            });
-            /*
-            } else {
+            if (setting('show_option')->productwise_delivery_charge ?? false) {
                 $shipping_cost = cart()->content()->sum(function ($item) use ($area) {
+                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
                     if ($area == 'Inside Dhaka') {
-                        return $item->options->shipping_inside * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
+                        return $item->options->shipping_inside * $factor;
                     } else {
-                        return $item->options->shipping_outside * ((setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1);
+                        return $item->options->shipping_outside * $factor;
+                    }
+                });
+            } else {
+                $shipping_cost = cart()->content()->max(function ($item) use ($area) {
+                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
+                    if ($area == 'Inside Dhaka') {
+                        return $item->options->shipping_inside * $factor;
+                    } else {
+                        return $item->options->shipping_outside * $factor;
                     }
                 });
             }
-            */
         }
 
         $freeDelivery = setting('free_delivery');
 
-        if (! ($freeDelivery->enabled ?? false)) {
+        if (! ((bool) ($freeDelivery->enabled ?? false)) || ($freeDelivery->enabled ?? false) == 'false') {
             return $shipping_cost;
         }
 
@@ -141,12 +186,24 @@ class Checkout extends Component
 
     public function updatedShipping(): void
     {
-        cart()->addCost('deliveryFee', $this->shippingCost());
+        if (! cart()->getCost('deliveryFee')) {
+            cart()->addCost('deliveryFee', $this->shippingCost($this->shipping));
+        }
+
+        if (isOninda() && config('app.resell')) {
+            /** @var User $reseller */
+            $reseller = auth('user')->user();
+            $this->retailDeliveryFee = $reseller->getShippingCost($this->shipping) ?: cart()->getCost('deliveryFee');
+        }
     }
 
     public function cartUpdated(): void
     {
         $this->updatedShipping();
+        $this->retail = cart()->content()->mapWithKeys(fn ($item) => [$item->id => [
+            'price' => $this->retail[$item->id]['price'] ?? $item->options->retail_price,
+            'quantity' => $item->qty,
+        ]])->toArray();
         $this->dispatch('cartUpdated');
     }
 
@@ -159,31 +216,43 @@ class Checkout extends Component
         $default_area = setting('default_area');
         if ($default_area->inside ?? false) {
             $shipping = 'Inside Dhaka';
+            $this->retailDeliveryFee = $this->shippingCost($shipping);
         }
         if ($default_area->outside ?? false) {
             $shipping = 'Outside Dhaka';
+            $this->retailDeliveryFee = $this->shippingCost($shipping);
         }
 
-        if ($user = auth('user')->user()) {
+        if ((!isOninda() || !config('app.resell')) && $user = auth('user')->user()) {
             $this->name = $user->name;
             if ($user->phone_number) {
                 $this->phone = Str::after($user->phone_number, '+880');
             }
             $this->address = $user->address ?? '';
             $this->note = $user->note ?? '';
-        } else {
+            $this->retailDiscount = $user->discount ?? 0;
+        } else if ($this->fillFromCookie()) {
             $this->name = Cookie::get('name', '');
             $this->shipping = Cookie::get('shipping', $shipping ?? '');
             $this->phone = Cookie::get('phone', '');
             $this->address = Cookie::get('address', '');
             $this->note = Cookie::get('note', '');
+            $this->retailDiscount = Cookie::get('retail_discount', 0);
+            $this->city_id = Cookie::get('city_id', '');
+            $this->area_id = Cookie::get('area_id', '');
         }
 
-        $this->cartUpdated();
+        // $this->cartUpdated();
     }
 
     public function checkout()
     {
+        if (isOninda() && auth('user')->guest()) {
+            $this->dispatch('notify', ['message' => 'Please login to add product to cart', 'type' => 'error']);
+
+            return redirect()->route('user.login')->with('danger', 'Please login to add product to cart');
+        }
+
         if (! ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)) {
             if (Str::startsWith($this->phone, '01')) {
                 $this->phone = Str::after($this->phone, '0');
@@ -192,13 +261,22 @@ class Checkout extends Component
             $this->phone = '+88'.$this->phone;
         }
 
-        $data = $this->validate([
+        $validationRules = [
             'name' => 'required',
             'phone' => $hidePrefix ? 'required|regex:/^\+8801\d{9}$/' : 'required|regex:/^1\d{9}$/',
             'address' => 'required',
             'note' => 'nullable',
             'shipping' => 'required',
-        ]);
+            'retailDiscount' => 'nullable|numeric|min:0',
+        ];
+
+        // Add validation for city and area if Pathao is enabled and user_selects_city_area is checked
+        if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false)) {
+            $validationRules['city_id'] = 'required';
+            $validationRules['area_id'] = 'required';
+        }
+
+        $data = $this->validate($validationRules);
 
         if (! $hidePrefix) {
             $data['phone'] = '+880'.$data['phone'];
@@ -218,7 +296,7 @@ class Checkout extends Component
         }
 
         $this->order = DB::transaction(function () use ($data, &$order, $fraud) {
-            $products = Product::find(cart()->content()->pluck('id'))
+            $data['products'] = Product::find(cart()->content()->pluck('id'))
                 ->mapWithKeys(function (Product $product) use ($fraud) {
                     $id = $product->id;
                     $quantity = min(cart($id)->qty, $fraud->max_qty_per_product ?? 3);
@@ -226,38 +304,20 @@ class Checkout extends Component
                     if ($quantity <= 0) {
                         return null;
                     }
-                    // Manage Stock
-                    if ($product->should_track) {
-                        if ($product->stock_count <= 0) {
-                            return null; // Allow overstock
-                        }
-                        $quantity = $product->stock_count >= $quantity ? $quantity : $product->stock_count;
-                        $product->decrement('stock_count', $quantity);
-                    }
 
-                    // Needed Attributes
-                    return [$id => [
-                        'id' => $id,
-                        'name' => $product->var_name,
-                        'slug' => $product->slug,
-                        'image' => optional($product->base_image)->src,
-                        'price' => $selling = $product->getPrice($quantity),
-                        'quantity' => $quantity,
-                        'category' => $product->category,
-                        'total' => $quantity * $selling,
-                    ]];
-                })->filter(function ($product) {
-                    return $product != null; // Only Available Products
-                })->toArray();
+                    $productData = (new ProductResource($product))->toCartItem($quantity);
+                    $productData['retail_price'] = $this->retail[$id]['price'] ?? $productData['price'];
 
-            if (empty($products)) {
+                    return [$id => $productData];
+                })->filter()->toArray();
+
+            if (empty($data['products'])) {
                 return $this->dispatch('notify', ['message' => 'All products are out of stock.', 'type' => 'danger']);
             }
 
-            $data['products'] = json_encode($products, JSON_UNESCAPED_UNICODE);
             $user = $this->getUser($data);
             $oldOrders = $user->orders()->get();
-            $status = data_get(config('app.orders', []), 0, 'PENDING'); // Default Status
+            $status = $this->getDefaultStatus();
 
             $oldOrders = Order::select(['id', 'admin_id', 'status'])->where('phone', $data['phone'])->get();
             $adminIds = $oldOrders->pluck('admin_id')->unique()->toArray();
@@ -278,20 +338,36 @@ class Checkout extends Component
                 }
             }
 
+            $orderData = [
+                'courier' => 'Other',
+                'is_fraud' => $oldOrders->whereIn('status', ['CANCELLED', 'RETURNED'])->count() > 0,
+                'is_repeat' => $oldOrders->count() > 0,
+                'shipping_area' => $data['shipping'],
+                'shipping_cost' => $this->shippingCost($data['shipping']),
+                'retail_delivery_fee' => $this->retailDeliveryFee,
+                'advanced' => $this->advanced,
+                'retail_discount' => $this->retailDiscount,
+                'subtotal' => cart()->subtotal(),
+                'purchase_cost' => cart()->content()->sum(function ($item) {
+                    return ($item->options->purchase_price ?: $item->options->price) * $item->qty;
+                }),
+            ];
+
+            // Add city and area data if Pathao is enabled and user_selects_city_area is checked
+            if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false)) {
+                $orderData['city_id'] = $this->city_id;
+                $orderData['area_id'] = $this->area_id;
+                $orderData['courier'] = 'Pathao';
+            }
+
             $data += [
+                'source_id' => config('app.instant_order_forwarding') ? 0 : null,
                 'admin_id' => $admin->id,
                 'user_id' => $user->id, // If User Logged In
                 'status' => $status,
                 'status_at' => now()->toDateTimeString(),
                 // Additional Data
-                'data' => [
-                    'courier' => 'Other',
-                    'is_fraud' => $oldOrders->whereIn('status', ['CANCELLED', 'RETURNED'])->count() > 0,
-                    'is_repeat' => $oldOrders->count() > 0,
-                    'shipping_area' => $data['shipping'],
-                    'shipping_cost' => $this->shippingCost(),
-                    'subtotal' => cart()->subtotal(),
-                ],
+                'data' => $orderData,
             ];
 
             $order = Order::create($data);
@@ -319,7 +395,7 @@ class Checkout extends Component
                 $this->facebookService->trackPurchase([
                     'id' => $order->id,
                     'total' => $order->data['subtotal'],
-                ], $products, [
+                ], $data['products'], [
                     'name' => $user->name,
                     'email' => $user->email,
                     'phone' => $user->phone_number,
@@ -340,7 +416,7 @@ class Checkout extends Component
                             'item_category' => $product['category'],
                             'price' => $product['price'],
                             'quantity' => $product['quantity'],
-                        ], $products)),
+                        ], $data['products'])),
                     ],
                 ]);
             }
@@ -355,10 +431,14 @@ class Checkout extends Component
         // Undefined index email.
         // $data['email'] && Mail::to($data['email'])->queue(new OrderPlaced($order));
 
+        if (config('app.instant_order_forwarding') && ! config('app.demo')) {
+            CallOnindaOrderApi::dispatch($this->order->id);
+        }
+
         cart()->destroy();
         session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Recieved. Thanks For Your Order.');
 
-        return redirect()->route('thank-you', [
+        return redirect()->route($this->getRedirectRoute(), [
             'order' => optional($this->order)->getKey(),
         ]);
     }
@@ -383,8 +463,29 @@ class Checkout extends Component
 
     public function render()
     {
+        // Create a temporary Order instance to use its Pathao methods
+        $tempOrder = new \App\Models\Order;
+        $this->cartUpdated();
+
         return view('livewire.checkout', [
             'user' => optional(auth('user')->user()),
+            'pathaoCities' => collect($tempOrder->pathaoCityList()),
+            'pathaoAreas' => collect($tempOrder->pathaoAreaList($this->city_id)),
         ]);
+    }
+
+    protected function fillFromCookie()
+    {
+        return true;
+    }
+
+    protected function getRedirectRoute()
+    {
+        return 'thank-you';
+    }
+
+    protected function getDefaultStatus()
+    {
+        return data_get(config('app.orders', []), 0, 'PENDING'); // Default Status
     }
 }

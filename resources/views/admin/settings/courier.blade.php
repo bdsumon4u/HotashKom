@@ -29,6 +29,13 @@
             <x-input name="Pathao[store_id]" :value="$Pathao->store_id" placeholder="Type store_id here" />
             <x-error field="Pathao[store_id]" />
         </div>
+        <div class="form-group col-md-auto">
+            <div class="checkbox checkbox-secondary">
+                <input type="hidden" name="Pathao[user_selects_city_area]" value="0">
+                <x-checkbox id="PathaoUserSelectsCityArea" name="Pathao[user_selects_city_area]" value="1" :checked="!!($Pathao->user_selects_city_area ?? false)" />
+                <x-label for="PathaoUserSelectsCityArea">User selects city and area during checkout</x-label>
+            </div>
+        </div>
     </div>
     <div class="form-row">
         @php($SteadFast = optional($SteadFast ?? null))

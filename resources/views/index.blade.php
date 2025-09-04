@@ -4,11 +4,90 @@
 
 @push('styles')
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <style>
+    .content-accordion .card {
+      border: 1px solid #e3e3e3;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .content-accordion .card-header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e3e3e3;
+      padding: 1rem 1.5rem;
+      border-radius: 8px 8px 0 0;
+    }
+    .content-accordion .btn-link {
+      color: #333;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      text-align: left;
+      padding: 0;
+      background: none;
+      border: none;
+    }
+    .content-accordion .btn-link:hover {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .content-accordion .btn-link:focus {
+      box-shadow: none;
+      outline: none;
+    }
+    .content-accordion .btn-link::after {
+      content: '−';
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #666;
+    }
+    .content-accordion .btn-link.collapsed::after {
+      content: '+';
+    }
+    .content-accordion .card-body {
+      padding: 1.5rem;
+      line-height: 1.6;
+      color: #555;
+      font-size: 0.95rem;
+    }
+    .content-accordion .collapse.show {
+      display: block;
+    }
+    .content-accordion .card-body h1,
+    .content-accordion .card-body h2,
+    .content-accordion .card-body h3,
+    .content-accordion .card-body h4,
+    .content-accordion .card-body h5,
+    .content-accordion .card-body h6 {
+      color: #333;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .content-accordion .card-body p {
+      margin-bottom: 1rem;
+    }
+    .content-accordion .card-body ul,
+    .content-accordion .card-body ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+    .content-accordion .card-body li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
 @endpush
 
 @section('content')
 
 @include('partials.slides')
+
+@if(isOninda() && config('app.resell') && auth('user')->guest())
+@include('partials.auth-forms')
+@endif
 
 <!-- .block-features -->
 @if(($services = setting('services'))->enabled ?? false)
@@ -35,7 +114,13 @@
     </div>
 </div><!-- .block-features / end -->
 @endif
-
+@if(isOninda())
+<div class="block">
+    <div class="container">
+        <x-reseller-verification-alert />
+    </div>
+</div>
+@endif
 @if(($show_option = setting('show_option'))->category_carousel ?? false)
 <div class="block block-products-carousel" data-layout="grid-cat">
     <div class="container">
@@ -127,6 +212,29 @@
         </div>
     </div>
 </div>
+@endif
+@if ($section->type == 'content')
+@php($page = \App\Models\Page::find($section->data->page_id ?? null))
+@if($page)
+<div class="block">
+    <div class="container">
+        <div class="accordion content-accordion" id="content-accordion-{{ $section->id }}">
+            <div class="card">
+                <div class="card-header" id="heading-{{ $section->id }}">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ $section->id }}" aria-expanded="true" aria-controls="collapse-{{ $section->id }}">
+                        {{ $page->title }}
+                    </button>
+                </div>
+                <div id="collapse-{{ $section->id }}" class="collapse show" aria-labelledby="heading-{{ $section->id }}" data-parent="#content-accordion-{{ $section->id }}">
+                    <div class="card-body">
+                        {!! $page->content !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @endif
 <!-- .block-products-carousel / end -->
 @endforeach

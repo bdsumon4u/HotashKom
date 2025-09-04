@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use App\Events\ProductCreated;
+use App\Jobs\RemoveResourceFromResellers;
+use App\Jobs\SyncProductStockWithResellers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\App;
 use Laravel\Scout\Searchable;
 use Nicolaslopezj\Searchable\SearchableTrait;
 
@@ -18,8 +18,20 @@ class Product extends Model
     protected $with = ['images'];
 
     protected $fillable = [
-        'brand_id', 'name', 'slug', 'description', 'price', 'selling_price', 'wholesale', 'sku',
-        'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'shipping_inside', 'shipping_outside', 'delivery_text',
+        'brand_id', 'name', 'slug', 'description', 'price', 'average_purchase_price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
+        'source_id', 'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'hot_sale', 'new_arrival', 'shipping_inside', 'shipping_outside', 'delivery_text',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_active' => 'boolean',
+        'hot_sale' => 'boolean',
+        'new_arrival' => 'boolean',
+        'should_track' => 'boolean',
     ];
 
     /**
@@ -47,24 +59,25 @@ class Product extends Model
      *
      * @return void
      */
-    protected static function booted()
+    public static function booted()
     {
         static::saved(function ($product): void {
-            if (App::runningInConsole() && ($product->categories->isEmpty() || $product->images->isEmpty())) {
-                $categories = range(1, 30);
-                $categories = array_map(fn ($key) => $categories[$key], array_rand($categories, mt_rand(2, 4)));
-                $additionals = range(47, 67);
-                $additionals = array_map(fn ($key) => $additionals[$key], array_rand($additionals, mt_rand(4, 7)));
-                ProductCreated::dispatch($product, [
-                    'categories' => $categories,
-                    'base_image' => mt_rand(47, 67),
-                    'additional_images' => $additionals,
-                ]);
+            // Dispatch job to sync stock attributes if they were changed
+            if (isOninda() && $product->isDirty(['should_track', 'stock_count'])) {
+                SyncProductStockWithResellers::dispatch($product);
             }
         });
 
-        static::deleting(function ($product): void {
-            $product->variations->each->delete();
+        static::deleting(function ($record): void {
+            if (! isOninda() && $record->source_id !== null) {
+                throw new \Exception('Cannot delete a resource that has been sourced.');
+            }
+
+            // Dispatch job to remove product from reseller databases
+            if (! $record->parent_id && isOninda()) { // not a variation
+                RemoveResourceFromResellers::dispatch($record->getTable(), $record->id);
+            }
+            $record->variations->each->delete();
         });
 
         static::addGlobalScope('latest', function (Builder $builder): void {
@@ -164,6 +177,13 @@ class Product extends Model
         return $this->belongsToMany(Option::class);
     }
 
+    public function purchases()
+    {
+        return $this->belongsToMany(Purchase::class, 'product_purchase')
+            ->withPivot(['price', 'quantity', 'subtotal'])
+            ->withTimestamps();
+    }
+
     protected function wholesale(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
@@ -178,7 +198,7 @@ class Product extends Model
             ];
         }, set: function ($value) {
             $data = [];
-            foreach ($value['quantity'] as $key => $quantity) {
+            foreach (($value['quantity'] ?? []) as $key => $quantity) {
                 $data[$quantity] = $value['price'][$key];
             }
             ksort($data);
@@ -199,6 +219,33 @@ class Product extends Model
         }
 
         return $price;
+    }
+
+    public function retailPrice(): int
+    {
+        $price = $this->suggested_price;
+
+        if (is_string($price) && preg_match('/^\s*(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*$/', $price, $matches)) {
+            $low = (float) $matches[1];
+            $high = (float) $matches[2];
+
+            return (int) round(($low + $high) / 2);
+        }
+
+        if (is_numeric($price) && $price > 0) {
+            return (int) round($price);
+        }
+
+        return (int) round($this->selling_price * 1.4);
+    }
+
+    public function suggestedRetailPrice(): string
+    {
+        if ($this->suggested_price) {
+            return '৳'.$this->suggested_price;
+        }
+
+        return sprintf('৳%d - ৳%d', round($this->selling_price * 1.3), round($this->selling_price * 1.5));
     }
 
     protected function baseImage(): \Illuminate\Database\Eloquent\Casts\Attribute
@@ -244,5 +291,25 @@ class Product extends Model
     public function shouldBeSearchable()
     {
         return $this->is_active;
+    }
+
+    public static function stockStatistics(): array
+    {
+        $products = static::where('should_track', true)->where('stock_count', '>', 0)->get([
+            'id', 'stock_count', 'average_purchase_price', 'selling_price',
+        ]);
+        $totalStockCount = $products->sum('stock_count');
+        $totalPurchaseValue = $products->sum(function ($product) {
+            return $product->stock_count * ($product->average_purchase_price ?? $product->selling_price);
+        });
+        $totalSellValue = $products->sum(function ($product) {
+            return $product->stock_count * $product->selling_price;
+        });
+
+        return [
+            'totalStockCount' => $totalStockCount,
+            'totalPurchaseValue' => theMoney($totalPurchaseValue),
+            'totalSellValue' => theMoney($totalSellValue),
+        ];
     }
 }

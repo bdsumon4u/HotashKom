@@ -214,7 +214,7 @@
                     success: function (data) {
                       $(document).find('[rename="'+id+'"] span').text('Rename');
                         $('.dataTable').DataTable().ajax.reload();
-                        
+
                         $.notify('<i class="mr-1 fa fa-bell-o"></i> Image renamed', {
                             type: 'success',
                             allow_dismiss: true,

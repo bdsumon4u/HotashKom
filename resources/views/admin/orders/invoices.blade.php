@@ -54,6 +54,7 @@
   </head>
   <body class="light-only" main-theme-layout="ltr">
     @foreach ($orders as $order)
+        @php require resource_path('views/admin/orders/reseller-info.php') @endphp
         <div class="invoice {{ ['page-break bt', 'pb-2', 'bt pb-2'][$loop->iteration % 3] }}">
             <div>
                 <div>
@@ -61,19 +62,24 @@
                         <div class="col-5">
                             <div class="media">
                                 <div class="media-left">
-                                    <img class="media-object" src="{{asset($logo->mobile)}}" alt="{{$company->name}}" style="max-width: 100%; max-height: 54px;">
+                                    @if($logoUrl)
+                                        <img class="media-object" src="{{ $logoUrl }}" alt="{{ $companyName }}" style="max-width: 100%; max-height: 54px;">
+                                    @endif
                                 </div>
                                 <div class="media-body m-l-20">
-                                    <h4 class="media-heading">{{ $company->name }}</h4>
-                                    <p class="m-0"><span class="digits">{{ $company->phone }}</span></p>
-                                    <p class="m-0">{{ $company->address }}</p>
+                                    <h4 class="media-heading">{{ $companyName }}</h4>
+                                    <p class="m-0"><span class="digits">{{ $phoneNumber }}</span></p>
+                                    <p class="m-0">{{ $address }}</p>
                                 </div>
                             </div>
                             <!-- End Info-->
                         </div>
                         <div class="col-3">
                             <div class="text-md-right">
-                                <h3>Invoice #<span class="digits counter">{{ $order->id }}</span></h3>
+                                <h3 class="mb-0">Invoice #<span class="digits counter">{{ $order->id }}</span></h3>
+                                @if(isOninda() && $order->source_id)
+                                    <strong>Source ID: #{{ $order->user->order_prefix.$order->source_id }}</strong><br>
+                                @endif
                                 <p>
                                     Ordered At: {{ $order->created_at->format('M') }}<span class="digits"> {{ $order->created_at->format('d, Y') }}</span>
                                     {{--                                            <br> Invoiced At: {{ date('M') }}<span class="digits"> {{ date('d, Y') }}</span>--}}
@@ -88,10 +94,10 @@
                         </div>
                     </div>
                 </div>
-                <hr>
+                <hr class="my-2">
                 <!-- End InvoiceTop-->
                 <div class="row">
-                    <div class="col-7">
+                    <div class="col-4">
                         <div class="media">
                             <div class="media-body m-l-20">
                                 <h6 class="mb-0">Customer Information:</h6>
@@ -101,10 +107,35 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-4">
+
+                    </div>
+                    @if(isOninda() && !(setting('show_option')->resellers_invoice ?? false))
+                    <div class="col-4">
+                        <div class="media">
+                            <div class="media-body m-l-20">
+                                <h6 class="mb-0">Sender's Information:</h6>
+                                <div class="media-heading">Name: {{ $senderName }}</div>
+                                <div>Phone: {{ $senderPhone }}</div>
+                                <div>Address: {{ $senderAddress }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                @if(isOninda() && (setting('show_option')->resellers_invoice ?? false))
+                <div class="row">
+                    <div class="col-12">
                         <span class="text-danger">{{$order->note ?? null}}</span>
                     </div>
                 </div>
+                @else
+                <div class="row">
+                    <div class="col-12">
+                        <span class="text-danger">{{$order->note ?? null}}</span>
+                    </div>
+                </div>
+                @endif
                 <!-- End Invoice Mid-->
                 <div>
                     <div class="table-responsive invoice-table" id="table">
@@ -121,6 +152,7 @@
                             </tr>
                             </thead>
                             <tbody>
+                            @php($retail = 0)
                             @foreach($order->products as $product)
                                 <tr>
                                     @unless (setting('show_option')->hide_invoice_image ?? false)
@@ -129,10 +161,11 @@
                                     </td>
                                     @endunless
                                     <td>{{ $product->name }}</td>
-                                    <td>{{ $product->price }}</td>
+                                    <td>{{ (isOninda() && config('app.resell')) ? ($product->retail_price ?? $product->price) : $product->price }}</td>
                                     <td>{{ $product->quantity }}</td>
-                                    <td>{{ $product->quantity * $product->price }}</td>
+                                    <td>{{ $amount = $product->quantity * ((isOninda() && config('app.resell')) ? ($product->retail_price ?? $product->price) : $product->price) }}</td>
                                 </tr>
+                            @php($retail += $amount)
                             @endforeach
                             <tr>
                                 <th class="py-1" rowspan="5" colspan="{{(setting('show_option')->hide_invoice_image ?? false)?2:3}}" style="text-align: center; vertical-align: middle; font-size: 24px;">
@@ -141,7 +174,7 @@
                             </tr>
                             <tr>
                                 <th class="py-1">Subtotal</th>
-                                <th class="py-1">{{ $order->data['subtotal'] }}</th>
+                                <th class="py-1">{{ $retail }}</th>
                             </tr>
                             <tr>
                                 <th class="py-1">Advanced</th>
@@ -149,11 +182,11 @@
                             </tr>
                             <tr>
                                 <th class="py-1">Delivery</th>
-                                <th class="py-1">{{ $order->data['shipping_cost'] }}</th>
+                                <th class="py-1">{{ (isOninda() && config('app.resell')) ? ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost']) : $order->data['shipping_cost'] }}</th>
                             </tr>
                             <tr>
                                 <th class="py-1">Discount</th>
-                                <th class="py-1">{{ $order->data['discount'] ?? 0 }}</th>
+                                <th class="py-1">{{ (isOninda() && config('app.resell')) ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0) }}</th>
                             </tr>
                             </tbody>
                         </table>
@@ -169,23 +202,24 @@
         window.onload = function () {
             window.print();
         };
-        window.onfocus = function() {
-            window.close();
-        };
         window.onafterprint = function() {
-            if (confirm('Update status to INVOCED?')) {
-                $.post({
+            if (confirm('Update status to INVOICED?')) {
+                $.ajax({
                     url: '{{ route('admin.orders.status') }}',
+                    method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
                         order_id: {!! json_encode(explode(',', request('order_id'))) !!},
                         status: 'INVOICED',
                     },
                     success: function (response) {
+                        console.log('Status updated successfully');
                         window.location.href = '{{ route('admin.orders.index', ['status' => 'INVOICED']) }}';
                     },
-                    complete: function () {
-                        
+                    error: function (xhr, status, error) {
+                        console.error('Error updating status:', error);
+                        alert('Failed to update status. Please try again.');
+                        window.close();
                     }
                 });
             } else {
