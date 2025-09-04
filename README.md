@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}374}$$ 🔥 domains are live now
+These 🔥 $${\color{red}378}$$ 🔥 domains are live now
 
-_Last updated: **2025-09-03 08:58:51 Asia/Dhaka**_
+_Last updated: **2025-09-04 08:59:12 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -473,3 +473,7 @@ _Last updated: **2025-09-03 08:58:51 Asia/Dhaka**_
 | 372 | [chineexe.com](http://chineexe.com) |
 | 373 | [gogonmart.com](http://gogonmart.com) |
 | 374 | [etkmart.com](http://etkmart.com) |
+| 375 | [trandytrade.com](http://trandytrade.com) |
+| 376 | [sohozkroy.com](http://sohozkroy.com) |
+| 377 | [ekingdombd.com](http://ekingdombd.com) |
+| 378 | [croymart.com](http://croymart.com) |
