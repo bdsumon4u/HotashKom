@@ -7,7 +7,7 @@ echo "Deploying application ..."
 if [ "$1" = "--dev" ]; then
     branch="dev"
 else
-    branch="wholesale"
+    branch="master"
 fi
 
 # Enter maintenance mode
@@ -19,6 +19,9 @@ fi
 
     # Install dependencies based on lock file
     /opt/alt/php83/usr/bin/php /opt/cpanel/composer/bin/composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress $(if [ branch != "dev" ]; then echo "--no-dev"; fi)
+
+    # Ensure all tables use InnoDB before running migrations
+    /opt/alt/php83/usr/bin/php artisan db:convert-innodb || true
 
     # Migrate database
     /opt/alt/php83/usr/bin/php artisan migrate --force
