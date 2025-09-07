@@ -341,10 +341,11 @@ class OrderController extends Controller
         }
 
         if (setting('Pathao')->enabled ?? false) {
-            $orders = [];
-            foreach (Order::whereIn('id', $order_ids)->where('data->courier', 'Pathao')->get() as $order) {
+            $pathaoData = [];
+            $pathaoOrders = Order::whereIn('id', $order_ids)->where('data->courier', 'Pathao')->get();
+            foreach ($pathaoOrders as $order) {
                 // try {
-                    $orders[] = $this->pathao($order);
+                    $pathaoData[] = $this->pathao($order);
                     $booked++;
                 // } catch (\App\Pathao\Exceptions\PathaoException $e) {
                 //     $errors = collect($e->errors)->values()->flatten()->toArray();
@@ -365,9 +366,9 @@ class OrderController extends Controller
             }
 
             try {
-                \App\Pathao\Facade\Pathao::order()->bulk($orders);
+                \App\Pathao\Facade\Pathao::order()->bulk($pathaoData);
 
-                Order::whereIn('id', $order_ids)->where('data->courier', 'Pathao')->update([
+                $pathaoOrders->each->update([
                     'data' => [
                         'consignment_id' => 'PENDING',
                     ],
@@ -378,6 +379,10 @@ class OrderController extends Controller
                 if ($message == 'Too many attempts') {
                     $message = 'Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.';
                 }
+            } catch (\Exception $e) {
+                // return back()->withDanger($e->getMessage());
+                Log::error($e->getMessage());
+                $error = true;
             }
         }
 
