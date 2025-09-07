@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}431}$$ 🔥 domains are live now
+These 🔥 $${\color{red}436}$$ 🔥 domains are live now
 
-_Last updated: **2025-09-06 08:57:44 Asia/Dhaka**_
+_Last updated: **2025-09-07 09:06:06 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -530,3 +530,8 @@ _Last updated: **2025-09-06 08:57:44 Asia/Dhaka**_
 | 429 | [ekingdombd.com](http://ekingdombd.com) |
 | 430 | [croymart.com](http://croymart.com) |
 | 431 | [faceparkbd.com](http://faceparkbd.com) |
+| 432 | [hnemart.com](http://hnemart.com) |
+| 433 | [jannathut.com](http://jannathut.com) |
+| 434 | [shokherebazar.com](http://shokherebazar.com) |
+| 435 | [rienterprise.com](http://rienterprise.com) |
+| 436 | [dhakauddokta.com](http://dhakauddokta.com) |
