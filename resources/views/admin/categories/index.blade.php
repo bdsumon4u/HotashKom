@@ -339,7 +339,7 @@
                                                         </div>
                                                         <button type="submit"
                                                             class="ml-auto btn btn-sm btn-success d-block"><i
-                                                                class="fa fa-check"></i> Edit</button>
+                                                                class="fa fa-check"></i> Submit</button>
                                                     </form>
                                                 </div>
                                             @endif

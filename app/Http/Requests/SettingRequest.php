@@ -59,6 +59,7 @@ class SettingRequest extends FormRequest
             return [
                 'gtm_id' => 'sometimes',
                 'pixel_ids' => 'sometimes',
+                'scripts' => 'sometimes',
             ];
         }
 
@@ -109,7 +110,6 @@ class SettingRequest extends FormRequest
             'show_option' => 'required|array',
             'discount_text' => 'required',
             'services' => 'required|array',
-            'scripts' => 'nullable',
         ];
     }
 }

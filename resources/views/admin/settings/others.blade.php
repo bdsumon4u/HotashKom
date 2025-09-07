@@ -216,13 +216,4 @@
             </div>
         @endforeach
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group">
-                <label for="scripts">Custom Scripts</label>
-                <x-textarea name="scripts" id="scripts">{{ $scripts ?? null }}</x-textarea>
-                <x-error field="scripts" />
-            </div>
-        </div>
-    </div>
 </div>
