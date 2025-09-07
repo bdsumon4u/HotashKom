@@ -341,49 +341,49 @@ class OrderController extends Controller
         }
 
         if (setting('Pathao')->enabled ?? false) {
-            $pathaoData = [];
+            // $pathaoData = [];
             $pathaoOrders = Order::whereIn('id', $order_ids)->where('data->courier', 'Pathao')->get();
             foreach ($pathaoOrders as $order) {
-                // try {
-                    $pathaoData[] = $this->pathao($order);
+                try {
+                    $this->pathao($order);
                     $booked++;
-                // } catch (\App\Pathao\Exceptions\PathaoException $e) {
-                //     $errors = collect($e->errors)->values()->flatten()->toArray();
-                //     $message = $errors[0] ?? $e->getMessage();
-                //     if ($message == 'Too many attempts') {
-                //         $message = 'Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.';
-                //     }
+                } catch (\App\Pathao\Exceptions\PathaoException $e) {
+                    $errors = collect($e->errors)->values()->flatten()->toArray();
+                    $message = $errors[0] ?? $e->getMessage();
+                    if ($message == 'Too many attempts') {
+                        $message = 'Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.';
+                    }
 
-                //     // return back()->withDanger($message);
-                //     Log::error($e->getMessage());
-                //     Log::error($message);
-                //     $error = true;
-                // } catch (\Exception $e) {
-                //     // return back()->withDanger($e->getMessage());
-                //     Log::error($e->getMessage());
-                //     $error = true;
-                // }
-            }
-
-            try {
-                \App\Pathao\Facade\Pathao::order()->bulk($pathaoData);
-
-                $pathaoOrders->each->update([
-                    'data' => [
-                        'consignment_id' => 'PENDING',
-                    ],
-                ]);
-            } catch (\App\Pathao\Exceptions\PathaoException $e) {
-                $errors = collect($e->errors)->values()->flatten()->toArray();
-                $message = $errors[0] ?? $e->getMessage();
-                if ($message == 'Too many attempts') {
-                    $message = 'Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.';
+                    // return back()->withDanger($message);
+                    Log::error($e->getMessage());
+                    Log::error($message);
+                    $error = true;
+                } catch (\Exception $e) {
+                    // return back()->withDanger($e->getMessage());
+                    Log::error($e->getMessage());
+                    $error = true;
                 }
-            } catch (\Exception $e) {
-                // return back()->withDanger($e->getMessage());
-                Log::error($e->getMessage());
-                $error = true;
             }
+
+            // try {
+            //     \App\Pathao\Facade\Pathao::order()->bulk($pathaoData);
+
+            //     $pathaoOrders->each->update([
+            //         'data' => [
+            //             'consignment_id' => 'PENDING',
+            //         ],
+            //     ]);
+            // } catch (\App\Pathao\Exceptions\PathaoException $e) {
+            //     $errors = collect($e->errors)->values()->flatten()->toArray();
+            //     $message = $errors[0] ?? $e->getMessage();
+            //     if ($message == 'Too many attempts') {
+            //         $message = 'Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.';
+            //     }
+            // } catch (\Exception $e) {
+            //     // return back()->withDanger($e->getMessage());
+            //     Log::error($e->getMessage());
+            //     $error = true;
+            // }
         }
 
         if (setting('Redx')->enabled ?? config('redx.enabled')) {
@@ -482,7 +482,7 @@ class OrderController extends Controller
 
     private function pathao($order): array
     {
-        return $data = [
+        $data = [
             'store_id' => setting('Pathao')->store_id, // Find in store list,
             'merchant_order_id' => $order->id, // Unique order id
             'recipient_name' => $order->name ?? 'N/A', // Customer name
@@ -510,6 +510,8 @@ class OrderController extends Controller
                 'consignment_id' => $data->consignment_id,
             ],
         ]);
+
+        return [];
     }
 
     private function redx($order): void
