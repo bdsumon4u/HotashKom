@@ -12,42 +12,156 @@
 @push('styles')
 <style>
 @media print {
+    @page {
+        margin: 0.3in !important;
+        size: A4 !important;
+    }
+
     html, body {
-        /* height:100vh; */
         margin: 0 !important;
         padding: 0 !important;
-        /* overflow: hidden; */
+        font-size: 14px !important;
     }
+
     .main-nav {
         display: none !important;
         width: 0 !important;
     }
+
     .page-body {
-        font-size: 14px;
-        margin-top: 0 !important;
-        margin-left: 0 !important;
+        font-size: 14px !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
+
     .page-break {
         page-break-after: always;
         border-top: 2px dashed #000;
     }
 
-    .page-main-header, .page-header, .card-header, .footer-fix {
+    .page-main-header, .page-header, .footer-fix {
         display: none !important;
     }
 
+    /* Table styling for print */
+    .table {
+        width: 100% !important;
+        table-layout: fixed !important;
+        font-size: 12px !important;
+    }
+
     th, td {
-        padding: 0.25rem !important;
+        padding: 4px 6px !important;
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+        white-space: normal !important;
+        vertical-align: top !important;
+    }
+
+    /* Column width adjustments for better fit */
+    .table th:nth-child(1), .table td:nth-child(1) { width: 5% !important; } /* SI */
+    .table th:nth-child(2), .table td:nth-child(2) { width: 7% !important; } /* ID */
+    .table th:nth-child(3), .table td:nth-child(3) { width: 16% !important; } /* Customer */
+    .table th:nth-child(4), .table td:nth-child(4) { width: 18% !important; } /* Address */
+    .table th:nth-child(5), .table td:nth-child(5) { width: 12% !important; } /* Note */
+    .table th:nth-child(6), .table td:nth-child(6) { width: 10% !important; } /* Courier */
+    .table th:nth-child(7), .table td:nth-child(7) { width: 10% !important; } /* Status */
+    .table th:nth-child(8), .table td:nth-child(8) { width: 8% !important; } /* Subtotal */
+    .table th:nth-child(9), .table td:nth-child(9) { width: 8% !important; } /* Delivery Charge */
+    .table th:nth-child(10), .table td:nth-child(10) { width: 8% !important; } /* Total */
+
+    /* For duplicate orders table (has Action column) - hide Action column in print */
+    .card-header .table th:nth-child(10), .card-header .table td:nth-child(10) {
+        display: none !important;
+    } /* Hide Action column */
+
+    .card-header .table th:nth-child(1), .card-header .table td:nth-child(1) { width: 8% !important; } /* ID */
+    .card-header .table th:nth-child(2), .card-header .table td:nth-child(2) { width: 15% !important; } /* Customer */
+    .card-header .table th:nth-child(3), .card-header .table td:nth-child(3) { width: 18% !important; } /* Address */
+    .card-header .table th:nth-child(4), .card-header .table td:nth-child(4) { width: 13% !important; } /* Note */
+    .card-header .table th:nth-child(5), .card-header .table td:nth-child(5) { width: 9% !important; } /* Courier */
+    .card-header .table th:nth-child(6), .card-header .table td:nth-child(6) { width: 9% !important; } /* Status */
+    .card-header .table th:nth-child(7), .card-header .table td:nth-child(7) { width: 7% !important; } /* Subtotal */
+    .card-header .table th:nth-child(8), .card-header .table td:nth-child(8) { width: 7% !important; } /* Delivery Charge */
+    .card-header .table th:nth-child(9), .card-header .table td:nth-child(9) { width: 7% !important; } /* Total */
+
+    /* Card styling */
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        page-break-inside: avoid;
+    }
+
+    .card-header {
+        background-color: #f8f9fa !important;
+        border-bottom: 1px solid #000 !important;
+        padding: 5px !important;
+    }
+
+    .card-body, .card-footer {
+        padding: 5px !important;
+    }
+
+    /* Hide print button and form elements */
+    .btn, .form-control {
+        display: none !important;
+    }
+
+    /* Show only the table content */
+    .card-header .border {
+        display: block !important;
     }
 
     a {
         text-decoration: none !important;
+        color: #000 !important;
+    }
+
+    /* Ensure text wrapping for long content */
+    .table td {
+        max-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Summary row styling */
+    .summary th {
+        background-color: #f8f9fa !important;
+        font-weight: bold !important;
+        border-top: 2px solid #000 !important;
+    }
+
+    /* Print header styles */
+    .print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #000;
+    }
+
+    .print-header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .print-header .date {
+        font-size: 14px;
+        color: #666;
+        margin-top: 5px;
     }
 }
 </style>
 @endpush
 
 @section('content')
+<!-- Print Header (hidden on screen, visible when printing) -->
+<div class="print-header" style="display: none;">
+    <h1>Scanning Report</h1>
+    <div class="date">Generated on: {{ now()->format('F j, Y \a\t g:i A') }}</div>
+</div>
+
 <div class="mb-5 row">
     <div class="mx-auto col-md-12">
         <div class="reports-table">
@@ -59,8 +173,7 @@
                             <thead>
                                 <tr>
                                     <th style="min-width: 50px;">ID</th>
-                                    <th>Name</th>
-                                    <th>Phone</th>
+                                    <th>Customer</th>
                                     <th>Address</th>
                                     <th>Note</th>
                                     <th style="min-width: 80px;">Courier</th>
@@ -97,8 +210,7 @@
                                 <tr>
                                     <th style="min-width: 50px;">SI</th>
                                     <th style="min-width: 50px;">ID</th>
-                                    <th>Name</th>
-                                    <th>Phone</th>
+                                    <th>Customer</th>
                                     <th>Address</th>
                                     <th>Note</th>
                                     <th style="min-width: 80px;">Courier</th>
@@ -144,10 +256,14 @@
         console.log('Scanning report initialized - isOninda:', isOninda);
 
         function cardPrint() {
+            // Show print header
+            $('.print-header').show();
+
             var printContents = document.getElementById('section-to-print').innerHTML;
+            var printHeader = document.querySelector('.print-header').outerHTML;
             var originalContents = document.body.innerHTML;
 
-            document.body.innerHTML = printContents;
+            document.body.innerHTML = printHeader + printContents;
 
             setTimeout(() => {
                 window.print();
@@ -208,7 +324,7 @@
             }
             var couriers = new Set();
             $('.card-body table tbody tr:not(:last-child)').each(function (index, tr) {
-                couriers.add($(tr).find('td:nth-child(5)').text());
+                couriers.add($(tr).find('td:nth-child(6)').text());
             });
             couriers = Array.from(couriers).filter((item) => item != 'N/A').join(', ').trim(', ');
             var courier = 'N/A';
@@ -217,7 +333,7 @@
             }
             var statuses = new Set();
             $('.card-body table tbody tr:not(:last-child)').each(function (index, tr) {
-                statuses.add($(tr).find('td:nth-child(6)').text());
+                statuses.add($(tr).find('td:nth-child(7)').text());
             });
             statuses = Array.from(statuses).filter((item) => item != 'N/A').join(', ').trim(', ');
             var status = 'N/A';
@@ -262,8 +378,7 @@
                 var tr = `
                     <tr data-id="${order.id}">
                         <td><a target="_blank" href="{{route('admin.orders.show', '')}}/${order.id}">${order.id}</a></td>
-                        <td>${order.name}</td>
-                        <td>${order.phone}</td>
+                        <td><strong>${order.name}</strong><br><small class="text-muted">${order.phone}</small></td>
                         <td>${order.address}</td>
                         <td>${order.note ?? 'N/A'}</td>
                         <td>${order.data.courier ?? 'N/A'}</td>
@@ -323,8 +438,7 @@
                 <tr data-id="${order.id}" class="${phones.includes(order.phone) ? 'border border-danger' : ''}">
                     <td>${1+$('.card-body table tbody tr').length}</td>
                     <td><a target="_blank" href="{{route('admin.orders.show', '')}}/${order.id}">${order.id}</a></td>
-                    <td>${order.name}</td>
-                    <td>${order.phone}</td>
+                    <td><strong>${order.name}</strong><br><small class="text-muted">${order.phone}</small></td>
                     <td>${order.address}</td>
                     <td>${order.note ?? 'N/A'}</td>
                     <td>${order.data.courier ?? 'N/A'}</td>
@@ -341,7 +455,7 @@
             });
 
             if (! $('.card-body table tbody tr:last-child').hasClass('summary')) {
-                $('.card-body table tbody').append('<tr class="summary"><th colspan="8" class="text-right">Total</th><th>'+subtotal+'</th><th>'+shipping+'</th><th>'+total+'</th></tr>');
+                $('.card-body table tbody').append('<tr class="summary"><th colspan="7" class="text-right">Total</th><th>'+subtotal+'</th><th>'+shipping+'</th><th>'+total+'</th></tr>');
             } else {
                 $('.card-body table tbody tr:last-child').find('th:nth-child(2)').text(subtotal);
                 $('.card-body table tbody tr:last-child').find('th:nth-child(3)').text(shipping);
