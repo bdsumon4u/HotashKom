@@ -280,31 +280,34 @@ class ApiController extends Controller
         // ]);
         // $order->forceFill(['courier' => ['booking' => 'Pathao'] + $courier]);
 
-        if ($request->event == 'order.pickup-requested') {
+        if (in_array($request->event, ['order.created', 'order.pickup-requested'])) {
             $order->fill([
                 'status' => 'SHIPPING',
+                'shipped_at' => now(),
                 'data' => [
                     'consignment_id' => $request->consignment_id,
                 ],
             ]);
         } elseif ($request->event == 'order.pickup-cancelled') {
             $order->status = 'CANCELLED';
-            $order->status_at = now();
         } elseif ($request->event == 'order.on-hold') {
             $order->status = 'WAITING';
-            $order->status_at = now();
         } elseif ($request->event == 'order.delivered') {
             $order->status = 'DELIVERED';
-            $order->status_at = now();
+        } elseif ($request->event == 'order.partial-delivery') {
+            $order->status = 'PARTIAL_DELIVERY';
         } elseif ($request->event == 'order.paid') {
 
         } elseif ($request->event == 'order.returned') {
             $order->status = 'RETURNED';
-            $order->status_at = now();
             // TODO: add to stock
+        } else if ($request->event == 'order.paid-return') {
+            $order->status = 'PAID_RETURN';
         }
 
-        $order->save();
+        $order->update([
+            'status_at' => now(),
+        ]);
 
         return response()->json(['message' => 'Webhook processed'], 202)
             ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');

@@ -340,7 +340,7 @@ class Checkout extends Component
 
             $orderData = [
                 'courier' => 'Other',
-                'is_fraud' => $oldOrders->whereIn('status', ['CANCELLED', 'RETURNED'])->count() > 0,
+                'is_fraud' => $oldOrders->whereIn('status', ['CANCELLED', 'RETURNED', 'PAID_RETURN'])->count() > 0,
                 'is_repeat' => $oldOrders->count() > 0,
                 'shipping_area' => $data['shipping'],
                 'shipping_cost' => $this->shippingCost($data['shipping']),

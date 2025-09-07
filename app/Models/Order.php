@@ -159,7 +159,13 @@ class Order extends Model
                         'order_id' => $order->id,
                     ]);
                 }
-            } elseif ($status === 'RETURNED') {
+            } elseif ($status === 'PAID_RETURN') {
+                $withdrawAmount = $packagingCharge;
+                $order->user->forceWithdraw($withdrawAmount, [
+                    'reason' => 'Order #'.$order->id.' is '.$status,
+                    'order_id' => $order->id,
+                ]);
+            } elseif ($status === 'RETURNED' && $order->getOriginal('status') !== 'PAID_RETURN') {
                 $withdrawAmount = $shippingCost + $packagingCharge; // Charge shipping cost and packaging fee
                 if ($order->getOriginal('status') === 'DELIVERED') {
                     // Withdraw commission (what was paid on delivery) and Oninda's delivery fee and packaging charge

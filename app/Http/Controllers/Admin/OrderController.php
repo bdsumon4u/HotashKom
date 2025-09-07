@@ -8,6 +8,7 @@ use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use App\Models\Product;
 use App\Notifications\User\OrderConfirmed;
+use App\Pathao\Facade\Pathao;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -340,25 +341,42 @@ class OrderController extends Controller
         }
 
         if (setting('Pathao')->enabled ?? false) {
+            $orders = [];
             foreach (Order::whereIn('id', $order_ids)->where('data->courier', 'Pathao')->get() as $order) {
-                try {
-                    $this->pathao($order);
+                // try {
+                    $orders[] = $this->pathao($order);
                     $booked++;
-                } catch (\App\Pathao\Exceptions\PathaoException $e) {
-                    $errors = collect($e->errors)->values()->flatten()->toArray();
-                    $message = $errors[0] ?? $e->getMessage();
-                    if ($message == 'Too many attempts') {
-                        $message = 'Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.';
-                    }
+                // } catch (\App\Pathao\Exceptions\PathaoException $e) {
+                //     $errors = collect($e->errors)->values()->flatten()->toArray();
+                //     $message = $errors[0] ?? $e->getMessage();
+                //     if ($message == 'Too many attempts') {
+                //         $message = 'Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.';
+                //     }
 
-                    // return back()->withDanger($message);
-                    Log::error($e->getMessage());
-                    Log::error($message);
-                    $error = true;
-                } catch (\Exception $e) {
-                    // return back()->withDanger($e->getMessage());
-                    Log::error($e->getMessage());
-                    $error = true;
+                //     // return back()->withDanger($message);
+                //     Log::error($e->getMessage());
+                //     Log::error($message);
+                //     $error = true;
+                // } catch (\Exception $e) {
+                //     // return back()->withDanger($e->getMessage());
+                //     Log::error($e->getMessage());
+                //     $error = true;
+                // }
+            }
+
+            try {
+                \App\Pathao\Facade\Pathao::order()->bulk($orders);
+
+                Order::whereIn('id', $order_ids)->where('data->courier', 'Pathao')->update([
+                    'data' => [
+                        'consignment_id' => 'PENDING',
+                    ],
+                ]);
+            } catch (\App\Pathao\Exceptions\PathaoException $e) {
+                $errors = collect($e->errors)->values()->flatten()->toArray();
+                $message = $errors[0] ?? $e->getMessage();
+                if ($message == 'Too many attempts') {
+                    $message = 'Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.';
                 }
             }
         }
@@ -457,9 +475,9 @@ class OrderController extends Controller
         return count($data['data'] ?? []);
     }
 
-    private function pathao($order): void
+    private function pathao($order): array
     {
-        $data = [
+        return $data = [
             'store_id' => setting('Pathao')->store_id, // Find in store list,
             'merchant_order_id' => $order->id, // Unique order id
             'recipient_name' => $order->name ?? 'N/A', // Customer name
@@ -705,7 +723,7 @@ class OrderController extends Controller
                 // where order_id is less than $order->id and status is CANCELLED or RETURNED
                 $order->update([
                     'data' => [
-                        'is_fraud' => $orders->where('id', '<', $order->id)->whereIn('status', ['CANCELLED', 'RETURNED'])->count() > 0,
+                        'is_fraud' => $orders->where('id', '<', $order->id)->whereIn('status', ['CANCELLED', 'RETURNED', 'PAID_RETURN'])->count() > 0,
                         'is_repeat' => $orders->where('id', '<', $order->id)->count() > 0,
                     ],
                 ]);
