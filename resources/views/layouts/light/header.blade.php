@@ -1,5 +1,5 @@
 <div class="page-main-header">
-  <div class="main-header-right row m-0">
+  <div class="m-0 main-header-right row">
     <form class="form-inline search-full" action="#" method="get">
       <div class="form-group w-100">
         <div class="Typeahead Typeahead--twitterUsers">
@@ -20,21 +20,21 @@
       </div>
       <button style="padding:2px 10px;border:none;background:none;" class="toggler-sidebar" id="sidebar-toggler"><i class="status_toggle middle" data-feather="grid"> </i></button>
     </div>
-    <div class="left-menu-header col horizontal-wrapper pl-0">
+    <div class="pl-0 left-menu-header col horizontal-wrapper">
       <ul class="horizontal-menu">
-        <li class=""><a class="nav-link text-nowrap" href="{{ url('/') }}" target="_blank">Store Front</a></li>
+        <li class=""><a class="nav-link text-nowrap" href="{{ url('/') }}">Store Front</a></li>
       </ul>
     </div>
     <div class="nav-right col-8 pull-right right-menu">
-      <ul class="nav-menus mr-0">
+      <ul class="mr-0 nav-menus">
 
         <li>
-          <a href="{{ route('admin.orders.create') }}" class="border px-2 py-1">
+          <a href="{{ route('admin.orders.create') }}" class="px-2 py-1 border">
             <i class="fa fa-plus"></i>
           </a>
         </li>
         <li class="maximize"><a class="text-dark" href="#!" onclick="javascript:toggleFullScreen()"><i data-feather="maximize"></i></a></li>
-        <li class="profile-nav onhover-dropdown p-0">
+        <li class="p-0 profile-nav onhover-dropdown">
           <div class="media profile-media">
             <img class="b-r-10" src="{{asset('assets/images/dashboard/profile.jpg')}}" alt="">
             <div class="media-body">

@@ -205,7 +205,7 @@
                         <a class="nav-link menu-title link-nav {{ request()->is('admin/staffs') ? 'active' : '' }}"
                             href="{{ route('admin.staffs.index') }}">
                             <i data-feather="users"> </i>
-                            <span>Staffs</span>
+                            <span>Panel Users</span>
                         </a>
                     </li>
 
@@ -213,7 +213,7 @@
                         <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.customers' ? 'active' : '' }}"
                             href="{{ route('admin.customers') }}">
                             <i data-feather="users"> </i>
-                            <span>Customers</span>
+                            <span>Customer List</span>
                         </a>
                     </li>
                     @if (isOninda())
