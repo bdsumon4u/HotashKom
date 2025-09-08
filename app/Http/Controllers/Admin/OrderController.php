@@ -448,7 +448,7 @@ class OrderController extends Controller
             'recipient_address' => $order->address ?? 'N/A',
             'recipient_phone' => $order->phone ?? '',
             'cod_amount' => $this->calculateOrderCollectionAmount($order),
-            // 'note' => $order->note,
+            'note' => '', // $order->note,
         ])->toJson();
 
         $response = Http::withHeaders([
