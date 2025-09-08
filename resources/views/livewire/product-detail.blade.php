@@ -146,16 +146,16 @@
                     $phone = strlen($phone) == 11 ? '88' . $phone : $phone;
                     $messenger = $company->messenger ?? '';
                 @endphp
-                <div class="gap-2 mt-2 d-flex justify-content-center">
+                <div class="gap-2 my-2 d-flex justify-content-center">
                     @if(strlen($messenger) > 13)
                     <a href="{{$messenger}}" target="_blank" rel="noopener"
-                        class="btn btn-outline-primary d-flex align-items-center" style="min-width: 140px;">
+                        class="mr-1 btn btn-primary d-flex align-items-center" style="min-width: 140px;">
                         <i class="mr-2 fab fa-facebook-messenger"></i> Messenger
                     </a>
                     @endif
                     <a href="https://api.whatsapp.com/send?phone={{ $phone }}&text=Hello+%0D%0AI+am+interested+in+ordering+%22{{ $product->name }}%22.%0D%0A%0D%0A{{ url()->current() }}"
                         target="_blank" rel="noopener"
-                        class="btn btn-outline-success d-flex align-items-center" style="min-width: 140px;">
+                        class="ml-1 btn btn-success d-flex align-items-center" style="min-width: 140px;">
                         <i class="mr-2 fab fa-whatsapp"></i> WhatsApp
                     </a>
                 </div>
