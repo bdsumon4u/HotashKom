@@ -221,7 +221,7 @@
                         <a class="nav-link d-flex menu-title link-nav {{ Route::currentRouteName() == 'admin.resellers.index' ? 'active' : '' }}"
                             href="{{ route('admin.resellers.index') }}">
                             <i data-feather="users"> </i>
-                            <span>Resellers</span>
+                            <span>Reseller List</span>
                         </a>
                     </li>
                     <li>
