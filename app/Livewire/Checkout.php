@@ -190,7 +190,7 @@ class Checkout extends Component
             cart()->addCost('deliveryFee', $this->shippingCost($this->shipping));
         }
 
-        if (isOninda() && config('app.resell')) {
+        if (isOninda() && config('app.resell') && auth('user')->check()) {
             /** @var User $reseller */
             $reseller = auth('user')->user();
             $this->retailDeliveryFee = $reseller->getShippingCost($this->shipping) ?: cart()->getCost('deliveryFee');
