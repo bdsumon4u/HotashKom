@@ -30,9 +30,31 @@ class MoneyRequestController extends Controller
         $transactions = Transaction::with('payable')
             ->where('type', 'withdraw')
             ->where('confirmed', false)
+            // Ensure we're filtering user withdrawals (polymorphic)
+            ->where('payable_type', (new User)->getMorphClass())
             ->orderBy('created_at', 'desc');
 
         return DataTables::of($transactions)
+            // Override ALL searching (global + per-column) to avoid referencing non-existent DB columns
+            ->filter(function ($query) {
+                $search = strtolower(request('search.value', ''));
+                if ($search === '' || $search === null) {
+                    return;
+                }
+
+                $query->where(function ($q) use ($search) {
+                    // Search by transaction id, amount, created_at
+                    $q->whereRaw('LOWER(CAST(`transactions`.`id` AS CHAR)) LIKE ?', ["%{$search}%"]) // id
+                        ->orWhereRaw('LOWER(CAST(`transactions`.`amount` AS CHAR)) LIKE ?', ["%{$search}%"]) // amount
+                        ->orWhereRaw('LOWER(DATE_FORMAT(`transactions`.`created_at`, "%Y-%m-%d %H:%i:%s")) LIKE ?', ["%{$search}%"]) // requested_at
+                        // Search related user (payable) fields
+                        ->orWhereHas('payable', function ($uq) use ($search) {
+                            $uq->whereRaw('LOWER(`name`) LIKE ?', ["%{$search}%"]) // reseller name
+                                ->orWhereRaw('LOWER(`shop_name`) LIKE ?', ["%{$search}%"]) // shop name
+                                ->orWhereRaw('LOWER(`bkash_number`) LIKE ?', ["%{$search}%"]); // bkash
+                        });
+                });
+            }, false)
             ->addIndexColumn()
             ->editColumn('id', fn ($row): string => $row->id)
             ->editColumn('reseller', function ($row): string {

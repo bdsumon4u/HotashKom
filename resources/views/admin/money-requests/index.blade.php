@@ -358,12 +358,12 @@
                 serverSide: true,
                 ajax: "{{ route('admin.money-requests.data') }}",
                 columns: [
-                    {data: 'id', name: 'id'},
-                    {data: 'reseller', name: 'reseller'},
-                    {data: 'bkash', name: 'bkash'},
-                    {data: 'amount', name: 'amount'},
-                    {data: 'requested_at', name: 'requested_at'},
-                    {data: 'status', name: 'status'},
+                    {data: 'id', name: 'id', searchable: false},
+                    {data: 'reseller', name: 'reseller', searchable: false},
+                    {data: 'bkash', name: 'bkash', searchable: false},
+                    {data: 'amount', name: 'amount', searchable: false},
+                    {data: 'requested_at', name: 'requested_at', searchable: false},
+                    {data: 'status', name: 'status', searchable: false},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
                 ],
                 order: [[0, 'desc']],
