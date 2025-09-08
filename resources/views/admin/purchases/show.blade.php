@@ -221,7 +221,9 @@
                 box-shadow: none !important;
                 margin: 0 0 10px 0 !important;
                 padding: 0 !important;
-                page-break-inside: avoid;
+                /* Allow long content/tables to flow across pages to avoid large blanks */
+                page-break-inside: auto !important;
+                break-inside: auto !important;
             }
 
             .card-body {
@@ -364,7 +366,7 @@
             /* Ensure cards have equal height */
             .h-100 {
                 height: auto !important;
-                min-height: 300px !important;
+                min-height: 0 !important;
             }
 
             /* Hide specific navigation and layout elements */

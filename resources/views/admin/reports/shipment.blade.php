@@ -290,10 +290,10 @@
         /* Print styles */
         @media print {
             html, body {
-                height: 100vh;
+                height: auto !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                overflow: hidden;
+                overflow: visible !important;
             }
 
             .main-nav {
@@ -315,7 +315,6 @@
                 font-size: 16px;
                 margin-top: 0 !important;
                 margin-left: 0 !important;
-                page-break-after: always;
             }
 
             .page-body p {
@@ -349,7 +348,6 @@
                 font-size: 16px;
                 margin-top: 0 !important;
                 margin-left: 0 !important;
-                page-break-after: always;
             }
 
             .page-body p {
@@ -369,7 +367,9 @@
                 box-shadow: none !important;
                 margin: 0 0 15px 0 !important;
                 padding: 0 !important;
-                page-break-inside: avoid;
+                /* Allow large cards (tables) to flow across pages to avoid big blanks */
+                page-break-inside: auto !important;
+                break-inside: auto !important;
             }
 
             .card-body {
