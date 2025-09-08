@@ -271,6 +271,7 @@
                                         <th>Reseller</th>
                                         <th>bKash</th>
                                         <th>Amount</th>
+                                        <th>Balance</th>
                                         <th>Requested At</th>
                                         <th>Status</th>
                                         <th>Actions</th>
@@ -362,6 +363,7 @@
                     {data: 'reseller', name: 'reseller', searchable: false},
                     {data: 'bkash', name: 'bkash', searchable: false},
                     {data: 'amount', name: 'amount', searchable: false},
+                    {data: 'balance', name: 'balance', searchable: false},
                     {data: 'requested_at', name: 'requested_at', searchable: false},
                     {data: 'status', name: 'status', searchable: false},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}

@@ -76,6 +76,17 @@ class MoneyRequestController extends Controller
             ->editColumn('amount', function ($row): string {
                 return '<span class="font-weight-bold text-primary">'.theMoney(abs($row->amount)).'</span>';
             })
+            ->addColumn('balance', function ($row): string {
+                $user = $row->payable;
+                if (! $user) {
+                    return 'N/A';
+                }
+
+                // Bavix\Wallet provides balance accessors; default to 0 if missing
+                $balance = $user->balance ?? 0;
+
+                return '<span class="font-weight-bold text-info">'.theMoney(abs($balance)).'</span>';
+            })
             ->editColumn('requested_at', function ($row): string {
                 return $row->created_at->format('M d, Y H:i');
             })
@@ -107,7 +118,7 @@ class MoneyRequestController extends Controller
                     </a>
                 </div>';
             })
-            ->rawColumns(['reseller', 'amount', 'status', 'actions'])
+            ->rawColumns(['reseller', 'amount', 'balance', 'status', 'actions'])
             ->make(true);
     }
 
