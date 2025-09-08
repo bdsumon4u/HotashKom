@@ -1,6 +1,6 @@
-@if ($show_option->customer_login ?? isOninda())
+@if ($show_option->customer_login)
 <div class="ml-2 indicator">
-    <a href="{{ auth('user')->check() ? route('reseller.dashboard') : route('user.login') }}" class="indicator__button">
+    <a href="{{ isOninda() ? route('reseller.dashboard') : route('admin.login') }}" class="indicator__button">
         <span class="indicator__area">
             <svg width="20" height="20">
                 <path
