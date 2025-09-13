@@ -75,6 +75,7 @@ class ProductDetail extends Component
 
     public function mount(): void
     {
+        $this->facebookService = app(FacebookPixelService::class);
         $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         if ($this->product->variations->isNotEmpty()) {
             $this->selectedVar = $this->product->variations->where('slug', request()->segment(2))->first()

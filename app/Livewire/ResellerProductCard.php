@@ -34,6 +34,7 @@ class ResellerProductCard extends Component
 
     public function mount(): void
     {
+        $this->facebookService ??= app(FacebookPixelService::class);
         $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         $this->maxQuantity = $this->product->should_track ? min($this->product->stock_count, $maxPerProduct) : $maxPerProduct;
         $this->retailPrice = $this->product->retailPrice();
@@ -77,7 +78,8 @@ class ResellerProductCard extends Component
     public function addToCart(): void
     {
         // Check if user is verified
-        if (isOninda() && (! auth('user')->user() || ! auth('user')->user()->is_verified)) {
+        $user = auth('user')->user();
+        if (isOninda() && (! $user || ! $user->is_verified)) {
             $this->dispatch('notify', ['message' => 'Please verify your account to add products to cart', 'type' => 'error']);
 
             return;

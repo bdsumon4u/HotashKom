@@ -20,6 +20,11 @@ class ProductCard extends Component
         $this->facebookService = $facebookService;
     }
 
+    public function mount()
+    {
+        $this->facebookService = app(FacebookPixelService::class);
+    }
+
     public function addToCart($instance = 'default')
     {
         return $this->addToKart($this->product, 1, $instance);
