@@ -96,7 +96,25 @@ class ProductController extends Controller
     {
         abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validationData();
+
+        // Check if price fields are being updated before saving
+        $priceFields = ['price', 'selling_price', 'average_purchase_price', 'suggested_price'];
+        $priceFieldsChanged = false;
+        $fieldsToUpdate = [];
+
+        foreach ($priceFields as $field) {
+            if (isset($data[$field]) && $data[$field] != $product->$field) {
+                $priceFieldsChanged = true;
+                $fieldsToUpdate[$field] = $data[$field];
+            }
+        }
+
         $product->update($data);
+
+        // Sync price changes to variations if price fields were updated
+        if ($priceFieldsChanged && ! $product->parent_id && $product->variations()->count() > 0) {
+            $this->syncPriceChangesToVariations($product, $fieldsToUpdate);
+        }
 
         // Handle relationships and dispatch copy job
         $this->handleProductRelationships($product, $data);
@@ -162,5 +180,18 @@ class ProductController extends Controller
 
         // Dispatch copy job after all relationships are established
         \App\Jobs\CopyProductToResellers::dispatch($product);
+    }
+
+    /**
+     * Sync price changes from parent product to all its variations
+     */
+    private function syncPriceChangesToVariations(Product $product, array $fieldsToUpdate): void
+    {
+        if ($product->parent_id || empty($fieldsToUpdate)) {
+            return;
+        }
+
+        // Update all variations with the changed price fields
+        $product->variations()->update($fieldsToUpdate);
     }
 }
