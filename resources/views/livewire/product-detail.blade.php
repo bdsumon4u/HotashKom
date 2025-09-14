@@ -21,7 +21,7 @@
             Price:
             @if(isOninda() && auth('user')->guest() && !$guest_can_see_price)
                 <span class="product-card__new-price text-danger">Login to see price</span>
-            @elseif(isOninda() && !auth('user')->user()->is_verified && !$guest_can_see_price)
+            @elseif(isOninda() && auth('user')->user() && !auth('user')->user()->is_verified && !$guest_can_see_price)
                 <span class="product-card__new-price text-danger">Verify account to see price</span>
             @elseif ($selling == $selectedVar->price)
                 {!! theMoney($selectedVar->price) !!}
