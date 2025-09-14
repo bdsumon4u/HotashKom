@@ -19,16 +19,14 @@
                 <div class="elementor-element elementor-element-34de74d elementor-widget elementor-widget-heading"
                     data-id="34de74d" data-element_type="widget" data-widget_type="heading.default">
                     <div class="elementor-widget-container">
-                        <h2 class="elementor-heading-title elementor-size-default">৩ পিস টি-শার্ট মাত্র
-                            ১১৯০</h2>
+                        <h2 class="elementor-heading-title elementor-size-default">{{$heading}}</h2>
                     </div>
                 </div>
                 <div class="elementor-element elementor-element-6ca1165 elementor-widget elementor-widget-text-editor"
                     data-id="6ca1165" data-element_type="widget"
                     data-widget_type="text-editor.default">
                     <div class="elementor-widget-container">
-                        <p>Premium Quality Jearsey T Shart Package কোয়ালিটি প্রোডাক্ট কখনো সস্থায়
-                            পাওয়া যায় না তবুও আমরা এই মুল্যে দিচ্ছি সর্বোচ্চ কোয়ালিটি </p>
+                        <p>{{$subheading}}</p>
                     </div>
                 </div>
                 <div class="elementor-element elementor-element-343882d7 elementor-align-center elementor-widget elementor-widget-button"
