@@ -229,7 +229,7 @@ function longCookie($field, $value)
     }
 }
 
-function cart($id = null): CartInstance|CartItem
+function cart($id = null): CartInstance|CartItem|null
 {
     $cart = Cart::instance(session('kart', 'default'));
 
