@@ -16,7 +16,7 @@ trait PreventsSourcedResourceDeletion
         if ($model->source_id !== null) {
             $resourceName = class_basename($model);
 
-            return back()->with('danger', "This {$resourceName} cannot be deleted because it is sourced from Oninda.");
+            return back()->with('danger', "This {$resourceName} cannot be deleted because it is sourced from a Wholesaler.");
         }
 
         return true;
