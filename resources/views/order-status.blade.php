@@ -1,6 +1,6 @@
 @extends('layouts.yellow.master')
 
-@title('Order Status')
+@title(session()->has('completed') ? 'Purchase' : 'Order Status')
 
 @section('content')
     <div class="block mt-4">
