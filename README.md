@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}437}$$ 🔥 domains are live now
+These 🔥 $${\color{red}442}$$ 🔥 domains are live now
 
-_Last updated: **2025-09-16 09:00:12 Asia/Dhaka**_
+_Last updated: **2025-09-17 08:59:15 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -536,3 +536,8 @@ _Last updated: **2025-09-16 09:00:12 Asia/Dhaka**_
 | 435 | [amarebazar.com](http://amarebazar.com) |
 | 436 | [rowshonenterprise.com](http://rowshonenterprise.com) |
 | 437 | [digdigonto.com](http://digdigonto.com) |
+| 438 | [arvally.com](http://arvally.com) |
+| 439 | [realsheba.com](http://realsheba.com) |
+| 440 | [sherabazarbd.com](http://sherabazarbd.com) |
+| 441 | [sabehabd.com](http://sabehabd.com) |
+| 442 | [baranbd.com](http://baranbd.com) |
