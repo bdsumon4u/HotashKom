@@ -403,24 +403,6 @@ class Checkout extends Component
                 ], $this);
             }
 
-            if (GoogleTagManagerFacade::isEnabled()) {
-                GoogleTagManagerFacade::flash([
-                    'event' => 'purchase',
-                    'ecommerce' => [
-                        'currency' => 'BDT',
-                        'transaction_id' => $order->id,
-                        'value' => $order->data['subtotal'],
-                        'items' => array_values(array_map(fn ($product): array => [
-                            'item_id' => $product['id'],
-                            'item_name' => $product['name'],
-                            'item_category' => $product['category'],
-                            'price' => $product['price'],
-                            'quantity' => $product['quantity'],
-                        ], $data['products'])),
-                    ],
-                ]);
-            }
-
             return $order;
         });
 
