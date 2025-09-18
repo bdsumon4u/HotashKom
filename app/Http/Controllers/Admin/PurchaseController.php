@@ -16,6 +16,8 @@ class PurchaseController extends Controller
      */
     public function index()
     {
+        abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
         return view('admin.purchases.index', Product::stockStatistics());
     }
 
@@ -24,6 +26,8 @@ class PurchaseController extends Controller
      */
     public function create()
     {
+        abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
         return view('admin.purchases.create');
     }
 
@@ -32,6 +36,8 @@ class PurchaseController extends Controller
      */
     public function store()
     {
+        abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
         // This will be handled by the Livewire component
         return redirect()->route('admin.purchases.index');
     }
@@ -41,6 +47,8 @@ class PurchaseController extends Controller
      */
     public function show(Purchase $purchase)
     {
+        abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
         return view('admin.purchases.show', compact('purchase'));
     }
 
@@ -49,6 +57,8 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
+        abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
         return view('admin.purchases.edit', compact('purchase'));
     }
 
@@ -57,6 +67,8 @@ class PurchaseController extends Controller
      */
     public function update(Request $request, Purchase $purchase)
     {
+        abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
         // This will be handled by the Livewire component
         return redirect()->route('admin.purchases.index');
     }
@@ -66,6 +78,8 @@ class PurchaseController extends Controller
      */
     public function destroy(Purchase $purchase)
     {
+        abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+
         DB::transaction(function () use ($purchase) {
             // Use service to revert stock changes
             $stockService = new PurchaseStockService;

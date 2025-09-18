@@ -90,6 +90,7 @@
                     <x-error field="selling_price" />
                 </div>
             </div>
+            @if(request()->user()->is('admin'))
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="average_purchase_price">Average Purchase Price</label>
@@ -97,6 +98,7 @@
                     <x-error field="average_purchase_price" />
                 </div>
             </div>
+            @endif
             @if(isOninda() && config('app.resell'))
             <div class="col-md-6">
                 <div class="form-group">
