@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}443}$$ 🔥 domains are live now
+These 🔥 $${\color{red}442}$$ 🔥 domains are live now
 
-_Last updated: **2025-09-18 09:01:11 Asia/Dhaka**_
+_Last updated: **2025-09-19 09:04:36 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -532,13 +532,12 @@ _Last updated: **2025-09-18 09:01:11 Asia/Dhaka**_
 | 431 | [reseller.sebaitsolutions.com](http://reseller.sebaitsolutions.com) |
 | 432 | [deshshop24.com](http://deshshop24.com) |
 | 433 | [rupaboron.com](http://rupaboron.com) |
-| 434 | [barakahexpress.com](http://barakahexpress.com) |
-| 435 | [mienterpriseltd.com](http://mienterpriseltd.com) |
-| 436 | [amarebazar.com](http://amarebazar.com) |
-| 437 | [rowshonenterprise.com](http://rowshonenterprise.com) |
-| 438 | [digdigonto.com](http://digdigonto.com) |
-| 439 | [arvally.com](http://arvally.com) |
-| 440 | [realsheba.com](http://realsheba.com) |
-| 441 | [sherabazarbd.com](http://sherabazarbd.com) |
-| 442 | [sabehabd.com](http://sabehabd.com) |
-| 443 | [baranbd.com](http://baranbd.com) |
+| 434 | [mienterpriseltd.com](http://mienterpriseltd.com) |
+| 435 | [amarebazar.com](http://amarebazar.com) |
+| 436 | [rowshonenterprise.com](http://rowshonenterprise.com) |
+| 437 | [digdigonto.com](http://digdigonto.com) |
+| 438 | [arvally.com](http://arvally.com) |
+| 439 | [realsheba.com](http://realsheba.com) |
+| 440 | [sherabazarbd.com](http://sherabazarbd.com) |
+| 441 | [sabehabd.com](http://sabehabd.com) |
+| 442 | [baranbd.com](http://baranbd.com) |
