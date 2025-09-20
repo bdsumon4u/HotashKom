@@ -17,8 +17,9 @@ fi
     # git reset --hard origin/production
     git pull origin $branch --force
 
-    # Install dependencies based on lock file
-    /opt/alt/php83/usr/bin/php /opt/cpanel/composer/bin/composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress $(if [ branch != "dev" ]; then echo "--no-dev"; fi)
+    /opt/alt/php83/usr/bin/php "$(command -v composer || echo /opt/cpanel/composer/bin/composer)" install \
+        --no-interaction --prefer-dist --optimize-autoloader --no-progress \
+        $(if [ "$branch" != "dev" ]; then echo "--no-dev"; fi)
 
     # Ensure all tables use InnoDB before running migrations
     /opt/alt/php83/usr/bin/php artisan db:convert-innodb || true
