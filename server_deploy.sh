@@ -17,7 +17,7 @@ fi
     # git reset --hard origin/production
     git pull origin $branch --force
 
-    /opt/alt/php83/usr/bin/php "$(command -v composer || echo /opt/cpanel/composer/bin/composer)" install \
+    /opt/alt/php83/usr/bin/php "$([ -f "./composer.phar" ] && echo "./composer.phar" || command -v composer || echo /opt/cpanel/composer/bin/composer)" install \
         --no-interaction --prefer-dist --optimize-autoloader --no-progress \
         $(if [ "$branch" != "dev" ]; then echo "--no-dev"; fi)
 
