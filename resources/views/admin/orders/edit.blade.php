@@ -27,7 +27,7 @@
                         <div>
                             <a href="{{ route('admin.orders.invoices', ['order_id' => $order->id]) }}" class="ml-1 btn btn-sm btn-primary">Invoice</a>
                             <a href="{{ route('admin.orders.booking', ['order_id' => $order->id]) }}" class="ml-1 btn btn-sm btn-primary">Send to Courier</a>
-                            @if($order->status == 'CONFIRMED' && ! isOninda() && is_null($order->source_id))
+                            @if($order->status == 'CONFIRMED' && isReseller() && is_null($order->source_id))
                                 <form id="forward-to-oninda-form" method="POST" action="{{ route('admin.orders.forward-to-oninda') }}" style="display:inline;">
                                     @csrf
                                     <input type="hidden" name="order_id[]" value="{{ $order->id }}">

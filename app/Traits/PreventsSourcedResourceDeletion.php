@@ -13,7 +13,7 @@ trait PreventsSourcedResourceDeletion
      */
     protected function preventSourcedResourceDeletion(Model $model)
     {
-        if ($model->source_id !== null) {
+        if (isReseller() && $model->source_id !== null) {
             $resourceName = class_basename($model);
 
             return back()->with('danger', "This {$resourceName} cannot be deleted because it is sourced from a Wholesaler.");

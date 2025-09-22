@@ -69,7 +69,7 @@ class Product extends Model
         });
 
         static::deleting(function ($record): void {
-            if (! isOninda() && $record->source_id !== null) {
+            if (isReseller() && $record->source_id !== null) {
                 throw new \Exception('Cannot delete a resource that has been sourced.');
             }
 

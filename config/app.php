@@ -8,6 +8,8 @@ return [
 
     'resell' => env('APP_RESELL', true),
 
+    'reseller' => env('APP_RESELLER'),
+
     'verification_fee' => env('APP_VERIFICATION_FEE', 1000),
 
     'instant_order_forwarding' => env('INSTANT_ORDER_FORWARDING', false),
