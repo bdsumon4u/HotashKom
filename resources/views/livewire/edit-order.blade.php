@@ -282,10 +282,14 @@
                     </table>
                 </div>
 
-                @if ($order->exists)
+                @if ($order->exists && config('services.courier_report.cheap'))
                 <h5 class="mt-3">Courier Report</h5>
                 <div style="height: 645px; overflow: hidden; position: relative;">
+                    @if (Carbon::parse(config('services.courier_report.expires'))->isPast())
+                    <div class="alert alert-danger">Courier Report API Expired</div>
+                    @else
                     <iframe src="https://www.bdcommerce.app/tools/delivery-fraud-check/{{$order->phone}}" width="1200" height="800" scrolling="no" style="position: absolute; top: -110px; left: -580px; overflow: hidden;"></iframe>
+                    @endif
                 </div>
                 @endif
             </div>
