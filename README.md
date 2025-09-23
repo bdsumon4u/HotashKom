@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}440}$$ 🔥 domains are live now
+These 🔥 $${\color{red}444}$$ 🔥 domains are live now
 
-_Last updated: **2025-09-22 09:10:53 Asia/Dhaka**_
+_Last updated: **2025-09-23 09:02:23 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -539,3 +539,7 @@ _Last updated: **2025-09-22 09:10:53 Asia/Dhaka**_
 | 438 | [royalchoicefield.com](http://royalchoicefield.com) |
 | 439 | [ekhonekinun.com](http://ekhonekinun.com) |
 | 440 | [barakabd.com](http://barakabd.com) |
+| 441 | [smartworldbd.com](http://smartworldbd.com) |
+| 442 | [amarhaatbazar.com](http://amarhaatbazar.com) |
+| 443 | [aroshishopping.com](http://aroshishopping.com) |
+| 444 | [babybarishop.com](http://babybarishop.com) |
