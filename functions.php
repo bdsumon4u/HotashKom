@@ -366,5 +366,5 @@ function isReseller(): bool
         $reseller = ! empty(config('app.oninda_url'));
     }
 
-    return config('app.reseller', $reseller);
+    return (bool) config('app.reseller', $reseller);
 }
