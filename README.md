@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}451}$$ 🔥 domains are live now
+These 🔥 $${\color{red}452}$$ 🔥 domains are live now
 
-_Last updated: **2025-09-25 09:05:33 Asia/Dhaka**_
+_Last updated: **2025-09-26 09:04:05 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -550,3 +550,4 @@ _Last updated: **2025-09-25 09:05:33 Asia/Dhaka**_
 | 449 | [clickbazarr.com](http://clickbazarr.com) |
 | 450 | [shohozebajar.com](http://shohozebajar.com) |
 | 451 | [bazarbary.com](http://bazarbary.com) |
+| 452 | [bdgallerye.com](http://bdgallerye.com) |
