@@ -120,3 +120,4 @@ Route::get('/cache-clear', [ApiController::class, 'clearCache'])->name('clear.ca
 
 // Feed routes
 Route::get('/feed/catalog', [FeedController::class, 'catalog'])->name('feed.catalog');
+Route::get('/feed/catalog-simple', [FeedController::class, 'catalogSimple'])->name('feed.catalog.simple');
