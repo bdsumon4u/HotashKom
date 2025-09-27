@@ -95,7 +95,7 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
 ## Active Deployments
 These 🔥 $${\color{red}452}$$ 🔥 domains are live now
 
-_Last updated: **2025-09-26 09:04:05 Asia/Dhaka**_
+_Last updated: **2025-09-27 08:57:58 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -529,25 +529,25 @@ _Last updated: **2025-09-26 09:04:05 Asia/Dhaka**_
 | 428 | [amarebazar.com](http://amarebazar.com) |
 | 429 | [rowshonenterprise.com](http://rowshonenterprise.com) |
 | 430 | [digdigonto.com](http://digdigonto.com) |
-| 431 | [arvally.com](http://arvally.com) |
-| 432 | [realsheba.com](http://realsheba.com) |
-| 433 | [sherabazarbd.com](http://sherabazarbd.com) |
-| 434 | [sabehabd.com](http://sabehabd.com) |
-| 435 | [baranbd.com](http://baranbd.com) |
-| 436 | [barakahexpress.com](http://barakahexpress.com) |
-| 437 | [rupaboron.com](http://rupaboron.com) |
-| 438 | [uddoktabari.com](http://uddoktabari.com) |
-| 439 | [royalchoicefield.com](http://royalchoicefield.com) |
-| 440 | [ekhonekinun.com](http://ekhonekinun.com) |
-| 441 | [barakabd.com](http://barakabd.com) |
-| 442 | [smartworldbd.com](http://smartworldbd.com) |
-| 443 | [amarhaatbazar.com](http://amarhaatbazar.com) |
-| 444 | [aroshishopping.com](http://aroshishopping.com) |
-| 445 | [babybarishop.com](http://babybarishop.com) |
-| 446 | [peaceshoppingbd.com](http://peaceshoppingbd.com) |
-| 447 | [barakastorebd.com](http://barakastorebd.com) |
-| 448 | [azizbazarbd.com](http://azizbazarbd.com) |
-| 449 | [clickbazarr.com](http://clickbazarr.com) |
-| 450 | [shohozebajar.com](http://shohozebajar.com) |
-| 451 | [bazarbary.com](http://bazarbary.com) |
-| 452 | [bdgallerye.com](http://bdgallerye.com) |
+| 431 | [barakahexpress.com](http://barakahexpress.com) |
+| 432 | [rupaboron.com](http://rupaboron.com) |
+| 433 | [uddoktabari.com](http://uddoktabari.com) |
+| 434 | [royalchoicefield.com](http://royalchoicefield.com) |
+| 435 | [ekhonekinun.com](http://ekhonekinun.com) |
+| 436 | [barakabd.com](http://barakabd.com) |
+| 437 | [smartworldbd.com](http://smartworldbd.com) |
+| 438 | [amarhaatbazar.com](http://amarhaatbazar.com) |
+| 439 | [aroshishopping.com](http://aroshishopping.com) |
+| 440 | [babybarishop.com](http://babybarishop.com) |
+| 441 | [peaceshoppingbd.com](http://peaceshoppingbd.com) |
+| 442 | [barakastorebd.com](http://barakastorebd.com) |
+| 443 | [azizbazarbd.com](http://azizbazarbd.com) |
+| 444 | [clickbazarr.com](http://clickbazarr.com) |
+| 445 | [shohozebajar.com](http://shohozebajar.com) |
+| 446 | [bazarbary.com](http://bazarbary.com) |
+| 447 | [bdgallerye.com](http://bdgallerye.com) |
+| 448 | [sabehabd.com](http://sabehabd.com) |
+| 449 | [baranbd.com](http://baranbd.com) |
+| 450 | [sherabazarbd.com](http://sherabazarbd.com) |
+| 451 | [arvally.com](http://arvally.com) |
+| 452 | [realsheba.com](http://realsheba.com) |
