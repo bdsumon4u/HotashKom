@@ -4,6 +4,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\BrandProductController;
 use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSectionProductController;
 use App\Http\Controllers\OrderTrackController;
@@ -116,3 +117,7 @@ Route::get('/scout-flush', [ApiController::class, 'scoutFlush']);
 Route::get('/scout-import', [ApiController::class, 'scoutImport']);
 Route::get('/link-optimize', [ApiController::class, 'linkOptimize']);
 Route::get('/cache-clear', [ApiController::class, 'clearCache'])->name('clear.cache');
+
+// Feed routes
+Route::get('/feed/catalog', [FeedController::class, 'catalog'])->name('feed.catalog');
+Route::get('/feed/catalog-simple', [FeedController::class, 'catalogSimple'])->name('feed.catalog.simple');
