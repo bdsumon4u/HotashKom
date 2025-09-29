@@ -25,7 +25,7 @@ class OrderTrackController extends Controller
             return back()->withDanger('Invalid Tracking Info Or Order Record Was Deleted.');
         }
 
-        if (session()->has('completed') && $request->is('thank-you')) {
+        if ($request->is('thank-you')) {
 
             if (GoogleTagManagerFacade::isEnabled()) {
                 $index = 0;
