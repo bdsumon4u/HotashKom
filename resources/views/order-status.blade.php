@@ -1,6 +1,6 @@
 @extends('layouts.yellow.master')
 
-@title(session()->has('completed') ? 'Purchase' : 'Order Status')
+@title(request()->is('thank-you') ? 'Purchase' : 'Order Status')
 
 @section('content')
     <div class="block mt-4">
