@@ -23,3 +23,20 @@ yarn-error.log
 .qodo
 
 .early.coverage
+
+# Editor-specific configuration (ensure all major editors are ignored)
+.DS_Store
+Thumbs.db
+/.vs
+/.history
+*.sublime-workspace
+*.sublime-project
+/.nova
+*.swp
+*.swo
+*~
+
+# MCP configuration (local tooling/config only)
+.mcp.json
+/.cursor
+/.junie
