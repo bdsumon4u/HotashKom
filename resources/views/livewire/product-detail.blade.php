@@ -1,6 +1,6 @@
 <div class="product__info">
     <h3 class="mb-2 product__name" data-name="{{ $selectedVar->var_name }}">{{ $product->name }}</h1>
-        <div class="pt-2 mb-2 d-flex justify-content-between border-top">
+        <div class="pt-2 mb-2 d-flex-justify-content-between border-top">
             <div>Product Code: <strong>{{ $selectedVar->sku }}</strong></div>
             <div>Availability:
                 <strong>

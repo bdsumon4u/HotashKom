@@ -135,7 +135,7 @@
                                     </p>
                                 @endif
                                 <div class="mt-2">
-                                    <p class="mb-0 mr-2 text-secondary d-inline-block">Categories:</p>
+                                    <p class="mr-2 mb-0 text-secondary d-inline-block">Categories:</p>
                                     @foreach($product->categories as $category)
                                         <a href="{{ route('categories.products', $category) }}" class="badge badge-primary">{{ $category->name }}</a>
                                     @endforeach
@@ -248,7 +248,7 @@
                 const next = activeG === lastG ? 0 : (activeG + 1);
                 gallery.eq(next).trigger('click');
             });
-            
+
             // Automatic navigation logic inside setInterval
             setInterval(() => {
                 let gallery = $('.xzoom-gallery');

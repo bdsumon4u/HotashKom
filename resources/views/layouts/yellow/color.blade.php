@@ -178,4 +178,7 @@
         border-color: {{$color->order_now->background_hover ?? null}} !important;
         color: {{$color->order_now->text_hover ?? null}} !important;
     }
+    .input-radio-label__list input:checked~span, .input-radio-label__list input:not(:checked):not(:disabled)~span:hover {
+        border-color: {{$color->primary->background_color ?? null}} !important;
+    }
 </style>
