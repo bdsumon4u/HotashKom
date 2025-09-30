@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ class ProductController extends Controller
      */
     public function __invoke(Request $request)
     {
+        $admin = Admin::find($request->admin_id);
         $select = [
             'products.*',
             DB::raw('COALESCE((SELECT NULLIF(SUM(v.stock_count), 0) FROM products v WHERE v.parent_id = products.id), products.stock_count) as stock'),
@@ -36,10 +38,10 @@ class ProductController extends Controller
 
                 return '<a href="'.route('products.show', $product).'" target="_blank">'.$product->name.'</a>'.$variationLabel;
             })
-            ->addColumn('price', function (Product $product): string {
+            ->addColumn('price', function (Product $product) use ($admin): string {
                 $averagePurchasePrice = $product->average_purchase_price ?? 0;
                 $priceHtml = '';
-                if ($averagePurchasePrice > 0) {
+                if ($averagePurchasePrice > 0 && $admin->is('admin')) {
                     $priceHtml .= '<span style="font-size: 13px; color: #888;">Purchase: <strong>'.theMoney($averagePurchasePrice).'</strong></span><hr style="margin: 2px 0;">';
                 }
                 if ($product->price == $product->selling_price) {
