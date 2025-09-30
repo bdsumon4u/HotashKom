@@ -49,6 +49,7 @@ final class FeedController extends Controller
                     ->chunk(100, function ($products) use ($file) {
                         foreach ($products as $product) {
                             try {
+                                $this->writeProductRow($file, $product, $product->id);
                                 // If product has variants, process the variants
                                 if ($product->variations->isNotEmpty()) {
                                     foreach ($product->variations as $variant) {
@@ -58,9 +59,6 @@ final class FeedController extends Controller
 
                                         $this->writeProductRow($file, $variant, $product->id);
                                     }
-                                } else {
-                                    // If product has no variants, process the product itself
-                                    $this->writeProductRow($file, $product, $product->id);
                                 }
                             } catch (\Exception $e) {
                                 Log::error('Error processing product in feed', [
@@ -114,7 +112,7 @@ final class FeedController extends Controller
                             $variant->categories = $product->categories;
 
                             return $variant;
-                        });
+                        })->prepend($product);
                     }
 
                     return collect([$product]);
