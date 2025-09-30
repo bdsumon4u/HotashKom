@@ -226,5 +226,28 @@
                 });
             }
         });
+
+        // Delete Reseller (only shown for unverified/pending view)
+        $(document).on('click', '.delete-reseller', function() {
+            var id = $(this).data('id');
+
+            if (confirm('Are you sure you want to delete this unverified reseller? This action cannot be undone.')) {
+                $.ajax({
+                    url: '/api/resellers/' + id,
+                    type: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        table.ajax.reload();
+                        $.notify(response.message || 'Reseller deleted successfully', 'success');
+                    },
+                    error: function(xhr) {
+                        var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to delete reseller';
+                        $.notify(msg, 'error');
+                    }
+                });
+            }
+        });
     </script>
 @endpush

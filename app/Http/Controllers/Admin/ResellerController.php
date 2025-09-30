@@ -18,10 +18,6 @@ class ResellerController extends Controller
     {
         $status = $request->query('status');
 
-        if ($status === 'pending') {
-            return view('admin.resellers.index', compact('status'));
-        }
-
         return view('admin.resellers.index', compact('status'));
     }
 

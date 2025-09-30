@@ -28,6 +28,8 @@ class ResellerController extends Controller
         // Filter by status if provided
         if ($isPendingView) {
             $resellers = $resellers->where('is_verified', false);
+        } else {
+            $resellers = $resellers->where('is_verified', true);
         }
 
         $dataTable = DataTables::of($resellers)
@@ -63,8 +65,9 @@ class ResellerController extends Controller
             if (! $isPendingView) {
                 $actions .= '<button type="button" class="btn btn-sm'.($row->is_verified ? ' btn-danger' : ' btn-success').' toggle-verify" data-id="'.$row->id.'" data-verified="'.$row->is_verified.'"><i class="fa'.($row->is_verified ? ' fa-times' : ' fa-check').'"></i></button>';
             } else {
-                // For pending resellers, only show verify button
+                // For pending resellers, show verify and delete
                 $actions .= '<button type="button" class="btn btn-sm btn-success toggle-verify" data-id="'.$row->id.'" data-verified="0"><i class="fa fa-check"></i></button>';
+                $actions .= '<button type="button" class="btn btn-sm btn-danger delete-reseller" data-id="'.$row->id.'"><i class="fa fa-trash"></i></button>';
             }
 
             $actions .= '</div>';
@@ -155,6 +158,29 @@ class ResellerController extends Controller
         return response()->json([
             'message' => 'Verification status updated successfully',
             'is_verified' => $reseller->is_verified,
+        ]);
+    }
+
+    /**
+     * Remove the specified reseller from storage.
+     */
+    public function destroy($id)
+    {
+        $reseller = User::findOrFail($id);
+
+        if ($reseller->is_verified) {
+            return response()->json([
+                'message' => 'Only unverified resellers can be deleted.',
+            ], 422);
+        }
+
+        // Optionally, ensure no dependent data should block deletion here
+        // e.g., if ($reseller->orders()->exists()) { ... }
+
+        $reseller->delete();
+
+        return response()->json([
+            'message' => 'Reseller deleted successfully',
         ]);
     }
 }

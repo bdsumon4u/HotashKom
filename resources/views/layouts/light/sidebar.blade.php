@@ -218,7 +218,7 @@
                     </li>
                     @if (isOninda())
                     <li>
-                        <a class="nav-link d-flex menu-title link-nav {{ Route::currentRouteName() == 'admin.resellers.index' ? 'active' : '' }}"
+                        <a class="nav-link d-flex menu-title link-nav {{ Route::currentRouteName() == 'admin.resellers.index' && request('status') == '' ? 'active' : '' }}"
                             href="{{ route('admin.resellers.index') }}">
                             <i data-feather="users"> </i>
                             <span>Reseller List</span>
