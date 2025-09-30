@@ -45,6 +45,7 @@ final class FeedController extends Controller
                 // Process products in chunks for better memory management
                 Product::with(['brand', 'categories', 'images', 'variations'])
                     ->where('is_active', true)
+                    ->whereNull('parent_id') // Only parents; variants handled via parent loop
                     ->chunk(100, function ($products) use ($file) {
                         foreach ($products as $product) {
                             try {
@@ -104,6 +105,7 @@ final class FeedController extends Controller
 
             $products = Product::with(['brand', 'categories', 'images', 'variations'])
                 ->where('is_active', true)
+                ->whereNull('parent_id') // Only parents; variants handled via mapping
                 ->get()
                 ->flatMap(function ($product) {
                     if ($product->variations->isNotEmpty()) {
@@ -179,6 +181,7 @@ final class FeedController extends Controller
         $shippingOutside = $this->formatPrice($product->shipping_outside);
 
         fputcsv($file, [
+            // Use products.id as the content ID (unique per product row)
             $product->id,
             $title,
             $description,
@@ -193,7 +196,8 @@ final class FeedController extends Controller
             $product->stock_count ?? 1,
             $sellingPrice.' BDT',
             now()->addDays(30)->format('Y-m-d\TH:i\Z').'/'.now()->addDays(60)->format('Y-m-d\TH:i\Z'),
-            $itemGroupId, // Use parent ID for item_group_id to group variants
+            // Keep group stable across variants. Use provided parent identifier.
+            $itemGroupId,
             'unisex',
             '',
             '',
