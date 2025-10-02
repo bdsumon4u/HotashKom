@@ -361,10 +361,14 @@ function isOninda(): bool
 
 function isReseller(): bool
 {
-    static $reseller = null;
-    if ($reseller === null) {
-        $reseller = ! empty(config('app.oninda_url'));
+    if (config('app.reseller') === false) {
+        return false;
     }
 
-    return (bool) config('app.reseller', $reseller);
+    static $reseller = null;
+    if ($reseller === null) {
+        $reseller = !!config('app.oninda_url');
+    }
+
+    return $reseller;
 }
