@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Jobs\CopyResourceToResellers;
 use App\Jobs\RemoveResourceFromResellers;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'image_id', 'name', 'slug', 'is_enabled',
     ];

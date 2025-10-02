@@ -161,17 +161,17 @@
                 <strong>Variations</strong>
             </div>
             <div class="p-2 card-body">
-                <div id="variations">
-                    @foreach ($product->variations as $variation)
-                    <div class="mb-3 shadow-sm card rounded-0">
-                        <div class="px-3 py-2 card-header">
-                            <a class="card-link" data-toggle="collapse" href="#collapse-{{$variation->id}}">
-                                [#{{$variation->id}}] {{ $variation->name }}
-                            </a>
-                        </div>
-                        <div id="collapse-{{$variation->id}}" class="collapse" data-parent="#variations">
-                            <div class="px-3 py-2 card-body">
-                                <x-form method="PATCH" action="{{ route('admin.products.variations.update', [$product, $variation]) }}">
+                <x-form method="PATCH" action="{{ route('admin.products.variations.bulk-update', $product) }}" id="variations-bulk-form">
+                    <div id="variations">
+                        @foreach ($product->variations as $variation)
+                        <div class="mb-3 shadow-sm card rounded-0">
+                            <div class="px-3 py-2 card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse-{{$variation->id}}">
+                                    [#{{$variation->id}}] {{ $variation->name }}
+                                </a>
+                            </div>
+                            <div id="collapse-{{$variation->id}}" class="collapse" data-parent="#variations">
+                                <div class="px-3 py-2 card-body">
                                     <div class="flex-wrap d-flex" style="column-gap: 3rem;">
                                         <div class="tab-pane active" id="var-price-{{$variation->id}}" role="tabpanel">
                                             <div class="row">
@@ -181,30 +181,31 @@
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="price-{{$variation->id}}">Price <span class="text-danger">*</span></label>
-                                                        <x-input id="price-{{$variation->id}}" name="price" :value="$variation->price" />
-                                                        <x-error field="price" />
+                                                        <input type="hidden" name="variations[{{$loop->index}}][id]" value="{{$variation->id}}">
+                                                        <x-input id="price-{{$variation->id}}" name="variations[{{$loop->index}}][price]" :value="$variation->price" />
+                                                        <x-error field="variations.{{$loop->index}}.price" />
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="selling-price-{{$variation->id}}">Selling Price <span class="text-danger">*</span></label>
-                                                        <x-input id="selling-price-{{$variation->id}}" name="selling_price" :value="$variation->selling_price" />
-                                                        <x-error field="selling_price" />
+                                                        <x-input id="selling-price-{{$variation->id}}" name="variations[{{$loop->index}}][selling_price]" :value="$variation->selling_price" />
+                                                        <x-error field="variations.{{$loop->index}}.selling_price" />
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="purchase-price-{{$variation->id}}">Average Purchase Price</label>
-                                                        <x-input id="purchase-price-{{$variation->id}}" name="purchase_price" :value="$variation->purchase_price" />
-                                                        <x-error field="purchase_price" />
+                                                        <x-input id="purchase-price-{{$variation->id}}" name="variations[{{$loop->index}}][purchase_price]" :value="$variation->purchase_price" />
+                                                        <x-error field="variations.{{$loop->index}}.purchase_price" />
                                                     </div>
                                                 </div>
                                                 @if(isOninda() && config('app.resell'))
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="suggested-price-{{$variation->id}}">Suggested Retail Price</label>
-                                                        <x-input id="suggested-price-{{$variation->id}}" name="suggested_price" :value="$variation->suggested_price" />
-                                                        <x-error field="suggested_price" />
+                                                        <x-input id="suggested-price-{{$variation->id}}" name="variations[{{$loop->index}}][suggested_price]" :value="$variation->suggested_price" />
+                                                        <x-error field="variations.{{$loop->index}}.suggested_price" />
                                                     </div>
                                                 </div>
                                                 @endif
@@ -220,8 +221,8 @@
                                                     @foreach (old('wholesale.price', $variation->wholesale['price'] ?? []) as $price)
                                                         <div class="mb-1 form-group">
                                                             <div class="input-group">
-                                                                <x-input name="wholesale[quantity][]" placeholder="Quantity" value="{{old('wholesale.quantity', $variation->wholesale['quantity'] ?? [])[$loop->index]}}" />
-                                                                <x-input name="wholesale[price][]" placeholder="Price" value="{{$price}}" />
+                                                                <x-input name="variations[{{$loop->parent->index}}][wholesale][quantity][]" placeholder="Quantity" value="{{old('wholesale.quantity', $variation->wholesale['quantity'] ?? [])[$loop->index]}}" />
+                                                                <x-input name="variations[{{$loop->parent->index}}][wholesale][price][]" placeholder="Price" value="{{$price}}" />
                                                                 <div class="input-group-append">
                                                                     <button type="button" class="btn btn-danger btn-sm remove-wholesale">x</button>
                                                                 </div>
@@ -229,7 +230,7 @@
                                                         </div>
                                                     @endforeach
                                                     <ul>
-                                                        @foreach ([$errors->first('wholesale.price.*'), $errors->first('wholesale.quantity.*')] as $error)
+                                                        @foreach ([$errors->first('variations.'.$loop->index.'.wholesale.price.*'), $errors->first('variations.'.$loop->index.'.wholesale.quantity.*')] as $error)
                                                             <li class="text-danger">{{ $error }}</li>
                                                         @endforeach
                                                     </ul>
@@ -244,39 +245,41 @@
                                                 <div class="col-sm-12">
                                                     <div class="form-group">
                                                         <div class="custom-control custom-checkbox">
-                                                            <input type="hidden" name="should_track" value="0" />
-                                                            <x-checkbox id="should-track-{{$variation->id}}" name="should_track" value="1" :checked="$variation->should_track" class="should_track custom-control-input" />
+                                                            <input type="hidden" name="variations[{{$loop->index}}][should_track]" value="0" />
+                                                            <x-checkbox id="should-track-{{$variation->id}}" name="variations[{{$loop->index}}][should_track]" value="1" :checked="$variation->should_track" class="should_track custom-control-input" />
                                                             <label for="should-track-{{$variation->id}}" class="custom-control-label">Should Track</label>
-                                                            <x-error field="should_track" />
+                                                            <x-error field="variations.{{$loop->index}}.should_track" />
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="sku-{{$variation->id}}">Product Code</label><span class="text-danger">*</span>
-                                                        <x-input id="sku-{{$variation->id}}" name="sku" :value="$variation->sku" />
-                                                        <x-error field="sku" />
+                                                        <x-input id="sku-{{$variation->id}}" name="variations[{{$loop->index}}][sku]" :value="$variation->sku" />
+                                                        <x-error field="variations.{{$loop->index}}.sku" />
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group stock-count" @if(!old('should_track', $variation->should_track)) style="display: none;" @endif>
                                                         <label for="stock-count-{{$variation->id}}">Stock Count <span class="text-danger">*</span></label>
-                                                        <x-input id="stock-count-{{$variation->id}}" name="stock_count" :value="$variation->stock_count" />
-                                                        <x-error field="stock_count" />
+                                                        <x-input id="stock-count-{{$variation->id}}" name="variations[{{$loop->index}}][stock_count]" :value="$variation->stock_count" />
+                                                        <x-error field="variations.{{$loop->index}}.stock_count" />
                                                     </div>
-                                                </div>
-                                                <div class="col-sm-12">
-                                                    <button type="submit" class="btn btn-block btn-success">Save</button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </x-form>
+                                </div>
                             </div>
                         </div>
+                        @endforeach
                     </div>
-                    @endforeach
-                </div>
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save All Variations
+                        </button>
+                    </div>
+                </x-form>
             </div>
         </div>
     </div>
@@ -335,6 +338,7 @@
         $('[selector]').select2({
             // tags: true,
         });
+
     });
 </script>
 @endpush

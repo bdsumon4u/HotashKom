@@ -100,6 +100,9 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::get('coupons/generate-code', [CouponController::class, 'generateCode'])->name('coupons.generate-code');
         Route::post('coupons/{coupon}/toggle-status', [CouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
 
+        // Bulk variations update route
+        Route::patch('products/{product}/variations/bulk-update', [ProductVariationController::class, 'bulkUpdate'])->name('products.variations.bulk-update');
+
         Route::resources([
             'staffs' => StaffController::class,
             'slides' => SlideController::class,

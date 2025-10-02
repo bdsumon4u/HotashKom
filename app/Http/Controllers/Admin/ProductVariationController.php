@@ -140,6 +140,82 @@ class ProductVariationController extends Controller
     }
 
     /**
+     * Update multiple variations in bulk.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function bulkUpdate(Request $request, Product $product)
+    {
+        abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
+
+        $variations = $request->get('variations', []);
+
+        if (empty($variations)) {
+            return back()->with('danger', 'No variations to update.');
+        }
+
+        // Process variations data to handle disabled fields
+        foreach ($variations as $index => $variation) {
+            // If should_track is false, set stock_count to 0
+            if (! isset($variation['should_track']) || ! $variation['should_track']) {
+                $variations[$index]['stock_count'] = 0;
+            }
+        }
+
+        $validator = Validator::make(['variations' => $variations], [
+            'variations.*.id' => 'required|exists:products,id',
+            'variations.*.price' => 'required|numeric|min:0',
+            'variations.*.selling_price' => 'required|numeric|min:0',
+            'variations.*.suggested_price' => 'nullable|numeric|min:0',
+            'variations.*.sku' => 'required|string',
+            'variations.*.should_track' => 'required|boolean',
+            'variations.*.stock_count' => 'required|numeric|min:0',
+            'variations.*.wholesale.quantity' => 'sometimes|array',
+            'variations.*.wholesale.price' => 'sometimes|array',
+            'variations.*.wholesale.quantity.*' => 'required|integer|gt:1',
+            'variations.*.wholesale.price.*' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        DB::transaction(function () use ($variations, $product): void {
+            foreach ($variations as $variationData) {
+                $variation = $product->variations()->findOrFail($variationData['id']);
+
+                // Prepare update data
+                $updateData = [
+                    'price' => $variationData['price'],
+                    'selling_price' => $variationData['selling_price'],
+                    'suggested_price' => $variationData['suggested_price'] ?? null,
+                    'sku' => $variationData['sku'],
+                    'should_track' => $variationData['should_track'],
+                    'stock_count' => $variationData['stock_count'],
+                ];
+
+                // Handle wholesale pricing if provided
+                if (isset($variationData['wholesale']['quantity']) && isset($variationData['wholesale']['price'])) {
+                    $wholesale = [];
+                    foreach ($variationData['wholesale']['quantity'] as $index => $quantity) {
+                        if (isset($variationData['wholesale']['price'][$index])) {
+                            $wholesale[] = [
+                                'quantity' => $quantity,
+                                'price' => $variationData['wholesale']['price'][$index],
+                            ];
+                        }
+                    }
+                    $updateData['wholesale'] = $wholesale;
+                }
+
+                $variation->update($updateData);
+            }
+        });
+
+        return back()->withSuccess('All variations have been updated successfully.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Product $product, Product $variation): void

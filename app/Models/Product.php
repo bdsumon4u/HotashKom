@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Jobs\RemoveResourceFromResellers;
 use App\Jobs\SyncProductStockWithResellers;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
@@ -12,6 +13,7 @@ use Nicolaslopezj\Searchable\SearchableTrait;
 
 class Product extends Model
 {
+    use HasFactory;
     use Searchable;
     // use SearchableTrait;
 
