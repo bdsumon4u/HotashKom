@@ -73,23 +73,36 @@ class ApiController extends Controller
 
     public function sectionProducts(Request $request, HomeSection $section)
     {
-        return $section->products(category: $request->category)->transform(fn ($product) => array_merge($product->toArray(), [
-            'images' => $product->images->pluck('src')->toArray(),
-            'price' => $product->selling_price,
-            'compareAtPrice' => $product->price,
-            'badges' => [],
-            'brand' => [],
-            'categories' => [],
-            'reviews' => 0,
-            'rating' => 0,
-            'attributes' => [],
-            'availability' => $product->should_track ? $product->stock_count : 'In Stock',
-        ]));
+        $page = $request->get('page', 1);
+        $perPage = min($request->get('per_page', 20), 20);
+
+        $products = $section->products(paginate: $perPage, category: $request->category);
+
+        // Load relationships and add base image URL
+        $this->loadProductRelationships($products);
+        $this->addBaseImageUrls($products);
+
+        if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+            return [
+                'data' => $products->items(),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'per_page' => $products->perPage(),
+                    'total' => $products->total(),
+                    'has_more' => $products->hasMorePages(),
+                ],
+            ];
+        }
+
+        return $products;
     }
 
     public function product(Request $request, $slug)
     {
-        $product = Product::where('slug', rawurldecode((string) $slug))->firstOrFail();
+        $product = Product::with(['images', 'variations.options', 'brand', 'categories'])
+            ->where('slug', rawurldecode((string) $slug))
+            ->firstOrFail();
 
         if ($product->parent_id) {
             $product = $product->parent;
@@ -138,13 +151,31 @@ class ApiController extends Controller
         ]);
     }
 
-    public function updatedOptions($value, $key): void
+    private function loadProductRelationships($products)
     {
-        $variation = $this->product->variations->first(fn ($item) => $item->options->pluck('id')->diff($this->options)->isEmpty());
+        $products->load([
+            'images' => function ($query) {
+                $query->select('images.id', 'images.path')
+                    ->withPivot(['img_type', 'order'])
+                    ->wherePivot('img_type', 'base')
+                    ->limit(1);
+            },
+            'categories:id,name,slug',
+            'brand:id,name,slug',
+        ]);
+    }
 
-        if ($variation) {
-            $this->selectedVar = $variation;
-        }
+    private function addBaseImageUrls($products)
+    {
+        $collection = $products instanceof \Illuminate\Pagination\LengthAwarePaginator
+            ? $products->getCollection()
+            : $products;
+
+        $collection->transform(function ($product) {
+            $product->base_image_url = cdn($product->base_image?->src) ?? '/images/placeholder.jpg';
+
+            return $product;
+        });
     }
 
     private function deliveryText($product, $freeDelivery)
@@ -217,13 +248,6 @@ class ApiController extends Controller
     public function category($slug)
     {
         return Category::where('slug', rawurldecode((string) $slug))->firstOrFail()->toArray();
-    }
-
-    public function products($search)
-    {
-        $products = Product::where('name', 'like', "%$search%")->take(5)->get();
-
-        return view('admin.orders.searched', compact('products'))->render();
     }
 
     public function order(Order $order)
@@ -301,7 +325,7 @@ class ApiController extends Controller
         } elseif ($request->event == 'order.returned') {
             $order->status = 'RETURNED';
             // TODO: add to stock
-        } else if ($request->event == 'order.paid-return') {
+        } elseif ($request->event == 'order.paid-return') {
             $order->status = 'PAID_RETURN';
         }
 

@@ -78,6 +78,7 @@
     .content-accordion .card-body li {
       margin-bottom: 0.5rem;
     }
+
   </style>
 @endpush
 
@@ -174,67 +175,66 @@
 @endif
 
 @foreach(sections() as $section)
-@php($products = $section->products())
+@if($section->type == 'pure-grid')
 <!-- .block-products-carousel -->
-@includeWhen($section->type == 'carousel-grid', 'partials.products.carousel-grid', [
-    'title' => $section->title,
-    'products' => $products,
-    'rows' => optional($section->data)->rows,
-    'cols' => optional($section->data)->cols,
-])
-@includeWhen($section->type == 'pure-grid', 'partials.products.pure-grid', [
-    'title' => $section->title,
-    'products' => $products,
-    'rows' => optional($section->data)->rows,
-    'cols' => optional($section->data)->cols,
-])
+<x-infinite-scroll-section :section="$section" />
+@else
+    @php($products = $section->products())
+    <!-- .block-products-carousel -->
+    @includeWhen($section->type == 'carousel-grid', 'partials.products.carousel-grid', [
+        'title' => $section->title,
+        'products' => $products,
+        'rows' => optional($section->data)->rows,
+        'cols' => optional($section->data)->cols,
+    ])
+@endif
 @if ($section->type == 'banner')
-@php($pseudoColumns = (array)$section->data->columns)
-<div class="block block-banner">
-    <div class="container-fluid">
-        <div class="row">
-            @foreach($pseudoColumns['width'] as $i => $width)
-            <div class="col-md-{{$width}} mb-3">
-                @php($link = $pseudoColumns['link'][$i])
-                @php($link = $link && $link != '#' ? $link : null)
-                @php($link = $link ? url($link) : null)
-                @php($categories = implode(',', ((array)$pseudoColumns['categories'] ?? [])[$i] ?? []))
-                <a href="{{ $link ?? route('products.index', $categories ? ['filter_category' => $categories] : []) }}">
-                    <img
-                        data-aos="{{$pseudoColumns['animation'][$i]}}"
-                        class="border img-fluid w-100"
-                        src="{{ cdn($pseudoColumns['image'][$i]) }}"
-                        alt="Image"
-                    >
-                </a>
+    @php($pseudoColumns = (array)$section->data->columns)
+    <div class="block block-banner">
+        <div class="container-fluid">
+            <div class="row">
+                @foreach($pseudoColumns['width'] as $i => $width)
+                <div class="col-md-{{$width}} mb-3">
+                    @php($link = $pseudoColumns['link'][$i])
+                    @php($link = $link && $link != '#' ? $link : null)
+                    @php($link = $link ? url($link) : null)
+                    @php($categories = implode(',', ((array)$pseudoColumns['categories'] ?? [])[$i] ?? []))
+                    <a href="{{ $link ?? route('products.index', $categories ? ['filter_category' => $categories] : []) }}">
+                        <img
+                            data-aos="{{$pseudoColumns['animation'][$i]}}"
+                            class="border img-fluid w-100"
+                            src="{{ cdn($pseudoColumns['image'][$i]) }}"
+                            alt="Image"
+                        >
+                    </a>
+                </div>
+                @endforeach
             </div>
-            @endforeach
         </div>
     </div>
-</div>
 @endif
 @if ($section->type == 'content')
-@php($page = \App\Models\Page::find($section->data->page_id ?? null))
-@if($page)
-<div class="block">
-    <div class="container">
-        <div class="accordion content-accordion" id="content-accordion-{{ $section->id }}">
-            <div class="card">
-                <div class="card-header" id="heading-{{ $section->id }}">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ $section->id }}" aria-expanded="true" aria-controls="collapse-{{ $section->id }}">
-                        {{ $page->title }}
-                    </button>
-                </div>
-                <div id="collapse-{{ $section->id }}" class="collapse show" aria-labelledby="heading-{{ $section->id }}" data-parent="#content-accordion-{{ $section->id }}">
-                    <div class="card-body">
-                        {!! $page->content !!}
+    @php($page = \App\Models\Page::find($section->data->page_id ?? null))
+    @if($page)
+    <div class="block">
+        <div class="container">
+            <div class="accordion content-accordion" id="content-accordion-{{ $section->id }}">
+                <div class="card">
+                    <div class="card-header" id="heading-{{ $section->id }}">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-{{ $section->id }}" aria-expanded="true" aria-controls="collapse-{{ $section->id }}">
+                            {{ $page->title }}
+                        </button>
+                    </div>
+                    <div id="collapse-{{ $section->id }}" class="collapse show" aria-labelledby="heading-{{ $section->id }}" data-parent="#content-accordion-{{ $section->id }}">
+                        <div class="card-body">
+                            {!! $page->content !!}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@endif
+    @endif
 @endif
 <!-- .block-products-carousel / end -->
 @endforeach
