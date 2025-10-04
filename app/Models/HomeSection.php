@@ -30,25 +30,37 @@ class HomeSection extends Model
         $rows = $this->data->rows ?? 3;
         $cols = $this->data->cols ?? 5;
         $sorted = setting('show_option')->product_sort ?? 'random';
+
         if ($this->type == 'carousel-grid') {
             $rows *= $cols;
         }
-        $query = Product::whereIsActive(1)->whereNull('parent_id');
+
+        // Optimize: Select only essential fields for better performance
+        $query = Product::select([
+            'id', 'name', 'slug', 'price', 'selling_price',
+            'should_track', 'stock_count', 'is_active', 'parent_id', 'updated_at',
+        ])
+            ->whereIsActive(1)
+            ->whereNull('parent_id');
+
         if ($category) {
             $query->whereHas('categories', function ($query) use ($category): void {
                 $query->where('categories.id', $category);
             });
         } elseif (($this->data->source ?? false) == 'specific') {
-            $query->whereHas('categories', function ($query): void {
-                $query->whereIn('categories.id', $this->categories->pluck('id')->toArray());
+            // Eager load categories to avoid N+1 queries
+            $categoryIds = $this->categories()->pluck('categories.id')->toArray();
+            $query->whereHas('categories', function ($query) use ($categoryIds): void {
+                $query->whereIn('categories.id', $categoryIds);
             })
                 ->orWhereIn('id', $ids);
         }
-        $query
-            // ->inRandomOrder()
-            ->when(! $paginate, function ($query) use ($rows, $cols): void {
-                $query->take($rows * $cols);
-            });
+
+        $query->when(! $paginate, function ($query) use ($rows, $cols): void {
+            $query->take($rows * $cols);
+        });
+
+        // Optimize: Use more efficient ordering
         if ($ids) {
             if ($sorted == 'random') {
                 $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');

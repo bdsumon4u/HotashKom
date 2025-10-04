@@ -109,6 +109,10 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::get('/thank-you', OrderTrackController::class)->name('thank-you');
     Route::match(['get', 'post'], 'track-order', OrderTrackController::class)->name('track-order');
 
+    // Cart API routes (moved from api.php to use same session)
+    Route::post('cart/add', [App\Http\Controllers\Api\CartController::class, 'add'])->name('cart.add');
+    Route::get('cart', [App\Http\Controllers\Api\CartController::class, 'get'])->name('cart.get');
+
     pageRoutes();
 });
 
