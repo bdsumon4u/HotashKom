@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}455}$$ 🔥 domains are live now
+These 🔥 $${\color{red}459}$$ 🔥 domains are live now
 
-_Last updated: **2025-10-03 09:00:45 Asia/Dhaka**_
+_Last updated: **2025-10-04 08:54:55 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -554,3 +554,7 @@ _Last updated: **2025-10-03 09:00:45 Asia/Dhaka**_
 | 453 | [ideal100.com](http://ideal100.com) |
 | 454 | [asell.com.bd](http://asell.com.bd) |
 | 455 | [endlessia.com](http://endlessia.com) |
+| 456 | [antorafashionngadgets.com](http://antorafashionngadgets.com) |
+| 457 | [ghoreboshebazar.com](http://ghoreboshebazar.com) |
+| 458 | [dailyshopbd24.com](http://dailyshopbd24.com) |
+| 459 | [hrshop24.com](http://hrshop24.com) |
