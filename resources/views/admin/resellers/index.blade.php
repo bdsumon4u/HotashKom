@@ -63,6 +63,7 @@
                                         <th>Shop</th>
                                         <th>Phone</th>
                                         <th>bKash</th>
+                                        <th style="white-space: nowrap;">Reg. Date</th>
                                         @if(!isset($status) || $status !== 'pending')
                                         <th>Balance</th>
                                         <th>Orders</th>
@@ -135,6 +136,12 @@
                     data: 'bkash_number',
                     name: 'bkash_number'
                 },
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                    sortable: true,
+                    searchable: true,
+                },
                 @if(!isset($status) || $status !== 'pending')
                 {
                     data: 'balance',
@@ -172,10 +179,10 @@
 
                     @if(!isset($status) || $status !== 'pending')
                     // For all resellers view - exclude balance, orders, verified, and actions columns
-                    if ($.inArray(i, [5, 6, 7, 8]) === -1) {
+                    if ($.inArray(i, [6, 7, 8, 9]) === -1) {
                     @else
                     // For pending resellers view - exclude actions column only
-                    if ($.inArray(i, [5]) === -1) {
+                    if ($.inArray(i, [6]) === -1) {
                     @endif
                         var column = this;
                         var input = document.createElement("input");
@@ -196,7 +203,7 @@
                 @if(isset($status) && $status === 'pending')
                 [0, 'desc'] // Sort by ID column (index 0) in descending order for pending resellers
                 @else
-                [5, 'desc'] // Sort by balance column (index 5) in descending order for all resellers
+                [6, 'desc'] // Sort by balance column (index 6) in descending order for all resellers
                 @endif
             ],
             pageLength: 50,

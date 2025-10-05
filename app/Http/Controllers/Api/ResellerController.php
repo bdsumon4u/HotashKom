@@ -38,7 +38,10 @@ class ResellerController extends Controller
             ->editColumn('name', fn ($row): string => '<a href="'.route('admin.orders.index', ['user_id' => $row->id, 'status' => '']).'">'.$row->name.'</a>')
             ->editColumn('shop_name', fn ($row): string => $row->shop_name ?? '-')
             ->editColumn('phone_number', fn ($row): string => $row->phone_number ?? '-')
-            ->editColumn('bkash_number', fn ($row): string => $row->bkash_number ?? '-');
+            ->editColumn('bkash_number', fn ($row): string => $row->bkash_number ?? '-')
+            ->editColumn('created_at', function ($row): string {
+                return optional($row->created_at)->format('d-M-Y');
+            });
 
         // Add conditional columns for non-pending view
         if (! $isPendingView) {
@@ -91,6 +94,13 @@ class ResellerController extends Controller
             })
             ->filterColumn('bkash_number', function ($query, $keyword): void {
                 $query->where('users.bkash_number', 'like', '%'.$keyword.'%');
+            })
+            ->filterColumn('created_at', function ($query, $keyword): void {
+                // Allow searching by date or partial datetime
+                $query->where(function ($q) use ($keyword) {
+                    $q->whereDate('users.created_at', $keyword)
+                        ->orWhere('users.created_at', 'like', '%'.$keyword.'%');
+                });
             });
 
         // Add conditional sorting for non-pending view
