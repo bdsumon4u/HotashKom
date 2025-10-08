@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}455}$$ 🔥 domains are live now
+These 🔥 $${\color{red}458}$$ 🔥 domains are live now
 
-_Last updated: **2025-10-07 09:01:59 Asia/Dhaka**_
+_Last updated: **2025-10-08 09:01:48 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -554,3 +554,6 @@ _Last updated: **2025-10-07 09:01:59 Asia/Dhaka**_
 | 453 | [ghoreboshebazar.com](http://ghoreboshebazar.com) |
 | 454 | [dailyshopbd24.com](http://dailyshopbd24.com) |
 | 455 | [hrshop24.com](http://hrshop24.com) |
+| 456 | [tuktakbazarbd.com](http://tuktakbazarbd.com) |
+| 457 | [dorkar24.com](http://dorkar24.com) |
+| 458 | [nittonotunebazar.com](http://nittonotunebazar.com) |
