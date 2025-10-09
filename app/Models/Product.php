@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Jobs\RemoveResourceFromResellers;
+use App\Jobs\SyncProductActiveWithResellers;
 use App\Jobs\SyncProductStockWithResellers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,6 +68,11 @@ class Product extends Model
             // Dispatch job to sync stock attributes if they were changed
             if (isOninda() && $product->isDirty(['should_track', 'stock_count'])) {
                 SyncProductStockWithResellers::dispatch($product);
+            }
+
+            // Dispatch job to sync active status if it was changed
+            if (isOninda() && $product->isDirty(['is_active'])) {
+                SyncProductActiveWithResellers::dispatch($product);
             }
         });
 
