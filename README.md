@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}458}$$ 🔥 domains are live now
+These 🔥 $${\color{red}460}$$ 🔥 domains are live now
 
-_Last updated: **2025-10-10 09:05:03 Asia/Dhaka**_
+_Last updated: **2025-10-11 08:57:46 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -557,3 +557,5 @@ _Last updated: **2025-10-10 09:05:03 Asia/Dhaka**_
 | 456 | [tuktakbazarbd.com](http://tuktakbazarbd.com) |
 | 457 | [dorkar24.com](http://dorkar24.com) |
 | 458 | [nittonotunebazar.com](http://nittonotunebazar.com) |
+| 459 | [abahon.com](http://abahon.com) |
+| 460 | [trusthubbd.com](http://trusthubbd.com) |
