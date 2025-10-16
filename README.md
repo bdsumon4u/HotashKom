@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}468}$$ 🔥 domains are live now
+These 🔥 $${\color{red}470}$$ 🔥 domains are live now
 
-_Last updated: **2025-10-15 09:08:59 Asia/Dhaka**_
+_Last updated: **2025-10-16 09:07:27 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -567,3 +567,5 @@ _Last updated: **2025-10-15 09:08:59 Asia/Dhaka**_
 | 466 | [ekhonekinun.com](http://ekhonekinun.com) |
 | 467 | [dhakauddokta.com](http://dhakauddokta.com) |
 | 468 | [ideal100.com](http://ideal100.com) |
+| 469 | [pijushmart.com](http://pijushmart.com) |
+| 470 | [utshahohaat.com](http://utshahohaat.com) |
