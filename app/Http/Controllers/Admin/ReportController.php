@@ -8,7 +8,6 @@ use App\Models\Product;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 
 class ReportController extends Controller
 {
@@ -61,17 +60,17 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'codes' => 'required',
-            'orders' => 'required',
-            'products' => 'required',
-            'courier' => 'required',
-            'status' => 'required',
-            'total' => 'required',
+            'codes' => ['required'],
+            'orders' => ['required'],
+            'products' => ['required'],
+            'courier' => ['required'],
+            'status' => ['required'],
+            'total' => ['required'],
         ]);
 
         Report::create($data);
 
-        return redirect()->route('admin.reports.index')
+        return to_route('admin.reports.index')
             ->with('success', 'Report created successfully.');
     }
 
@@ -107,17 +106,17 @@ class ReportController extends Controller
     public function update(Request $request, Report $report)
     {
         $data = $request->validate([
-            'codes' => 'required',
-            'orders' => 'required',
-            'products' => 'required',
-            'courier' => 'required',
-            'status' => 'required',
-            'total' => 'required',
+            'codes' => ['required'],
+            'orders' => ['required'],
+            'products' => ['required'],
+            'courier' => ['required'],
+            'status' => ['required'],
+            'total' => ['required'],
         ]);
 
         $report->update($data);
 
-        return redirect()->route('admin.reports.index')
+        return to_route('admin.reports.index')
             ->with('success', 'Report updated successfully.');
     }
 
@@ -131,7 +130,7 @@ class ReportController extends Controller
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
         $report->delete();
 
-        return redirect()->route('admin.reports.index')
+        return to_route('admin.reports.index')
             ->with('success', 'Report deleted successfully.');
     }
 
@@ -149,9 +148,9 @@ class ReportController extends Controller
     public function customer(Request $request)
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
-        $_start = Carbon::parse(\request('start_d', date('Y-m-d')));
+        $_start = \Illuminate\Support\Facades\Date::parse(\request('start_d', date('Y-m-d')));
         $start = $_start->format('Y-m-d');
-        $_end = Carbon::parse(\request('end_d'));
+        $_end = \Illuminate\Support\Facades\Date::parse(\request('end_d'));
         $end = $_end->format('Y-m-d');
         $type = $request->get('date_type', 'status_at');
         $top = $request->get('top_by', 'order_amount');

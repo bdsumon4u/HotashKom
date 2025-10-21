@@ -20,8 +20,8 @@ class ChangePasswordController extends Controller
         }
 
         $data = $request->validate([
-            'old_password' => 'required',
-            'password' => 'required|confirmed|min:8',
+            'old_password' => ['required'],
+            'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
         $user = auth('user')->user();

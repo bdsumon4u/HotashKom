@@ -7,7 +7,6 @@ use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Product;
 use App\Services\ProductReportService;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
@@ -19,9 +18,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $_start = Carbon::parse(request('start_d'));
+        $_start = \Illuminate\Support\Facades\Date::parse(request('start_d'));
         $start = $_start->format('Y-m-d');
-        $_end = Carbon::parse(request('end_d'));
+        $_end = \Illuminate\Support\Facades\Date::parse(request('end_d'));
         $end = $_end->format('Y-m-d');
 
         $totalSQL = 'COUNT(*) as order_count, SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.subtotal"))) + SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.shipping_cost"))) - COALESCE(SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.discount"))), 0) as total_amount';
@@ -97,11 +96,9 @@ class HomeController extends Controller
         $lowStockProducts = Product::whereShouldTrack(1)->where('stock_count', '<', 10)->get();
 
         // Get total pending withdrawal amount
-        $pendingWithdrawalAmount = cache()->remember('pending_withdrawal_amount', 300, function () {
-            return abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
-                ->where('confirmed', false)
-                ->sum('amount'));
-        });
+        $pendingWithdrawalAmount = cache()->memo()->remember('pending_withdrawal_amount', 300, fn (): float|int => abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
+            ->where('confirmed', false)
+            ->sum('amount')));
 
         return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProducts', 'lowStockProducts', 'start', 'end', 'pendingWithdrawalAmount'));
     }

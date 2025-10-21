@@ -2,31 +2,28 @@
 
 namespace App\Models;
 
-use App\Jobs\CopyResourceToResellers;
-use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Option extends Model
 {
     protected $guarded = ['id'];
 
+    #[\Override]
     public static function booted(): void
     {
         static::saved(function ($option): void {
             // Dispatch job to copy option to reseller databases
             if (isOninda() && $option->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($option);
+                dispatch(new \App\Jobs\CopyResourceToResellers($option));
             }
         });
 
         static::deleting(function ($option): void {
-            if (isReseller() && $option->source_id !== null) {
-                throw new \Exception('Cannot delete a resource that has been sourced.');
-            }
+            throw_if(isReseller() && $option->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove option from reseller databases
             if (isOninda()) {
-                RemoveResourceFromResellers::dispatch($option->getTable(), $option->id);
+                dispatch(new \App\Jobs\RemoveResourceFromResellers($option->getTable(), $option->id));
             }
         });
     }

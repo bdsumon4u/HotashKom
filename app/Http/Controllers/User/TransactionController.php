@@ -20,17 +20,11 @@ class TransactionController extends Controller
 
             return DataTables::of($transactions)
                 ->addIndexColumn()
-                ->editColumn('type', function ($row) {
-                    return $row->type === 'deposit' ?
-                        '<span class="badge badge-success">Deposit</span>' :
-                        '<span class="badge badge-danger">Withdraw</span>';
-                })
-                ->editColumn('amount', function ($row) {
-                    return number_format($row->amount, 2);
-                })
-                ->editColumn('created_at', function ($row) {
-                    return $row->created_at->format('d M Y, h:i A');
-                })
+                ->editColumn('type', fn ($row): string => $row->type === 'deposit' ?
+                    '<span class="badge badge-success">Deposit</span>' :
+                    '<span class="badge badge-danger">Withdraw</span>')
+                ->editColumn('amount', fn ($row): string => number_format($row->amount, 2))
+                ->editColumn('created_at', fn ($row) => $row->created_at->format('d M Y, h:i A'))
                 ->addColumn('meta', function ($row) {
                     $meta = $row->meta;
 
@@ -67,7 +61,7 @@ class TransactionController extends Controller
     public function withdrawRequest(Request $request)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:1',
+            'amount' => ['required', 'numeric', 'min:1'],
         ]);
 
         $user = auth('user')->user();

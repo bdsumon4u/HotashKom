@@ -30,7 +30,7 @@ final readonly class ProductReportService
             $orderQuery->where('admin_id', $staffId);
         }
 
-        if ($shippedAt) {
+        if ($shippedAt instanceof \Illuminate\Support\Carbon) {
             $orderQuery->whereNotNull('shipped_at')
                 ->whereDate('shipped_at', $shippedAt);
         }
@@ -50,7 +50,7 @@ final readonly class ProductReportService
                 return $products;
             })
             ->groupBy('name') // Group by name instead of id to avoid duplicates
-            ->mapWithKeys(fn ($item, $name) => [$name => [
+            ->mapWithKeys(fn ($item, $name): array => [$name => [
                 'name' => $name,
                 'slug' => $item->first()['slug'] ?? '',
                 'quantity' => (int) $item->sum('quantity'),
@@ -66,12 +66,10 @@ final readonly class ProductReportService
                     // Otherwise use wholesale amounts (original behavior)
                     return $product['total'];
                 }),
-                'purchase_cost' => (float) $item->sum(function ($product) {
-                    return ((isset($product['purchase_price']) && $product['purchase_price']) ? $product['purchase_price'] : $product['price']) * $product['quantity'];
-                }),
+                'purchase_cost' => (float) $item->sum(fn ($product): int|float => ((isset($product['purchase_price']) && $product['purchase_price']) ? $product['purchase_price'] : $product['price']) * $product['quantity']),
             ]])
             ->sortByDesc('quantity')
-            ->toArray();
+            ->all();
 
         return [
             'products' => $products,

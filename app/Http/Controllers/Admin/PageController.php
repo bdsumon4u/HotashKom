@@ -43,14 +43,14 @@ class PageController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
-            'title' => 'required',
-            'slug' => 'required|unique:pages',
-            'content' => 'required',
+            'title' => ['required'],
+            'slug' => ['required', 'unique:pages'],
+            'content' => ['required'],
         ]);
 
         Page::create($data);
 
-        return redirect()->route('admin.pages.index')->withSuccess('Page Created.');
+        return to_route('admin.pages.index')->withSuccess('Page Created.');
     }
 
     /**
@@ -74,14 +74,14 @@ class PageController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
-            'title' => 'required',
+            'title' => ['required'],
             'slug' => 'required|unique:pages,slug,'.$page->id,
-            'content' => 'required',
+            'content' => ['required'],
         ]);
 
         $page->update($data);
 
-        return redirect()->route('admin.pages.index')->withSuccess('Page Updated.');
+        return to_route('admin.pages.index')->withSuccess('Page Updated.');
     }
 
     /**

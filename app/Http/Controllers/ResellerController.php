@@ -51,7 +51,7 @@ final class ResellerController extends Controller
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%")
                     ->orWhere('sku', $search);
             });
@@ -100,16 +100,16 @@ final class ResellerController extends Controller
     {
         // Validate the request
         $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|regex:/^1\d{9}$/',
-            'address' => 'required|string',
-            'shipping' => 'required|in:Inside Dhaka,Outside Dhaka',
-            'note' => 'nullable|string',
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'regex:/^1\d{9}$/'],
+            'address' => ['required', 'string'],
+            'shipping' => ['required', 'in:Inside Dhaka,Outside Dhaka'],
+            'note' => ['nullable', 'string'],
         ]);
 
         // Process the checkout using the existing checkout logic
         // For now, redirect to the main checkout with the form data
-        return redirect()->route('checkout')->with([
+        return to_route('checkout')->with([
             'reseller_checkout_data' => $request->all(),
         ]);
     }
@@ -172,7 +172,7 @@ final class ResellerController extends Controller
                     if ($order->products) {
                         $productsArray = is_array($order->products) ? $order->products : (array) $order->products;
                         if (! empty($productsArray)) {
-                            foreach ($productsArray as $productId => $product) {
+                            foreach ($productsArray as $product) {
                                 $product = (array) $product;
                                 $products .= "<li>{$product['quantity']} x <a class='text-underline' href='".route('products.show', $product['slug'])."' target='_blank'>{$product['name']}</a></li>";
                             }
@@ -231,9 +231,7 @@ final class ResellerController extends Controller
     {
         $user = Auth::guard('user')->user();
 
-        if ($order->user_id !== $user->id) {
-            abort(403);
-        }
+        abort_if($order->user_id !== $user->id, 403);
 
         return view('reseller.order-show', compact('order'));
     }
@@ -242,14 +240,10 @@ final class ResellerController extends Controller
     {
         $user = Auth::guard('user')->user();
 
-        if ($order->user_id !== $user->id) {
-            abort(403, 'You can only edit your own orders.');
-        }
+        abort_if($order->user_id !== $user->id, 403, 'You can only edit your own orders.');
 
         // Check if order status allows editing
-        if (! in_array($order->status, ['PENDING', 'CONFIRMED'])) {
-            abort(403, 'You can only edit orders with PENDING or CONFIRMED status.');
-        }
+        abort_unless(in_array($order->status, ['PENDING', 'CONFIRMED']), 403, 'You can only edit orders with PENDING or CONFIRMED status.');
 
         return view('reseller.order-edit', compact('order'));
     }
@@ -258,14 +252,10 @@ final class ResellerController extends Controller
     {
         $user = Auth::guard('user')->user();
 
-        if ($order->user_id !== $user->id) {
-            abort(403, 'You can only cancel your own orders.');
-        }
+        abort_if($order->user_id !== $user->id, 403, 'You can only cancel your own orders.');
 
         // Check if order status allows cancellation
-        if (! in_array($order->status, ['PENDING', 'CONFIRMED'])) {
-            abort(403, 'You can only cancel orders with PENDING or CONFIRMED status.');
-        }
+        abort_unless(in_array($order->status, ['PENDING', 'CONFIRMED']), 403, 'You can only cancel orders with PENDING or CONFIRMED status.');
 
         // Update order status to CANCELLED
         $order->update([
@@ -273,7 +263,7 @@ final class ResellerController extends Controller
             'status_at' => now()->toDateTimeString(),
         ]);
 
-        return redirect()->route('reseller.orders')
+        return to_route('reseller.orders')
             ->with('success', 'Order cancelled successfully.');
     }
 
@@ -287,29 +277,27 @@ final class ResellerController extends Controller
                 'draw' => $request->draw,
                 'recordsTotal' => $transactions->total(),
                 'recordsFiltered' => $transactions->total(),
-                'data' => $transactions->map(function ($transaction, $index) {
-                    return [
-                        'DT_RowIndex' => $index + 1,
-                        'type' => $transaction->type === 'deposit'
-                            ? '<span class="badge badge-success">Deposit</span>'
-                            : '<span class="badge badge-danger">Withdraw</span>',
-                        'amount' => number_format((float) $transaction->amount, 2).' tk',
-                        'created_at' => $transaction->created_at->format('d-M-Y H:i'),
-                        'status' => $transaction->confirmed ? 'COMPLETED' : 'PENDING',
-                        'meta' => (function ($meta) {
-                            if (isset($meta['trx_id']) && isset($meta['admin_id'])) {
-                                return '<span class="text-muted">Trx ID: '.e($meta['trx_id']).' by staff #'.e($meta['admin_id']).'</span>';
-                            }
+                'data' => $transactions->map(fn ($transaction, $index): array => [
+                    'DT_RowIndex' => $index + 1,
+                    'type' => $transaction->type === 'deposit'
+                        ? '<span class="badge badge-success">Deposit</span>'
+                        : '<span class="badge badge-danger">Withdraw</span>',
+                    'amount' => number_format((float) $transaction->amount, 2).' tk',
+                    'created_at' => $transaction->created_at->format('d-M-Y H:i'),
+                    'status' => $transaction->confirmed ? 'COMPLETED' : 'PENDING',
+                    'meta' => (function ($meta) {
+                        if (isset($meta['trx_id']) && isset($meta['admin_id'])) {
+                            return '<span class="text-muted">Trx ID: '.e($meta['trx_id']).' by staff #'.e($meta['admin_id']).'</span>';
+                        }
 
-                            $title = $meta['reason'] ?? 'N/A';
-                            if ($id = $meta['order_id'] ?? false) {
-                                return '<a target="_blank" href="'.route('reseller.orders.show', $id).'">'.e($title).'</a>';
-                            }
+                        $title = $meta['reason'] ?? 'N/A';
+                        if ($id = $meta['order_id'] ?? false) {
+                            return '<a target="_blank" href="'.route('reseller.orders.show', $id).'">'.e($title).'</a>';
+                        }
 
-                            return e($title);
-                        })($transaction->meta),
-                    ];
-                }),
+                        return e($title);
+                    })($transaction->meta),
+                ]),
             ]);
         }
 
@@ -326,16 +314,16 @@ final class ResellerController extends Controller
         $user = Auth::guard('user')->user();
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'shop_name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
+            'shop_name' => ['required', 'string', 'max:255'],
             'email' => 'required|email|unique:users,email,'.$user->id,
-            'phone_number' => 'required|string|max:20',
-            'bkash_number' => 'required|string|max:20',
-            'address' => 'nullable|string|max:500',
+            'phone_number' => ['required', 'string', 'max:20'],
+            'bkash_number' => ['required', 'string', 'max:20'],
+            'address' => ['nullable', 'string', 'max:500'],
             'domain' => 'nullable|string|max:255|unique:users,domain,'.$user->id,
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'inside_dhaka_shipping' => 'nullable|integer|min:0|max:999999',
-            'outside_dhaka_shipping' => 'nullable|integer|min:0|max:999999',
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'inside_dhaka_shipping' => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'outside_dhaka_shipping' => ['nullable', 'integer', 'min:0', 'max:999999'],
         ]);
 
         $user->fill($request->only([
@@ -356,7 +344,7 @@ final class ResellerController extends Controller
 
         $user->save();
 
-        return redirect()->route('reseller.profile')
+        return to_route('reseller.profile')
             ->with('success', 'Profile updated successfully!');
     }
 }

@@ -16,6 +16,7 @@ class MenuItem extends Model
      *
      * @return void
      */
+    #[\Override]
     protected static function booted()
     {
         static::addGlobalScope('order', function (Builder $builder): void {
@@ -24,11 +25,11 @@ class MenuItem extends Model
         });
 
         static::saved(function ($item): void {
-            cache()->forget('menus:'.$item->menu->slug);
+            cache()->memo()->forget('menus:'.$item->menu->slug);
         });
 
         static::deleting(function ($item): void {
-            cache()->forget('menus:'.$item->menu->slug);
+            cache()->memo()->forget('menus:'.$item->menu->slug);
         });
     }
 

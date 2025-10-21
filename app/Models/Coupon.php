@@ -17,12 +17,6 @@ class Coupon extends Model
         'is_active',
     ];
 
-    protected $casts = [
-        'expires_at' => 'datetime',
-        'is_active' => 'boolean',
-        'discount' => 'decimal:2',
-    ];
-
     /**
      * Check if coupon is valid
      */
@@ -36,11 +30,7 @@ class Coupon extends Model
             return false;
         }
 
-        if ($this->max_usages && $this->used_count >= $this->max_usages) {
-            return false;
-        }
-
-        return true;
+        return ! ($this->max_usages && $this->used_count >= $this->max_usages);
     }
 
     /**
@@ -62,18 +52,19 @@ class Coupon extends Model
     /**
      * Get formatted discount text
      */
-    public function getDiscountTextAttribute(): string
+    protected function discountText(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return '৳'.number_format($this->discount, 2);
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn (): string => '৳'.number_format($this->discount, 2));
     }
 
     /**
      * Scope for active coupons
      */
-    public function scopeActive($query)
+    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    protected function active($query)
     {
         return $query->where('is_active', true)
-            ->where(function ($q) {
+            ->where(function ($q): void {
                 $q->whereNull('expires_at')
                     ->orWhere('expires_at', '>', now());
             });
@@ -85,5 +76,14 @@ class Coupon extends Model
     public static function findByCode(string $code): ?self
     {
         return static::where('code', strtoupper($code))->first();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'expires_at' => 'datetime',
+            'is_active' => 'boolean',
+            'discount' => 'decimal:2',
+        ];
     }
 }

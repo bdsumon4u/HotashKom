@@ -15,12 +15,12 @@ class ProductCard extends Component
 
     protected $facebookService;
 
-    public function boot(FacebookPixelService $facebookService)
+    public function boot(FacebookPixelService $facebookService): void
     {
         $this->facebookService = $facebookService;
     }
 
-    public function mount()
+    public function mount(): void
     {
         $this->facebookService = app(FacebookPixelService::class);
     }

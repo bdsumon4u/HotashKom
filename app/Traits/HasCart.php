@@ -11,7 +11,7 @@ trait HasCart
     public function addToKart(Product $product, int $quantity = 1, string $instance = 'default', $retailPrice = null)
     {
         session(['kart' => $instance]);
-        if ($instance == 'landing') {
+        if ($instance === 'landing') {
             cart()->destroy();
         }
 
@@ -64,8 +64,8 @@ trait HasCart
         $this->dispatch('cartUpdated');
         $this->dispatch('notify', ['message' => 'Product added to cart']);
 
-        if ($instance != 'default' && $instance != 'landing') {
-            return redirect()->route('checkout');
+        if ($instance !== 'default' && $instance !== 'landing') {
+            return to_route('checkout');
         }
     }
 }

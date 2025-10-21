@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\ProductReportService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ShipmentReportController extends Controller
@@ -16,8 +15,8 @@ class ShipmentReportController extends Controller
      */
     public function index(Request $request)
     {
-        $start = Carbon::parse($request->get('start_d', now()));
-        $end = Carbon::parse($request->get('end_d', now()));
+        $start = \Illuminate\Support\Facades\Date::parse($request->get('start_d', now()));
+        $end = \Illuminate\Support\Facades\Date::parse($request->get('end_d', now()));
 
         $report = $this->generateReport($start->format('Y-m-d'), $end->format('Y-m-d'));
 
@@ -43,7 +42,7 @@ class ShipmentReportController extends Controller
     /**
      * Generate shipment report for the given date range
      */
-    private function generateReport($startDate, $endDate)
+    private function generateReport($startDate, $endDate): array
     {
         $orders = Order::whereNotNull('shipped_at')
             ->whereBetween(DB::raw('DATE(shipped_at)'), [$startDate, $endDate])
@@ -52,13 +51,9 @@ class ShipmentReportController extends Controller
         $totalShipped = $orders->count();
 
         $statusBreakdown = $orders->groupBy('status')->map(function ($group) {
-            $totalSubtotal = $group->sum(function ($order) {
-                return $order->data['subtotal'] ?? 0;
-            });
+            $totalSubtotal = $group->sum(fn ($order) => $order->data['subtotal'] ?? 0);
 
-            $totalPurchaseCost = $group->sum(function ($order) {
-                return (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0);
-            });
+            $totalPurchaseCost = $group->sum(fn ($order) => (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0));
 
             return [
                 'count' => $group->count(),
@@ -78,16 +73,10 @@ class ShipmentReportController extends Controller
             }
         }
 
-        $dailyBreakdown = $orders->groupBy(function ($order) {
-            return $order->shipped_at->format('Y-m-d');
-        })->map(function ($group) {
-            $totalSubtotal = $group->sum(function ($order) {
-                return $order->data['subtotal'] ?? 0;
-            });
+        $dailyBreakdown = $orders->groupBy(fn ($order) => $order->shipped_at->format('Y-m-d'))->map(function ($group) {
+            $totalSubtotal = $group->sum(fn ($order) => $order->data['subtotal'] ?? 0);
 
-            $totalPurchaseCost = $group->sum(function ($order) {
-                return (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0);
-            });
+            $totalPurchaseCost = $group->sum(fn ($order) => (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0));
 
             return [
                 'total' => $group->count(),
@@ -99,16 +88,10 @@ class ShipmentReportController extends Controller
             ];
         });
 
-        $courierBreakdown = $orders->groupBy(function ($order) {
-            return $order->data['courier'] ?? 'Other';
-        })->map(function ($group) {
-            $totalSubtotal = $group->sum(function ($order) {
-                return $order->data['subtotal'] ?? 0;
-            });
+        $courierBreakdown = $orders->groupBy(fn ($order) => $order->data['courier'] ?? 'Other')->map(function ($group) {
+            $totalSubtotal = $group->sum(fn ($order) => $order->data['subtotal'] ?? 0);
 
-            $totalPurchaseCost = $group->sum(function ($order) {
-                return (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0);
-            });
+            $totalPurchaseCost = $group->sum(fn ($order) => (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0));
 
             return [
                 'total' => $group->count(),

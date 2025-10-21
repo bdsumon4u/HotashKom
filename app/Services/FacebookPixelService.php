@@ -29,10 +29,8 @@ class FacebookPixelService
 
     /**
      * Create server-side custom data object
-     *
-     * @return CustomData
      */
-    protected function createServerCustomData(array $customData)
+    protected function createServerCustomData(array $customData): \FacebookAds\Object\ServerSide\CustomData
     {
         $customDataObj = new CustomData;
 
@@ -97,10 +95,8 @@ class FacebookPixelService
 
     /**
      * Track an event with both client and server-side tracking
-     *
-     * @return void
      */
-    public function trackEvent(string $eventName, array $customData = [], array $userData = [], ?Component $component = null)
+    public function trackEvent(string $eventName, array $customData = [], array $userData = [], ?Component $component = null): void
     {
         try {
             // Generate event ID
@@ -110,7 +106,7 @@ class FacebookPixelService
             // MetaPixel::flashEvent($eventName, $customData, $eventId);
 
             // If component is provided, dispatch event to browser
-            if ($component) {
+            if ($component instanceof \Livewire\Component) {
                 info('dispatching event to browser', [
                     'eventName' => $eventName,
                     'customData' => $customData,
@@ -123,7 +119,7 @@ class FacebookPixelService
                 ]);
             }
 
-            defer(function () use ($eventName, $eventId, $customData, $userData) {
+            defer(function () use ($eventName, $eventId, $customData, $userData): void {
                 // info('dispatching event to server', [
                 //     'eventName' => $eventName,
                 //     'customData' => $customData,
@@ -133,12 +129,12 @@ class FacebookPixelService
                 $serverCustomData = $this->createServerCustomData($customData);
                 $serverUserData = $this->createServerUserData($userData);
 
-                foreach (explode('|', config('meta-pixel.meta_pixel')) as $pixel) {
+                foreach (explode('|', (string) config('meta-pixel.meta_pixel')) as $pixel) {
                     [$id, $token, $test] = explode(':', $pixel);
                     MetaPixel::setPixelId($id);
                     MetaPixel::setToken($token);
                     MetaPixel::setTestEventCode($test);
-                    MetaPixel::send($eventName, $eventId, $serverCustomData, $serverUserData, $customData['page_url'] ?? null);
+                    MetaPixel::send($eventName, $eventId, $serverCustomData, $serverUserData);
                 }
             });
 
@@ -156,10 +152,8 @@ class FacebookPixelService
 
     /**
      * Track AddToCart event
-     *
-     * @return void
      */
-    public function trackAddToCart(array $product, ?Component $component = null)
+    public function trackAddToCart(array $product, ?Component $component = null): void
     {
         $this->trackEvent('AddToCart', [
             'currency' => 'BDT',
@@ -173,10 +167,8 @@ class FacebookPixelService
 
     /**
      * Track Purchase event
-     *
-     * @return void
      */
-    public function trackPurchase(array $order, array $products, array $userData, ?Component $component = null)
+    public function trackPurchase(array $order, array $products, array $userData, ?Component $component = null): void
     {
         $this->trackEvent('Purchase', [
             'currency' => 'BDT',

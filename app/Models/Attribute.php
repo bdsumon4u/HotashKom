@@ -2,31 +2,28 @@
 
 namespace App\Models;
 
-use App\Jobs\CopyResourceToResellers;
-use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Attribute extends Model
 {
     protected $guarded = ['id'];
 
+    #[\Override]
     public static function booted(): void
     {
         static::saved(function ($attribute): void {
             // Dispatch job to copy attribute to reseller databases
             if (isOninda() && $attribute->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($attribute);
+                dispatch(new \App\Jobs\CopyResourceToResellers($attribute));
             }
         });
 
         static::deleting(function ($record): void {
-            if (isReseller() && $record->source_id !== null) {
-                throw new \Exception('Cannot delete a resource that has been sourced.');
-            }
+            throw_if(isReseller() && $record->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove attribute from reseller databases
             if (isOninda()) {
-                RemoveResourceFromResellers::dispatch($record->getTable(), $record->id);
+                dispatch(new \App\Jobs\RemoveResourceFromResellers($record->getTable(), $record->id));
             }
         });
     }

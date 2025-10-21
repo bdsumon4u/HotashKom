@@ -43,11 +43,11 @@ class MenuController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
-            'name' => 'required',
-            'slug' => 'required|unique:menus',
+            'name' => ['required'],
+            'slug' => ['required', 'unique:menus'],
         ]);
 
-        return redirect()->route('admin.menus.edit', Menu::create($data))->withSuccess('Menu Has Been Created.');
+        return to_route('admin.menus.edit', Menu::create($data))->withSuccess('Menu Has Been Created.');
     }
 
     /**

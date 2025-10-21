@@ -13,6 +13,7 @@ class ProductResource extends JsonResource
      *
      * @return array<string, mixed>
      */
+    #[\Override]
     public function toArray(Request $request): array
     {
         $data = Arr::except(parent::toArray($request), [
@@ -52,7 +53,7 @@ class ProductResource extends JsonResource
             'name' => $this->resource->varName,
             'slug' => $this->resource->slug,
             'sku' => $this->resource->sku,
-            'image' => optional($this->resource->baseImage)->src,
+            'image' => $this->resource->baseImage?->src,
             'category' => $this->resource->category,
             'quantity' => $quantity,
             'price' => $price = $this->resource->getPrice($quantity),

@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Traits\PreventsSourcedResourceDeletion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -45,7 +44,7 @@ class CategoryController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         if ($request->has('categories')) {
             $data = $request->validate([
-                'categories' => 'required|array',
+                'categories' => ['required', 'array'],
             ]);
 
             collect($data['categories'])
@@ -68,16 +67,16 @@ class CategoryController extends Controller
                     $category->update($data);
                 });
 
-            cache()->forget('categories:nested');
+            cache()->memo()->forget('categories:nested');
 
             return true;
         }
         $data = $request->validate([
-            'parent_id' => 'nullable|integer',
-            'name' => 'required|unique:categories',
-            'slug' => 'required|unique:categories',
-            'base_image' => 'nullable|integer',
-            'is_enabled' => 'boolean',
+            'parent_id' => ['nullable', 'integer'],
+            'name' => ['required', 'unique:categories'],
+            'slug' => ['required', 'unique:categories'],
+            'base_image' => ['nullable', 'integer'],
+            'is_enabled' => ['boolean'],
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
@@ -138,11 +137,11 @@ class CategoryController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
-            'parent_id' => 'nullable|integer',
+            'parent_id' => ['nullable', 'integer'],
             'name' => 'required|unique:categories,name,'.$category->id,
             'slug' => 'required|unique:categories,slug,'.$category->id,
-            'base_image' => 'nullable|integer',
-            'is_enabled' => 'boolean',
+            'base_image' => ['nullable', 'integer'],
+            'is_enabled' => ['boolean'],
         ]);
 
         // Prevent circular reference: category cannot be its own parent
@@ -180,6 +179,6 @@ class CategoryController extends Controller
 
         $category->delete();
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category Has Been Deleted.');
+        return to_route('admin.categories.index')->with('success', 'Category Has Been Deleted.');
     }
 }

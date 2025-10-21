@@ -4,14 +4,10 @@
     $isResellerInvoice = isOninda() && (setting('show_option')->resellers_invoice ?? false);
 
     // Helper function to get fallback value
-    $getFallback = function($value, $fallback) {
-        return $value ?: $fallback;
-    };
+    $getFallback = (fn($value, $fallback) => $value ?: $fallback);
 
     // Helper function to get user or company value
-    $getUserOrCompany = function($userField, $companyField) use ($user, $company) {
-        return ($user && $user->$userField) ? $user->$userField : ($company->$companyField ?? '');
-    };
+    $getUserOrCompany = (fn($userField, $companyField) => ($user && $user->$userField) ? $user->$userField : ($company->$companyField ?? ''));
 
     // For walk-in users or non-reseller invoices, use current platform settings
     if ($isWalkIn || !$isResellerInvoice) {
@@ -41,8 +37,8 @@
             // Logo with proper URL construction
             if (isset($resellerLogo->mobile)) {
                 $domain = $user->domain ?? '';
-                if ($domain && !str_starts_with($domain, 'http')) {
-                    $domain = (parse_url(config('app.url'), PHP_URL_SCHEME) ?: 'https') . '://' . $domain;
+                if ($domain && !str_starts_with((string) $domain, 'http')) {
+                    $domain = (parse_url((string) config('app.url'), PHP_URL_SCHEME) ?: 'https') . '://' . $domain;
                 }
                 $logoUrl = $domain . $resellerLogo->mobile;
             } else {

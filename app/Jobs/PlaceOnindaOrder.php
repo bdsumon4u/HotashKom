@@ -122,7 +122,7 @@ class PlaceOnindaOrder implements ShouldQueue
                 $cartItem['retail_price'] = $product->price;
 
                 return [$product->source_id => $cartItem];
-            })->filter()->toArray();
+            })->filter()->all();
 
             // Prepare order data for Oninda database
             $orderData = $this->prepareOrderData($resellerOrder, $mappedProducts);
@@ -176,11 +176,7 @@ class PlaceOnindaOrder implements ShouldQueue
             $adminQ = DB::table('admins')
                 ->orderByRaw('CASE WHEN is_active = 1 THEN 0 ELSE 1 END, role_id desc, last_order_received_at asc');
 
-            if (count($adminIds) > 0) {
-                $admin = $adminQ->whereIn('id', $adminIds)->first() ?? $adminQ->first();
-            } else {
-                $admin = $adminQ->first();
-            }
+            $admin = count($adminIds) > 0 ? $adminQ->whereIn('id', $adminIds)->first() ?? $adminQ->first() : $adminQ->first();
         } else {
             $adminQ = DB::table('admins')
                 ->where('role_id', Admin::SALESMAN)

@@ -34,6 +34,7 @@ class ContentColumn extends PageBlock
             ->columns(2);
     }
 
+    #[\Override]
     public static function mutateData(array $data): array
     {
         $data['content'] = static::transformListHtmlQuick($data['content']);

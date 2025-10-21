@@ -10,6 +10,7 @@ class Page extends Model
         'title', 'slug', 'content',
     ];
 
+    #[\Override]
     public function getRouteKeyName()
     {
         return 'slug';

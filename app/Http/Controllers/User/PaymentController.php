@@ -45,22 +45,22 @@ class PaymentController extends Controller
     public function applyCoupon(Request $request)
     {
         $request->validate([
-            'coupon_code' => 'required|string|max:50',
+            'coupon_code' => ['required', 'string', 'max:50'],
         ]);
 
         $coupon = Coupon::findByCode($request->coupon_code);
 
-        if (! $coupon) {
-            return redirect()->route('user.payment.verification')
+        if (! $coupon instanceof \App\Models\Coupon) {
+            return to_route('user.payment.verification')
                 ->with('error', 'Invalid coupon code.');
         }
 
         if (! $coupon->isValid()) {
-            return redirect()->route('user.payment.verification')
+            return to_route('user.payment.verification')
                 ->with('error', 'This coupon is not valid or has expired.');
         }
 
-        return redirect()->route('user.payment.verification', ['coupon_code' => $coupon->code])
+        return to_route('user.payment.verification', ['coupon_code' => $coupon->code])
             ->with('success', 'Coupon applied successfully!');
     }
 
@@ -70,7 +70,7 @@ class PaymentController extends Controller
     public function createPayment(Request $request)
     {
         $request->validate([
-            'coupon_code' => 'nullable|string|max:50',
+            'coupon_code' => ['nullable', 'string', 'max:50'],
         ]);
 
         $user = auth()->user();
@@ -105,7 +105,7 @@ class PaymentController extends Controller
                     'amount' => $finalAmount,
                     'original_amount' => $verificationFee,
                     'discount_amount' => $discountAmount,
-                    'coupon_id' => $appliedCoupon ? $appliedCoupon->id : null,
+                    'coupon_id' => $appliedCoupon instanceof \App\Models\Coupon ? $appliedCoupon->id : null,
                     'payment_id' => $payment['paymentID'],
                     'merchant_invoice_number' => $payment['merchantInvoiceNumber'],
                 ],
@@ -115,7 +115,7 @@ class PaymentController extends Controller
             return redirect()->away($payment['bkashURL']);
 
         } catch (\Exception $e) {
-            return redirect()->route('user.payment.verification')
+            return to_route('user.payment.verification')
                 ->with('error', 'Failed to create payment: '.$e->getMessage());
         }
     }

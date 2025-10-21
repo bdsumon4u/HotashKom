@@ -15,9 +15,9 @@ class PurchaseCreate extends Component
 
     public $products = [];
 
-    public $selectedProduct = null;
+    public $selectedProduct;
 
-    public $selectedVariant = null;
+    public $selectedVariant;
 
     public $items = [];
 
@@ -47,24 +47,24 @@ class PurchaseCreate extends Component
         'items.*.quantity' => 'required|integer|min:1',
     ];
 
-    public function mount()
+    public function mount(): void
     {
         $this->purchase_date = now()->toDateString();
     }
 
-    public function updatedSearch($value)
+    public function updatedSearch($value): void
     {
         $this->products = [];
         $this->selectedProduct = null;
         $this->selectedVariant = null;
-        if (strlen($value) > 2) {
+        if (strlen((string) $value) > 2) {
             $this->products = Product::with(['variations.options', 'options', 'brand'])
                 ->whereNull('parent_id')
                 ->whereIsActive(1)
-                ->where(function ($q) use ($value) {
+                ->where(function ($q) use ($value): void {
                     $q->where('name', 'like', "%{$value}%")
                         ->orWhere('sku', 'like', "%{$value}%")
-                        ->orWhereHas('variations', function ($q2) use ($value) {
+                        ->orWhereHas('variations', function ($q2) use ($value): void {
                             $q2->where('name', 'like', "%{$value}%")
                                 ->orWhere('sku', 'like', "%{$value}%");
                         });
@@ -74,7 +74,7 @@ class PurchaseCreate extends Component
         }
     }
 
-    public function selectProduct($productId)
+    public function selectProduct($productId): void
     {
         $product = Product::with(['variations.options', 'options', 'brand'])->find($productId);
         $this->selectedProduct = $product;
@@ -84,7 +84,7 @@ class PurchaseCreate extends Component
         $this->inputKey++;
     }
 
-    public function selectVariant($variantId)
+    public function selectVariant($variantId): void
     {
         $variant = Product::with(['options', 'brand', 'parent'])->find($variantId);
         $this->selectedVariant = $variant;
@@ -94,7 +94,7 @@ class PurchaseCreate extends Component
         $this->inputKey++;
     }
 
-    public function addItem($product)
+    public function addItem($product): void
     {
         // Prevent duplicate
         foreach ($this->items as $item) {
@@ -119,14 +119,14 @@ class PurchaseCreate extends Component
         ];
     }
 
-    public function updateItem($index, $field, $value)
+    public function updateItem($index, $field, $value): void
     {
         if (isset($this->items[$index])) {
             $this->items[$index][$field] = $value;
         }
     }
 
-    public function removeItem($index)
+    public function removeItem($index): void
     {
         unset($this->items[$index]);
         $this->items = array_values($this->items);
@@ -134,7 +134,7 @@ class PurchaseCreate extends Component
 
     public function getTotalProperty()
     {
-        return collect($this->items)->sum(fn ($item) => (float) ($item['price'] ?? 0) * (float) ($item['quantity'] ?? 0));
+        return collect($this->items)->sum(fn ($item): float => (float) ($item['price'] ?? 0) * (float) ($item['quantity'] ?? 0));
     }
 
     public function save()
@@ -168,7 +168,7 @@ class PurchaseCreate extends Component
 
         session()->flash('success', 'Purchase record created successfully!');
 
-        return redirect()->route('admin.purchases.index');
+        return to_route('admin.purchases.index');
     }
 
     public function render()

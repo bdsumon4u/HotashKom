@@ -43,7 +43,7 @@ class SyncResellerResources extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $only = $this->option('only') ? array_map('trim', explode(',', $this->option('only'))) : [];
         $baseDelay = (int) $this->option('delay');
@@ -96,7 +96,7 @@ class SyncResellerResources extends Command
 
         $this->info("Using delay: {$actualDelay}s for {$tableName} table (base: {$baseDelay}s × multiplier: {$delayMultiplier})");
 
-        $modelClass::chunk($isProduct ? 50 : 100, function ($items) use ($actualDelay, $isProduct, &$currentDelay) {
+        $modelClass::chunk($isProduct ? 50 : 100, function ($items) use ($actualDelay, $isProduct, &$currentDelay): void {
             foreach ($items as $item) {
                 if ($isProduct) {
                     dispatch(new CopyProductToResellers($item))->delay(now()->addSeconds($currentDelay));

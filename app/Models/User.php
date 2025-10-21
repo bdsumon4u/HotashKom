@@ -41,9 +41,10 @@ class User extends Authenticatable implements Confirmable, Wallet
         'db_password', // Hide database password
     ];
 
+    #[\Override]
     public static function booted(): void
     {
-        static::updated(function (User $user) {
+        static::updated(function (User $user): void {
             if (Arr::get($user->getChanges(), 'is_verified')) {
                 $user->deposit(0, [
                     'reason' => 'Verify Reseller Account',
@@ -110,10 +111,8 @@ class User extends Authenticatable implements Confirmable, Wallet
 
     /**
      * Get the database configuration for this reseller.
-     *
-     * @return array
      */
-    public function getDatabaseConfig()
+    public function getDatabaseConfig(): array
     {
         return [
             'driver' => 'mysql',
@@ -147,9 +146,9 @@ class User extends Authenticatable implements Confirmable, Wallet
     /**
      * Get the full URL for the user's logo.
      */
-    public function getLogoUrlAttribute()
+    protected function logoUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return $this->logo ? asset('storage/'.$this->logo) : null;
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn (): ?string => $this->logo ? asset('storage/'.$this->logo) : null);
     }
 
     /**

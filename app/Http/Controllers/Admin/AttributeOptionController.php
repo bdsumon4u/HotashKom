@@ -38,8 +38,8 @@ class AttributeOptionController extends Controller
         }
 
         $attribute->options()->create($request->validate([
-            'name' => 'required',
-            'value' => 'required',
+            'name' => ['required'],
+            'value' => ['required'],
         ]));
 
         return back()->withSuccess('Option created successfully');
@@ -74,8 +74,8 @@ class AttributeOptionController extends Controller
         }
 
         $option->update($request->validate([
-            'name' => 'required',
-            'value' => 'required',
+            'name' => ['required'],
+            'value' => ['required'],
         ]));
 
         return back()->withSuccess('Option updated successfully');

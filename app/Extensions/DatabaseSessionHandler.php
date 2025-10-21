@@ -15,6 +15,7 @@ class DatabaseSessionHandler extends \Illuminate\Session\DatabaseSessionHandler
      *
      * @throws BindingResolutionException
      */
+    #[\Override]
     protected function addUserInformation(&$payload)
     {
         if ($this->container->bound(Guard::class)) {

@@ -10,14 +10,15 @@ class Slide extends Model
         'mobile_src', 'desktop_src', 'title', 'text', 'btn_name', 'btn_href', 'is_active',
     ];
 
+    #[\Override]
     public static function booted(): void
     {
         static::saved(function ($menu): void {
-            cache()->put('slides', static::whereIsActive(1)->get());
+            cache()->memo()->put('slides', static::whereIsActive(1)->get());
         });
 
         static::deleted(function (): void {
-            cache()->forget('slides');
+            cache()->memo()->forget('slides');
         });
     }
 }

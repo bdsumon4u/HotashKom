@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use App\Jobs\RemoveResourceFromResellers;
-use App\Jobs\SyncProductActiveWithResellers;
-use App\Jobs\SyncProductStockWithResellers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,18 +20,6 @@ class Product extends Model
     protected $fillable = [
         'brand_id', 'name', 'slug', 'description', 'price', 'average_purchase_price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
         'source_id', 'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'hot_sale', 'new_arrival', 'shipping_inside', 'shipping_outside', 'delivery_text',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'is_active' => 'boolean',
-        'hot_sale' => 'boolean',
-        'new_arrival' => 'boolean',
-        'should_track' => 'boolean',
     ];
 
     /**
@@ -59,31 +44,28 @@ class Product extends Model
 
     /**
      * The "booted" method of the model.
-     *
-     * @return void
      */
-    public static function booted()
+    #[\Override]
+    public static function booted(): void
     {
         static::saved(function ($product): void {
             // Dispatch job to sync stock attributes if they were changed
             if (isOninda() && $product->isDirty(['should_track', 'stock_count'])) {
-                SyncProductStockWithResellers::dispatch($product);
+                dispatch(new \App\Jobs\SyncProductStockWithResellers($product));
             }
 
             // Dispatch job to sync active status if it was changed
             if (isOninda() && $product->isDirty(['is_active'])) {
-                SyncProductActiveWithResellers::dispatch($product);
+                dispatch(new \App\Jobs\SyncProductActiveWithResellers($product));
             }
         });
 
         static::deleting(function ($record): void {
-            if (isReseller() && $record->source_id !== null) {
-                throw new \Exception('Cannot delete a resource that has been sourced.');
-            }
+            throw_if(isReseller() && $record->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove product from reseller databases
             if (! $record->parent_id && isOninda()) { // not a variation
-                RemoveResourceFromResellers::dispatch($record->getTable(), $record->id);
+                dispatch(new \App\Jobs\RemoveResourceFromResellers($record->getTable(), $record->id));
             }
             $record->variations->each->delete();
         });
@@ -307,17 +289,26 @@ class Product extends Model
             'id', 'stock_count', 'average_purchase_price', 'selling_price',
         ]);
         $totalStockCount = $products->sum('stock_count');
-        $totalPurchaseValue = $products->sum(function ($product) {
-            return $product->stock_count * ($product->average_purchase_price ?? $product->selling_price);
-        });
-        $totalSellValue = $products->sum(function ($product) {
-            return $product->stock_count * $product->selling_price;
-        });
+        $totalPurchaseValue = $products->sum(fn ($product): int|float => $product->stock_count * ($product->average_purchase_price ?? $product->selling_price));
+        $totalSellValue = $products->sum(fn ($product): int|float => $product->stock_count * $product->selling_price);
 
         return [
             'totalStockCount' => $totalStockCount,
             'totalPurchaseValue' => theMoney($totalPurchaseValue),
             'totalSellValue' => theMoney($totalSellValue),
+        ];
+    }
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'hot_sale' => 'boolean',
+            'new_arrival' => 'boolean',
+            'should_track' => 'boolean',
         ];
     }
 }

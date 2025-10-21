@@ -106,7 +106,7 @@ class RegisterController extends Controller
         return Auth::guard('user');
     }
 
-    private function prefixCountryCode(array &$data)
+    private function prefixCountryCode(array &$data): void
     {
         foreach (['phone', 'bkash'] as $type) {
             $number = Str::replace(['-', ' '], '', $data[$type.'_number']);

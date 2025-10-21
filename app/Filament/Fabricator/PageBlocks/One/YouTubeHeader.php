@@ -26,6 +26,7 @@ class YouTubeHeader extends PageBlock
             ]);
     }
 
+    #[\Override]
     public static function mutateData(array $data): array
     {
         $data['headline'] = static::highlightWords($data['headline'], $data['highlights']);

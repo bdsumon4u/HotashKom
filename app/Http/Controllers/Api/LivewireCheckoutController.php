@@ -22,12 +22,12 @@ class LivewireCheckoutController extends Controller
         }
 
         $data = $request->validate([
-            'name' => 'required',
+            'name' => ['required'],
             'phone' => $hidePrefix ? 'required|regex:/^\+8801\d{9}$/' : 'required|regex:/^1\d{9}$/',
-            'address' => 'required',
-            'note' => 'nullable',
-            'shipping' => 'required',
-            'cart' => 'required|array',
+            'address' => ['required'],
+            'note' => ['nullable'],
+            'shipping' => ['required'],
+            'cart' => ['required', 'array'],
         ]);
 
         $livewire = new Checkout;

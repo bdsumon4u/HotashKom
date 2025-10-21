@@ -20,10 +20,6 @@ class Purchase extends Model
         'total_amount',
     ];
 
-    protected $casts = [
-        'purchase_date' => 'date',
-    ];
-
     public function productPurchases(): HasMany
     {
         return $this->hasMany(ProductPurchase::class);
@@ -39,5 +35,12 @@ class Purchase extends Model
         return $this->belongsToMany(Product::class, 'product_purchase')
             ->withPivot(['price', 'quantity', 'subtotal'])
             ->withTimestamps();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'purchase_date' => 'date',
+        ];
     }
 }

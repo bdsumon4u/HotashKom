@@ -62,14 +62,14 @@ class ResetPasswordController extends Controller
         }
         $request->merge(['phone' => $phone]);
         $request->validate([
-            'token' => 'required',
-            'phone' => 'required|string',
-            'password' => 'required|string|confirmed|min:8',
-            'otp' => 'required|string|size:6',
+            'token' => ['required'],
+            'phone' => ['required', 'string'],
+            'password' => ['required', 'string', 'confirmed', 'min:8'],
+            'otp' => ['required', 'string', 'size:6'],
         ]);
 
         // Verify the token
-        $userId = Cache::get('password_reset_token_'.$request->token);
+        $userId = Cache::memo()->get('password_reset_token_'.$request->token);
         if (! $userId) {
             return back()->withErrors(['token' => 'This password reset token is invalid.']);
         }
@@ -82,7 +82,7 @@ class ResetPasswordController extends Controller
 
         // Verify the OTP
         $otpKey = 'password_reset_otp_'.$request->phone;
-        $storedOtp = Cache::get($otpKey);
+        $storedOtp = Cache::memo()->get($otpKey);
 
         if (! $storedOtp || $storedOtp !== $request->otp) {
             return back()->withErrors(['otp' => 'The OTP is invalid.']);

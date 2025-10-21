@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Http\Resources\ProductResource;
-use App\Jobs\CallOnindaOrderApi;
 use App\Models\Admin;
 use App\Models\Order;
 use App\Models\Product;
@@ -19,7 +18,6 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
-use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 use function Illuminate\Support\defer;
 
@@ -57,7 +55,7 @@ class Checkout extends Component
 
     protected $facebookService;
 
-    public function boot(FacebookPixelService $facebookService)
+    public function boot(FacebookPixelService $facebookService): void
     {
         $this->facebookService = $facebookService;
     }
@@ -200,10 +198,10 @@ class Checkout extends Component
     public function cartUpdated(): void
     {
         $this->updatedShipping();
-        $this->retail = cart()->content()->mapWithKeys(fn ($item) => [$item->id => [
+        $this->retail = cart()->content()->mapWithKeys(fn ($item): array => [$item->id => [
             'price' => $this->retail[$item->id]['price'] ?? $item->options->retail_price,
             'quantity' => $item->qty,
-        ]])->toArray();
+        ]])->all();
         $this->dispatch('cartUpdated');
     }
 
@@ -223,7 +221,7 @@ class Checkout extends Component
             $this->retailDeliveryFee = $this->shippingCost($shipping);
         }
 
-        if ((!isOninda() || !config('app.resell')) && $user = auth('user')->user()) {
+        if ((! isOninda() || ! config('app.resell')) && $user = auth('user')->user()) {
             $this->name = $user->name;
             if ($user->phone_number) {
                 $this->phone = Str::after($user->phone_number, '+880');
@@ -231,7 +229,7 @@ class Checkout extends Component
             $this->address = $user->address ?? '';
             $this->note = $user->note ?? '';
             $this->retailDiscount = $user->discount ?? 0;
-        } else if ($this->fillFromCookie()) {
+        } elseif ($this->fillFromCookie()) {
             $this->name = Cookie::get('name', '');
             $this->shipping = Cookie::get('shipping', $shipping ?? '');
             $this->phone = Cookie::get('phone', '');
@@ -250,7 +248,7 @@ class Checkout extends Component
         if (isOninda() && auth('user')->guest()) {
             $this->dispatch('notify', ['message' => 'Please login to add product to cart', 'type' => 'error']);
 
-            return redirect()->route('user.login')->with('danger', 'Please login to add product to cart');
+            return to_route('user.login')->with('danger', 'Please login to add product to cart');
         }
 
         if (! ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)) {
@@ -287,12 +285,12 @@ class Checkout extends Component
         $fraud = setting('fraud');
 
         if (
-            Cache::get('fraud:hourly:'.request()->ip()) >= ($fraud->allow_per_hour ?? 3)
-            || Cache::get('fraud:hourly:'.$data['phone']) >= ($fraud->allow_per_hour ?? 3)
-            || Cache::get('fraud:daily:'.request()->ip()) >= ($fraud->allow_per_day ?? 7)
-            || Cache::get('fraud:daily:'.$data['phone']) >= ($fraud->allow_per_day ?? 7)
+            Cache::memo()->get('fraud:hourly:'.request()->ip()) >= ($fraud->allow_per_hour ?? 3)
+            || Cache::memo()->get('fraud:hourly:'.$data['phone']) >= ($fraud->allow_per_hour ?? 3)
+            || Cache::memo()->get('fraud:daily:'.request()->ip()) >= ($fraud->allow_per_day ?? 7)
+            || Cache::memo()->get('fraud:daily:'.$data['phone']) >= ($fraud->allow_per_day ?? 7)
         ) {
-            return redirect()->back()->with('error', 'প্রিয় গ্রাহক, আরও অর্ডার করতে চাইলে আমাদের হেল্প লাইন '.setting('company')->phone.' নাম্বারে কল দিয়ে সরাসরি কথা বলুন।');
+            return back()->with('error', 'প্রিয় গ্রাহক, আরও অর্ডার করতে চাইলে আমাদের হেল্প লাইন '.setting('company')->phone.' নাম্বারে কল দিয়ে সরাসরি কথা বলুন।');
         }
 
         $this->order = DB::transaction(function () use ($data, &$order, $fraud) {
@@ -324,11 +322,7 @@ class Checkout extends Component
 
             if (config('app.round_robin_order_receiving')) {
                 $adminQ = Admin::orderByRaw('CASE WHEN is_active = 1 THEN 0 ELSE 1 END, role_id desc, last_order_received_at asc');
-                if (count($adminIds) > 0) {
-                    $admin = $adminQ->whereIn('id', $adminIds)->first() ?? $adminQ->first();
-                } else {
-                    $admin = $adminQ->first();
-                }
+                $admin = count($adminIds) > 0 ? $adminQ->whereIn('id', $adminIds)->first() ?? $adminQ->first() : $adminQ->first();
             } else {
                 $adminQ = Admin::where('role_id', Admin::SALESMAN)->where('is_active', true)->inRandomOrder();
                 if (count($adminIds) > 0) {
@@ -348,9 +342,7 @@ class Checkout extends Component
                 'advanced' => $this->advanced,
                 'retail_discount' => $this->retailDiscount,
                 'subtotal' => cart()->subtotal(),
-                'purchase_cost' => cart()->content()->sum(function ($item) {
-                    return ($item->options->purchase_price ?: $item->options->price) * $item->qty;
-                }),
+                'purchase_cost' => cart()->content()->sum(fn ($item): int|float => ($item->options->purchase_price ?: $item->options->price) * $item->qty),
             ];
 
             // Add city and area data if Pathao is enabled and user_selects_city_area is checked
@@ -372,7 +364,7 @@ class Checkout extends Component
 
             $order = Order::create($data);
 
-            defer(function () use ($admin, $user, $order) {
+            defer(function () use ($admin, $user, $order): void {
                 $admin->update(['last_order_received_at' => now()]);
                 $user->notify(new OrderPlaced($order));
 
@@ -406,7 +398,7 @@ class Checkout extends Component
             return $order;
         });
 
-        if (! $this->order) {
+        if (! $this->order instanceof \App\Models\Order) {
             return back();
         }
 
@@ -414,14 +406,14 @@ class Checkout extends Component
         // $data['email'] && Mail::to($data['email'])->queue(new OrderPlaced($order));
 
         if (config('app.instant_order_forwarding') && ! config('app.demo')) {
-            CallOnindaOrderApi::dispatch($this->order->id);
+            dispatch(new \App\Jobs\CallOnindaOrderApi($this->order->id));
         }
 
         cart()->destroy();
         session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Recieved. Thanks For Your Order.');
 
-        return redirect()->route($this->getRedirectRoute(), [
-            'order' => optional($this->order)->getKey(),
+        return to_route($this->getRedirectRoute(), [
+            'order' => $this->order?->getKey(),
         ]);
     }
 
@@ -456,12 +448,12 @@ class Checkout extends Component
         ]);
     }
 
-    protected function fillFromCookie()
+    protected function fillFromCookie(): bool
     {
         return true;
     }
 
-    protected function getRedirectRoute()
+    protected function getRedirectRoute(): string
     {
         return 'thank-you';
     }

@@ -15,15 +15,10 @@ class RemoveProductVariationsFromResellers implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $productId;
-
     /**
      * Create a new job instance.
      */
-    public function __construct(int $productId)
-    {
-        $this->productId = $productId;
-    }
+    public function __construct(protected int $productId) {}
 
     /**
      * Execute the job.

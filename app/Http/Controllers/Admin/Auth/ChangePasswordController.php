@@ -22,9 +22,9 @@ class ChangePasswordController extends Controller
         }
 
         $data = $request->validate([
-            'name' => 'required',
+            'name' => ['required'],
             'email' => 'required|email|unique:admins,email,'.auth('admin')->id(),
-            'password' => 'nullable|min:8',
+            'password' => ['nullable', 'min:8'],
         ]);
 
         if ($data['password']) {

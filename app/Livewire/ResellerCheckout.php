@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 class ResellerCheckout extends Checkout
 {
+    #[\Override]
     public function render()
     {
         // Create a temporary Order instance to use its Pathao methods
@@ -17,29 +18,33 @@ class ResellerCheckout extends Checkout
         ]);
     }
 
+    #[\Override]
     public function checkout()
     {
         // Check if user is verified before proceeding with checkout
         if (isOninda() && (! auth('user')->user() || ! auth('user')->user()->is_verified)) {
             $this->dispatch('notify', ['message' => 'Please verify your account to place an order', 'type' => 'error']);
 
-            return redirect()->route('user.payment.verification')->with('danger', 'Please verify your account to place an order');
+            return to_route('user.payment.verification')->with('danger', 'Please verify your account to place an order');
         }
 
         return parent::checkout();
     }
 
-    protected function fillFromCookie()
+    #[\Override]
+    protected function fillFromCookie(): bool
     {
         return false;
     }
 
-    protected function getRedirectRoute()
+    #[\Override]
+    protected function getRedirectRoute(): string
     {
         return 'reseller.thank-you';
     }
 
-    protected function getDefaultStatus()
+    #[\Override]
+    protected function getDefaultStatus(): string
     {
         return 'CONFIRMED';
     }

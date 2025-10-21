@@ -86,14 +86,10 @@ class ResellerEditOrder extends Component
         // Check if reseller can edit this order
         $user = auth('user')->user();
 
-        if ($order->user_id !== $user->id) {
-            abort(403, 'You can only edit your own orders.');
-        }
+        abort_if($order->user_id !== $user->id, 403, 'You can only edit your own orders.');
 
         // Check if order status allows editing
-        if (! in_array($order->status, ['PENDING', 'CONFIRMED'])) {
-            abort(403, 'You can only edit orders with PENDING or CONFIRMED status.');
-        }
+        abort_unless(in_array($order->status, ['PENDING', 'CONFIRMED']), 403, 'You can only edit orders with PENDING or CONFIRMED status.');
 
         $this->order = $order;
         $this->fill($this->order->only($this->attrs) + $this->order->data);
@@ -204,7 +200,7 @@ class ResellerEditOrder extends Component
     public function updated($property): void
     {
         // Handle retail price updates for specific products
-        if (preg_match('/^selectedProducts\.(\d+)\.retail_price$/', $property, $matches)) {
+        if (preg_match('/^selectedProducts\.(\d+)\.retail_price$/', (string) $property, $matches)) {
             $productId = (int) $matches[1];
             $this->handleRetailPriceUpdate($productId);
         }
@@ -244,7 +240,7 @@ class ResellerEditOrder extends Component
 
         session()->flash('success', 'Order updated successfully.');
 
-        return redirect()->route('reseller.orders.show', $this->order);
+        return to_route('reseller.orders.show', $this->order);
     }
 
     public function cancelOrder()
@@ -269,7 +265,7 @@ class ResellerEditOrder extends Component
 
         session()->flash('success', 'Order cancelled successfully.');
 
-        return redirect()->route('reseller.orders.show', $this->order);
+        return to_route('reseller.orders.show', $this->order);
     }
 
     public function render()

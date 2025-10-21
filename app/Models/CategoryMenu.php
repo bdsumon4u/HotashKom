@@ -10,16 +10,17 @@ class CategoryMenu extends Model
 
     protected $with = ['category'];
 
+    #[\Override]
     public static function booted(): void
     {
         static::saved(function ($menu): void {
-            cache()->forget('catmenu:nested');
-            cache()->forget('catmenu:nestedwithparent');
+            cache()->memo()->forget('catmenu:nested');
+            cache()->memo()->forget('catmenu:nestedwithparent');
         });
 
         static::deleting(function ($menu): void {
-            cache()->forget('catmenu:nested');
-            cache()->forget('catmenu:nestedwithparent');
+            cache()->memo()->forget('catmenu:nested');
+            cache()->memo()->forget('catmenu:nestedwithparent');
         });
     }
 
@@ -47,7 +48,7 @@ class CategoryMenu extends Model
             ->orderBy('order');
         $count && $query->take($count);
 
-        return cache()->rememberForever('catmenu:nested', fn () => $query->get());
+        return cache()->memo()->rememberForever('catmenu:nested', fn () => $query->get());
     }
 
     public static function nestedWithParent($count = 0)
@@ -59,6 +60,6 @@ class CategoryMenu extends Model
             ->orderBy('order');
         $count && $query->take($count);
 
-        return cache()->rememberForever('catmenu:nestedwithparent', fn () => $query->get());
+        return cache()->memo()->rememberForever('catmenu:nestedwithparent', fn () => $query->get());
     }
 }

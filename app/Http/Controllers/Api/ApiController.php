@@ -19,13 +19,13 @@ class ApiController extends Controller
 {
     public function menus()
     {
-        return cache()->remember('menus', now()->addMinute(), fn () => Menu::all()->mapWithKeys(fn ($menu) => [$menu->slug => $menu->menuItems]));
+        return cache()->memo()->remember('menus', now()->addMinute(), fn () => Menu::all()->mapWithKeys(fn ($menu): array => [$menu->slug => $menu->menuItems]));
     }
 
     public function searchSuggestions(Request $request)
     {
         return Product::search($request->get('query'), fn ($query) => $query->whereNull('parent_id')->whereIsActive(1))
-            ->take($request->get('limit'))->get()->transform(fn ($product) => array_merge($product->toArray(), [
+            ->take($request->get('limit'))->get()->transform(fn ($product): array => array_merge($product->toArray(), [
                 'images' => $product->images->pluck('src')->toArray(),
                 'price' => $product->selling_price,
                 'compareAtPrice' => $product->price,
@@ -46,7 +46,7 @@ class ApiController extends Controller
 
     public function slides()
     {
-        return slides()->transform(fn ($slide) => $slide->only(['title', 'text', 'btn_name', 'btn_href']) + [
+        return slides()->transform(fn ($slide): array => $slide->only(['title', 'text', 'btn_name', 'btn_href']) + [
             'imageClassic' => [
                 'ltr' => asset($slide->desktop_src),
                 'rtl' => asset($slide->desktop_src),
@@ -64,8 +64,8 @@ class ApiController extends Controller
 
     public function sections(Request $request)
     {
-        return sections()->transform(fn ($section) => array_merge($section->toArray(), [
-            'categories' => $section->categories->map(fn ($category) => array_merge($category->toArray(), [
+        return sections()->transform(fn ($section): array => array_merge($section->toArray(), [
+            'categories' => $section->categories->map(fn ($category): array => array_merge($category->toArray(), [
                 'sectionId' => $section->id,
             ]))->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => $section->type == 'pure-grid' ? 'View All' : 'All']),
         ]));
@@ -151,10 +151,10 @@ class ApiController extends Controller
         ]);
     }
 
-    private function loadProductRelationships($products)
+    private function loadProductRelationships($products): void
     {
         $products->load([
-            'images' => function ($query) {
+            'images' => function ($query): void {
                 $query->select('images.id', 'images.path')
                     ->withPivot(['img_type', 'order'])
                     ->wherePivot('img_type', 'base')
@@ -165,7 +165,7 @@ class ApiController extends Controller
         ]);
     }
 
-    private function addBaseImageUrls($products)
+    private function addBaseImageUrls($products): void
     {
         $collection = $products instanceof \Illuminate\Pagination\LengthAwarePaginator
             ? $products->getCollection()
@@ -213,7 +213,7 @@ class ApiController extends Controller
             ->where('id', '!=', $product->id)
             ->limit(config('services.products_count.related', 20))
             ->get()
-            ->transform(fn ($product) => array_merge($product->toArray(), [
+            ->transform(fn ($product): array => array_merge($product->toArray(), [
                 'images' => $product->images->pluck('src')->toArray(),
                 'price' => $product->selling_price,
                 'compareAtPrice' => $product->price,
@@ -239,7 +239,7 @@ class ApiController extends Controller
         }
 
         return Category::all()
-            ->transform(fn ($category) => $category->toArray() + [
+            ->transform(fn ($category): array => $category->toArray() + [
                 'type' => 'shop',
             ])
             ->toJson();
@@ -264,7 +264,7 @@ class ApiController extends Controller
             'delivery_text', 'products_page', 'delivery_charge',
         ]));
 
-        // return cache()->remember('settings:'.implode(';', $keys), now()->addMinute(), function () use ($keys) {
+        // return cache()->memo()->remember('settings:'.implode(';', $keys), now()->addMinute(), function () use ($keys) {
         return Setting::whereIn('name', $keys)->get(['name', 'value'])->pluck('value', 'name');
         // });
     }

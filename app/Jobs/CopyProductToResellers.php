@@ -20,19 +20,14 @@ class CopyProductToResellers implements ShouldQueue
 
     public $backoff = [10, 30, 60]; // Retry delays in seconds
 
-    public $timeout = 600; // 10 minutes timeout for products
-
-    protected $product;
+    public $timeout = 600;
 
     protected $idMap = [];
 
     /**
      * Create a new job instance.
      */
-    public function __construct(Product $product)
-    {
-        $this->product = $product;
-    }
+    public function __construct(protected \App\Models\Product $product) {}
 
     /**
      * Handle a job failure.
@@ -45,7 +40,7 @@ class CopyProductToResellers implements ShouldQueue
     /**
      * Retry the job if it fails due to connection issues
      */
-    public function retryAfter(\Throwable $exception): int
+    public function backoff(\Throwable $exception): int
     {
         if ($this->attempts() >= $this->tries) {
             return 0; // Don't retry anymore
@@ -734,7 +729,7 @@ class CopyProductToResellers implements ShouldQueue
 
         $foreignKeys = [];
         foreach ($insertData as $key => $value) {
-            if (str_ends_with($key, '_id') && $value) {
+            if (str_ends_with((string) $key, '_id') && $value) {
                 $foreignKeys[$key] = $value;
             }
         }

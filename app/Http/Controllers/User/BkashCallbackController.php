@@ -30,7 +30,8 @@ class BkashCallbackController extends Controller
                 'paymentId' => $paymentId,
                 'status' => $status,
             ]);
-            return redirect()->route('user.profile')
+
+            return to_route('user.profile')
                 ->with('error', 'Payment was not successful')
                 ->with('payment_id', $paymentId);
         }
@@ -44,7 +45,8 @@ class BkashCallbackController extends Controller
                     'paymentId' => $paymentId,
                     'status' => $status,
                 ]);
-                return redirect()->route('user.profile')
+
+                return to_route('user.profile')
                     ->with('error', 'Payment session expired. Please try again.');
             }
 
@@ -57,7 +59,7 @@ class BkashCallbackController extends Controller
 
             // Check if payment was successful
             if (($response['transactionStatus'] ?? '') === 'Completed') {
-                DB::transaction(function () use ($paymentInfo, $response) {
+                DB::transaction(function () use ($paymentInfo, $response): void {
                     info('Bkash callback transaction', [
                         'paymentInfo' => $paymentInfo,
                         'response' => $response,
@@ -100,21 +102,22 @@ class BkashCallbackController extends Controller
                     'response' => $response,
                 ]);
 
-                return redirect()->route('user.profile')
+                return to_route('user.profile')
                     ->with('success', 'Payment successful! Your account has been verified.');
             } else {
                 info('Bkash callback failed not completed', [
                     'paymentInfo' => $paymentInfo,
                     'response' => $response,
                 ]);
-                return redirect()->route('user.profile')
+
+                return to_route('user.profile')
                     ->with('error', 'Payment failed or was cancelled.');
             }
 
         } catch (\Exception $e) {
             Log::error('Payment callback error: '.$e->getMessage());
 
-            return redirect()->route('user.profile')
+            return to_route('user.profile')
                 ->with('error', 'Payment verification failed. Please contact support.');
         }
     }

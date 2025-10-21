@@ -28,6 +28,7 @@ use Z3d0X\FilamentFabricator\View\ResourceSchemaSlot;
 
 class LandingResource extends PageResource
 {
+    #[\Override]
     public static function form(Form $form): Form
     {
         return $form
@@ -105,7 +106,7 @@ class LandingResource extends PageResource
                                             ->icon('heroicon-o-arrow-top-right-on-square')
                                             ->url(fn (): string => PageResource::getUrl($context, ['record' => $get('parent_id')]))
                                             ->openUrlInNewTab()
-                                            ->visible(fn () => filled($get('parent_id')))
+                                            ->visible(fn (): bool => filled($get('parent_id')))
                                     )
                                     ->relationship(
                                         'parent',

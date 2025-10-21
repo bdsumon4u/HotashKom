@@ -25,9 +25,9 @@ class ApiController extends Controller
 
             Auth::guard('admin')->setUser($authUser);
 
-            return redirect()->back()->with('success', 'Logged Out From Other Devices');
+            return back()->with('success', 'Logged Out From Other Devices');
         }
 
-        return redirect()->back()->withErrors(['password' => 'Password is incorrect']);
+        return back()->withErrors(['password' => 'Password is incorrect']);
     }
 }

@@ -37,9 +37,9 @@ class MenuItemController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
-            'menu_id' => 'required|integer',
-            'name' => 'required',
-            'href' => 'required',
+            'menu_id' => ['required', 'integer'],
+            'name' => ['required'],
+            'href' => ['required'],
         ]);
 
         MenuItem::create($data);
@@ -80,8 +80,8 @@ class MenuItemController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
-            'name' => 'required',
-            'href' => 'required',
+            'name' => ['required'],
+            'href' => ['required'],
         ]);
 
         $menuItem->update($data);

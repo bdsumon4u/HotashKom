@@ -16,15 +16,10 @@ class SyncProductStockWithResellers implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected Product $product;
-
     /**
      * Create a new job instance.
      */
-    public function __construct(Product $product)
-    {
-        $this->product = $product;
-    }
+    public function __construct(protected Product $product) {}
 
     /**
      * Execute the job.

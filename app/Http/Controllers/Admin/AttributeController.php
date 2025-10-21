@@ -42,7 +42,7 @@ class AttributeController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         Attribute::create($request->validate([
-            'name' => 'required',
+            'name' => ['required'],
         ]));
 
         return redirect()->action([static::class, 'index']);
@@ -73,7 +73,7 @@ class AttributeController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $attribute->update($request->validate([
-            'name' => 'required',
+            'name' => ['required'],
         ]));
 
         return redirect()->action([static::class, 'index']);

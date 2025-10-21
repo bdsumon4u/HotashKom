@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Jobs\CopyResourceToResellers;
-use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,33 +13,32 @@ class Brand extends Model
         'image_id', 'name', 'slug', 'is_enabled',
     ];
 
+    #[\Override]
     public static function booted(): void
     {
         static::saved(function ($brand): void {
-            cache()->forget('brands');
+            cache()->memo()->forget('brands');
 
             // Dispatch job to copy brand to reseller databases
             if (isOninda() && $brand->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($brand);
+                dispatch(new \App\Jobs\CopyResourceToResellers($brand));
             }
         });
 
         static::deleting(function ($brand): void {
-            if (isReseller() && $brand->source_id !== null) {
-                throw new \Exception('Cannot delete a resource that has been sourced.');
-            }
+            throw_if(isReseller() && $brand->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove brand from reseller databases
             if (isOninda()) {
-                RemoveResourceFromResellers::dispatch($brand->getTable(), $brand->id);
+                dispatch(new \App\Jobs\RemoveResourceFromResellers($brand->getTable(), $brand->id));
             }
-            cache()->forget('brands');
+            cache()->memo()->forget('brands');
         });
     }
 
     public static function cached()
     {
-        return cache()->rememberForever('brands', fn () => Brand::where('is_enabled', true)->get());
+        return cache()->memo()->rememberForever('brands', fn () => Brand::where('is_enabled', true)->get());
     }
 
     public function image()

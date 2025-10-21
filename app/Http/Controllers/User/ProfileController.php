@@ -19,13 +19,13 @@ class ProfileController extends Controller
         }
 
         $data = $request->validate([
-            'name' => 'required',
-            'email' => 'nullable',
-            'phone_number' => 'required',
-            'address' => 'nullable',
-            'shop_name' => 'nullable',
-            'domain' => 'nullable',
-            'logo' => 'nullable|image|max:2048',
+            'name' => ['required'],
+            'email' => ['nullable'],
+            'phone_number' => ['required'],
+            'address' => ['nullable'],
+            'shop_name' => ['nullable'],
+            'domain' => ['nullable'],
+            'logo' => ['nullable', 'image', 'max:2048'],
         ]);
 
         $user = auth('user')->user();

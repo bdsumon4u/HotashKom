@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\CallOnindaOrderApi;
 use App\Models\Order;
 use Illuminate\Console\Command;
 
@@ -31,7 +30,7 @@ class DispatchOnindaOrderApi extends Command
 
         // Find orders placed within the last hour with null or 0 source_id
         $orders = Order::where('created_at', '>=', now()->subHour())
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->whereNull('source_id')
                     ->orWhere('source_id', 0);
             })
@@ -48,7 +47,7 @@ class DispatchOnindaOrderApi extends Command
         $dispatchedCount = 0;
         foreach ($orders as $order) {
             try {
-                CallOnindaOrderApi::dispatch($order->id);
+                dispatch(new \App\Jobs\CallOnindaOrderApi($order->id));
                 $dispatchedCount++;
                 $this->line("Dispatched job for order ID: {$order->id}");
             } catch (\Exception $e) {

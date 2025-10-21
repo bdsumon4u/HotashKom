@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 if (! function_exists('slides')) {
     function slides()
     {
-        return cache()->rememberForever('slides', function () {
+        return cache()->memo()->rememberForever('slides', function () {
             return Slide::whereIsActive(1)->get([
                 'title', 'text', 'mobile_src', 'desktop_src', 'btn_name', 'btn_href',
             ]);
@@ -32,7 +32,7 @@ if (! function_exists('slides')) {
 if (! function_exists('sections')) {
     function sections()
     {
-        return cache()->rememberForever('homesections', function () {
+        return cache()->memo()->rememberForever('homesections', function () {
             return HomeSection::orderBy('order', 'asc')->get();
         });
     }
@@ -132,7 +132,7 @@ if (! function_exists('pageRoutes')) {
 if (! function_exists('setting')) {
     function setting($name, $default = null)
     {
-        return cache()->rememberForever('settings:'.$name, function () use ($name, $default) {
+        return cache()->memo()->rememberForever('settings:'.$name, function () use ($name, $default) {
             return optional(Setting::whereName($name)->first())->value ?? $default;
         });
     }

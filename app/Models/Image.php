@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Jobs\CopyResourceToResellers;
-use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -16,28 +14,27 @@ class Image extends Model
         'filename', 'disk', 'path', 'extension', 'mime', 'size',
     ];
 
+    #[\Override]
     public static function booted(): void
     {
         static::saved(function ($image): void {
             // Dispatch job to copy image to reseller databases
             if (isOninda() && $image->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($image);
+                dispatch(new \App\Jobs\CopyResourceToResellers($image));
             }
         });
 
         static::deleting(function ($image): void {
-            if (isReseller() && $image->source_id !== null) {
-                throw new \Exception('Cannot delete a resource that has been sourced.');
-            }
+            throw_if(isReseller() && $image->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove image from reseller databases
             if (isOninda()) {
-                RemoveResourceFromResellers::dispatch($image->getTable(), $image->id);
+                dispatch(new \App\Jobs\RemoveResourceFromResellers($image->getTable(), $image->id));
             }
         });
     }
 
-    public function sizeHuman(): Attribute
+    protected function sizeHuman(): Attribute
     {
         $bytes = $this->size;
         $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
@@ -47,7 +44,7 @@ class Image extends Model
         return Attribute::get(fn (): string => round($bytes, 2).' '.$units[$i]);
     }
 
-    public function src(): Attribute
+    protected function src(): Attribute
     {
         return Attribute::get(function () {
             $encodedPath = Str::of($this->path)

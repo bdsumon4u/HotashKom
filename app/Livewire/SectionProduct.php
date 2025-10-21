@@ -32,7 +32,7 @@ class SectionProduct extends Component
                 'id' => $product->id,
                 'name' => $product->name,
                 'slug' => $product->slug,
-                'image' => optional($product->base_image)->src,
+                'image' => $product->base_image?->src,
             ])->toArray();
     }
 
@@ -60,12 +60,12 @@ class SectionProduct extends Component
     {
         return view('livewire.section-product', [
             'selectedProducts' => Product::whereIn('id', $this->selectedIds)
-                ->get()->mapWithKeys(fn ($product, $i) => [$product->id => [
+                ->get()->mapWithKeys(fn ($product, $i): array => [$product->id => [
                     'order' => array_search($product->id, $this->selectedIds) + 1,
                     'id' => $product->id,
                     'name' => $product->name,
                     'slug' => $product->slug,
-                    'image' => optional($product->base_image)->src,
+                    'image' => $product->base_image?->src,
                 ]])->sortBy('order')->toArray(),
         ]);
     }

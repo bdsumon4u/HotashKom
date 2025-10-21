@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Jobs\SyncOrderStatusWithReseller;
-use App\Jobs\SyncProductStockWithResellers;
 use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -30,18 +28,9 @@ class Order extends Model
         'data' => '{"subtotal":0,"shipping_cost":0,"retail_delivery_fee":0,"advanced":0,"discount":0,"retail_discount":0,"courier":"Other","city_id":"","area_id":"","weight":0.5,"packaging_charge":25}',
     ];
 
-    protected $casts = [
-        'source_id' => 'integer',
-        'user_id' => 'integer',
-        'admin_id' => 'integer',
-        'products' => 'array',
-        'data' => 'array',
-        'status_at' => 'datetime',
-        'shipped_at' => 'datetime',
-    ];
-
     protected static $logFillable = true;
 
+    #[\Override]
     public static function booted(): void
     {
         static::retrieved(function (Order $order): void {
@@ -109,7 +98,7 @@ class Order extends Model
             }
         });
 
-        static::updated(function (Order $order) {
+        static::updated(function (Order $order): void {
             if (! isOninda()) {
                 return;
             }
@@ -118,14 +107,14 @@ class Order extends Model
 
             // Dispatch job to sync status with resellers
             if ($status) {
-                SyncOrderStatusWithReseller::dispatch($order->id);
+                dispatch(new \App\Jobs\SyncOrderStatusWithReseller($order->id));
             }
 
             if (! in_array($status, ['DELIVERED', 'RETURNED'])) {
                 return;
             }
 
-            $retail = collect($order->products)->sum(fn ($product) => (float) $product->retail_price * (int) $product->quantity);
+            $retail = collect($order->products)->sum(fn ($product): float => (float) $product->retail_price * (int) $product->quantity);
             $shippingCost = (float) ($order->data['shipping_cost'] ?? 0); // Oninda's delivery fee
             $retailDeliveryFee = (float) ($order->data['retail_delivery_fee'] ?? 0); // Reseller's delivery fee charged to customer
             $advanced = (float) ($order->data['advanced'] ?? 0);
@@ -134,15 +123,14 @@ class Order extends Model
             $discount = (float) ($order->data['discount'] ?? 0);
             $packagingCharge = (float) ($order->data['packaging_charge'] ?? 25); // Packaging charge
 
-            $calculateCommission = function () use ($retail, $retailDeliveryFee, $advanced, $retailDiscount, $subtotal, $shippingCost, $discount, $packagingCharge) {
+            $calculateCommission = (fn (): float =>
                 // Commission = (retail + retail_delivery_fee) - advanced - retail_discount - (subtotal + shipping_cost - discount) - packaging_charge
-                return $retail
-                    + $retailDeliveryFee
-                    - $advanced
-                    - $retailDiscount
-                    - ($subtotal + $shippingCost - $discount)
-                    - $packagingCharge;
-            };
+                $retail
+                + $retailDeliveryFee
+                - $advanced
+                - $retailDiscount
+                - ($subtotal + $shippingCost - $discount)
+                - $packagingCharge);
 
             if ($status === 'DELIVERED') {
                 $amount = $calculateCommission();
@@ -214,7 +202,7 @@ class Order extends Model
             return 1;
         };
 
-        if (! $fact = $sign()) {
+        if ((($fact = $sign())) === 0) {
             info('no fact');
 
             return;
@@ -232,7 +220,7 @@ class Order extends Model
             $product->increment('stock_count', $increment);
             info('incremented', ['product' => $product->id, 'increment' => $increment]);
             // Dispatch job to sync stock with resellers
-            SyncProductStockWithResellers::dispatch($product);
+            dispatch(new \App\Jobs\SyncProductStockWithResellers($product));
         }
     }
 
@@ -241,12 +229,12 @@ class Order extends Model
         return "The order #{$this->id} has been {$eventName}";
     }
 
-    public function products(): Attribute
+    protected function products(): Attribute
     {
         return Attribute::get(fn ($products): mixed => json_decode((string) $products));
     }
 
-    public function data(): Attribute
+    protected function data(): Attribute
     {
         return Attribute::make(
             fn ($data): mixed => json_decode((string) $data, true),
@@ -254,14 +242,14 @@ class Order extends Model
         );
     }
 
-    public function barcode(): Attribute
+    protected function barcode(): Attribute
     {
         $pad = str_pad($this->id, 10, '0', STR_PAD_LEFT);
 
         return Attribute::get(fn (): string => substr($pad, 0, 3).'-'.substr($pad, 3, 3).'-'.substr($pad, 6, 4));
     }
 
-    public function condition(): Attribute
+    protected function condition(): Attribute
     {
         return Attribute::get(function (): int {
             $retail = 0;
@@ -365,15 +353,15 @@ class Order extends Model
                     $item = (array) $item;
                     $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? ($item['quantity'] ?? 1) : 1;
 
-                    return ($item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
-                }) ?: setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+                    return ($item[$shipping_area === 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
+                }) ?: setting('delivery_charge')->{$shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
             } else {
                 $shipping_cost = $products->max(function ($item) use ($shipping_area) {
                     $item = (array) $item;
                     $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? ($item['quantity'] ?? 1) : 1;
 
-                    return ($item[$shipping_area == 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
-                }) ?: setting('delivery_charge')->{$shipping_area == 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+                    return ($item[$shipping_area === 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
+                }) ?: setting('delivery_charge')->{$shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
             }
         }
 
@@ -429,7 +417,7 @@ class Order extends Model
         }
 
         $exception = false;
-        $cityList = cache()->remember('pathao_cities', now()->addDay(), function () use (&$exception) {
+        $cityList = cache()->memo()->remember('pathao_cities', now()->addDay(), function () use (&$exception) {
             try {
                 return Pathao::area()->city()->data;
             } catch (\Exception) {
@@ -440,7 +428,7 @@ class Order extends Model
         });
 
         if ($exception) {
-            cache()->forget('pathao_cities');
+            cache()->memo()->forget('pathao_cities');
         }
 
         return $cityList;
@@ -457,7 +445,7 @@ class Order extends Model
         $cityId ??= $this->data['city_id'] ?? false;
         if ($cityId) {
 
-            $areaList = cache()->remember('pathao_areas:'.$cityId, now()->addDay(), function () use (&$exception, &$cityId) {
+            $areaList = cache()->memo()->remember('pathao_areas:'.$cityId, now()->addDay(), function () use (&$exception, &$cityId) {
                 try {
                     return Pathao::area()->zone($cityId)->data;
                 } catch (\Exception) {
@@ -469,7 +457,7 @@ class Order extends Model
         }
 
         if ($exception) {
-            cache()->forget('pathao_areas:'.$cityId);
+            cache()->memo()->forget('pathao_areas:'.$cityId);
         }
 
         return $areaList;
@@ -483,7 +471,7 @@ class Order extends Model
 
         $areaList = [];
         $exception = false;
-        $areaList = cache()->remember('redx_areas', now()->addDay(), function () use (&$exception) {
+        $areaList = cache()->memo()->remember('redx_areas', now()->addDay(), function () use (&$exception) {
             try {
                 return Redx::area()->list()->areas;
             } catch (\Exception) {
@@ -494,9 +482,22 @@ class Order extends Model
         });
 
         if ($exception) {
-            cache()->forget('redx_areas');
+            cache()->memo()->forget('redx_areas');
         }
 
         return $areaList;
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'source_id' => 'integer',
+            'user_id' => 'integer',
+            'admin_id' => 'integer',
+            'products' => 'array',
+            'data' => 'array',
+            'status_at' => 'datetime',
+            'shipped_at' => 'datetime',
+        ];
     }
 }

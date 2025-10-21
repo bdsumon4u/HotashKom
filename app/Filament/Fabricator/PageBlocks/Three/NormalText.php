@@ -20,6 +20,7 @@ class NormalText extends PageBlock
             ]);
     }
 
+    #[\Override]
     public static function mutateData(array $data): array
     {
         return $data;

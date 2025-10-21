@@ -15,18 +15,10 @@ class RemoveResourceFromResellers implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $table;
-
-    protected $id;
-
     /**
      * Create a new job instance.
      */
-    public function __construct(string $table, int $id)
-    {
-        $this->table = $table;
-        $this->id = $id;
-    }
+    public function __construct(protected string $table, protected int $id) {}
 
     /**
      * Execute the job.

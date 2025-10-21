@@ -67,6 +67,7 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
         $this->notify(new ResetPassword($token));
     }
 
+    #[\Override]
     public function is($role)
     {
         if (is_array($role)) {

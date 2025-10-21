@@ -3,12 +3,10 @@
 namespace App\Livewire;
 
 use App\Http\Resources\ProductResource;
-use App\Jobs\CallOnindaOrderApi;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
@@ -89,11 +87,11 @@ class EditOrder extends Component
     public function getCourierReportProperty()
     {
         $expires = config('services.courier_report.expires');
-        if (! $expires || Carbon::parse($expires)->isPast()) {
+        if (! $expires || \Illuminate\Support\Facades\Date::parse($expires)->isPast()) {
             return 'API Expired';
         }
 
-        $report = cache()->remember(
+        $report = cache()->memo()->remember(
             'courier:'.($this->order->phone ?? ''),
             now()->addHours(4),
             function () {
@@ -111,7 +109,7 @@ class EditOrder extends Component
         );
 
         if (is_string($report)) {
-            cache()->forget('courier:'.($this->order->phone ?? ''));
+            cache()->memo()->forget('courier:'.($this->order->phone ?? ''));
         }
 
         return $report;
@@ -215,12 +213,12 @@ class EditOrder extends Component
         }
     }
 
-    public function updatedRetailDeliveryFee($value)
+    public function updatedRetailDeliveryFee($value): void
     {
         $this->order->fill(['data' => array_merge($this->order->data, ['retail_delivery_fee' => $value])]);
     }
 
-    public function updatedPackagingCharge($value)
+    public function updatedPackagingCharge($value): void
     {
         $this->order->fill(['data' => array_merge($this->order->data, ['packaging_charge' => $value])]);
     }
@@ -256,7 +254,7 @@ class EditOrder extends Component
             $this->order->save();
 
             if (config('app.instant_order_forwarding') && ! config('app.demo')) {
-                CallOnindaOrderApi::dispatch($this->order->id);
+                dispatch(new \App\Jobs\CallOnindaOrderApi($this->order->id));
             }
 
             if ($confirming && ($user = $this->order->user)) {
@@ -275,10 +273,10 @@ class EditOrder extends Component
 
             session()->flash('success', 'Order created successfully.');
 
-            return redirect()->route('admin.orders.edit', $this->order);
+            return to_route('admin.orders.edit', $this->order);
         }
 
-        return redirect()->route('admin.orders.edit', $this->order);
+        return to_route('admin.orders.edit', $this->order);
     }
 
     private function getUser()

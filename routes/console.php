@@ -1,6 +1,5 @@
 <?php
 
-use App\Jobs\CleanupDuplicateRelationships;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -16,17 +15,17 @@ Schedule::command('queue:work --timeout=90 --tries=3 --sleep=1 --max-jobs=100 --
     ->runInBackground();
 
 // Cleanup duplicate relationships command
-Artisan::command('resellers:cleanup-duplicates {--product-id= : Clean up duplicates for a specific product ID}', function () {
+Artisan::command('resellers:cleanup-duplicates {--product-id= : Clean up duplicates for a specific product ID}', function (): void {
     $productId = $this->option('product-id');
 
     $this->info('Starting cleanup of duplicate relationships...');
 
     if ($productId) {
         $this->info("Cleaning up duplicates for product ID: {$productId}");
-        CleanupDuplicateRelationships::dispatch((int) $productId);
+        dispatch(new \App\Jobs\CleanupDuplicateRelationships((int) $productId));
     } else {
         $this->info('Cleaning up duplicates for all products...');
-        CleanupDuplicateRelationships::dispatch();
+        dispatch(new \App\Jobs\CleanupDuplicateRelationships);
     }
 
     $this->info('Cleanup job dispatched successfully!');

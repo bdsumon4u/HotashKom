@@ -15,12 +15,12 @@ class EnsureResellerIsVerified
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!isOninda() || auth('user')->guest()) {
+        if (! isOninda() || auth('user')->guest()) {
             return $next($request);
         }
 
-        if (!auth('user')->user()->is_verified) {
-            return redirect()->route('user.profile');
+        if (! auth('user')->user()->is_verified) {
+            return to_route('user.profile');
         }
 
         return $next($request);

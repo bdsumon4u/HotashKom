@@ -20,9 +20,7 @@ class CopyResourceToResellers implements ShouldQueue
 
     public $backoff = [10, 30, 60]; // Retry delays in seconds
 
-    public $timeout = 300; // 5 minutes timeout
-
-    protected $model;
+    public $timeout = 300;
 
     protected $table;
 
@@ -31,10 +29,9 @@ class CopyResourceToResellers implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(Model $model)
+    public function __construct(protected \Illuminate\Database\Eloquent\Model $model)
     {
-        $this->model = $model;
-        $this->table = $model->getTable();
+        $this->table = $this->model->getTable();
     }
 
     /**
@@ -48,7 +45,7 @@ class CopyResourceToResellers implements ShouldQueue
     /**
      * Retry the job if it fails due to connection issues
      */
-    public function retryAfter(\Throwable $exception): int
+    public function backoff(\Throwable $exception): int
     {
         if ($this->attempts() >= $this->tries) {
             return 0; // Don't retry anymore
@@ -174,36 +171,34 @@ class CopyResourceToResellers implements ShouldQueue
         // Handle foreign keys in the data
         $foreignKeys = [];
         foreach ($data as $key => $value) {
-            if (str_ends_with($key, '_id') && $value && $key !== 'id') {
+            if (str_ends_with((string) $key, '_id') && $value && $key !== 'id') {
                 $foreignKeys[$key] = $value;
             }
         }
 
         // Resolve foreign key relationships
-        if (! empty($foreignKeys)) {
-            foreach ($foreignKeys as $foreignKey => $sourceId) {
-                // Get the related table name
-                $relatedTable = $this->getRelatedTableName($foreignKey);
+        foreach ($foreignKeys as $foreignKey => $sourceId) {
+            // Get the related table name
+            $relatedTable = $this->getRelatedTableName($foreignKey);
 
-                if ($relatedTable) {
-                    // Find the reseller's ID for this source_id
-                    $resellerId = $this->getResellerIdBySourceId($relatedTable, $sourceId);
+            if ($relatedTable) {
+                // Find the reseller's ID for this source_id
+                $resellerId = $this->getResellerIdBySourceId($relatedTable, $sourceId);
+
+                if ($resellerId) {
+                    // Replace the foreign key with the reseller's ID
+                    $data[$foreignKey] = $resellerId;
+                } else {
+                    // If related resource doesn't exist, copy it first
+                    $resellerId = $this->copyRelatedResource($relatedTable, $sourceId);
 
                     if ($resellerId) {
                         // Replace the foreign key with the reseller's ID
                         $data[$foreignKey] = $resellerId;
                     } else {
-                        // If related resource doesn't exist, copy it first
-                        $resellerId = $this->copyRelatedResource($relatedTable, $sourceId);
-
-                        if ($resellerId) {
-                            // Replace the foreign key with the reseller's ID
-                            $data[$foreignKey] = $resellerId;
-                        } else {
-                            // If we still can't get the related resource, remove the foreign key
-                            unset($data[$foreignKey]);
-                            Log::warning("Failed to copy related resource: {$relatedTable} with source_id {$sourceId}");
-                        }
+                        // If we still can't get the related resource, remove the foreign key
+                        unset($data[$foreignKey]);
+                        Log::warning("Failed to copy related resource: {$relatedTable} with source_id {$sourceId}");
                     }
                 }
             }
@@ -324,7 +319,7 @@ class CopyResourceToResellers implements ShouldQueue
             // Handle nested foreign keys recursively
             $foreignKeys = [];
             foreach ($data as $key => $value) {
-                if (str_ends_with($key, '_id') && $value && $key !== 'id') {
+                if (str_ends_with((string) $key, '_id') && $value && $key !== 'id') {
                     $foreignKeys[$key] = $value;
                 }
             }
@@ -383,12 +378,12 @@ class CopyResourceToResellers implements ShouldQueue
     {
         // Common model mappings
         $modelMappings = [
-            'attributes' => 'App\Models\Attribute',
-            'options' => 'App\Models\Option',
-            'categories' => 'App\Models\Category',
-            'brands' => 'App\Models\Brand',
-            'products' => 'App\Models\Product',
-            'images' => 'App\Models\Image',
+            'attributes' => \App\Models\Attribute::class,
+            'options' => \App\Models\Option::class,
+            'categories' => \App\Models\Category::class,
+            'brands' => \App\Models\Brand::class,
+            'products' => \App\Models\Product::class,
+            'images' => \App\Models\Image::class,
         ];
 
         return $modelMappings[$table] ?? null;
@@ -401,12 +396,12 @@ class CopyResourceToResellers implements ShouldQueue
     {
         // Multiple unique column mappings
         $uniqueColumnsMappings = [
-            'App\Models\Product' => ['sku', 'slug'],
-            'App\Models\Attribute' => ['name'],
-            'App\Models\Option' => ['name'],
-            'App\Models\Category' => ['slug', 'name'],
-            'App\Models\Brand' => ['name', 'slug'],
-            'App\Models\Image' => ['path'],
+            \App\Models\Product::class => ['sku', 'slug'],
+            \App\Models\Attribute::class => ['name'],
+            \App\Models\Option::class => ['name'],
+            \App\Models\Category::class => ['slug', 'name'],
+            \App\Models\Brand::class => ['name', 'slug'],
+            \App\Models\Image::class => ['path'],
         ];
 
         return $uniqueColumnsMappings[$modelClass] ?? ['id'];

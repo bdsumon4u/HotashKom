@@ -38,7 +38,7 @@ class CategoryMenuController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         if ($request->has('category')) {
             $data = $request->validate([
-                'category' => 'required|array',
+                'category' => ['required', 'array'],
             ]);
 
             collect($data['category'])
@@ -49,7 +49,7 @@ class CategoryMenuController extends Controller
 
         if ($request->has('categories')) {
             $data = $request->validate([
-                'categories' => 'required|array',
+                'categories' => ['required', 'array'],
             ]);
 
             collect($data['categories'])
@@ -57,14 +57,14 @@ class CategoryMenuController extends Controller
                     CategoryMenu::updateOrInsert(['id' => $val['id']], $val);
                 })->toArray();
 
-            cache()->forget('catmenu:nested');
-            cache()->forget('catmenu:nestedwithparent');
+            cache()->memo()->forget('catmenu:nested');
+            cache()->memo()->forget('catmenu:nestedwithparent');
 
             return true;
         }
 
-        cache()->forget('catmenu:nested');
-        cache()->forget('catmenu:nestedwithparent');
+        cache()->memo()->forget('catmenu:nested');
+        cache()->memo()->forget('catmenu:nestedwithparent');
 
         return back();
     }

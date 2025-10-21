@@ -12,10 +12,11 @@ class HomeSection extends Model
 
     protected $with = ['categories'];
 
+    #[\Override]
     public static function booted(): void
     {
         static::deleted(function (): void {
-            cache()->forget('homesections');
+            cache()->memo()->forget('homesections');
         });
     }
 

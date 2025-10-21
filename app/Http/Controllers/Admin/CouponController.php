@@ -33,12 +33,12 @@ class CouponController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:coupons,code',
-            'description' => 'nullable|string',
-            'discount' => 'required|numeric|min:0',
-            'max_usages' => 'nullable|integer|min:1',
-            'expires_at' => 'nullable|date|after:now',
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:50', 'unique:coupons,code'],
+            'description' => ['nullable', 'string'],
+            'discount' => ['required', 'numeric', 'min:0'],
+            'max_usages' => ['nullable', 'integer', 'min:1'],
+            'expires_at' => ['nullable', 'date', 'after:now'],
         ]);
 
         Coupon::create([
@@ -51,7 +51,7 @@ class CouponController extends Controller
             'is_active' => $request->has('is_active'),
         ]);
 
-        return redirect()->route('admin.coupons.index')
+        return to_route('admin.coupons.index')
             ->with('success', 'Coupon created successfully.');
     }
 
@@ -77,12 +77,12 @@ class CouponController extends Controller
     public function update(Request $request, Coupon $coupon)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
             'code' => 'required|string|max:50|unique:coupons,code,'.$coupon->id,
-            'description' => 'nullable|string',
-            'discount' => 'required|numeric|min:0',
-            'max_usages' => 'nullable|integer|min:1',
-            'expires_at' => 'nullable|date',
+            'description' => ['nullable', 'string'],
+            'discount' => ['required', 'numeric', 'min:0'],
+            'max_usages' => ['nullable', 'integer', 'min:1'],
+            'expires_at' => ['nullable', 'date'],
         ]);
 
         $coupon->update([
@@ -95,7 +95,7 @@ class CouponController extends Controller
             'is_active' => $request->has('is_active'),
         ]);
 
-        return redirect()->route('admin.coupons.index')
+        return to_route('admin.coupons.index')
             ->with('success', 'Coupon updated successfully.');
     }
 
@@ -106,7 +106,7 @@ class CouponController extends Controller
     {
         $coupon->delete();
 
-        return redirect()->route('admin.coupons.index')
+        return to_route('admin.coupons.index')
             ->with('success', 'Coupon deleted successfully.');
     }
 
@@ -129,7 +129,7 @@ class CouponController extends Controller
     {
         $coupon->update(['is_active' => ! $coupon->is_active]);
 
-        return redirect()->route('admin.coupons.index')
+        return to_route('admin.coupons.index')
             ->with('success', 'Coupon status updated successfully.');
     }
 }

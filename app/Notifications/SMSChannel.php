@@ -16,7 +16,7 @@ class SMSChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        $phone = preg_replace('/[^\d]/', '', $notifiable->phone_number);
+        $phone = preg_replace('/[^\d]/', '', (string) $notifiable->phone_number);
         $phone = Str::startsWith($phone, '0')
             ? '88'.$phone
             : Str::replaceFirst('+', '', $phone);

@@ -26,7 +26,7 @@ final class FeedController extends Controller
             'Pragma' => 'no-cache',
         ];
 
-        $callback = function () {
+        $callback = function (): void {
             try {
                 $file = fopen('php://output', 'w');
 
@@ -46,7 +46,7 @@ final class FeedController extends Controller
                 Product::with(['brand', 'categories', 'images', 'variations'])
                     ->where('is_active', true)
                     ->whereNull('parent_id') // Only parents; variants handled via parent loop
-                    ->chunk(100, function ($products) use ($file) {
+                    ->chunk(100, function ($products) use ($file): void {
                         foreach ($products as $product) {
                             try {
                                 $this->writeProductRow($file, $product, $product->id);
@@ -234,7 +234,7 @@ final class FeedController extends Controller
 
         // Remove extra whitespace and normalize line breaks
         $description = preg_replace('/\s+/', ' ', $description);
-        $description = trim($description);
+        $description = trim((string) $description);
 
         // Check if description is all caps and convert to proper case
         if (mb_strtoupper($description) === $description && mb_strlen($description) > 3) {

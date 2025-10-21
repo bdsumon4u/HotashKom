@@ -103,13 +103,13 @@ class LoginController extends Controller
             if (! $request->otp) {
                 $this->sendOTP($user);
 
-                return redirect()->back()->withInput()->withErrors([
+                return back()->withInput()->withErrors([
                     'otp' => 'Please enter the OTP.',
                 ])->with('token:sent', 'An OTP has been sent to company phone.');
             }
 
-            if (Cache::get('auth:'.$request->input('login')) != $request->otp) {
-                return redirect()->back()->withInput()->withErrors([
+            if (Cache::memo()->get('auth:'.$request->input('login')) != $request->otp) {
+                return back()->withInput()->withErrors([
                     'otp' => 'Invalid OTP.',
                 ])->with('token:sent', 'Didn\'t match OTP sent to company phone.');
             }
@@ -169,11 +169,11 @@ class LoginController extends Controller
      */
     private function sendOTP(&$user): void
     {
-        throw_if(Cache::get($key = 'auth:'.\request()->get('login')), ValidationException::withMessages([
+        throw_if(Cache::memo()->get($key = 'auth:'.\request()->get('login')), ValidationException::withMessages([
             'password' => ['Please wait for OTP.'],
         ]));
         $ttl = (property_exists($this, 'decayMinutes') ? $this->decayMinutes : 2) * 60;
-        $otp = Cache::remember($key, $ttl, fn (): int => mt_rand(1000, 999999));
+        $otp = Cache::memo()->remember($key, $ttl, fn (): int => mt_rand(1000, 999999));
         $user->notify(new SendOTP($otp));
     }
 }

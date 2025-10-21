@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create(config('bkash.database.table_prefix', 'bkash_') . 'refunds', function (Blueprint $table) {
+        Schema::create(config('bkash.database.table_prefix', 'bkash_').'refunds', function (Blueprint $table) {
             $table->id();
             $table->string('payment_id');
             $table->string('original_trx_id');
@@ -20,15 +20,15 @@ return new class extends Migration
             $table->string('reason')->nullable();
             $table->timestamps();
 
-           $table->foreign('payment_id')
-                 ->references('payment_id')
-                 ->on(config('bkash.database.table_prefix', 'bkash_') . 'payments')
-                 ->cascadeOnDelete();
+            $table->foreign('payment_id')
+                ->references('payment_id')
+                ->on(config('bkash.database.table_prefix', 'bkash_').'payments')
+                ->cascadeOnDelete();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists(config('bkash.database.table_prefix', 'bkash_') . 'refunds');
+        Schema::dropIfExists(config('bkash.database.table_prefix', 'bkash_').'refunds');
     }
 };

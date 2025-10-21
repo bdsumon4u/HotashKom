@@ -19,18 +19,10 @@ class ResellerController extends Controller
         $isPendingView = $request->has('status') && $request->status === 'pending';
 
         // Only load orders count if not pending view (to avoid unnecessary query
-        if (! $isPendingView) {
-            $resellers = User::withCount('orders');
-        } else {
-            $resellers = User::query();
-        }
+        $resellers = ! $isPendingView ? User::withCount('orders') : User::query();
 
         // Filter by status if provided
-        if ($isPendingView) {
-            $resellers = $resellers->where('is_verified', false);
-        } else {
-            $resellers = $resellers->where('is_verified', true);
-        }
+        $resellers = $isPendingView ? $resellers->where('is_verified', false) : $resellers->where('is_verified', true);
 
         $dataTable = DataTables::of($resellers)
             ->addIndexColumn()
@@ -39,9 +31,7 @@ class ResellerController extends Controller
             ->editColumn('shop_name', fn ($row): string => $row->shop_name ?? '-')
             ->editColumn('phone_number', fn ($row): string => $row->phone_number ?? '-')
             ->editColumn('bkash_number', fn ($row): string => $row->bkash_number ?? '-')
-            ->editColumn('created_at', function ($row): string {
-                return optional($row->created_at)->format('d-M-Y');
-            });
+            ->editColumn('created_at', fn ($row): string => $row->created_at?->format('d-M-Y'));
 
         // Add conditional columns for non-pending view
         if (! $isPendingView) {
@@ -73,9 +63,7 @@ class ResellerController extends Controller
                 $actions .= '<button type="button" class="btn btn-sm btn-danger delete-reseller" data-id="'.$row->id.'"><i class="fa fa-trash"></i></button>';
             }
 
-            $actions .= '</div>';
-
-            return $actions;
+            return $actions.'</div>';
         });
 
         $dataTable = $dataTable
@@ -97,7 +85,7 @@ class ResellerController extends Controller
             })
             ->filterColumn('created_at', function ($query, $keyword): void {
                 // Allow searching by date or partial datetime
-                $query->where(function ($q) use ($keyword) {
+                $query->where(function ($q) use ($keyword): void {
                     $q->whereDate('users.created_at', $keyword)
                         ->orWhere('users.created_at', 'like', '%'.$keyword.'%');
                 });
@@ -105,9 +93,9 @@ class ResellerController extends Controller
 
         // Add conditional sorting for non-pending view
         if (! $isPendingView) {
-            $dataTable = $dataTable->orderColumn('balance', function ($query, $order) {
+            $dataTable = $dataTable->orderColumn('balance', function ($query, $order): void {
                 // Prioritize resellers with pending withdrawals first, then sort by balance
-                $query->leftJoin('wallets', function ($join) {
+                $query->leftJoin('wallets', function ($join): void {
                     $join->on('users.id', '=', 'wallets.holder_id')
                         ->where('wallets.slug', 'default');
                 })
@@ -143,10 +131,10 @@ class ResellerController extends Controller
         $reseller = User::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'shop_name' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:255',
-            'bkash_number' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
+            'shop_name' => ['required', 'string', 'max:255'],
+            'phone_number' => ['required', 'string', 'max:255'],
+            'bkash_number' => ['required', 'string', 'max:255'],
         ]);
 
         $reseller->update($validated);

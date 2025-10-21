@@ -20,6 +20,7 @@ class NormalText extends PageBlock
             ]);
     }
 
+    #[\Override]
     public static function mutateData(array $data): array
     {
         $data['content'] = preg_replace('/<hr\s*\/?>/i', '

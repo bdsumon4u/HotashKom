@@ -12,20 +12,21 @@ class Setting extends Model
         'name', 'value',
     ];
 
+    #[\Override]
     public static function booted(): void
     {
         static::saved(function ($setting): void {
-            Cache::put('settings:'.$setting->name, $setting);
+            Cache::memo()->put('settings:'.$setting->name, $setting);
             Cache::forget('settings');
         });
     }
 
     public static function array()
     {
-        return Cache::rememberForever('settings', fn () => self::all()->flatMap(fn ($setting) => [$setting->name => $setting->value])->toArray());
+        return Cache::memo()->rememberForever('settings', fn () => self::all()->flatMap(fn ($setting): array => [$setting->name => $setting->value])->toArray());
     }
 
-    public function value(): Attribute
+    protected function value(): Attribute
     {
         return Attribute::make(
             fn ($value): mixed => json_decode((string) $value),

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\PlaceOnindaOrder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,9 +16,9 @@ class ResellerOrderController extends Controller
     {
         info('placeOrder', ['request' => $request->all()]);
         $validator = Validator::make($request->all(), [
-            'order_id' => 'required|array',
-            'order_id.*' => 'required|integer',
-            'domain' => 'required|string',
+            'order_id' => ['required', 'array'],
+            'order_id.*' => ['required', 'integer'],
+            'domain' => ['required', 'string'],
         ]);
 
         if ($validator->fails()) {
@@ -32,7 +31,7 @@ class ResellerOrderController extends Controller
         // Dispatch job to place order on Oninda
         info('dispatching job', ['request' => $request->all()]);
         foreach ($request->order_id as $orderId) {
-            PlaceOnindaOrder::dispatch($orderId, $request->domain);
+            dispatch(new \App\Jobs\PlaceOnindaOrder($orderId, $request->domain));
         }
 
         return response()->json([

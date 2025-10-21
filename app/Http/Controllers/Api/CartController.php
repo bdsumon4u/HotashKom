@@ -11,9 +11,9 @@ class CartController extends Controller
     public function add(Request $request)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'integer|min:1|max:10',
-            'instance' => 'string|in:default,kart,landing',
+            'product_id' => ['required', 'exists:products,id'],
+            'quantity' => ['integer', 'min:1', 'max:10'],
+            'instance' => ['string', 'in:default,kart,landing'],
         ]);
 
         $product = Product::findOrFail($request->product_id);

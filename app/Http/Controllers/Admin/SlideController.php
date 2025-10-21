@@ -44,7 +44,7 @@ class SlideController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $request->validate([
-            'file' => 'required|image',
+            'file' => ['required', 'image'],
         ]);
 
         $file = $request->file('file');
@@ -93,11 +93,11 @@ class SlideController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
-            'title' => 'nullable|max:255',
-            'text' => 'nullable|max:255',
-            'btn_name' => 'nullable|max:20',
-            'btn_href' => 'nullable|max:255',
-            'is_active' => 'sometimes|boolean',
+            'title' => ['nullable', 'max:255'],
+            'text' => ['nullable', 'max:255'],
+            'btn_name' => ['nullable', 'max:20'],
+            'btn_href' => ['nullable', 'max:255'],
+            'is_active' => ['sometimes', 'boolean'],
         ]);
 
         $slide->update($data);

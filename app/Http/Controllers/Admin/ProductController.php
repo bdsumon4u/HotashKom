@@ -179,7 +179,7 @@ class ProductController extends Controller
         }
 
         // Dispatch copy job after all relationships are established
-        \App\Jobs\CopyProductToResellers::dispatch($product);
+        dispatch(new \App\Jobs\CopyProductToResellers($product));
     }
 
     /**

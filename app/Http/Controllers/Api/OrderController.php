@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -19,8 +18,8 @@ class OrderController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $_start = Carbon::parse(\request('start_d'));
-        $_end = Carbon::parse(\request('end_d'));
+        $_start = \Illuminate\Support\Facades\Date::parse(\request('start_d'));
+        $_end = \Illuminate\Support\Facades\Date::parse(\request('end_d'));
 
         $orders = Order::with('admin');
         if (strtolower($request->type) === 'online') {
@@ -53,7 +52,7 @@ class OrderController extends Controller
         }
 
         if ($request->shipped_at) {
-            $shippedDate = Carbon::parse($request->shipped_at);
+            $shippedDate = \Illuminate\Support\Facades\Date::parse($request->shipped_at);
             $orders->whereNotNull('orders.shipped_at')
                 ->whereBetween('orders.shipped_at', [
                     $shippedDate->startOfDay()->toDateTimeString(),
@@ -174,7 +173,7 @@ class OrderController extends Controller
                 return $return.'<div style="white-space: nowrap; display: none;">Tracking Code: <a href="https://www.steadfast.com.bd/?tracking_code=" target="_blank"></a></div>';
             })
             ->filterColumn('customer', function ($query, $keyword): void {
-                $query->where(function ($q) use ($keyword) {
+                $query->where(function ($q) use ($keyword): void {
                     $q->where('orders.name', 'like', '%'.$keyword.'%')
                         ->orWhere('orders.phone', 'like', '%'.$keyword.'%')
                         ->orWhere('orders.address', 'like', '%'.$keyword.'%');
@@ -225,8 +224,8 @@ class OrderController extends Controller
                 if (str_contains($keyword, ' - ')) {
                     [$start, $end] = explode(' - ', $keyword);
                     $query->whereBetween('orders.created_at', [
-                        Carbon::parse($start)->startOfDay(),
-                        Carbon::parse($end)->endOfDay(),
+                        \Illuminate\Support\Facades\Date::parse($start)->startOfDay(),
+                        \Illuminate\Support\Facades\Date::parse($end)->endOfDay(),
                     ]);
                 }
             })
@@ -250,7 +249,7 @@ class OrderController extends Controller
             return 'disabled title="This order is managed by the Wholesaler"';
         }
 
-        if (! $status) {
+        if ($status === '' || $status === '0') {
             return '';
         }
 

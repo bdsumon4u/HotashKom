@@ -21,17 +21,11 @@ class TransactionController extends Controller
 
             return DataTables::of($transactions)
                 ->addIndexColumn()
-                ->editColumn('type', function ($row) {
-                    return $row->type === 'deposit' ?
-                        '<span class="badge badge-success">Deposit</span>' :
-                        '<span class="badge badge-danger">Withdraw</span>';
-                })
-                ->editColumn('amount', function ($row) {
-                    return number_format($row->amount, 2);
-                })
-                ->editColumn('created_at', function ($row) {
-                    return $row->created_at->format('d M Y, h:i A');
-                })
+                ->editColumn('type', fn ($row): string => $row->type === 'deposit' ?
+                    '<span class="badge badge-success">Deposit</span>' :
+                    '<span class="badge badge-danger">Withdraw</span>')
+                ->editColumn('amount', fn ($row): string => number_format($row->amount, 2))
+                ->editColumn('created_at', fn ($row) => $row->created_at->format('d M Y, h:i A'))
                 ->addColumn('status', function ($row) {
                     if ($row->confirmed) {
                         return '<span class="badge badge-success">Confirmed</span>';
@@ -78,8 +72,8 @@ class TransactionController extends Controller
     public function withdraw(Request $request, User $user)
     {
         $request->validate([
-            'amount' => 'required|numeric|min:1',
-            'trx_id' => 'required|string|max:255',
+            'amount' => ['required', 'numeric', 'min:1'],
+            'trx_id' => ['required', 'string', 'max:255'],
         ]);
 
         $availableBalance = $user->getAvailableBalance();
@@ -110,7 +104,7 @@ class TransactionController extends Controller
     public function deleteWithdraw(Request $request, User $user)
     {
         $request->validate([
-            'transaction_id' => 'required|integer',
+            'transaction_id' => ['required', 'integer'],
         ]);
 
         $transaction = $user->wallet->transactions()
@@ -127,7 +121,7 @@ class TransactionController extends Controller
         $transaction->delete();
 
         // Clear pending withdrawal cache
-        cache()->forget('pending_withdrawal_amount');
+        cache()->memo()->forget('pending_withdrawal_amount');
 
         return response()->json(['message' => 'Withdrawal request deleted successfully']);
     }
@@ -140,8 +134,8 @@ class TransactionController extends Controller
     public function confirmWithdraw(Request $request, User $user)
     {
         $request->validate([
-            'trx_id' => 'required|string|max:255',
-            'transaction_id' => 'required|integer',
+            'trx_id' => ['required', 'string', 'max:255'],
+            'transaction_id' => ['required', 'integer'],
         ]);
 
         $transaction = $user->wallet->transactions()
@@ -165,7 +159,7 @@ class TransactionController extends Controller
         $user->confirm($transaction);
 
         // Clear pending withdrawal cache
-        cache()->forget('pending_withdrawal_amount');
+        cache()->memo()->forget('pending_withdrawal_amount');
 
         return response()->json(['message' => 'Withdrawal confirmed successfully']);
     }

@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Jobs\CopyResourceToResellers;
-use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
@@ -12,35 +10,34 @@ class Category extends Model
         'parent_id', 'image_id', 'name', 'slug', 'order', 'is_enabled',
     ];
 
+    #[\Override]
     public static function booted(): void
     {
         static::saved(function ($category): void {
-            cache()->forget('categories:nested:');
-            cache()->forget('categories:nested:1');
-            cache()->forget('homesections');
+            cache()->memo()->forget('categories:nested:');
+            cache()->memo()->forget('categories:nested:1');
+            cache()->memo()->forget('homesections');
 
             // Dispatch job to copy category to reseller databases
             if (isOninda() && $category->wasRecentlyCreated) {
-                CopyResourceToResellers::dispatch($category);
+                dispatch(new \App\Jobs\CopyResourceToResellers($category));
             }
         });
 
         static::deleting(function ($category): void {
-            if (isReseller() && $category->source_id !== null) {
-                throw new \Exception('Cannot delete a resource that has been sourced.');
-            }
+            throw_if(isReseller() && $category->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove category from reseller databases
             if (isOninda()) {
-                RemoveResourceFromResellers::dispatch($category->getTable(), $category->id);
+                dispatch(new \App\Jobs\RemoveResourceFromResellers($category->getTable(), $category->id));
             }
             $category->childrens->each->delete();
         });
 
         static::deleted(function ($category): void {
-            cache()->forget('categories:nested:');
-            cache()->forget('categories:nested:1');
-            cache()->forget('homesections');
+            cache()->memo()->forget('categories:nested:');
+            cache()->memo()->forget('categories:nested:1');
+            cache()->memo()->forget('homesections');
         });
     }
 
@@ -74,7 +71,7 @@ class Category extends Model
             return $query->get();
         }
 
-        return cache()->rememberForever('categories:nested:'.$enabledOnly, fn () => $query->get());
+        return cache()->memo()->rememberForever('categories:nested:'.$enabledOnly, fn () => $query->get());
     }
 
     public function products()

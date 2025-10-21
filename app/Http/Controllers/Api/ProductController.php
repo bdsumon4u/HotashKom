@@ -31,7 +31,7 @@ class ProductController extends Controller
 
         $dt = DataTables::eloquent($query)
             ->addIndexColumn()
-            ->addColumn('image', fn (Product $product): string => '<img src="'.asset(optional($product->base_image)->src).'" width="100" height="100" />')
+            ->addColumn('image', fn (Product $product): string => '<img src="'.asset($product->base_image?->src).'" width="100" height="100" />')
             ->editColumn('name', function (Product $product): string {
                 $variationCount = $product->variations->count();
                 $variationLabel = $variationCount > 0 ? ' <span class="badge badge-secondary">'.$variationCount.' variation'.($variationCount > 1 ? 's' : '').'</span>' : '';
@@ -96,15 +96,15 @@ class ProductController extends Controller
                     <a href="'.route('admin.products.destroy', $product).'" data-action="delete" class="btn btn-sm btn-block btn-danger">Delete</a>
                 </div>')
             ->rawColumns(['image', 'name', 'price', 'stock', 'status', 'actions'])
-            ->orderColumn('stock', function ($query, $direction) {
+            ->orderColumn('stock', function ($query, $direction): void {
                 $query->orderByRaw(
                     "should_track DESC, stock $direction"
                 );
             })
-            ->orderColumn('price', function ($query, $direction) {
+            ->orderColumn('price', function ($query, $direction): void {
                 $query->orderBy('selling_price', $direction);
             })
-            ->orderColumn('status', function ($query, $direction) {
+            ->orderColumn('status', function ($query, $direction): void {
                 $query->orderBy('is_active', $direction === 'desc' ? 'asc' : 'desc')
                     ->orderBy('hot_sale', $direction === 'desc' ? 'asc' : 'desc')
                     ->orderBy('new_arrival', $direction === 'desc' ? 'asc' : 'desc');

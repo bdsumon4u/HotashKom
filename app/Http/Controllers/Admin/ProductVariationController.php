@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\RemoveProductVariationsFromResellers;
 use App\Models\Option;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -50,7 +49,7 @@ class ProductVariationController extends Controller
                 $product->variations()->delete();
 
                 // Delete variations from reseller databases
-                RemoveProductVariationsFromResellers::dispatch($product->id);
+                dispatch(new \App\Jobs\RemoveProductVariationsFromResellers($product->id));
 
                 $variations = collect($attributes->first())->crossJoin(...$attributes->splice(1));
                 $newVariations = collect();
@@ -109,14 +108,14 @@ class ProductVariationController extends Controller
         abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
         $request->mergeIfMissing(['stock_count' => 0]);
         $validator = Validator::make($request->all(), [
-            'price' => 'required|numeric',
-            'selling_price' => 'required|numeric',
-            'suggested_price' => 'nullable',
-            'wholesale.quantity' => 'sometimes|array',
-            'wholesale.price' => 'sometimes|array',
-            'wholesale.quantity.*' => 'required|integer|gt:1',
-            'wholesale.price.*' => 'required|integer|min:1',
-            'should_track' => 'required|boolean',
+            'price' => ['required', 'numeric'],
+            'selling_price' => ['required', 'numeric'],
+            'suggested_price' => ['nullable'],
+            'wholesale.quantity' => ['sometimes', 'array'],
+            'wholesale.price' => ['sometimes', 'array'],
+            'wholesale.quantity.*' => ['required', 'integer', 'gt:1'],
+            'wholesale.price.*' => ['required', 'integer', 'min:1'],
+            'should_track' => ['required', 'boolean'],
             'sku' => 'required|unique:products,sku,'.$variation->id,
         ]);
 
@@ -163,17 +162,17 @@ class ProductVariationController extends Controller
         }
 
         $validator = Validator::make(['variations' => $variations], [
-            'variations.*.id' => 'required|exists:products,id',
-            'variations.*.price' => 'required|numeric|min:0',
-            'variations.*.selling_price' => 'required|numeric|min:0',
-            'variations.*.suggested_price' => 'nullable|numeric|min:0',
-            'variations.*.sku' => 'required|string',
-            'variations.*.should_track' => 'required|boolean',
-            'variations.*.stock_count' => 'required|numeric|min:0',
-            'variations.*.wholesale.quantity' => 'sometimes|array',
-            'variations.*.wholesale.price' => 'sometimes|array',
-            'variations.*.wholesale.quantity.*' => 'required|integer|gt:1',
-            'variations.*.wholesale.price.*' => 'required|integer|min:1',
+            'variations.*.id' => ['required', 'exists:products,id'],
+            'variations.*.price' => ['required', 'numeric', 'min:0'],
+            'variations.*.selling_price' => ['required', 'numeric', 'min:0'],
+            'variations.*.suggested_price' => ['nullable', 'numeric', 'min:0'],
+            'variations.*.sku' => ['required', 'string'],
+            'variations.*.should_track' => ['required', 'boolean'],
+            'variations.*.stock_count' => ['required', 'numeric', 'min:0'],
+            'variations.*.wholesale.quantity' => ['sometimes', 'array'],
+            'variations.*.wholesale.price' => ['sometimes', 'array'],
+            'variations.*.wholesale.quantity.*' => ['required', 'integer', 'gt:1'],
+            'variations.*.wholesale.price.*' => ['required', 'integer', 'min:1'],
         ]);
 
         if ($validator->fails()) {

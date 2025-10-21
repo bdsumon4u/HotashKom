@@ -94,7 +94,7 @@ class LoginController extends Controller
 
             $this->sendOTP($user);
 
-            return redirect()->back()->withInput()
+            return back()->withInput()
                 ->with('token:sent', 'An OTP has been sent to your mobile.');
         }
 
@@ -116,7 +116,7 @@ class LoginController extends Controller
         $user = $this->getUser($request->login);
         $this->sendOTP($user);
 
-        return redirect()->back()->withInput()
+        return back()->withInput()
             ->with('token:sent', 'An OTP has been sent to your mobile.');
     }
 
@@ -126,7 +126,7 @@ class LoginController extends Controller
             'login' => Str::startsWith($phone, '0') ? '+88'.$phone : $phone,
         ]);
         \request()->validate([
-            'login' => 'required|regex:/^\+8801\d{9}$/',
+            'login' => ['required', 'regex:/^\+8801\d{9}$/'],
         ]);
 
         return User::query()->firstWhere('phone_number', \request()->get('login'));
@@ -137,11 +137,11 @@ class LoginController extends Controller
      */
     private function sendOTP(&$user): void
     {
-        throw_if(Cache::get($key = 'auth:'.\request()->get('login')), ValidationException::withMessages([
+        throw_if(Cache::memo()->get($key = 'auth:'.\request()->get('login')), ValidationException::withMessages([
             'password' => ['Please wait for OTP.'],
         ]));
         $ttl = (property_exists($this, 'decayMinutes') ? $this->decayMinutes : 2) * 60;
-        $otp = Cache::remember($key, $ttl, fn (): int => mt_rand(1000, 999999));
+        $otp = Cache::memo()->remember($key, $ttl, fn (): int => mt_rand(1000, 999999));
         $user->notify(new SendOTP($otp));
     }
 
@@ -155,7 +155,7 @@ class LoginController extends Controller
         return ['phone_number', 'email'];
     }
 
-    public function isPhoneNumber($login)
+    public function isPhoneNumber($login): bool
     {
         return Str::startsWith($login, '01') || Str::startsWith($login, '+8801');
     }

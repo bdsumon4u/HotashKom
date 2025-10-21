@@ -52,7 +52,7 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
             Route::post('password/resend-otp', 'Auth\ForgotPasswordController@resendOtp')->name('password.resend-otp');
 
             // User profile and orders routes
-            Route::middleware('auth:user')->group(function () {
+            Route::middleware('auth:user')->group(function (): void {
                 Route::match(['get', 'post'], 'profile', 'ProfileController')->name('profile');
                 Route::get('orders', 'OrderController')->name('orders');
 
@@ -73,14 +73,14 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     });
 
     // Reseller Panel Routes (outside user group but with auth middleware)
-    Route::middleware('auth:user')->group(function () {
-        Route::prefix('reseller')->name('reseller.')->group(function () {
+    Route::middleware('auth:user')->group(function (): void {
+        Route::prefix('reseller')->name('reseller.')->group(function (): void {
             Route::get('dashboard', [ResellerController::class, 'dashboard'])->name('dashboard');
             Route::get('profile', [ResellerController::class, 'profile'])->name('profile');
             Route::post('profile', [ResellerController::class, 'updateProfile'])->name('profile.update');
 
             // Routes that require verification
-            Route::middleware(App\Http\Middleware\EnsureResellerIsVerified::class)->group(function () {
+            Route::middleware(App\Http\Middleware\EnsureResellerIsVerified::class)->group(function (): void {
                 Route::get('products', [ResellerController::class, 'products'])->name('products');
                 Route::get('orders', [ResellerController::class, 'orders'])->name('orders');
                 Route::get('orders/{order}', [ResellerController::class, 'showOrder'])->name('orders.show');

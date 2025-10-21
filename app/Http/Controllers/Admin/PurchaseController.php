@@ -39,7 +39,7 @@ class PurchaseController extends Controller
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
 
         // This will be handled by the Livewire component
-        return redirect()->route('admin.purchases.index');
+        return to_route('admin.purchases.index');
     }
 
     /**
@@ -70,7 +70,7 @@ class PurchaseController extends Controller
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
 
         // This will be handled by the Livewire component
-        return redirect()->route('admin.purchases.index');
+        return to_route('admin.purchases.index');
     }
 
     /**
@@ -80,7 +80,7 @@ class PurchaseController extends Controller
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
 
-        DB::transaction(function () use ($purchase) {
+        DB::transaction(function () use ($purchase): void {
             // Use service to revert stock changes
             $stockService = new PurchaseStockService;
             $stockService->revertStockChanges($purchase);
@@ -89,7 +89,7 @@ class PurchaseController extends Controller
             $purchase->delete();
         });
 
-        return redirect()->route('admin.purchases.index')
+        return to_route('admin.purchases.index')
             ->with('success', 'Purchase record deleted successfully!');
     }
 }

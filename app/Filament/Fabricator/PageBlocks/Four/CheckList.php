@@ -26,6 +26,7 @@ class CheckList extends PageBlock
             ]);
     }
 
+    #[\Override]
     public static function mutateData(array $data): array
     {
         $data['content'] = static::transformListHtmlQuick($data['content']);

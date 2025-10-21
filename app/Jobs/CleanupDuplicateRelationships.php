@@ -21,15 +21,10 @@ class CleanupDuplicateRelationships implements ShouldQueue
 
     public $timeout = 600;
 
-    protected $productId;
-
     /**
      * Create a new job instance.
      */
-    public function __construct(?int $productId = null)
-    {
-        $this->productId = $productId;
-    }
+    public function __construct(protected ?int $productId = null) {}
 
     /**
      * Handle a job failure.

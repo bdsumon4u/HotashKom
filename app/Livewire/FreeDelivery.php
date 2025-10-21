@@ -48,7 +48,7 @@ class FreeDelivery extends Component
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,
-            'image' => optional($product->base_image)->src,
+            'image' => $product->base_image?->src,
             'quantity' => $quantity,
         ];
 

@@ -52,7 +52,7 @@ class SendOTP extends Notification
      */
     public function toArray($notifiable): array
     {
-        $phone = preg_replace('/[^\d]/', '', setting('company')->phone);
+        $phone = preg_replace('/[^\d]/', '', (string) setting('company')->phone);
         $phone = Str::startsWith($phone, '0')
             ? '88'.$phone
             : Str::replaceFirst('+', '', $phone);

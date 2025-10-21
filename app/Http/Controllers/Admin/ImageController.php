@@ -34,7 +34,7 @@ class ImageController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $request->validate([
-            'file' => 'required|image',
+            'file' => ['required', 'image'],
         ]);
 
         $file = $request->file('file');
@@ -58,7 +58,7 @@ class ImageController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $request->validate([
-            'filename' => 'required|string',
+            'filename' => ['required', 'string'],
         ]);
 
         $image->update($request->only('filename'));

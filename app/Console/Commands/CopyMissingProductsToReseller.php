@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\CopyProductToResellers;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -99,7 +98,7 @@ class CopyMissingProductsToReseller extends Command
 
         foreach ($missingProducts as $product) {
             try {
-                CopyProductToResellers::dispatch($product)->onQueue($queue);
+                dispatch(new \App\Jobs\CopyProductToResellers($product))->onQueue($queue);
                 $dispatchedCount++;
                 $progressBar->advance();
             } catch (\Exception $e) {

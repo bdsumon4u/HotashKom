@@ -8,10 +8,8 @@ use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use App\Models\Product;
 use App\Notifications\User\OrderConfirmed;
-use App\Pathao\Facade\Pathao;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -31,7 +29,7 @@ class OrderController extends Controller
     {
         abort_if(request()->user()->is('uploader'), 403);
         if (! request()->has('status')) {
-            return redirect()->route('admin.orders.index', ['status' => 'PENDING']);
+            return to_route('admin.orders.index', ['status' => 'PENDING']);
         }
 
         return $this->view();
@@ -74,7 +72,7 @@ class OrderController extends Controller
                 ];
 
                 DB::purge('reseller');
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // If database connection fails, mark as not connected
                 $resellerData[$order->user->id] = [
                     'company' => null,
@@ -116,9 +114,9 @@ class OrderController extends Controller
     public function filter(Request $request)
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
-        $_start = Carbon::parse(\request('start_d', date('Y-m-d')));
+        $_start = \Illuminate\Support\Facades\Date::parse(\request('start_d', date('Y-m-d')));
         $start = $_start->format('Y-m-d');
-        $_end = Carbon::parse(\request('end_d'));
+        $_end = \Illuminate\Support\Facades\Date::parse(\request('end_d'));
         $end = $_end->format('Y-m-d');
 
         $totalSQL = 'COUNT(*) as order_count, SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.subtotal"))) + SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.shipping_cost"))) - COALESCE(SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.discount"))), 0) as total_amount';
@@ -181,7 +179,7 @@ class OrderController extends Controller
                 'slug' => $item->random()['slug'],
                 'quantity' => $item->sum('quantity'),
                 'total' => $item->sum('total'),
-            ])->sortByDesc('quantity')->toArray();
+            ])->sortByDesc('quantity')->all();
 
         return view('admin.orders.filter', [
             'start' => $start,
@@ -219,7 +217,7 @@ class OrderController extends Controller
                     ];
 
                     DB::purge('reseller');
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     $resellerData[$reseller->id] = [
                         'company' => null,
                         'logo' => null,
@@ -240,7 +238,7 @@ class OrderController extends Controller
 
     public function invoices(Request $request)
     {
-        $request->validate(['order_id' => 'required']);
+        $request->validate(['order_id' => ['required']]);
         $order_ids = explode(',', $request->order_id);
         $order_ids = array_map('trim', $order_ids);
         $order_ids = array_filter($order_ids);
@@ -272,7 +270,7 @@ class OrderController extends Controller
                     ];
 
                     DB::purge('reseller');
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     // If database connection fails, mark as not connected
                     $resellerData[$reseller->id] = [
                         'company' => null,
@@ -295,7 +293,7 @@ class OrderController extends Controller
 
     public function stickers(Request $request)
     {
-        $request->validate(['order_id' => 'required']);
+        $request->validate(['order_id' => ['required']]);
         $order_ids = explode(',', $request->order_id);
         $order_ids = array_map('trim', $order_ids);
         $order_ids = array_filter($order_ids);
@@ -324,7 +322,7 @@ class OrderController extends Controller
 
     public function booking(Request $request)
     {
-        $request->validate(['order_id' => 'required']);
+        $request->validate(['order_id' => ['required']]);
         $order_ids = explode(',', $request->order_id);
         $order_ids = array_map('trim', $order_ids);
         $order_ids = array_filter($order_ids);
@@ -411,11 +409,11 @@ class OrderController extends Controller
         }
 
         if ($error) {
-            return redirect()->back() // $this->invoices($request);
+            return back() // $this->invoices($request);
                 ->withDanger('Booked '.$booked.' out of '.count($order_ids).' orders. Please try again later.');
         }
 
-        return redirect()->back() // $this->invoices($request);
+        return back() // $this->invoices($request);
             ->withSuccess('Orders are sent to Courier.');
     }
 
@@ -423,13 +421,10 @@ class OrderController extends Controller
      * Calculate the collection amount (COD/amount_to_collect/cash_collection_amount) for an order.
      *
      * @param  \App\Models\Order  $order
-     * @return int|float
      */
-    private function calculateOrderCollectionAmount($order)
+    private function calculateOrderCollectionAmount($order): float
     {
-        $retail = array_reduce((array) $order->products, function ($sum, $product) {
-            return $sum + (float) ($product->{(isOninda() && config('app.resell')) ? 'retail_price' : 'price'} ?? 0) * (int) ($product->quantity ?? 1);
-        }, 0);
+        $retail = array_reduce((array) $order->products, fn ($sum, $product): float => $sum + (float) ($product->{(isOninda() && config('app.resell')) ? 'retail_price' : 'price'} ?? 0) * (int) ($product->quantity ?? 1), 0);
         $deliveryFee = (float) ($order->data[(isOninda() && config('app.resell')) ? 'retail_delivery_fee' : 'shipping_cost'] ?? 0);
         $discount = (float) ($order->data[(isOninda() && config('app.resell')) ? 'retail_discount' : 'discount'] ?? 0);
         $advanced = (float) ($order->data['advanced'] ?? 0);
@@ -553,21 +548,21 @@ class OrderController extends Controller
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
         $request->validate([
-            'courier' => 'required',
-            'order_id' => 'required|array',
+            'courier' => ['required'],
+            'order_id' => ['required', 'array'],
         ]);
 
         Order::whereIn('id', $request->order_id)
             ->get()->map->update(['data' => ['courier' => $request->courier]]);
 
-        return redirect()->back()->withSuccess('Courier Has Been Updated.');
+        return back()->withSuccess('Courier Has Been Updated.');
     }
 
     public function status(Request $request)
     {
         $request->validate([
-            'status' => 'required',
-            'order_id' => 'required|array',
+            'status' => ['required'],
+            'order_id' => ['required', 'array'],
         ]);
 
         $data['status'] = $request->status;
@@ -583,21 +578,21 @@ class OrderController extends Controller
             $orders->each(fn ($order) => $order->user->notify(new OrderConfirmed($order)));
         }
 
-        return redirect()->back()->withSuccess('Order Status Has Been Updated.');
+        return back()->withSuccess('Order Status Has Been Updated.');
     }
 
     public function staff(Request $request)
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $request->validate([
-            'admin_id' => 'required',
-            'order_id' => 'required|array',
+            'admin_id' => ['required'],
+            'order_id' => ['required', 'array'],
         ]);
 
         $data['admin_id'] = $request->admin_id;
         Order::whereIn('id', $request->order_id)->where('admin_id', '!=', $request->admin_id)->update($data);
 
-        return redirect()->back()->withSuccess('Order Staff Has Been Updated.');
+        return back()->withSuccess('Order Staff Has Been Updated.');
     }
 
     public function updateQuantity(Request $request, Order $order)
@@ -637,14 +632,14 @@ class OrderController extends Controller
     public function forwardToOninda(Request $request)
     {
         $request->validate([
-            'order_id' => 'required|array',
+            'order_id' => ['required', 'array'],
         ]);
 
         if (config('app.demo')) {
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Demo mode doesn\'t allow this operation.'], 422);
             } else {
-                return redirect()->back()->with('danger', 'Demo mode doesn\'t allow this operaton.');
+                return back()->with('danger', 'Demo mode doesn\'t allow this operaton.');
             }
         }
 
@@ -657,11 +652,11 @@ class OrderController extends Controller
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.'], 422);
             } else {
-                return redirect()->back()->with('danger', 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.');
+                return back()->with('danger', 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.');
             }
         }
 
-        $domain = preg_replace('/^www\./', '', parse_url(config('app.url'), PHP_URL_HOST));
+        $domain = preg_replace('/^www\./', '', parse_url((string) config('app.url'), PHP_URL_HOST));
         $endpoint = config('app.oninda_url').'/api/reseller/orders/place';
 
         // Set source_id = 0 to indicate processing state
@@ -680,14 +675,14 @@ class OrderController extends Controller
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Failed to forward orders to the Wholesaler: '.$e->getMessage()], 500);
             } else {
-                return redirect()->back()->with('danger', 'Failed to forward orders to the Wholesaler: '.$e->getMessage());
+                return back()->with('danger', 'Failed to forward orders to the Wholesaler: '.$e->getMessage());
             }
         }
 
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Orders are being forwarded to the Wholesaler.']);
         } else {
-            return redirect()->back()->with('success', 'Orders are being forwarded to the Wholesaler.');
+            return back()->with('success', 'Orders are being forwarded to the Wholesaler.');
         }
     }
 

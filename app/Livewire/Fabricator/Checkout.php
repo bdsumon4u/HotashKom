@@ -11,6 +11,7 @@ class Checkout extends \App\Livewire\Checkout
 
     public Product $product;
 
+    #[\Override]
     public function increaseQuantity($id): void
     {
         if (! ($row = cart($id)) && ($product = Product::find($id))) {
@@ -21,6 +22,7 @@ class Checkout extends \App\Livewire\Checkout
         $this->cartUpdated();
     }
 
+    #[\Override]
     public function decreaseQuantity($id): void
     {
         if (! ($row = cart($id)) && ($product = Product::find($id))) {
@@ -31,12 +33,14 @@ class Checkout extends \App\Livewire\Checkout
         $this->cartUpdated();
     }
 
+    #[\Override]
     public function mount(): void
     {
         ProductDetail::landing($this->product);
         parent::mount();
     }
 
+    #[\Override]
     public function render()
     {
         return view('livewire.fabricator.checkout');

@@ -31,24 +31,23 @@ class MoneyRequestController extends Controller
             ->where('type', 'withdraw')
             ->where('confirmed', false)
             // Ensure we're filtering user withdrawals (polymorphic)
-            ->where('payable_type', (new User)->getMorphClass())
-            ->orderBy('created_at', 'desc');
+            ->where('payable_type', (new User)->getMorphClass())->latest();
 
         return DataTables::of($transactions)
             // Override ALL searching (global + per-column) to avoid referencing non-existent DB columns
-            ->filter(function ($query) {
-                $search = strtolower(request('search.value', ''));
+            ->filter(function ($query): void {
+                $search = strtolower((string) request('search.value', ''));
                 if ($search === '' || $search === null) {
                     return;
                 }
 
-                $query->where(function ($q) use ($search) {
+                $query->where(function ($q) use ($search): void {
                     // Search by transaction id, amount, created_at
                     $q->whereRaw('LOWER(CAST(`transactions`.`id` AS CHAR)) LIKE ?', ["%{$search}%"]) // id
                         ->orWhereRaw('LOWER(CAST(`transactions`.`amount` AS CHAR)) LIKE ?', ["%{$search}%"]) // amount
                         ->orWhereRaw('LOWER(DATE_FORMAT(`transactions`.`created_at`, "%Y-%m-%d %H:%i:%s")) LIKE ?', ["%{$search}%"]) // requested_at
                         // Search related user (payable) fields
-                        ->orWhereHas('payable', function ($uq) use ($search) {
+                        ->orWhereHas('payable', function ($uq) use ($search): void {
                             $uq->whereRaw('LOWER(`name`) LIKE ?', ["%{$search}%"]) // reseller name
                                 ->orWhereRaw('LOWER(`shop_name`) LIKE ?', ["%{$search}%"]) // shop name
                                 ->orWhereRaw('LOWER(`bkash_number`) LIKE ?', ["%{$search}%"]); // bkash
@@ -73,9 +72,7 @@ class MoneyRequestController extends Controller
 
                 return $user ? ($user->bkash_number ?? 'N/A') : 'N/A';
             })
-            ->editColumn('amount', function ($row): string {
-                return '<span class="font-weight-bold text-primary">'.theMoney(abs($row->amount)).'</span>';
-            })
+            ->editColumn('amount', fn ($row): string => '<span class="font-weight-bold text-primary">'.theMoney(abs($row->amount)).'</span>')
             ->addColumn('balance', function ($row): string {
                 $user = $row->payable;
                 if (! $user) {
@@ -87,12 +84,8 @@ class MoneyRequestController extends Controller
 
                 return '<span class="font-weight-bold text-info">'.theMoney(abs($balance)).'</span>';
             })
-            ->editColumn('requested_at', function ($row): string {
-                return $row->created_at->format('M d, Y H:i');
-            })
-            ->editColumn('status', function ($row): string {
-                return '<span class="badge badge-warning">Pending</span>';
-            })
+            ->editColumn('requested_at', fn ($row): string => $row->created_at->format('M d, Y H:i'))
+            ->editColumn('status', fn ($row): string => '<span class="badge badge-warning">Pending</span>')
             ->addColumn('actions', function ($row) {
                 $user = $row->payable;
                 if (! $user) {
@@ -130,9 +123,9 @@ class MoneyRequestController extends Controller
     public function confirm(Request $request)
     {
         $request->validate([
-            'transaction_id' => 'required|integer',
-            'user_id' => 'required|integer',
-            'trx_id' => 'required|string|max:255',
+            'transaction_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
+            'trx_id' => ['required', 'string', 'max:255'],
         ]);
 
         $transaction = Transaction::where('id', $request->transaction_id)
@@ -160,7 +153,7 @@ class MoneyRequestController extends Controller
         $user->confirm($transaction);
 
         // Clear pending withdrawal cache
-        cache()->forget('pending_withdrawal_amount');
+        cache()->memo()->forget('pending_withdrawal_amount');
 
         return response()->json(['message' => 'Withdrawal confirmed successfully']);
     }
@@ -173,8 +166,8 @@ class MoneyRequestController extends Controller
     public function deleteRequest(Request $request)
     {
         $request->validate([
-            'transaction_id' => 'required|integer',
-            'user_id' => 'required|integer',
+            'transaction_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
         ]);
 
         $transaction = Transaction::where('id', $request->transaction_id)
@@ -190,7 +183,7 @@ class MoneyRequestController extends Controller
         $transaction->delete();
 
         // Clear pending withdrawal cache
-        cache()->forget('pending_withdrawal_amount');
+        cache()->memo()->forget('pending_withdrawal_amount');
 
         return response()->json(['message' => 'Withdrawal request deleted successfully']);
     }

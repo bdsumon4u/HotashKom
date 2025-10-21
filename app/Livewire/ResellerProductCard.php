@@ -27,7 +27,7 @@ class ResellerProductCard extends Component
 
     protected $facebookService;
 
-    public function boot(FacebookPixelService $facebookService)
+    public function boot(FacebookPixelService $facebookService): void
     {
         $this->facebookService = $facebookService;
     }

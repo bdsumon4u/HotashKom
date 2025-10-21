@@ -20,7 +20,7 @@ class CallOnindaOrderApi implements ShouldQueue
 
     public function handle(): void
     {
-        $domain = preg_replace('/^www\./', '', parse_url(config('app.url'), PHP_URL_HOST));
+        $domain = preg_replace('/^www\./', '', parse_url((string) config('app.url'), PHP_URL_HOST));
         $endpoint = config('app.oninda_url').'/api/reseller/orders/place';
 
         info('Calling Oninda order API: '.$endpoint, $data = [
@@ -30,7 +30,7 @@ class CallOnindaOrderApi implements ShouldQueue
 
         try {
             Http::post($endpoint, $data)->throw();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             DB::table('orders')->whereIntegerInRaw('id', [$this->orderId])->update(['source_id' => null]);
         }
     }
