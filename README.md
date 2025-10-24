@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}468}$$ 🔥 domains are live now
+These 🔥 $${\color{red}470}$$ 🔥 domains are live now
 
-_Last updated: **2025-10-23 09:08:02 Asia/Dhaka**_
+_Last updated: **2025-10-24 09:05:07 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -546,24 +546,26 @@ _Last updated: **2025-10-23 09:08:02 Asia/Dhaka**_
 | 445 | [antorafashionngadgets.com](http://antorafashionngadgets.com) |
 | 446 | [dailyshopbd24.com](http://dailyshopbd24.com) |
 | 447 | [hrshop24.com](http://hrshop24.com) |
-| 448 | [tuktakbazarbd.com](http://tuktakbazarbd.com) |
-| 449 | [dorkar24.com](http://dorkar24.com) |
-| 450 | [nittonotunebazar.com](http://nittonotunebazar.com) |
-| 451 | [abahon.com](http://abahon.com) |
-| 452 | [trusthubbd.com](http://trusthubbd.com) |
-| 453 | [arhalalshop.com](http://arhalalshop.com) |
-| 454 | [yakindepartmentalstore.com](http://yakindepartmentalstore.com) |
-| 455 | [oriolifestyle.com](http://oriolifestyle.com) |
-| 456 | [nittoponnoshop.com](http://nittoponnoshop.com) |
-| 457 | [jubayerstores.com](http://jubayerstores.com) |
-| 458 | [ghoreboshebazar.com](http://ghoreboshebazar.com) |
-| 459 | [etkmart.com](http://etkmart.com) |
-| 460 | [ekhonekinun.com](http://ekhonekinun.com) |
-| 461 | [dhakauddokta.com](http://dhakauddokta.com) |
-| 462 | [pijushmart.com](http://pijushmart.com) |
-| 463 | [utshahohaat.com](http://utshahohaat.com) |
-| 464 | [luxoraeshop.com](http://luxoraeshop.com) |
-| 465 | [meyabhai.com](http://meyabhai.com) |
-| 466 | [jayanshops.com](http://jayanshops.com) |
-| 467 | [southsell.com](http://southsell.com) |
-| 468 | [ideal100.com](http://ideal100.com) |
+| 448 | [dorkar24.com](http://dorkar24.com) |
+| 449 | [nittonotunebazar.com](http://nittonotunebazar.com) |
+| 450 | [abahon.com](http://abahon.com) |
+| 451 | [trusthubbd.com](http://trusthubbd.com) |
+| 452 | [arhalalshop.com](http://arhalalshop.com) |
+| 453 | [yakindepartmentalstore.com](http://yakindepartmentalstore.com) |
+| 454 | [oriolifestyle.com](http://oriolifestyle.com) |
+| 455 | [nittoponnoshop.com](http://nittoponnoshop.com) |
+| 456 | [jubayerstores.com](http://jubayerstores.com) |
+| 457 | [pijushmart.com](http://pijushmart.com) |
+| 458 | [utshahohaat.com](http://utshahohaat.com) |
+| 459 | [luxoraeshop.com](http://luxoraeshop.com) |
+| 460 | [meyabhai.com](http://meyabhai.com) |
+| 461 | [jayanshops.com](http://jayanshops.com) |
+| 462 | [southsell.com](http://southsell.com) |
+| 463 | [tntbazar.com](http://tntbazar.com) |
+| 464 | [bondhuzone.com](http://bondhuzone.com) |
+| 465 | [ezyshopz.com](http://ezyshopz.com) |
+| 466 | [ghoreboshebazar.com](http://ghoreboshebazar.com) |
+| 467 | [etkmart.com](http://etkmart.com) |
+| 468 | [ekhonekinun.com](http://ekhonekinun.com) |
+| 469 | [dhakauddokta.com](http://dhakauddokta.com) |
+| 470 | [ideal100.com](http://ideal100.com) |
