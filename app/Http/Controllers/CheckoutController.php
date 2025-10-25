@@ -27,7 +27,7 @@ class CheckoutController extends Controller
                             'item_category' => $product->options->category,
                             'price' => $product->price,
                             'quantity' => $product->qty,
-                        ]),
+                        ])->values(),
                     ],
                 ]);
             }
