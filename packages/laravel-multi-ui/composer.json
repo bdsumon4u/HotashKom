@@ -1,0 +1,32 @@
+{
+    "name": "hotash/laravel-multi-ui",
+    "description": "Laravel Ui Package For Multiple Guards.",
+    "type": "package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sumon Ahmed",
+            "email": "bdsumon4u@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Hotash\\LaravelMultiUi\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hotash\\LaravelMultiUi\\UiServiceProvider"
+            ]
+        }
+    }
+}

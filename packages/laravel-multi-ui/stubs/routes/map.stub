@@ -1,0 +1,22 @@
+
+
+    /**
+     * The path to the "home" route for {{SINGULAR_STUDLY}}.
+     *
+     * @var string
+     */
+    public const {{UPPERCASE}}_HOME = '/{{SINGULAR_KEBAB}}/home';
+
+    /**
+     * Define the "{{SINGULAR_KEBAB}}" routes for the application.
+     *
+     * These routes are typically stateless.
+     *
+     * @return void
+     */
+    protected function map{{SINGULAR_STUDLY}}Routes()
+    {
+        Route::middleware(['web'])
+            ->namespace($this->namespace)
+            ->group(base_path('routes/{{SINGULAR_KEBAB}}.php'));
+    }

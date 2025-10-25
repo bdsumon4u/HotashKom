@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Hotash\LaravelMultiUi\Facades\MultiUi;
+
+# Controller Level Namespace
+Route::group(['namespace' => '{{SINGULAR_STUDLY}}', 'as' => '{{SINGULAR_KEBAB}}.'], function() {
+
+    # {{SINGULAR_STUDLY}} Level Namespace & No Prefix
+    MultiUi::routes([
+        'URLs' => [
+            'login' => 'enter',
+            'register' => 'create-{{SINGULAR_KEBAB}}-account',
+            'reset/password' => 'reset-pass',
+            'logout' => 'getout',
+        ],
+        'prefix' => [
+            'URL' => '{{SINGULAR_KEBAB}}-',
+            'except' => 'register',
+        ],
+    ]);
+    #...
+    #...
+
+    Route::group(['prefix' => '{{SINGULAR_KEBAB}}'], function() {
+        # {{SINGULAR_STUDLY}} Level Namespace & '{{SINGULAR_KEBAB}}' Prefix
+        Route::get('/home', 'HomeController@index')->name('home');
+        Route::get('example', function() {
+            dump('bdsumon4u');
+        })->name('example');
+        #...
+        #...
+    });
+});
+
+# Controller Level Namespace & No Prefix
+#...
+#...

@@ -1,0 +1,22 @@
+<?php
+
+use App\{{SINGULAR_STUDLY}};
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
+class {{SINGULAR_STUDLY}}Seeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        {{SINGULAR_STUDLY}}::create([
+            'name' => 'Sumon Ahmed',
+            'email' => 'bdsumon4u@gmail.com',
+            'password' => Hash::make('password'),
+        ]);
+    }
+}

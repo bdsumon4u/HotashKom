@@ -1,0 +1,5 @@
+
+        '{{PLURAL_KEBAB}}' => [
+            'driver' => 'eloquent',
+            'model'  => App\{{SINGULAR_STUDLY}}::class,
+        ],
