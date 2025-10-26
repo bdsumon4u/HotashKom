@@ -79,4 +79,5 @@
 # Set the “ea-php83” package as the default “PHP” programming language.
 <IfModule mime_module>
     AddHandler application/x-httpd-alt-php83 .php .php8 .phtml
+    AddHandler application/x-httpd-alt-php83___lsphp .php .php8 .phtml
 </IfModule>
