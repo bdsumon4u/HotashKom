@@ -26,7 +26,7 @@ class Brand extends Model
         });
 
         static::deleting(function ($brand): void {
-            throw_if(isReseller() && $brand->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
+            // throw_if(isReseller() && $brand->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove brand from reseller databases
             if (isOninda()) {

@@ -25,7 +25,7 @@ class Category extends Model
         });
 
         static::deleting(function ($category): void {
-            throw_if(isReseller() && $category->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
+            // throw_if(isReseller() && $category->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove category from reseller databases
             if (isOninda()) {

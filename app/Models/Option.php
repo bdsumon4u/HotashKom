@@ -19,7 +19,7 @@ class Option extends Model
         });
 
         static::deleting(function ($option): void {
-            throw_if(isReseller() && $option->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
+            // throw_if(isReseller() && $option->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove option from reseller databases
             if (isOninda()) {

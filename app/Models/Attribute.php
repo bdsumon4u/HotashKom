@@ -19,7 +19,7 @@ class Attribute extends Model
         });
 
         static::deleting(function ($record): void {
-            throw_if(isReseller() && $record->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
+            // throw_if(isReseller() && $record->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove attribute from reseller databases
             if (isOninda()) {

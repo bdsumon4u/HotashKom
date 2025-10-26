@@ -25,7 +25,7 @@ class Image extends Model
         });
 
         static::deleting(function ($image): void {
-            throw_if(isReseller() && $image->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
+            // throw_if(isReseller() && $image->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Dispatch job to remove image from reseller databases
             if (isOninda()) {
