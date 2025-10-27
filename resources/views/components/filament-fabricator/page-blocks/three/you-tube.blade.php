@@ -114,7 +114,7 @@
             <!-- Order Button -->
             <div class="youtube-button-wrapper">
                 <a href="#order" class="youtube-button">
-                    অর্ডার করুন
+{{ __('button.order_now') }}
                 </a>
             </div>
         </div>

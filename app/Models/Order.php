@@ -353,15 +353,15 @@ class Order extends Model
                     $item = (array) $item;
                     $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? ($item['quantity'] ?? 1) : 1;
 
-                    return ($item[$shipping_area === 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
-                }) ?: setting('delivery_charge')->{$shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+                    return ($item[$shipping_area === __('frontend.checkout.inside_dhaka') ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
+                }) ?: setting('delivery_charge')->{$shipping_area === __('frontend.checkout.inside_dhaka') ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
             } else {
                 $shipping_cost = $products->max(function ($item) use ($shipping_area) {
                     $item = (array) $item;
                     $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? ($item['quantity'] ?? 1) : 1;
 
-                    return ($item[$shipping_area === 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
-                }) ?: setting('delivery_charge')->{$shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+                    return ($item[$shipping_area === __('frontend.checkout.inside_dhaka') ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
+                }) ?: setting('delivery_charge')->{$shipping_area === __('frontend.checkout.inside_dhaka') ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
             }
         }
 

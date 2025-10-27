@@ -35,7 +35,7 @@
                                             <a class="elementor-button elementor-button-link elementor-size-md elementor-animation-pop"
                                                 href="#order">
                                                 <span class="elementor-button-content-wrapper">
-                                                    <span class="elementor-button-text">অর্ডার করতে চাই</span>
+                                                    <span class="elementor-button-text">{{ __('button.want_order') }}</span>
                                                 </span>
                                             </a>
                                         </div>

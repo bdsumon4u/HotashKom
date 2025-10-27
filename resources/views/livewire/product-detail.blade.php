@@ -128,7 +128,7 @@
                     </div>
                 </div>
                 <div class="p-1 mt-2 text-center call-for-order" style="border: 2px dashed #dedede;">
-                    <div>এই পণ্য সম্পর্কে প্রশ্ন আছে? অনুগ্রহপূর্বক কল করুন:</div>
+                    <div>{{ __('product.questions') }}</div>
                     @foreach (explode(' ', setting('call_for_order')) as $phone)
                         @if ($phone = trim($phone))
                             <a href="tel:{{ $phone }}" class="text-danger">
@@ -161,8 +161,7 @@
                 </div>
                 @if (($free_delivery->enabled ?? false) && $deliveryText)
                     <div class="mt-2 text-center border font-weight-bold">
-                        <p class="mb-1 border-bottom">আজ অর্ডার করলে <br> সারা বাংলাদেশে ডেলিভারি চার্জ <strong
-                                class="text-danger">ফ্রি</strong></p>
+                        <p class="mb-1 border-bottom">{!! __('product.free_delivery') !!}</p>
                         {!! $deliveryText !!}
                     </div>
                 @endif

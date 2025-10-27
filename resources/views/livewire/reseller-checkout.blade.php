@@ -21,21 +21,21 @@
         <div class="shadow-sm card mb-lg-0 rounded-0">
             <div class="p-3 card-body rounded-0 sahdow-sm">
                 <div class="mb-2 text-center border text-danger" style="padding: 2px 10px; font-size: 1.25rem;">
-                    নিচের তথ্যগুলো সঠিকভাবে পূরণ করে <strong>কনফার্ম অর্ডার</strong> বাটনে ক্লিক করুন।
+                    {!! __('checkout.heading') !!}
                 </div>
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
-                        <label>কাস্টমারের নাম: <span class="text-danger">*</span></label>
+                        <label>{{ __('checkout.customer_name') }}: <span class="text-danger">*</span></label>
                     </div>
                     <div class="form-group col-md-9">
-                        <x-input name="name" wire:model="name" place-holder="এখানে কাস্টমারের নাম লিখুন।"
-                            placeholder="Type customer's name here." />
+                        <x-input name="name" wire:model="name" place-holder="{{ __('checkout.customer_name_placeholder') }}"
+                            placeholder="{{ __('checkout.customer_name_placeholder') }}" />
                         <x-error field="name" />
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
-                        <label>মোবাইল নম্বর: <span class="text-danger">*</span></label>
+                        <label>{{ __('checkout.mobile_number') }}: <span class="text-danger">*</span></label>
                     </div>
                     <div class="form-group col-md-9">
                         <div class="input-group">
@@ -45,15 +45,15 @@
                             </div>
                             @endunless
                             <x-input type="tel" name="phone" wire:model="phone"
-                                place-holder="কাস্টমারের ফোন নম্বর লিখুন।"
-                                placeholder="Type customer's phone number." />
+                                place-holder="{{ __('checkout.mobile_placeholder') }}"
+                                placeholder="{{ __('checkout.mobile_placeholder') }}" />
                             <x-error field="phone" />
                         </div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
-                        <label class="d-block"><label>ডেলিভারি এরিয়া: <span class="text-danger">*</span></label>
+                        <label class="d-block"><label>{{ __('checkout.delivery_area') }}: <span class="text-danger">*</span></label>
                     </div>
                     <div class="form-group col-md-9">
                         <div class="form-control @error('shipping') is-invalid @enderror h-auto">
@@ -61,9 +61,9 @@
                                 <input type="radio" wire:model.live="shipping"
                                     @change="$wire.updateField('shipping', $event.target.value)"
                                     class="custom-control-input" id="inside-dhaka" name="shipping" value="Inside Dhaka">
-                                <label class="custom-control-label" for="inside-dhaka">ঢাকা শহর
+                                <label class="custom-control-label" for="inside-dhaka">{{ __('checkout.inside_dhaka') }}
                                     ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Inside Dhaka') }}
-                                    টাকা)
+                                    {{ __('checkout.currency') }})
                                 </label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
@@ -71,9 +71,9 @@
                                     @change="$wire.updateField('shipping', $event.target.value)"
                                     class="custom-control-input" id="outside-dhaka" name="shipping"
                                     value="Outside Dhaka">
-                                <label class="custom-control-label" for="outside-dhaka">ঢাকার বাইরে
+                                <label class="custom-control-label" for="outside-dhaka">{{ __('checkout.outside_dhaka') }}
                                     ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Outside Dhaka') }}
-                                    টাকা)
+                                    {{ __('checkout.currency') }})
                                 </label>
                             </div>
                         </div>
@@ -82,22 +82,22 @@
                 </div>
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
-                        <label>কাস্টমারের ঠিকানা: <span class="text-danger">*</span></label>
+                        <label>{{ __('checkout.customer_address') }}: <span class="text-danger">*</span></label>
                     </div>
                     <div class="form-group col-md-9">
                         <x-textarea name="address" wire:model="address"
-                            place-holder="এখানে কাস্টমারের পুরো ঠিকানা লিখুন।"
-                            placeholder="Type customer's address here."></x-textarea>
+                            place-holder="{{ __('checkout.address_placeholder') }}"
+                            placeholder="{{ __('checkout.address_placeholder') }}"></x-textarea>
                         <x-error field="address" />
                     </div>
                 </div>
                 @unless (setting('show_option')->hide_checkout_note ?? false)
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
-                        <label>নোট (অপশনাল):</label>
+                        <label>{{ __('checkout.note') }}:</label>
                     </div>
                     <div class="form-group col-md-9">
-                        <x-textarea name="note" wire:model="note" placeholder="আপনি চাইলে কোন নোট লিখতে পারেন।">
+                        <x-textarea name="note" wire:model="note" placeholder="{{ __('checkout.note_placeholder') }}">
                         </x-textarea>
                         <x-error field="note" />
                     </div>
@@ -107,11 +107,11 @@
                 @if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false))
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
-                        <label>সিটি: <span class="text-danger">*</span></label>
+                        <label>{{ __('checkout.city') }}: <span class="text-danger">*</span></label>
                     </div>
                     <div class="form-group col-md-9">
                         <select class="form-control @error('city_id') is-invalid @enderror" wire:model.live="city_id">
-                            <option value="">সিটি নির্বাচন করুন</option>
+                            <option value="">{{ __('checkout.select_city') }}</option>
                             @foreach ($pathaoCities as $city)
                             <option value="{{ $city->city_id }}">{{ $city->city_name }}</option>
                             @endforeach
@@ -121,15 +121,15 @@
                 </div>
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
-                        <label>এলাকা: <span class="text-danger">*</span></label>
+                        <label>{{ __('checkout.area') }}: <span class="text-danger">*</span></label>
                     </div>
                     <div class="form-group col-md-9">
                         <div wire:loading.class="d-flex" wire:target="city_id" class="d-none h-100 align-items-center">
-                            এলাকা লোড হচ্ছে...
+                            {{ __('checkout.area_loading') }}
                         </div>
                         <select wire:loading.remove wire:target="city_id"
                             class="form-control @error('area_id') is-invalid @enderror" wire:model.live="area_id">
-                            <option value="">এলাকা নির্বাচন করুন</option>
+                            <option value="">{{ __('checkout.select_area') }}</option>
                             @foreach ($pathaoAreas as $area)
                             <option value="{{ $area->zone_id }}">{{ $area->zone_name }}</option>
                             @endforeach
@@ -183,7 +183,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>Discount (TK)</th>
+                            <th>Discount ({{config('app.currency')}})</th>
                             <td>
                                 <input type="number" @focus="$event.target.select()" x-model="retailDiscount" step="10"
                                     min="0" class="form-control form-control-sm" />
@@ -221,7 +221,7 @@
                     </div>
                 </div>
                 <button type="button" wire:click="checkout" wire:loading.attr="disabled"
-                    class="text-white btn btn-primary btn-xl btn-block">কনফার্ম অর্ডার</button>
+                    class="text-white btn btn-primary btn-xl btn-block">{{ __('checkout.confirm_order') }}</button>
             </div>
         </div>
     </div>
@@ -271,7 +271,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <th style="font-size:14px;">Discount (TK)</th>
+                            <th style="font-size:14px;">Discount ({{config('app.currency')}})</th>
                             <td>
                                 <input type="number" @focus="$event.target.select()" x-model="retailDiscount" step="10"
                                     min="0" class="form-control form-control-sm" />
@@ -315,7 +315,7 @@
                         </div>
                     </div>
                     <button type="button" wire:click="checkout" wire:loading.attr="disabled"
-                        class="text-white btn btn-primary btn-xl btn-block">কনফার্ম অর্ডার</button>
+                        class="text-white btn btn-primary btn-xl btn-block">{{ __('checkout.confirm_order') }}</button>
                 </div>
             </div>
         </div>
@@ -343,7 +343,7 @@
                 if (!this.retail || typeof this.retail !== 'object') return 0;
                 return Object.values(this.retail).reduce((a, b) => a + b.price * b.quantity, 0);
             },
-            format(price) { return 'TK ' + price.toLocaleString('en-US', { maximumFractionDigits: 0 }) },
+            format(price) { return '{{config('app.currency')}} ' + price.toLocaleString('en-US', { maximumFractionDigits: 0 }) },
         }));
         });
 </script>

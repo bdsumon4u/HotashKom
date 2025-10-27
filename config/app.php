@@ -119,11 +119,15 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'bn'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+
+    'currency' => env('APP_CURRENCY', 'টাকা'),
+
+    'currency_symbol' => env('APP_CURRENCY_SYMBOL', '৳'),
 
     /*
     |--------------------------------------------------------------------------

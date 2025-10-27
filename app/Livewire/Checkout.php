@@ -213,11 +213,11 @@ class Checkout extends Component
 
         $default_area = setting('default_area');
         if ($default_area->inside ?? false) {
-            $shipping = 'Inside Dhaka';
+            $shipping = __('frontend.checkout.inside_dhaka');
             $this->retailDeliveryFee = $this->shippingCost($shipping);
         }
         if ($default_area->outside ?? false) {
-            $shipping = 'Outside Dhaka';
+            $shipping = __('frontend.checkout.outside_dhaka');
             $this->retailDeliveryFee = $this->shippingCost($shipping);
         }
 

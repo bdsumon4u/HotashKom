@@ -184,9 +184,9 @@ function infiniteScroll(sectionId) {
                      } else if (isOninda && guestCanSeePrice) {
                          priceHTML = '<small class="product-card__new-price text-danger">Verify account to see price</small>';
                      } else if (hasDiscount) {
-                         priceHTML = `<span class="product-card__new-price">Tk. ${productSellingPrice}</span><span class="product-card__old-price">Tk. ${productPrice}</span>`;
+                         priceHTML = `<span class="product-card__new-price">{{config('app.currency')}}. ${productSellingPrice}</span><span class="product-card__old-price">{{config('app.currency')}}. ${productPrice}</span>`;
                      } else {
-                         priceHTML = `Tk. ${productPrice}`;
+                         priceHTML = `${config('app.currency')}. ${productPrice}`;
                      }
 
                      return `

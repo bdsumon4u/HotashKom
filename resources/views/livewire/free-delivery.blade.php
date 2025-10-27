@@ -17,7 +17,7 @@
             <div x-show="free && !all" class="px-3 row">
                 <input type="search" wire:model.live.debounce.250ms="search" id="search"
                     placeholder="Search Product" class="form-control">
-                
+
                 @if (session()->has('error'))
                     <strong class="text-danger d-flex align-items-center">{{ session('error') }}</strong>
                 @endif
@@ -104,7 +104,7 @@
                                         href="{{ route('products.show', $product['slug']) }}">{{ $product['name'] }}</a>
                                 </td>
                                 <td>
-                                    
+
                                     <div class="input-number product__quantity">
                                         <input type="number" id="quantity-{{ $product['id'] }}"
                                             class="form-control input-number__input"

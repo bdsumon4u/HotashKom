@@ -141,6 +141,7 @@ if (! function_exists('setting')) {
 if (! function_exists('theMoney')) {
     function theMoney($amount, $decimals = null, $currency = 'TK')
     {
+        $currency = config('app.currency');
         // Ensure amount is numeric to prevent number_format errors
         if (! is_numeric($amount)) {
             $amount = (float) ($amount ?? 0);

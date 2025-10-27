@@ -94,17 +94,17 @@ class ProductDetail extends Component
         if ($freeDelivery->for_all ?? false) {
             $text = '<ul class="p-0 pl-4 mb-0 list-unstyled">';
             if ($freeDelivery->min_quantity > 0) {
-                $text .= '<li>কমপক্ষে <strong class="text-danger">'.$freeDelivery->min_quantity.'</strong> টি প্রোডাক্ট অর্ডার করুন</li>';
+                $text .= '<li>'.__('product.min_quantity_all', ['count' => $freeDelivery->min_quantity]).'</li>';
             }
             if ($freeDelivery->min_amount > 0) {
-                $text .= '<li>কমপক্ষে <strong class="text-danger">'.$freeDelivery->min_amount.'</strong> টাকার প্রোডাক্ট অর্ডার করুন</li>';
+                $text .= '<li>'.__('product.min_amount_all', ['amount' => $freeDelivery->min_amount]).'</li>';
             }
 
             return $text.'</ul>';
         }
 
         if (array_key_exists($this->product->id, $products = ((array) ($freeDelivery->products ?? [])) ?? [])) {
-            return 'কমপক্ষে <strong class="text-danger">'.$products[$this->product->id].'</strong> টি অর্ডার করুন';
+            return __('product.specific_product_min_quantity', ['count' => $products[$this->product->id]]);
         }
 
         return false;

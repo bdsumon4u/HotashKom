@@ -49,7 +49,7 @@
                                                 <a href="{{route('products.show', $product->options->slug)}}">{{$product->name}}</a>
                                             </div>
                                             <div class="dropcart__product-meta">
-                                                <span class="dropcart__product-quantity">{{$product->qty}}</span> x <span class="dropcart__product-price">TK {{$product->price}}</span>
+                                                <span class="dropcart__product-quantity">{{$product->qty}}</span> x <span class="dropcart__product-price">{{config('app.currency')}} {{$product->price}}</span>
                                             </div>
                                         </div>
                                     </div>

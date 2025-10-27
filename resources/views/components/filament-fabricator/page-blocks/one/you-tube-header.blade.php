@@ -189,7 +189,7 @@
 
             <!-- Order Button -->
             <a href="#order" class="youtube-header-button">
-                অর্ডার করতে চাই
+{{ __('button.want_order') }}
             </a>
         </div>
     </div>

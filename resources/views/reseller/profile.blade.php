@@ -175,7 +175,7 @@
                                                        placeholder="0" min="0" step="1"
                                                        value="{{ old('inside_dhaka_shipping', $user->inside_dhaka_shipping ?? 0) }}">
                                                     <div class="input-group-append">
-                                                        <span class="input-group-text">TK</span>
+                                                        <span class="input-group-text">{{config('app.currency')}}</span>
                                                     </div>
                                                 </div>
                                                 @error('inside_dhaka_shipping')
@@ -194,7 +194,7 @@
                                                        placeholder="0" min="0" step="1"
                                                        value="{{ old('outside_dhaka_shipping', $user->outside_dhaka_shipping ?? 0) }}">
                                                     <div class="input-group-append">
-                                                        <span class="input-group-text">TK</span>
+                                                        <span class="input-group-text">{{config('app.currency')}}</span>
                                                     </div>
                                                 </div>
                                                 @error('outside_dhaka_shipping')

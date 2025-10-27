@@ -13,7 +13,7 @@
                     </div>
                     <div class="dropcart__product-meta">
                         <span class="dropcart__product-quantity">{{ $product->qty }}</span> x <span
-                            class="dropcart__product-price">TK {{ $product->price }}</span>
+                            class="dropcart__product-price">{{config('app.currency')}} {{ $product->price }}</span>
                     </div>
                 </div>
                 <button type="button" class="dropcart__product-remove btn btn-light btn-sm btn-svg-icon"

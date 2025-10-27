@@ -29,7 +29,7 @@
                         <div class="elementor-button-wrapper">
                             <a class="elementor-button elementor-button-link elementor-size-lg" href="#order">
                                 <span class="elementor-button-content-wrapper">
-                                    <span class="elementor-button-text">অর্ডার করুন</span>
+                                    <span class="elementor-button-text">{{ __('button.order_now') }}</span>
                                 </span>
                             </a>
                         </div>

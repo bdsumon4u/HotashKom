@@ -8,8 +8,7 @@
                 <div class="elementor-element elementor-element-9a9501a elementor-element-72090b7 elementor-element-68acae2 elementor-element-37676298 elementor-element-4e1d8f5a elementor-widget elementor-widget-heading"
                     data-id="72090b7" data-element_type="widget" data-widget_type="heading.default">
                     <div class="elementor-widget-container">
-                        <h2 class="elementor-heading-title elementor-size-default">অর্ডার করতে নিচের ফর্মটি
-                            পূরণ করুন</h2>
+                        <h2 class="elementor-heading-title elementor-size-default">{{ __('order.order_form') }}</h2>
                     </div>
                 </div>
                 @if ($layout == 'five')
@@ -21,9 +20,7 @@
                             <a href="tel:{{ setting('company')->phone }}">
 
                                 <h3 class="elementor-headline e-animated e-hide-highlight">
-                                    <span class="elementor-headline-plain-text elementor-headline-text-wrapper">ফোনে
-                                        অর্ডার
-                                        করুন: </span>
+                                    <span class="elementor-headline-plain-text elementor-headline-text-wrapper">{{ __('order.phone_order') }}: </span>
                                     <span class="elementor-headline-dynamic-wrapper elementor-headline-text-wrapper">
                                         <span
                                             class="elementor-headline-dynamic-text elementor-headline-text-active">{{ setting('company')->phone }}</span>
@@ -82,11 +79,10 @@
                                                     <div class="woocommerce-billing-fields__field-wrapper">
                                                         <p class="form-row form-row-first wcf-column-100 validate-required"
                                                             id="billing_first_name_field" data-priority="10"><label
-                                                                for="billing_first_name" class="">আপনার
-                                                                নাম&nbsp;<abbr class="required"
+                                                                for="billing_first_name" class="">{{ __('checkout.customer_name') }}&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label><span
                                                                 class="woocommerce-input-wrapper"><input type="text"
-                                                                    wire:model="name" class="input-text "
+                                                                    wire:model="name" class="input-text"
                                                                     name="billing_first_name" id="billing_first_name"
                                                                     placeholder="" value="" aria-required="true"
                                                                     autocomplete="given-name" />
@@ -99,7 +95,7 @@
                                                                 for="billing_address_1" class="">Shipping&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label><div
                                                                 class="woocommerce-input-wrapper">
-                                                                
+
 
                                                                 <ul id="shipping_method"
                                                                     style="border: 1px solid var( --wcf-field-border-color ); display: flex; column-gap: 1rem; padding: .5rem;"
@@ -112,7 +108,7 @@
                                                                             value="Inside Dhaka"
                                                                             class="shipping_method"
                                                                             checked='checked' /><label
-                                                                            for="shipping_method_0_flat_rate1">ঢাকা শহর <strong
+                                                                            for="shipping_method_0_flat_rate1">{{ __('checkout.inside_dhaka') }} <strong
                                                                                 class="woocommerce-Price-amount amount"><bdi>
                                                                                     @if (!(setting('show_option')->productwise_delivery_charge ?? false))
                                                                                         <strong
@@ -129,7 +125,7 @@
                                                                             id="shipping_method_0_flat_rate2"
                                                                             value="Outside Dhaka"
                                                                             class="shipping_method" /><label
-                                                                            for="shipping_method_0_flat_rate2">ঢাকার বাইরে <strong
+                                                                            for="shipping_method_0_flat_rate2">{{ __('checkout.outside_dhaka') }} <strong
                                                                                 class="woocommerce-Price-amount amount"><bdi>
                                                                                     @if (!(setting('show_option')->productwise_delivery_charge ?? false))
                                                                                         <strong
@@ -139,18 +135,17 @@
                                                                                 </bdi></strong></label>
                                                                     </li>
                                                                 </ul>
-                                                                
+
                                                                 <div
                                                                     class="wcf-field-required-error">{{ $errors->first('address') }}</div>
                                                             </div>
                                                         </div>
                                                         <p class="form-row form-row-wide address-field wcf-column-100 validate-required"
                                                             id="billing_address_1_field" data-priority="50"><label
-                                                                for="billing_address_1" class="">আপনার সম্পূর্ণ
-                                                                ঠিকানা&nbsp;<abbr class="required"
+                                                                for="billing_address_1" class="">{{ __('checkout.customer_address') }}&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label><span
                                                                 class="woocommerce-input-wrapper"><input type="text"
-                                                                    wire:model="address" class="input-text "
+                                                                    wire:model="address" class="input-text"
                                                                     name="billing_address_1" id="billing_address_1"
                                                                     placeholder="House number and street name"
                                                                     value="" aria-required="true"
@@ -161,12 +156,11 @@
                                                         </p>
                                                         <p class="form-row form-row-wide wcf-column-100 validate-required validate-phone"
                                                             id="billing_phone_field" data-priority="100">
-                                                            <label for="billing_phone" class="">আপনার ফোন
-                                                                নাম্বার&nbsp;<abbr class="required"
+                                                            <label for="billing_phone" class="">{{ __('checkout.mobile_number') }}&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label><span
                                                                 class="woocommerce-input-wrapper"><input
                                                                     type="tel" wire:model="phone"
-                                                                    class="input-text " name="billing_phone"
+                                                                    class="input-text" name="billing_phone"
                                                                     id="billing_phone" placeholder=""
                                                                     value="{{ setting('show_option')->hide_phone_prefix ?? false ? '' : '+880' }}"
                                                                     aria-required="true" autocomplete="tel" />
@@ -189,7 +183,7 @@
                                                 Products </h3>
                                             <div class="wcf-qty-options">
                                                 @foreach ($product->variations->isEmpty() ? [$product] : $product->variations as $product)
-                                                    <div class="wcf-qty-row wcf-qty-row-452 "
+                                                    <div class="wcf-qty-row wcf-qty-row-452"
                                                         data-options="{&quot;product_id&quot;:440,&quot;variation_id&quot;:452,&quot;type&quot;:&quot;variation&quot;,&quot;unique_id&quot;:&quot;zwr6yipq&quot;,&quot;mode&quot;:&quot;quantity&quot;,&quot;highlight_text&quot;:&quot;&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;default_quantity&quot;:1,&quot;original_price&quot;:&quot;200&quot;,&quot;discounted_price&quot;:&quot;&quot;,&quot;total_discounted_price&quot;:&quot;&quot;,&quot;currency&quot;:&quot;&amp;#2547;&amp;nbsp;&quot;,&quot;cart_item_key&quot;:&quot;4606109fe00ffd19b2a98941e90aaaa8&quot;,&quot;save_value&quot;:&quot;&quot;,&quot;save_percent&quot;:&quot;&quot;,&quot;sign_up_fee&quot;:0,&quot;subscription_price&quot;:&quot;200&quot;,&quot;trial_period_string&quot;:&quot;&quot;}">
                                                         <div class="wcf-item">
                                                             <div class="wcf-item-selector wcf-item-multiple-sel">
@@ -217,12 +211,12 @@
                                                                         class="wcf-display-title">{{ $product->name }}</span><span
                                                                         class="wcf-display-title-quantity">
                                                                         <div class="wcf-display-attributes"><span
-                                                                                class="wcf-att-inner">Price: Tk
+                                                                                class="wcf-att-inner">Price: {{config('app.currency')}}
                                                                                 {{ $prc = $row->price ?? $product->selling_price }}</span>
                                                                         </div>
                                                                 </div>
 
-                                                                <div class="wcf-qty ">
+                                                                <div class="wcf-qty">
                                                                     <div class="wcf-qty-selection-wrap">
                                                                         <span
                                                                             class="wcf-qty-selection-btn wcf-qty-decrement wcf-qty-change-icon"

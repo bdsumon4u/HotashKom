@@ -24,7 +24,7 @@
                         <a href="{{ route('products.show', $product->options->slug) }}"
                             class="cart-table__product-name">{{ $product->name }}</a>
                     </td>
-                    <td class="cart-table__column cart-table__column--price" data-title="Price">TK {{ $product->price }}</td>
+                    <td class="cart-table__column cart-table__column--price" data-title="Price">{{config('app.currency')}} {{ $product->price }}</td>
                     @if (isOninda())
                     <td class="cart-table__column cart-table__column--price" data-title="Price">
                         <div class="input-group input-group-sm">
@@ -44,7 +44,7 @@
                             <div class="input-number__sub" wire:click="decreaseQuantity('{{ $product->rowId }}')"></div>
                         </div>
                     </td>
-                    <td class="cart-table__column cart-table__column--total" data-title="Total">TK
+                    <td class="cart-table__column cart-table__column--total" data-title="Total">{{config('app.currency')}}
                         {{ $product->price * $product->qty }}</td>
                     <td class="cart-table__column cart-table__column--remove">
                         <button type="button" class="btn btn-light btn-sm btn-svg-icon"

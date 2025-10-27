@@ -103,7 +103,7 @@
                 @endforeach
                 <tr>
                     <th class="py-1" rowspan="5" colspan="3" style="text-align: center; vertical-align: middle; font-size: 24px;">
-                        <span style="font-weight: 400;">Condition</span>: TK. {{ $retail + ((isOninda() && config('app.resell')) ? ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost']) : $order->data['shipping_cost']) - ((isOninda() && config('app.resell')) ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)) - ($order->data['advanced'] ?? 0) }}
+                        <span style="font-weight: 400;">Condition</span>: {{config('app.currency')}}. {{ $retail + ((isOninda() && config('app.resell')) ? ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost']) : $order->data['shipping_cost']) - ((isOninda() && config('app.resell')) ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0)) - ($order->data['advanced'] ?? 0) }}
                     </th>
                 </tr>
                 <tr>

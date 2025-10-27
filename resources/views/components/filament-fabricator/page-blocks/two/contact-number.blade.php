@@ -16,7 +16,7 @@
                 <div class="elementor-element elementor-element-f33d443 elementor-widget elementor-widget-heading"
                     data-id="f33d443" data-element_type="widget" data-widget_type="heading.default">
                     <div class="elementor-widget-container">
-                        <h2 class="elementor-heading-title elementor-size-default">প্রয়োজনে ফোন করুন</h2>
+                        <h2 class="elementor-heading-title elementor-size-default">{{ __('fabricator.call_us') }}</h2>
                     </div>
                 </div>
                 <div class="elementor-element elementor-element-197cb12 elementor-align-center elementor-widget elementor-widget-button"

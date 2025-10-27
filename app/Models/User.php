@@ -157,8 +157,8 @@ class User extends Authenticatable implements Confirmable, Wallet
     public function getShippingCost(string $shippingArea): int
     {
         return match ($shippingArea) {
-            'Inside Dhaka' => (int) ($this->inside_dhaka_shipping ?? 0),
-            'Outside Dhaka' => (int) ($this->outside_dhaka_shipping ?? 0),
+            __('frontend.checkout.inside_dhaka') => (int) ($this->inside_dhaka_shipping ?? 0),
+            __('frontend.checkout.outside_dhaka') => (int) ($this->outside_dhaka_shipping ?? 0),
             default => 0,
         };
     }
