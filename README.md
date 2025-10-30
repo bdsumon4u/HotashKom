@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}435}$$ 🔥 domains are live now
+These 🔥 $${\color{red}445}$$ 🔥 domains are live now
 
-_Last updated: **2025-10-29 09:19:24 Asia/Dhaka**_
+_Last updated: **2025-10-30 09:15:11 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -528,9 +528,19 @@ _Last updated: **2025-10-29 09:19:24 Asia/Dhaka**_
 | 427 | [ekhonekinun.com](http://ekhonekinun.com) |
 | 428 | [dhakauddokta.com](http://dhakauddokta.com) |
 | 429 | [ideal100.com](http://ideal100.com) |
-| 430 | [oneemart.com](http://oneemart.com) |
-| 431 | [clicktoeasybuy.com](http://clicktoeasybuy.com) |
-| 432 | [mkemart.com](http://mkemart.com) |
-| 433 | [alizahub.com](http://alizahub.com) |
-| 434 | [horekrokombajar.com](http://horekrokombajar.com) |
-| 435 | [rowshonenterprise.com](http://rowshonenterprise.com) |
+| 430 | [horekrokombajar.com](http://horekrokombajar.com) |
+| 431 | [rowshonenterprise.com](http://rowshonenterprise.com) |
+| 432 | [bishalbajar.com](http://bishalbajar.com) |
+| 433 | [openshop-bd.com](http://openshop-bd.com) |
+| 434 | [haowamartbd.com](http://haowamartbd.com) |
+| 435 | [trustvally.com](http://trustvally.com) |
+| 436 | [agami.com.bd](http://agami.com.bd) |
+| 437 | [clicktoeasybuy.com](http://clicktoeasybuy.com) |
+| 438 | [mkemart.com](http://mkemart.com) |
+| 439 | [alizahub.com](http://alizahub.com) |
+| 440 | [ashamartbd.com](http://ashamartbd.com) |
+| 441 | [dorkar-shop.com](http://dorkar-shop.com) |
+| 442 | [oneemart.com](http://oneemart.com) |
+| 443 | [rongtulimart.com](http://rongtulimart.com) |
+| 444 | [bondhuzone.com](http://bondhuzone.com) |
+| 445 | [punokbd.com](http://punokbd.com) |
