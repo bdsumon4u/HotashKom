@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}445}$$ 🔥 domains are live now
+These 🔥 $${\color{red}444}$$ 🔥 domains are live now
 
-_Last updated: **2025-10-30 09:15:11 Asia/Dhaka**_
+_Last updated: **2025-10-31 09:15:01 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -534,13 +534,12 @@ _Last updated: **2025-10-30 09:15:11 Asia/Dhaka**_
 | 433 | [openshop-bd.com](http://openshop-bd.com) |
 | 434 | [haowamartbd.com](http://haowamartbd.com) |
 | 435 | [trustvally.com](http://trustvally.com) |
-| 436 | [agami.com.bd](http://agami.com.bd) |
-| 437 | [clicktoeasybuy.com](http://clicktoeasybuy.com) |
-| 438 | [mkemart.com](http://mkemart.com) |
-| 439 | [alizahub.com](http://alizahub.com) |
-| 440 | [ashamartbd.com](http://ashamartbd.com) |
-| 441 | [dorkar-shop.com](http://dorkar-shop.com) |
-| 442 | [oneemart.com](http://oneemart.com) |
-| 443 | [rongtulimart.com](http://rongtulimart.com) |
-| 444 | [bondhuzone.com](http://bondhuzone.com) |
-| 445 | [punokbd.com](http://punokbd.com) |
+| 436 | [clicktoeasybuy.com](http://clicktoeasybuy.com) |
+| 437 | [mkemart.com](http://mkemart.com) |
+| 438 | [alizahub.com](http://alizahub.com) |
+| 439 | [ashamartbd.com](http://ashamartbd.com) |
+| 440 | [dorkar-shop.com](http://dorkar-shop.com) |
+| 441 | [rongtulimart.com](http://rongtulimart.com) |
+| 442 | [bondhuzone.com](http://bondhuzone.com) |
+| 443 | [punokbd.com](http://punokbd.com) |
+| 444 | [oneemart.com](http://oneemart.com) |
