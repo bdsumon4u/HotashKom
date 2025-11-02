@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}444}$$ 🔥 domains are live now
+These 🔥 $${\color{red}447}$$ 🔥 domains are live now
 
-_Last updated: **2025-11-01 09:15:37 Asia/Dhaka**_
+_Last updated: **2025-11-02 09:19:15 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -543,3 +543,6 @@ _Last updated: **2025-11-01 09:15:37 Asia/Dhaka**_
 | 442 | [bondhuzone.com](http://bondhuzone.com) |
 | 443 | [punokbd.com](http://punokbd.com) |
 | 444 | [oneemart.com](http://oneemart.com) |
+| 445 | [safwanemart.com](http://safwanemart.com) |
+| 446 | [ponnokuthirbd.com](http://ponnokuthirbd.com) |
+| 447 | [babelshopbd.com](http://babelshopbd.com) |
