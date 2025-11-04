@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}448}$$ 🔥 domains are live now
+These 🔥 $${\color{red}452}$$ 🔥 domains are live now
 
-_Last updated: **2025-11-03 09:21:37 Asia/Dhaka**_
+_Last updated: **2025-11-04 09:14:22 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -503,47 +503,51 @@ _Last updated: **2025-11-03 09:21:37 Asia/Dhaka**_
 | 402 | [antorafashionngadgets.com](http://antorafashionngadgets.com) |
 | 403 | [dailyshopbd24.com](http://dailyshopbd24.com) |
 | 404 | [hrshop24.com](http://hrshop24.com) |
-| 405 | [dorkar24.com](http://dorkar24.com) |
-| 406 | [nittonotunebazar.com](http://nittonotunebazar.com) |
-| 407 | [abahon.com](http://abahon.com) |
-| 408 | [trusthubbd.com](http://trusthubbd.com) |
-| 409 | [arhalalshop.com](http://arhalalshop.com) |
-| 410 | [yakindepartmentalstore.com](http://yakindepartmentalstore.com) |
-| 411 | [oriolifestyle.com](http://oriolifestyle.com) |
-| 412 | [nittoponnoshop.com](http://nittoponnoshop.com) |
-| 413 | [jubayerstores.com](http://jubayerstores.com) |
-| 414 | [pijushmart.com](http://pijushmart.com) |
-| 415 | [utshahohaat.com](http://utshahohaat.com) |
-| 416 | [luxoraeshop.com](http://luxoraeshop.com) |
-| 417 | [meyabhai.com](http://meyabhai.com) |
-| 418 | [jayanshops.com](http://jayanshops.com) |
-| 419 | [southsell.com](http://southsell.com) |
-| 420 | [tntbazar.com](http://tntbazar.com) |
-| 421 | [ezyshopz.com](http://ezyshopz.com) |
-| 422 | [absmart24.com](http://absmart24.com) |
-| 423 | [thedreamerbd.com](http://thedreamerbd.com) |
-| 424 | [ghoreboshebazar.com](http://ghoreboshebazar.com) |
-| 425 | [etkmart.com](http://etkmart.com) |
-| 426 | [ekhonekinun.com](http://ekhonekinun.com) |
-| 427 | [dhakauddokta.com](http://dhakauddokta.com) |
-| 428 | [ideal100.com](http://ideal100.com) |
-| 429 | [horekrokombajar.com](http://horekrokombajar.com) |
-| 430 | [rowshonenterprise.com](http://rowshonenterprise.com) |
-| 431 | [bishalbajar.com](http://bishalbajar.com) |
-| 432 | [openshop-bd.com](http://openshop-bd.com) |
-| 433 | [haowamartbd.com](http://haowamartbd.com) |
-| 434 | [trustvally.com](http://trustvally.com) |
-| 435 | [agami.com.bd](http://agami.com.bd) |
-| 436 | [clicktoeasybuy.com](http://clicktoeasybuy.com) |
-| 437 | [mkemart.com](http://mkemart.com) |
-| 438 | [alizahub.com](http://alizahub.com) |
-| 439 | [ashamartbd.com](http://ashamartbd.com) |
-| 440 | [dorkar-shop.com](http://dorkar-shop.com) |
-| 441 | [rongtulimart.com](http://rongtulimart.com) |
-| 442 | [bondhuzone.com](http://bondhuzone.com) |
-| 443 | [punokbd.com](http://punokbd.com) |
-| 444 | [onlinedokaan.com](http://onlinedokaan.com) |
-| 445 | [oneemart.com](http://oneemart.com) |
-| 446 | [safwanemart.com](http://safwanemart.com) |
-| 447 | [ponnokuthirbd.com](http://ponnokuthirbd.com) |
-| 448 | [babelshopbd.com](http://babelshopbd.com) |
+| 405 | [tuktakbazarbd.com](http://tuktakbazarbd.com) |
+| 406 | [dorkar24.com](http://dorkar24.com) |
+| 407 | [nittonotunebazar.com](http://nittonotunebazar.com) |
+| 408 | [abahon.com](http://abahon.com) |
+| 409 | [trusthubbd.com](http://trusthubbd.com) |
+| 410 | [arhalalshop.com](http://arhalalshop.com) |
+| 411 | [yakindepartmentalstore.com](http://yakindepartmentalstore.com) |
+| 412 | [oriolifestyle.com](http://oriolifestyle.com) |
+| 413 | [nittoponnoshop.com](http://nittoponnoshop.com) |
+| 414 | [jubayerstores.com](http://jubayerstores.com) |
+| 415 | [pijushmart.com](http://pijushmart.com) |
+| 416 | [utshahohaat.com](http://utshahohaat.com) |
+| 417 | [luxoraeshop.com](http://luxoraeshop.com) |
+| 418 | [meyabhai.com](http://meyabhai.com) |
+| 419 | [jayanshops.com](http://jayanshops.com) |
+| 420 | [southsell.com](http://southsell.com) |
+| 421 | [tntbazar.com](http://tntbazar.com) |
+| 422 | [ezyshopz.com](http://ezyshopz.com) |
+| 423 | [absmart24.com](http://absmart24.com) |
+| 424 | [thedreamerbd.com](http://thedreamerbd.com) |
+| 425 | [ghoreboshebazar.com](http://ghoreboshebazar.com) |
+| 426 | [etkmart.com](http://etkmart.com) |
+| 427 | [ekhonekinun.com](http://ekhonekinun.com) |
+| 428 | [dhakauddokta.com](http://dhakauddokta.com) |
+| 429 | [ideal100.com](http://ideal100.com) |
+| 430 | [horekrokombajar.com](http://horekrokombajar.com) |
+| 431 | [rowshonenterprise.com](http://rowshonenterprise.com) |
+| 432 | [bishalbajar.com](http://bishalbajar.com) |
+| 433 | [openshop-bd.com](http://openshop-bd.com) |
+| 434 | [haowamartbd.com](http://haowamartbd.com) |
+| 435 | [trustvally.com](http://trustvally.com) |
+| 436 | [agami.com.bd](http://agami.com.bd) |
+| 437 | [clicktoeasybuy.com](http://clicktoeasybuy.com) |
+| 438 | [mkemart.com](http://mkemart.com) |
+| 439 | [alizahub.com](http://alizahub.com) |
+| 440 | [ashamartbd.com](http://ashamartbd.com) |
+| 441 | [dorkar-shop.com](http://dorkar-shop.com) |
+| 442 | [rongtulimart.com](http://rongtulimart.com) |
+| 443 | [bondhuzone.com](http://bondhuzone.com) |
+| 444 | [punokbd.com](http://punokbd.com) |
+| 445 | [onlinedokaan.com](http://onlinedokaan.com) |
+| 446 | [oneemart.com](http://oneemart.com) |
+| 447 | [safwanemart.com](http://safwanemart.com) |
+| 448 | [ponnokuthirbd.com](http://ponnokuthirbd.com) |
+| 449 | [babelshopbd.com](http://babelshopbd.com) |
+| 450 | [bajarmela.com](http://bajarmela.com) |
+| 451 | [recartexpress.com](http://recartexpress.com) |
+| 452 | [eeasymart.com](http://eeasymart.com) |
