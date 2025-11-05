@@ -188,6 +188,12 @@
                     <label for="guest-can-see-price" class="my-1">Guest Price</label>
                 </div>
                 @endif
+                <div class="checkbox checkbox-secondary">
+                    <input type="hidden" name="show_option[show_others_orders]" value="0">
+                    <x-checkbox id="show-others-orders" name="show_option[show_others_orders]" value="1"
+                        :checked="!!($show_option->show_others_orders ?? false)" />
+                    <label for="show-others-orders" class="my-1">Show Other's Orders</label>
+                </div>
             </div>
         </div>
     </div>
