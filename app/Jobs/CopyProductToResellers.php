@@ -241,8 +241,10 @@ class CopyProductToResellers implements ShouldQueue
         $productData['source_id'] = $productData['id'];
         unset($productData['id']);
 
-        // Ensure reseller selling price equals retail price
-        $productData['selling_price'] = $this->product->retailPrice();
+        if (config('app.resell')) {
+            // Ensure reseller selling price equals retail price
+            $productData['selling_price'] = $this->product->retailPrice();
+        }
 
         // ===== RESELLER DATABASE OPERATIONS =====
 
@@ -339,8 +341,10 @@ class CopyProductToResellers implements ShouldQueue
             $varData['source_id'] = $varData['id'];
             unset($varData['id']);
 
-            // Ensure reseller variation selling price equals retail price
-            $varData['selling_price'] = $this->calculateRetailPrice($variation->suggested_price, $variation->selling_price);
+            if (config('app.resell')) {
+                // Ensure reseller variation selling price equals retail price
+                $varData['selling_price'] = $this->calculateRetailPrice($variation->suggested_price, $variation->selling_price);
+            }
 
             // ===== RESELLER DATABASE OPERATIONS =====
 
