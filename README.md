@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}453}$$ 🔥 domains are live now
+These 🔥 $${\color{red}454}$$ 🔥 domains are live now
 
-_Last updated: **2025-11-06 09:18:17 Asia/Dhaka**_
+_Last updated: **2025-11-07 09:14:59 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -540,15 +540,16 @@ _Last updated: **2025-11-06 09:18:17 Asia/Dhaka**_
 | 439 | [mkemart.com](http://mkemart.com) |
 | 440 | [alizahub.com](http://alizahub.com) |
 | 441 | [ashamartbd.com](http://ashamartbd.com) |
-| 442 | [dorkar-shop.com](http://dorkar-shop.com) |
-| 443 | [rongtulimart.com](http://rongtulimart.com) |
-| 444 | [bondhuzone.com](http://bondhuzone.com) |
-| 445 | [punokbd.com](http://punokbd.com) |
-| 446 | [onlinedokaan.com](http://onlinedokaan.com) |
-| 447 | [oneemart.com](http://oneemart.com) |
-| 448 | [safwanemart.com](http://safwanemart.com) |
-| 449 | [ponnokuthirbd.com](http://ponnokuthirbd.com) |
-| 450 | [babelshopbd.com](http://babelshopbd.com) |
-| 451 | [bajarmela.com](http://bajarmela.com) |
-| 452 | [recartexpress.com](http://recartexpress.com) |
-| 453 | [eeasymart.com](http://eeasymart.com) |
+| 442 | [rongtulimart.com](http://rongtulimart.com) |
+| 443 | [bondhuzone.com](http://bondhuzone.com) |
+| 444 | [punokbd.com](http://punokbd.com) |
+| 445 | [onlinedokaan.com](http://onlinedokaan.com) |
+| 446 | [oneemart.com](http://oneemart.com) |
+| 447 | [safwanemart.com](http://safwanemart.com) |
+| 448 | [ponnokuthirbd.com](http://ponnokuthirbd.com) |
+| 449 | [babelshopbd.com](http://babelshopbd.com) |
+| 450 | [bajarmela.com](http://bajarmela.com) |
+| 451 | [recartexpress.com](http://recartexpress.com) |
+| 452 | [eeasymart.com](http://eeasymart.com) |
+| 453 | [qismatshop.com](http://qismatshop.com) |
+| 454 | [kismat51.com](http://kismat51.com) |
