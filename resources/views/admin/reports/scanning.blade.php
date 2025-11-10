@@ -377,7 +377,7 @@
 
                 var tr = `
                     <tr data-id="${order.id}">
-                        <td><a target="_blank" href="{{route('admin.orders.show', '')}}/${order.id}">${order.id}</a></td>
+                        <td><a target="_blank" href="/admin/orders/${order.id}">${order.id}</a></td>
                         <td><strong>${order.name}</strong><br><small class="text-muted">${order.phone}</small></td>
                         <td>${order.address}</td>
                         <td>${order.note ?? 'N/A'}</td>
@@ -437,7 +437,7 @@
             var tr = `
                 <tr data-id="${order.id}" class="${phones.includes(order.phone) ? 'border border-danger' : ''}">
                     <td>${1+$('.card-body table tbody tr').length}</td>
-                    <td><a target="_blank" href="{{route('admin.orders.show', '')}}/${order.id}">${order.id}</a></td>
+                    <td><a target="_blank" href="/admin/orders/${order.id}">${order.id}</a></td>
                     <td><strong>${order.name}</strong><br><small class="text-muted">${order.phone}</small></td>
                     <td>${order.address}</td>
                     <td>${order.note ?? 'N/A'}</td>
@@ -484,7 +484,7 @@
                 } else {
                     var tr = `
                         <tr data-id="${product.id}">
-                            <td><a target="_blank" href="{{route('products.show', '')}}/${product.slug}">${product.name}</a></td>
+                            <td><a target="_blank" href="/products/${product.slug}">${product.name}</a></td>
                             <td>${product.quantity}</td>
                             <td>${productTotal}</td>
                         </tr>
