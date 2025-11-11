@@ -26,7 +26,13 @@
                             </button>
                         </div>
 
-                        <form method="GET" action="{{ route('products.index') }}" id="filter-form"
+                        <form method="GET" action="{{
+                            ($category = request()->route()->parameter('category'))
+                                ? route('categories.products', $category)
+                                : (($brand = request()->route()->parameter('brand'))
+                                    ? route('brands.products', $brand)
+                                    : route('products.index'))
+                        }}" id="filter-form"
                               x-show="mobileOpen || isDesktop"
                               x-transition
                               class="filter-sidebar__content"
@@ -162,7 +168,13 @@
                             <!-- Filter Actions -->
                             <div class="filter-actions">
                                 <button type="submit" class="btn btn-primary">Filter</button>
-                                <a href="{{ route('products.index', request()->only('search')) }}" class="btn btn-secondary">Reset</a>
+                                <a href="{{
+                                    ($category = request()->route()->parameter('category'))
+                                        ? route('categories.products', $category)
+                                        : (($brand = request()->route()->parameter('brand'))
+                                            ? route('brands.products', $brand)
+                                            : route('products.index', request()->only('search')))
+                                }}" class="btn btn-secondary">Reset</a>
                             </div>
                         </form>
                     </div>

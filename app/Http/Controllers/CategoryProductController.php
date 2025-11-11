@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Traits\HasProductFilters;
 use Illuminate\Http\Request;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class CategoryProductController extends Controller
 {
+    use HasProductFilters;
+
     /**
      * Handle the incoming request.
      *
@@ -16,16 +19,15 @@ class CategoryProductController extends Controller
     public function __invoke(Request $request, Category $category)
     {
         $per_page = $request->get('per_page', 50);
-        $sorted = setting('show_option')->product_sort ?? 'random';
-        $products = $category->products()->whereIsActive(1);
-        if ($sorted == 'random') {
-            $products->inRandomOrder();
-        } elseif ($sorted == 'updated_at') {
-            $products->latest('updated_at');
-        } elseif ($sorted == 'selling_price') {
-            $products->orderBy('selling_price');
-        }
-        $products = $products->paginate($per_page)->appends(request()->query());
+        $query = $category->products()->whereIsActive(1)->whereNull('parent_id');
+
+        // Apply filters
+        $this->applyProductFilters($query, $request);
+
+        // Apply sorting
+        $this->applyProductSorting($query);
+
+        $products = $query->paginate($per_page)->appends(request()->query());
 
         if (GoogleTagManagerFacade::isEnabled()) {
             GoogleTagManagerFacade::set([
@@ -44,9 +46,12 @@ class CategoryProductController extends Controller
             ]);
         }
 
+        // Get filter data
+        $filterData = $this->getProductFilterData();
+
         return view('products.index', [
             'products' => $products,
             'per_page' => $per_page,
-        ]);
+        ] + $filterData);
     }
 }
