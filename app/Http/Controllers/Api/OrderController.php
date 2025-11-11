@@ -40,7 +40,7 @@ class OrderController extends Controller
             $orders->where('orders.status', $request->status);
         }
 
-        if ($request->staff_id && setting('show_option')->show_others_orders ?? false) {
+        if ($request->staff_id && !(setting('show_option')->show_others_orders ?? false)) {
             $orders->where('orders.admin_id', $request->staff_id);
         }
 
