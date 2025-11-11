@@ -93,77 +93,39 @@
                                 </div>
                             </div>
 
-                            <!-- Price Range Filter -->
-                            @if(isset($priceRange) && $priceRange && $priceRange->min_price && $priceRange->max_price)
-                            <div class="filter-block">
-                                <div class="filter-block__header" @click="priceOpen = !priceOpen">
-                                    <h4 class="filter-block__title">Price</h4>
-                                    <i class="fa" :class="priceOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                                </div>
-                                <div class="filter-block__content" x-show="priceOpen" x-transition>
-                                    <div class="price-filter">
-                                        <div class="price-filter__display">
-                                            <span x-text="formatPrice(minPrice)"></span> - <span x-text="formatPrice(maxPrice)"></span>
-                                        </div>
-                                        <div class="price-filter__slider-container">
-                                            <div class="price-filter__track">
-                                                <div class="price-filter__track-fill"
-                                                     :style="'left: ' + ((minPrice - {{ $priceRange->min_price }}) / ({{ $priceRange->max_price }} - {{ $priceRange->min_price }}) * 100) + '%; width: ' + ((maxPrice - minPrice) / ({{ $priceRange->max_price }} - {{ $priceRange->min_price }}) * 100) + '%;'"></div>
-                                            </div>
-                                            <input type="range"
-                                                   class="price-filter__slider price-filter__slider--min"
-                                                   min="{{ $priceRange->min_price }}"
-                                                   max="{{ $priceRange->max_price }}"
-                                                   step="100"
-                                                   :value="minPrice"
-                                                   @input="minPrice = Math.min(parseInt($event.target.value), maxPrice); updatePriceDisplay()">
-                                            <input type="range"
-                                                   class="price-filter__slider price-filter__slider--max"
-                                                   min="{{ $priceRange->min_price }}"
-                                                   max="{{ $priceRange->max_price }}"
-                                                   step="100"
-                                                   :value="maxPrice"
-                                                   @input="maxPrice = Math.max(parseInt($event.target.value), minPrice); updatePriceDisplay()">
-                                        </div>
-                                        <input type="hidden" name="min_price" :value="minPrice">
-                                        <input type="hidden" name="max_price" :value="maxPrice">
+                            <!-- Attributes Filter -->
+                            @php
+                                $filterOption = request('filter_option');
+                                $selectedOptions = [];
+
+                                if ($filterOption) {
+                                    if (is_array($filterOption)) {
+                                        $selectedOptions = array_map('intval', array_filter($filterOption));
+                                    } else {
+                                        $selectedOptions = array_map('intval', explode(',', $filterOption));
+                                    }
+                                }
+                            @endphp
+                            @foreach($attributes ?? [] as $attribute)
+                                <div class="filter-block">
+                                    <div class="filter-block__header" @click="attributesOpen['{{ $attribute->id }}'] = !attributesOpen['{{ $attribute->id }}']">
+                                        <h4 class="filter-block__title">{{ $attribute->name }}</h4>
+                                        <i class="fa" :class="attributesOpen['{{ $attribute->id }}'] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                                    </div>
+                                    <div class="filter-block__content" x-show="attributesOpen['{{ $attribute->id }}']" x-transition>
+                                        @foreach($attribute->options as $option)
+                                            <label class="filter-checkbox">
+                                                <input type="checkbox"
+                                                       name="filter_option[]"
+                                                       value="{{ $option->id }}"
+                                                       @if(in_array((int)$option->id, $selectedOptions)) checked @endif
+                                                       @change="updateFilter()">
+                                                <span class="filter-checkbox__label">{{ $option->name }}</span>
+                                            </label>
+                                        @endforeach
                                     </div>
                                 </div>
-                            </div>
-                            @endif
-
-                            <!-- Brands Filter -->
-                            <div class="filter-block">
-                                <div class="filter-block__header" @click="brandsOpen = !brandsOpen">
-                                    <h4 class="filter-block__title">Brand</h4>
-                                    <i class="fa" :class="brandsOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                                </div>
-                                <div class="filter-block__content" x-show="brandsOpen" x-transition>
-                                    @php
-                                        $filterBrand = request('filter_brand');
-                                        $selectedBrands = [];
-
-                                        if ($filterBrand) {
-                                            if (is_array($filterBrand)) {
-                                                $selectedBrands = array_map('intval', array_filter($filterBrand));
-                                            } else {
-                                                $selectedBrands = array_map('intval', explode(',', $filterBrand));
-                                            }
-                                        }
-                                    @endphp
-                                    @foreach($brands ?? [] as $brand)
-                                        <label class="filter-checkbox">
-                                            <input type="checkbox"
-                                                   name="filter_brand[]"
-                                                   value="{{ $brand->id }}"
-                                                   @if(in_array((int)$brand->id, $selectedBrands)) checked @endif
-                                                   @change="updateFilter()">
-                                            <span class="filter-checkbox__label">{{ $brand->name }}</span>
-                                            <span class="filter-checkbox__count">({{ $brand->products()->whereIsActive(1)->whereNull('parent_id')->count() }})</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
+                            @endforeach
 
                             <!-- Filter Actions -->
                             <div class="filter-actions">
@@ -331,103 +293,6 @@
     font-size: 0.9rem;
 }
 
-.price-filter {
-    padding: 0.5rem 0;
-}
-
-.price-filter__slider-container {
-    position: relative;
-    height: 40px;
-}
-
-.price-filter__track {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: #e9ecef;
-    border-radius: 3px;
-    transform: translateY(-50%);
-    z-index: 1;
-}
-
-.price-filter__track-fill {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    background: #007bff;
-    border-radius: 3px;
-    z-index: 2;
-}
-
-.price-filter__slider {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 0;
-    margin: 0;
-    padding: 0;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-    background: transparent;
-    pointer-events: none;
-    z-index: 3;
-    transform: translateY(-50%);
-}
-
-.price-filter__slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    background: #007bff;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    cursor: pointer;
-    pointer-events: all;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    transition: transform 0.1s ease;
-}
-
-.price-filter__slider::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-}
-
-.price-filter__slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    background: #007bff;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    cursor: pointer;
-    pointer-events: all;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    transition: transform 0.1s ease;
-}
-
-.price-filter__slider::-moz-range-thumb:hover {
-    transform: scale(1.1);
-}
-
-.price-filter__slider--min {
-    z-index: 4;
-}
-
-.price-filter__slider--max {
-    z-index: 3;
-}
-
-.price-filter__display {
-    text-align: center;
-    font-weight: 600;
-    color: #007bff;
-    font-size: 1rem;
-}
-
 .filter-actions {
     margin-top: 1.5rem;
     display: flex;
@@ -460,15 +325,13 @@ function filterSidebar() {
         mobileOpen: false,
         isDesktop: window.innerWidth >= 768,
         categoriesOpen: true,
-        priceOpen: true,
-        brandsOpen: true,
-        minPrice: {{ request('min_price', isset($priceRange) && $priceRange ? $priceRange->min_price : 0) }},
-        maxPrice: {{ request('max_price', isset($priceRange) && $priceRange ? $priceRange->max_price : 100000) }},
+        attributesOpen: {},
 
         init() {
-            // Set initial price values
-            this.minPrice = {{ request('min_price', isset($priceRange) && $priceRange ? $priceRange->min_price : 0) }};
-            this.maxPrice = {{ request('max_price', isset($priceRange) && $priceRange ? $priceRange->max_price : 100000) }};
+            // Initialize attributes open state
+            @foreach($attributes ?? [] as $attribute)
+                this.attributesOpen['{{ $attribute->id }}'] = true;
+            @endforeach
 
             // Handle window resize
             window.addEventListener('resize', () => {
@@ -486,15 +349,6 @@ function filterSidebar() {
         updateFilter() {
             // Auto-submit on filter change (optional - remove if you want manual filter button)
             // this.$el.closest('form').submit();
-        },
-
-        updatePriceDisplay() {
-            // Values are already constrained in the @input handlers
-            // This method is kept for potential future use
-        },
-
-        formatPrice(price) {
-            return '৳' + parseInt(price).toLocaleString('en-US');
         }
     }
 }

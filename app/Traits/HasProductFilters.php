@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
-use App\Models\Brand;
+use App\Models\Attribute;
 use App\Models\Category;
-use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -36,20 +35,28 @@ trait HasProductFilters
             }
         }
 
-        // Filter by brands
-        if ($request->filter_brand) {
-            $brandIds = is_array($request->filter_brand)
-                ? $request->filter_brand
-                : explode(',', $request->filter_brand);
-            $query->whereIn('brand_id', array_filter($brandIds));
-        }
+        // Filter by attributes/options
+        if ($request->filter_option) {
+            $optionIds = is_array($request->filter_option)
+                ? $request->filter_option
+                : explode(',', $request->filter_option);
+            $optionIds = array_filter($optionIds);
 
-        // Filter by price range
-        if ($request->min_price) {
-            $query->where('selling_price', '>=', $request->min_price);
-        }
-        if ($request->max_price) {
-            $query->where('selling_price', '<=', $request->max_price);
+            if (! empty($optionIds)) {
+                // Filter products that have the selected options either directly or through variations
+                $query->where(function ($q) use ($optionIds): void {
+                    // Products that have the options directly
+                    $q->whereHas('options', function ($optQuery) use ($optionIds): void {
+                        $optQuery->whereIn('options.id', $optionIds);
+                    })
+                        // OR products that have variations with the selected options
+                        ->orWhereHas('variations', function ($varQuery) use ($optionIds): void {
+                            $varQuery->whereHas('options', function ($optQuery) use ($optionIds): void {
+                                $optQuery->whereIn('options.id', $optionIds);
+                            });
+                        });
+                });
+            }
         }
     }
 
@@ -69,9 +76,9 @@ trait HasProductFilters
     }
 
     /**
-     * Get filter data for products (categories, brands, price range).
+     * Get filter data for products (categories, attributes with options).
      *
-     * @return array{categories: \Illuminate\Database\Eloquent\Collection, brands: \Illuminate\Database\Eloquent\Collection, priceRange: \App\Models\Product|null}
+     * @return array{categories: \Illuminate\Database\Eloquent\Collection, attributes: \Illuminate\Database\Eloquent\Collection}
      */
     protected function getProductFilterData(): array
     {
@@ -104,27 +111,45 @@ trait HasProductFilters
             })
             ->values();
 
-        // Get brands that have products
-        $brands = Brand::cached()
-            ->filter(function ($brand) {
-                return $brand->products()
-                    ->whereIsActive(1)
-                    ->whereNull('parent_id')
-                    ->exists();
+        // Get attributes that have options used in active products
+        // Options are typically linked to variation products (with parent_id), not parent products
+        // So we need to check if the variation's parent product is active and has no parent_id
+        $attributes = Attribute::whereHas('options', function ($query): void {
+            $query->whereHas('products', function ($prodQuery): void {
+                $prodQuery->whereIsActive(1)
+                    ->where(function ($q): void {
+                        // Options linked directly to parent products (no parent_id)
+                        $q->whereNull('parent_id')
+                            // OR options linked to variations - check if parent is active
+                            ->orWhereHas('parent', function ($parentQuery): void {
+                                $parentQuery->whereIsActive(1)->whereNull('parent_id');
+                            });
+                    });
+            });
+        })
+            ->with(['options' => function ($query): void {
+                $query->whereHas('products', function ($prodQuery): void {
+                    $prodQuery->whereIsActive(1)
+                        ->where(function ($q): void {
+                            // Options linked directly to parent products (no parent_id)
+                            $q->whereNull('parent_id')
+                                // OR options linked to variations - check if parent is active
+                                ->orWhereHas('parent', function ($parentQuery): void {
+                                    $parentQuery->whereIsActive(1)->whereNull('parent_id');
+                                });
+                        });
+                });
+            }])
+            ->get()
+            ->filter(function ($attribute) {
+                // Only include attributes that have at least one option with products
+                return $attribute->options->isNotEmpty();
             })
             ->values();
 
-        // Get price range
-        $priceRange = Product::whereIsActive(1)
-            ->whereNull('parent_id')
-            ->withoutGlobalScope('latest')
-            ->selectRaw('MIN(selling_price) as min_price, MAX(selling_price) as max_price')
-            ->first();
-
         return [
             'categories' => $categories,
-            'brands' => $brands,
-            'priceRange' => $priceRange,
+            'attributes' => $attributes,
         ];
     }
 }
