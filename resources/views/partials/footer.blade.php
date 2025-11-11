@@ -86,7 +86,7 @@
                 </div>
                 @else
                 <div class="site-footer__payments">
-                    <img src="{{ asset('payments.webp') }}" style="height: 55px;" />
+                    <img src="{{ asset('payments.png') }}" style="height: 55px;" />
                 </div>
                 @endif
             </div>
