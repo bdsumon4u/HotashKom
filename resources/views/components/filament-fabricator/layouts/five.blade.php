@@ -83,7 +83,7 @@
 </head>
 
 <body
-    class="cartflows_step-template cartflows_step-template-cartflows-canvas single single-cartflows_step postid-618 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12  cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-618 cartflows-canvas">
+    class="cartflows_step-template cartflows_step-template-cartflows-canvas single single-cartflows_step postid-618 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12 cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-618 cartflows-canvas">
 
 
     <div class="cartflows-container">
@@ -125,7 +125,7 @@
                     </div>
                 </div>
             </section>
-            
+
             <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
 
 
