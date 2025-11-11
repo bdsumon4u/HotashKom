@@ -44,6 +44,7 @@
                             @endif
 
                             <!-- Categories Filter -->
+                            @if(!isset($hideCategoryFilter) || !$hideCategoryFilter)
                             <div class="filter-block">
                                 <div class="filter-block__header" @click="categoriesOpen = !categoriesOpen">
                                     <h4 class="filter-block__title">Categories</h4>
@@ -92,6 +93,7 @@
                                     @endforeach
                                 </div>
                             </div>
+                            @endif
 
                             <!-- Attributes Filter -->
                             @php

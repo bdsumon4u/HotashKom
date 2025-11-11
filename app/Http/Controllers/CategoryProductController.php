@@ -46,12 +46,13 @@ class CategoryProductController extends Controller
             ]);
         }
 
-        // Get filter data
-        $filterData = $this->getProductFilterData();
+        // Get filter data - only attributes for products in this category
+        $filterData = $this->getProductFilterData($category);
 
         return view('products.index', [
             'products' => $products,
             'per_page' => $per_page,
+            'hideCategoryFilter' => true,
         ] + $filterData);
     }
 }

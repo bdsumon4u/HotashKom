@@ -78,9 +78,10 @@ trait HasProductFilters
     /**
      * Get filter data for products (categories, attributes with options).
      *
+     * @param  \App\Models\Category|null  $category  Optional category to filter attributes by
      * @return array{categories: \Illuminate\Database\Eloquent\Collection, attributes: \Illuminate\Database\Eloquent\Collection}
      */
-    protected function getProductFilterData(): array
+    protected function getProductFilterData(?Category $category = null): array
     {
         // Get categories that have products
         $categories = Category::nested(0, true)
@@ -114,33 +115,66 @@ trait HasProductFilters
         // Get attributes that have options used in active products
         // Options are typically linked to variation products (with parent_id), not parent products
         // So we need to check if the variation's parent product is active and has no parent_id
-        $attributes = Attribute::whereHas('options', function ($query): void {
-            $query->whereHas('products', function ($prodQuery): void {
+        $attributesQuery = Attribute::whereHas('options', function ($query) use ($category): void {
+            $query->whereHas('products', function ($prodQuery) use ($category): void {
                 $prodQuery->whereIsActive(1)
-                    ->where(function ($q): void {
+                    ->where(function ($q) use ($category): void {
                         // Options linked directly to parent products (no parent_id)
-                        $q->whereNull('parent_id')
+                        $q->where(function ($parentQ) use ($category): void {
+                            $parentQ->whereNull('parent_id');
+
+                            // If category is provided, filter by category
+                            if ($category) {
+                                $parentQ->whereHas('categories', function ($catQuery) use ($category): void {
+                                    $catQuery->where('categories.id', $category->id);
+                                });
+                            }
+                        })
                             // OR options linked to variations - check if parent is active
-                            ->orWhereHas('parent', function ($parentQuery): void {
+                            ->orWhereHas('parent', function ($parentQuery) use ($category): void {
                                 $parentQuery->whereIsActive(1)->whereNull('parent_id');
+
+                                // If category is provided, filter by category
+                                if ($category) {
+                                    $parentQuery->whereHas('categories', function ($catQuery) use ($category): void {
+                                        $catQuery->where('categories.id', $category->id);
+                                    });
+                                }
                             });
                     });
             });
         })
-            ->with(['options' => function ($query): void {
-                $query->whereHas('products', function ($prodQuery): void {
+            ->with(['options' => function ($query) use ($category): void {
+                $query->whereHas('products', function ($prodQuery) use ($category): void {
                     $prodQuery->whereIsActive(1)
-                        ->where(function ($q): void {
+                        ->where(function ($q) use ($category): void {
                             // Options linked directly to parent products (no parent_id)
-                            $q->whereNull('parent_id')
+                            $q->where(function ($parentQ) use ($category): void {
+                                $parentQ->whereNull('parent_id');
+
+                                // If category is provided, filter by category
+                                if ($category) {
+                                    $parentQ->whereHas('categories', function ($catQuery) use ($category): void {
+                                        $catQuery->where('categories.id', $category->id);
+                                    });
+                                }
+                            })
                                 // OR options linked to variations - check if parent is active
-                                ->orWhereHas('parent', function ($parentQuery): void {
+                                ->orWhereHas('parent', function ($parentQuery) use ($category): void {
                                     $parentQuery->whereIsActive(1)->whereNull('parent_id');
+
+                                    // If category is provided, filter by category
+                                    if ($category) {
+                                        $parentQuery->whereHas('categories', function ($catQuery) use ($category): void {
+                                            $catQuery->where('categories.id', $category->id);
+                                        });
+                                    }
                                 });
                         });
                 });
-            }])
-            ->get()
+            }]);
+
+        $attributes = $attributesQuery->get()
             ->filter(function ($attribute) {
                 // Only include attributes that have at least one option with products
                 return $attribute->options->isNotEmpty();
