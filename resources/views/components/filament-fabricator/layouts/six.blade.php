@@ -13,42 +13,6 @@
             contain-intrinsic-size: 3000px 1500px
         }
     </style>
-    <script type='application/javascript' id='pys-version-script'>
-        console.log('PixelYourSite Free version 11.1.1');
-    </script>
-    <link rel='dns-prefetch' href='//fonts.googleapis.com' />
-    <link rel="alternate" type="application/rss+xml" title="isolatefashions bd &raquo; Feed"
-        href="https://isolatefashionsbd.com/feed/" />
-    <link rel="alternate" type="application/rss+xml" title="isolatefashions bd &raquo; Comments Feed"
-        href="https://isolatefashionsbd.com/comments/feed/" />
-    <script>
-        window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16.0.1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/16.0.1\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/isolatefashionsbd.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.8.3"}};
-/*! This file is auto-generated */
-!function(s,n){var o,i,e;function c(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function p(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data),a=(e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0),new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data));return t.every(function(e,t){return e===a[t]})}function u(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);for(var n=e.getImageData(16,16,1,1),a=0;a<n.data.length;a++)if(0!==n.data[a])return!1;return!0}function f(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\udedf")}return!1}function g(e,t,n,a){var r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):s.createElement("canvas"),o=r.getContext("2d",{willReadFrequently:!0}),i=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(function(e){i[e]=t(o,e,n,a)}),i}function t(e){var t=s.createElement("script");t.src=e,t.defer=!0,s.head.appendChild(t)}"undefined"!=typeof Promise&&(o="wpEmojiSettingsSupports",i=["flag","emoji"],n.supports={everything:!0,everythingExceptFlag:!0},e=new Promise(function(e){s.addEventListener("DOMContentLoaded",e,{once:!0})}),new Promise(function(t){var n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+g.toString()+"("+[JSON.stringify(i),f.toString(),p.toString(),u.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"}),r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=function(e){c(n=e.data),r.terminate(),t(n)})}catch(e){}c(n=g(i,f,p,u))}t(n)}).then(function(e){for(var t in e)n.supports[t]=e[t],n.supports.everything=n.supports.everything&&n.supports[t],"flag"!==t&&(n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&n.supports[t]);n.supports.everythingExceptFlag=n.supports.everythingExceptFlag&&!n.supports.flag,n.DOMReady=!1,n.readyCallback=function(){n.DOMReady=!0}}).then(function(){return e}).then(function(){var e;n.supports.everything||(n.readyCallback(),(e=n.source||{}).concatemoji?t(e.concatemoji):e.wpemoji&&e.twemoji&&(t(e.twemoji),t(e.wpemoji)))}))}((window,document),window._wpemojiSettings);
-    </script>
-    <link rel='stylesheet' id='astra-google-fonts-css'
-        href='https://fonts.googleapis.com/css?family=Lato%3A400%2C700&#038;display=fallback&#038;ver=4.11.12'
-        media='all' />
-    <style id='wp-emoji-styles-inline-css'>
-        img.wp-smiley,
-        img.emoji {
-            display: inline !important;
-            border: none !important;
-            box-shadow: none !important;
-            height: 1em !important;
-            width: 1em !important;
-            margin: 0 0.07em !important;
-            vertical-align: -0.1em !important;
-            background: none !important;
-            padding: 0 !important;
-        }
-    </style>
-    <link rel='stylesheet' id='CF_block-cartflows-style-css-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows/modules/gutenberg/build/style-blocks.css?ver=2.1.14'
-        media='all' />
-    <link rel='stylesheet' id='CFP_block-cfp-style-css-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows-pro/modules/gutenberg/build/style-blocks.css?ver=2.0.3'
-        media='all' />
     <style id='global-styles-inline-css'>
         :root {
             --wp--preset--aspect-ratio--square: 1;
@@ -593,17 +557,7 @@
             line-height: 1.6;
         }
     </style>
-    <link rel='stylesheet' id='bizmation-otp-plugin-styles-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/bizmation-inventory/otp.css?ver=1.0' media='all' />
-    <link rel='stylesheet' id='select2-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/css/select2.css?ver=10.3.4'
-        media='all' />
-    <link rel='stylesheet' id='woocommerce-layout-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/css/woocommerce-layout.css?ver=10.3.4'
-        media='all' />
-    <link rel='stylesheet' id='woocommerce-smallscreen-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/css/woocommerce-smallscreen.css?ver=10.3.4'
-        media='only screen and (max-width: 768px)' />
+
     <link rel='stylesheet' id='woocommerce-general-css'
         href='https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/css/woocommerce.css?ver=10.3.4'
         media='all' />
@@ -612,140 +566,6 @@
             visibility: visible;
         }
     </style>
-    <link rel='stylesheet' id='orderguard-phone-validation-styles-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/orderguard/assets/css/phone-validation.css?ver=1.47'
-        media='all' />
-    <style id='orderguard-phone-validation-styles-inline-css'>
-        .woocommerce-error.orderguard-phone-error {
-            position: relative;
-            padding: 15px 20px 15px 45px;
-            margin: 0 0 20px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff4444 100%);
-            color: #ffffff;
-            border: none;
-            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.2);
-            transform-origin: top;
-            animation: slideInDown 0.5s ease-out, shake 0.8s cubic-bezier(.36, .07, .19, .97) both;
-        }
-
-        .woocommerce-error.orderguard-phone-error::before {
-            content: '\f534';
-            font-family: dashicons;
-            display: inline-block;
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            font-size: 20px;
-            color: #ffffff;
-            animation: pulse 2s infinite;
-        }
-
-        .woocommerce-error.orderguard-phone-error li {
-            padding: 0;
-            margin: 0;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 1.5;
-        }
-
-        @keyframes slideInDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes shake {
-
-            10%,
-            90% {
-                transform: translateX(-1px);
-            }
-
-            20%,
-            80% {
-                transform: translateX(2px);
-            }
-
-            30%,
-            50%,
-            70% {
-                transform: translateX(-4px);
-            }
-
-            40%,
-            60% {
-                transform: translateX(4px);
-            }
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: translateY(-50%) scale(1);
-            }
-
-            50% {
-                transform: translateY(-50%) scale(1.2);
-            }
-
-            100% {
-                transform: translateY(-50%) scale(1);
-            }
-        }
-
-        /* Input field validation styles */
-        #billing_phone.orderguard-invalid {
-            border-color: #ff4444 !important;
-            box-shadow: 0 0 0 1px #ff4444 !important;
-            animation: shake 0.8s cubic-bezier(.36, .07, .19, .97) both;
-        }
-
-        #billing_phone:focus {
-            transition: all 0.3s ease;
-        }
-
-        /* Live validation message */
-        .orderguard-live-validation {
-            display: none;
-            font-size: 12px;
-            color: #ff4444;
-            margin-top: 5px;
-            padding: 8px 12px;
-            border-radius: 4px;
-            background-color: rgba(255, 68, 68, 0.1);
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
-    <link rel='stylesheet' id='dashicons-css'
-        href='https://isolatefashionsbd.com/wp-includes/css/dashicons.min.css?ver=6.8.3' media='all' />
-    <link rel='stylesheet' id='orderguard-style-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/orderguard/assets/css/style.css?ver=1.47' media='all' />
-    <link rel='stylesheet' id='orderguard-blocked-user-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/orderguard/assets/css/blocked-user.css?ver=1.47'
-        media='all' />
-    <link rel='stylesheet' id='brands-styles-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/css/brands.css?ver=10.3.4'
-        media='all' />
     <link rel='stylesheet' id='thwcfd-checkout-style-css'
         href='https://isolatefashionsbd.com/wp-content/plugins/woo-checkout-field-editor-pro/public/assets/css/thwcfd-public.min.css?ver=2.1.4'
         media='all' />
@@ -838,24 +658,6 @@
     <link rel='stylesheet' id='wcf-pro-multistep-checkout-css'
         href='https://isolatefashionsbd.com/wp-content/plugins/cartflows-pro/assets/css/multistep-checkout.css?ver=2.0.3'
         media='all' />
-    <link rel='stylesheet' id='elementor-gf-local-roboto-css'
-        href='https://isolatefashionsbd.com/wp-content/uploads/elementor/google-fonts/css/roboto.css?ver=1745045282'
-        media='all' />
-    <link rel='stylesheet' id='elementor-gf-local-robotoslab-css'
-        href='https://isolatefashionsbd.com/wp-content/uploads/elementor/google-fonts/css/robotoslab.css?ver=1745045303'
-        media='all' />
-    <link rel='stylesheet' id='elementor-gf-local-hindsiliguri-css'
-        href='https://isolatefashionsbd.com/wp-content/uploads/elementor/google-fonts/css/hindsiliguri.css?ver=1745045308'
-        media='all' />
-    <link rel='stylesheet' id='elementor-gf-local-anekbangla-css'
-        href='https://isolatefashionsbd.com/wp-content/uploads/elementor/google-fonts/css/anekbangla.css?ver=1745045318'
-        media='all' />
-    <link rel='stylesheet' id='elementor-gf-local-montserrat-css'
-        href='https://isolatefashionsbd.com/wp-content/uploads/elementor/google-fonts/css/montserrat.css?ver=1745045357'
-        media='all' />
-    <script id="jquery-core-js-extra">
-        var pysFacebookRest = {"restApiUrl":"https:\/\/isolatefashionsbd.com\/wp-json\/pys-facebook\/v1\/event","debug":""};
-    </script>
     <script src="https://isolatefashionsbd.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js">
     </script>
     <script src="https://isolatefashionsbd.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1"
@@ -884,46 +686,6 @@
     <link rel='stylesheet' id='cartflows-pro-elementor-style-css'
         href='https://isolatefashionsbd.com/wp-content/plugins/cartflows-pro/modules/elementor/widgets-css/frontend.css?ver=2.0.3'
         media='all' />
-    <script
-        src="https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/js/selectWoo/selectWoo.full.min.js?ver=1.0.9-wc.10.3.4"
-        id="selectWoo-js" data-wp-strategy="defer"></script>
-    <script id="orderguard-phone-validation-js-extra">
-        var orderguardPhoneValidation = {"enabled":"1","message":"\u0985\u09a8\u09c1\u0997\u09cd\u09b0\u09b9 \u0995\u09b0\u09c7 \u0986\u09aa\u09a8\u09be\u09b0 \u09b8\u09a0\u09bf\u0995 \u09e7\u09e7 \u09b8\u0982\u0996\u09cd\u09af\u09be\u09b0 \u09ab\u09cb\u09a8 \u09a8\u09ae\u09cd\u09ac\u09b0 \u09a6\u09bf\u09a8"};
-    </script>
-    <script src="https://isolatefashionsbd.com/wp-content/plugins/orderguard/assets/js/phone-validation.js?ver=1.47"
-        id="orderguard-phone-validation-js"></script>
-    <script id="orderguard-incomplete-orders-js-extra">
-        var orderguard_incomplete = {"ajax_url":"https:\/\/isolatefashionsbd.com\/wp-admin\/admin-ajax.php","nonce":"9e81ae7172"};
-    </script>
-    <script src="https://isolatefashionsbd.com/wp-content/plugins/orderguard/assets/js/incomplete-orders.js?ver=1.47"
-        id="orderguard-incomplete-orders-js"></script>
-    <script id="orderguard-repeat-blocker-js-extra">
-        var orderguardRepeatBlocker = {"ajaxurl":"https:\/\/isolatefashionsbd.com\/wp-admin\/admin-ajax.php","nonce":"cf4d941df2","timeLimit":"24","errorMessage":"\u098f\u0987 \u09a8\u09be\u09ae\u09cd\u09ac\u09be\u09b0 \u09a6\u09bf\u09df\u09c7 \u0986\u0997\u09c7 \u0985\u09b0\u09cd\u09a1\u09be\u09b0 \u0995\u09b0\u09be \u09b9\u09df\u09c7\u099b\u09c7\u0964 \u09a6\u09df\u09be \u0995\u09b0\u09c7 \u09a8\u09a4\u09c1\u09a8 \u0985\u09b0\u09cd\u09a1\u09be\u09b0 \u09a6\u09bf\u09a4\u09c7 \u09e8\u09ea \u0998\u09a3\u09cd\u099f\u09be \u0985\u09aa\u09c7\u0995\u09cd\u09b7\u09be \u0995\u09b0\u09c1\u09a8\u0964","showPopup":"1","supportNumber":"01784026333"};
-    </script>
-    <script src="https://isolatefashionsbd.com/wp-content/plugins/orderguard/assets/js/repeat-order-blocker.js?ver=1.47"
-        id="orderguard-repeat-blocker-js"></script>
-    <script id="orderguard-fraud-detection-js-extra">
-        var orderguardFraudDetection = {"ajaxurl":"https:\/\/isolatefashionsbd.com\/wp-admin\/admin-ajax.php","nonce":"c4165f1d28"};
-    </script>
-    <script src="https://isolatefashionsbd.com/wp-content/plugins/orderguard/assets/js/fraud-detection.js?ver=1.47"
-        id="orderguard-fraud-detection-js"></script>
-    <script src="https://isolatefashionsbd.com/wp-content/plugins/orderguard/assets/js/blocked-user.js?ver=1.47"
-        id="orderguard-blocked-user-js"></script>
-    <script id="thwcfd-checkout-script-js-extra">
-        var thwcfd_public_var = {"is_override_required":"1","is_wc_version_grt_9_x":"1","shipping_visible_after_adrs":""};
-    </script>
-    <script
-        src="https://isolatefashionsbd.com/wp-content/plugins/woo-checkout-field-editor-pro/public/assets/js/thwcfd-public.min.js?ver=2.1.4"
-        id="thwcfd-checkout-script-js"></script>
-    <script
-        src="https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/js/sourcebuster/sourcebuster.min.js?ver=10.3.4"
-        id="sourcebuster-js-js"></script>
-    <script id="wc-order-attribution-js-extra">
-        var wc_order_attribution = {"params":{"lifetime":1.0e-5,"session":30,"base64":false,"ajaxurl":"https:\/\/isolatefashionsbd.com\/wp-admin\/admin-ajax.php","prefix":"wc_order_attribution_","allowTracking":true},"fields":{"source_type":"current.typ","referrer":"current_add.rf","utm_campaign":"current.cmp","utm_source":"current.src","utm_medium":"current.mdm","utm_content":"current.cnt","utm_id":"current.id","utm_term":"current.trm","utm_source_platform":"current.plt","utm_creative_format":"current.fmt","utm_marketing_tactic":"current.tct","session_entry":"current_add.ep","session_start_time":"current_add.fd","session_pages":"session.pgs","session_count":"udata.vst","user_agent":"udata.uag"}};
-    </script>
-    <script
-        src="https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/js/frontend/order-attribution.min.js?ver=10.3.4"
-        id="wc-order-attribution-js"></script>
     <script src="https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.32.2"
         id="elementor-webpack-runtime-js"></script>
     <script
