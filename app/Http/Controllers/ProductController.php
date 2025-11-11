@@ -188,6 +188,7 @@ class ProductController extends Controller
         // Get price range
         $priceRange = Product::whereIsActive(1)
             ->whereNull('parent_id')
+            ->withoutGlobalScope('latest')
             ->selectRaw('MIN(selling_price) as min_price, MAX(selling_price) as max_price')
             ->first();
 
