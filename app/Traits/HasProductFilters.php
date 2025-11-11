@@ -66,6 +66,9 @@ trait HasProductFilters
     protected function applyProductSorting(Builder|Relation $query): void
     {
         $sorted = setting('show_option')->product_sort ?? 'random';
+
+        $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+
         if ($sorted == 'random') {
             $query->inRandomOrder();
         } elseif ($sorted == 'updated_at') {

@@ -62,6 +62,8 @@ class HomeSection extends Model
         });
 
         // Optimize: Use more efficient ordering
+        $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+
         if ($ids) {
             if ($sorted == 'random') {
                 $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');

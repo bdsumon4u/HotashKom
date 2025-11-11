@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Notifications\Admin\ResetPassword;
 use App\Notifications\Admin\VerifyEmail;
+use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
@@ -114,6 +115,10 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        if (! Filament::auth()->check()) {
+            return false;
+        }
+
+        return Filament::auth()->user()->is('admin');
     }
 }
