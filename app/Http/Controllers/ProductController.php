@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\HomeSection;
 use App\Models\Product;
 use App\Models\Setting;
@@ -44,40 +46,92 @@ class ProductController extends Controller
             $section = HomeSection::with('categories')->findOrFail($section);
             $products = $section->products($per_page);
         } else {
+            $query = Product::whereIsActive(1)->whereNull('parent_id');
+
+            // Filter by categories
             if ($request->filter_category) {
-                // if filter_category is a comma separated ids(numeric) then use it as category ids
-                if (is_numeric(str_replace(',', '', $request->filter_category))) {
-                    $products = Product::whereHas('categories', function ($query) use ($request): void {
-                        $query->whereIn('categories.id', explode(',', $request->filter_category));
+                $categoryFilter = $request->filter_category;
+                if (is_array($categoryFilter)) {
+                    $query->whereHas('categories', function ($q) use ($categoryFilter): void {
+                        $q->whereIn('categories.id', array_filter($categoryFilter));
+                    });
+                } elseif (is_numeric(str_replace(',', '', $categoryFilter))) {
+                    $query->whereHas('categories', function ($q) use ($categoryFilter): void {
+                        $q->whereIn('categories.id', explode(',', $categoryFilter));
                     });
                 } else {
-                    $products = Product::whereHas('categories', function ($query) use ($request): void {
-                        $query->where('categories.slug', rawurldecode($request->filter_category));
+                    $query->whereHas('categories', function ($q) use ($categoryFilter): void {
+                        $q->where('categories.slug', rawurldecode($categoryFilter));
                     });
                 }
-                $products = $products->whereIsActive(1)->whereNull('parent_id');
+            }
 
-                $sorted = setting('show_option')->product_sort ?? 'random';
-                if ($sorted == 'random') {
-                    $products->inRandomOrder();
-                } elseif ($sorted == 'updated_at') {
-                    $products->latest('updated_at');
-                } elseif ($sorted == 'selling_price') {
-                    $products->orderBy('selling_price');
-                }
-            } else {
-                $products = Product::search($request->search, function ($query): void {
-                    $query->whereIsActive(1)->whereNull('parent_id');
+            // Filter by brands
+            if ($request->filter_brand) {
+                $brandIds = is_array($request->filter_brand)
+                    ? $request->filter_brand
+                    : explode(',', $request->filter_brand);
+                $query->whereIn('brand_id', array_filter($brandIds));
+            }
+
+            // Filter by price range
+            if ($request->min_price) {
+                $query->where('selling_price', '>=', $request->min_price);
+            }
+            if ($request->max_price) {
+                $query->where('selling_price', '<=', $request->max_price);
+            }
+
+            // Search
+            if ($request->search) {
+                $products = Product::search($request->search, function ($q) use ($request): void {
+                    $q->whereIsActive(1)->whereNull('parent_id');
+
+                    // Apply filters to search query
+                    if ($request->filter_category) {
+                        $categoryFilter = $request->filter_category;
+                        if (is_array($categoryFilter)) {
+                            $q->whereHas('categories', function ($catQuery) use ($categoryFilter): void {
+                                $catQuery->whereIn('categories.id', array_filter($categoryFilter));
+                            });
+                        } elseif (is_numeric(str_replace(',', '', $categoryFilter))) {
+                            $q->whereHas('categories', function ($catQuery) use ($categoryFilter): void {
+                                $catQuery->whereIn('categories.id', explode(',', $categoryFilter));
+                            });
+                        }
+                    }
+                    if ($request->filter_brand) {
+                        $brandIds = is_array($request->filter_brand)
+                            ? $request->filter_brand
+                            : explode(',', $request->filter_brand);
+                        $q->whereIn('brand_id', array_filter($brandIds));
+                    }
+                    if ($request->min_price) {
+                        $q->where('selling_price', '>=', $request->min_price);
+                    }
+                    if ($request->max_price) {
+                        $q->where('selling_price', '<=', $request->max_price);
+                    }
 
                     $sorted = setting('show_option')->product_sort ?? 'random';
                     if ($sorted == 'random') {
-                        $query->inRandomOrder();
+                        $q->inRandomOrder();
                     } elseif ($sorted == 'updated_at') {
-                        $query->latest('updated_at');
+                        $q->latest('updated_at');
                     } elseif ($sorted == 'selling_price') {
-                        $query->orderBy('selling_price');
+                        $q->orderBy('selling_price');
                     }
                 });
+            } else {
+                $sorted = setting('show_option')->product_sort ?? 'random';
+                if ($sorted == 'random') {
+                    $query->inRandomOrder();
+                } elseif ($sorted == 'updated_at') {
+                    $query->latest('updated_at');
+                } elseif ($sorted == 'selling_price') {
+                    $query->orderBy('selling_price');
+                }
+                $products = $query;
             }
 
             $products = $products->paginate($per_page);
@@ -89,7 +143,55 @@ class ProductController extends Controller
             return ProductResource::collection($products);
         }
 
-        return $this->view(compact('products', 'per_page', 'rows', 'cols', 'section'));
+        // Get filter data - only categories and brands with products
+        $categories = Category::nested(0, true)
+            ->filter(function ($category) {
+                // Check if category has products
+                $hasProducts = $category->products()
+                    ->whereIsActive(1)
+                    ->whereNull('parent_id')
+                    ->exists();
+
+                // Also check if any child category has products
+                $hasChildProducts = $category->childrens->some(function ($child) {
+                    return $child->products()
+                        ->whereIsActive(1)
+                        ->whereNull('parent_id')
+                        ->exists();
+                });
+
+                return $hasProducts || $hasChildProducts;
+            })
+            ->map(function ($category) {
+                // Filter children to only those with products
+                $category->setRelation('childrens', $category->childrens->filter(function ($child) {
+                    return $child->products()
+                        ->whereIsActive(1)
+                        ->whereNull('parent_id')
+                        ->exists();
+                }));
+
+                return $category;
+            })
+            ->values(); // Re-index the collection
+
+        // Get brands that have products
+        $brands = Brand::cached()
+            ->filter(function ($brand) {
+                return $brand->products()
+                    ->whereIsActive(1)
+                    ->whereNull('parent_id')
+                    ->exists();
+            })
+            ->values(); // Re-index the collection
+
+        // Get price range
+        $priceRange = Product::whereIsActive(1)
+            ->whereNull('parent_id')
+            ->selectRaw('MIN(selling_price) as min_price, MAX(selling_price) as max_price')
+            ->first();
+
+        return $this->view(compact('products', 'per_page', 'rows', 'cols', 'section', 'categories', 'brands', 'priceRange'));
     }
 
     /**
