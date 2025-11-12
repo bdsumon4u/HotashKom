@@ -1,0 +1,142 @@
+/* CSS for Offer Yes/No Button module */
+.cartflows-pro-elementor__before_title,
+.cartflows-pro-elementor__after_title,
+.cartflows-pro-elementor__offer-yes-no-button-title {
+	vertical-align: middle;
+}
+
+.cartflows-pro-elementor__before_title_sub_title {
+	margin-right: 10px;
+}
+
+.cartflows-pro-elementor__after_title_sub_title {
+	margin-left: 10px;
+}
+
+.elementor-widget-offer-yes-no-button .cartflows-pro-elementor__offer-yes-no-button-sub-title {
+	font-size: 0.9em;
+}
+
+.cartflows-pro-elementor__offer-yes-no-inner-wrap {
+	display: inline-flex;
+}
+
+/* CSS for Offer Product Price module */
+.elementor-editor-active .cartflows-pro-elementor__offer-product-price .wcf-offer-price .wcf-offer-price-inner,
+.elementor-editor-preview .cartflows-pro-elementor__offer-product-price .wcf-offer-price .wcf-offer-price-inner {
+	display: block !important;
+}
+
+/* CSS for Offer Product Quantity module */
+.cartflows-pro-elementor__offer-product-quantity .quantity .input-text.qty.text {
+	max-width: 100%;
+}
+.cartflows-elementor__offer-product-quantity_align-left .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+	margin-right: auto;
+}
+.cartflows-elementor__offer-product-quantity_align-right .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+	margin-left: auto;
+}
+.cartflows-elementor__offer-product-quantity_align-center .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+	margin-left: auto;
+	margin-right: auto;
+}
+.cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity .screen-reader-text {
+	display: unset;
+}
+
+/* Offer action button */
+.elementor-editor-active .cartflows-pro-elementor__offer-yes-no-button a.elementor-button {
+	pointer-events: none;
+}
+.cartflows-pro-elementor__offer-yes-no-button-icon-wrap svg,
+.cartflows-pro-elementor__offer-yes-no-link svg {
+	height: 1em;
+	width: 1em;
+}
+
+/* Responsive CSS */
+
+/* Mobile CSS */
+@media ( max-width: 767px ) {
+	/* CSS for Offer Product Variation module */
+	.cartflows-elementor__offer-product-variation_align-mobile-left .cartflows-pro-elementor__offer-product-variation .wcf-embeded-product-variation-wrap .variations {
+		margin-right: auto;
+	}
+	.cartflows-elementor__offer-product-variation_align-mobile-right .cartflows-pro-elementor__offer-product-variation .wcf-embeded-product-variation-wrap .variations {
+		margin-left: auto;
+	}
+	.cartflows-elementor__offer-product-variation_align-mobile-center .cartflows-pro-elementor__offer-product-variation .wcf-embeded-product-variation-wrap .variations {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.cartflows-elementor__offer-product-quantity_align-mobile-left .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+		margin-right: auto;
+	}
+	.cartflows-elementor__offer-product-quantity_align-mobile-right .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+		margin-left: auto;
+	}
+	.cartflows-elementor__offer-product-quantity_align-mobile-center .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+/* Mobile CSS */
+
+/* Tablet CSS */
+@media ( min-width: 768px ) and ( max-width: 1024px ) {
+	/* CSS for Offer Product Variation module */
+	.cartflows-elementor__offer-product-variation_align-tablet-left .cartflows-pro-elementor__offer-product-variation .wcf-embeded-product-variation-wrap .variations {
+		margin-right: auto;
+	}
+	.cartflows-elementor__offer-product-variation_align-tablet-right .cartflows-pro-elementor__offer-product-variation .wcf-embeded-product-variation-wrap .variations {
+		margin-left: auto;
+	}
+	.cartflows-elementor__offer-product-variation_align-tablet-center .cartflows-pro-elementor__offer-product-variation .wcf-embeded-product-variation-wrap .variations {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.cartflows-elementor__offer-product-quantity_align-tablet-left .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+		margin-right: auto;
+	}
+	.cartflows-elementor__offer-product-quantity_align-tablet-right .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+		margin-left: auto;
+	}
+	.cartflows-elementor__offer-product-quantity_align-tablet-center .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+
+/* Tablet CSS */
+
+/* Desktop & Large Devices CSS */
+@media ( min-width: 1025px ) {
+	/* CSS for Offer Product Variation module */
+	.cartflows-elementor__offer-product-variation_align-left .cartflows-pro-elementor__offer-product-variation .wcf-embeded-product-variation-wrap .variations {
+		margin-right: auto;
+	}
+	.cartflows-elementor__offer-product-variation_align-right .cartflows-pro-elementor__offer-product-variation .wcf-embeded-product-variation-wrap .variations {
+		margin-left: auto;
+	}
+	.cartflows-elementor__offer-product-variation_align-center .cartflows-pro-elementor__offer-product-variation .wcf-embeded-product-variation-wrap .variations {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.cartflows-elementor__offer-product-quantity_align-left .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+		margin-right: auto;
+	}
+	.cartflows-elementor__offer-product-quantity_align-right .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+		margin-left: auto;
+	}
+	.cartflows-elementor__offer-product-quantity_align-center .cartflows-pro-elementor__offer-product-quantity .wcf-embeded-product-quantity-wrap .quantity {
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+/* Desktop & Large Devices CSS */
+
+/* Responsive CSS */

@@ -559,7 +559,7 @@
     </style>
 
     <link rel='stylesheet' id='woocommerce-general-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/css/woocommerce.css?ver=10.3.4'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/css/woocommerce.css?ver=10.3.4') }}'
         media='all' />
     <style id='woocommerce-inline-inline-css'>
         .woocommerce form .form-row .required {
@@ -567,10 +567,10 @@
         }
     </style>
     <link rel='stylesheet' id='thwcfd-checkout-style-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/woo-checkout-field-editor-pro/public/assets/css/thwcfd-public.min.css?ver=2.1.4'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/woo-checkout-field-editor-pro/public/assets/css/thwcfd-public.min.css?ver=2.1.4') }}'
         media='all' />
     <link rel='stylesheet' id='wcf-normalize-frontend-global-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows/assets/css/cartflows-normalize.css?ver=2.1.14'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/cartflows/assets/css/cartflows-normalize.css?ver=2.1.14') }}'
         media='all' />
     <style id='wcf-normalize-frontend-global-inline-css'>
         :root {
@@ -586,7 +586,7 @@
         }
     </style>
     <link rel='stylesheet' id='wcf-frontend-global-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows/assets/css/frontend.css?ver=2.1.14'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/cartflows/assets/css/frontend.css?ver=2.1.14') }}'
         media='all' />
     <style id='wcf-frontend-global-inline-css'>
         :root {
@@ -597,13 +597,13 @@
         }
     </style>
     <link rel='stylesheet' id='wcf-pro-frontend-global-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows-pro/assets/css/frontend.css?ver=2.0.3'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/cartflows-pro/assets/css/frontend.css?ver=2.0.3') }}'
         media='all' />
     <link rel='stylesheet' id='elementor-frontend-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.32.2'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.32.2') }}'
         media='all' />
     <link rel='stylesheet' id='elementor-post-22-css'
-        href='https://isolatefashionsbd.com/wp-content/uploads/elementor/css/post-22.css?ver=1762689002' media='all' />
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/uploads/elementor/css/post-22.css?ver=1762689002') }}' media='all' />
     <link rel='stylesheet' id='elementor-post-120-css' href='{{ asset('
         assets/demo.orioit.com/wp-content/uploads/elementor/css/post-120.css?ver=1736887944') }}' media='all' />
     <link rel='stylesheet' id='wcf-checkout-template-css' href='{{ asset('
@@ -613,31 +613,31 @@
         assets/demo.orioit.com/wp-content/plugins/cartflows-pro/assets/css/checkout-styles.css?ver=2.0.10') }}'
         media='all' />
     <link rel='stylesheet' id='widget-heading-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/widget-heading.min.css?ver=3.32.2'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/widget-heading.min.css?ver=3.32.2') }}'
         media='all' />
     <link rel='stylesheet' id='swiper-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=8.4.5'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=8.4.5') }}'
         media='all' />
     <link rel='stylesheet' id='e-swiper-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/conditionals/e-swiper.min.css?ver=3.32.2'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/conditionals/e-swiper.min.css?ver=3.32.2') }}'
         media='all' />
     <link rel='stylesheet' id='widget-image-carousel-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/widget-image-carousel.min.css?ver=3.32.2'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/widget-image-carousel.min.css?ver=3.32.2') }}'
         media='all' />
     <link rel='stylesheet' id='widget-icon-list-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css?ver=3.32.2'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css?ver=3.32.2') }}'
         media='all' />
     <link rel='stylesheet' id='e-animation-push-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-push.min.css?ver=3.32.2'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-push.min.css?ver=3.32.2') }}'
         media='all' />
     <link rel='stylesheet' id='widget-image-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=3.32.2'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=3.32.2') }}'
         media='all' />
     <link rel='stylesheet' id='elementor-post-31816-css'
-        href='https://isolatefashionsbd.com/wp-content/uploads/elementor/css/post-31816.css?ver=1762689016'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/uploads/elementor/css/post-31816.css?ver=1762689016') }}'
         media='all' />
     <link rel='stylesheet' id='wcf-checkout-template-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows/assets/css/checkout-template.css?ver=2.1.14'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/cartflows/assets/css/checkout-template.css?ver=2.1.14') }}'
         media='all' />
     <style id='wcf-checkout-template-inline-css'>
         .wcf-embed-checkout-form .woocommerce #payment #place_order:before {
@@ -653,14 +653,14 @@
         }
     </style>
     <link rel='stylesheet' id='wcf-pro-checkout-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows-pro/assets/css/checkout-styles.css?ver=2.0.3'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/cartflows-pro/assets/css/checkout-styles.css?ver=2.0.3') }}'
         media='all' />
     <link rel='stylesheet' id='wcf-pro-multistep-checkout-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows-pro/assets/css/multistep-checkout.css?ver=2.0.3'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/cartflows-pro/assets/css/multistep-checkout.css?ver=2.0.3') }}'
         media='all' />
-    <script src="https://isolatefashionsbd.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js">
+    <script src="{{ asset('assets/isolatefashionsbd.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1') }}" id="jquery-core-js">
     </script>
-    <script src="https://isolatefashionsbd.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1"
+    <script src="{{ asset('assets/isolatefashionsbd.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1') }}"
         id="jquery-migrate-js"></script>
 </head>
 
@@ -678,31 +678,31 @@
     </div>
 
     <link rel='stylesheet' id='wc-blocks-style-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/client/blocks/wc-blocks.css?ver=wc-10.3.4'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/client/blocks/wc-blocks.css?ver=wc-10.3.4') }}'
         media='all' />
     <link rel='stylesheet' id='cartflows-elementor-style-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows/modules/elementor/widgets-css/frontend.css?ver=2.1.14'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/cartflows/modules/elementor/widgets-css/frontend.css?ver=2.1.14') }}'
         media='all' />
     <link rel='stylesheet' id='cartflows-pro-elementor-style-css'
-        href='https://isolatefashionsbd.com/wp-content/plugins/cartflows-pro/modules/elementor/widgets-css/frontend.css?ver=2.0.3'
+        href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/cartflows-pro/modules/elementor/widgets-css/frontend.css?ver=2.0.3') }}'
         media='all' />
-    <script src="https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.32.2"
+    <script src="{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.32.2') }}"
         id="elementor-webpack-runtime-js"></script>
     <script
-        src="https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.32.2"
+        src="{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.32.2') }}"
         id="elementor-frontend-modules-js"></script>
-    <script src="https://isolatefashionsbd.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.3" id="jquery-ui-core-js">
+    <script src="{{ asset('assets/isolatefashionsbd.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.3') }}" id="jquery-ui-core-js">
     </script>
     <script id="elementor-frontend-js-before">
-        var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false,"isScriptDebug":false},"i18n":{"shareOnFacebook":"Share on Facebook","shareOnTwitter":"Share on Twitter","pinIt":"Pin it","download":"Download","downloadImage":"Download image","fullscreen":"Fullscreen","zoom":"Zoom","share":"Share","playVideo":"Play Video","previous":"Previous","next":"Next","close":"Close","a11yCarouselPrevSlideMessage":"Previous slide","a11yCarouselNextSlideMessage":"Next slide","a11yCarouselFirstSlideMessage":"This is the first slide","a11yCarouselLastSlideMessage":"This is the last slide","a11yCarouselPaginationBulletMessage":"Go to slide"},"is_rtl":false,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"responsive":{"breakpoints":{"mobile":{"label":"Mobile Portrait","value":767,"default_value":767,"direction":"max","is_enabled":true},"mobile_extra":{"label":"Mobile Landscape","value":880,"default_value":880,"direction":"max","is_enabled":false},"tablet":{"label":"Tablet Portrait","value":1024,"default_value":1024,"direction":"max","is_enabled":true},"tablet_extra":{"label":"Tablet Landscape","value":1200,"default_value":1200,"direction":"max","is_enabled":false},"laptop":{"label":"Laptop","value":1366,"default_value":1366,"direction":"max","is_enabled":false},"widescreen":{"label":"Widescreen","value":2400,"default_value":2400,"direction":"min","is_enabled":false}},"hasCustomBreakpoints":false},"version":"3.32.2","is_static":false,"experimentalFeatures":{"e_font_icon_svg":true,"additional_custom_breakpoints":true,"container":true,"nested-elements":true,"home_screen":true,"global_classes_should_enforce_capabilities":true,"e_variables":true,"cloud-library":true,"e_opt_in_v4_page":true,"import-export-customization":true},"urls":{"assets":"https:\/\/isolatefashionsbd.com\/wp-content\/plugins\/elementor\/assets\/","ajaxurl":"https:\/\/isolatefashionsbd.com\/wp-admin\/admin-ajax.php","uploadUrl":"https:\/\/isolatefashionsbd.com\/wp-content\/uploads"},"nonces":{"floatingButtonsClickTracking":"d6c8310021"},"swiperClass":"swiper","settings":{"page":[],"editorPreferences":[]},"kit":{"active_breakpoints":["viewport_mobile","viewport_tablet"],"global_image_lightbox":"yes","lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description"},"post":{"id":31816,"title":"MENS%20padding%20jacket%20%E2%80%93%20isolatefashions%20bd","excerpt":"","featuredImage":false}};
+        var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false,"isScriptDebug":false},"i18n":{"shareOnFacebook":"Share on Facebook","shareOnTwitter":"Share on Twitter","pinIt":"Pin it","download":"Download","downloadImage":"Download image","fullscreen":"Fullscreen","zoom":"Zoom","share":"Share","playVideo":"Play Video","previous":"Previous","next":"Next","close":"Close","a11yCarouselPrevSlideMessage":"Previous slide","a11yCarouselNextSlideMessage":"Next slide","a11yCarouselFirstSlideMessage":"This is the first slide","a11yCarouselLastSlideMessage":"This is the last slide","a11yCarouselPaginationBulletMessage":"Go to slide"},"is_rtl":false,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"responsive":{"breakpoints":{"mobile":{"label":"Mobile Portrait","value":767,"default_value":767,"direction":"max","is_enabled":true},"mobile_extra":{"label":"Mobile Landscape","value":880,"default_value":880,"direction":"max","is_enabled":false},"tablet":{"label":"Tablet Portrait","value":1024,"default_value":1024,"direction":"max","is_enabled":true},"tablet_extra":{"label":"Tablet Landscape","value":1200,"default_value":1200,"direction":"max","is_enabled":false},"laptop":{"label":"Laptop","value":1366,"default_value":1366,"direction":"max","is_enabled":false},"widescreen":{"label":"Widescreen","value":2400,"default_value":2400,"direction":"min","is_enabled":false}},"hasCustomBreakpoints":false},"version":"3.32.2","is_static":false,"experimentalFeatures":{"e_font_icon_svg":true,"additional_custom_breakpoints":true,"container":true,"nested-elements":true,"home_screen":true,"global_classes_should_enforce_capabilities":true,"e_variables":true,"cloud-library":true,"e_opt_in_v4_page":true,"import-export-customization":true},"urls":{"assets":"{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/') }}","ajaxurl":"{{ asset('assets/isolatefashionsbd.com/wp-admin/admin-ajax.php') }}","uploadUrl":"{{ asset('assets/isolatefashionsbd.com/wp-content/uploads') }}"},"nonces":{"floatingButtonsClickTracking":"d6c8310021"},"swiperClass":"swiper","settings":{"page":[],"editorPreferences":[]},"kit":{"active_breakpoints":["viewport_mobile","viewport_tablet"],"global_image_lightbox":"yes","lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description"},"post":{"id":31816,"title":"MENS%20padding%20jacket%20%E2%80%93%20isolatefashions%20bd","excerpt":"","featuredImage":false}};
     </script>
-    <script src="https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.32.2"
+    <script src="{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.32.2') }}"
         id="elementor-frontend-js"></script>
     <script
-        src="https://isolatefashionsbd.com/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5"
+        src="{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5') }}"
         id="swiper-js"></script>
     <script
-        src="https://isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/js/flexslider/jquery.flexslider.min.js?ver=2.7.2-wc.10.3.4"
+        src="{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/woocommerce/assets/js/flexslider/jquery.flexslider.min.js?ver=2.7.2-wc.10.3.4') }}"
         id="wc-flexslider-js" defer data-wp-strategy="defer"></script>
 </body>
 

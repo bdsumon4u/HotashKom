@@ -1,0 +1,346 @@
+/*--------------------------------------------------------------
+# Loader
+---------------------------------------------------------------*/
+
+.wcf-loader-bg.show {
+	display: block;
+}
+.wcf-loader-bg {
+	display: none;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	overflow: hidden;
+	background: rgba( 0, 0, 0, 0.5 );
+	z-index: 99999;
+	animation: popup 0.7s;
+}
+.wcf-loader-wrap {
+	width: 100%;
+	max-width: 500px;
+	height: auto;
+	min-height: 140px;
+	top: 50%;
+	left: 50%;
+	position: relative;
+	transform: translate( -50%, -50% );
+	overflow: hidden;
+	background: #fff;
+	border-radius: 3px;
+	padding: 50px;
+}
+.wcf-order-msg {
+	text-align: center;
+}
+.wcf-order-msg .wcf-payment-success {
+	color: #28a745;
+}
+.wcf-order-msg .wcf-payment-failed {
+	color: #dc3545;
+}
+.wcf-order-msg p {
+	margin: 0 0 0.7em;
+}
+.wcf-order-msg .wcf-note {
+	font-size: 13px;
+}
+.wcf-order-msg .wcf-note-no {
+	display: none;
+}
+p.wcf-process-msg {
+	font-size: 1.2em;
+}
+
+.wcf-loader,
+.wcf-loader::after {
+	border-radius: 50%;
+	width: 8em;
+	height: 8em;
+}
+.wcf-loader {
+	margin: 25px auto;
+	font-size: 10px;
+	position: relative;
+	text-indent: -9999em;
+	border-top: 5px solid #d4d4d4;
+	border-right: 5px solid #d4d4d4;
+	border-bottom: 5px solid #d4d4d4;
+	border-left: 5px solid #f16334;
+	transform: translateZ( 0 );
+	animation: load8 550ms infinite linear;
+}
+
+/*
+* *********************************************************
+* Thank you extended css
+* *********************************************************
+*/
+.wcf-offer-child-order ul.order_details {
+	padding: 0;
+}
+
+/*
+* *********************************************************
+* Upsell/Downsell shortcodes
+* *********************************************************
+*/
+/* Product Images */
+.woocommerce-product-gallery .slides {
+	position: relative;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.woocommerce-product-gallery .woocommerce-product-gallery__image {
+	width: 100%;
+	display: inline-block;
+}
+
+.woocommerce-product-gallery .flex-direction-nav a {
+	height: 60px;
+}
+.woocommerce-product-gallery .flex-direction-nav .flex-prev,
+.woocommerce-product-gallery .flex-direction-nav .flex-next {
+	display: inline-block;
+	font-family: dashicons;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.woocommerce-product-gallery .flex-direction-nav .flex-prev::before {
+	content: "\f341";
+}
+
+.woocommerce-product-gallery .flex-direction-nav .flex-next::before {
+	content: "\f345";
+}
+
+.woocommerce-product-gallery .flex-direction-nav .flex-prev {
+	left: -50px;
+}
+
+.woocommerce-product-gallery .flex-direction-nav .flex-next {
+	right: -50px;
+	text-align: right;
+}
+
+.woocommerce-product-gallery:hover .flex-direction-nav .flex-prev {
+	opacity: 0.7;
+	left: 10px;
+}
+
+.woocommerce-product-gallery:hover .flex-direction-nav .flex-next {
+	opacity: 0.7;
+	right: 10px;
+}
+
+/* Price shortcode */
+.wcf-offer-price {
+	font-size: 22px;
+}
+
+.wcf-offer-price .del {
+	padding-right: 6px;
+	text-decoration: line-through;
+	opacity: 0.5;
+}
+
+.wcf-offer-shipping-fee {
+	display: block;
+	font-size: 15px;
+}
+/*
+* *********************************************************
+* CSS for the select options on the Upsell & Downsell page
+* *********************************************************
+*/
+.wcf-embeded-product-variation-wrap .variations_form .variations {
+	margin: 0;
+}
+
+.wcf-embeded-product-variation-wrap .variations_form .variations td.label,
+.wcf-embeded-product-quantity-wrap .quantity label.screen-reader-text {
+	font-weight: 600;
+	font-family: inherit;
+	margin-top: 10px;
+}
+
+.wcf-embeded-product-variation-wrap .variations_form .variations td.label,
+.wcf-embeded-product-variation-wrap .variations_form .variations td.value {
+	padding: 0 0 5px 0;
+	vertical-align: middle;
+}
+
+.wcf-embeded-product-quantity-wrap .quantity input[type="number"],
+.wcf-embeded-product-variation-wrap .variations_form .variations select {
+	background-color: #fff;
+	background-image: none;
+	border: 1px solid;
+	border-color: #d4d4d4;
+	border-radius: 0;
+	box-shadow: inset 0 -1em 0.7em 0 rgba( 0, 0, 0, 0.01 );
+	color: #a5a5a5;
+	display: inline-block;
+	font-family: inherit;
+	font-weight: inherit;
+	font-size: 14px;
+	height: auto;
+	line-height: 1.42857143 !important;
+	min-height: 34px;
+	outline: none;
+	padding: 10px 15px;
+	max-width: 100%;
+	/*min-width: 85%;*/
+	width: 100%;
+	margin-right: 0;
+	-webkit-appearance: none;
+}
+
+.wcf-embeded-product-variation-wrap .variations_form .variations select:focus,
+.wcf-embeded-product-quantity-wrap .quantity input[type="number"]:focus {
+	background: #fff;
+	transition: 0.2s;
+}
+
+.wcf-embeded-product-variation-wrap .variations_form .single_variation_wrap {
+	float: left;
+	margin-right: 40px;
+	vertical-align: middle;
+}
+
+.wcf-embeded-product-variation-wrap .variations_form .single_variation_wrap .single_variation {
+	overflow: hidden;
+}
+
+.wcf-embeded-product-variation-wrap .single_variation_wrap .single_variation .woocommerce-variation-description {
+	display: none;
+}
+
+.wcf-embeded-product-variation-wrap .variations_form .variations .reset_variations {
+	text-decoration: none;
+	font-family: inherit;
+	font-weight: 500;
+	font-size: 10px;
+	float: right;
+	margin-top: 10px;
+	color: #a00a00;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	display: none;
+}
+.wcf-embeded-product-variation-wrap .variations_form .variations .reset_variations::before {
+	content: "\274C";
+	font-size: 8px;
+	margin-right: 5px;
+}
+
+.wcf-embeded-product-variation-wrap .variations_form .price,
+.wcf-embeded-product-variation-wrap .variations_form .single_variation_wrap .woocommerce-variation-price {
+	margin: 0;
+	font-family: inherit;
+	font-weight: 400;
+	overflow: hidden;
+	min-height: 35px;
+	vertical-align: middle;
+	line-height: 2.12;
+}
+
+.wcf-embeded-product-variation-wrap .variations .var_not_selected {
+	border: 1px solid #e2401c !important;
+}
+
+.cartflows-container .single_variation_wrap .woocommerce-variation {
+	display: none !important;
+}
+
+.wcf-embeded-product-variation-wrap table,
+.wcf-embeded-product-quantity-wrap .quantity input[type="number"] {
+	max-width: 250px;
+	max-width: 200px;
+}
+
+.wcf-embeded-product-variation-wrap table,
+.wcf-embeded-product-variation-wrap table tbody,
+.wcf-embeded-product-variation-wrap table tbody tr,
+.wcf-embeded-product-variation-wrap table tbody tr td,
+.wcf-embeded-product-variation-wrap table tbody tr td,
+.wcf-embeded-product-variation-wrap table tfoot,
+.wcf-embeded-product-variation-wrap table tfoot tr,
+.wcf-embeded-product-variation-wrap table tfoot tr td,
+.wcf-embeded-product-variation-wrap table tfoot tr td {
+	width: 100%;
+	display: block !important;
+}
+
+.wcf-embeded-product-quantity-wrap .quantity {
+	display: block;
+}
+
+.wcf-embeded-product-quantity-wrap .quantity .screen-reader-text {
+	clip-path: none;
+	display: inline-block;
+	visibility: visible;
+	opacity: 1;
+	position: relative !important;
+	top: 0;
+	color: #404040;
+	font-size: 15px;
+	min-height: 34px;
+	min-height: 22px;
+	width: 100%;
+	padding-top: 0;
+}
+
+.wcf-embeded-product-quantity-wrap .quantity label {
+	padding: 5px 0;
+	width: 100%;
+}
+
+@media ( min-width: 769px ) {
+	.wcf-embeded-product-variation-wrap table,
+	.wcf-embeded-product-quantity-wrap .quantity input[type="number"] {
+		max-width: 80%;
+	}
+}
+
+@media ( max-width: 768px ) {
+	.wcf-embeded-product-variation-wrap table,
+	.wcf-embeded-product-quantity-wrap .quantity input[type="number"] {
+		max-width: 100%;
+	}
+}
+/*
+* *********************************************************
+* CSS for the select options on the Upsell & Downsell page
+* *********************************************************
+*/
+
+@keyframes load8 {
+	0% {
+		transform: rotate( 0deg );
+	}
+	100% {
+		transform: rotate( 360deg );
+	}
+}
+
+@keyframes popup {
+	0% {
+		transform: scale( 1.2 );
+	}
+}
+
+/**
+* Astra Addon Compatibility CSS.
+*
+* Removing the raw HTML of plus/minus buttons on the upsell page.
+* Restricted only to offer page using wcf-offer-product-quantity class.
+*/
+body[class*=" astra-addon-"] .wcf-offer-product-quantity label[for^="minus_qty"],
+body[class*=" astra-addon-"] .wcf-offer-product-quantity a#minus_qty,
+body[class*=" astra-addon-"] .wcf-offer-product-quantity a#plus_qty,
+body[class*=" astra-addon-"] .wcf-offer-product-quantity label[for^="plus_qty"] {
+	display: none !important;
+}

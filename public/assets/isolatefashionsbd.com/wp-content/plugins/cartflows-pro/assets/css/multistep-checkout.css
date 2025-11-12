@@ -1,0 +1,252 @@
+/**
+ * Multistep Checkout CSS
+ */
+
+/* Navigation Buttons CSS Start
+ */
+
+.wcf-multistep-nav-btn-group {
+	-js-display: inline-flex;
+	display: inline-flex;
+	margin: 20px 0 20px 0;
+	position: relative;
+	/* left: 50%; */
+	font-size: 16px;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.wcf-multistep-nav-btn-group span {
+	background-color: var( --wcf-btn-bg-color );
+	border: 1px solid;
+	border-color: var( --wcf-btn-bg-color );
+	color: var( --wcf-btn-text-color );
+	cursor: pointer;
+	float: left;
+	width: auto;
+	text-align: center;
+	border-radius: 4px;
+	font-weight: 400;
+	padding: 11px 15px;
+}
+
+.wcf-multistep-nav-btn-group span:hover {
+	border-color: var( --wcf-btn-bg-hover-color );
+	background-color: var( --wcf-btn-bg-hover-color );
+	color: var( --wcf-btn-hover-text-color );
+}
+
+.wcf-multistep-nav-btn-group a {
+	align-self: center;
+}
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep .wcf-customer-info-main-wrapper #payment .wcf-multistep-buttons-wrapper {
+	-js-display: flex;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep .wcf-customer-info-main-wrapper #payment .wcf-multistep-nav-back-btn {
+	display: inline-block;
+	align-self: center;
+	width: 50%;
+	font-size: 16px;
+}
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep .wcf-customer-info-main-wrapper #payment #place_order {
+	display: inline-block;
+	padding: 11px 15px;
+	width: 50%;
+	clear: both;
+	float: none;
+}
+/* Navigation Buttons CSS End
+ */
+
+/* Important CSS for multistep checkout Start */
+
+/* Hide shipping and payment when billing class available */
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-billing .woocommerce-checkout-payment,
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-billing .wcf-payment-option-heading,
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-billing .wcf-payment-step-review-details,
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-billing .wcf-col-2.col-2 {
+	display: none;
+}
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-billing .wcf-multistep-nav-back-btn {
+	visibility: hidden;
+}
+/* Hide Billing and payment when shipping class available */
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-shipping .wcf-col-1,
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-shipping .wcf-payment-option-heading,
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-shipping .wcf-payment-step-review-details,
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-shipping .woocommerce-checkout-payment {
+	display: none;
+}
+/* Hide Billing and Shipping when payment class available */
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-payment .wcf-col-1,
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-payment .wcf-col-2.col-2,
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-payment .wcf-multistep-nav-btn-group {
+	display: none;
+}
+
+/* Important CSS for multistep checkout End
+ */
+
+/* Top Navigation Buttons CSS Start
+ */
+
+.wcf-embed-checkout-form .wcf-multistep-checkout-breadcrumb {
+	width: 100%;
+	/* padding: 20px; */
+	margin: 10px 10px 10px 0;
+}
+
+.wcf-embed-checkout-form .wcf-multistep-checkout-breadcrumb .wcf-checkout-breadcrumb {
+	display: inline-block;
+	margin: 5px 5px 5px 0;
+}
+
+.wcf-embed-checkout-form .wcf-multistep-checkout-breadcrumb .wcf-checkout-breadcrumb a {
+	color: var( --wcf-text-color );
+}
+
+.wcf-embed-checkout-form .wcf-multistep-checkout-breadcrumb .wcf-checkout-breadcrumb a.wcf-current-step {
+	color: var( --wcf-primary-color );
+}
+
+.wcf-embed-checkout-form .wcf-multistep-checkout-breadcrumb .wcf-checkout-breadcrumb:not( :last-child ) ::after {
+	content: "\00bb";
+	height: 16px;
+	width: 16px;
+	margin-left: 10px;
+	color: #000;
+}
+/* Top Navigation Buttons CSS End
+ */
+
+/* Custom Shipping methods CSS Start
+ */
+.wcf-multistep-shipping-table {
+	margin: 15px 0 15px 0;
+}
+
+.wcf-multistep-shipping-table .woocommerce-shipping-totals.shipping th {
+	display: none;
+}
+
+.wcf-multistep-shipping-table table {
+	margin: 0;
+}
+
+.wcf-multistep-shipping-table ul#shipping_method li {
+	padding: 12px;
+	margin: 0;
+}
+
+.wcf-multistep-shipping-table ul#shipping_method li input {
+	vertical-align: middle;
+	height: 18px;
+	width: 18px;
+	cursor: pointer;
+	margin: 2px 11px 0 0;
+	border: 1px solid #d1d5db;
+	border-radius: 50%;
+	line-height: 0;
+	box-shadow: inset 0 1px 2px rgb( 0 0 0 / 10% );
+	transition: 0.05s border-color ease-in-out;
+	-webkit-appearance: none;
+}
+
+.wcf-multistep-shipping-table ul#shipping_method li input:checked::before {
+	background-color: var( --wcf-primary-color );
+	border-radius: 50px;
+	content: "\2022";
+	text-indent: -9999px;
+	display: inline-block;
+	font: normal normal 400 15px/1 cartflows-icon;
+	vertical-align: middle;
+	-webkit-font-smoothing: antialiased;
+	margin: 5px;
+	width: 6px;
+	height: 6px;
+}
+
+.wcf-multistep-shipping-table ul#shipping_method li label {
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.wcf-multistep-shipping-table ul#shipping_method {
+	border-radius: 4px;
+	border: 1px solid #d6d7db;
+}
+
+.wcf-multistep-shipping-table ul#shipping_method li:not( :last-child ) {
+	border-bottom: 1px solid #d6d7db;
+}
+/* Custom Shipping methods CSS End
+ */
+
+/* Custom sections CSS Start
+ */
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep ul.wcf-review-details-wrapper {
+	border: 1px solid #d6d7db;
+	border-radius: 4px;
+	padding: 0;
+	margin: 15px 0 15px 0;
+}
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep ul.wcf-review-details-wrapper li:not( :last-child ) {
+	border-bottom: 1px solid #d6d7db;
+}
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep ul.wcf-review-details-wrapper li {
+	-js-display: flex;
+	display: flex;
+	padding: 0 0.85em;
+}
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep ul.wcf-review-details-wrapper .wcf-review-details-inner {
+	padding: 0.85em 0;
+	-js-display: flex;
+	display: flex;
+	flex: 1;
+}
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep ul.wcf-review-details-wrapper .wcf-review-detail-label {
+	flex: 0 0 6em;
+	font-weight: 400;
+}
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep ul.wcf-review-details-wrapper .wcf-review-detail-content {
+	color: #404040;
+}
+
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep ul.wcf-review-details-wrapper .wcf-review-detail-link {
+	text-align: right;
+	padding: 0.85em 0;
+	flex: 0 0 auto;
+	width: 16.66666667%;
+}
+.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep ul.wcf-review-details .wcf-review-detail-link .wcf-step-link {
+	color: #b3b3b3;
+	white-space: nowrap;
+	text-decoration: none;
+}
+
+/* Custom sections CSS End
+ */
+
+/* Show product option on step 1 if position is set to after customer details */
+.wcf-embed-checkout-form.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-shipping .wcf-product-option-wrap.wcf-product-option-after-customer,
+.wcf-embed-checkout-form.wcf-embed-checkout-form-modern-checkout.wcf-payment .wcf-product-option-wrap.wcf-product-option-after-customer {
+	display: none;
+}
+
+/* Show order bump on step 1 if position is set to after customer details */
+.wcf-embed-checkout-form.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-shipping .wcf-bump-order-grid-wrap.wcf-after-customer,
+.wcf-embed-checkout-form.wcf-embed-checkout-form-modern-checkout.wcf-modern-skin-multistep.wcf-payment .wcf-bump-order-grid-wrap.wcf-after-customer {
+	display: none;
+}

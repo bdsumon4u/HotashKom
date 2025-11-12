@@ -17,10 +17,10 @@
         media='all' />
     <link rel='stylesheet' id='elementor-post-7-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/uploads/elementor/css/post-7.css?ver=1736836498') }}' media='all' />
-    
+
     <link rel='stylesheet' id='wcf-frontend-global-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/frontend.css?ver=2.0.12') }}' media='all' />
-    
+
     <link rel='stylesheet' id='swiper-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=8.4.5') }}'
         media='all' />
@@ -47,11 +47,11 @@
     <link rel='stylesheet' id='wcf-checkout-template-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/checkout-template.css?ver=2.0.12') }}'
         media='all' />
-    
+
     <link rel='stylesheet' id='wcf-pro-checkout-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows-pro/assets/css/checkout-styles.css?ver=2.0.10') }}'
         media='all' />
-    
+
     <link rel='stylesheet' id='google-fonts-1-css'
         href='https://fonts.googleapis.com/css?family=Roboto%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CRoboto+Slab%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CHind+Siliguri%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CPoppins%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CMontserrat%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&#038;display=swap&#038;ver=6.7.1'
         media='all' />
@@ -62,25 +62,25 @@
     <script
         src="{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/js/js-cookie/js.cookie.min.js?ver=2.1.4-wc.9.4.2') }}"
         id="js-cookie-js" defer data-wp-strategy="defer"></script>
-    
+
     <script
         src="{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/js/jquery-blockui/jquery.blockUI.min.js?ver=2.7.0-wc.9.4.2') }}"
         id="jquery-blockui-js" defer data-wp-strategy="defer"></script>
-    
-    
+
+
     <script
         src="{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/js/jquery-cookie/jquery.cookie.min.js?ver=1.4.1-wc.9.4.2') }}"
         id="jquery-cookie-js" data-wp-strategy="defer"></script>
-    
+
 </head>
 
 <body
-    class="cartflows_step-template-default single single-cartflows_step postid-120 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12  cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-120">
+    class="cartflows_step-template-default single single-cartflows_step postid-120 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12 cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-120">
 
 
     <a class="skip-link screen-reader-text" href="#content">Skip to content</a>
 
-    <header id="site-header" class="site-header dynamic-header ">
+    <header id="site-header" class="site-header dynamic-header">
         <div class="header-inner">
             <div class="site-branding show-title">
             </div>
@@ -106,7 +106,7 @@
 
 
     </main>
-    
+
     <script
         src="{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/js/flexslider/jquery.flexslider.min.js?ver=2.7.2-wc.9.4.2') }}"
         id="flexslider-js" defer data-wp-strategy="defer"></script>
