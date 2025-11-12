@@ -147,6 +147,34 @@ class EditOrder extends Component
 
         foreach (json_decode(json_encode($this->order->products), true) ?? [] as $product) {
             $this->selectedProducts[$product['id']] = $product;
+
+            $parentId = $product['parent_id'] ?? $product['id'];
+
+            // Initialize options from selected products if they have selected_options
+            if (isset($product['selected_options']) && is_array($product['selected_options'])) {
+                $this->options[$parentId] = $product['selected_options'];
+            } else {
+                // If selected_options not stored, try to determine from the product
+                // Load the product to check if it's a variation
+                $productModel = Product::with('options')->find($product['id']);
+                if ($productModel) {
+                    // If it's a variation (has parent_id in database), get its options
+                    if ($productModel->parent_id) {
+                        $this->options[$productModel->parent_id] = $productModel->options->pluck('id', 'attribute_id')->toArray();
+                    } elseif ($parentId != $product['id']) {
+                        // If parent_id is set in order data but product is not a variation in DB
+                        // This means the stored product ID might be a variation that was added
+                        $parentProduct = Product::with('variations.options')->find($parentId);
+                        if ($parentProduct && $parentProduct->variations->isNotEmpty()) {
+                            // Try to find the variation that matches this product ID
+                            $variation = $parentProduct->variations->firstWhere('id', $product['id']);
+                            if ($variation) {
+                                $this->options[$parentId] = $variation->options->pluck('id', 'attribute_id')->toArray();
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -167,12 +195,79 @@ class EditOrder extends Component
 
         $productData = (new ProductResource($product))->toCartItem($quantity);
 
+        // Store parent product ID and selected options for variation changes
+        $productData['parent_id'] = $product->parent_id ?? $product->id;
+        $productData['selected_options'] = $this->options[$product->id] ?? [];
+
         $this->selectedProducts[$id] = $productData;
 
         $this->updatedShippingArea($this->shipping_area);
 
         $this->search = '';
         $this->dispatch('notify', ['message' => 'Product added successfully.']);
+    }
+
+    public function updateSelectedProductVariation($productId, $attributeId, $optionId): void
+    {
+        if (! isset($this->selectedProducts[$productId])) {
+            return;
+        }
+
+        $selectedProduct = $this->selectedProducts[$productId];
+        $parentId = $selectedProduct['parent_id'] ?? $productId;
+
+        // Get the parent product
+        $parentProduct = Product::with('variations.options')->find($parentId);
+        if (! $parentProduct) {
+            return;
+        }
+
+        // Update options for this product (this will update the UI)
+        if (! isset($this->options[$parentId])) {
+            $this->options[$parentId] = [];
+        }
+        $this->options[$parentId][$attributeId] = (int) $optionId;
+
+        // Find the matching variation
+        $variation = $parentProduct->variations->first(function ($item) use ($parentId) {
+            return $item->options
+                ->pluck('id')
+                ->diff($this->options[$parentId] ?? [])
+                ->isEmpty();
+        });
+
+        // If no variation found, use parent product
+        $product = $variation ?? $parentProduct;
+
+        if ($product->should_track && $product->stock_count <= 0) {
+            session()->flash('error', 'Selected variation is out of stock.');
+
+            return;
+        }
+
+        // Update the selected product data
+        $quantity = $selectedProduct['quantity'] ?? 1;
+        $productData = (new ProductResource($product))->toCartItem($quantity);
+        $productData['parent_id'] = $parentId;
+        $productData['selected_options'] = $this->options[$parentId];
+
+        // Preserve retail_price if it exists
+        if (isset($selectedProduct['retail_price'])) {
+            $productData['retail_price'] = $selectedProduct['retail_price'];
+        }
+
+        // Update the product in selectedProducts, keeping the same key
+        // but updating the ID to the new variation's ID
+        $newProductId = $product->id;
+        if ($newProductId != $productId) {
+            // If the ID changed, we need to update the key
+            unset($this->selectedProducts[$productId]);
+            $this->selectedProducts[$newProductId] = $productData;
+        } else {
+            $this->selectedProducts[$productId] = $productData;
+        }
+
+        $this->updatedShippingArea($this->shipping_area);
     }
 
     public function increaseQuantity($id): void
@@ -334,8 +429,21 @@ class EditOrder extends Component
             }
         }
 
+        // Load parent products for selected products to show variations
+        $selectedProductParents = collect();
+        foreach ($this->selectedProducts as $selectedProduct) {
+            $parentId = $selectedProduct['parent_id'] ?? $selectedProduct['id'];
+            if (! $selectedProductParents->has($parentId)) {
+                $parent = Product::with('variations.options')->find($parentId);
+                if ($parent) {
+                    $selectedProductParents[$parentId] = $parent;
+                }
+            }
+        }
+
         return view('livewire.edit-order', [
             'products' => $products,
+            'selectedProductParents' => $selectedProductParents,
         ]);
     }
 }

@@ -223,13 +223,31 @@
 
                                         @if ($available = !$selectedVar->should_track || $selectedVar->stock_count > 0)
                                             <button type="button" class="btn btn-primary"
-                                                wire:click="addProduct({{ $selectedVar }})" @disabled(isReseller() && !is_null($order->source_id))>Add to Order</button>
+                                                wire:click="addProduct({{ $selectedVar->id }})" @disabled(isReseller() && !is_null($order->source_id))>Add to Order</button>
                                         @endif
                                     </td>
                                 </tr>
                             @endforeach
-                            @php($retail = 0)
+                            @php
+                                $retail = 0;
+                            @endphp
                             @foreach ($selectedProducts as $product)
+                                @php
+                                    $parentId = $product['parent_id'] ?? $product['id'];
+                                    $parentProduct = $selectedProductParents[$parentId] ?? null;
+                                    $attributes = null;
+                                    $optionGroup = null;
+
+                                    if ($parentProduct && $parentProduct->variations->isNotEmpty()) {
+                                        // Get option groups for this parent product
+                                        $optionGroup = $parentProduct->variations
+                                            ->pluck('options')
+                                            ->flatten()
+                                            ->unique('id')
+                                            ->groupBy('attribute_id');
+                                        $attributes = \App\Models\Attribute::find($optionGroup->keys());
+                                    }
+                                @endphp
                                 <tr>
                                     <td>
                                         <img src="{{ asset($product['image']) }}" width="100" height="100"
@@ -238,6 +256,30 @@
                                     <td>
                                         <a
                                             href="{{ route('products.show', $product['slug']) }}">{{ $product['name'] }}</a>
+
+                                        @if($parentProduct && $parentProduct->variations->isNotEmpty() && isset($attributes))
+                                            @foreach ($attributes as $attribute)
+                                                <div class="mt-2 mb-2 form-group product__option">
+                                                    <label class="product__option-label">{{ $attribute->name }}</label>
+                                                    <div class="input-radio-label">
+                                                        <div class="input-radio-label__list">
+                                                            @foreach ($optionGroup[$attribute->id] as $option)
+                                                                <label>
+                                                                    <input type="radio"
+                                                                        name="selected_product_{{ $product['id'] }}_attribute_{{ $attribute->id }}"
+                                                                        wire:change="updateSelectedProductVariation({{ $product['id'] }}, {{ $attribute->id }}, {{ $option->id }})"
+                                                                        value="{{ $option->id }}"
+                                                                        class="option-picker"
+                                                                        @checked(isset($options[$parentId][$attribute->id]) && $options[$parentId][$attribute->id] == $option->id)
+                                                                        @disabled(isReseller() && !is_null($order->source_id))>
+                                                                    <span>{{ $option->name }}</span>
+                                                                </label>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
 
                                         <div class="mt-2 d-flex flex-column">
                                             @if(isOninda() && config('app.resell'))
