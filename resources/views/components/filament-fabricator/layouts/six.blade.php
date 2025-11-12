@@ -604,13 +604,10 @@
         media='all' />
     <link rel='stylesheet' id='elementor-post-22-css'
         href='{{ asset('assets/isolatefashionsbd.com/wp-content/uploads/elementor/css/post-22.css?ver=1762689002') }}' media='all' />
-    <link rel='stylesheet' id='elementor-post-120-css' href='{{ asset('
-        assets/demo.orioit.com/wp-content/uploads/elementor/css/post-120.css?ver=1736887944') }}' media='all' />
-    <link rel='stylesheet' id='wcf-checkout-template-css' href='{{ asset('
-        assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/checkout-template.css?ver=2.0.12') }}' media='all' />
+    <link rel='stylesheet' id='elementor-post-120-css' href='{{ asset('assets/demo.orioit.com/wp-content/uploads/elementor/css/post-120.css?ver=1736887944') }}' media='all' />
+    <link rel='stylesheet' id='wcf-checkout-template-css' href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/checkout-template.css?ver=2.0.12') }}' media='all' />
 
-    <link rel='stylesheet' id='wcf-pro-checkout-css' href='{{ asset('
-        assets/demo.orioit.com/wp-content/plugins/cartflows-pro/assets/css/checkout-styles.css?ver=2.0.10') }}'
+    <link rel='stylesheet' id='wcf-pro-checkout-css' href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows-pro/assets/css/checkout-styles.css?ver=2.0.10') }}'
         media='all' />
     <link rel='stylesheet' id='widget-heading-css'
         href='{{ asset('assets/isolatefashionsbd.com/wp-content/plugins/elementor/assets/css/widget-heading.min.css?ver=3.32.2') }}'
