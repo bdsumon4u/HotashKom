@@ -114,9 +114,20 @@
                         </div>
                         <div class="mt-2 xzoom-thumbs d-flex">
                             <a href="{{ asset($product->base_image->src) }}"><img data-detail="{{ route('products.show', $product) }}" class="xzoom-gallery product-base__image" width="80" src="{{ asset($product->base_image->src) }}"  xpreview="{{ asset($product->base_image->src) }}"></a>
-                            @foreach($product->additional_images as $image)
-                                <a href="{{ asset($image->src) }}">
-                                    <img class="xzoom-gallery" width="80" src="{{ asset($image->src) }}">
+                            @php
+                                // Collect all variant base images
+                                $variantImages = $product->variations->pluck('base_image')->filter();
+
+                                // Merge variant images with additional images and get unique ones
+                                $allImages = $product->additional_images->merge($variantImages)->unique('id');
+                            @endphp
+                            @foreach($allImages as $image)
+                                @php
+                                    // Check if this image belongs to any variant
+                                    $variantId = $product->variations->first(fn($v) => $v->base_image && $v->base_image->id === $image->id)?->id;
+                                @endphp
+                                <a href="{{ asset($image->src) }}" @if($variantId) class="variant-image-link" data-variant-id="{{ $variantId }}" @endif>
+                                    <img class="xzoom-gallery @if($variantId) variant-image @endif" width="80" src="{{ asset($image->src) }}" @if($variantId) data-variant-id="{{ $variantId }}" @endif>
                                 </a>
                             @endforeach
                         </div>
@@ -226,44 +237,79 @@
         $(document).ready(function () {
             let activeG = 0;
             let lastG = 0;
-            $('.zoom-control.left').click(function () {
+            let autoNavigationTimer = null;
+
+            // Function to update active gallery index
+            function updateActiveIndex() {
                 let gallery = $('.xzoom-gallery');
                 gallery.each(function (g, e) {
                     if ($(e).hasClass('xactive')) {
                         activeG = g;
                     }
                     lastG = g;
-                })
-                const prev = activeG === 0 ? lastG : (activeG - 1);
-                gallery.eq(prev).trigger('click');
-            });
-            $('.zoom-control.right').click(function () {
+                });
+            }
+
+            // Function to navigate to next image
+            function navigateToNext() {
+                updateActiveIndex();
                 let gallery = $('.xzoom-gallery');
-                gallery.each(function (g, e) {
-                    if ($(e).hasClass('xactive')) {
-                        activeG = g;
-                    }
-                    lastG = g;
-                })
                 const next = activeG === lastG ? 0 : (activeG + 1);
                 gallery.eq(next).trigger('click');
+            }
+
+            // Function to reset auto navigation timer
+            function resetAutoNavigation() {
+                if (autoNavigationTimer) {
+                    clearInterval(autoNavigationTimer);
+                }
+                autoNavigationTimer = setInterval(() => {
+                    navigateToNext();
+                }, 3000);
+            }
+
+            // Listen for variant change event from Livewire
+            Livewire.on('variantChanged', (event) => {
+                const variantId = event.variantId;
+                const variantImageSrc = event.variantImageSrc;
+
+                // Navigate to the variant's base image if exists
+                if (variantImageSrc) {
+                    const variantImage = $('.variant-image[data-variant-id="' + variantId + '"]');
+
+                    if (variantImage.length > 0) {
+                        // Reset auto navigation to prevent immediate jump
+                        resetAutoNavigation();
+
+                        // Trigger click on the variant image to display it in xzoom
+                        setTimeout(() => {
+                            variantImage.trigger('click');
+                            updateActiveIndex();
+                        }, 100);
+                    }
+                }
             });
 
-            // Automatic navigation logic inside setInterval
-            setInterval(() => {
+            $('.zoom-control.left').click(function () {
+                updateActiveIndex();
                 let gallery = $('.xzoom-gallery');
-                gallery.each(function (g, e) {
-                    if ($(e).hasClass('xactive')) {
-                        activeG = g; // Find the active image index
-                    }
-                    lastG = g; // Find the last image index
-                });
-                const next = activeG === lastG ? 0 : (activeG + 1); // Calculate next index
-                gallery.removeClass('xactive'); // Remove active class from all
-                gallery.eq(next).addClass('xactive'); // Add active class to the next image
+                const prev = activeG === 0 ? lastG : (activeG - 1);
+                gallery.eq(prev).trigger('click');
+                resetAutoNavigation();
+            });
 
-                $('img.xzoom').attr('src', gallery.eq(next).attr('src'));
-            }, 3000);
+            $('.zoom-control.right').click(function () {
+                navigateToNext();
+                resetAutoNavigation();
+            });
+
+            // Handle manual image clicks
+            $('.xzoom-gallery').on('click', function() {
+                resetAutoNavigation();
+            });
+
+            // Start automatic navigation
+            resetAutoNavigation();
         });
     </script>
 @endpush

@@ -266,6 +266,28 @@
                                                         <x-error field="variations.{{$loop->index}}.stock_count" />
                                                     </div>
                                                 </div>
+                                                @php
+                                                    $hasColorOption = $variation->options->contains(fn($option) => strtolower($option->attribute->name) === 'color');
+                                                @endphp
+                                                @if($hasColorOption)
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label for="variant-image-{{$variation->id}}" class="mb-0 d-block">
+                                                            <strong>Variant Image</strong>
+                                                            <button type="button" class="px-2 btn single btn-light" data-toggle="modal" data-target="#variant-single-picker-{{$variation->id}}" style="background: transparent; margin-left: 5px;">
+                                                                <i class="mr-1 fa fa-image text-secondary"></i>
+                                                                <span>Browse</span>
+                                                            </button>
+                                                        </label>
+                                                        <div id="variant-preview-{{$variation->id}}" class="variant-image-preview @unless($variation->base_image) d-none @endunless" style="height: 100px; width: 100px; margin: 5px; margin-left: 0px;">
+                                                            @if($variation->base_image)
+                                                            <img src="{{ asset($variation->base_image->src) }}" alt="Variant Image" data-toggle="modal" data-target="#variant-single-picker-{{$variation->id}}" class="img-thumbnail img-responsive" style="cursor: pointer;">
+                                                            @endif
+                                                            <input type="hidden" name="variations[{{$loop->index}}][base_image_id]" value="{{ $variation->base_image->id ?? '' }}" class="variant-base-image-id">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -288,6 +310,19 @@
 
 @include('admin.images.single-picker', ['selected' => old('base_image', optional($product->base_image)->id)])
 @include('admin.images.multi-picker', ['selected' => old('additional_images', $product->additional_images->pluck('id')->toArray())])
+
+@foreach ($product->variations as $variation)
+    @php
+        $hasColorOption = $variation->options->contains(fn($option) => strtolower($option->attribute->name) === 'color');
+    @endphp
+    @if($hasColorOption)
+        @include('admin.images.variant-single-picker', [
+            'variationId' => $variation->id,
+            'variationIndex' => $loop->index,
+            'selected' => optional($variation->base_image)->id ?? 0
+        ])
+    @endif
+@endforeach
 @endsection
 
 @push('js')

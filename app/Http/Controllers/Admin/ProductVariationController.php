@@ -169,6 +169,7 @@ class ProductVariationController extends Controller
             'variations.*.sku' => ['required', 'string'],
             'variations.*.should_track' => ['required', 'boolean'],
             'variations.*.stock_count' => ['required', 'numeric', 'min:0'],
+            'variations.*.base_image_id' => ['nullable', 'exists:images,id'],
             'variations.*.wholesale.quantity' => ['sometimes', 'array'],
             'variations.*.wholesale.price' => ['sometimes', 'array'],
             'variations.*.wholesale.quantity.*' => ['required', 'integer', 'gt:1'],
@@ -208,6 +209,13 @@ class ProductVariationController extends Controller
                 }
 
                 $variation->update($updateData);
+
+                // Handle base image for variant
+                if (isset($variationData['base_image_id']) && ! empty($variationData['base_image_id'])) {
+                    $variation->images()->sync([
+                        $variationData['base_image_id'] => ['img_type' => 'base', 'order' => 0],
+                    ]);
+                }
             }
         });
 

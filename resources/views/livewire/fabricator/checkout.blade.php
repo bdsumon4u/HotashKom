@@ -86,7 +86,7 @@
                                                                 নাম&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label><span
                                                                 class="woocommerce-input-wrapper"><input type="text"
-                                                                    wire:model="name" class="input-text "
+                                                                    wire:model="name" class="input-text"
                                                                     name="billing_first_name" id="billing_first_name"
                                                                     placeholder="" value="" aria-required="true"
                                                                     autocomplete="given-name" />
@@ -99,7 +99,7 @@
                                                                 for="billing_address_1" class="">Shipping&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label><div
                                                                 class="woocommerce-input-wrapper">
-                                                                
+
 
                                                                 <ul id="shipping_method"
                                                                     style="border: 1px solid var( --wcf-field-border-color ); display: flex; column-gap: 1rem; padding: .5rem;"
@@ -139,7 +139,7 @@
                                                                                 </bdi></strong></label>
                                                                     </li>
                                                                 </ul>
-                                                                
+
                                                                 <div
                                                                     class="wcf-field-required-error">{{ $errors->first('address') }}</div>
                                                             </div>
@@ -150,7 +150,7 @@
                                                                 ঠিকানা&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label><span
                                                                 class="woocommerce-input-wrapper"><input type="text"
-                                                                    wire:model="address" class="input-text "
+                                                                    wire:model="address" class="input-text"
                                                                     name="billing_address_1" id="billing_address_1"
                                                                     placeholder="House number and street name"
                                                                     value="" aria-required="true"
@@ -166,7 +166,7 @@
                                                                     title="required">*</abbr></label><span
                                                                 class="woocommerce-input-wrapper"><input
                                                                     type="tel" wire:model="phone"
-                                                                    class="input-text " name="billing_phone"
+                                                                    class="input-text" name="billing_phone"
                                                                     id="billing_phone" placeholder=""
                                                                     value="{{ setting('show_option')->hide_phone_prefix ?? false ? '' : '+880' }}"
                                                                     aria-required="true" autocomplete="tel" />
@@ -183,75 +183,7 @@
                                         </div>
 
 
-                                        <div style="margin-top: 0"
-                                            class="wcf-product-option-wrap wcf-yp-skin-cards wcf-product-option-after-customer">
-                                            <h3 id="your_products_heading" style="margin-bottom: .25rem;"> Your
-                                                Products </h3>
-                                            <div class="wcf-qty-options">
-                                                @foreach ($product->variations->isEmpty() ? [$product] : $product->variations as $product)
-                                                    <div class="wcf-qty-row wcf-qty-row-452 "
-                                                        data-options="{&quot;product_id&quot;:440,&quot;variation_id&quot;:452,&quot;type&quot;:&quot;variation&quot;,&quot;unique_id&quot;:&quot;zwr6yipq&quot;,&quot;mode&quot;:&quot;quantity&quot;,&quot;highlight_text&quot;:&quot;&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;default_quantity&quot;:1,&quot;original_price&quot;:&quot;200&quot;,&quot;discounted_price&quot;:&quot;&quot;,&quot;total_discounted_price&quot;:&quot;&quot;,&quot;currency&quot;:&quot;&amp;#2547;&amp;nbsp;&quot;,&quot;cart_item_key&quot;:&quot;4606109fe00ffd19b2a98941e90aaaa8&quot;,&quot;save_value&quot;:&quot;&quot;,&quot;save_percent&quot;:&quot;&quot;,&quot;sign_up_fee&quot;:0,&quot;subscription_price&quot;:&quot;200&quot;,&quot;trial_period_string&quot;:&quot;&quot;}">
-                                                        <div class="wcf-item">
-                                                            <div class="wcf-item-selector wcf-item-multiple-sel">
-                                                                <input class="wcf-multiple-sel" type="checkbox"
-                                                                    @if ($row = cart()->content()->first(fn ($item) => $item->id == $product->id))
-                                                                        wire:click="remove('{{ $row->rowId }}')"
-                                                                        checked
-                                                                    @else
-                                                                        wire:click="increaseQuantity({{ $product->id }})"
-                                                                    @endif
-                                                                    name="wcf-multiple-sel"
-                                                                    value="{{ $product->id }}"
-                                                                >
-                                                            </div>
 
-                                                            <div class="wcf-item-image" style=""><img
-                                                                    fetchpriority="high" decoding="async"
-                                                                    width="300" height="300"
-                                                                    src="{{ $product->base_image->src }}"
-                                                                    class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
-                                                                    alt="" /></div>
-                                                            <div class="wcf-item-content-options">
-                                                                <div class="wcf-item-wrap">
-                                                                    <span
-                                                                        class="wcf-display-title">{{ $product->name }}</span><span
-                                                                        class="wcf-display-title-quantity">
-                                                                        <div class="wcf-display-attributes"><span
-                                                                                class="wcf-att-inner">Price: Tk
-                                                                                {{ $prc = $row->price ?? $product->selling_price }}</span>
-                                                                        </div>
-                                                                </div>
-
-                                                                <div class="wcf-qty ">
-                                                                    <div class="wcf-qty-selection-wrap">
-                                                                        <span
-                                                                            class="wcf-qty-selection-btn wcf-qty-decrement wcf-qty-change-icon"
-                                                                            title=""
-                                                                            wire:click="decreaseQuantity({{ $product->id }})">&minus;</span>
-                                                                        <input autocomplete="off" type="number"
-                                                                            value="{{ $qty = $row->qty ?? 0 }}"
-                                                                            step="1" name="wcf_qty_selection"
-                                                                            class="wcf-qty-selection"
-                                                                            data-sale-limit="false" title="">
-                                                                        <span
-                                                                            class="wcf-qty-selection-btn wcf-qty-increment wcf-qty-change-icon"
-                                                                            title=""
-                                                                            wire:click="increaseQuantity({{ $product->id }})">&plus;</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="wcf-price">
-                                                                    <div class="wcf-display-price wcf-field-label">
-                                                                        <span
-                                                                            class="woocommerce-Price-amount amount"><span
-                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $qty * $prc }}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
 
 
                                         <div class='wcf-order-wrap'>
@@ -378,6 +310,71 @@
 
 
                                         </div>
+
+                                        <div style="margin: 0; padding: 0; width: 100%;" class="wcf-product-option-wrap wcf-yp-skin-cards wcf-product-option-after-customer">
+                                            <h3 id="your_products_heading" style="margin-bottom: .25rem;"> Your
+                                                Products </h3>
+                                            <div class="wcf-qty-options" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+                                                @foreach ($product->variations->isEmpty() ? [$product] : $product->variations as $product)
+                                                <div class="wcf-qty-row wcf-qty-row-452"
+                                                    data-options="{&quot;product_id&quot;:440,&quot;variation_id&quot;:452,&quot;type&quot;:&quot;variation&quot;,&quot;unique_id&quot;:&quot;zwr6yipq&quot;,&quot;mode&quot;:&quot;quantity&quot;,&quot;highlight_text&quot;:&quot;&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;default_quantity&quot;:1,&quot;original_price&quot;:&quot;200&quot;,&quot;discounted_price&quot;:&quot;&quot;,&quot;total_discounted_price&quot;:&quot;&quot;,&quot;currency&quot;:&quot;&amp;#2547;&amp;nbsp;&quot;,&quot;cart_item_key&quot;:&quot;4606109fe00ffd19b2a98941e90aaaa8&quot;,&quot;save_value&quot;:&quot;&quot;,&quot;save_percent&quot;:&quot;&quot;,&quot;sign_up_fee&quot;:0,&quot;subscription_price&quot;:&quot;200&quot;,&quot;trial_period_string&quot;:&quot;&quot;}">
+                                                    <div class="wcf-item">
+                                                        <div class="wcf-item-selector wcf-item-multiple-sel">
+                                                            <input class="wcf-multiple-sel" type="checkbox" @if ($row=cart()->content()->first(fn ($item) =>
+                                                            $item->id == $product->id))
+                                                            wire:click="remove('{{ $row->rowId }}')"
+                                                            checked
+                                                            @else
+                                                            wire:click="increaseQuantity({{ $product->id }})"
+                                                            @endif
+                                                            name="wcf-multiple-sel"
+                                                            value="{{ $product->id }}"
+                                                            >
+                                                        </div>
+
+                                                        <div class="wcf-item-image" style=""><img fetchpriority="high" decoding="async" width="300" height="300"
+                                                                src="{{ asset($product->base_image->src) }}"
+                                                                class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail" alt="" /></div>
+                                                        <div class="wcf-item-content-options">
+                                                            <div class="wcf-item-wrap">
+                                                                <span class="wcf-display-title">{{ $product->name }}</span><span
+                                                                    class="wcf-display-title-quantity">
+                                                                    <div class="wcf-display-attributes"><span class="wcf-att-inner">Price: Tk
+                                                                            {{ $prc = $row->price ?? $product->selling_price }}</span>
+                                                                    </div>
+                                                            </div>
+
+                                                            <div class="wcf-qty">
+                                                                <div class="wcf-qty-selection-wrap">
+                                                                    <span class="wcf-qty-selection-btn wcf-qty-decrement wcf-qty-change-icon" title=""
+                                                                        wire:click="decreaseQuantity({{ $product->id }})">&minus;</span>
+                                                                    <input autocomplete="off" type="number" value="{{ $qty = $row->qty ?? 0 }}" step="1"
+                                                                        name="wcf_qty_selection" class="wcf-qty-selection" data-sale-limit="false" title="">
+                                                                    <span class="wcf-qty-selection-btn wcf-qty-increment wcf-qty-change-icon" title=""
+                                                                        wire:click="increaseQuantity({{ $product->id }})">&plus;</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="wcf-price">
+                                                                <div class="wcf-display-price wcf-field-label">
+                                                                    <span class="woocommerce-Price-amount amount"><span
+                                                                            class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $qty * $prc
+                                                                        }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <style>
+                                            @media (min-width: 768px) {
+                                                .wcf-qty-options {
+                                                    grid-template-columns: repeat(2, 1fr) !important;
+                                                }
+                                            }
+                                        </style>
                                     </form>
 
                                 </div>
