@@ -89,6 +89,13 @@
 @endpush
 
 @section('content')
+@php
+    $colorOptions = $product->variations->flatMap(function ($variation) {
+        return $variation->options->filter(function ($option) {
+            return strtolower($option->attribute->name) === 'color';
+        });
+    })->unique('id')->values();
+@endphp
 <div class="mb-5 row">
     @if($errors->any())
     <div class="col-12">
@@ -156,12 +163,61 @@
             </div>
         </div>
 
+        @if($colorOptions->isNotEmpty())
+        <div class="shadow-sm card rounded-0">
+            <div class="px-3 py-2 card-header">
+                <strong>Color Images</strong>
+                <small class="text-muted d-block">Select one image per color. It will be applied to all variations with that color.</small>
+            </div>
+            <div class="p-3 card-body">
+                <div class="row">
+                    @foreach ($colorOptions as $colorOption)
+                    <div class="mb-3 col-md-6">
+                        <div class="p-2 rounded border">
+                            <label class="mb-2 d-block">
+                                <strong>{{ $colorOption->name }}</strong>
+                                <button type="button" class="px-2 btn btn-sm btn-light" data-toggle="modal" data-target="#color-image-picker-{{$colorOption->id}}" style="background: transparent; margin-left: 5px;">
+                                    <i class="mr-1 fa fa-image text-secondary"></i>
+                                    <span>Browse</span>
+                                </button>
+                            </label>
+                            <div id="color-preview-{{$colorOption->id}}" class="color-image-preview" style="min-height: 100px;">
+                                @php
+                                    // Find any variation with this color to get its current image
+                                    $variationWithColor = $product->variations->first(function($v) use ($colorOption) {
+                                        return $v->options->contains('id', $colorOption->id);
+                                    });
+                                    $currentImage = $variationWithColor?->base_image;
+                                @endphp
+                                @if($currentImage)
+                                <img src="{{ asset($currentImage->src) }}" alt="{{ $colorOption->name }}" data-toggle="modal" data-target="#color-image-picker-{{$colorOption->id}}" class="img-thumbnail" style="max-width: 100px; cursor: pointer;">
+                                @else
+                                <p class="text-muted no-image-text">No image selected</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
+
         <div class="shadow-sm card rounded-0">
             <div class="px-3 py-2 card-header">
                 <strong>Variations</strong>
             </div>
             <div class="p-2 card-body">
                 <x-form method="PATCH" action="{{ route('admin.products.variations.bulk-update', $product) }}" id="variations-bulk-form">
+                    @foreach ($colorOptions as $colorOption)
+                    @php
+                        $variationWithColor = $product->variations->first(function($v) use ($colorOption) {
+                            return $v->options->contains('id', $colorOption->id);
+                        });
+                        $currentImage = $variationWithColor?->base_image;
+                    @endphp
+                    <input type="hidden" name="color_images[{{$colorOption->id}}]" value="{{ $currentImage?->id ?? '' }}" class="color-image-input-{{$colorOption->id}}">
+                    @endforeach
                     <div id="variations">
                         @foreach ($product->variations as $variation)
                         <div class="mb-3 shadow-sm card rounded-0">
@@ -266,28 +322,6 @@
                                                         <x-error field="variations.{{$loop->index}}.stock_count" />
                                                     </div>
                                                 </div>
-                                                @php
-                                                    $hasColorOption = $variation->options->contains(fn($option) => strtolower($option->attribute->name) === 'color');
-                                                @endphp
-                                                @if($hasColorOption)
-                                                <div class="col-md-12">
-                                                    <div class="form-group">
-                                                        <label for="variant-image-{{$variation->id}}" class="mb-0 d-block">
-                                                            <strong>Variant Image</strong>
-                                                            <button type="button" class="px-2 btn single btn-light" data-toggle="modal" data-target="#variant-single-picker-{{$variation->id}}" style="background: transparent; margin-left: 5px;">
-                                                                <i class="mr-1 fa fa-image text-secondary"></i>
-                                                                <span>Browse</span>
-                                                            </button>
-                                                        </label>
-                                                        <div id="variant-preview-{{$variation->id}}" class="variant-image-preview @unless($variation->base_image) d-none @endunless" style="height: 100px; width: 100px; margin: 5px; margin-left: 0px;">
-                                                            @if($variation->base_image)
-                                                            <img src="{{ asset($variation->base_image->src) }}" alt="Variant Image" data-toggle="modal" data-target="#variant-single-picker-{{$variation->id}}" class="img-thumbnail img-responsive" style="cursor: pointer;">
-                                                            @endif
-                                                            <input type="hidden" name="variations[{{$loop->index}}][base_image_id]" value="{{ $variation->base_image->id ?? '' }}" class="variant-base-image-id">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -296,7 +330,7 @@
                         </div>
                         @endforeach
                     </div>
-                    <div class="text-center mt-3">
+                    <div class="mt-3 text-center">
                         <button type="submit" class="btn btn-success">
                             <i class="fas fa-save"></i> Save All Variations
                         </button>
@@ -311,17 +345,18 @@
 @include('admin.images.single-picker', ['selected' => old('base_image', optional($product->base_image)->id)])
 @include('admin.images.multi-picker', ['selected' => old('additional_images', $product->additional_images->pluck('id')->toArray())])
 
-@foreach ($product->variations as $variation)
+@foreach ($colorOptions as $colorOption)
     @php
-        $hasColorOption = $variation->options->contains(fn($option) => strtolower($option->attribute->name) === 'color');
+        $variationWithColor = $product->variations->first(function($v) use ($colorOption) {
+            return $v->options->contains('id', $colorOption->id);
+        });
+        $currentImage = $variationWithColor?->base_image;
     @endphp
-    @if($hasColorOption)
-        @include('admin.images.variant-single-picker', [
-            'variationId' => $variation->id,
-            'variationIndex' => $loop->index,
-            'selected' => optional($variation->base_image)->id ?? 0
-        ])
-    @endif
+    @include('admin.images.color-image-picker', [
+        'colorOptionId' => $colorOption->id,
+        'colorOptionName' => $colorOption->name,
+        'selected' => $currentImage?->id ?? 0
+    ])
 @endforeach
 @endsection
 

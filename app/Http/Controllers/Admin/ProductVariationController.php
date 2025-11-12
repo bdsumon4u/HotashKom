@@ -161,7 +161,10 @@ class ProductVariationController extends Controller
             }
         }
 
-        $validator = Validator::make(['variations' => $variations], [
+        $validator = Validator::make([
+            'variations' => $variations,
+            'color_images' => $request->get('color_images', []),
+        ], [
             'variations.*.id' => ['required', 'exists:products,id'],
             'variations.*.price' => ['required', 'numeric', 'min:0'],
             'variations.*.selling_price' => ['required', 'numeric', 'min:0'],
@@ -169,18 +172,19 @@ class ProductVariationController extends Controller
             'variations.*.sku' => ['required', 'string'],
             'variations.*.should_track' => ['required', 'boolean'],
             'variations.*.stock_count' => ['required', 'numeric', 'min:0'],
-            'variations.*.base_image_id' => ['nullable', 'exists:images,id'],
             'variations.*.wholesale.quantity' => ['sometimes', 'array'],
             'variations.*.wholesale.price' => ['sometimes', 'array'],
             'variations.*.wholesale.quantity.*' => ['required', 'integer', 'gt:1'],
             'variations.*.wholesale.price.*' => ['required', 'integer', 'min:1'],
+            'color_images' => ['sometimes', 'array'],
+            'color_images.*' => ['nullable', 'exists:images,id'],
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        DB::transaction(function () use ($variations, $product): void {
+        DB::transaction(function () use ($variations, $product, $request): void {
             foreach ($variations as $variationData) {
                 $variation = $product->variations()->findOrFail($variationData['id']);
 
@@ -209,12 +213,25 @@ class ProductVariationController extends Controller
                 }
 
                 $variation->update($updateData);
+            }
 
-                // Handle base image for variant
-                if (isset($variationData['base_image_id']) && ! empty($variationData['base_image_id'])) {
-                    $variation->images()->sync([
-                        $variationData['base_image_id'] => ['img_type' => 'base', 'order' => 0],
-                    ]);
+            // Handle color images - apply one image to all variations with that color
+            $colorImages = $request->get('color_images', []);
+            foreach ($colorImages as $optionId => $imageId) {
+                if ($imageId) {
+                    // Find all variations of this product that have this color option
+                    $variationsWithColor = $product->variations()
+                        ->whereHas('options', function ($query) use ($optionId): void {
+                            $query->where('options.id', $optionId);
+                        })
+                        ->get();
+
+                    // Set the base image for each variation with this color
+                    foreach ($variationsWithColor as $variation) {
+                        $variation->images()->sync([
+                            $imageId => ['img_type' => 'base', 'order' => 0],
+                        ]);
+                    }
                 }
             }
         });
