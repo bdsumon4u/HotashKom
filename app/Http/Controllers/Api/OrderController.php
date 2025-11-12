@@ -40,7 +40,7 @@ class OrderController extends Controller
             $orders->where('orders.status', $request->status);
         }
 
-        if ($request->staff_id && !(setting('show_option')->show_others_orders ?? false)) {
+        if ($request->staff_id && ! (setting('show_option')->show_others_orders ?? false)) {
             $orders->where('orders.admin_id', $request->staff_id);
         }
 
@@ -129,7 +129,17 @@ class OrderController extends Controller
             ->editColumn('products', function ($row) {
                 $products = '<ul style="list-style: none; padding-left: 1rem;">';
                 foreach ((array) ($row->products) ?? [] as $product) {
-                    $products .= "<li>{$product->quantity} x <a class='text-underline' href='".route('products.show', $product->slug)."' target='_blank'>{$product->name}</a></li>";
+                    $imageUrl = $product->image ?? '';
+                    if ($imageUrl) {
+                        // Handle both relative paths and full URLs
+                        $imageSrc = (str_starts_with($imageUrl, 'http://') || str_starts_with($imageUrl, 'https://'))
+                            ? $imageUrl
+                            : asset($imageUrl);
+                        $imageHtml = "<img src='{$imageSrc}' alt='{$product->name}' style='width: 40px; height: 40px; object-fit: cover; margin-left: 4px; margin-right: 8px; vertical-align: middle; border-radius: 4px;' />";
+                    } else {
+                        $imageHtml = '';
+                    }
+                    $products .= "<li style='margin-bottom: 12px;'><div style='display: flex; align-items: center; margin-bottom: 4px;'>{$product->quantity} x {$imageHtml}</div><div><a class='text-underline' href='".route('products.show', $product->slug)."' target='_blank'>{$product->name}</a></div></li>";
                 }
 
                 return $products.'</ul>';
