@@ -123,11 +123,15 @@
                             @endphp
                             @foreach($allImages as $image)
                                 @php
-                                    // Check if this image belongs to any variant
-                                    $variantId = $product->variations->first(fn($v) => $v->base_image && $v->base_image->id === $image->id)?->id;
+                                    // Find all variants that have this image (same image can belong to multiple variants)
+                                    $variantIds = $product->variations
+                                        ->filter(fn($v) => $v->base_image && $v->base_image->id === $image->id)
+                                        ->pluck('id')
+                                        ->toArray();
+                                    $hasVariants = !empty($variantIds);
                                 @endphp
-                                <a href="{{ asset($image->src) }}" @if($variantId) class="variant-image-link" data-variant-id="{{ $variantId }}" @endif>
-                                    <img class="xzoom-gallery @if($variantId) variant-image @endif" width="80" src="{{ asset($image->src) }}" @if($variantId) data-variant-id="{{ $variantId }}" @endif>
+                                <a href="{{ asset($image->src) }}" @if($hasVariants) class="variant-image-link" data-variant-ids="{{ json_encode($variantIds) }}" @endif>
+                                    <img class="xzoom-gallery @if($hasVariants) variant-image @endif" width="80" src="{{ asset($image->src) }}" @if($hasVariants) data-variant-ids="{{ json_encode($variantIds) }}" @endif>
                                 </a>
                             @endforeach
                         </div>
@@ -275,9 +279,17 @@
 
                 // Navigate to the variant's base image if exists
                 if (variantImageSrc) {
-                    const variantImage = $('.variant-image[data-variant-id="' + variantId + '"]');
+                    // Find image that belongs to this variant (check if variant ID is in the array)
+                    let variantImage = null;
+                    $('.variant-image').each(function() {
+                        const variantIds = $(this).data('variant-ids');
+                        if (variantIds && Array.isArray(variantIds) && variantIds.includes(variantId)) {
+                            variantImage = $(this);
+                            return false; // break the loop
+                        }
+                    });
 
-                    if (variantImage.length > 0) {
+                    if (variantImage && variantImage.length > 0) {
                         // Reset auto navigation to prevent immediate jump
                         resetAutoNavigation();
 
