@@ -43,6 +43,8 @@ class Checkout extends \App\Livewire\Checkout
     #[\Override]
     public function render()
     {
+        $this->cartUpdated();
+
         return view('livewire.fabricator.checkout');
     }
 }
