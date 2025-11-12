@@ -19,7 +19,20 @@
                     <div class="elementor-widget-container">
                         <div class="elementor-image-carousel-wrapper swiper" dir="ltr">
                             <div class="elementor-image-carousel swiper-wrapper" aria-live="off">
-                                @foreach($images ?: $page->product->additional_images->map->src as $image)
+                                @php
+                                    // If $images is empty, prepend base image, add additional images, append variant base images, keep unique
+                                    // Otherwise, use $images directly
+                                    if (empty($images)) {
+                                        $baseImage = $page->product->base_image ? collect([$page->product->base_image]) : collect();
+                                        $additionalImages = $page->product->additional_images ?? collect();
+                                        $variantImages = $page->product->variations->pluck('base_image')->filter();
+                                        $allImages = $baseImage->merge($additionalImages)->merge($variantImages)->unique('id');
+                                        $imageList = $allImages->map(fn($img) => $img->src ?? $img)->values();
+                                    } else {
+                                        $imageList = is_array($images) ? $images : collect($images);
+                                    }
+                                @endphp
+                                @foreach($imageList as $image)
                                 <div class="swiper-slide" role="group" aria-roledescription="slide">
                                     <figure class="swiper-slide-inner"><img class="swiper-slide-image swiper-lazy"
                                             data-src="{{Str::isUrl($image) ? $image : asset('storage/'.$image)}}" />
