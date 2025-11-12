@@ -16,7 +16,7 @@ class HomeSection extends Model
     public static function booted(): void
     {
         static::deleted(function (): void {
-            cache()->memo()->forget('homesections');
+            cacheMemo()->forget('homesections');
         });
     }
 

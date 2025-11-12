@@ -19,7 +19,7 @@ class ApiController extends Controller
 {
     public function menus()
     {
-        return cache()->memo()->remember('menus', now()->addMinute(), fn () => Menu::all()->mapWithKeys(fn ($menu): array => [$menu->slug => $menu->menuItems]));
+        return cacheMemo()->remember('menus', now()->addMinute(), fn () => Menu::all()->mapWithKeys(fn ($menu): array => [$menu->slug => $menu->menuItems]));
     }
 
     public function searchSuggestions(Request $request)
@@ -264,7 +264,7 @@ class ApiController extends Controller
             'delivery_text', 'products_page', 'delivery_charge',
         ]));
 
-        // return cache()->memo()->remember('settings:'.implode(';', $keys), now()->addMinute(), function () use ($keys) {
+        // return cacheMemo()->remember('settings:'.implode(';', $keys), now()->addMinute(), function () use ($keys) {
         return Setting::whereIn('name', $keys)->get(['name', 'value'])->pluck('value', 'name');
         // });
     }

@@ -96,7 +96,7 @@ class HomeController extends Controller
         $lowStockProducts = Product::whereShouldTrack(1)->where('stock_count', '<', 10)->get();
 
         // Get total pending withdrawal amount
-        $pendingWithdrawalAmount = cache()->memo()->remember('pending_withdrawal_amount', 300, fn (): float|int => abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
+        $pendingWithdrawalAmount = cacheMemo()->remember('pending_withdrawal_amount', 300, fn (): float|int => abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
             ->where('confirmed', false)
             ->sum('amount')));
 

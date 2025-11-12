@@ -285,10 +285,10 @@ class Checkout extends Component
         $fraud = setting('fraud');
 
         if (
-            Cache::memo()->get('fraud:hourly:'.request()->ip()) >= ($fraud->allow_per_hour ?? 3)
-            || Cache::memo()->get('fraud:hourly:'.$data['phone']) >= ($fraud->allow_per_hour ?? 3)
-            || Cache::memo()->get('fraud:daily:'.request()->ip()) >= ($fraud->allow_per_day ?? 7)
-            || Cache::memo()->get('fraud:daily:'.$data['phone']) >= ($fraud->allow_per_day ?? 7)
+            cacheMemo()->get('fraud:hourly:'.request()->ip()) >= ($fraud->allow_per_hour ?? 3)
+            || cacheMemo()->get('fraud:hourly:'.$data['phone']) >= ($fraud->allow_per_hour ?? 3)
+            || cacheMemo()->get('fraud:daily:'.request()->ip()) >= ($fraud->allow_per_day ?? 7)
+            || cacheMemo()->get('fraud:daily:'.$data['phone']) >= ($fraud->allow_per_day ?? 7)
         ) {
             return back()->with('error', 'প্রিয় গ্রাহক, আরও অর্ডার করতে চাইলে আমাদের হেল্প লাইন '.setting('company')->phone.' নাম্বারে কল দিয়ে সরাসরি কথা বলুন।');
         }

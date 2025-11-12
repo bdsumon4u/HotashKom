@@ -417,7 +417,7 @@ class Order extends Model
         }
 
         $exception = false;
-        $cityList = cache()->memo()->remember('pathao_cities', now()->addDay(), function () use (&$exception) {
+        $cityList = cacheMemo()->remember('pathao_cities', now()->addDay(), function () use (&$exception) {
             try {
                 return Pathao::area()->city()->data;
             } catch (\Exception) {
@@ -428,7 +428,7 @@ class Order extends Model
         });
 
         if ($exception) {
-            cache()->memo()->forget('pathao_cities');
+            cacheMemo()->forget('pathao_cities');
         }
 
         return $cityList;
@@ -445,7 +445,7 @@ class Order extends Model
         $cityId ??= $this->data['city_id'] ?? false;
         if ($cityId) {
 
-            $areaList = cache()->memo()->remember('pathao_areas:'.$cityId, now()->addDay(), function () use (&$exception, &$cityId) {
+            $areaList = cacheMemo()->remember('pathao_areas:'.$cityId, now()->addDay(), function () use (&$exception, &$cityId) {
                 try {
                     return Pathao::area()->zone($cityId)->data;
                 } catch (\Exception) {
@@ -457,7 +457,7 @@ class Order extends Model
         }
 
         if ($exception) {
-            cache()->memo()->forget('pathao_areas:'.$cityId);
+            cacheMemo()->forget('pathao_areas:'.$cityId);
         }
 
         return $areaList;
@@ -471,7 +471,7 @@ class Order extends Model
 
         $areaList = [];
         $exception = false;
-        $areaList = cache()->memo()->remember('redx_areas', now()->addDay(), function () use (&$exception) {
+        $areaList = cacheMemo()->remember('redx_areas', now()->addDay(), function () use (&$exception) {
             try {
                 return Redx::area()->list()->areas;
             } catch (\Exception) {
@@ -482,7 +482,7 @@ class Order extends Model
         });
 
         if ($exception) {
-            cache()->memo()->forget('redx_areas');
+            cacheMemo()->forget('redx_areas');
         }
 
         return $areaList;

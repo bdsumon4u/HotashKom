@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Notifications\User\OrderPlaced;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class OrderTrackController extends Controller
@@ -76,7 +75,7 @@ class OrderTrackController extends Controller
             return back()->withDanger('Order is already confirmed.');
         }
         if ($request->get('action') === 'resend') {
-            if (Cache::memo()->get('order:confirm:'.$order->id)) {
+            if (cacheMemo()->get('order:confirm:'.$order->id)) {
                 return back()->withSuccess('Please wait for the confirmation code');
             } else {
                 $order->user->notify(new OrderPlaced($order));
@@ -85,7 +84,7 @@ class OrderTrackController extends Controller
             }
         }
         if ($request->get('action') === 'confirm') {
-            if (Cache::memo()->get('order:confirm:'.$order->id) == $request->get('code')) {
+            if (cacheMemo()->get('order:confirm:'.$order->id) == $request->get('code')) {
                 $order->update(['status' => data_get(config('app.orders'), 0, 'PROCESSING')]);
 
                 return back()->withSuccess('Your order has been confirmed');

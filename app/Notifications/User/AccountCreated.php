@@ -6,7 +6,6 @@ use App\Notifications\SMSChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Cache;
 
 use function url;
 
@@ -55,7 +54,7 @@ class AccountCreated extends Notification
      */
     public function toArray($notifiable): array
     {
-        $otp = Cache::memo()->remember('auth:'.$notifiable->phone_number, /* 86400 */ 2 * 60, fn (): int => mt_rand(1000, 999999));
+        $otp = cacheMemo()->remember('auth:'.$notifiable->phone_number, /* 86400 */ 2 * 60, fn (): int => mt_rand(1000, 999999));
 
         return [
             'msg' => 'Dear '.$notifiable->name.', an account has been created for you at '.config('app.name').'. You can login using your phone number. Your access token is '.$otp.'.',

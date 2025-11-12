@@ -23,7 +23,7 @@ class HomeSectionController extends Controller
             $orders = request('orders');
             DB::statement('UPDATE home_sections SET `order` = CASE id '.implode(' ', array_map(fn ($id): string => "WHEN $id THEN $orders[$id] ", array_keys($orders))).'END');
 
-            cache()->memo()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
+            cacheMemo()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
 
             return response()->json(['message' => 'Sections Have Been Reordered.']);
         }
@@ -70,7 +70,7 @@ class HomeSectionController extends Controller
         if ($categories) {
             $homeSection->categories()->sync($categories);
         }
-        cache()->memo()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
+        cacheMemo()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
 
         return to_route('admin.home-sections.edit', $homeSection)->with('success', 'Section Has Been Created.');
     }
@@ -118,7 +118,7 @@ class HomeSectionController extends Controller
         $categories = Arr::pull($data, 'categories');
         $homeSection->update($data);
         $homeSection->categories()->sync($categories);
-        cache()->memo()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
+        cacheMemo()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
 
         return to_route('admin.home-sections.index')->with('success', 'Section Has Been Updated.');
     }

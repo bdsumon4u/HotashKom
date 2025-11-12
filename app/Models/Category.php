@@ -14,9 +14,9 @@ class Category extends Model
     public static function booted(): void
     {
         static::saved(function ($category): void {
-            cache()->memo()->forget('categories:nested:');
-            cache()->memo()->forget('categories:nested:1');
-            cache()->memo()->forget('homesections');
+            cacheMemo()->forget('categories:nested:');
+            cacheMemo()->forget('categories:nested:1');
+            cacheMemo()->forget('homesections');
 
             // Dispatch job to copy category to reseller databases
             if (isOninda() && $category->wasRecentlyCreated) {
@@ -35,9 +35,9 @@ class Category extends Model
         });
 
         static::deleted(function ($category): void {
-            cache()->memo()->forget('categories:nested:');
-            cache()->memo()->forget('categories:nested:1');
-            cache()->memo()->forget('homesections');
+            cacheMemo()->forget('categories:nested:');
+            cacheMemo()->forget('categories:nested:1');
+            cacheMemo()->forget('homesections');
         });
     }
 
@@ -71,7 +71,7 @@ class Category extends Model
             return $query->get();
         }
 
-        return cache()->memo()->rememberForever('categories:nested:'.$enabledOnly, fn () => $query->get());
+        return cacheMemo()->rememberForever('categories:nested:'.$enabledOnly, fn () => $query->get());
     }
 
     public function products()

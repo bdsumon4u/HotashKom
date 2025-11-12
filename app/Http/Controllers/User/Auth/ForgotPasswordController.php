@@ -67,14 +67,14 @@ class ForgotPasswordController extends Controller
 
         // Store OTP in cache with expiration time (1 hour)
         $otpKey = 'password_reset_otp_'.$request->phone;
-        Cache::memo()->put($otpKey, $otp, now()->addHour());
+        cacheMemo()->put($otpKey, $otp, now()->addHour());
 
         // Send OTP via SMS
         $user->notify(new SendOTP($otp));
 
         // Generate a token for password reset form
         $token = Str::random(60);
-        Cache::memo()->put('password_reset_token_'.$token, $user->id, now()->addHour());
+        cacheMemo()->put('password_reset_token_'.$token, $user->id, now()->addHour());
 
         // Record this request for rate limiting
         RateLimiter::hit($this->throttleKey($request));
@@ -107,7 +107,7 @@ class ForgotPasswordController extends Controller
         }
 
         // Verify the token
-        $userId = Cache::memo()->get('password_reset_token_'.$request->token);
+        $userId = cacheMemo()->get('password_reset_token_'.$request->token);
         if (! $userId) {
             return back()->withErrors(['token' => 'This password reset token is invalid.']);
         }
@@ -122,7 +122,7 @@ class ForgotPasswordController extends Controller
 
         // Store OTP in cache with expiration time (1 hour)
         $otpKey = 'password_reset_otp_'.$request->phone;
-        Cache::memo()->put($otpKey, $otp, now()->addHour());
+        cacheMemo()->put($otpKey, $otp, now()->addHour());
 
         // Send OTP via SMS
         $user->notify(new SendOTP($otp));

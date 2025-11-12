@@ -34,7 +34,7 @@ class CartController extends Controller
                 }
             });
         }
-        cache()->memo()->rememberForever('last_cart_cleanup_at', fn (): \Carbon\CarbonInterface => now());
+        cacheMemo()->rememberForever('last_cart_cleanup_at', fn (): \Carbon\CarbonInterface => now());
 
         return view('admin.carts.index', [
             'carts' => DB::table('shopping_cart')

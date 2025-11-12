@@ -6,7 +6,6 @@ use App\Notifications\SMSChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Cache;
 
 class OrderPlaced extends Notification
 {
@@ -48,7 +47,7 @@ class OrderPlaced extends Notification
      */
     public function toArray($notifiable): array
     {
-        $code = Cache::memo()->remember('order:confirm:'.$this->order->id, 5 * 60, fn (): int => mt_rand(1000, 999999));
+        $code = cacheMemo()->remember('order:confirm:'.$this->order->id, 5 * 60, fn (): int => mt_rand(1000, 999999));
 
         return [
             'msg' => 'Thanks for shopping. Your order ID is '.$this->order->id.'. Login: '.url('auth'),

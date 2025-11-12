@@ -12,16 +12,28 @@ use App\Models\Slide;
 use Azmolla\Shoppingcart\Cart as CartInstance;
 use Azmolla\Shoppingcart\CartItem;
 use Azmolla\Shoppingcart\Facades\Cart;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
+if (! function_exists('cacheMemo')) {
+    function cacheMemo(): CacheManager
+    {
+        if (config('cache.memo')) {
+            return cache()->memo();
+        }
+
+        return cache();
+    }
+}
+
 if (! function_exists('slides')) {
     function slides()
     {
-        return cache()->memo()->rememberForever('slides', function () {
+        return cacheMemo()->rememberForever('slides', function () {
             return Slide::whereIsActive(1)->get([
                 'title', 'text', 'mobile_src', 'desktop_src', 'btn_name', 'btn_href',
             ]);
@@ -32,7 +44,7 @@ if (! function_exists('slides')) {
 if (! function_exists('sections')) {
     function sections()
     {
-        return cache()->memo()->rememberForever('homesections', function () {
+        return cacheMemo()->rememberForever('homesections', function () {
             return HomeSection::orderBy('order', 'asc')->get();
         });
     }
@@ -132,7 +144,7 @@ if (! function_exists('pageRoutes')) {
 if (! function_exists('setting')) {
     function setting($name, $default = null)
     {
-        return cache()->memo()->rememberForever('settings:'.$name, function () use ($name, $default) {
+        return cacheMemo()->rememberForever('settings:'.$name, function () use ($name, $default) {
             return optional(Setting::whereName($name)->first())->value ?? $default;
         });
     }

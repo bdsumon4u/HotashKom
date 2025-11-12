@@ -9,7 +9,6 @@ use Hotash\LaravelMultiUi\Backend\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -137,11 +136,11 @@ class LoginController extends Controller
      */
     private function sendOTP(&$user): void
     {
-        throw_if(Cache::memo()->get($key = 'auth:'.\request()->get('login')), ValidationException::withMessages([
+        throw_if(cacheMemo()->get($key = 'auth:'.\request()->get('login')), ValidationException::withMessages([
             'password' => ['Please wait for OTP.'],
         ]));
         $ttl = (property_exists($this, 'decayMinutes') ? $this->decayMinutes : 2) * 60;
-        $otp = Cache::memo()->remember($key, $ttl, fn (): int => mt_rand(1000, 999999));
+        $otp = cacheMemo()->remember($key, $ttl, fn (): int => mt_rand(1000, 999999));
         $user->notify(new SendOTP($otp));
     }
 

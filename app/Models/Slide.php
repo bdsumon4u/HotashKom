@@ -14,11 +14,11 @@ class Slide extends Model
     public static function booted(): void
     {
         static::saved(function ($menu): void {
-            cache()->memo()->put('slides', static::whereIsActive(1)->get());
+            cacheMemo()->put('slides', static::whereIsActive(1)->get());
         });
 
         static::deleted(function (): void {
-            cache()->memo()->forget('slides');
+            cacheMemo()->forget('slides');
         });
     }
 }

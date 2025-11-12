@@ -17,7 +17,7 @@ class Brand extends Model
     public static function booted(): void
     {
         static::saved(function ($brand): void {
-            cache()->memo()->forget('brands');
+            cacheMemo()->forget('brands');
 
             // Dispatch job to copy brand to reseller databases
             if (isOninda() && $brand->wasRecentlyCreated) {
@@ -32,13 +32,13 @@ class Brand extends Model
             if (isOninda()) {
                 dispatch(new \App\Jobs\RemoveResourceFromResellers($brand->getTable(), $brand->id));
             }
-            cache()->memo()->forget('brands');
+            cacheMemo()->forget('brands');
         });
     }
 
     public static function cached()
     {
-        return cache()->memo()->rememberForever('brands', fn () => Brand::where('is_enabled', true)->get());
+        return cacheMemo()->rememberForever('brands', fn () => Brand::where('is_enabled', true)->get());
     }
 
     public function image()

@@ -17,9 +17,9 @@ class SettingRepository
         && $data = $this->mergeLogo($data);
         foreach ($data as $name => $value) {
             $this->set($name, $value);
-            \cache()->memo()->forget('settings:'.$name);
+            \cacheMemo()->forget('settings:'.$name);
         }
-        \cache()->memo()->forget('settings');
+        \cacheMemo()->forget('settings');
     }
 
     public function get($name)

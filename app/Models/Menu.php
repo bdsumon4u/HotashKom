@@ -16,11 +16,11 @@ class Menu extends Model
     public static function booted(): void
     {
         static::saved(function ($menu): void {
-            cache()->memo()->forget('menus:'.$menu->slug);
+            cacheMemo()->forget('menus:'.$menu->slug);
         });
 
         static::deleting(function ($menu): void {
-            cache()->memo()->forget('menus:'.$menu->slug);
+            cacheMemo()->forget('menus:'.$menu->slug);
         });
     }
 

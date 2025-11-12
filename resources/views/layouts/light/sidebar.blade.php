@@ -248,7 +248,7 @@
                             <span>Money Requests</span>
                             @if(config('app.resell'))
                             @php
-                                $pendingAmount = cache()->memo()->remember('pending_withdrawal_amount', 300, function () {
+                                $pendingAmount = cacheMemo()->remember('pending_withdrawal_amount', 300, function () {
                                     return abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
                                         ->where('confirmed', false)
                                         ->sum('amount'));

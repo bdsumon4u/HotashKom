@@ -153,7 +153,7 @@ class MoneyRequestController extends Controller
         $user->confirm($transaction);
 
         // Clear pending withdrawal cache
-        cache()->memo()->forget('pending_withdrawal_amount');
+        cacheMemo()->forget('pending_withdrawal_amount');
 
         return response()->json(['message' => 'Withdrawal confirmed successfully']);
     }
@@ -183,7 +183,7 @@ class MoneyRequestController extends Controller
         $transaction->delete();
 
         // Clear pending withdrawal cache
-        cache()->memo()->forget('pending_withdrawal_amount');
+        cacheMemo()->forget('pending_withdrawal_amount');
 
         return response()->json(['message' => 'Withdrawal request deleted successfully']);
     }

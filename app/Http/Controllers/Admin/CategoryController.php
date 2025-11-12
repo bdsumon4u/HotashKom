@@ -67,7 +67,7 @@ class CategoryController extends Controller
                     $category->update($data);
                 });
 
-            cache()->memo()->forget('categories:nested');
+            cacheMemo()->forget('categories:nested');
 
             return true;
         }

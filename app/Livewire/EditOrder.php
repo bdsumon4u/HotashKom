@@ -91,7 +91,7 @@ class EditOrder extends Component
             return 'API Expired';
         }
 
-        $report = cache()->memo()->remember(
+        $report = cacheMemo()->remember(
             'courier:'.($this->order->phone ?? ''),
             now()->addHours(4),
             function () {
@@ -109,7 +109,7 @@ class EditOrder extends Component
         );
 
         if (is_string($report)) {
-            cache()->memo()->forget('courier:'.($this->order->phone ?? ''));
+            cacheMemo()->forget('courier:'.($this->order->phone ?? ''));
         }
 
         return $report;

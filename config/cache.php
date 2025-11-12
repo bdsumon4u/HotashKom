@@ -17,6 +17,8 @@ return [
 
     'default' => env('CACHE_STORE', 'database'),
 
+    'memo' => env('CACHE_MEMO', false),
+
     /*
     |--------------------------------------------------------------------------
     | Cache Stores

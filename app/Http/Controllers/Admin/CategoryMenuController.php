@@ -57,14 +57,14 @@ class CategoryMenuController extends Controller
                     CategoryMenu::updateOrInsert(['id' => $val['id']], $val);
                 })->toArray();
 
-            cache()->memo()->forget('catmenu:nested');
-            cache()->memo()->forget('catmenu:nestedwithparent');
+            cacheMemo()->forget('catmenu:nested');
+            cacheMemo()->forget('catmenu:nestedwithparent');
 
             return true;
         }
 
-        cache()->memo()->forget('catmenu:nested');
-        cache()->memo()->forget('catmenu:nestedwithparent');
+        cacheMemo()->forget('catmenu:nested');
+        cacheMemo()->forget('catmenu:nestedwithparent');
 
         return back();
     }

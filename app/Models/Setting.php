@@ -16,14 +16,14 @@ class Setting extends Model
     public static function booted(): void
     {
         static::saved(function ($setting): void {
-            Cache::memo()->put('settings:'.$setting->name, $setting);
+            cacheMemo()->put('settings:'.$setting->name, $setting);
             Cache::forget('settings');
         });
     }
 
     public static function array()
     {
-        return Cache::memo()->rememberForever('settings', fn () => self::all()->flatMap(fn ($setting): array => [$setting->name => $setting->value])->toArray());
+        return cacheMemo()->rememberForever('settings', fn () => self::all()->flatMap(fn ($setting): array => [$setting->name => $setting->value])->toArray());
     }
 
     protected function value(): Attribute
