@@ -70,61 +70,182 @@
                                             </div>
                                         @endif
 
+                                        @php
+                                            // Group variations by color
+                                            $colorOptions = collect();
+                                            if ($product->variations->isNotEmpty()) {
+                                                $colorOptions = $product->variations->flatMap(function ($variation) {
+                                                    return $variation->options->filter(function ($option) {
+                                                        return strtolower($option->attribute->name) === 'color';
+                                                    });
+                                                })->unique('id')->values();
+                                            }
+
+                                            // Determine the initially selected product/variation
+                                            // Priority:
+                                            // 1. Check if any variation of this product is in cart
+                                            // 2. If $product is a variation (has parent_id), use it
+                                            // 3. Otherwise, use the first variation or the product itself
+                                            $selectedProduct = null;
+
+                                            // First, check cart for any variation of this product
+                                            $cartVariation = cart()->content()->first(function($item) use ($product) {
+                                                $itemProduct = \App\Models\Product::find($item->id);
+                                                if (!$itemProduct) return false;
+
+                                                // Check if this cart item is a variation of our product
+                                                $parentId = $product->parent_id ?? $product->id;
+                                                return $itemProduct->id == $parentId || $itemProduct->parent_id == $parentId;
+                                            });
+
+                                            if ($cartVariation) {
+                                                // Use the variation that's in the cart
+                                                $selectedProduct = \App\Models\Product::with('options')->find($cartVariation->id);
+                                            } elseif ($product->parent_id) {
+                                                // Product is a variation itself
+                                                $selectedProduct = $product;
+                                            } elseif ($product->variations->isNotEmpty()) {
+                                                // Use the first variation
+                                                $selectedProduct = $product->variations->first();
+                                            } else {
+                                                // Product has no variations
+                                                $selectedProduct = $product;
+                                            }
+
+                                            // Get the option IDs of the selected product for pre-selection
+                                            $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
+                                        @endphp
+
                                         <div style="margin: 0; padding: 0; width: 100%;"
                                             class="wcf-product-option-wrap wcf-yp-skin-cards wcf-product-option-after-customer">
                                             <h3 id="your_products_heading" style="margin-bottom: .25rem;"> Your
                                                 Products </h3>
                                             <div class="wcf-qty-options" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
-                                                @foreach ($product->variations->isEmpty() ? [$product] : $product->variations as $product)
-                                                <div class="wcf-qty-row wcf-qty-row-452"
-                                                    data-options="{&quot;product_id&quot;:440,&quot;variation_id&quot;:452,&quot;type&quot;:&quot;variation&quot;,&quot;unique_id&quot;:&quot;zwr6yipq&quot;,&quot;mode&quot;:&quot;quantity&quot;,&quot;highlight_text&quot;:&quot;&quot;,&quot;quantity&quot;:&quot;1&quot;,&quot;default_quantity&quot;:1,&quot;original_price&quot;:&quot;200&quot;,&quot;discounted_price&quot;:&quot;&quot;,&quot;total_discounted_price&quot;:&quot;&quot;,&quot;currency&quot;:&quot;&amp;#2547;&amp;nbsp;&quot;,&quot;cart_item_key&quot;:&quot;4606109fe00ffd19b2a98941e90aaaa8&quot;,&quot;save_value&quot;:&quot;&quot;,&quot;save_percent&quot;:&quot;&quot;,&quot;sign_up_fee&quot;:0,&quot;subscription_price&quot;:&quot;200&quot;,&quot;trial_period_string&quot;:&quot;&quot;}">
-                                                    <div class="wcf-item">
-                                                        <div class="wcf-item-selector wcf-item-multiple-sel">
-                                                            <input class="wcf-multiple-sel" type="checkbox" @if ($row=cart()->content()->first(fn ($item) =>
-                                                            $item->id == $product->id))
-                                                            wire:click="remove('{{ $row->rowId }}')"
-                                                            checked
-                                                            @else
-                                                            wire:click="increaseQuantity({{ $product->id }})"
-                                                            @endif
-                                                            name="wcf-multiple-sel"
-                                                            value="{{ $product->id }}"
-                                                            >
-                                                        </div>
-
-                                                        <div class="wcf-item-image" style=""><img fetchpriority="high" decoding="async" width="300" height="300"
-                                                                src="{{ asset($product->base_image->src) }}"
-                                                                class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail" alt="" /></div>
-                                                        <div class="wcf-item-content-options">
-                                                            <div class="wcf-item-wrap">
-                                                                <span class="wcf-display-title">{{ $product->name }}</span><span
-                                                                    class="wcf-display-title-quantity">
-                                                                    <div class="wcf-display-attributes"><span class="wcf-att-inner">Price: Tk
-                                                                            {{ $prc = $row->price ?? $product->selling_price }}</span>
-                                                                    </div>
+                                                @if($colorOptions->isEmpty())
+                                                    {{-- No variations, show the main product --}}
+                                                    @php
+                                                        $row = cart()->content()->first(fn ($item) => $item->id == $product->id);
+                                                    @endphp
+                                                    <div class="wcf-qty-row wcf-qty-row-{{ $product->id }}">
+                                                        <div class="wcf-item">
+                                                            <div class="wcf-item-selector wcf-item-multiple-sel">
+                                                                <input class="wcf-multiple-sel" type="checkbox"
+                                                                @if ($row)
+                                                                    wire:click="remove('{{ $row->rowId }}')"
+                                                                    checked
+                                                                @else
+                                                                    wire:click="increaseQuantity({{ $product->id }})"
+                                                                @endif
+                                                                name="wcf-multiple-sel"
+                                                                value="{{ $product->id }}">
                                                             </div>
 
-                                                            <div class="wcf-qty">
-                                                                <div class="wcf-qty-selection-wrap">
-                                                                    <span class="wcf-qty-selection-btn wcf-qty-decrement wcf-qty-change-icon" title=""
-                                                                        wire:click="decreaseQuantity({{ $product->id }})">&minus;</span>
-                                                                    <input autocomplete="off" type="number" value="{{ $qty = $row->qty ?? 0 }}" step="1"
-                                                                        name="wcf_qty_selection" class="wcf-qty-selection" data-sale-limit="false" title="">
-                                                                    <span class="wcf-qty-selection-btn wcf-qty-increment wcf-qty-change-icon" title=""
-                                                                        wire:click="increaseQuantity({{ $product->id }})">&plus;</span>
+                                                            <div class="wcf-item-image" style=""><img fetchpriority="high" decoding="async" width="300" height="300"
+                                                                    src="{{ asset($product->base_image->src) }}"
+                                                                    class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail" alt="" /></div>
+                                                            <div class="wcf-item-content-options">
+                                                                <div class="wcf-item-wrap">
+                                                                    <span class="wcf-display-title">{{ $product->name }}</span><span
+                                                                        class="wcf-display-title-quantity">
+                                                                        <div class="wcf-display-attributes"><span class="wcf-att-inner">Price: Tk
+                                                                                {{ $prc = $row->price ?? $product->selling_price }}</span>
+                                                                        </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="wcf-price">
-                                                                <div class="wcf-display-price wcf-field-label">
-                                                                    <span class="woocommerce-Price-amount amount"><span
-                                                                            class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $qty * $prc
-                                                                        }}</span>
+
+                                                                <div class="wcf-qty">
+                                                                    <div class="wcf-qty-selection-wrap">
+                                                                        <span class="wcf-qty-selection-btn wcf-qty-decrement wcf-qty-change-icon" title=""
+                                                                            wire:click="decreaseQuantity({{ $product->id }})">&minus;</span>
+                                                                        <input autocomplete="off" type="number" value="{{ $qty = $row->qty ?? 0 }}" step="1"
+                                                                            name="wcf_qty_selection" class="wcf-qty-selection" data-sale-limit="false" title="">
+                                                                        <span class="wcf-qty-selection-btn wcf-qty-increment wcf-qty-change-icon" title=""
+                                                                            wire:click="increaseQuantity({{ $product->id }})">&plus;</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="wcf-price">
+                                                                    <div class="wcf-display-price wcf-field-label">
+                                                                        <span class="woocommerce-Price-amount amount"><span
+                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $qty * $prc
+                                                                            }}</span>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                @endforeach
+                                                @else
+                                                    {{-- Show color options only --}}
+                                                    @foreach ($colorOptions as $colorOption)
+                                                        @php
+                                                            // Find any variation with this color to get image and price
+                                                            $sampleVariation = $product->variations->first(function($v) use ($colorOption) {
+                                                                return $v->options->contains('id', $colorOption->id);
+                                                            });
+
+                                                            // Check if any variation with this color is in cart
+                                                            $cartRow = cart()->content()->first(function($item) use ($product, $colorOption) {
+                                                                $itemProduct = \App\Models\Product::find($item->id);
+                                                                return $itemProduct &&
+                                                                       $itemProduct->parent_id == $product->id &&
+                                                                       $itemProduct->options->contains('id', $colorOption->id);
+                                                            });
+
+                                                            // Check if any product variation is in cart
+                                                            $anyProductInCart = cart()->content()->first(function($item) use ($product) {
+                                                                $itemProduct = \App\Models\Product::find($item->id);
+                                                                return $itemProduct && $itemProduct->parent_id == $product->id;
+                                                            });
+
+                                                            $displayImage = $sampleVariation->base_image ?? $product->base_image;
+                                                            $displayPrice = $cartRow ? $cartRow->price : $sampleVariation->selling_price;
+                                                            $displayQty = $cartRow ? $cartRow->qty : 0;
+
+                                                            // Check if this color should be selected based on $selectedProduct
+                                                            $shouldCheck = !$anyProductInCart && in_array($colorOption->id, $selectedOptionIds);
+                                                        @endphp
+                                                        <div class="wcf-qty-row wcf-qty-row-color-{{ $colorOption->id }}">
+                                                            <div class="wcf-item">
+                                                                <div class="wcf-item-selector wcf-item-multiple-sel">
+                                                                    <input class="wcf-multiple-sel color-checkbox" type="checkbox"
+                                                                        data-color-id="{{ $colorOption->id }}"
+                                                                        @if($cartRow || $shouldCheck) checked @endif
+                                                                        name="wcf-multiple-sel"
+                                                                        value="{{ $colorOption->id }}">
+                                                                </div>
+
+                                                                <div class="wcf-item-image" style=""><img fetchpriority="high" decoding="async" width="300" height="300"
+                                                                        src="{{ asset($displayImage->src) }}"
+                                                                        class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail" alt="" /></div>
+                                                                <div class="wcf-item-content-options">
+                                                                    <div class="wcf-item-wrap">
+                                                                        <span class="wcf-display-title">{{ $product->name }} - {{ $colorOption->name }}</span><span
+                                                                            class="wcf-display-title-quantity">
+                                                                            <div class="wcf-display-attributes"><span class="wcf-att-inner">Price: Tk
+                                                                                    <span class="color-price-{{ $colorOption->id }}">{{ $displayPrice }}</span></span>
+                                                                            </div>
+                                                                    </div>
+
+                                                                    <div class="wcf-qty">
+                                                                        <div class="wcf-qty-selection-wrap">
+                                                                            <span class="wcf-qty-selection-btn wcf-qty-decrement wcf-qty-change-icon color-qty-decrement"
+                                                                                data-color-id="{{ $colorOption->id }}" title="">&minus;</span>
+                                                                            <input autocomplete="off" type="number" value="{{ $displayQty }}" step="1"
+                                                                                name="wcf_qty_selection" class="wcf-qty-selection color-qty-input-{{ $colorOption->id }}"
+                                                                                data-sale-limit="false" title="" readonly>
+                                                                            <span class="wcf-qty-selection-btn wcf-qty-increment wcf-qty-change-icon color-qty-increment"
+                                                                                data-color-id="{{ $colorOption->id }}" title="">&plus;</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="wcf-price">
+                                                                        <div class="wcf-display-price wcf-field-label">
+                                                                            <span class="woocommerce-Price-amount amount"><span
+                                                                                    class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;<span class="color-total-{{ $colorOption->id }}">{{ $displayQty * $displayPrice }}</span></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                @endif
                                             </div>
                                         </div>
 
@@ -240,6 +361,45 @@
                                                                     class="wcf-field-required-error">{{ $errors->first('phone') }}</span>
                                                             </span>
                                                         </p>
+
+                                                        @if($colorOptions->isNotEmpty())
+                                                            @php
+                                                                // Get all non-color attributes from variations
+                                                                $otherAttributes = $product->variations
+                                                                    ->flatMap(fn($v) => $v->options)
+                                                                    ->filter(fn($option) => strtolower($option->attribute->name) !== 'color')
+                                                                    ->unique('id')
+                                                                    ->groupBy('attribute_id');
+
+                                                                $attributes = \App\Models\Attribute::find($otherAttributes->keys());
+                                                            @endphp
+
+                                                            @foreach($attributes as $attribute)
+                                                                <div class="form-row form-row-wide address-field wcf-column-100 validate-required"
+                                                                    id="attribute_{{ $attribute->id }}_field" data-priority="105">
+                                                                    <label for="attribute_{{ $attribute->id }}" class="">{{ $attribute->name }}&nbsp;<abbr class="required"
+                                                                        title="required">*</abbr></label>
+                                                                    <div class="woocommerce-input-wrapper">
+                                                                        <ul id="attribute_{{ $attribute->id }}"
+                                                                            style="border: 1px solid var( --wcf-field-border-color ); display: flex; column-gap: 1rem; padding: .5rem; list-style: none; margin: 0;"
+                                                                            class="woocommerce-shipping-methods">
+                                                                            @foreach($otherAttributes[$attribute->id] as $option)
+                                                                                <li style="white-space: nowrap; margin: 0; display: flex;">
+                                                                                    <input type="radio"
+                                                                                        name="attribute_{{ $attribute->id }}"
+                                                                                        data-attribute-id="{{ $attribute->id }}"
+                                                                                        id="attribute_option_{{ $option->id }}"
+                                                                                        value="{{ $option->id }}"
+                                                                                        class="attribute-option-radio"
+                                                                                        @if(in_array($option->id, $selectedOptionIds)) checked='checked' @endif />
+                                                                                    <label for="attribute_option_{{ $option->id }}" style="margin: 0;">{{ $option->name }}</label>
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        @endif
                                                     </div>
 
                                                 </div>
@@ -387,12 +547,198 @@
             </div>
         </div>
     </div>
+    @php
+        $variationsData = $product->variations->map(function($v) {
+            return [
+                'id' => $v->id,
+                'options' => $v->options->pluck('id')->toArray(),
+                'selling_price' => $v->selling_price,
+            ];
+        });
+    @endphp
+
     <script>
-    console.log('ami');
+        // Store variation data for finding correct variation ID
+        const productVariations = @json($variationsData);
+
+        // Store selected color and attributes
+        let selectedColorId = null;
+        const selectedAttributes = {};
+        let currentCartVariationId = null; // Track the variation currently in cart
+
+        // Handle color checkbox changes (work as radio buttons)
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('color-checkbox')) {
+                const colorId = e.target.dataset.colorId;
+                const isChecked = e.target.checked;
+
+                if (isChecked) {
+                    // Uncheck all other color checkboxes
+                    document.querySelectorAll('.color-checkbox').forEach(cb => {
+                        if (cb !== e.target) {
+                            cb.checked = false;
+                        }
+                    });
+
+                    selectedColorId = parseInt(colorId);
+                    updateVariationSelection();
+                } else {
+                    selectedColorId = null;
+                    updateVariationSelection();
+                }
+            }
+
+            // Handle attribute selection changes
+            if (e.target.classList.contains('attribute-option-radio')) {
+                const attributeId = e.target.dataset.attributeId;
+                const optionId = parseInt(e.target.value);
+
+                selectedAttributes[attributeId] = optionId;
+                updateVariationSelection();
+            }
+        });
+
+        // Handle quantity increment
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('color-qty-increment')) {
+                const colorId = parseInt(e.target.dataset.colorId);
+
+                // Make sure this color is selected
+                if (selectedColorId !== colorId) {
+                    const colorCheckbox = document.querySelector(`.color-checkbox[data-color-id="${colorId}"]`);
+                    if (colorCheckbox) {
+                        colorCheckbox.click(); // This will trigger color selection
+                    }
+                    selectedColorId = colorId;
+                }
+
+                const variationId = getVariationId();
+                if (variationId) {
+                    @this.call('increaseQuantity', variationId);
+                }
+            }
+
+            // Handle quantity decrement
+            if (e.target.classList.contains('color-qty-decrement')) {
+                const colorId = parseInt(e.target.dataset.colorId);
+                const qtyInput = document.querySelector(`.color-qty-input-${colorId}`);
+                const currentQty = parseInt(qtyInput ? qtyInput.value : 0) || 0;
+
+                if (currentQty > 0) {
+                    // Make sure this color is selected
+                    if (selectedColorId !== colorId) {
+                        selectedColorId = colorId;
+                    }
+
+                    const variationId = getVariationId();
+                    if (variationId) {
+                        @this.call('decreaseQuantity', variationId);
+                    }
+                }
+            }
+        });
+
+        function updateVariationSelection() {
+            if (!selectedColorId) return;
+
+            // Build array of selected option IDs (color + other attributes)
+            const selectedOptions = [selectedColorId, ...Object.values(selectedAttributes)];
+
+            // Find matching variation
+            const variation = productVariations.find(v => {
+                return selectedOptions.every(opt => v.options.includes(opt)) &&
+                       selectedOptions.length === v.options.length;
+            });
+
+            if (variation) {
+                // Get current quantity for this color
+                const qtyInput = document.querySelector(`.color-qty-input-${selectedColorId}`);
+                const currentQty = parseInt(qtyInput ? qtyInput.value : 0) || 0;
+
+                // Update price display for this color
+                const priceElement = document.querySelector(`.color-price-${selectedColorId}`);
+                if (priceElement) {
+                    priceElement.textContent = variation.selling_price;
+                }
+
+                // Update total display
+                const totalElement = document.querySelector(`.color-total-${selectedColorId}`);
+                if (totalElement) {
+                    totalElement.textContent = currentQty * variation.selling_price;
+                }
+
+                // Check if this variation is already in cart or if we need to swap
+                const colorCheckbox = document.querySelector(`.color-checkbox[data-color-id="${selectedColorId}"]`);
+                if (colorCheckbox && colorCheckbox.checked) {
+                    // Check if we're selecting a different variation than what's currently tracked
+                    if (currentCartVariationId !== variation.id) {
+                        // Different variation selected - Livewire's increaseQuantity will call
+                        // ProductDetail::landing() which destroys cart and adds new variation
+                        console.log('Swapping variation from', currentCartVariationId, 'to', variation.id);
+                        currentCartVariationId = variation.id;
+                        @this.call('increaseQuantity', variation.id);
+                    } else if (currentQty === 0) {
+                        // No cart item yet, add it
+                        console.log('Adding new variation', variation.id);
+                        currentCartVariationId = variation.id;
+                        @this.call('increaseQuantity', variation.id);
+                    } else {
+                        // Same variation already selected and in cart
+                        console.log('Same variation already selected', variation.id);
+                        currentCartVariationId = variation.id;
+                    }
+                }
+            }
+        }
+
+        function getVariationId() {
+            if (!selectedColorId) return null;
+
+            const selectedOptions = [selectedColorId, ...Object.values(selectedAttributes)];
+
+            const variation = productVariations.find(v => {
+                return selectedOptions.every(opt => v.options.includes(opt)) &&
+                       selectedOptions.length === v.options.length;
+            });
+
+            return variation ? variation.id : null;
+        }
+
+        // Initialize on page load - detect if any color is already checked/in cart
+        document.addEventListener('DOMContentLoaded', function() {
+            // Find the first checked color checkbox
+            const checkedColorCheckbox = document.querySelector('.color-checkbox:checked');
+            if (checkedColorCheckbox) {
+                selectedColorId = parseInt(checkedColorCheckbox.dataset.colorId);
+            }
+
+            // Find any pre-selected attribute options
+            document.querySelectorAll('.attribute-option-radio:checked').forEach(radio => {
+                const attributeId = radio.dataset.attributeId;
+                const optionId = parseInt(radio.value);
+                selectedAttributes[attributeId] = optionId;
+            });
+
+            // Find the current variation ID (what's in cart now)
+            if (selectedColorId && Object.keys(selectedAttributes).length > 0) {
+                const selectedOptions = [selectedColorId, ...Object.values(selectedAttributes)];
+                const variation = productVariations.find(v => {
+                    return selectedOptions.every(opt => v.options.includes(opt)) &&
+                           selectedOptions.length === v.options.length;
+                });
+                if (variation) {
+                    currentCartVariationId = variation.id;
+                }
+            }
+
+            // Trigger initial variation selection if color is selected
+            if (selectedColorId && Object.keys(selectedAttributes).length > 0) {
+                updateVariationSelection();
+            }
+        });
+
         // Send data to the server before the user leaves
         window.addEventListener("beforeunload", function (event) {
-            // Send data using Fetch API (asynchronous)
-            console.log('send');
             navigator.sendBeacon(
                 "/save-checkout-progress",
                 new Blob([JSON.stringify({
@@ -401,14 +747,6 @@
                     address: document.getElementById('billing_address_1').value,
                 })], { type: 'application/json' })
             );
-
-            // Optional: If you want to use Fetch (uncomment below)
-            // fetch("/api/save-checkout-progress", {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify(formData),
-            //     keepalive: true, // Ensures request completes before browser unloads
-            // });
         });
     </script>
 </section>
