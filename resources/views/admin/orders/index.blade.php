@@ -129,9 +129,9 @@
                                     <th width="80">Source</th>
                                     @endif
                                     <th>Customer</th>
-                                    <th>Products</th>
+                                    <th style="min-width: 250px;">Products</th>
                                     <th width="10">Amount</th>
-                                    <th width="10">Status</th>
+                                    <th>Status</th>
                                     <th>Courier</th>
                                     <th>Staff</th>
                                     <th style="white-space: nowrap; min-width: 150px;">Date and Time</th>
