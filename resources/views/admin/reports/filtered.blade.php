@@ -9,7 +9,8 @@
         <thead>
             <tr>
                 <th style="min-width: 50px;">SI</th>
-                <th style="min-width: 120px;">Name</th>
+                <th style="min-width: 80px;">Image</th>
+                <th style="min-width: 150px;">Name</th>
                 <th style="min-width: 100px;">Orders</th>
                 <th style="min-width: 100px;">Quantity</th>
                 <th style="min-width: 100px;">Purchase</th>
@@ -25,10 +26,36 @@
                     $purchaseAmount += ($product['purchase_cost'] ?? 0);
                     $subtotalAmount += $product['total'];
                     $profit = $product['total'] - ($product['purchase_cost'] ?? 0);
+                    
+                    // Find product by slug to get image
+                    $productModel = null;
+                    if (!empty($product['slug'])) {
+                        $productModel = \App\Models\Product::where('slug', $product['slug'])->first();
+                    }
+                    $imageUrl = $productModel && $productModel->base_image 
+                        ? asset($productModel->base_image->src) 
+                        : asset('assets/images/product-placeholder.jpg');
                 @endphp
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $product['name'] }}</td>
+                    <td class="text-center">
+                        <img src="{{ $imageUrl }}" 
+                             alt="{{ $product['name'] }}" 
+                             class="img-fluid rounded"
+                             style="width: 50px; height: 50px; object-fit: cover;"
+                             onerror="this.src='{{ asset('assets/images/product-placeholder.jpg') }}'">
+                    </td>
+                    <td>
+                        @if($productModel)
+                            <a href="{{ route('admin.products.edit', $productModel->parent_id ?? $productModel->id) }}" 
+                               target="_blank" 
+                               class="text-decoration-none">
+                                {{ $product['name'] }}
+                            </a>
+                        @else
+                            {{ $product['name'] }}
+                        @endif
+                    </td>
                     <td>{{ count($productInOrders[$name] ?? []) }}</td>
                     <td>{{ $product['quantity'] }}</td>
                     <td>{!!theMoney($product['purchase_cost'] ?? 0)!!}</td>
@@ -41,7 +68,7 @@
             @endforeach
         </tbody>
         <tfoot>
-            <th colspan="2" class="text-right">Total</th>
+            <th colspan="3" class="text-right">Total</th>
             <th>{{ $orders }}</th>
             <th>{{ $total }}</th>
             <th>{!!theMoney($purchaseAmount)!!}</th>
