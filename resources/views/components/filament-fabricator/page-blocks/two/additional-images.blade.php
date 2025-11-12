@@ -12,19 +12,19 @@
                     data-settings="{&quot;slides_to_show&quot;:&quot;3&quot;,&quot;slides_to_show_mobile&quot;:&quot;2&quot;,&quot;navigation&quot;:&quot;both&quot;,&quot;autoplay&quot;:&quot;yes&quot;,&quot;pause_on_hover&quot;:&quot;yes&quot;,&quot;pause_on_interaction&quot;:&quot;yes&quot;,&quot;autoplay_speed&quot;:5000,&quot;infinite&quot;:&quot;yes&quot;,&quot;speed&quot;:500,&quot;image_spacing_custom&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:20,&quot;sizes&quot;:[]},&quot;image_spacing_custom_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;image_spacing_custom_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]}}"
                     data-widget_type="image-carousel.default">
                     <div class="elementor-widget-container">
-                        <div class="elementor-image-carousel-wrapper swiper" dir="ltr">
+                        <div class="elementor-image-carousel-wrapper swiper image-carousel-{{ $page->id ?? 'default' }}" dir="ltr" role="region" aria-roledescription="carousel" aria-label="Image Carousel">
                             <div class="elementor-image-carousel swiper-wrapper" aria-live="off">
                                 @foreach($images ?: $page->product->additional_images->map->src as $image)
-                                <div class="swiper-slide" role="group" aria-roledescription="slide">
+                                <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="{{$loop->iteration}} of {{count($images ?: $page->product->additional_images->map->src)}}">
                                     <figure class="swiper-slide-inner"><img decoding="async"
                                             class="swiper-slide-image"
                                             src="{{ Str::isUrl($image) ? $image : asset('storage/'.$image) }}"
-                                            alt="tshirt3" /></figure>
+                                            alt="{{$loop->iteration}} of {{count($images ?: $page->product->additional_images->map->src)}}" /></figure>
                                 </div>
                                 @endforeach
                             </div>
-                            <div class="elementor-swiper-button elementor-swiper-button-prev"
-                                role="button" tabindex="0">
+                            <div class="elementor-swiper-button elementor-swiper-button-prev swiper-button-prev"
+                                role="button" tabindex="0" aria-label="Previous slide">
                                 <svg aria-hidden="true" class="e-font-icon-svg e-eicon-chevron-left"
                                     viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -32,8 +32,8 @@
                                     </path>
                                 </svg>
                             </div>
-                            <div class="elementor-swiper-button elementor-swiper-button-next"
-                                role="button" tabindex="0">
+                            <div class="elementor-swiper-button elementor-swiper-button-next swiper-button-next"
+                                role="button" tabindex="0" aria-label="Next slide">
                                 <svg aria-hidden="true" class="e-font-icon-svg e-eicon-chevron-right"
                                     viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -45,6 +45,53 @@
                             <div class="swiper-pagination"></div>
                         </div>
                     </div>
+                    <script>
+                        (function() {
+                            const carouselId = 'image-carousel-{{ $page->id ?? 'default' }}';
+                            function initCarousel() {
+                                const carouselWrapper = document.querySelector('.' + carouselId);
+                                if (carouselWrapper && typeof Swiper !== 'undefined') {
+                                    new Swiper(carouselWrapper, {
+                                        slidesPerView: 3,
+                                        spaceBetween: 20,
+                                        loop: true,
+                                        autoplay: {
+                                            delay: 5000,
+                                            pauseOnMouseEnter: true,
+                                            disableOnInteraction: false,
+                                        },
+                                        speed: 500,
+                                        navigation: {
+                                            nextEl: carouselWrapper.querySelector('.swiper-button-next'),
+                                            prevEl: carouselWrapper.querySelector('.swiper-button-prev'),
+                                        },
+                                        pagination: {
+                                            el: carouselWrapper.querySelector('.swiper-pagination'),
+                                            clickable: true,
+                                        },
+                                        breakpoints: {
+                                            0: {
+                                                slidesPerView: 2,
+                                                spaceBetween: 10,
+                                            },
+                                            768: {
+                                                slidesPerView: 3,
+                                                spaceBetween: 20,
+                                            },
+                                        },
+                                    });
+                                } else if (carouselWrapper && typeof Swiper === 'undefined') {
+                                    // Retry after a short delay if Swiper is not loaded yet
+                                    setTimeout(initCarousel, 100);
+                                }
+                            }
+                            if (document.readyState === 'loading') {
+                                document.addEventListener('DOMContentLoaded', initCarousel);
+                            } else {
+                                initCarousel();
+                            }
+                        })();
+                    </script>
                 </div>
             </div>
         </div>

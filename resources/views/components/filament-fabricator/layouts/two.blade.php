@@ -120,11 +120,11 @@
     </script>
     <script id="elementor-pro-frontend-js-before">
         var ElementorProFrontendConfig = {
-            "ajaxurl": "https:\/\/demo.orioit.com\/wp-admin\/admin-ajax.php",
+            "ajaxurl": "{{ asset('assets/demo.orioit.com/wp-admin/admin-ajax.php') }}",
             "nonce": "e020cc32a2",
             "urls": {
-                "assets": "https:\/\/demo.orioit.com\/wp-content\/plugins\/elementor-pro\/assets\/",
-                "rest": "https:\/\/demo.orioit.com\/wp-json\/"
+                "assets": "{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor-pro/assets/') }}\/",
+                "rest": "{{ asset('assets/demo.orioit.com/wp-json/') }}\/"
             },
             "settings": {
                 "lazy_load_background_images": true
@@ -205,8 +205,8 @@
             },
             "woocommerce": {
                 "menu_cart": {
-                    "cart_page_url": "https:\/\/demo.orioit.com",
-                    "checkout_page_url": "https:\/\/demo.orioit.com",
+                    "cart_page_url": "{{ url('/') }}",
+                    "checkout_page_url": "{{ url('/') }}",
                     "fragments_nonce": "7d7f529b9d"
                 },
                 "productAddedToCart": true
@@ -216,7 +216,7 @@
                 "app_id": ""
             },
             "lottie": {
-                "defaultAnimationUrl": "https:\/\/demo.orioit.com\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"
+                "defaultAnimationUrl": "{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor-pro/modules/lottie/assets/animations/default.json') }}"
             }
         };
     </script>
@@ -328,9 +328,9 @@
                 "launchpad-checklist": true
             },
             "urls": {
-                "assets": "https:\/\/demo.orioit.com\/wp-content\/plugins\/elementor\/assets\/",
-                "ajaxurl": "https:\/\/demo.orioit.com\/wp-admin\/admin-ajax.php",
-                "uploadUrl": "https:\/\/demo.orioit.com\/wp-content\/uploads"
+                "assets": "{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/') }}\/",
+                "ajaxurl": "{{ asset('assets/demo.orioit.com/wp-admin/admin-ajax.php') }}",
+                "uploadUrl": "{{ asset('assets/demo.orioit.com/wp-content/uploads') }}"
             },
             "nonces": {
                 "floatingButtonsClickTracking": "b90916dce7"
@@ -427,6 +427,8 @@
     </script>
     <script src="{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.25.9') }}"
         id="elementor-frontend-js"></script>
+    <script src="{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5') }}"
+        id="swiper-js"></script>
 
 </body>
 
