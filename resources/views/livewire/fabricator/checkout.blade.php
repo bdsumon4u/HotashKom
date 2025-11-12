@@ -255,6 +255,22 @@
                                                     grid-template-columns: repeat(2, 1fr) !important;
                                                 }
                                             }
+
+                                            /* Make color cards clickable */
+                                            .wcf-qty-row[class*="wcf-qty-row-color-"] {
+                                                cursor: pointer;
+                                                transition: all 0.2s ease;
+                                            }
+
+                                            .wcf-qty-row[class*="wcf-qty-row-color-"]:hover {
+                                                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                                                transform: translateY(-2px);
+                                            }
+
+                                            /* Keep buttons with their own cursor */
+                                            .wcf-qty-selection-btn {
+                                                cursor: pointer !important;
+                                            }
                                         </style>
 
                                         <div class="wcf-col2-set col2-set" id="customer_details">
@@ -703,6 +719,27 @@
 
             return variation ? variation.id : null;
         }
+
+        // Make entire color card clickable
+        document.addEventListener('click', function(e) {
+            // Find if click is within a color card
+            const colorCard = e.target.closest('.wcf-qty-row[class*="wcf-qty-row-color-"]');
+
+            if (colorCard) {
+                // Don't trigger if clicking on buttons or checkbox itself
+                if (e.target.closest('.wcf-qty-selection-btn') ||
+                    e.target.closest('.color-checkbox') ||
+                    e.target.classList.contains('color-checkbox')) {
+                    return;
+                }
+
+                // Find and click the checkbox
+                const checkbox = colorCard.querySelector('.color-checkbox');
+                if (checkbox && !checkbox.checked) {
+                    checkbox.click();
+                }
+            }
+        });
 
         // Initialize on page load - detect if any color is already checked/in cart
         document.addEventListener('DOMContentLoaded', function() {
