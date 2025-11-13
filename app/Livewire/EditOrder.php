@@ -31,7 +31,8 @@ class EditOrder extends Component
     #[Validate('required')]
     public ?string $name = '';
 
-    #[Validate('required|regex:/^\+8801\d{9}$/')]
+    #[Validate('required')]
+    #[Validate('regex:/^(?:\+27|27|0)\d{9}$/')]
     public ?string $phone = '';
 
     public ?string $email = '';
@@ -117,9 +118,9 @@ class EditOrder extends Component
 
     protected function prepareForValidation($attributes): array
     {
-        if (Str::startsWith($attributes['phone'], '01')) {
-            $this->phone = $attributes['phone'] = '+88'.$attributes['phone'];
-        }
+        $attributes['phone'] = $this->sanitizePhoneInput($attributes['phone'] ?? '');
+        $attributes['phone'] = $this->normalizeSouthAfricanPhone($attributes['phone']);
+        $this->phone = $this->formatPhoneForInput($attributes['phone']);
 
         return $attributes;
     }
@@ -128,6 +129,7 @@ class EditOrder extends Component
     {
         $this->order = $order;
         $this->fill($this->order->only($this->attrs));
+        $this->phone = $this->formatPhoneForInput($this->phone);
 
         // Cast meta data to proper types
         $this->discount = (int) ($this->order->data['discount'] ?? 0);
@@ -288,7 +290,7 @@ class EditOrder extends Component
         // For Oninda environment, create a walk-in customer
         if (isOninda()) {
             return User::query()->firstOrCreate(
-                ['phone_number' => '+8800000000000'],
+                ['phone_number' => '+27000000000'],
                 array_merge([
                     'name' => 'Walk-in Reseller',
                     'email' => 'walkin@hotash.tech',
@@ -313,6 +315,68 @@ class EditOrder extends Component
                 'remember_token' => Str::random(10),
             ])
         );
+    }
+
+    private function sanitizePhoneInput(?string $phone): string
+    {
+        if ($phone === null) {
+            return '';
+        }
+
+        $trimmed = trim($phone);
+        $hasPlusPrefix = Str::startsWith($trimmed, '+');
+        $digits = preg_replace('/\D+/', '', $trimmed);
+
+        if (! is_string($digits)) {
+            return '';
+        }
+
+        return $hasPlusPrefix ? '+'.$digits : $digits;
+    }
+
+    private function digitsWithoutCountryCode(string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        if (! is_string($digits)) {
+            return '';
+        }
+
+        if (Str::startsWith($digits, '27') && strlen($digits) >= 11) {
+            $digits = substr($digits, 2);
+        }
+
+        if (Str::startsWith($digits, '0') && strlen($digits) === 10) {
+            $digits = substr($digits, 1);
+        }
+
+        return $digits;
+    }
+
+    private function normalizeSouthAfricanPhone(string $phone): string
+    {
+        $digits = $this->digitsWithoutCountryCode($phone);
+
+        return '+27'.$digits;
+    }
+
+    private function formatPhoneForInput(?string $phone): string
+    {
+        if (! $phone) {
+            return '';
+        }
+
+        $digits = $this->digitsWithoutCountryCode($phone);
+
+        if ($digits === '') {
+            return '';
+        }
+
+        if (strlen($digits) === 9) {
+            return '0'.$digits;
+        }
+
+        return $phone;
     }
 
     public function render()

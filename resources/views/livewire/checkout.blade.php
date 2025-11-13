@@ -30,7 +30,7 @@
                         <div class="input-group">
                             @unless (setting('show_option')->hide_phone_prefix ?? false)
                             <div class="input-group-prepend">
-                                <span class="input-group-text">+880</span>
+                                <span class="input-group-text">+27</span>
                             </div>
                             @endunless
                             <x-input type="tel" name="phone" wire:model="phone"

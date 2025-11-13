@@ -224,7 +224,7 @@ class Checkout extends Component
         if ((! isOninda() || ! config('app.resell')) && $user = auth('user')->user()) {
             $this->name = $user->name;
             if ($user->phone_number) {
-                $this->phone = Str::after($user->phone_number, '+880');
+                $this->phone = $this->formatPhoneForInput($user->phone_number);
             }
             $this->address = $user->address ?? '';
             $this->note = $user->note ?? '';
@@ -232,7 +232,7 @@ class Checkout extends Component
         } elseif ($this->fillFromCookie()) {
             $this->name = Cookie::get('name', '');
             $this->shipping = Cookie::get('shipping', $shipping ?? '');
-            $this->phone = Cookie::get('phone', '');
+            $this->phone = $this->formatPhoneForInput(Cookie::get('phone', ''));
             $this->address = Cookie::get('address', '');
             $this->note = Cookie::get('note', '');
             $this->retailDiscount = Cookie::get('retail_discount', 0);
@@ -251,17 +251,11 @@ class Checkout extends Component
             return to_route('user.login')->with('danger', 'Please login to add product to cart');
         }
 
-        if (! ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)) {
-            if (Str::startsWith($this->phone, '01')) {
-                $this->phone = Str::after($this->phone, '0');
-            }
-        } elseif (Str::startsWith($this->phone, '01')) { // hide prefix
-            $this->phone = '+88'.$this->phone;
-        }
+        $this->phone = $this->sanitizePhoneInput($this->phone);
 
         $validationRules = [
             'name' => 'required',
-            'phone' => $hidePrefix ? 'required|regex:/^\+8801\d{9}$/' : 'required|regex:/^1\d{9}$/',
+            'phone' => ['required', 'regex:/^(?:\+27|27|0)\d{9}$/'],
             'address' => 'required',
             'note' => 'nullable',
             'shipping' => 'required',
@@ -276,9 +270,8 @@ class Checkout extends Component
 
         $data = $this->validate($validationRules);
 
-        if (! $hidePrefix) {
-            $data['phone'] = '+880'.$data['phone'];
-        }
+        $data['phone'] = $this->normalizeSouthAfricanPhone($data['phone']);
+        $this->phone = $this->formatPhoneForInput($data['phone']);
 
         throw_if(cart()->count() === 0, ValidationException::withMessages(['products' => 'Your cart is empty.']));
 
@@ -446,6 +439,68 @@ class Checkout extends Component
             'pathaoCities' => collect($tempOrder->pathaoCityList()),
             'pathaoAreas' => collect($tempOrder->pathaoAreaList($this->city_id)),
         ]);
+    }
+
+    private function sanitizePhoneInput(?string $phone): string
+    {
+        if ($phone === null) {
+            return '';
+        }
+
+        $trimmed = trim($phone);
+        $hasPlusPrefix = Str::startsWith($trimmed, '+');
+        $digits = preg_replace('/\D+/', '', $trimmed);
+
+        if (! is_string($digits)) {
+            return '';
+        }
+
+        return $hasPlusPrefix ? '+'.$digits : $digits;
+    }
+
+    private function digitsWithoutCountryCode(string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        if (! is_string($digits)) {
+            return '';
+        }
+
+        if (Str::startsWith($digits, '27') && strlen($digits) >= 11) {
+            $digits = substr($digits, 2);
+        }
+
+        if (Str::startsWith($digits, '0') && strlen($digits) === 10) {
+            $digits = substr($digits, 1);
+        }
+
+        return $digits;
+    }
+
+    private function normalizeSouthAfricanPhone(string $phone): string
+    {
+        $digits = $this->digitsWithoutCountryCode($phone);
+
+        return '+27'.$digits;
+    }
+
+    private function formatPhoneForInput(?string $phone): string
+    {
+        if (! $phone) {
+            return '';
+        }
+
+        $digits = $this->digitsWithoutCountryCode($phone);
+
+        if ($digits === '') {
+            return '';
+        }
+
+        if (strlen($digits) === 9) {
+            return '0'.$digits;
+        }
+
+        return $phone;
     }
 
     protected function fillFromCookie(): bool

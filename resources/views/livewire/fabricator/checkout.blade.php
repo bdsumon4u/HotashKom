@@ -162,7 +162,7 @@
                                                                     type="tel" wire:model="phone"
                                                                     class="input-text" name="billing_phone"
                                                                     id="billing_phone" placeholder=""
-                                                                    value="{{ setting('show_option')->hide_phone_prefix ?? false ? '' : '+880' }}"
+                                                                    value="{{ setting('show_option')->hide_phone_prefix ?? false ? '' : '+27' }}"
                                                                     aria-required="true" autocomplete="tel" />
                                                                 <span
                                                                     class="wcf-field-required-error">{{ $errors->first('phone') }}</span>
