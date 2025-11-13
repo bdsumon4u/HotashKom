@@ -14,6 +14,8 @@ return [
 
     'instant_order_forwarding' => env('INSTANT_ORDER_FORWARDING', false),
 
+    'infinite_scroll_section' => env('APP_INFINITE_SCROLL_SECTION', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

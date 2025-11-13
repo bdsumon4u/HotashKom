@@ -176,14 +176,22 @@
 
 @foreach(sections() as $section)
 @if($section->type == 'pure-grid')
-<!-- .block-products-carousel -->
-<x-infinite-scroll-section :section="$section" />
+    <!-- .block-products-carousel -->
+    @if(config('app.infinite_scroll_section', false))
+    <x-infinite-scroll-section :section="$section" />
+    @else
+    @include('partials.products.pure-grid', [
+        'title' => $section->title,
+        'products' => $section->products(),
+        'cols' => optional($section->data)->cols ?? 5,
+        'section' => $section,
+    ])
+    @endif
 @else
-    @php($products = $section->products())
     <!-- .block-products-carousel -->
     @includeWhen($section->type == 'carousel-grid', 'partials.products.carousel-grid', [
         'title' => $section->title,
-        'products' => $products,
+        'products' => $section->products(),
         'rows' => optional($section->data)->rows,
         'cols' => optional($section->data)->cols,
     ])
