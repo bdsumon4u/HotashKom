@@ -190,8 +190,8 @@
                             <th colspan="2" class="text-center">Delivery Charge</th>
                         </tr>
                         <tr>
-                            <th width="50%">Inside Dhaka</th>
-                            <th width="50%">Outside Dhaka</th>
+                            <th width="50%">{{ __('checkout.inside_dhaka') }}</th>
+                            <th width="50%">{{ __('checkout.outside_dhaka') }}</th>
                         </tr>
                     </thead>
                     <tbody>
