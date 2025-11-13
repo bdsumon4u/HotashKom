@@ -400,13 +400,14 @@
                                                                             style="border: 1px solid var( --wcf-field-border-color ); display: flex; column-gap: 1rem; padding: .5rem; list-style: none; margin: 0;"
                                                                             class="woocommerce-shipping-methods">
                                                                             @foreach($otherAttributes[$attribute->id] as $option)
-                                                                                <li style="white-space: nowrap; margin: 0; display: flex;">
+                                                                                <li style="white-space: nowrap; margin: 0; display: flex; align-items: center;">
                                                                                     <input type="radio"
                                                                                         name="attribute_{{ $attribute->id }}"
                                                                                         data-attribute-id="{{ $attribute->id }}"
                                                                                         id="attribute_option_{{ $option->id }}"
                                                                                         value="{{ $option->id }}"
                                                                                         class="attribute-option-radio"
+                                                                                        style="margin: 3px .4375em 0 0;"
                                                                                         @if(in_array($option->id, $selectedOptionIds)) checked='checked' @endif />
                                                                                     <label for="attribute_option_{{ $option->id }}" style="margin: 0;">{{ $option->name }}</label>
                                                                                 </li>
