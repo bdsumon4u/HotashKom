@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}458}$$ 🔥 domains are live now
+These 🔥 $${\color{red}459}$$ 🔥 domains are live now
 
-_Last updated: **2025-11-14 09:17:15 Asia/Dhaka**_
+_Last updated: **2025-11-15 09:11:59 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -554,6 +554,7 @@ _Last updated: **2025-11-14 09:17:15 Asia/Dhaka**_
 | 453 | [minichinabazar.com](http://minichinabazar.com) |
 | 454 | [aminaemart.com](http://aminaemart.com) |
 | 455 | [aarot24.com](http://aarot24.com) |
-| 456 | [trusthubbd.com](http://trusthubbd.com) |
-| 457 | [taslimashop.com](http://taslimashop.com) |
-| 458 | [rojshopping.com](http://rojshopping.com) |
+| 456 | [nsbbd.com](http://nsbbd.com) |
+| 457 | [trusthubbd.com](http://trusthubbd.com) |
+| 458 | [taslimashop.com](http://taslimashop.com) |
+| 459 | [rojshopping.com](http://rojshopping.com) |
