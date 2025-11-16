@@ -203,18 +203,18 @@
             window.print();
         };
         window.onafterprint = function() {
-            if (confirm('Update status to INVOICED?')) {
+            if (confirm('Update status to PACKAGING?')) {
                 $.ajax({
                     url: '{{ route('admin.orders.status') }}',
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
                         order_id: {!! json_encode(explode(',', request('order_id'))) !!},
-                        status: 'INVOICED',
+                        status: 'PACKAGING',
                     },
                     success: function (response) {
                         console.log('Status updated successfully');
-                        window.location.href = '{{ route('admin.orders.index', ['status' => 'INVOICED']) }}';
+                        window.location.href = '{{ route('admin.orders.index', ['status' => 'PACKAGING']) }}';
                     },
                     error: function (xhr, status, error) {
                         console.error('Error updating status:', error);

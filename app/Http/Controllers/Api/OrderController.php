@@ -121,9 +121,9 @@ class OrderController extends Controller
             ->addColumn('checkbox', fn ($row): string => '<input type="checkbox" class="form-control" name="order_id[]" value="'.$row->id.'" '.$this->isDisabled($row).' style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">')
             ->editColumn('customer', fn ($row): string => "
                     <div>
-                        <div><i class='mr-1 fa fa-user'></i>{$row->name}</div>
-                        <div><i class='mr-1 fa fa-phone'></i><a href='tel:{$row->phone}'>{$row->phone}</a></div>
-                        <div><i class='mr-1 fa fa-map-marker'></i>{$row->address}</div>".
+                        <div style='white-space:nowrap;'><i class='mr-1 fa fa-user'></i>{$row->name}</div>
+                        <div style='white-space:nowrap;'><i class='mr-1 fa fa-phone'></i><a href='tel:{$row->phone}'>".without88($row->phone)."</a></div>
+                        <div style='white-space:nowrap;'><i class='mr-1 fa fa-map-marker'></i>{$row->address}</div>".
                 ($row->note ? "<div class='text-danger'><i class='mr-1 fa fa-sticky-note-o'></i>{$row->note}</div>" : '').
                 '</div>')
             ->editColumn('products', function ($row) {

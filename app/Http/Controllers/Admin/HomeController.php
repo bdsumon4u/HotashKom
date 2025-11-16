@@ -39,7 +39,7 @@ class HomeController extends Controller
         $productsData = (new ProductReportService)->generateProductsReport(
             $_start,
             $_end,
-            ['CONFIRMED', 'INVOICED', 'SHIPPING'],
+            ['CONFIRMED', 'PACKAGING', 'SHIPPING'],
             request('date_type', 'status_at'),
             request('staff_id')
         );

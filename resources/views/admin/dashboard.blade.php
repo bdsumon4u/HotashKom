@@ -178,7 +178,7 @@
                 <div class="shadow-sm card rounded-0">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center">
                         <strong>Processing Products</strong>
-                        <small>CONFIRMED+INVOICED+SHIPPING</small>
+                        <small>CONFIRMED+PACKAGING+SHIPPING</small>
                     </div>
                     <div class="p-3 card-body">
                         @if(!empty($products))

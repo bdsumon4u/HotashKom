@@ -2,7 +2,6 @@
 
 namespace App\Filament\Fabricator\Layouts;
 
-use Filament\Facades\Filament;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Z3d0X\FilamentFabricator\Layouts\Layout;

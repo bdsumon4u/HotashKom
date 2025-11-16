@@ -19,7 +19,7 @@ final class ResellerController extends Controller
 
         $totalOrders = Order::where('user_id', $user->id)->count();
         $totalSales = Order::where('user_id', $user->id)
-            ->whereIn('status', ['CONFIRMED', 'INVOICED', 'SHIPPING', 'DELIVERED'])
+            ->whereIn('status', ['CONFIRMED', 'PACKAGING', 'SHIPPING', 'DELIVERED'])
             ->sum('data->subtotal');
         $availableBalance = $user->getAvailableBalance();
 

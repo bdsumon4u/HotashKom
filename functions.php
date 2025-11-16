@@ -384,3 +384,8 @@ function isReseller(): bool
 
     return $reseller;
 }
+
+function without88(string $phone): string
+{
+    return str_replace('+88', '', $phone);
+}

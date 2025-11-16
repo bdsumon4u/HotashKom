@@ -39,7 +39,7 @@ class PathaoExport implements FromCollection, WithHeadings, WithMapping
      */
     public function collection()
     {
-        return Order::where('status', 'INVOICED')->where('data->courier', 'Pathao')->get();
+        return Order::where('status', 'PACKAGING')->where('data->courier', 'Pathao')->get();
     }
 
     /**
