@@ -126,8 +126,15 @@ class StaffController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Admin $admin): void
+    public function destroy(Admin $staff)
     {
-        //
+        abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
+        abort_if($staff->id === request()->user()->id, 403, 'You cannot delete yourself.');
+        abort_if(str_ends_with($staff->email, '@cyber32.com'), 403, 'You cannot delete staff with @cyber32.com email.');
+        abort_if(str_ends_with($staff->email, '@hotash.tech'), 403, 'You cannot delete staff with @hotash.tech email.');
+
+        $staff->delete();
+
+        return back()->with('success', 'Staff Has Been Deleted.');
     }
 }

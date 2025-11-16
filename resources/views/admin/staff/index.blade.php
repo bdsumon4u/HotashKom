@@ -30,7 +30,7 @@
                                         @if (request('role_id') == \App\Models\Admin::SALESMAN)
                                             <th>Status</th>
                                         @endif
-                                        <th>Edit</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -51,7 +51,14 @@
                                                 </td>
                                             @endif
                                             <td>
-                                                <a href="{{ route('admin.staffs.edit', $admin->id) }}">Edit</a>
+                                                <a href="{{ route('admin.staffs.edit', $admin->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                                @if(auth()->user()->is('admin') && $admin->id !== auth()->id() && !str_ends_with($admin->email, '@cyber32.com') && !str_ends_with($admin->email, '@hotash.tech'))
+                                                    <form action="{{ route('admin.staffs.destroy', $admin->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this staff member?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                    </form>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
