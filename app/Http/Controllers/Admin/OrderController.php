@@ -288,7 +288,9 @@ class OrderController extends Controller
             }
         }
 
-        return view('admin.orders.invoices', compact('orders', 'resellerData'));
+        $invoicesPerPage = request('invoices_per_page', setting('show_option')->invoices_per_page ?? 3);
+
+        return view('admin.orders.invoices-'.$invoicesPerPage, compact('orders', 'resellerData'));
     }
 
     public function stickers(Request $request)

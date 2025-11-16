@@ -260,7 +260,7 @@
                         else if (data === 'CONFIRMED' || data === 'DELIVERED') badgeClass = 'badge-success';
                         else if (data === 'CANCELLED' || data === 'LOST') badgeClass = 'badge-danger';
                         else if (data === 'RETURNED') badgeClass = 'badge-warning';
-                        else if (data === 'INVOICED' || data === 'SHIPPING' || data === 'WAITING') badgeClass = 'badge-info';
+                        else if (data === 'PACKAGING' || data === 'SHIPPING' || data === 'WAITING') badgeClass = 'badge-info';
                         let html = '<span class="badge' + ' ' + badgeClass + '">' + data + '</span>';
                         if (row.consignment_id && row.tracking_url) {
                             html += ' <div class="text-nowrap">C.ID: <a href="' + row.tracking_url + '" target="_blank">' + row.consignment_id + '</a></div>';

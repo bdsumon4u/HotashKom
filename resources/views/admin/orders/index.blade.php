@@ -46,7 +46,7 @@
                         </div>
                         <div class="row d-none" style="row-gap: .25rem;">
                             <div class="col-auto pr-0 d-flex align-items-center" check-count></div>
-                            @unless(false && in_array(request('status'), ['CONFIRMED', 'INVOICED']))
+                            @unless(false && in_array(request('status'), ['CONFIRMED', 'PACKAGING']))
                             <div class="col-auto px-1">
                                 <select name="status" id="status" onchange="changeStatus()" class="text-white form-control form-control-sm bg-primary">
                                     <option value="">Change Status</option>
@@ -108,7 +108,7 @@
                                     @if(isReseller())
                                     <button onclick="forwardToOninda()" id="forward-to-oninda" class="ml-1 btn btn-sm btn-primary">Forward to Wholesaler</button>
                                     @endif
-                                @elseif(request('status') == 'INVOICED')
+                                @elseif(request('status') == 'PACKAGING')
                                     <button onclick="courier()" id="courier" class="ml-1 btn btn-sm btn-primary">Send to Courier</button>
                                 @endif
                             </div>

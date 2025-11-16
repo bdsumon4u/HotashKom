@@ -34,7 +34,7 @@ return [
         'PENDING',
         'WAITING',
         'CONFIRMED',
-        'INVOICED',
+        'PACKAGING',
         'SHIPPING',
         'DELIVERED',
         'PARTIAL_DELIVERY',
@@ -46,7 +46,7 @@ return [
 
     'increment' => ['PENDING', 'WAITING', 'RETURNED', 'CANCELLED', 'PAID_RETURN'],
 
-    'decrement' => ['CONFIRMED', 'INVOICED', 'SHIPPING', 'DELIVERED', 'LOST', 'PARTIAL_DELIVERY'],
+    'decrement' => ['CONFIRMED', 'PACKAGING', 'SHIPPING', 'DELIVERED', 'LOST', 'PARTIAL_DELIVERY'],
 
     'round_robin_order_receiving' => env('ROUND_ROBIN_ORDER_RECEIVING', false),
 

@@ -131,6 +131,17 @@
                 </select>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="invoices-per-page">Invoices Per A4 Paper</label>
+                @php $invoicesPerPage = $show_option->invoices_per_page ?? 3; @endphp
+                <select name="show_option[invoices_per_page]" id="invoices-per-page" class="form-control">
+                    <option value="1" @if ($invoicesPerPage == 1) selected @endif>1 Invoice</option>
+                    <option value="2" @if ($invoicesPerPage == 2) selected @endif>2 Invoices</option>
+                    <option value="3" @if ($invoicesPerPage == 3) selected @endif>3 Invoices</option>
+                </select>
+            </div>
+        </div>
         <div class="col-md-9">
             <div class="flex-wrap mt-2 d-flex" style="row-gap: .25rem; column-gap: .75rem;">
                 <div class="checkbox checkbox-secondary">
