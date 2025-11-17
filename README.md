@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}459}$$ 🔥 domains are live now
+These 🔥 $${\color{red}468}$$ 🔥 domains are live now
 
-_Last updated: **2025-11-16 09:22:17 Asia/Dhaka**_
+_Last updated: **2025-11-17 09:20:42 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -558,3 +558,12 @@ _Last updated: **2025-11-16 09:22:17 Asia/Dhaka**_
 | 457 | [trusthubbd.com](http://trusthubbd.com) |
 | 458 | [taslimashop.com](http://taslimashop.com) |
 | 459 | [rojshopping.com](http://rojshopping.com) |
+| 460 | [rokomariebazar.com](http://rokomariebazar.com) |
+| 461 | [trustmart24.com](http://trustmart24.com) |
+| 462 | [nittoebazar.com](http://nittoebazar.com) |
+| 463 | [e-bazar24.com](http://e-bazar24.com) |
+| 464 | [e-market24.com](http://e-market24.com) |
+| 465 | [ponnovaly.com](http://ponnovaly.com) |
+| 466 | [bikroyemart.com](http://bikroyemart.com) |
+| 467 | [rokomaryhut.com](http://rokomaryhut.com) |
+| 468 | [powerpartsbd.com](http://powerpartsbd.com) |
