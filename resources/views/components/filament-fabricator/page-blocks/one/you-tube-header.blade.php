@@ -170,7 +170,7 @@
                     @endphp
 
                     @if($videoId)
-                        <div class="youtube-header-video-container">
+                        <div class="youtube-header-video-container" style="height: 400px;">
                             <iframe
                                 class="youtube-header-iframe"
                                 src="https://www.youtube.com/embed/{{ $videoId }}?rel=0&modestbranding=1&autoplay=1&play_on_mobile=1"

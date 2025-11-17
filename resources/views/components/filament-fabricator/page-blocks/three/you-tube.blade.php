@@ -89,7 +89,7 @@
                     @endphp
 
                     @if($videoId)
-                        <div class="youtube-video-container">
+                        <div class="youtube-video-container" style="height: 400px;">
                             <iframe
                                 class="youtube-iframe"
                                 src="https://www.youtube.com/embed/{{ $videoId }}?rel=0&modestbranding=1"
