@@ -7,14 +7,37 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $company->name }} - @yield('title')</title>
-    <link rel="icon" type="image/png" href="{{ asset($logo->favicon) }}"><!-- fonts -->
+    <link rel="icon" type="image/png" href="{{ asset($logo->favicon) }}">
+    
+    @php
+        $bootstrapCss = cdnAsset('bootstrap.css', 'strokya/vendor/bootstrap-4.2.1/css/bootstrap.min.css');
+        $fontawesomeCss = cdnAsset('fontawesome.css', 'strokya/vendor/fontawesome-5.6.1/css/all.min.css');
+        $jqueryJs = cdnAsset('jquery', 'strokya/vendor/jquery-3.3.1/jquery.min.js');
+    @endphp
+    
+    {{-- Preload critical CSS --}}
+    <link rel="preload" href="{{ $bootstrapCss }}" as="style" crossorigin="anonymous">
+    <link rel="preload" href="{{ $fontawesomeCss }}" as="style" crossorigin="anonymous">
+    <link rel="preload" href="{{ versionedAsset('strokya/css/style.css') }}" as="style">
+    
+    {{-- Preload critical JavaScript --}}
+    <link rel="preload" href="{{ $jqueryJs }}" as="script" crossorigin="anonymous">
+    
+    {{-- Preconnect to CDN domains for faster DNS resolution --}}
+    @if(config('cdn.enabled', true))
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    @endif
+    
     <!-- css -->
     @include('googletagmanager::head')
     <x-metapixel-head/>
     @include('layouts.yellow.css')
     <!-- js -->
     <!-- font - fontawesome -->
-    <link rel="stylesheet" href="{{ asset('strokya/vendor/fontawesome-5.6.1/css/all.min.css') }}"><!-- font - stroyka -->
+    <link rel="stylesheet" href="{{ $fontawesomeCss }}" crossorigin="anonymous" referrerpolicy="no-referrer"><!-- font - stroyka -->
     <link rel="stylesheet" href="{{ asset('strokya/fonts/stroyka/stroyka.css') }}">
     @include('layouts.yellow.color')
     <style>

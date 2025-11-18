@@ -1,0 +1,69 @@
+<?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | CDN Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure CDN URLs for external libraries. When enabled, these will
+    | replace local asset files with CDN versions for better performance.
+    |
+    */
+
+    'enabled' => env('CDN_ENABLED', true),
+
+    'provider' => env('CDN_PROVIDER', 'jsdelivr'), // jsdelivr, cdnjs, unpkg
+
+    'assets' => [
+        'jquery' => [
+            'version' => '3.7.1',
+            'jsdelivr' => 'https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js',
+            'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js',
+            'unpkg' => 'https://unpkg.com/jquery@3.7.1/dist/jquery.min.js',
+        ],
+        'bootstrap' => [
+            'version' => '4.6.2',
+            'css' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css',
+                'unpkg' => 'https://unpkg.com/bootstrap@4.6.2/dist/css/bootstrap.min.css',
+            ],
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js',
+                'unpkg' => 'https://unpkg.com/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js',
+            ],
+        ],
+        'fontawesome' => [
+            'version' => '6.5.1',
+            'css' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
+                'unpkg' => 'https://unpkg.com/@fortawesome/fontawesome-free@6.5.1/css/all.min.css',
+            ],
+        ],
+        'owl-carousel' => [
+            'version' => '2.3.4',
+            'css' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/owl.carousel@2.3.4/dist/assets/owl.carousel.min.css',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css',
+                'unpkg' => 'https://unpkg.com/owl.carousel@2.3.4/dist/assets/owl.carousel.min.css',
+            ],
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/owl.carousel@2.3.4/dist/owl.carousel.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js',
+                'unpkg' => 'https://unpkg.com/owl.carousel@2.3.4/dist/owl.carousel.min.js',
+            ],
+        ],
+        'svg4everybody' => [
+            'version' => '2.1.11',
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/svg4everybody@2.1.11/dist/svg4everybody.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/svg4everybody/2.1.11/svg4everybody.min.js',
+                'unpkg' => 'https://unpkg.com/svg4everybody@2.1.11/dist/svg4everybody.min.js',
+            ],
+        ],
+    ],
+];
+
