@@ -64,6 +64,65 @@ return [
                 'unpkg' => 'https://unpkg.com/svg4everybody@2.1.11/dist/svg4everybody.min.js',
             ],
         ],
+        'jquery-3.5.1' => [
+            'version' => '3.5.1',
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js',
+                'unpkg' => 'https://unpkg.com/jquery@3.5.1/dist/jquery.min.js',
+            ],
+        ],
+        'popper' => [
+            'version' => '2.11.8',
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js',
+                'unpkg' => 'https://unpkg.com/@popperjs/core@2.11.8/dist/umd/popper.min.js',
+            ],
+        ],
+        'bootstrap-5' => [
+            'version' => '5.3.3',
+            'css' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css',
+                'unpkg' => 'https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+            ],
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js',
+                'unpkg' => 'https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+            ],
+        ],
+        'datatables' => [
+            'version' => '1.13.7',
+            'css' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.13.7/css/dataTables.bootstrap5.min.css',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs5/1.13.7/dataTables.bootstrap5.min.css',
+                'unpkg' => 'https://unpkg.com/datatables.net-bs5@1.13.7/css/dataTables.bootstrap5.min.css',
+            ],
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/datatables.net@1.13.7/js/jquery.dataTables.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/datatables.net/1.13.7/js/jquery.dataTables.min.js',
+                'unpkg' => 'https://unpkg.com/datatables.net@1.13.7/js/jquery.dataTables.min.js',
+            ],
+            'js-bootstrap5' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.13.7/js/dataTables.bootstrap5.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/datatables.net-bs5/1.13.7/js/dataTables.bootstrap5.min.js',
+                'unpkg' => 'https://unpkg.com/datatables.net-bs5@1.13.7/js/dataTables.bootstrap5.min.js',
+            ],
+        ],
+        'select2' => [
+            'version' => '4.1.0',
+            'css' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0/css/select2.min.css',
+                'unpkg' => 'https://unpkg.com/select2@4.1.0/dist/css/select2.min.css',
+            ],
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0/js/select2.min.js',
+                'unpkg' => 'https://unpkg.com/select2@4.1.0/dist/js/select2.min.js',
+            ],
+        ],
     ],
 ];
-

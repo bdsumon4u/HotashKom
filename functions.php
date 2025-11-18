@@ -253,10 +253,20 @@ if (! function_exists('cdnAsset')) {
         $cdnConfig = config('cdn.assets', []);
         $provider = config('cdn.provider', 'jsdelivr');
 
-        // Handle assets with separate CSS/JS (e.g., 'bootstrap.css', 'bootstrap.js', 'fontawesome.css')
+        // Handle assets with separate CSS/JS (e.g., 'bootstrap.css', 'bootstrap.js', 'fontawesome.css', 'datatables.js-bootstrap5')
         if (str_contains($assetName, '.')) {
-            [$name, $type] = explode('.', $assetName, 2);
+            $parts = explode('.', $assetName, 2);
+            $name = $parts[0];
+            $type = $parts[1];
             $asset = $cdnConfig[$name] ?? null;
+
+            // Handle special cases like 'datatables.js-bootstrap5'
+            if (str_contains($type, '-')) {
+                [$jsType, $variant] = explode('-', $type, 2);
+                if ($asset && isset($asset["{$jsType}-{$variant}"][$provider])) {
+                    return $asset["{$jsType}-{$variant}"][$provider];
+                }
+            }
 
             if ($asset && isset($asset[$type][$provider])) {
                 return $asset[$type][$provider];

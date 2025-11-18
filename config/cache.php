@@ -21,7 +21,7 @@ return [
 
     'response_cache' => [
         'enabled' => env('RESPONSE_CACHE_ENABLED', false),
-        'store' => env('RESPONSE_CACHE_STORE', 'redis'),
+        'store' => env('RESPONSE_CACHE_STORE', env('CACHE_STORE', 'database')),
     ],
 
     /*

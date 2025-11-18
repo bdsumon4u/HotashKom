@@ -55,7 +55,16 @@ class ApiController extends Controller
         Artisan::call('config:clear');
         Artisan::call('view:clear');
         Artisan::call('route:clear');
-        Artisan::call('responsecache:clear');
+
+        // Only clear response cache if it's enabled
+        if (config('cache.response_cache.enabled', false)) {
+            try {
+                Artisan::call('responsecache:clear');
+            } catch (\Exception $e) {
+                // Silently fail if Redis is not available
+                // This prevents errors when Redis is not configured
+            }
+        }
 
         return back()->with('success', 'Cache has been cleared');
     }

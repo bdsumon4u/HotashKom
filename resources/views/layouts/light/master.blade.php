@@ -8,6 +8,28 @@
     <link rel="icon" href="{{asset($logo->favicon ?? '')}}" type="image/x-icon">
     <link rel="shortcut icon" href="{{asset($logo->favicon ?? '')}}" type="image/x-icon">
     <title>{{ $company->name ?? '' }} - @yield('title')</title>
+    
+    @php
+        $jqueryJs = cdnAsset('jquery-3.5.1', 'assets/js/jquery-3.5.1.min.js');
+        $fontawesomeCss = cdnAsset('fontawesome.css', 'assets/css/fontawesome.css');
+    @endphp
+    
+    {{-- Preload critical CSS --}}
+    <link rel="preload" href="{{ $fontawesomeCss }}" as="style" crossorigin="anonymous">
+    <link rel="preload" href="{{ versionedAsset('assets/css/bootstrap.css') }}" as="style">
+    <link rel="preload" href="{{ versionedAsset('assets/css/style.css') }}" as="style">
+    
+    {{-- Preload critical JavaScript --}}
+    <link rel="preload" href="{{ $jqueryJs }}" as="script" crossorigin="anonymous">
+    
+    {{-- Preconnect to CDN domains for faster DNS resolution --}}
+    @if(config('cdn.enabled', true))
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    @endif
+    
     @include('layouts.light.css')
     <style>
       @media (min-width: 992px) {
