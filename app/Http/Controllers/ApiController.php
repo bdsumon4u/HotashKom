@@ -55,6 +55,7 @@ class ApiController extends Controller
         Artisan::call('config:clear');
         Artisan::call('view:clear');
         Artisan::call('route:clear');
+        Artisan::call('responsecache:clear');
 
         return back()->with('success', 'Cache has been cleared');
     }

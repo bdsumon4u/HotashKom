@@ -215,6 +215,7 @@ class ApiController extends Controller
             ->get()
             ->transform(fn ($product): array => array_merge($product->toArray(), [
                 'images' => $product->images->pluck('src')->toArray(),
+                'base_image_url' => $product->base_image ? asset($product->base_image->src) : null,
                 'price' => $product->selling_price,
                 'compareAtPrice' => $product->price,
                 'badges' => [],

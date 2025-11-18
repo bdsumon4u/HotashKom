@@ -9,7 +9,7 @@
                 <ul class="departments__links">
                     @foreach($categories as $category)
                         <li class="departments__item @if($category->childrens->isNotEmpty()) departments__item--menu @endif">
-                            <a href="{{ route('categories.products', $category) }}">{{ $category->name }}
+                            <a href="{{ route('categories.products', $category) }}" wire:navigate.hover>{{ $category->name }}
                                 @if ($category->childrens->isNotEmpty())
                                     <svg class="departments__link-arrow" width="6px" height="9px">
                                         <use
@@ -24,7 +24,7 @@
                                     <ul class="menu menu--layout--classic">
                                         @foreach ($category->childrens as $category)
                                             <li>
-                                                <a href="{{ route('categories.products', $category) }}">{{ $category->name }}
+                                                <a href="{{ route('categories.products', $category) }}" wire:navigate.hover>{{ $category->name }}
                                                     @if ($category->childrens->isNotEmpty())
                                                         <svg class="menu__arrow" width="6px" height="9px">
                                                             <use
@@ -38,7 +38,7 @@
                                                         <!-- .menu -->
                                                         <ul class="menu menu--layout--classic">
                                                             @foreach($category->childrens as $category)
-                                                                <li><a href="{{ route('categories.products', $category) }}">{{ $category->name }}</a></li>
+                                                                <li><a href="{{ route('categories.products', $category) }}" wire:navigate.hover>{{ $category->name }}</a></li>
                                                             @endforeach
                                                         </ul>
                                                         <!-- .menu / end -->
@@ -52,7 +52,7 @@
                         </li>
                     @endforeach
                     <li class="departments__item">
-                        <a href="{{ route('categories') }}">View All Categories
+                        <a href="{{ route('categories') }}" wire:navigate.hover>View All Categories
                             <svg class="departments__link-arrow" width="6px" height="9px">
                                 <use
                                     xlink:href="{{ asset('strokya/images/sprite.svg#arrow-rounded-right-6x9') }}">

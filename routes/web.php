@@ -94,8 +94,6 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
         });
     });
 
-    Route::get('/categories', [ApiController::class, 'categories'])->name('categories');
-    Route::get('/brands', [ApiController::class, 'brands'])->name('brands');
     Route::post('save-checkout-progress', [ApiController::class, 'saveCheckoutProgress']);
 
     Route::get('/', HomeController::class)->name('/');
@@ -108,6 +106,19 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::post('/leads', [LeadController::class, 'store'])
         ->middleware('throttle:1,10')
         ->name('leads.store');
+    Route::middleware('response.cache')->group(function (): void {
+        Route::get('/categories', [ApiController::class, 'categories'])->name('categories');
+        Route::get('/brands', [ApiController::class, 'brands'])->name('brands');
+
+        Route::get('/', HomeController::class)->name('/');
+        Route::get('/sections/{section}/products', HomeSectionProductController::class)->name('home-sections.products');
+        Route::get('/shop', [ProductController::class, 'index'])->name('products.index');
+        Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+        Route::get('/categories/{category:slug}/products', CategoryProductController::class)->name('categories.products');
+        Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
+
+        pageRoutes();
+    });
 
     Route::view('/cart', 'cart')->name('cart');
     Route::match(['get', 'post'], '/checkout', CheckoutController::class)->name('checkout')->middleware(EnsureResellerIsVerified::class);
@@ -118,7 +129,6 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::post('cart/add', [App\Http\Controllers\Api\CartController::class, 'add'])->name('cart.add');
     Route::get('cart', [App\Http\Controllers\Api\CartController::class, 'get'])->name('cart.get');
 
-    pageRoutes();
 });
 
 Route::get('/storage-link', [ApiController::class, 'storageLink']);

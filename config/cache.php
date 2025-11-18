@@ -19,6 +19,11 @@ return [
 
     'memo' => env('CACHE_MEMO', false),
 
+    'response_cache' => [
+        'enabled' => env('RESPONSE_CACHE_ENABLED', false),
+        'store' => env('RESPONSE_CACHE_STORE', 'redis'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Cache Stores

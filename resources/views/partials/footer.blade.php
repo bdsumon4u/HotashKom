@@ -23,8 +23,13 @@
                             <h5 class="footer-links__title">Quick Links</h5>
                             <ul class="footer-links__list">
                                 @foreach($menuItems as $item)
+                                @php
+                                    $rawHref = $item->href;
+                                    $isExternal = \Illuminate\Support\Str::startsWith($rawHref, ['http://', 'https://', 'mailto:', 'tel:', '#']);
+                                    $href = $isExternal ? $rawHref : url($rawHref);
+                                @endphp
                                 <li class="footer-links__item">
-                                    <a href="{{ url($item->href) }}" class="footer-links__link">{{ $item->name }}</a>
+                                    <a href="{{ $href }}" class="footer-links__link" @unless($isExternal) wire:navigate.hover @endunless>{{ $item->name }}</a>
                                 </li>
                                 @endforeach
                             </ul>

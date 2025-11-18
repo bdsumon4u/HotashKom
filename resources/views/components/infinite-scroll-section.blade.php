@@ -11,10 +11,10 @@
                 @if($section->title ?? null)
                     <div class="block-header">
                         <h3 class="block-header__title" style="padding: 0.375rem 1rem;">
-                            <a href="{{ route('home-sections.products', $section) }}">{{ $section->title }}</a>
+                            <a href="{{ route('home-sections.products', $section) }}" wire:navigate.hover>{{ $section->title }}</a>
                         </h3>
                         <div class="block-header__divider"></div>
-                        <a href="{{ route('products.index', ['filter_section' => $section->id]) }}" class="ml-3 btn btn-sm btn-all">
+                        <a href="{{ route('products.index', ['filter_section' => $section->id]) }}" class="ml-3 btn btn-sm btn-all" wire:navigate.hover>
                             View All
                         </a>
                     </div>
@@ -121,6 +121,7 @@ function infiniteScroll(sectionId) {
                 this.loadedProductIds.add(productId);
                 const element = this.createProductElement(product, index);
                 container.appendChild(element);
+                this.attachNavigationHandlers(element);
             });
         },
 
@@ -129,6 +130,19 @@ function infiniteScroll(sectionId) {
             div.className = 'products-list__item';
             div.innerHTML = this.getProductHTML(product, index);
             return div;
+        },
+
+        attachNavigationHandlers(element) {
+            const productLinks = element.querySelectorAll('a.product-link[data-navigate]');
+            productLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const href = link.getAttribute('href');
+                    if (href && window.Livewire && window.Livewire.navigate) {
+                        e.preventDefault();
+                        window.Livewire.navigate(href);
+                    }
+                });
+            });
         },
 
                  getProductHTML(product, index) {
@@ -196,13 +210,13 @@ function infiniteScroll(sectionId) {
                                  ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale"><small>Discount:</small> ${discountPercent}%</div>` : ''}
                              </div>
                              <div class="product-card__image">
-                                 <a href="${productUrl}">
+                                 <a href="${productUrl}" class="product-link" data-navigate>
                                      <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;">
                                  </a>
                              </div>
                              <div class="product-card__info">
                                  <div class="product-card__name">
-                                     <a href="${productUrl}" data-name="${product.var_name || productName}">${productName}</a>
+                                     <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
                                  </div>
                              </div>
                              <div class="product-card__actions">

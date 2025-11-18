@@ -23,8 +23,13 @@ echo "Deploying application ..."
     # Note: If you're using queue workers, this is the place to restart them.
     # ...
 
+    /opt/alt/php83/usr/bin/php artisan responsecache:clear || true
+
     # Clear cache
     /opt/alt/php83/usr/bin/php artisan optimize:clear
+
+    # Warm up caches
+    /opt/alt/php83/usr/bin/php artisan optimize
 
     # Reload PHP to update opcache
     # echo "" | sudo -S service php7.4-fpm reload

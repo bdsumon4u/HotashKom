@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="{{ asset('strokya/fonts/stroyka/stroyka.css') }}">
     @include('layouts.yellow.color')
     <style>
+        [x-cloak] { display: none !important; }
         .topbar__item {
             flex: none;
         }
@@ -186,6 +187,7 @@
 </head>
 
 <body class="header-fixed" style="margin: 0; padding: 0;">
+    <x-livewire-progress bar-class="bg-warning" track-class="bg-white/50" />
     @include('googletagmanager::body')
     <x-metapixel-body/>
     <!-- quickview-modal -->
@@ -347,6 +349,15 @@
                 $("a.widget-connect__button").toggleClass("button-slide-out button-slide");
             });
         });
+    </script>
+    <script>
+        document.addEventListener('click', function (event) {
+            const zoomThumb = event.target.closest('.xzoom-thumbs a');
+
+            if (zoomThumb) {
+                event.preventDefault();
+            }
+        }, true);
     </script>
     <!-- Scripts -->
     <script>

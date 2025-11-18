@@ -13,6 +13,7 @@ use Azmolla\Shoppingcart\Cart as CartInstance;
 use Azmolla\Shoppingcart\CartItem;
 use Azmolla\Shoppingcart\Facades\Cart;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 if (! function_exists('cacheMemo')) {
-    function cacheMemo(): CacheManager
+    function cacheMemo(): CacheManager|CacheRepository
     {
         if (config('cache.memo')) {
             return cache()->memo();

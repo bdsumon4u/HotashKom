@@ -225,11 +225,40 @@
         </div>
     </div>
     <!-- .block-products-carousel -->
-    @include('partials.products.pure-grid', [
-        'title' => 'Related Products',
-        'cols' => $related_products->cols,
-        'rows' => $related_products->rows,
-    ])
+    @php($relatedProductsSetting = setting('related_products'))
+    <div class="lazy-related-products"
+         x-data="lazyRelatedProducts('{{ $product->slug }}', {{ $relatedProductsSetting->cols ?? 5 }})"
+         x-init="init()"
+         data-show-option="{{ json_encode([
+             'product_grid_button' => setting('show_option')->product_grid_button ?? 'add_to_cart',
+             'add_to_cart_icon' => setting('show_option')->add_to_cart_icon ?? '',
+             'add_to_cart_text' => setting('show_option')->add_to_cart_text ?? 'Add to Cart',
+             'order_now_icon' => setting('show_option')->order_now_icon ?? '',
+             'order_now_text' => setting('show_option')->order_now_text ?? 'Order Now',
+             'discount_text' => setting('discount_text') ?? '<small>Discount:</small> [percent]%',
+         ]) }}"
+         data-is-oninda="{{ isOninda() ? 'true' : 'false' }}"
+         data-guest-can-see-price="{{ (bool)(setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}">
+        <div class="block block-products-carousel">
+            <div class="container">
+                <div class="block-header">
+                    <h3 class="block-header__title" style="padding: 0.375rem 1rem;">
+                        Related Products
+                    </h3>
+                    <div class="block-header__divider"></div>
+                </div>
+                <div class="products-view__list products-list" data-layout="grid-{{ $relatedProductsSetting->cols ?? 5 }}-full" data-with-features="false">
+                    <div class="products-list__body" id="related-products-container">
+                        <div x-show="loading" class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- .block-products-carousel / end -->
 @endsection
 
@@ -262,14 +291,25 @@
                 gallery.eq(next).trigger('click');
             }
 
+            // Function to schedule next auto navigation
+            function scheduleNextNavigation() {
+                if (autoNavigationTimer) {
+                    clearTimeout(autoNavigationTimer);
+                }
+                autoNavigationTimer = setTimeout(() => {
+                    navigateToNext();
+                    // Note: scheduleNextNavigation() is not called here because
+                    // navigateToNext() triggers a click, which fires the click handler
+                    // that calls resetAutoNavigation(), which schedules the next one
+                }, 3000);
+            }
+
             // Function to reset auto navigation timer
             function resetAutoNavigation() {
                 if (autoNavigationTimer) {
-                    clearInterval(autoNavigationTimer);
+                    clearTimeout(autoNavigationTimer);
                 }
-                autoNavigationTimer = setInterval(() => {
-                    navigateToNext();
-                }, 3000);
+                scheduleNextNavigation();
             }
 
             // Listen for variant change event from Livewire
@@ -321,7 +361,205 @@
             });
 
             // Start automatic navigation
-            resetAutoNavigation();
+            scheduleNextNavigation();
+        });
+
+        // Lazy load related products
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('lazyRelatedProducts', (productSlug, cols) => ({
+                productSlug: productSlug,
+                cols: cols,
+                loading: false,
+                loaded: false,
+                observer: null,
+
+                init() {
+                    // Set up Intersection Observer to load when section is near viewport
+                    this.observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && !this.loaded && !this.loading) {
+                                this.loadProducts();
+                            }
+                        });
+                    }, {
+                        rootMargin: '200px' // Start loading 200px before section enters viewport
+                    });
+
+                    // Observe the lazy-related-products container
+                    this.$nextTick(() => {
+                        const container = this.$el;
+                        if (container) {
+                            this.observer.observe(container);
+                        }
+                    });
+                },
+
+                async loadProducts() {
+                    if (this.loading || this.loaded) return;
+
+                    this.loading = true;
+                    const container = document.getElementById('related-products-container');
+                    if (!container) {
+                        this.loading = false;
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch(`/api/products/${this.productSlug}/related.json`);
+
+                        if (response.ok) {
+                            const products = await response.json();
+                            this.renderProducts(products, container);
+                            this.loaded = true;
+                            this.observer?.disconnect();
+                        } else {
+                            container.innerHTML = '<div class="text-center py-5 text-muted">Unable to load related products.</div>';
+                        }
+                    } catch (error) {
+                        console.error('Error loading related products:', error);
+                        container.innerHTML = '<div class="text-center py-5 text-muted">Unable to load related products.</div>';
+                    }
+
+                    this.loading = false;
+                },
+
+                renderProducts(products, container) {
+                    if (!products || products.length === 0) {
+                        container.innerHTML = '<div class="text-center py-5 text-muted">No related products found.</div>';
+                        return;
+                    }
+
+                    // Clear loading indicator
+                    container.innerHTML = '';
+
+                    products.forEach((product) => {
+                        const productElement = this.createProductElement(product);
+                        container.appendChild(productElement);
+                        this.attachNavigationHandlers(productElement);
+                    });
+                },
+
+                createProductElement(product) {
+                    const div = document.createElement('div');
+                    div.className = 'products-list__item';
+                    div.innerHTML = this.getProductHTML(product);
+                    return div;
+                },
+
+                attachNavigationHandlers(element) {
+                    const productLinks = element.querySelectorAll('a.product-link[data-navigate]');
+                    productLinks.forEach(link => {
+                        link.addEventListener('click', (e) => {
+                            const href = link.getAttribute('href');
+                            if (href && window.Livewire && window.Livewire.navigate) {
+                                e.preventDefault();
+                                window.Livewire.navigate(href);
+                            }
+                        });
+                    });
+                },
+
+                getProductHTML(product) {
+                    const productId = product.id;
+                    const productName = product.name || 'Product';
+                    const productSlug = product.slug || productId;
+                    const productPrice = product.compareAtPrice || product.price || 0;
+                    const productSellingPrice = product.price || productPrice;
+                    const productImage = product.base_image_url || (product.images && product.images.length > 0 
+                        ? `/storage/${product.images[0]}` 
+                        : '/images/placeholder.jpg');
+                    const productUrl = `/products/${productSlug}`;
+                    const inStock = product.availability !== 'Out of Stock' && (product.availability === 'In Stock' || (product.availability && parseInt(product.availability) > 0));
+                    const stockCount = typeof product.availability === 'number' ? product.availability : (product.availability === 'In Stock' ? null : 0);
+                    const shouldTrack = typeof product.availability === 'number' || product.availability !== 'In Stock';
+                    const hasDiscount = productPrice !== productSellingPrice && productPrice > 0;
+                    const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
+
+                    // Get settings from data attributes
+                    const showOption = JSON.parse(this.$el.dataset.showOption || '{}');
+                    const isOninda = this.$el.dataset.isOninda === 'true';
+                    const guestCanSeePrice = this.$el.dataset.guestCanSeePrice === 'true';
+
+                    // Format price to match theMoney() function format: "TK <span>amount</span>"
+                    const formatPrice = (price) => {
+                        return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
+                    };
+
+                    // Generate buttons HTML
+                    let buttonsHTML = '';
+                    if (!isOninda) {
+                        const available = inStock;
+                        const disabledAttr = available ? '' : 'disabled';
+
+                        if (showOption.product_grid_button === 'add_to_cart') {
+                            buttonsHTML = `
+                                <div class="product-card__buttons">
+                                    <button class="btn btn-primary product-card__addtocart" type="button" ${disabledAttr}
+                                            data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
+                                        ${showOption.add_to_cart_icon || ''}
+                                        <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
+                                    </button>
+                                </div>
+                            `;
+                        } else if (showOption.product_grid_button === 'order_now') {
+                            buttonsHTML = `
+                                <div class="product-card__buttons">
+                                    <button class="btn btn-primary product-card__ordernow" type="button" ${disabledAttr}
+                                            data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
+                                        ${showOption.order_now_icon || ''}
+                                        <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
+                                    </button>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    // Generate price HTML
+                    let priceHTML = '';
+                    if (isOninda && !guestCanSeePrice) {
+                        priceHTML = '<span class="product-card__new-price text-danger">Login to see price</span>';
+                    } else if (isOninda && guestCanSeePrice) {
+                        priceHTML = '<small class="product-card__new-price text-danger">Verify account to see price</small>';
+                    } else if (hasDiscount) {
+                        priceHTML = `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
+                    } else {
+                        priceHTML = formatPrice(productSellingPrice);
+                    }
+
+                    const discountText = (showOption.discount_text || '<small>Discount:</small> [percent]%').replace('[percent]', discountPercent);
+
+                    return `
+                        <div class="product-card" data-id="${productId}" data-max="${shouldTrack ? (stockCount || 0) : -1}">
+                            <div class="product-card__badges-list">
+                                ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
+                                ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
+                            </div>
+                            <div class="product-card__image">
+                                <a href="${productUrl}" class="product-link" data-navigate>
+                                    <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;">
+                                </a>
+                            </div>
+                            <div class="product-card__info">
+                                <div class="product-card__name">
+                                    <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
+                                </div>
+                            </div>
+                            <div class="product-card__actions">
+                                <div class="product-card__availability">Availability:
+                                    ${!shouldTrack ?
+                                        '<span class="text-success">In Stock</span>' :
+                                        `<span class="text-${(stockCount || 0) > 0 ? 'success' : 'danger'}">${stockCount || 0} In Stock</span>`
+                                    }
+                                </div>
+                                <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}">
+                                    ${priceHTML}
+                                </div>
+                                ${buttonsHTML}
+                            </div>
+                        </div>
+                    `;
+                }
+            }));
         });
     </script>
 @endpush
