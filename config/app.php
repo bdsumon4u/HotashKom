@@ -29,6 +29,18 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Asset Versioning
+    |--------------------------------------------------------------------------
+    |
+    | This value is used for cache busting static assets. Change this value
+    | whenever you update CSS/JS files to force browsers to fetch new versions.
+    |
+    */
+
+    'asset_version' => env('APP_ASSET_VERSION', '1.0.0'),
+
     // Check: Order->adjustStock
     'orders' => [
         'PENDING',

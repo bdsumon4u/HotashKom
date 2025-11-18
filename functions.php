@@ -146,7 +146,9 @@ if (! function_exists('setting')) {
     function setting($name, $default = null)
     {
         return cacheMemo()->rememberForever('settings:'.$name, function () use ($name, $default) {
-            return optional(Setting::whereName($name)->first())->value ?? $default;
+            $setting = Setting::whereName($name)->first();
+
+            return $setting?->value ?? $default;
         });
     }
 }
@@ -233,6 +235,70 @@ function cdn(?string $url, int $w = 150, int $h = 150)
     }
 
     return asset($url);
+}
+
+if (! function_exists('cdnAsset')) {
+    /**
+     * Get CDN URL for an asset if CDN is enabled, otherwise return local asset.
+     *
+     * @param  string  $assetName  The asset name (e.g., 'jquery', 'bootstrap.css')
+     * @param  string  $fallback  Fallback local asset path if CDN is disabled
+     */
+    function cdnAsset(string $assetName, string $fallback): string
+    {
+        if (! config('cdn.enabled', true)) {
+            return asset($fallback);
+        }
+
+        $cdnConfig = config('cdn.assets', []);
+        $provider = config('cdn.provider', 'jsdelivr');
+
+        // Handle assets with separate CSS/JS (e.g., 'bootstrap.css', 'bootstrap.js', 'fontawesome.css')
+        if (str_contains($assetName, '.')) {
+            [$name, $type] = explode('.', $assetName, 2);
+            $asset = $cdnConfig[$name] ?? null;
+
+            if ($asset && isset($asset[$type][$provider])) {
+                return $asset[$type][$provider];
+            }
+        } else {
+            // Handle simple assets (e.g., 'jquery', 'svg4everybody')
+            $asset = $cdnConfig[$assetName] ?? null;
+
+            if ($asset) {
+                // Check if it has a direct URL for the provider (for simple assets like jquery)
+                if (isset($asset[$provider])) {
+                    return $asset[$provider];
+                }
+
+                // Check if it has a 'js' key (for JS-only assets)
+                if (isset($asset['js'][$provider])) {
+                    return $asset['js'][$provider];
+                }
+
+                // Check if it has a 'css' key (for CSS-only assets)
+                if (isset($asset['css'][$provider])) {
+                    return $asset['css'][$provider];
+                }
+            }
+        }
+
+        // Fallback to local asset if CDN asset not found
+        return asset($fallback);
+    }
+}
+
+if (! function_exists('versionedAsset')) {
+    /**
+     * Get versioned asset URL for cache busting.
+     */
+    function versionedAsset(string $path, ?bool $secure = null): string
+    {
+        $url = asset($path, $secure);
+        $version = config('app.asset_version', '1.0.0');
+
+        return $url.(str_contains($url, '?') ? '&' : '?').'v='.$version;
+    }
 }
 
 function longCookie($field, $value)
