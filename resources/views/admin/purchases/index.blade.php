@@ -122,12 +122,15 @@
 </div>
 @endsection
 
+@push('css')
+<link href="{{ cdnAsset('datatables.css', 'assets/css/datatables.css') }}" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link href="{{ cdnAsset('select2.css', 'assets/css/select2.css') }}" rel="stylesheet" crossorigin="anonymous" referrerpolicy="no-referrer">
+@endpush
+
 @push('scripts')
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<script src="{{ cdnAsset('datatables.js', 'assets/js/datatables.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ cdnAsset('datatables.js-bootstrap5', 'assets/js/datatables-bootstrap5.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ cdnAsset('select2.js', 'assets/js/select2.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script>
 function confirmDelete(purchaseId) {

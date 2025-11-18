@@ -40,13 +40,13 @@
                                     @foreach(unserialize($cart->content) as $product)
                                     <div class="dropcart__product d-flex" data-id="{{$product->id}}" style="gap: .5rem;">
                                         <div class="dropcart__product-image">
-                                            <a href="{{route('products.show', $product->options->slug)}}" target="_blank">
+                                            <a href="{{route('products.show', $product->options->slug ?? 'not-found')}}" target="_blank">
                                                 <img src="{{asset($product->options->image)}}" alt="" width="50" height="50">
                                             </a>
                                         </div>
                                         <div class="dropcart__product-info">
                                             <div class="dropcart__product-name">
-                                                <a href="{{route('products.show', $product->options->slug)}}">{{$product->name}}</a>
+                                                <a href="{{route('products.show', $product->options->slug ?? 'not-found')}}">{{$product->name}}</a>
                                             </div>
                                             <div class="dropcart__product-meta">
                                                 <span class="dropcart__product-quantity">{{$product->qty}}</span> x <span class="dropcart__product-price">TK {{$product->price}}</span>

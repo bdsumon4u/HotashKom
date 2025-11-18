@@ -61,8 +61,11 @@ return [
      * Here you may define the cache store that should be used to store
      * requests. This can be the name of any store that is
      * configured in app/config/cache.php
+     *
+     * Defaults to 'database' if Redis is not available, otherwise 'redis'
+     * Set RESPONSE_CACHE_STORE in .env to override
      */
-    'cache_store' => env('RESPONSE_CACHE_STORE', 'redis'),
+    'cache_store' => env('RESPONSE_CACHE_STORE', env('CACHE_STORE', 'database')),
 
     /*
      * Here you may define replacers that dynamically replace content from the response.
