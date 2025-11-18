@@ -118,7 +118,7 @@
                                                         @enderror
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="create-slug">Slug</label>
+                                                        <label for="create-slug">Link</label><span class="text-danger">*</span>
                                                         <input type="text" name="slug" value="{{ old('slug') }}"
                                                             id="create-slug"
                                                             class="form-control @error('slug') is-invalid @enderror">
@@ -186,7 +186,7 @@
                                                             @enderror
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="edit-slug">Slug</label><span
+                                                            <label for="edit-slug">Link</label><span
                                                                 class="text-danger">*</span>
                                                             <input type="text" name="slug"
                                                                 value="{{ old('slug', $active->slug) }}" id="edit-slug"

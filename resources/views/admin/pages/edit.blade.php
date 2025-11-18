@@ -22,7 +22,7 @@
                         <x-error field="title" />
                     </div>
                     <div class="form-group">
-                        <x-label for="slug" /><span class="text-danger">*</span>
+                        <label for="slug">Link</label><span class="text-danger">*</span>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">{{ url('/') }}/</div>

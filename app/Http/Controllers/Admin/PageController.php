@@ -44,8 +44,10 @@ class PageController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
             'title' => ['required'],
-            'slug' => ['required', 'unique:pages'],
+            'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:pages'],
             'content' => ['required'],
+        ], [
+            'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         Page::create($data);
@@ -75,8 +77,10 @@ class PageController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
             'title' => ['required'],
-            'slug' => 'required|unique:pages,slug,'.$page->id,
+            'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:pages,slug,'.$page->id],
             'content' => ['required'],
+        ], [
+            'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         $page->update($data);

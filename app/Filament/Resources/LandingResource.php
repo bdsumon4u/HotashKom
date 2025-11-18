@@ -74,7 +74,7 @@ class LandingResource extends PageResource
                                     ->dehydrated(false),
 
                                 TextInput::make('slug')
-                                    ->label(__('filament-fabricator::page-resource.labels.slug'))
+                                    ->label('Link')
                                     ->default(fn () => Filament::getTenant()->slug)
                                     ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule, Get $get) => $rule->where('parent_id', $get('parent_id')))
                                     ->afterStateUpdated(function (Set $set): void {
@@ -83,6 +83,9 @@ class LandingResource extends PageResource
                                     ->rule(fn ($state): \Closure => function (string $attribute, $value, Closure $fail) use ($state): void {
                                         if ($state !== '/' && (Str::startsWith($value, '/') || Str::endsWith($value, '/'))) {
                                             $fail(__('filament-fabricator::page-resource.errors.slug_starts_or_ends_with_slash'));
+                                        }
+                                        if ($state !== '/' && ! preg_match('/^[a-zA-Z0-9-]+$/', $value)) {
+                                            $fail('The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.');
                                         }
                                     })
                                     ->required(),

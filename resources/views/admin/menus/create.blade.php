@@ -22,7 +22,7 @@
                         <x-error field="name" />
                     </div>
                     <div class="form-group">
-                        <x-label for="slug" />
+                        <label for="slug">Link</label>
                         <x-input name="slug" />
                         <x-error field="slug" />
                     </div>
