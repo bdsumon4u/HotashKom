@@ -211,6 +211,15 @@ class ApiController extends Controller
             })
             ->whereNull('parent_id')
             ->where('id', '!=', $product->id)
+            ->with([
+                'images' => function ($query): void {
+                    $query->select('images.id', 'images.path')->withPivot(['img_type', 'order']);
+                },
+            ])
+            ->select([
+                'id', 'name', 'slug', 'price', 'selling_price',
+                'should_track', 'stock_count', 'is_active', 'parent_id',
+            ])
             ->limit(config('services.products_count.related', 20))
             ->get()
             ->transform(fn ($product): array => array_merge($product->toArray(), [
