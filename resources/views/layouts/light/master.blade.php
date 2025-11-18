@@ -140,7 +140,7 @@
                 <div class="col-lg-6">
                   @yield('breadcrumb-title')
                   <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{route('admin.home')}}"><i data-feather="home"></i></a></li>
+                    <li class="breadcrumb-item"><a href="{{route('admin.home')}}" wire:navigate.hover><i data-feather="home"></i></a></li>
                     @yield('breadcrumb-items')
                   </ol>
                 </div>

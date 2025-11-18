@@ -172,14 +172,14 @@
                             @if ($product->brand)
                                 <p class="mb-0 text-secondary">
                                     Brand: <a href="{{ route('brands.products', $product->brand) }}"
-                                        class="text-primary badge badge-light"><big>{{ $product->brand->name }}</big></a>
+                                        class="text-primary badge badge-light" wire:navigate.hover><big>{{ $product->brand->name }}</big></a>
                                 </p>
                             @endif
                             <div class="mt-2">
                                 <p class="mr-2 mb-0 text-secondary d-inline-block">Categories:</p>
                                 @foreach ($product->categories as $category)
                                     <a href="{{ route('categories.products', $category) }}"
-                                        class="badge badge-primary">{{ $category->name }}</a>
+                                        class="badge badge-primary" wire:navigate.hover>{{ $category->name }}</a>
                                 @endforeach
                             </div>
                         </div>
