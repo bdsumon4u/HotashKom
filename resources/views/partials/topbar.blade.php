@@ -8,15 +8,20 @@
             </div>
             @endif
             @foreach($menuItems as $item)
+            @php
+                $rawHref = $item->href;
+                $isExternal = \Illuminate\Support\Str::startsWith($rawHref, ['http://', 'https://', 'mailto:', 'tel:', '#']);
+                $href = $isExternal ? $rawHref : url($rawHref);
+            @endphp
             <div class="topbar__item topbar__item--link d-none d-md-flex">
-                <a class="topbar-link" href="{{ url($item->href) }}">{!! $item->name !!}</a>
+                <a class="topbar-link" href="{{ $href }}" @unless($isExternal) wire:navigate.hover @endunless>{!! $item->name !!}</a>
             </div>
             @endforeach
             <marquee class="d-flex align-items-center h-100 mx-2" behavior="" direction="">{!! $scroll_text ?? '' !!}</marquee>
             <div class="topbar__spring"></div>
             @if($show_option->track_order ?? false)
             <div class="topbar__item topbar__item--link">
-                <a class="topbar-link" href="{{ url('/track-order') }}">Track Order</a>
+                <a class="topbar-link" href="{{ url('/track-order') }}" wire:navigate.hover>Track Order</a>
             </div>
             @endif
         </div>

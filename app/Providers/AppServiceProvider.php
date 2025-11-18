@@ -3,6 +3,13 @@
 namespace App\Providers;
 
 use App\Extensions\DatabaseSessionHandler;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\HomeSection;
+use App\Models\Page;
+use App\Models\Product;
+use App\Models\Slide;
+use App\Observers\ResponseCacheObserver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
@@ -55,5 +62,16 @@ class AppServiceProvider extends ServiceProvider
             new \App\Redx\Apis\StoreApi,
             new \App\Redx\Apis\OrderApi
         ));
+
+        collect([
+            Brand::class,
+            Category::class,
+            HomeSection::class,
+            Page::class,
+            Product::class,
+            Slide::class,
+        ])->each(static function (string $model): void {
+            $model::observe(ResponseCacheObserver::class);
+        });
     }
 }

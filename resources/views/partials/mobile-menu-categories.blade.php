@@ -12,7 +12,7 @@
             @foreach($categories as $category)
                 <li class="mobile-links__item" data-collapse-item>
                     <div class="mobile-links__item-title">
-                        <a href="{{ route('categories.products', $category) }}" class="mobile-links__item-link">{{ $category->name }}</a>
+                        <a href="{{ route('categories.products', $category) }}" class="mobile-links__item-link" wire:navigate.hover>{{ $category->name }}</a>
                         @if($category->childrens->isNotEmpty())
                             <button class="mobile-links__item-toggle" type="button" data-collapse-trigger>
                                 <svg class="mobile-links__item-arrow" width="12px" height="7px">
@@ -27,7 +27,7 @@
                                 @foreach($category->childrens as $category)
                                     <li class="mobile-links__item" data-collapse-item>
                                         <div class="mobile-links__item-title">
-                                            <a href="{{ route('categories.products', $category) }}" class="mobile-links__item-link">{{ $category->name }}</a>
+                                            <a href="{{ route('categories.products', $category) }}" class="mobile-links__item-link" wire:navigate.hover>{{ $category->name }}</a>
                                             @if($category->childrens->isNotEmpty())
                                                 <button class="mobile-links__item-toggle" type="button" data-collapse-trigger>
                                                     <svg class="mobile-links__item-arrow" width="12px" height="7px">
@@ -42,7 +42,7 @@
                                                     @foreach($category->childrens as $category)
                                                         <li class="mobile-links__item" data-collapse-item>
                                                             <div class="mobile-links__item-title">
-                                                                <a href="{{ route('categories.products', $category) }}" class="mobile-links__item-link">{{ $category->name }}</a>
+                                                                <a href="{{ route('categories.products', $category) }}" class="mobile-links__item-link" wire:navigate.hover>{{ $category->name }}</a>
                                                             </div>
                                                         </li>
                                                     @endforeach
@@ -58,8 +58,8 @@
             @endforeach
             <li class="mobile-links__item">
                 <div class="mobile-links__item-title">
-                    <a href="{{ route('categories') }}" class="mobile-links__item-link">View All Categories</a>
-                    <a href="{{ route('categories') }}" class="mobile-links__item-toggle d-flex justify-content-center align-items-center">
+                    <a href="{{ route('categories') }}" class="mobile-links__item-link" wire:navigate.hover>View All Categories</a>
+                    <a href="{{ route('categories') }}" class="mobile-links__item-toggle d-flex justify-content-center align-items-center" wire:navigate.hover>
                         <svg class="mobile-links__item-arrow" width="12px" height="12px">
                             <use xlink:href="{{ asset('strokya/images/sprite.svg#arrow-rounded-right-8x13') }}"></use>
                         </svg>

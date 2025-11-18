@@ -127,7 +127,7 @@
     <div class="container">
         <div class="block-header">
             <h3 class="block-header__title" style="padding: 0.375rem 1rem;">
-                <a href="{{ route('categories') }}">Categories</a>
+                <a href="{{ route('categories') }}" wire:navigate.hover>Categories</a>
             </h3>
             <div class="block-header__divider"></div>
             <div class="block-header__arrows-list">
@@ -152,14 +152,14 @@
                     <div class="products-list__item">
                         <div class="product-card">
                             <div class="product-card__image">
-                                <a href="{{ route('categories.products', $category) }}">
+                                <a href="{{ route('categories.products', $category) }}" wire:navigate.hover>
                                     <img src="{{ cdn($category->image_src, 100, 100) }}" alt="Product Image">
                                 </a>
                             </div>
                             <div class="product-card__info">
                                 <div class="product-card__name">
                                     <h6 style="overflow: hidden;text-overflow:ellipsis;">
-                                        <a href="{{ route('categories.products', $category) }}" title="{{$category->name}}">{{ $category->name }}</a>
+                                        <a href="{{ route('categories.products', $category) }}" wire:navigate.hover title="{{$category->name}}">{{ $category->name }}</a>
                                     </h6>
                                 </div>
                             </div>
@@ -207,7 +207,7 @@
                     @php($link = $link && $link != '#' ? $link : null)
                     @php($link = $link ? url($link) : null)
                     @php($categories = implode(',', ((array)$pseudoColumns['categories'] ?? [])[$i] ?? []))
-                    <a href="{{ $link ?? route('products.index', $categories ? ['filter_category' => $categories] : []) }}">
+                    <a href="{{ $link ?? route('products.index', $categories ? ['filter_category' => $categories] : []) }}" @if(! $link) wire:navigate.hover @endif>
                         <img
                             data-aos="{{$pseudoColumns['animation'][$i]}}"
                             class="border img-fluid w-100"
@@ -252,7 +252,7 @@
     <div class="container">
         <div class="block-header">
             <h3 class="block-header__title" style="padding: 0.375rem 1rem;">
-                <a href="{{ route('brands') }}">Brands</a>
+                <a href="{{ route('brands') }}" wire:navigate.hover>Brands</a>
             </h3>
             <div class="block-header__divider"></div>
             <div class="block-header__arrows-list">
@@ -277,14 +277,14 @@
                     <div class="products-list__item">
                         <div class="product-card">
                             <div class="product-card__image">
-                                <a href="{{ route('brands.products', $brand) }}">
+                                <a href="{{ route('brands.products', $brand) }}" wire:navigate.hover>
                                     <img src="{{ cdn($brand->image_src, 100, 100) }}" alt="Product Image">
                                 </a>
                             </div>
                             <div class="product-card__info">
                                 <div class="product-card__name">
                                     <h6 style="overflow: hidden;text-overflow:ellipsis;">
-                                        <a href="{{ route('brands.products', $brand) }}" title="{{$brand->name}}">{{ $brand->name }}</a>
+                                        <a href="{{ route('brands.products', $brand) }}" wire:navigate.hover title="{{$brand->name}}">{{ $brand->name }}</a>
                                     </h6>
                                 </div>
                             </div>

@@ -90,15 +90,6 @@ class ProductController extends Controller
             $product = $product->parent;
         }
         $product->load(['brand', 'categories', 'variations.options']);
-        $categories = $product->categories->pluck('id')->toArray();
-        $products = Product::whereIsActive(1)
-            ->whereHas('categories', function ($query) use ($categories): void {
-                $query->whereIn('categories.id', $categories);
-            })
-            ->whereNull('parent_id')
-            ->where('id', '!=', $product->id)
-            ->limit(config('services.products_count.related', 20))
-            ->get();
 
         if (GoogleTagManagerFacade::isEnabled()) {
             GoogleTagManagerFacade::set([
@@ -119,6 +110,6 @@ class ProductController extends Controller
             ]);
         }
 
-        return $this->view(compact('product', 'products'));
+        return $this->view(compact('product'));
     }
 }

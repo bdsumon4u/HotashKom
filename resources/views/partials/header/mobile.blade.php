@@ -10,7 +10,7 @@
                             <use xlink:href="{{ asset('strokya/images/sprite.svg#menu-18x14') }}"></use>
                         </svg>
                     </button>
-                    <a class="mobile-header__logo" href="{{ url('/') }}">
+                    <a class="mobile-header__logo" href="{{ url('/') }}" wire:navigate.hover>
                         <img src="{{ asset($logo->mobile ?? '') }}" alt="Logo" style="max-width: 100%; max-height: 54px;">
                     </a>
                     <div class="mobile-header__search">

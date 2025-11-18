@@ -5,7 +5,7 @@
         <!-- .topbar / end -->
         <div class="site-header__middle container">
             <div class="site-header__logo">
-                <a href="{{ url('/') }}">
+                <a href="{{ url('/') }}" wire:navigate.hover>
                     <img src="{{ asset($logo->desktop ?? '') }}" alt="Logo" style="max-width: 100%; max-height: 84px;">
                 </a>
             </div>
