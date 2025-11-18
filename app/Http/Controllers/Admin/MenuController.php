@@ -44,7 +44,9 @@ class MenuController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
             'name' => ['required'],
-            'slug' => ['required', 'unique:menus'],
+            'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:menus'],
+        ], [
+            'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         return to_route('admin.menus.edit', Menu::create($data))->withSuccess('Menu Has Been Created.');

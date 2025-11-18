@@ -44,9 +44,11 @@ class BrandController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
             'name' => ['required', 'unique:brands'],
-            'slug' => ['required', 'unique:brands'],
+            'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:brands'],
             'base_image' => ['nullable', 'integer'],
             'is_enabled' => ['boolean'],
+        ], [
+            'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
@@ -66,9 +68,11 @@ class BrandController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validate([
             'name' => 'required|unique:brands,name,'.$brand->id,
-            'slug' => 'required|unique:brands,slug,'.$brand->id,
+            'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:brands,slug,'.$brand->id],
             'base_image' => ['nullable', 'integer'],
             'is_enabled' => ['boolean'],
+        ], [
+            'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');

@@ -74,9 +74,11 @@ class CategoryController extends Controller
         $data = $request->validate([
             'parent_id' => ['nullable', 'integer'],
             'name' => ['required', 'unique:categories'],
-            'slug' => ['required', 'unique:categories'],
+            'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:categories'],
             'base_image' => ['nullable', 'integer'],
             'is_enabled' => ['boolean'],
+        ], [
+            'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
@@ -139,9 +141,11 @@ class CategoryController extends Controller
         $data = $request->validate([
             'parent_id' => ['nullable', 'integer'],
             'name' => 'required|unique:categories,name,'.$category->id,
-            'slug' => 'required|unique:categories,slug,'.$category->id,
+            'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:categories,slug,'.$category->id],
             'base_image' => ['nullable', 'integer'],
             'is_enabled' => ['boolean'],
+        ], [
+            'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         // Prevent circular reference: category cannot be its own parent
