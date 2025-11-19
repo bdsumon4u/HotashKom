@@ -152,7 +152,7 @@ function infiniteScroll(sectionId) {
                      const productPrice = product.price || 0;
                      const productSellingPrice = product.selling_price || productPrice;
                      const productImage = product.base_image_url || '/images/placeholder.jpg';
-                     const productUrl = `/products/${productSlug}`;
+                     const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                      const inStock = !product.should_track || (product.stock_count || 0) > 0;
                      const hasDiscount = productPrice !== productSellingPrice;
                      const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;

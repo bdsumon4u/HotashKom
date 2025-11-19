@@ -331,20 +331,55 @@
     @endif
 </div>
 
+@once
 @push('scripts')
 <script>
     document.addEventListener('alpine:init', () => {
-                    Alpine.data('sumPrices', () => ({
-            retail: @entangle('retail'),
-            advanced: @entangle('advanced'),
-            retail_delivery: @entangle('retailDeliveryFee'),
-            retailDiscount: @entangle('retailDiscount'),
-            get subtotal() {
-                if (!this.retail || typeof this.retail !== 'object') return 0;
-                return Object.values(this.retail).reduce((a, b) => a + b.price * b.quantity, 0);
-            },
-            format(price) { return 'TK ' + price.toLocaleString('en-US', { maximumFractionDigits: 0 }) },
-        }));
-        });
+        if (typeof Alpine.data('sumPrices') === 'undefined') {
+            Alpine.data('sumPrices', () => ({
+                retail: @js($retail ?? []),
+                advanced: @js($advanced ?? 0),
+                retail_delivery: @js($retailDeliveryFee ?? 0),
+                retailDiscount: @js($retailDiscount ?? 0),
+                init() {
+                    // Sync with Livewire on initialization
+                    this.$watch('retail', (value) => {
+                        if (this.$wire && typeof this.$wire.updateField === 'function') {
+                            this.$wire.updateField('retail', value);
+                        }
+                    }, { deep: true });
+                    
+                    this.$watch('advanced', (value) => {
+                        if (this.$wire && typeof this.$wire.updateField === 'function') {
+                            this.$wire.updateField('advanced', value);
+                        }
+                    });
+                    
+                    this.$watch('retail_delivery', (value) => {
+                        if (this.$wire && typeof this.$wire.updateField === 'function') {
+                            this.$wire.updateField('retailDeliveryFee', value);
+                        }
+                    });
+                    
+                    this.$watch('retailDiscount', (value) => {
+                        if (this.$wire && typeof this.$wire.updateField === 'function') {
+                            this.$wire.updateField('retailDiscount', value);
+                        }
+                    });
+                },
+                get subtotal() {
+                    if (!this.retail || typeof this.retail !== 'object') return 0;
+                    return Object.values(this.retail).reduce((a, b) => {
+                        if (!b || typeof b !== 'object') return a;
+                        return a + (parseFloat(b.price) || 0) * (parseInt(b.quantity) || 0);
+                    }, 0);
+                },
+                format(price) {
+                    return 'TK ' + (parseFloat(price) || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+                },
+            }));
+        }
+    });
 </script>
 @endpush
+@endonce

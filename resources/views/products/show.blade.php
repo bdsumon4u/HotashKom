@@ -405,7 +405,7 @@
                     }
 
                     try {
-                        const response = await fetch(`/api/products/${this.productSlug}/related.json`);
+                        const response = await fetch(`/api/products/${encodeURIComponent(this.productSlug)}/related.json`);
 
                         if (response.ok) {
                             const products = await response.json();
@@ -468,7 +468,7 @@
                     const productImage = product.base_image_url || (product.images && product.images.length > 0 
                         ? `/storage/${product.images[0]}` 
                         : '/images/placeholder.jpg');
-                    const productUrl = `/products/${productSlug}`;
+                    const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                     const inStock = product.availability !== 'Out of Stock' && (product.availability === 'In Stock' || (product.availability && parseInt(product.availability) > 0));
                     const stockCount = typeof product.availability === 'number' ? product.availability : (product.availability === 'In Stock' ? null : 0);
                     const shouldTrack = typeof product.availability === 'number' || product.availability !== 'In Stock';

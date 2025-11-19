@@ -3,13 +3,13 @@
         @forelse(cart()->content() as $product)
             <div class="dropcart__product" data-id="{{ $product->id }}">
                 <div class="dropcart__product-image">
-                    <a href="{{ route('products.show', $product->options->slug) }}">
+                    <a href="{{ route('products.show', $product->options->slug) }}" wire:navigate.hover>
                         <img src="{{ asset($product->options->image) }}" alt="">
                     </a>
                 </div>
                 <div class="dropcart__product-info">
                     <div class="dropcart__product-name">
-                        <a href="{{ route('products.show', $product->options->slug) }}">{{ $product->name }}</a>
+                        <a href="{{ route('products.show', $product->options->slug) }}" wire:navigate.hover>{{ $product->name }}</a>
                     </div>
                     <div class="dropcart__product-meta">
                         <span class="dropcart__product-quantity">{{ $product->qty }}</span> x <span
@@ -36,7 +36,7 @@
         </table>
     </div>
     <div class="dropcart__buttons">
-        <a class="btn btn-outline-primary btn-sm" href="{{ route('reseller.checkout') }}">View Cart</a>
-        <a class="btn btn-primary" href="{{ auth('user')->check() ? route('reseller.checkout') : route('checkout') }}">Checkout</a>
+        <a class="btn btn-outline-primary btn-sm" href="{{ route('reseller.checkout') }}" wire:navigate.hover>View Cart</a>
+        <a class="btn btn-primary" href="{{ auth('user')->check() ? route('reseller.checkout') : route('checkout') }}" wire:navigate.hover>Checkout</a>
     </div>
 </div><!-- .dropcart / end -->

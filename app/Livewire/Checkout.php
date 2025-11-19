@@ -43,7 +43,7 @@ class Checkout extends Component
 
     protected $listeners = ['updateField'];
 
-    public $retail = [];
+    public array $retail = [];
 
     public $retailDeliveryFee = 0;
 
@@ -62,9 +62,13 @@ class Checkout extends Component
 
     public function updateField($field, $value): void
     {
-        $this->$field = $value;
-
-        longCookie($field, $value);
+        if ($field === 'retail' && is_array($value)) {
+            // Merge the retail array to preserve existing values
+            $this->retail = array_merge($this->retail, $value);
+        } else {
+            $this->$field = $value;
+            longCookie($field, $value);
+        }
 
         // I don't know how, but it works.
         // $this->updatedShipping(); // doesn't work.
@@ -198,10 +202,12 @@ class Checkout extends Component
     public function cartUpdated(): void
     {
         $this->updatedShipping();
-        $this->retail = cart()->content()->mapWithKeys(fn ($item): array => [$item->id => [
-            'price' => $this->retail[$item->id]['price'] ?? $item->options->retail_price,
-            'quantity' => $item->qty,
-        ]])->all();
+        $this->retail = cart()->content()->mapWithKeys(fn ($item): array => [
+            (string) $item->id => [
+                'price' => $this->retail[$item->id]['price'] ?? $item->options->retail_price ?? 0,
+                'quantity' => $item->qty,
+            ],
+        ])->all();
         $this->dispatch('cartUpdated');
     }
 
@@ -240,7 +246,8 @@ class Checkout extends Component
             $this->area_id = Cookie::get('area_id', '');
         }
 
-        // $this->cartUpdated();
+        // Initialize retail array properly
+        $this->cartUpdated();
     }
 
     public function checkout()
@@ -445,6 +452,10 @@ class Checkout extends Component
             'user' => optional(auth('user')->user()),
             'pathaoCities' => collect($tempOrder->pathaoCityList()),
             'pathaoAreas' => collect($tempOrder->pathaoAreaList($this->city_id)),
+            'retail' => $this->retail,
+            'advanced' => $this->advanced,
+            'retailDeliveryFee' => $this->retailDeliveryFee,
+            'retailDiscount' => $this->retailDiscount,
         ]);
     }
 

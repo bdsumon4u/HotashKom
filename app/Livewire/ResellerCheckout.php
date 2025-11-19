@@ -15,6 +15,10 @@ class ResellerCheckout extends Checkout
             'user' => optional(auth('user')->user()),
             'pathaoCities' => collect($tempOrder->pathaoCityList()),
             'pathaoAreas' => collect($tempOrder->pathaoAreaList($this->city_id)),
+            'retail' => $this->retail,
+            'advanced' => $this->advanced,
+            'retailDeliveryFee' => $this->retailDeliveryFee,
+            'retailDiscount' => $this->retailDiscount,
         ]);
     }
 

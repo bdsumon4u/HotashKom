@@ -18,7 +18,7 @@
         <li class="maximize"><a class="text-dark" href="#!" onclick="javascript:toggleFullScreen()"><i data-feather="maximize"></i></a></li>
 
         <!-- Cart Indicator -->
-        <a href="{{ route('reseller.checkout') }}" class="mx-3 text-dark">
+        <a href="{{ route('reseller.checkout') }}" class="mx-3 text-dark" wire:navigate.hover>
             <i data-feather="shopping-cart"></i>
             <livewire:cart-count />
         </a>

@@ -104,7 +104,7 @@
                             <hr>
 
                             <div class="mb-3">
-                                <a href="{{ route('checkout') }}" class="btn btn-primary btn-block btn-lg">
+                                <a href="{{ route('checkout') }}" class="btn btn-primary btn-block btn-lg" wire:navigate.hover>
                                     <i class="fa fa-credit-card mr-2"></i>Proceed to Checkout
                                 </a>
                             </div>

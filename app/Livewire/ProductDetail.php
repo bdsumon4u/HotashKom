@@ -79,7 +79,8 @@ class ProductDetail extends Component
         $this->facebookService = app(FacebookPixelService::class);
         $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         if ($this->product->variations->isNotEmpty()) {
-            $this->selectedVar = $this->product->variations->where('slug', request()->segment(2))->first()
+            $segmentSlug = request()->segment(2);
+            $this->selectedVar = $this->product->variations->where('slug', $segmentSlug ? rawurldecode((string) $segmentSlug) : null)->first()
                 ?? $this->product->variations->random();
         } else {
             $this->selectedVar = $this->product;
