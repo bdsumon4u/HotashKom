@@ -8,6 +8,56 @@
     <link rel="icon" href="{{asset($logo->favicon ?? '')}}" type="image/x-icon">
     <link rel="shortcut icon" href="{{asset($logo->favicon ?? '')}}" type="image/x-icon">
     <title>{{ $company->name ?? '' }} - Reseller Panel - @yield('title')</title>
+    @php
+        $jqueryJs = cdnAsset('jquery-3.5.1', 'assets/js/jquery-3.5.1.min.js');
+    @endphp
+    {{-- Global jQuery for SPA navigation --}}
+    <script
+        src="{{ $jqueryJs }}"
+        data-navigate-once
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    ></script>
+    <script data-navigate-once>
+        (function () {
+            if (window.runWhenJQueryReady) {
+                return;
+            }
+
+            const queue = [];
+
+            function flushQueue() {
+                if (typeof window.jQuery === 'undefined') {
+                    return;
+                }
+
+                while (queue.length) {
+                    const callback = queue.shift();
+                    try {
+                        callback(window.jQuery);
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            }
+
+            function scheduleFlush() {
+                queueMicrotask(flushQueue);
+            }
+
+            window.runWhenJQueryReady = function (callback) {
+                if (typeof window.jQuery !== 'undefined') {
+                    callback(window.jQuery);
+                } else {
+                    queue.push(callback);
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', scheduleFlush, { once: true });
+            document.addEventListener('livewire:navigate', scheduleFlush);
+            scheduleFlush();
+        })();
+    </script>
     @include('layouts.light.css')
     <style>
       @media (min-width: 992px) {
@@ -169,25 +219,31 @@
     @stack('scripts')
     @livewireScripts
     <script>
-      $(window).on('notify', function (ev) {
-          for (let item of ev.detail) {
-              $.notify(item.message, {
-                  type: item.type ?? 'info',
+      runWhenJQueryReady(function ($) {
+          $(window)
+              .off('notify.reseller')
+              .on('notify.reseller', function (ev) {
+                  for (let item of ev.detail) {
+                      $.notify(item.message, {
+                          type: item.type ?? 'info',
+                      });
+                  }
               });
-          }
-      });
-      $(document).on('click', '#sidebar-toggler', function (ev) {
-        console.log(ev);
-        ev.preventDefault();
-        $nav = $(".main-nav");
-        $header = $(".page-main-header");
-        $nav.toggleClass('close_icon');
-        $header.toggleClass('close_icon');
-        if ($nav.hasClass("close_icon")) {
-          $("body").css("overflow-y", "auto");
-        } else {
-          $("body").css("overflow-y", "hidden");
-        }
+
+          $(document)
+              .off('click.resellerSidebar', '#sidebar-toggler')
+              .on('click.resellerSidebar', '#sidebar-toggler', function (ev) {
+                  ev.preventDefault();
+                  const $nav = $(".main-nav");
+                  const $header = $(".page-main-header");
+                  $nav.toggleClass('close_icon');
+                  $header.toggleClass('close_icon');
+                  if ($nav.hasClass("close_icon")) {
+                      $("body").css("overflow-y", "auto");
+                  } else {
+                      $("body").css("overflow-y", "hidden");
+                  }
+              });
       });
     </script>
   </body>

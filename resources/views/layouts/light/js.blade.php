@@ -1,5 +1,3 @@
-<!-- latest jquery-->
-<script src="{{ cdnAsset('jquery-3.5.1', 'assets/js/jquery-3.5.1.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!-- Bootstrap js-->
 <script src="{{ cdnAsset('popper', 'assets/js/bootstrap/popper.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="{{ versionedAsset('assets/js/bootstrap/bootstrap.js') }}"></script>

@@ -227,7 +227,7 @@
     <!-- .block-products-carousel -->
     @php($relatedProductsSetting = setting('related_products'))
     <div class="lazy-related-products"
-         x-data="lazyRelatedProducts('{{ $product->slug }}', {{ $relatedProductsSetting->cols ?? 5 }})"
+         x-data="lazyRelatedProducts({{ $product->getKey() }}, {{ $relatedProductsSetting->cols ?? 5 }})"
          x-init="init()"
          data-show-option="{{ json_encode([
              'product_grid_button' => setting('show_option')->product_grid_button ?? 'add_to_cart',
@@ -249,7 +249,7 @@
                 </div>
                 <div class="products-view__list products-list" data-layout="grid-{{ $relatedProductsSetting->cols ?? 5 }}-full" data-with-features="false">
                     <div class="products-list__body" id="related-products-container">
-                        <div x-show="loading" class="text-center py-5">
+                        <div x-show="loading" class="py-5 text-center">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="sr-only">Loading...</span>
                             </div>
@@ -376,8 +376,8 @@
 
             window.__lazyRelatedProductsRegistered = true;
 
-            window.Alpine.data('lazyRelatedProducts', (productSlug, cols) => ({
-                productSlug: productSlug,
+            window.Alpine.data('lazyRelatedProducts', (productId, cols) => ({
+                productId: productId,
                 cols: cols,
                 loading: false,
                 loaded: false,
@@ -415,7 +415,7 @@
                     }
 
                     try {
-                        const response = await fetch(`/api/products/${encodeURIComponent(this.productSlug)}/related.json`);
+                        const response = await fetch(`/api/products/${encodeURIComponent(this.productId)}/related.json`);
 
                         if (response.ok) {
                             const products = await response.json();
@@ -423,11 +423,11 @@
                             this.loaded = true;
                             this.observer?.disconnect();
                         } else {
-                            container.innerHTML = '<div class="text-center py-5 text-muted">Unable to load related products.</div>';
+                            container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
                         }
                     } catch (error) {
                         console.error('Error loading related products:', error);
-                        container.innerHTML = '<div class="text-center py-5 text-muted">Unable to load related products.</div>';
+                        container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
                     }
 
                     this.loading = false;
@@ -435,7 +435,7 @@
 
                 renderProducts(products, container) {
                     if (!products || products.length === 0) {
-                        container.innerHTML = '<div class="text-center py-5 text-muted">No related products found.</div>';
+                        container.innerHTML = '<div class="py-5 text-center text-muted">No related products found.</div>';
                         return;
                     }
 
@@ -475,8 +475,8 @@
                     const productSlug = product.slug || productId;
                     const productPrice = product.compareAtPrice || product.price || 0;
                     const productSellingPrice = product.price || productPrice;
-                    const productImage = product.base_image_url || (product.images && product.images.length > 0 
-                        ? `/storage/${product.images[0]}` 
+                    const productImage = product.base_image_url || (product.images && product.images.length > 0
+                        ? `/storage/${product.images[0]}`
                         : '/images/placeholder.jpg');
                     const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                     const inStock = product.availability !== 'Out of Stock' && (product.availability === 'In Stock' || (product.availability && parseInt(product.availability) > 0));
