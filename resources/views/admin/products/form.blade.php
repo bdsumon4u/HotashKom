@@ -78,7 +78,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="price">Old Price</label><span class="text-danger">*</span>
+                    <label for="price">Old Price</label>
                     <x-input name="price" :value="$product->price" />
                     <x-error field="price" />
                 </div>

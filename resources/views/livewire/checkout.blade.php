@@ -56,8 +56,8 @@
                                     @change="$wire.updateField('shipping', $event.target.value)"
                                     class="custom-control-input" id="inside-dhaka" name="shipping" value="Inside Dhaka">
                                 <label class="custom-control-label" for="inside-dhaka">ঢাকা শহর
-                                    ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Inside Dhaka') }}
-                                    টাকা)
+                                    @if(cart()->subTotal()) ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Inside Dhaka') }}
+                                    টাকা) @endif
                                 </label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
@@ -66,8 +66,8 @@
                                     class="custom-control-input" id="outside-dhaka" name="shipping"
                                     value="Outside Dhaka">
                                 <label class="custom-control-label" for="outside-dhaka">ঢাকার বাইরে
-                                    ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Outside Dhaka') }}
-                                    টাকা)
+                                    @if(cart()->subTotal()) ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Outside Dhaka') }}
+                                    টাকা) @endif
                                 </label>
                             </div>
                         </div>
@@ -218,7 +218,7 @@
                     </div>
                 </div>
                 <button type="button" wire:click="checkout" wire:loading.attr="disabled"
-                    class="text-white btn btn-primary btn-xl btn-block">কনফার্ম অর্ডার</button>
+                    class="text-white btn btn-primary btn-xl btn-block">{{ setting('show_option')->checkout_button_text ?? 'কনফার্ম অর্ডার' }}</button>
             </div>
         </div>
     </div>
@@ -314,7 +314,7 @@
                         </div>
                     </div>
                     <button type="button" wire:click="checkout" wire:loading.attr="disabled"
-                        class="text-white btn btn-primary btn-xl btn-block">কনফার্ম অর্ডার</button>
+                        class="text-white btn btn-primary btn-xl btn-block">{{ setting('show_option')->checkout_button_text ?? 'কনফার্ম অর্ডার' }}</button>
                 </div>
             </div>
         </div>

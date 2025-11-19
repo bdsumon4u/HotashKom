@@ -18,6 +18,10 @@ class ProductRequest extends FormRequest
     {
         $sku = $this->get('sku');
         $this->merge(['sku' => strtoupper((string) $sku)]);
+
+        if (! $this->price) {
+            $this->merge(['price' => $this->get('selling_price')]);
+        }
     }
 
     /**
@@ -31,7 +35,7 @@ class ProductRequest extends FormRequest
             'description' => 'required',
             'categories' => 'required|array',
             'brand' => 'nullable|integer',
-            'price' => 'required|integer',
+            'price' => 'nullable|integer',
             'selling_price' => 'required|integer',
             'suggested_price' => 'nullable',
             'wholesale.quantity' => 'sometimes|array',
