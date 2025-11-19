@@ -25,6 +25,13 @@
                     <x-error field="show_option.order_now_text" />
                 </div>
             </div>
+            <div class="py-2 row borderr">
+                <div class="col-12">
+                    <label for="show_option-checkout_button_text">`Checkout Button` text</label>
+                    <x-input name="show_option[checkout_button_text]" id="show_option-checkout_button_text" :value="$show_option->checkout_button_text ?? 'কনফার্ম অর্ডার'" />
+                    <x-error field="show_option.checkout_button_text" />
+                </div>
+            </div>
         </div>
         <div class="col-md-6 d-flex flex-column justify-content-center">
             <label for="" class="my-1">Product Grid Button</label>

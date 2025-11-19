@@ -140,6 +140,10 @@ class Checkout extends Component
 
     public function shippingCost(?string $area = null)
     {
+        if (! cart()->subTotal()) {
+            return 0;
+        }
+
         $this->isFreeDelivery = false;
         $area ??= $this->shipping;
         $shipping_cost = 0;

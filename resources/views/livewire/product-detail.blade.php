@@ -24,7 +24,7 @@
             @elseif(isOninda() && auth('user')->user() && !auth('user')->user()->is_verified && !$guest_can_see_price)
                 <span class="product-card__new-price text-danger">Verify account to see price</span>
             @elseif ($selling == $selectedVar->price)
-                {!! theMoney($selectedVar->price) !!}
+                {!! $selling ? theMoney($selectedVar->price) : 'Contact Us' !!}
             @else
                 <span class="product-card__new-price">{!! theMoney($selling) !!}</span>
                 <span class="product-card__old-price">{!! theMoney($selectedVar->price) !!}</span>
