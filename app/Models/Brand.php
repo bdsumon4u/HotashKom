@@ -65,11 +65,16 @@ class Brand extends Model
      */
     public function resolveRouteBinding($value, $field = null)
     {
-        $field = $field ?: 'slug';
+        $field ??= $this->getRouteKeyName();
 
-        // Decode URL-encoded slug
-        $decodedValue = rawurldecode((string) $value);
+        // Only decode URL-encoded value when the field is 'slug'
+        if ($field === 'slug') {
+            $decodedValue = rawurldecode((string) $value);
 
-        return $this->where($field, $decodedValue)->first();
+            return $this->where($field, $decodedValue)->first();
+        }
+
+        // For other fields (like 'id'), use the value as-is
+        return $this->where($field, $value)->first();
     }
 }
