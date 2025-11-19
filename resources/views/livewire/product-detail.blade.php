@@ -47,12 +47,18 @@
         @endif
 
         @foreach ($attributes as $attribute)
+            @php
+                $attributeOptions = $optionGroup[$attribute->id] ?? [];
+                if (empty($attributeOptions)) {
+                    continue;
+                }
+            @endphp
             <div class="mb-1 form-group product__option d-flex align-items-center" style="column-gap: .5rem;">
                 <label class="product__option-label">{{ $attribute->name }}:</label>
                 @if (strtolower($attribute->name) == 'color')
                     <div class="input-radio-color">
                         <div class="input-radio-color__list">
-                            @foreach ($optionGroup[$attribute->id] as $option)
+                            @foreach ($attributeOptions as $option)
                                 <label
                                     class="input-radio-color__item @if (strtolower($option->name) == 'white') input-radio-color__item--white @endif"
                                     style="color: {{ $option->value }};" data-toggle="tooltip" title=""
@@ -68,12 +74,12 @@
                 @else
                     <div class="input-radio-label">
                         <div class="input-radio-label__list">
-                            @foreach ($optionGroup[$attribute->id] as $option)
+                            @foreach ($attributeOptions as $option)
                                 <label>
                                     <input type="radio" wire:model.live="options.{{ $attribute->id }}"
                                         name="options[{{ $attribute->id }}]" value="{{ $option->id }}"
                                         class="option-picker">
-                                    <span class="p-1 @if($options[$attribute->id] == $option->id) border-primary @endif">{{ $option->name }}</span>
+                                    <span class="p-1 @if(($options[$attribute->id] ?? null) == $option->id) border-primary @endif">{{ $option->name }}</span>
                                 </label>
                             @endforeach
                         </div>

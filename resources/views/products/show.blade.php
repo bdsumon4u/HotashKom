@@ -365,8 +365,18 @@
         });
 
         // Lazy load related products
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('lazyRelatedProducts', (productSlug, cols) => ({
+        const registerLazyRelatedProducts = () => {
+            if (typeof window.Alpine === 'undefined') {
+                return;
+            }
+
+            if (window.__lazyRelatedProductsRegistered) {
+                return;
+            }
+
+            window.__lazyRelatedProductsRegistered = true;
+
+            window.Alpine.data('lazyRelatedProducts', (productSlug, cols) => ({
                 productSlug: productSlug,
                 cols: cols,
                 loading: false,
@@ -560,6 +570,12 @@
                     `;
                 }
             }));
-        });
+        };
+
+        if (window.Alpine) {
+            registerLazyRelatedProducts();
+        } else {
+            document.addEventListener('alpine:init', registerLazyRelatedProducts);
+        }
     </script>
 @endpush
