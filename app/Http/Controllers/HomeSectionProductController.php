@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\HomeSection;
-use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class HomeSectionProductController extends Controller
@@ -17,9 +16,10 @@ class HomeSectionProductController extends Controller
     {
         $rows = 3;
         $cols = 5;
-        if ($productsPage = Setting::whereName('products_page')->first()) {
-            $rows = $productsPage->value->rows;
-            $cols = $productsPage->value->cols;
+        $productsPage = setting('products_page');
+        if ($productsPage) {
+            $rows = $productsPage->rows ?? 3;
+            $cols = $productsPage->cols ?? 5;
         }
         $per_page = $request->get('per_page', $rows * $cols);
         $products = $section->products($per_page)->appends(request()->query());

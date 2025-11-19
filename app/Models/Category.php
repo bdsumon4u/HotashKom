@@ -17,6 +17,13 @@ class Category extends Model
             cacheMemo()->forget('categories:nested:');
             cacheMemo()->forget('categories:nested:1');
             cacheMemo()->forget('homesections');
+            cacheMemo()->forget('product_filter_data');
+            cacheMemo()->forget('product_filter_data:category:'.$category->id);
+            cacheMemo()->forget('api_categories:all');
+            cacheMemo()->forget('api_category:'.$category->slug);
+            for ($i = 0; $i <= 5; $i++) {
+                cacheMemo()->forget("api_categories:nested:{$i}");
+            }
 
             // Dispatch job to copy category to reseller databases
             if (isOninda() && $category->wasRecentlyCreated) {
@@ -38,6 +45,13 @@ class Category extends Model
             cacheMemo()->forget('categories:nested:');
             cacheMemo()->forget('categories:nested:1');
             cacheMemo()->forget('homesections');
+            cacheMemo()->forget('product_filter_data');
+            cacheMemo()->forget('product_filter_data:category:'.$category->id);
+            cacheMemo()->forget('api_categories:all');
+            cacheMemo()->forget('api_category:'.$category->slug);
+            for ($i = 0; $i <= 5; $i++) {
+                cacheMemo()->forget("api_categories:nested:{$i}");
+            }
         });
     }
 

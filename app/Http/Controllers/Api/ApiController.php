@@ -64,11 +64,15 @@ class ApiController extends Controller
 
     public function sections(Request $request)
     {
-        return sections()->transform(fn ($section): array => array_merge($section->toArray(), [
-            'categories' => $section->categories->map(fn ($category): array => array_merge($category->toArray(), [
-                'sectionId' => $section->id,
-            ]))->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => $section->type == 'pure-grid' ? 'View All' : 'All']),
-        ]));
+        $cacheKey = 'api_sections';
+
+        return cacheMemo()->remember($cacheKey, now()->addHours(6), function () {
+            return sections()->transform(fn ($section): array => array_merge($section->toArray(), [
+                'categories' => $section->categories->map(fn ($category): array => array_merge($category->toArray(), [
+                    'sectionId' => $section->id,
+                ]))->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => $section->type == 'pure-grid' ? 'View All' : 'All']),
+            ]));
+        });
     }
 
     public function sectionProducts(Request $request, HomeSection $section)
@@ -202,40 +206,45 @@ class ApiController extends Controller
 
     public function relatedProducts(Request $request, $slug)
     {
-        $product = Product::where('slug', rawurldecode((string) $slug))->firstOrFail();
+        $decodedSlug = rawurldecode((string) $slug);
+        $cacheKey = 'related_products:'.$decodedSlug;
 
-        $categories = $product->categories->pluck('id')->toArray();
+        return cacheMemo()->remember($cacheKey, now()->addHours(6), function () use ($decodedSlug) {
+            $product = Product::where('slug', $decodedSlug)->firstOrFail();
 
-        return Product::whereIsActive(1)
-            ->whereHas('categories', function ($query) use ($categories): void {
-                $query->whereIn('categories.id', $categories);
-            })
-            ->whereNull('parent_id')
-            ->where('id', '!=', $product->id)
-            ->with([
-                'images' => function ($query): void {
-                    $query->select('images.id', 'images.path')->withPivot(['img_type', 'order']);
-                },
-            ])
-            ->select([
-                'id', 'name', 'slug', 'price', 'selling_price',
-                'should_track', 'stock_count', 'is_active', 'parent_id',
-            ])
-            ->limit(config('services.products_count.related', 20))
-            ->get()
-            ->transform(fn ($product): array => array_merge($product->toArray(), [
-                'images' => $product->images->pluck('src')->toArray(),
-                'base_image_url' => $product->base_image ? asset($product->base_image->src) : null,
-                'price' => $product->selling_price,
-                'compareAtPrice' => $product->price,
-                'badges' => [],
-                'brand' => [],
-                'categories' => [],
-                'reviews' => 0,
-                'rating' => 0,
-                'attributes' => [],
-                'availability' => $product->should_track ? $product->stock_count : 'In Stock',
-            ]));
+            $categories = $product->categories->pluck('id')->toArray();
+
+            return Product::whereIsActive(1)
+                ->whereHas('categories', function ($query) use ($categories): void {
+                    $query->whereIn('categories.id', $categories);
+                })
+                ->whereNull('parent_id')
+                ->where('id', '!=', $product->id)
+                ->with([
+                    'images' => function ($query): void {
+                        $query->select('images.id', 'images.path')->withPivot(['img_type', 'order']);
+                    },
+                ])
+                ->select([
+                    'id', 'name', 'slug', 'price', 'selling_price',
+                    'should_track', 'stock_count', 'is_active', 'parent_id',
+                ])
+                ->limit(config('services.products_count.related', 20))
+                ->get()
+                ->transform(fn ($product): array => array_merge($product->toArray(), [
+                    'images' => $product->images->pluck('src')->toArray(),
+                    'base_image_url' => $product->base_image ? asset($product->base_image->src) : null,
+                    'price' => $product->selling_price,
+                    'compareAtPrice' => $product->price,
+                    'badges' => [],
+                    'brand' => [],
+                    'categories' => [],
+                    'reviews' => 0,
+                    'rating' => 0,
+                    'attributes' => [],
+                    'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+                ]));
+        });
     }
 
     public function areas($city_id)
@@ -246,19 +255,31 @@ class ApiController extends Controller
     public function categories(Request $request)
     {
         if ($request->nested) {
-            return Category::nested($request->get('count', 0));
+            $count = $request->get('count', 0);
+            $cacheKey = 'api_categories:nested:'.$count;
+
+            return cacheMemo()->remember($cacheKey, now()->addHours(12), fn () => Category::nested($count));
         }
 
-        return Category::all()
-            ->transform(fn ($category): array => $category->toArray() + [
-                'type' => 'shop',
-            ])
-            ->toJson();
+        $cacheKey = 'api_categories:all';
+
+        return cacheMemo()->remember($cacheKey, now()->addHours(12), function () {
+            return Category::all()
+                ->transform(fn ($category): array => $category->toArray() + [
+                    'type' => 'shop',
+                ])
+                ->toJson();
+        });
     }
 
     public function category($slug)
     {
-        return Category::where('slug', rawurldecode((string) $slug))->firstOrFail()->toArray();
+        $decodedSlug = rawurldecode((string) $slug);
+        $cacheKey = 'api_category:'.$decodedSlug;
+
+        return cacheMemo()->remember($cacheKey, now()->addHours(12), function () use ($decodedSlug) {
+            return Category::where('slug', $decodedSlug)->firstOrFail()->toArray();
+        });
     }
 
     public function order(Order $order)

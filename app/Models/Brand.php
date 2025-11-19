@@ -18,6 +18,8 @@ class Brand extends Model
     {
         static::saved(function ($brand): void {
             cacheMemo()->forget('brands');
+            // Clear product filter data since brands are part of filters
+            cacheMemo()->forget('product_filter_data');
 
             // Dispatch job to copy brand to reseller databases
             if (isOninda() && $brand->wasRecentlyCreated) {
@@ -33,6 +35,8 @@ class Brand extends Model
                 dispatch(new \App\Jobs\RemoveResourceFromResellers($brand->getTable(), $brand->id));
             }
             cacheMemo()->forget('brands');
+            // Clear product filter data since brands are part of filters
+            cacheMemo()->forget('product_filter_data');
         });
     }
 

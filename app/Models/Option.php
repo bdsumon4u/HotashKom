@@ -12,6 +12,9 @@ class Option extends Model
     public static function booted(): void
     {
         static::saved(function ($option): void {
+            // Clear product filter data since options are part of filters
+            cacheMemo()->forget('product_filter_data');
+
             // Dispatch job to copy option to reseller databases
             if (isOninda() && $option->wasRecentlyCreated) {
                 dispatch(new \App\Jobs\CopyResourceToResellers($option));
@@ -20,6 +23,9 @@ class Option extends Model
 
         static::deleting(function ($option): void {
             // throw_if(isReseller() && $option->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
+
+            // Clear product filter data since options are part of filters
+            cacheMemo()->forget('product_filter_data');
 
             // Dispatch job to remove option from reseller databases
             if (isOninda()) {

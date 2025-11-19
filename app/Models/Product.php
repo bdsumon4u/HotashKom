@@ -49,6 +49,26 @@ class Product extends Model
     public static function booted(): void
     {
         static::saved(function ($product): void {
+            // Clear related caches
+            cacheMemo()->forget('product_filter_data');
+            cacheMemo()->forget('related_products:'.$product->slug);
+
+            // Clear category-specific filter data for all categories this product belongs to
+            $product->categories->each(function ($category) {
+                cacheMemo()->forget('product_filter_data:category:'.$category->id);
+            });
+
+            if ($product->parent_id) {
+                $parent = $product->parent;
+                if ($parent) {
+                    cacheMemo()->forget('related_products:'.$parent->slug);
+                    // Also clear category-specific caches for parent product's categories
+                    $parent->categories->each(function ($category) {
+                        cacheMemo()->forget('product_filter_data:category:'.$category->id);
+                    });
+                }
+            }
+
             // Dispatch job to sync stock attributes if they were changed
             if (isOninda() && $product->isDirty(['should_track', 'stock_count'])) {
                 dispatch(new \App\Jobs\SyncProductStockWithResellers($product));
@@ -62,6 +82,20 @@ class Product extends Model
 
         static::deleting(function ($record): void {
             // throw_if(isReseller() && $record->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
+
+            // Clear related caches before deletion
+            cacheMemo()->forget('product_filter_data');
+            cacheMemo()->forget('related_products:'.$record->slug);
+            if ($record->parent_id) {
+                $parent = $record->parent;
+                if ($parent) {
+                    cacheMemo()->forget('related_products:'.$parent->slug);
+                }
+            } else {
+                // Clear related products cache for all products that might have been related
+                // We clear all category-specific filter data since this product might have been in those categories
+                cacheMemo()->forget('product_filter_data');
+            }
 
             // Dispatch job to remove product from reseller databases
             if (! $record->parent_id && isOninda()) { // not a variation

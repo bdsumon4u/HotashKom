@@ -40,5 +40,24 @@ final class ResponseCacheObserver
         }
 
         ResponseCache::clear();
+
+        // Clear related caches
+        $this->clearRelatedCaches();
+    }
+
+    private function clearRelatedCaches(): void
+    {
+        // Clear product filter data cache (general and category-specific)
+        cacheMemo()->forget('product_filter_data');
+        // Note: Category-specific cache keys will be cleared when categories are updated
+
+        // Clear API caches
+        cacheMemo()->forget('api_categories:all');
+        cacheMemo()->forget('api_sections');
+
+        // Clear nested category caches (we clear a few common ones)
+        for ($i = 0; $i <= 5; $i++) {
+            cacheMemo()->forget("api_categories:nested:{$i}");
+        }
     }
 }

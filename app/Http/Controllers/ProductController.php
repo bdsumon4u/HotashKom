@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ProductResource;
 use App\Models\HomeSection;
 use App\Models\Product;
-use App\Models\Setting;
 use App\Traits\HasProductFilters;
 use Illuminate\Http\Request;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
@@ -38,9 +37,10 @@ class ProductController extends Controller
         $section = null;
         $rows = 3;
         $cols = 5;
-        if ($productsPage = Setting::whereName('products_page')->first()) {
-            $rows = $productsPage->value->rows;
-            $cols = $productsPage->value->cols;
+        $productsPage = setting('products_page');
+        if ($productsPage) {
+            $rows = $productsPage->rows ?? 3;
+            $cols = $productsPage->cols ?? 5;
         }
         $per_page = $request->get('per_page', $rows * $cols);
         if ($section = request('filter_section', 0)) {
