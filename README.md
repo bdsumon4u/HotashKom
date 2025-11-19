@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}468}$$ 🔥 domains are live now
+These 🔥 $${\color{red}470}$$ 🔥 domains are live now
 
-_Last updated: **2025-11-18 09:16:33 Asia/Dhaka**_
+_Last updated: **2025-11-19 09:16:03 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -547,23 +547,25 @@ _Last updated: **2025-11-18 09:16:33 Asia/Dhaka**_
 | 446 | [sonost.com](http://sonost.com) |
 | 447 | [safwanemart.com](http://safwanemart.com) |
 | 448 | [bajarmela.com](http://bajarmela.com) |
-| 449 | [sylban.com](http://sylban.com) |
-| 450 | [mohammademart.com](http://mohammademart.com) |
-| 451 | [fenionlinebd.com](http://fenionlinebd.com) |
-| 452 | [fatemaemart.com](http://fatemaemart.com) |
-| 453 | [minichinabazar.com](http://minichinabazar.com) |
-| 454 | [aminaemart.com](http://aminaemart.com) |
-| 455 | [aarot24.com](http://aarot24.com) |
-| 456 | [nsbbd.com](http://nsbbd.com) |
-| 457 | [trusthubbd.com](http://trusthubbd.com) |
-| 458 | [taslimashop.com](http://taslimashop.com) |
-| 459 | [rojshopping.com](http://rojshopping.com) |
-| 460 | [rokomariebazar.com](http://rokomariebazar.com) |
-| 461 | [trustmart24.com](http://trustmart24.com) |
-| 462 | [nittoebazar.com](http://nittoebazar.com) |
-| 463 | [e-bazar24.com](http://e-bazar24.com) |
-| 464 | [e-market24.com](http://e-market24.com) |
-| 465 | [ponnovaly.com](http://ponnovaly.com) |
-| 466 | [bikroyemart.com](http://bikroyemart.com) |
-| 467 | [rokomaryhut.com](http://rokomaryhut.com) |
-| 468 | [powerpartsbd.com](http://powerpartsbd.com) |
+| 449 | [mohammademart.com](http://mohammademart.com) |
+| 450 | [fenionlinebd.com](http://fenionlinebd.com) |
+| 451 | [fatemaemart.com](http://fatemaemart.com) |
+| 452 | [minichinabazar.com](http://minichinabazar.com) |
+| 453 | [aminaemart.com](http://aminaemart.com) |
+| 454 | [aarot24.com](http://aarot24.com) |
+| 455 | [nsbbd.com](http://nsbbd.com) |
+| 456 | [trusthubbd.com](http://trusthubbd.com) |
+| 457 | [taslimashop.com](http://taslimashop.com) |
+| 458 | [rojshopping.com](http://rojshopping.com) |
+| 459 | [rokomariebazar.com](http://rokomariebazar.com) |
+| 460 | [trustmart24.com](http://trustmart24.com) |
+| 461 | [nittoebazar.com](http://nittoebazar.com) |
+| 462 | [e-bazar24.com](http://e-bazar24.com) |
+| 463 | [e-market24.com](http://e-market24.com) |
+| 464 | [ponnovaly.com](http://ponnovaly.com) |
+| 465 | [bikroyemart.com](http://bikroyemart.com) |
+| 466 | [rokomaryhut.com](http://rokomaryhut.com) |
+| 467 | [powerpartsbd.com](http://powerpartsbd.com) |
+| 468 | [easydeals24.com](http://easydeals24.com) |
+| 469 | [proyozonvally.com](http://proyozonvally.com) |
+| 470 | [isomartbd.com](http://isomartbd.com) |
