@@ -13,10 +13,13 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Pathao\Facade\Pathao;
+use App\Traits\HasProductFilters;
 use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
+    use HasProductFilters;
+
     public function menus()
     {
         return cacheMemo()->remember('menus', now()->addMinute(), fn () => Menu::all()->mapWithKeys(fn ($menu): array => [$menu->slug => $menu->menuItems]));
@@ -100,6 +103,69 @@ class ApiController extends Controller
         }
 
         return $products;
+    }
+
+    public function shopProducts(Request $request)
+    {
+        $page = (int) $request->get('page', 1);
+        $perPage = min((int) $request->get('per_page', 20), 50);
+
+        // Use the same logic as ProductController::index
+        $query = Product::whereIsActive(1)->whereNull('parent_id');
+
+        // Apply filters using the trait
+        $this->applyProductFilters($query, $request);
+
+        // Apply sorting using the trait method
+        $this->applyProductSorting($query);
+
+        // Explicitly select all columns to avoid issues with RAND() and pagination
+        $query->select('products.*');
+
+        // Search
+        if ($request->search) {
+            $products = Product::search($request->search, function ($q) use ($request): void {
+                $q->whereIsActive(1)->whereNull('parent_id');
+                $this->applyProductFilters($q, $request);
+                $this->applyProductSorting($q);
+                // Explicitly select all columns
+                $q->select('products.*');
+            })->paginate($perPage, 'page', $page);
+        } else {
+            // Paginate the query
+            $products = $query->paginate($perPage, 'page', $page);
+        }
+
+        // Load relationships and add base image URL
+        $this->loadProductRelationships($products);
+        $this->addBaseImageUrls($products);
+
+        // Transform products to match the format expected by the frontend
+        $transformedProducts = $products->getCollection()->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'price' => $product->price,
+                'selling_price' => $product->selling_price,
+                'should_track' => $product->should_track,
+                'stock_count' => $product->stock_count,
+                'base_image_url' => $product->base_image_url ?? '/images/placeholder.jpg',
+                'var_name' => $product->var_name ?? $product->name,
+            ];
+        });
+
+        return response()->json([
+            'data' => $transformedProducts->toArray(),
+            'pagination' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'has_more' => $products->hasMorePages(),
+                'next_page' => $products->currentPage() < $products->lastPage() ? $products->currentPage() + 1 : null,
+            ],
+        ]);
     }
 
     public function product(Request $request, $slug)
