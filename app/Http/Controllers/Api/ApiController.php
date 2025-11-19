@@ -130,10 +130,10 @@ class ApiController extends Controller
                 $this->applyProductSorting($q);
                 // Explicitly select all columns
                 $q->select('products.*');
-            })->paginate($perPage, 'page', $page);
+            })->paginate(perPage: $perPage, pageName: 'page', page: $page);
         } else {
             // Paginate the query
-            $products = $query->paginate($perPage, 'page', $page);
+            $products = $query->paginate(perPage: $perPage, columns: ['*'], pageName: 'page', page: $page);
         }
 
         // Load relationships and add base image URL
