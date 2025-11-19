@@ -60,6 +60,16 @@ class Checkout extends Component
         $this->facebookService = $facebookService;
     }
 
+    public function hydrate(): void
+    {
+        if (app()->environment('local') && request()->has('calls')) {
+            logger()->debug('Checkout Livewire call queue', [
+                'calls' => request()->input('calls'),
+                'updates' => request()->input('updates'),
+            ]);
+        }
+    }
+
     public function updateField($field, $value): void
     {
         if ($field === 'retail' && is_array($value)) {
@@ -472,5 +482,22 @@ class Checkout extends Component
     protected function getDefaultStatus()
     {
         return data_get(config('app.orders', []), 0, 'PENDING'); // Default Status
+    }
+
+    public function toJSON(): array
+    {
+        return [
+            'name' => $this->name,
+            'phone' => $this->phone,
+            'shipping' => $this->shipping,
+            'address' => $this->address,
+            'note' => $this->note,
+            'city_id' => $this->city_id,
+            'area_id' => $this->area_id,
+            'retail' => $this->retail,
+            'retailDeliveryFee' => $this->retailDeliveryFee,
+            'advanced' => $this->advanced,
+            'retailDiscount' => $this->retailDiscount,
+        ];
     }
 }
