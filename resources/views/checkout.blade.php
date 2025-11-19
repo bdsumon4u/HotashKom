@@ -31,35 +31,74 @@
 
 @push('scripts')
 <script>
-    // Send data to the server before the user leaves
-    window.addEventListener("beforeunload", function (event) {
-        // Send data using Fetch API (asynchronous)
-        navigator.sendBeacon(
-            "/save-checkout-progress",
-            new Blob([JSON.stringify({
-                name: $('#name').val(),
-                phone: $('#phone').val(),
-                address: $('#address').val(),
-            })], { type: 'application/json' })
-        );
+    (function () {
+        const endpoint = '/save-checkout-progress';
 
-        // Optional: If you want to use Fetch (uncomment below)
-        // fetch("/api/save-checkout-progress", {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify(formData),
-        //     keepalive: true, // Ensures request completes before browser unloads
-        // });
-    });
-</script>
-<script>
-    $(document).ready(function() {
-        $('[place-order]').on('click', function (ev) {
-            if ($(this).hasClass('disabled')) {
-                ev.preventDefault();
+        const getFieldValue = (selector) => document.querySelector(selector)?.value ?? '';
+
+        function sendCheckoutProgress() {
+            const payload = {
+                name: getFieldValue('[name="name"]'),
+                phone: getFieldValue('[name="phone"]'),
+                address: getFieldValue('[name="address"]'),
+            };
+
+            const body = JSON.stringify(payload);
+            const blob = new Blob([body], { type: 'application/json' });
+
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(endpoint, blob);
+            } else {
+                fetch(endpoint, {
+                    method: 'POST',
+                    body,
+                    headers: { 'Content-Type': 'application/json' },
+                    keepalive: true,
+                }).catch(() => {});
             }
-            $(this).text('Processing..').css('opacity', 1).addClass('disabled');
-        });
-    });
+        }
+
+        function handlePlaceOrderClick(event) {
+            const button = event.currentTarget;
+
+            if (button.classList.contains('disabled')) {
+                event.preventDefault();
+                return;
+            }
+
+            button.textContent = 'Processing..';
+            button.style.opacity = 1;
+            button.classList.add('disabled');
+        }
+
+        function registerCheckoutInteractions() {
+            if (window.__checkoutBeforeUnloadHandler) {
+                window.removeEventListener('beforeunload', window.__checkoutBeforeUnloadHandler);
+            }
+
+            window.__checkoutBeforeUnloadHandler = sendCheckoutProgress;
+            window.addEventListener('beforeunload', window.__checkoutBeforeUnloadHandler);
+
+            document.querySelectorAll('[place-order]').forEach((button) => {
+                if (button.__checkoutClickHandler) {
+                    return;
+                }
+
+                const handler = (event) => handlePlaceOrderClick.call(button, event);
+                button.addEventListener('click', handler);
+                button.__checkoutClickHandler = handler;
+            });
+        }
+
+        const boot = () => queueMicrotask(registerCheckoutInteractions);
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot, { once: true });
+        } else {
+            boot();
+        }
+
+        document.addEventListener('livewire:navigate', boot);
+    })();
 </script>
 @endpush

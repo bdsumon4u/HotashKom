@@ -29,7 +29,7 @@
                     <td class="cart-table__column cart-table__column--price" data-title="Price">
                         <div class="input-group input-group-sm">
                             <input type="number" class="form-control form-control-sm" 
-                                x-model="retail['{{$product->id}}']?.price" 
+                                x-model="retail['{{$product->id}}'].price" 
                                 min="0" @focus="$event.target.select()" />
                             <div class="input-group-append">
                                 <span class="input-group-text">৳</span>
@@ -40,7 +40,7 @@
                     <td class="cart-table__column cart-table__column--quantity" data-title="Quantity">
                         <div class="input-number product__quantity">
                             <input class="form-control input-number__input" type="number" min="1"
-                                x-model="retail['{{$product->id}}']?.quantity"
+                                x-model="retail['{{$product->id}}'].quantity"
                                 value="{{ $product->qty }}" max="{{ $product->max }}" readonly />
                             <div class="input-number__add" wire:click="increaseQuantity('{{ $product->rowId }}')"></div>
                             <div class="input-number__sub" wire:click="decreaseQuantity('{{ $product->rowId }}')"></div>
