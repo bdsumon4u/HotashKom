@@ -79,6 +79,205 @@
         })();
     </script>
 
+    <script data-navigate-once>
+        (function () {
+            if (window.lazyRelatedProducts) {
+                return;
+            }
+
+            window.lazyRelatedProducts = function (productId, cols) {
+                return {
+                    productId,
+                    cols,
+                    loading: false,
+                    loaded: false,
+                    observer: null,
+
+                    init() {
+                        this.observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting && !this.loaded && !this.loading) {
+                                    this.loadProducts();
+                                }
+                            });
+                        }, {
+                            rootMargin: '200px',
+                        });
+
+                        this.$nextTick(() => {
+                            if (this.$el) {
+                                this.observer.observe(this.$el);
+                            }
+                        });
+                    },
+
+                    async loadProducts() {
+                        if (this.loading || this.loaded) {
+                            return;
+                        }
+
+                        this.loading = true;
+                        const container = document.getElementById('related-products-container');
+                        if (!container) {
+                            this.loading = false;
+                            return;
+                        }
+
+                        try {
+                            const response = await fetch(`/api/products/${encodeURIComponent(this.productId)}/related.json`);
+
+                            if (response.ok) {
+                                const products = await response.json();
+                                this.renderProducts(products, container);
+                                this.loaded = true;
+                                this.observer?.disconnect();
+                            } else {
+                                container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
+                            }
+                        } catch (error) {
+                            console.error('Error loading related products:', error);
+                            container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
+                        }
+
+                        this.loading = false;
+                    },
+
+                    renderProducts(products, container) {
+                        if (!products || products.length === 0) {
+                            container.innerHTML = '<div class="py-5 text-center text-muted">No related products found.</div>';
+                            return;
+                        }
+
+                        container.innerHTML = '';
+
+                        products.forEach((product) => {
+                            const productElement = this.createProductElement(product);
+                            container.appendChild(productElement);
+                            this.attachNavigationHandlers(productElement);
+                        });
+                    },
+
+                    createProductElement(product) {
+                        const div = document.createElement('div');
+                        div.className = 'products-list__item';
+                        div.innerHTML = this.getProductHTML(product);
+                        return div;
+                    },
+
+                    attachNavigationHandlers(element) {
+                        const productLinks = element.querySelectorAll('a.product-link[data-navigate]');
+                        productLinks.forEach(link => {
+                            link.addEventListener('click', (e) => {
+                                const href = link.getAttribute('href');
+                                if (href && window.Livewire && window.Livewire.navigate) {
+                                    e.preventDefault();
+                                    window.Livewire.navigate(href);
+                                }
+                            });
+                        });
+                    },
+
+                    getProductHTML(product) {
+                        const productId = product.id;
+                        const productName = product.name || 'Product';
+                        const productSlug = product.slug || productId;
+                        const productPrice = product.compareAtPrice || product.price || 0;
+                        const productSellingPrice = product.price || productPrice;
+                        const productImage = product.base_image_url || (product.images && product.images.length > 0
+                            ? `/storage/${product.images[0]}`
+                            : '/images/placeholder.jpg');
+                        const productUrl = `/products/${encodeURIComponent(productSlug)}`;
+                        const inStock = product.availability !== 'Out of Stock' && (product.availability === 'In Stock' || (product.availability && parseInt(product.availability) > 0));
+                        const stockCount = typeof product.availability === 'number' ? product.availability : (product.availability === 'In Stock' ? null : 0);
+                        const shouldTrack = typeof product.availability === 'number' || product.availability !== 'In Stock';
+                        const hasDiscount = productPrice !== productSellingPrice && productPrice > 0;
+                        const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
+
+                        const showOption = JSON.parse(this.$el?.dataset.showOption || '{}');
+                        const isOninda = this.$el?.dataset.isOninda === 'true';
+                        const guestCanSeePrice = this.$el?.dataset.guestCanSeePrice === 'true';
+
+                        const formatPrice = (price) => {
+                            return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
+                        };
+
+                        let buttonsHTML = '';
+                        if (!isOninda) {
+                            const available = inStock;
+                            const disabledAttr = available ? '' : 'disabled';
+
+                            if (showOption.product_grid_button === 'add_to_cart') {
+                                buttonsHTML = `
+                                    <div class="product-card__buttons">
+                                        <button class="btn btn-primary product-card__addtocart" type="button" ${disabledAttr}
+                                                data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
+                                            ${showOption.add_to_cart_icon || ''}
+                                            <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
+                                        </button>
+                                    </div>
+                                `;
+                            } else if (showOption.product_grid_button === 'order_now') {
+                                buttonsHTML = `
+                                    <div class="product-card__buttons">
+                                        <button class="btn btn-primary product-card__ordernow" type="button" ${disabledAttr}
+                                                data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
+                                            ${showOption.order_now_icon || ''}
+                                            <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                        }
+
+                        let priceHTML = '';
+                        if (isOninda && !guestCanSeePrice) {
+                            priceHTML = '<span class="product-card__new-price text-danger">Login to see price</span>';
+                        } else if (isOninda && guestCanSeePrice) {
+                            priceHTML = '<small class="product-card__new-price text-danger">Verify account to see price</small>';
+                        } else if (hasDiscount) {
+                            priceHTML = `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
+                        } else {
+                            priceHTML = formatPrice(productSellingPrice);
+                        }
+
+                        const discountText = (showOption.discount_text || '<small>Discount:</small> [percent]%').replace('[percent]', discountPercent);
+
+                        return `
+                            <div class="product-card" data-id="${productId}" data-max="${shouldTrack ? (stockCount || 0) : -1}">
+                                <div class="product-card__badges-list">
+                                    ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
+                                    ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
+                                </div>
+                                <div class="product-card__image">
+                                    <a href="${productUrl}" class="product-link" data-navigate>
+                                        <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;">
+                                    </a>
+                                </div>
+                                <div class="product-card__info">
+                                    <div class="product-card__name">
+                                        <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
+                                    </div>
+                                </div>
+                                <div class="product-card__actions">
+                                    <div class="product-card__availability">Availability:
+                                        ${!shouldTrack ?
+                                            '<span class="text-success">In Stock</span>' :
+                                            `<span class="text-${(stockCount || 0) > 0 ? 'success' : 'danger'}">${stockCount || 0} In Stock</span>`
+                                        }
+                                    </div>
+                                    <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}">
+                                        ${priceHTML}
+                                    </div>
+                                    ${buttonsHTML}
+                                </div>
+                            </div>
+                        `;
+                    }
+                };
+            };
+        })();
+    </script>
+
     <!-- css -->
     @include('googletagmanager::head')
     <x-metapixel-head/>
@@ -312,6 +511,353 @@
     </div><!-- site / end -->
     @livewireScripts
     @include('layouts.yellow.js')
+    <script src="{{ asset('strokya/vendor/xzoom/xzoom.min.js') }}"></script>
+    <script src="{{ asset('strokya/vendor/xZoom-master/example/js/vendor/modernizr.js') }}"></script>
+    <script src="{{ asset('strokya/vendor/xZoom-master/example/js/setup.js') }}"></script>
+    <script>
+        (function () {
+            function registerLazyRelatedProductsComponent() {
+                if (window.__lazyRelatedProductsComponentRegistered) {
+                    return;
+                }
+
+                const initComponent = () => {
+                    if (window.__lazyRelatedProductsComponentRegistered) {
+                        return;
+                    }
+
+                    window.__lazyRelatedProductsComponentRegistered = true;
+
+                    window.Alpine.data('lazyRelatedProducts', (productId, cols) => ({
+                        productId: productId,
+                        cols: cols,
+                        loading: false,
+                        loaded: false,
+                        observer: null,
+
+                        init() {
+                            this.observer = new IntersectionObserver((entries) => {
+                                entries.forEach(entry => {
+                                    if (entry.isIntersecting && !this.loaded && !this.loading) {
+                                        this.loadProducts();
+                                    }
+                                });
+                            }, {
+                                rootMargin: '200px'
+                            });
+
+                            this.$nextTick(() => {
+                                const container = this.$el;
+                                if (container) {
+                                    this.observer.observe(container);
+                                }
+                            });
+                        },
+
+                        async loadProducts() {
+                            if (this.loading || this.loaded) {
+                                return;
+                            }
+
+                            this.loading = true;
+                            const container = document.getElementById('related-products-container');
+                            if (!container) {
+                                this.loading = false;
+                                return;
+                            }
+
+                            try {
+                                const response = await fetch(`/api/products/${encodeURIComponent(this.productId)}/related.json`);
+
+                                if (response.ok) {
+                                    const products = await response.json();
+                                    this.renderProducts(products, container);
+                                    this.loaded = true;
+                                    this.observer?.disconnect();
+                                } else {
+                                    container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
+                                }
+                            } catch (error) {
+                                console.error('Error loading related products:', error);
+                                container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
+                            }
+
+                            this.loading = false;
+                        },
+
+                        renderProducts(products, container) {
+                            if (!products || products.length === 0) {
+                                container.innerHTML = '<div class="py-5 text-center text-muted">No related products found.</div>';
+                                return;
+                            }
+
+                            container.innerHTML = '';
+
+                            products.forEach((product) => {
+                                const productElement = this.createProductElement(product);
+                                container.appendChild(productElement);
+                                this.attachNavigationHandlers(productElement);
+                            });
+                        },
+
+                        createProductElement(product) {
+                            const div = document.createElement('div');
+                            div.className = 'products-list__item';
+                            div.innerHTML = this.getProductHTML(product);
+                            return div;
+                        },
+
+                        attachNavigationHandlers(element) {
+                            const productLinks = element.querySelectorAll('a.product-link[data-navigate]');
+                            productLinks.forEach(link => {
+                                link.addEventListener('click', (e) => {
+                                    const href = link.getAttribute('href');
+                                    if (href && window.Livewire && window.Livewire.navigate) {
+                                        e.preventDefault();
+                                        window.Livewire.navigate(href);
+                                    }
+                                });
+                            });
+                        },
+
+                        getProductHTML(product) {
+                            const productId = product.id;
+                            const productName = product.name || 'Product';
+                            const productSlug = product.slug || productId;
+                            const productPrice = product.compareAtPrice || product.price || 0;
+                            const productSellingPrice = product.price || productPrice;
+                            const productImage = product.base_image_url || (product.images && product.images.length > 0
+                                ? `/storage/${product.images[0]}`
+                                : '/images/placeholder.jpg');
+                            const productUrl = `/products/${encodeURIComponent(productSlug)}`;
+                            const inStock = product.availability !== 'Out of Stock' && (product.availability === 'In Stock' || (product.availability && parseInt(product.availability) > 0));
+                            const stockCount = typeof product.availability === 'number' ? product.availability : (product.availability === 'In Stock' ? null : 0);
+                            const shouldTrack = typeof product.availability === 'number' || product.availability !== 'In Stock';
+                            const hasDiscount = productPrice !== productSellingPrice && productPrice > 0;
+                            const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
+
+                            const showOption = JSON.parse(this.$el.dataset.showOption || '{}');
+                            const isOninda = this.$el.dataset.isOninda === 'true';
+                            const guestCanSeePrice = this.$el.dataset.guestCanSeePrice === 'true';
+
+                            const formatPrice = (price) => {
+                                return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
+                            };
+
+                            let buttonsHTML = '';
+                            if (!isOninda) {
+                                const available = inStock;
+                                const disabledAttr = available ? '' : 'disabled';
+
+                                if (showOption.product_grid_button === 'add_to_cart') {
+                                    buttonsHTML = `
+                                        <div class="product-card__buttons">
+                                            <button class="btn btn-primary product-card__addtocart" type="button" ${disabledAttr}
+                                                    data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
+                                                ${showOption.add_to_cart_icon || ''}
+                                                <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
+                                            </button>
+                                        </div>
+                                    `;
+                                } else if (showOption.product_grid_button === 'order_now') {
+                                    buttonsHTML = `
+                                        <div class="product-card__buttons">
+                                            <button class="btn btn-primary product-card__ordernow" type="button" ${disabledAttr}
+                                                    data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
+                                                ${showOption.order_now_icon || ''}
+                                                <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
+                                            </button>
+                                        </div>
+                                    `;
+                                }
+                            }
+
+                            let priceHTML = '';
+                            if (isOninda && !guestCanSeePrice) {
+                                priceHTML = '<span class="product-card__new-price text-danger">Login to see price</span>';
+                            } else if (isOninda && guestCanSeePrice) {
+                                priceHTML = '<small class="product-card__new-price text-danger">Verify account to see price</small>';
+                            } else if (hasDiscount) {
+                                priceHTML = `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
+                            } else {
+                                priceHTML = formatPrice(productSellingPrice);
+                            }
+
+                            const discountText = (showOption.discount_text || '<small>Discount:</small> [percent]%').replace('[percent]', discountPercent);
+
+                            return `
+                                <div class="product-card" data-id="${productId}" data-max="${shouldTrack ? (stockCount || 0) : -1}">
+                                    <div class="product-card__badges-list">
+                                        ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
+                                        ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
+                                    </div>
+                                    <div class="product-card__image">
+                                        <a href="${productUrl}" class="product-link" data-navigate>
+                                            <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;">
+                                        </a>
+                                    </div>
+                                    <div class="product-card__info">
+                                        <div class="product-card__name">
+                                            <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
+                                        </div>
+                                    </div>
+                                    <div class="product-card__actions">
+                                        <div class="product-card__availability">Availability:
+                                            ${!shouldTrack ?
+                                                '<span class="text-success">In Stock</span>' :
+                                                `<span class="text-${(stockCount || 0) > 0 ? 'success' : 'danger'}">${stockCount || 0} In Stock</span>`
+                                            }
+                                        </div>
+                                        <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}">
+                                            ${priceHTML}
+                                        </div>
+                                        ${buttonsHTML}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }));
+                };
+
+                if (window.Alpine) {
+                    initComponent();
+                } else {
+                    document.addEventListener('alpine:init', initComponent, { once: true });
+                }
+            }
+
+            function initializeProductShowScripts() {
+                if (!document.querySelector('.xzoom-container')) {
+                    if (typeof window.__productShowCleanup === 'function') {
+                        window.__productShowCleanup();
+                        window.__productShowCleanup = null;
+                    }
+                    return;
+                }
+
+                runWhenJQueryReady(($) => {
+                    if (typeof window.__productShowCleanup === 'function') {
+                        window.__productShowCleanup();
+                        window.__productShowCleanup = null;
+                    }
+
+                    const namespace = '.productShow';
+                    const $galleries = $('.xzoom-gallery');
+
+                    if (! $galleries.length) {
+                        return;
+                    }
+
+                    if (typeof $.fn.xzoom === 'function') {
+                        $('.xzoom, .xzoom-gallery').xzoom({
+                            zoomWidth: 400,
+                            title: true,
+                            tint: '#333',
+                            Xoffset: 15,
+                        });
+                    }
+
+                    let activeG = 0;
+                    let lastG = 0;
+                    let autoNavigationTimer = null;
+
+                    function updateActiveIndex() {
+                        $galleries.each(function (g, e) {
+                            if ($(e).hasClass('xactive')) {
+                                activeG = g;
+                            }
+                            lastG = g;
+                        });
+                    }
+
+                    function navigateToNext() {
+                        updateActiveIndex();
+                        const next = activeG === lastG ? 0 : (activeG + 1);
+                        $galleries.eq(next).trigger('click');
+                    }
+
+                    function scheduleNextNavigation() {
+                        clearTimeout(autoNavigationTimer);
+                        autoNavigationTimer = setTimeout(() => {
+                            navigateToNext();
+                        }, 3000);
+                    }
+
+                    function resetAutoNavigation() {
+                        clearTimeout(autoNavigationTimer);
+                        scheduleNextNavigation();
+                    }
+
+                    $('.zoom-control.left').off('click'+namespace).on('click'+namespace, function () {
+                        updateActiveIndex();
+                        const prev = activeG === 0 ? lastG : (activeG - 1);
+                        $galleries.eq(prev).trigger('click');
+                        resetAutoNavigation();
+                    });
+
+                    $('.zoom-control.right').off('click'+namespace).on('click'+namespace, function () {
+                        navigateToNext();
+                        resetAutoNavigation();
+                    });
+
+                    $galleries.off('click'+namespace).on('click'+namespace, function () {
+                        resetAutoNavigation();
+                    });
+
+                    scheduleNextNavigation();
+
+                    window.__handleVariantChange = function (event) {
+                        const variantId = event.variantId;
+                        const variantImage = $('.variant-image').filter(function () {
+                            const ids = $(this).data('variant-ids');
+                            return Array.isArray(ids) && ids.includes(variantId);
+                        }).first();
+
+                        if (variantImage.length) {
+                            resetAutoNavigation();
+                            setTimeout(() => {
+                                variantImage.trigger('click');
+                                updateActiveIndex();
+                            }, 100);
+                        }
+                    };
+
+                    if (!window.__variantChangeListenerRegistered) {
+                        window.__variantChangeListenerRegistered = true;
+
+                        const registerVariantListener = () => {
+                            Livewire.on('variantChanged', (event) => {
+                                if (typeof window.__handleVariantChange === 'function') {
+                                    window.__handleVariantChange(event);
+                                }
+                            });
+                        };
+
+                        if (window.Livewire) {
+                            registerVariantListener();
+                        } else {
+                            document.addEventListener('livewire:load', registerVariantListener, { once: true });
+                        }
+                    }
+
+                    window.__productShowCleanup = function () {
+                        clearTimeout(autoNavigationTimer);
+                        $('.zoom-control.left').off('click'+namespace);
+                        $('.zoom-control.right').off('click'+namespace);
+                        $galleries.off('click'+namespace);
+                    };
+                });
+            }
+
+            function runInitializers() {
+                registerLazyRelatedProductsComponent();
+                requestAnimationFrame(initializeProductShowScripts);
+            }
+
+            document.addEventListener('DOMContentLoaded', runInitializers);
+            document.addEventListener('livewire:navigate', runInitializers);
+        })();
+    </script>
     <script>
         runWhenJQueryReady(function ($) {
             $(window)
@@ -355,6 +901,391 @@
             $(window).off('scroll.siteHeader').on('scroll.siteHeader', onScroll);
             onScroll();
         });
+    </script>
+    <script data-navigate-once>
+        (function () {
+            if (window.__storefrontComponentsRegistered) {
+                return;
+            }
+
+            window.__storefrontComponentsRegistered = true;
+
+            const registerPaginationLinks = () => {
+                document.querySelectorAll('.pagination a').forEach(link => {
+                    if (link.hasAttribute('wire:navigate') || link.hasAttribute('wire:navigate.hover')) {
+                        return;
+                    }
+
+                    if (link.getAttribute('href')) {
+                        link.setAttribute('wire:navigate.hover', '');
+                    }
+                });
+            };
+
+            document.addEventListener('DOMContentLoaded', registerPaginationLinks);
+            document.addEventListener('livewire:navigate', () => queueMicrotask(registerPaginationLinks));
+            document.addEventListener('livewire:navigated', registerPaginationLinks);
+
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('filterSidebar', (attributeIds = []) => ({
+                    mobileOpen: window.innerWidth >= 768,
+                    isDesktop: window.innerWidth >= 768,
+                    categoriesOpen: true,
+                    attributesOpen: attributeIds.reduce((acc, id) => {
+                        acc[id] = true;
+                        return acc;
+                    }, {}),
+
+                    init() {
+                        this.checkDesktop();
+                        window.addEventListener('resize', () => this.checkDesktop());
+                    },
+
+                    checkDesktop() {
+                        this.isDesktop = window.innerWidth >= 768;
+                        if (this.isDesktop) {
+                            this.mobileOpen = true;
+                        }
+                    },
+
+                    updateFilter() {},
+                }));
+
+                Alpine.data('productCountDisplay', (totalProducts, initialCount) => ({
+                    totalProducts,
+                    loadedProducts: initialCount,
+
+                    updateCount(count) {
+                        this.loadedProducts = count;
+                    },
+
+                    getDisplayText() {
+                        if (this.loadedProducts >= this.totalProducts) {
+                            return `Showing all ${this.totalProducts} products`;
+                        }
+
+                        return `Showing ${this.loadedProducts} of ${this.totalProducts} products`;
+                    },
+                }));
+
+                Alpine.data('shopInfiniteScroll', (initialPage = 1, initialHasMore = false, perPage = 20, totalProducts = 0) => ({
+                    currentPage: initialPage,
+                    hasMore: !!initialHasMore,
+                    loading: false,
+                    perPage,
+                    totalProducts,
+                    loadedProductIds: new Set(),
+                    observer: null,
+
+                    init() {
+                        this.markInitialProducts();
+                        this.$nextTick(() => {
+                            this.updateProductCount();
+                            this.setupIntersectionObserver();
+                        });
+                    },
+
+                    markInitialProducts() {
+                        const container = this.getContainer();
+                        if (!container) {
+                            return;
+                        }
+
+                        const ids = container.dataset.initialProducts;
+                        if (!ids) {
+                            return;
+                        }
+
+                        try {
+                            JSON.parse(ids).forEach(id => this.loadedProductIds.add(Number(id)));
+                        } catch (error) {
+                            console.error('Failed to parse initial product IDs', error);
+                        }
+                    },
+
+                    async loadProducts() {
+                        if (!this.hasMore || this.loading) {
+                            if (!this.hasMore) {
+                                this.disconnectObserver();
+                            }
+                            return;
+                        }
+
+                        this.loading = true;
+
+                        try {
+                            const params = new URLSearchParams(window.location.search);
+                            params.set('page', this.currentPage + 1);
+                            params.set('per_page', this.perPage);
+
+                            const response = await fetch(`/api/shop/products?${params.toString()}`, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                },
+                            });
+
+                            if (response.ok) {
+                                const data = await response.json();
+                                this.handleResponse(data);
+                            } else {
+                                this.hasMore = false;
+                                this.disconnectObserver();
+                            }
+                        } catch (error) {
+                            console.error('Error loading products:', error);
+                            this.hasMore = false;
+                            this.disconnectObserver();
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+
+                    handleResponse(data) {
+                        if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
+                            this.hasMore = false;
+                            this.disconnectObserver();
+                            return;
+                        }
+
+                        const currentPage = data.pagination?.current_page || (this.currentPage + 1);
+                        const lastPage = data.pagination?.last_page || 1;
+                        const hasMorePages = currentPage < lastPage;
+
+                        this.currentPage = currentPage;
+
+                        const before = this.loadedProductIds.size;
+                        this.appendProducts(data.data);
+                        const after = this.loadedProductIds.size;
+                        const newlyAdded = after - before;
+
+                        if (!hasMorePages || after >= this.totalProducts || (newlyAdded === 0 && after >= this.totalProducts * 0.95)) {
+                            this.hasMore = false;
+                            this.disconnectObserver();
+                        } else {
+                            this.hasMore = hasMorePages;
+                        }
+                    },
+
+                    appendProducts(products) {
+                        const container = document.getElementById('products-container-shop');
+                        if (!container) {
+                            return;
+                        }
+
+                        products.forEach((product, index) => {
+                            const productId = product.id || index;
+
+                            if (this.loadedProductIds.has(productId)) {
+                                return;
+                            }
+
+                            this.loadedProductIds.add(productId);
+                            const element = this.createProductElement(product, index);
+                            container.appendChild(element);
+                            this.attachNavigationHandlers(element);
+                        });
+
+                        this.updateProductCount();
+
+                        if (this.hasMore && this.observer) {
+                            this.$nextTick(() => {
+                                const trigger = this.$refs.loadMoreTrigger || this.$el.querySelector('.load-more-trigger');
+                                if (trigger) {
+                                    try {
+                                        this.observer.unobserve(trigger);
+                                    } catch (error) {
+                                        console.error(error);
+                                    }
+                                    this.observer.observe(trigger);
+                                }
+                            });
+                        } else if (!this.hasMore) {
+                            this.disconnectObserver();
+                        }
+                    },
+
+                    updateProductCount() {
+                        const countElement = document.getElementById('product-count-display');
+                        if (countElement && countElement._x_dataStack && countElement._x_dataStack[0]) {
+                            const alpineData = countElement._x_dataStack[0];
+                            if (alpineData && typeof alpineData.updateCount === 'function') {
+                                alpineData.updateCount(this.loadedProductIds.size);
+                            }
+                        }
+                    },
+
+                    createProductElement(product, index) {
+                        const div = document.createElement('div');
+                        div.className = 'products-list__item';
+                        div.innerHTML = this.getProductHTML(product, index);
+                        return div;
+                    },
+
+                    attachNavigationHandlers(element) {
+                        const productLinks = element.querySelectorAll('a.product-link[data-navigate]');
+                        productLinks.forEach(link => {
+                            link.addEventListener('click', (e) => {
+                                const href = link.getAttribute('href');
+                                if (href && window.Livewire && window.Livewire.navigate) {
+                                    e.preventDefault();
+                                    window.Livewire.navigate(href);
+                                }
+                            });
+                        });
+                    },
+
+                    getProductHTML(product, index) {
+                        const productId = product.id || index;
+                        const productName = product.name || 'Product';
+                        const productSlug = product.slug || productId;
+                        const productPrice = product.price || 0;
+                        const productSellingPrice = product.selling_price || productPrice;
+                        const productImage = product.base_image_url || '/images/placeholder.jpg';
+                        const productUrl = `/products/${encodeURIComponent(productSlug)}`;
+                        const inStock = !product.should_track || (product.stock_count || 0) > 0;
+                        const hasDiscount = productPrice !== productSellingPrice && productPrice > 0;
+                        const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
+
+                        const showOption = this.getShowOption();
+                        const isOninda = this.getIsOninda();
+                        const guestCanSeePrice = this.getGuestCanSeePrice();
+
+                        const formatPrice = (price) => {
+                            return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
+                        };
+
+                        let buttonsHTML = '';
+                        if (!isOninda) {
+                            const available = inStock;
+                            const disabledAttr = available ? '' : 'disabled';
+
+                            if (showOption.product_grid_button === 'add_to_cart') {
+                                buttonsHTML = `
+                                    <div class="product-card__buttons">
+                                        <button class="btn btn-primary product-card__addtocart" type="button" ${disabledAttr}
+                                                data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
+                                            ${showOption.add_to_cart_icon || ''}
+                                            <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
+                                        </button>
+                                    </div>
+                                `;
+                            } else if (showOption.product_grid_button === 'order_now') {
+                                buttonsHTML = `
+                                    <div class="product-card__buttons">
+                                        <button class="btn btn-primary product-card__ordernow" type="button" ${disabledAttr}
+                                                data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
+                                            ${showOption.order_now_icon || ''}
+                                            <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
+                                        </button>
+                                    </div>
+                                `;
+                            }
+                        }
+
+                        let priceHTML = '';
+                        if (isOninda && !guestCanSeePrice) {
+                            priceHTML = '<span class="product-card__new-price text-danger">Login to see price</span>';
+                        } else if (isOninda && guestCanSeePrice) {
+                            priceHTML = '<small class="product-card__new-price text-danger">Verify account to see price</small>';
+                        } else if (hasDiscount) {
+                            priceHTML = `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
+                        } else {
+                            priceHTML = formatPrice(productSellingPrice);
+                        }
+
+                        const discountText = (showOption.discount_text || '<small>Discount:</small> [percent]%').replace(/\[percent\]/g, discountPercent);
+
+                        return `
+                            <div class="product-card" data-id="${productId}" data-max="${product.should_track ? (product.stock_count || 0) : -1}">
+                                <div class="product-card__badges-list">
+                                    ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
+                                    ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
+                                </div>
+                                <div class="product-card__image">
+                                    <a href="${productUrl}" class="product-link" data-navigate>
+                                        <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;" loading="lazy">
+                                    </a>
+                                </div>
+                                <div class="product-card__info">
+                                    <div class="product-card__name">
+                                        <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
+                                    </div>
+                                </div>
+                                <div class="product-card__actions">
+                                    <div class="product-card__availability">Availability:
+                                        ${!product.should_track ?
+                                            '<span class="text-success">In Stock</span>' :
+                                            `<span class="text-${(product.stock_count || 0) > 0 ? 'success' : 'danger'}">${product.stock_count || 0} In Stock</span>`
+                                        }
+                                    </div>
+                                    <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}">
+                                        ${priceHTML}
+                                    </div>
+                                    ${buttonsHTML}
+                                </div>
+                            </div>
+                        `;
+                    },
+
+                    getContainer() {
+                        return this.$el.querySelector('#products-container-shop');
+                    },
+
+                    getShowOption() {
+                        const container = this.getContainer();
+                        if (container && container.dataset.showOption) {
+                            return JSON.parse(container.dataset.showOption);
+                        }
+                        return {};
+                    },
+
+                    getIsOninda() {
+                        const container = this.getContainer();
+                        return container && container.dataset.isOninda === 'true';
+                    },
+
+                    getGuestCanSeePrice() {
+                        const container = this.getContainer();
+                        return container && container.dataset.guestCanSeePrice === 'true';
+                    },
+
+                    setupIntersectionObserver() {
+                        this.observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting && !this.loading && this.hasMore) {
+                                    this.loadProducts();
+                                } else if (!this.hasMore) {
+                                    this.disconnectObserver();
+                                }
+                            });
+                        }, {
+                            root: null,
+                            rootMargin: '200px',
+                            threshold: 0.01,
+                        });
+
+                        this.$nextTick(() => {
+                            const trigger = this.$refs.loadMoreTrigger || this.$el.querySelector('.load-more-trigger');
+                            if (trigger) {
+                                this.observer.observe(trigger);
+                            }
+                        });
+                    },
+
+                    disconnectObserver() {
+                        if (this.observer) {
+                            try {
+                                this.observer.disconnect();
+                            } catch (error) {
+                                console.error(error);
+                            }
+                            this.observer = null;
+                        }
+                    },
+                }));
+            });
+        })();
     </script>
     @stack('scripts')
     @php
