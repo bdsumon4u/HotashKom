@@ -10,5 +10,9 @@
 <script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js"></script>
 <script src="{{ asset('strokya/js/algolia.js') }}"></script>
 <script src="{{ asset('strokya/vendor/jquery.bootstrap-growl.min.js') }}"></script> --}}
-<script src="{{ cdnAsset('svg4everybody', 'strokya/vendor/svg4everybody-2.1.9/svg4everybody.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script>svg4everybody();</script>
+<script src="{{ asset('strokya/vendor/svg4everybody-2.1.9/svg4everybody.min.js') }}"></script>
+<script>
+    if (typeof svg4everybody !== 'undefined') {
+        svg4everybody();
+    }
+</script>
