@@ -113,7 +113,8 @@ class ApiController extends Controller
             if ($request->options) {
                 $selectedVar = $product->variations->first(fn ($item) => $item->options->pluck('id')->diff($request->options)->isEmpty());
             } else {
-                $selectedVar = $product->variations->where('slug', request()->segment(2))->first()
+                $segmentSlug = request()->segment(2);
+                $selectedVar = $product->variations->where('slug', $segmentSlug ? rawurldecode((string) $segmentSlug) : null)->first()
                     ?? $product->variations->random();
             }
         } else {
