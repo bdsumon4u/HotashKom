@@ -15,8 +15,14 @@ class HomeSection extends Model
     #[\Override]
     public static function booted(): void
     {
+        static::saved(function (): void {
+            cacheMemo()->forget('homesections');
+            cacheMemo()->forget('api_sections');
+        });
+
         static::deleted(function (): void {
             cacheMemo()->forget('homesections');
+            cacheMemo()->forget('api_sections');
         });
     }
 

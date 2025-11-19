@@ -159,7 +159,15 @@ class ProductController extends Controller
     {
         // Handle categories
         if (isset($data['categories'])) {
+            // Get old categories before sync to clear their specific caches
+            $oldCategoryIds = $product->categories->pluck('id')->toArray();
             $product->categories()->sync($data['categories']);
+
+            // Clear category-specific filter data for both old and new categories
+            $allCategoryIds = array_unique(array_merge($oldCategoryIds, $data['categories']));
+            foreach ($allCategoryIds as $categoryId) {
+                cacheMemo()->forget('product_filter_data:category:'.$categoryId);
+            }
         }
 
         // Handle images
