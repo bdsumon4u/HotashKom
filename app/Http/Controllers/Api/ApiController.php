@@ -270,14 +270,11 @@ class ApiController extends Controller
         return false;
     }
 
-    public function relatedProducts(Request $request, $slug)
+    public function relatedProducts(Request $request, Product $product)
     {
-        $decodedSlug = rawurldecode((string) $slug);
-        $cacheKey = 'related_products:'.$decodedSlug;
+        $cacheKey = 'related_products:'.$product->getKey();
 
-        return cacheMemo()->remember($cacheKey, now()->addHours(6), function () use ($decodedSlug) {
-            $product = Product::where('slug', $decodedSlug)->firstOrFail();
-
+        return cacheMemo()->remember($cacheKey, now()->addHours(6), function () use ($product) {
             $categories = $product->categories->pluck('id')->toArray();
 
             return Product::whereIsActive(1)

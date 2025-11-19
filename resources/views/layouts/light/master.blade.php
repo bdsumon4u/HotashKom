@@ -30,6 +30,54 @@
         <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     @endif
     
+    {{-- Global jQuery for SPA navigation --}}
+    <script
+        src="{{ $jqueryJs }}"
+        data-navigate-once
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    ></script>
+    <script data-navigate-once>
+        (function () {
+            if (window.runWhenJQueryReady) {
+                return;
+            }
+
+            const queue = [];
+
+            function flushQueue() {
+                if (typeof window.jQuery === 'undefined') {
+                    return;
+                }
+
+                while (queue.length) {
+                    const callback = queue.shift();
+                    try {
+                        callback(window.jQuery);
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            }
+
+            function scheduleFlush() {
+                queueMicrotask(flushQueue);
+            }
+
+            window.runWhenJQueryReady = function (callback) {
+                if (typeof window.jQuery !== 'undefined') {
+                    callback(window.jQuery);
+                } else {
+                    queue.push(callback);
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', scheduleFlush, { once: true });
+            document.addEventListener('livewire:navigate', scheduleFlush);
+            scheduleFlush();
+        })();
+    </script>
+    
     @include('layouts.light.css')
     <style>
       @media (min-width: 992px) {
@@ -163,18 +211,21 @@
     @include('layouts.light.js')
     @livewireScripts
     <script>
-      $(document).on('click', '#sidebar-toggler', function (ev) {
-        console.log(ev);
-        ev.preventDefault();
-        $nav = $(".main-nav");
-        $header = $(".page-main-header");
-        $nav.toggleClass('close_icon');
-        $header.toggleClass('close_icon');
-        if ($nav.hasClass("close_icon")) {
-          $("body").css("overflow-y", "auto");
-        } else {
-          $("body").css("overflow-y", "hidden");
-        }
+      runWhenJQueryReady(function ($) {
+        $(document)
+          .off('click.lightSidebar', '#sidebar-toggler')
+          .on('click.lightSidebar', '#sidebar-toggler', function (ev) {
+            ev.preventDefault();
+            const $nav = $(".main-nav");
+            const $header = $(".page-main-header");
+            $nav.toggleClass('close_icon');
+            $header.toggleClass('close_icon');
+            if ($nav.hasClass("close_icon")) {
+              $("body").css("overflow-y", "auto");
+            } else {
+              $("body").css("overflow-y", "hidden");
+            }
+          });
       });
       window.slugify = function (src) {
         return src.toLowerCase()
@@ -198,66 +249,78 @@
     @stack('scripts')
     @bukScripts(true)
     <script>
-      $(window).on('notify', function (ev) {
-          for (let item of ev.detail) {
+      runWhenJQueryReady(function ($) {
+        $(window)
+          .off('notify.lightPanel')
+          .on('notify.lightPanel', function (ev) {
+            for (let item of ev.detail) {
               $.notify(item.message, {
-                  type: item.type ?? 'info',
+                type: item.type ?? 'info',
               });
-          }
-      });
-
-        $('[name="shipping"]').on('change', function (ev) {
-            var val = $(this).data('val');
-            $('.shipping').val(val);
-        });
-
-        $(document).on('click', '.img-rename', function (ev) {
-            ev.preventDefault();
-            var input = $(this).parent().prev();
-
-            // if input is disabled, enable it
-            if (input.prop('disabled')) {
-                input.prop('disabled', false);
-                input.focus();
-                input.select();
-                $(this).find('span').text('Save');
-            } else {
-                var id = input.data('id');
-                var filename = input.val();
-                input.prop('disabled', true);
-                $.ajax({
-                    url: "/admin/images/"+id,
-                    type: "PUT",
-                    data: {
-                        _token: "{{csrf_token()}}",
-                        id: id,
-                        filename: filename,
-                    },
-                    success: function (data) {
-                      $(document).find('[rename="'+id+'"] span').text('Rename');
-                        $('.dataTable').DataTable().ajax.reload();
-
-                        $.notify('<i class="mr-1 fa fa-bell-o"></i> Image renamed', {
-                            type: 'success',
-                            allow_dismiss: true,
-                            // delay: 2000,
-                            showProgressbar: true,
-                            timer: 300,
-                            z_index: 9999,
-                            animate:{
-                                enter:'animated fadeInDown',
-                                exit:'animated fadeOutUp'
-                            }
-                        });
-                    }
-                });
             }
-        });
+          });
 
-        $(document).on('click', '[data-clip]', function (ev) {
+        $('[name="shipping"]')
+          .off('change.lightShipping')
+          .on('change.lightShipping', function () {
+            const val = $(this).data('val');
+            $('.shipping').val(val);
+          })
+          .trigger('change');
+
+        $(document)
+          .off('click.lightRename', '.img-rename')
+          .on('click.lightRename', '.img-rename', function (ev) {
             ev.preventDefault();
-            var text = $(this).data('clip');
-            var input = document.createElement('input');
+            const input = $(this).parent().prev();
+
+            if (input.prop('disabled')) {
+              input.prop('disabled', false);
+              input.focus();
+              input.select();
+              $(this).find('span').text('Save');
+            } else {
+              const id = input.data('id');
+              const filename = input.val();
+              input.prop('disabled', true);
+              $.ajax({
+                url: "/admin/images/" + id,
+                type: "PUT",
+                data: {
+                  _token: "{{csrf_token()}}",
+                  id: id,
+                  filename: filename,
+                },
+                success: function () {
+                  $(document).find('[rename="'+id+'"] span').text('Rename');
+                  $('.dataTable').DataTable().ajax.reload();
+
+                  $.notify('<i class="mr-1 fa fa-bell-o"></i> Image renamed', {
+                    type: 'success',
+                    allow_dismiss: true,
+                    showProgressbar: true,
+                    timer: 300,
+                    z_index: 9999,
+                    animate:{
+                      enter:'animated fadeInDown',
+                      exit:'animated fadeOutUp'
+                    }
+                  });
+                },
+                error: function () {
+                  input.prop('disabled', false);
+                  $(document).find('[rename="'+id+'"] span').text('Rename');
+                }
+              });
+            }
+          });
+
+        $(document)
+          .off('click.lightClipboard', '[data-clip]')
+          .on('click.lightClipboard', '[data-clip]', function (ev) {
+            ev.preventDefault();
+            const text = $(this).data('clip');
+            const input = document.createElement('input');
             input.value = text;
             $(this).after(input);
             input.focus();
@@ -266,29 +329,30 @@
             input.remove();
 
             $.notify('<i class="mr-1 fa fa-bell-o"></i> Copied to clipboard', {
-                type: 'success',
-                allow_dismiss: true,
-                // delay: 2000,
-                showProgressbar: true,
-                timer: 300,
-                z_index: 9999,
-                animate:{
-                    enter:'animated fadeInDown',
-                    exit:'animated fadeOutUp'
-                }
+              type: 'success',
+              allow_dismiss: true,
+              showProgressbar: true,
+              timer: 300,
+              z_index: 9999,
+              animate:{
+                enter:'animated fadeInDown',
+                exit:'animated fadeOutUp'
+              }
             });
-        });
+          });
 
-        // ajax every 1 minute
-        setInterval(function () {
+        if (!window.__pendingCountInterval) {
+          window.__pendingCountInterval = setInterval(function () {
             $.ajax({
-                url: "/api/pending-count/"+{{auth('admin')->id()}},
-                type: "GET",
-                success: function (data) {
-                  $('.pending-count').text(data);
-                }
+              url: "/api/pending-count/"+{{auth('admin')->id()}},
+              type: "GET",
+              success: function (data) {
+                $('.pending-count').text(data);
+              }
             });
-        }, 60000);
+          }, 60000);
+        }
+      });
     </script>
   </body>
 </html>

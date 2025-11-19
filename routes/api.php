@@ -41,7 +41,7 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
     Route::get('sections/{section}/products', [ApiController::class, 'sectionProducts']);
     Route::get('shop/products', [ApiController::class, 'shopProducts']);
     Route::get('products/{slug}.json', [ApiController::class, 'product'])->name('product');
-    Route::get('products/{slug}/related.json', [ApiController::class, 'relatedProducts']);
+    Route::get('products/{product}/related.json', [ApiController::class, 'relatedProducts']);
     Route::get('areas/{city_id}', [ApiController::class, 'areas']);
     Route::get('categories', [ApiController::class, 'categories']);
     Route::get('categories/{slug}.json', [ApiController::class, 'category']);

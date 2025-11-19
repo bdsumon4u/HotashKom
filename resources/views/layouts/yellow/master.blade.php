@@ -31,6 +31,54 @@
         <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     @endif
 
+    {{-- Global jQuery (needed for SPA navigation) --}}
+    <script
+        src="{{ $jqueryJs }}"
+        data-navigate-once
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    ></script>
+    <script data-navigate-once>
+        (function () {
+            if (window.runWhenJQueryReady) {
+                return;
+            }
+
+            const queue = [];
+
+            function flushQueue() {
+                if (typeof window.jQuery === 'undefined') {
+                    return;
+                }
+
+                while (queue.length) {
+                    const callback = queue.shift();
+                    try {
+                        callback(window.jQuery);
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+            }
+
+            function scheduleFlush() {
+                queueMicrotask(flushQueue);
+            }
+
+            window.runWhenJQueryReady = function (callback) {
+                if (typeof window.jQuery !== 'undefined') {
+                    callback(window.jQuery);
+                } else {
+                    queue.push(callback);
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', scheduleFlush, { once: true });
+            document.addEventListener('livewire:navigate', scheduleFlush);
+            scheduleFlush();
+        })();
+    </script>
+
     <!-- css -->
     @include('googletagmanager::head')
     <x-metapixel-head/>
@@ -265,59 +313,46 @@
     @livewireScripts
     @include('layouts.yellow.js')
     <script>
-        $(window).on('notify', function (ev) {
-            for (let item of ev.detail) {
-                $.notify(item.message, {
-                    type: item.type ?? 'info',
+        runWhenJQueryReady(function ($) {
+            $(window)
+                .off('notify.storefront')
+                .on('notify.storefront', function (ev) {
+                    for (let item of ev.detail) {
+                        $.notify(item.message, {
+                            type: item.type ?? 'info',
+                        });
+                    }
                 });
-            }
-        });
-        $(window).on('dataLayer', function (ev) {
-            for (let item of ev.detail) {
-                window.dataLayer.push(item);
-            }
-        });
-        $(document).ready(function () {
-            // $(document).on('change', '.option-picker', function (ev) {
-            //     var options = [];
-            //     $(document).find('.option-picker:checked').each((_, item) => options.push(item.value));
 
-            //     $.get({
-            //         url: '',
-            //         data: {options},
-            //         success: function(data) {
-            //             $('.product__content').data('id', data.dataId);
-            //             $('.product__content').data('max', data.dataMax);
-            //             $('.product__info').remove();
-            //             $('.xzoom-container').after(data.content);
-            //         },
-            //         dataType: 'json',
-            //     });
-            // });
+            $(window)
+                .off('dataLayer.storefront')
+                .on('dataLayer.storefront', function (ev) {
+                    for (let item of ev.detail) {
+                        window.dataLayer.push(item);
+                    }
+                });
 
             function onScroll() {
-                // $('input, textarea').blur();
-                var scrollTop = $(this).scrollTop()
+                const scrollTop = $(window).scrollTop();
+
                 if (scrollTop > 32) {
                     $('.site__header.position-fixed .topbar').hide();
                 } else {
                     $('.site__header.position-fixed .topbar').show();
                 }
+
                 if (scrollTop > 100) {
-                    // $('.site-header').addClass('sticky');
-                    // $('.site-header__phone').removeClass('d-none');
                     $('.departments').removeClass('departments--opened departments--fixed');
                     $('.departments__body').attr('style', '');
                 } else {
-                    // $('.site-header').removeClass('sticky');
-                    // $('.site-header__phone').addClass('d-none');
-                    if ($('.departments').data('departments-fixed-by') != '')
+                    if ($('.departments').data('departments-fixed-by') !== '') {
                         $('.departments').addClass('departments--opened departments--fixed');
+                    }
                     $('.departments--opened.departments--fixed .departments__body').css('min-height', '458px');
                 }
             }
 
-            $(window).on('scroll', onScroll);
+            $(window).off('scroll.siteHeader').on('scroll.siteHeader', onScroll);
             onScroll();
         });
     </script>
@@ -364,13 +399,15 @@
         <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
     </a>
     @endif
-    <script type="text/javascript">
-        window.addEventListener('load', function() {
-            $(".widget-connect__button-activator-icon").click(function () {
-                $(this).toggleClass("active");
-                $(".widget-connect").toggleClass("active");
-                $("a.widget-connect__button").toggleClass("button-slide-out button-slide");
-            });
+    <script>
+        runWhenJQueryReady(function ($) {
+            $(".widget-connect__button-activator-icon")
+                .off('click.widgetConnect')
+                .on('click.widgetConnect', function () {
+                    $(this).toggleClass("active");
+                    $(".widget-connect").toggleClass("active");
+                    $("a.widget-connect__button").toggleClass("button-slide-out button-slide");
+                });
         });
     </script>
     <script>
