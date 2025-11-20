@@ -86,9 +86,9 @@ trait HasProductFilters
      */
     protected function getProductFilterData(?Category $category = null): array
     {
-        $cacheKey = 'product_filter_data'.($category ? ':category:'.$category->id : '');
+        $cacheKey = 'filters'.($category ? ':category:'.$category->id : '');
 
-        return cacheMemo()->remember($cacheKey, now()->addHour(), function () use ($category): array {
+        return cacheRememberNamespaced('product_filters', $cacheKey, now()->addHour(), function () use ($category): array {
             // Get categories that have products
             $categories = Category::nested(0, true)
                 ->filter(function ($category) {

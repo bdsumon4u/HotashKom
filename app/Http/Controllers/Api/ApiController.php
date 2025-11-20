@@ -67,9 +67,7 @@ class ApiController extends Controller
 
     public function sections(Request $request)
     {
-        $cacheKey = 'api_sections';
-
-        return cacheMemo()->remember($cacheKey, now()->addHours(6), function () {
+        return cacheRememberNamespaced('api_sections', 'sections', now()->addHours(6), function () {
             return sections()->transform(fn ($section): array => array_merge($section->toArray(), [
                 'categories' => $section->categories->map(fn ($category): array => array_merge($category->toArray(), [
                     'sectionId' => $section->id,
@@ -272,9 +270,7 @@ class ApiController extends Controller
 
     public function relatedProducts(Request $request, Product $product)
     {
-        $cacheKey = 'related_products:'.$product->getKey();
-
-        return cacheMemo()->remember($cacheKey, now()->addHours(6), function () use ($product) {
+        return cacheRememberNamespaced('related_products', 'product:'.$product->getKey(), now()->addHours(6), function () use ($product) {
             $categories = $product->categories->pluck('id')->toArray();
 
             return Product::whereIsActive(1)
@@ -319,14 +315,11 @@ class ApiController extends Controller
     {
         if ($request->nested) {
             $count = $request->get('count', 0);
-            $cacheKey = 'api_categories:nested:'.$count;
 
-            return cacheMemo()->remember($cacheKey, now()->addHours(12), fn () => Category::nested($count));
+            return cacheRememberNamespaced('api_categories', 'nested:'.$count, now()->addHours(12), fn () => Category::nested($count));
         }
 
-        $cacheKey = 'api_categories:all';
-
-        return cacheMemo()->remember($cacheKey, now()->addHours(12), function () {
+        return cacheRememberNamespaced('api_categories', 'all', now()->addHours(12), function () {
             return Category::all()
                 ->transform(fn ($category): array => $category->toArray() + [
                     'type' => 'shop',
@@ -338,9 +331,8 @@ class ApiController extends Controller
     public function category($slug)
     {
         $decodedSlug = rawurldecode((string) $slug);
-        $cacheKey = 'api_category:'.$decodedSlug;
 
-        return cacheMemo()->remember($cacheKey, now()->addHours(12), function () use ($decodedSlug) {
+        return cacheRememberNamespaced('api_category', 'slug:'.$decodedSlug, now()->addHours(12), function () use ($decodedSlug) {
             return Category::where('slug', $decodedSlug)->firstOrFail()->toArray();
         });
     }
