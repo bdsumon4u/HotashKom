@@ -566,6 +566,18 @@
                     }
 
                     if (typeof $.fn.xzoom === 'function') {
+                        // Destroy existing xZoom instances to prevent conflicts on SPA navigation
+                        $('.xzoom, .xzoom-gallery').each(function () {
+                            const xzoom = $(this).data('xzoom');
+                            if (xzoom && typeof xzoom.destroy === 'function') {
+                                try {
+                                    xzoom.destroy();
+                                } catch (e) {
+                                    // Ignore errors during cleanup
+                                }
+                            }
+                        });
+
                         $('.xzoom, .xzoom-gallery').xzoom({
                             zoomWidth: 400,
                             title: true,
@@ -962,7 +974,7 @@
                                         console.error(error);
                                     }
                                     if (this.observer) {
-                                        this.observer.observe(trigger);
+                                    this.observer.observe(trigger);
                                     }
                                 }
                             });

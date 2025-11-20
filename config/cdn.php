@@ -124,5 +124,21 @@ return [
                 'unpkg' => 'https://unpkg.com/select2@4.1.0/dist/js/select2.min.js',
             ],
         ],
+        'hammerjs' => [
+            'version' => '2.0.8',
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js',
+                'unpkg' => 'https://unpkg.com/hammerjs@2.0.8/hammer.min.js',
+            ],
+        ],
+        'jquery-hammerjs' => [
+            'version' => '2.0.0',
+            'js' => [
+                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/jquery-hammerjs@2.0.0/jquery.hammer.min.js',
+                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery-hammerjs/2.0.0/jquery.hammer.min.js',
+                'unpkg' => 'https://unpkg.com/jquery-hammerjs@2.0.0/jquery.hammer.min.js',
+            ],
+        ],
     ],
 ];
