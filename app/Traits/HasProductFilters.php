@@ -9,6 +9,7 @@ use App\Models\Category;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 trait HasProductFilters
 {
@@ -70,7 +71,22 @@ trait HasProductFilters
         $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
 
         if ($sorted == 'random') {
-            $query->inRandomOrder();
+            $seed = request()->get('shuffle');
+            if (! $seed) {
+                $seed = (string) random_int(1, PHP_INT_MAX);
+                request()->merge(['shuffle' => $seed]);
+            }
+
+            $seedInt = abs((int) crc32((string) $seed));
+            $driver = DB::connection()->getDriverName();
+
+            if ($driver === 'mysql') {
+                $query->orderByRaw('RAND('.$seedInt.')');
+            } elseif ($driver === 'pgsql') {
+                $query->orderByRaw('RANDOM()');
+            } else {
+                $query->inRandomOrder();
+            }
         } elseif ($sorted == 'updated_at') {
             $query->latest('updated_at');
         } elseif ($sorted == 'selling_price') {

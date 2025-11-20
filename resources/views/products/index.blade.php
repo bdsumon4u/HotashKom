@@ -173,6 +173,7 @@
                         <div class="products-view__list products-list" 
                              data-layout="grid-4-full" 
                              data-with-features="false" 
+                             data-shuffle="{{ request('shuffle') }}"
                              x-data="shopInfiniteScroll({{ $products->currentPage() }}, @json($products->hasMorePages()), {{ $per_page ?? 20 }}, {{ $products->total() }})" 
                              x-init="init()">
                             <div class="products-list__body"
