@@ -1128,6 +1128,9 @@
 
                         if (this.hasMore && this.observer) {
                             this.$nextTick(() => {
+                                if (!this.observer) {
+                                    return;
+                                }
                                 const trigger = this.$refs.loadMoreTrigger || this.$el.querySelector('.load-more-trigger');
                                 if (trigger) {
                                     try {
@@ -1135,7 +1138,9 @@
                                     } catch (error) {
                                         console.error(error);
                                     }
-                                    this.observer.observe(trigger);
+                                    if (this.observer) {
+                                        this.observer.observe(trigger);
+                                    }
                                 }
                             });
                         } else if (!this.hasMore) {
@@ -1305,7 +1310,7 @@
 
                         this.$nextTick(() => {
                             const trigger = this.$refs.loadMoreTrigger || this.$el.querySelector('.load-more-trigger');
-                            if (trigger) {
+                            if (trigger && this.observer) {
                                 this.observer.observe(trigger);
                             }
                         });
