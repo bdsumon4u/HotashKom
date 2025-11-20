@@ -8,8 +8,9 @@
 
         //Integration with hammer.js
         var isTouchSupported = 'ontouchstart' in window;
+        var hasHammer = typeof $.fn.hammer === 'function';
 
-        if (isTouchSupported) {
+        if (isTouchSupported && hasHammer) {
             //If touch device
             $('.xzoom, .xzoom2, .xzoom3, .xzoom4, .xzoom5').each(function(){
                 var xzoom = $(this).data('xzoom');
