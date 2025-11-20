@@ -14,6 +14,13 @@
         $fontawesomeCss = cdnAsset('fontawesome.css', 'assets/css/fontawesome.css');
     @endphp
     
+    @include('layouts.partials.cdn-fallback', [
+        'fallbackAssets' => [
+            'jquery' => asset('assets/js/jquery-3.5.1.min.js'),
+            'popper' => asset('assets/js/bootstrap/popper.min.js'),
+        ],
+    ])
+    
     {{-- Preload critical CSS --}}
     <link rel="preload" href="{{ $fontawesomeCss }}" as="style" crossorigin="anonymous">
     <link rel="preload" href="{{ versionedAsset('assets/css/bootstrap.css') }}" as="style">
@@ -36,10 +43,12 @@
         data-navigate-once
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
+        onerror="window.__loadLocalAsset && window.__loadLocalAsset('jquery')"
     ></script>
     <script data-navigate-once>
         (function () {
             if (window.runWhenJQueryReady) {
+                window.__flushRunWhenJQueryQueue && window.__flushRunWhenJQueryQueue();
                 return;
             }
 
@@ -64,6 +73,8 @@
                 queueMicrotask(flushQueue);
             }
 
+            window.__flushRunWhenJQueryQueue = flushQueue;
+
             window.runWhenJQueryReady = function (callback) {
                 if (typeof window.jQuery !== 'undefined') {
                     callback(window.jQuery);
@@ -75,6 +86,9 @@
             document.addEventListener('DOMContentLoaded', scheduleFlush, { once: true });
             document.addEventListener('livewire:navigate', scheduleFlush);
             scheduleFlush();
+            if (document.readyState !== 'loading') {
+                scheduleFlush();
+            }
         })();
     </script>
     

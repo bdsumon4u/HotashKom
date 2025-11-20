@@ -15,6 +15,14 @@
         $jqueryJs = cdnAsset('jquery', 'strokya/vendor/jquery-3.3.1/jquery.min.js');
     @endphp
 
+    @include('layouts.partials.cdn-fallback', [
+        'fallbackAssets' => [
+            'jquery' => asset('strokya/vendor/jquery-3.3.1/jquery.min.js'),
+            'bootstrap' => asset('strokya/vendor/bootstrap-4.2.1/js/bootstrap.bundle.min.js'),
+            'owl' => asset('strokya/vendor/owl-carousel-2.3.4/owl.carousel.min.js'),
+            'svg4everybody' => asset('strokya/vendor/svg4everybody-2.1.9/svg4everybody.min.js'),
+        ],
+    ])
     {{-- Preload critical CSS --}}
     <link rel="preload" href="{{ $bootstrapCss }}" as="style" crossorigin="anonymous">
     <link rel="preload" href="{{ $fontawesomeCss }}" as="style" crossorigin="anonymous">
@@ -31,36 +39,6 @@
         <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     @endif
 
-    <script data-navigate-once>
-        (function () {
-            if (window.__loadLocalAsset) {
-                return;
-            }
-
-            window.__loadLocalAsset = function (key) {
-                if (!key) {
-                    return;
-                }
-
-                const map = {
-                    jquery: '{{ asset('strokya/vendor/jquery-3.3.1/jquery.min.js') }}',
-                    bootstrap: '{{ asset('strokya/vendor/bootstrap-4.2.1/js/bootstrap.bundle.min.js') }}',
-                    owl: '{{ asset('strokya/vendor/owl-carousel-2.3.4/owl.carousel.min.js') }}',
-                };
-
-                if (!map[key] || document.querySelector('script[data-local-'+key+']')) {
-                    return;
-                }
-
-                const script = document.createElement('script');
-                script.src = map[key];
-                script.dataset.navigateOnce = 'true';
-                script.setAttribute('data-local-'+key, 'true');
-                document.head.appendChild(script);
-            };
-        })();
-    </script>
-
     {{-- Global jQuery (needed for SPA navigation) --}}
     <script
         src="{{ $jqueryJs }}"
@@ -72,6 +50,7 @@
     <script data-navigate-once>
         (function () {
             if (window.runWhenJQueryReady) {
+                window.__flushRunWhenJQueryQueue && window.__flushRunWhenJQueryQueue();
                 return;
             }
 
@@ -96,6 +75,8 @@
                 queueMicrotask(flushQueue);
             }
 
+            window.__flushRunWhenJQueryQueue = flushQueue;
+
             window.runWhenJQueryReady = function (callback) {
                 if (typeof window.jQuery !== 'undefined') {
                     callback(window.jQuery);
@@ -107,6 +88,9 @@
             document.addEventListener('DOMContentLoaded', scheduleFlush, { once: true });
             document.addEventListener('livewire:navigate', scheduleFlush);
             scheduleFlush();
+            if (document.readyState !== 'loading') {
+                scheduleFlush();
+            }
         })();
     </script>
     </script>
@@ -686,6 +670,8 @@
                 registerLazyRelatedProductsComponent();
                 requestAnimationFrame(initializeProductShowScripts);
             }
+
+            registerLazyRelatedProductsComponent();
 
             document.addEventListener('DOMContentLoaded', runInitializers);
             document.addEventListener('livewire:navigate', runInitializers);

@@ -31,6 +31,89 @@ if (! function_exists('cacheMemo')) {
     }
 }
 
+if (! function_exists('cacheSupportsTags')) {
+    function cacheSupportsTags(): bool
+    {
+        $store = cache()->getStore();
+
+        return method_exists($store, 'tags');
+    }
+}
+
+if (! function_exists('cacheNamespaceVersion')) {
+    function cacheNamespaceVersion(string $namespace): int
+    {
+        $key = 'cache_namespaces:'.$namespace;
+        $version = cache()->get($key);
+
+        if (! $version) {
+            $version = 1;
+            cache()->forever($key, $version);
+        }
+
+        return (int) $version;
+    }
+}
+
+if (! function_exists('bumpCacheNamespace')) {
+    function bumpCacheNamespace(string $namespace): void
+    {
+        $key = 'cache_namespaces:'.$namespace;
+
+        if (cache()->has($key) && method_exists(cache(), 'increment')) {
+            cache()->increment($key);
+
+            return;
+        }
+
+        cache()->forever($key, cacheNamespaceVersion($namespace) + 1);
+    }
+}
+
+if (! function_exists('cacheNamespaceKey')) {
+    function cacheNamespaceKey(string $key, string $namespace): string
+    {
+        $version = cacheNamespaceVersion($namespace);
+
+        return $namespace.':v'.$version.':'.$key;
+    }
+}
+
+if (! function_exists('cacheRememberNamespaced')) {
+    function cacheRememberNamespaced(string $namespace, string $key, \DateTimeInterface|int|null $ttl, callable $callback): mixed
+    {
+        if (cacheSupportsTags()) {
+            return cache()->tags($namespace)->remember($key, $ttl, $callback);
+        }
+
+        return cacheMemo()->remember(cacheNamespaceKey($key, $namespace), $ttl, $callback);
+    }
+}
+
+if (! function_exists('cacheRememberForeverNamespaced')) {
+    function cacheRememberForeverNamespaced(string $namespace, string $key, callable $callback): mixed
+    {
+        if (cacheSupportsTags()) {
+            return cache()->tags($namespace)->rememberForever($key, $callback);
+        }
+
+        return cacheMemo()->rememberForever(cacheNamespaceKey($key, $namespace), $callback);
+    }
+}
+
+if (! function_exists('cacheInvalidateNamespace')) {
+    function cacheInvalidateNamespace(string $namespace): void
+    {
+        if (cacheSupportsTags()) {
+            cache()->tags($namespace)->flush();
+
+            return;
+        }
+
+        bumpCacheNamespace($namespace);
+    }
+}
+
 if (! function_exists('slides')) {
     function slides()
     {

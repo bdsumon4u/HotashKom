@@ -1,5 +1,5 @@
 <!-- Bootstrap js-->
-<script src="{{ cdnAsset('popper', 'assets/js/bootstrap/popper.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{{ cdnAsset('popper', 'assets/js/bootstrap/popper.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="window.__loadLocalAsset && window.__loadLocalAsset('popper')"></script>
 <script src="{{ versionedAsset('assets/js/bootstrap/bootstrap.js') }}"></script>
 <!--Bootstrap notify-->
 <script src="{{ versionedAsset('assets/js/notify/bootstrap-notify.min.js') }}"></script>
