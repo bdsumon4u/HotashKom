@@ -31,12 +31,43 @@
         <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     @endif
 
+    <script data-navigate-once>
+        (function () {
+            if (window.__loadLocalAsset) {
+                return;
+            }
+
+            window.__loadLocalAsset = function (key) {
+                if (!key) {
+                    return;
+                }
+
+                const map = {
+                    jquery: '{{ asset('strokya/vendor/jquery-3.3.1/jquery.min.js') }}',
+                    bootstrap: '{{ asset('strokya/vendor/bootstrap-4.2.1/js/bootstrap.bundle.min.js') }}',
+                    owl: '{{ asset('strokya/vendor/owl-carousel-2.3.4/owl.carousel.min.js') }}',
+                };
+
+                if (!map[key] || document.querySelector('script[data-local-'+key+']')) {
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = map[key];
+                script.dataset.navigateOnce = 'true';
+                script.setAttribute('data-local-'+key, 'true');
+                document.head.appendChild(script);
+            };
+        })();
+    </script>
+
     {{-- Global jQuery (needed for SPA navigation) --}}
     <script
         src="{{ $jqueryJs }}"
         data-navigate-once
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
+        onerror="window.__loadLocalAsset && window.__loadLocalAsset('jquery')"
     ></script>
     <script data-navigate-once>
         (function () {
@@ -78,204 +109,6 @@
             scheduleFlush();
         })();
     </script>
-
-    <script data-navigate-once>
-        (function () {
-            if (window.lazyRelatedProducts) {
-                return;
-            }
-
-            window.lazyRelatedProducts = function (productId, cols) {
-                return {
-                    productId,
-                    cols,
-                    loading: false,
-                    loaded: false,
-                    observer: null,
-
-                    init() {
-                        this.observer = new IntersectionObserver((entries) => {
-                            entries.forEach(entry => {
-                                if (entry.isIntersecting && !this.loaded && !this.loading) {
-                                    this.loadProducts();
-                                }
-                            });
-                        }, {
-                            rootMargin: '200px',
-                        });
-
-                        this.$nextTick(() => {
-                            if (this.$el) {
-                                this.observer.observe(this.$el);
-                            }
-                        });
-                    },
-
-                    async loadProducts() {
-                        if (this.loading || this.loaded) {
-                            return;
-                        }
-
-                        this.loading = true;
-                        const container = document.getElementById('related-products-container');
-                        if (!container) {
-                            this.loading = false;
-                            return;
-                        }
-
-                        try {
-                            const response = await fetch(`/api/products/${encodeURIComponent(this.productId)}/related.json`);
-
-                            if (response.ok) {
-                                const products = await response.json();
-                                this.renderProducts(products, container);
-                                this.loaded = true;
-                                this.observer?.disconnect();
-                            } else {
-                                container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
-                            }
-                        } catch (error) {
-                            console.error('Error loading related products:', error);
-                            container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
-                        }
-
-                        this.loading = false;
-                    },
-
-                    renderProducts(products, container) {
-                        if (!products || products.length === 0) {
-                            container.innerHTML = '<div class="py-5 text-center text-muted">No related products found.</div>';
-                            return;
-                        }
-
-                        container.innerHTML = '';
-
-                        products.forEach((product) => {
-                            const productElement = this.createProductElement(product);
-                            container.appendChild(productElement);
-                            this.attachNavigationHandlers(productElement);
-                        });
-                    },
-
-                    createProductElement(product) {
-                        const div = document.createElement('div');
-                        div.className = 'products-list__item';
-                        div.innerHTML = this.getProductHTML(product);
-                        return div;
-                    },
-
-                    attachNavigationHandlers(element) {
-                        const productLinks = element.querySelectorAll('a.product-link[data-navigate]');
-                        productLinks.forEach(link => {
-                            link.addEventListener('click', (e) => {
-                                const href = link.getAttribute('href');
-                                if (href && window.Livewire && window.Livewire.navigate) {
-                                    e.preventDefault();
-                                    window.Livewire.navigate(href);
-                                }
-                            });
-                        });
-                    },
-
-                    getProductHTML(product) {
-                        const productId = product.id;
-                        const productName = product.name || 'Product';
-                        const productSlug = product.slug || productId;
-                        const productPrice = product.compareAtPrice || product.price || 0;
-                        const productSellingPrice = product.price || productPrice;
-                        const productImage = product.base_image_url || (product.images && product.images.length > 0
-                            ? `/storage/${product.images[0]}`
-                            : '/images/placeholder.jpg');
-                        const productUrl = `/products/${encodeURIComponent(productSlug)}`;
-                        const inStock = product.availability !== 'Out of Stock' && (product.availability === 'In Stock' || (product.availability && parseInt(product.availability) > 0));
-                        const stockCount = typeof product.availability === 'number' ? product.availability : (product.availability === 'In Stock' ? null : 0);
-                        const shouldTrack = typeof product.availability === 'number' || product.availability !== 'In Stock';
-                        const hasDiscount = productPrice !== productSellingPrice && productPrice > 0;
-                        const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
-
-                        const showOption = JSON.parse(this.$el?.dataset.showOption || '{}');
-                        const isOninda = this.$el?.dataset.isOninda === 'true';
-                        const guestCanSeePrice = this.$el?.dataset.guestCanSeePrice === 'true';
-
-                        const formatPrice = (price) => {
-                            return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
-                        };
-
-                        let buttonsHTML = '';
-                        if (!isOninda) {
-                            const available = inStock;
-                            const disabledAttr = available ? '' : 'disabled';
-
-                            if (showOption.product_grid_button === 'add_to_cart') {
-                                buttonsHTML = `
-                                    <div class="product-card__buttons">
-                                        <button class="btn btn-primary product-card__addtocart" type="button" ${disabledAttr}
-                                                data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
-                                            ${showOption.add_to_cart_icon || ''}
-                                            <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
-                                        </button>
-                                    </div>
-                                `;
-                            } else if (showOption.product_grid_button === 'order_now') {
-                                buttonsHTML = `
-                                    <div class="product-card__buttons">
-                                        <button class="btn btn-primary product-card__ordernow" type="button" ${disabledAttr}
-                                                data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
-                                            ${showOption.order_now_icon || ''}
-                                            <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
-                                        </button>
-                                    </div>
-                                `;
-                            }
-                        }
-
-                        let priceHTML = '';
-                        if (isOninda && !guestCanSeePrice) {
-                            priceHTML = '<span class="product-card__new-price text-danger">Login to see price</span>';
-                        } else if (isOninda && guestCanSeePrice) {
-                            priceHTML = '<small class="product-card__new-price text-danger">Verify account to see price</small>';
-                        } else if (hasDiscount) {
-                            priceHTML = `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
-                        } else {
-                            priceHTML = formatPrice(productSellingPrice);
-                        }
-
-                        const discountText = (showOption.discount_text || '<small>Discount:</small> [percent]%').replace('[percent]', discountPercent);
-
-                        return `
-                            <div class="product-card" data-id="${productId}" data-max="${shouldTrack ? (stockCount || 0) : -1}">
-                                <div class="product-card__badges-list">
-                                    ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
-                                    ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
-                                </div>
-                                <div class="product-card__image">
-                                    <a href="${productUrl}" class="product-link" data-navigate>
-                                        <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;">
-                                    </a>
-                                </div>
-                                <div class="product-card__info">
-                                    <div class="product-card__name">
-                                        <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
-                                    </div>
-                                </div>
-                                <div class="product-card__actions">
-                                    <div class="product-card__availability">Availability:
-                                        ${!shouldTrack ?
-                                            '<span class="text-success">In Stock</span>' :
-                                            `<span class="text-${(stockCount || 0) > 0 ? 'success' : 'danger'}">${stockCount || 0} In Stock</span>`
-                                        }
-                                    </div>
-                                    <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}">
-                                        ${priceHTML}
-                                    </div>
-                                    ${buttonsHTML}
-                                </div>
-                            </div>
-                        `;
-                    }
-                };
-            };
-        })();
     </script>
 
     <!-- css -->
