@@ -874,6 +874,10 @@
                             const params = new URLSearchParams(window.location.search);
                             params.set('page', this.currentPage + 1);
                             params.set('per_page', this.perPage);
+                            const shuffleSeed = this.getShuffleSeed();
+                            if (shuffleSeed) {
+                                params.set('shuffle', shuffleSeed);
+                            }
 
                             const response = await fetch(`/api/shop/products?${params.toString()}`, {
                                 headers: {
@@ -1110,6 +1114,10 @@
                     getGuestCanSeePrice() {
                         const container = this.getContainer();
                         return container && container.dataset.guestCanSeePrice === 'true';
+                    },
+
+                    getShuffleSeed() {
+                        return this.$el?.dataset.shuffle || '';
                     },
 
                     setupIntersectionObserver() {
