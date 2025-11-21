@@ -88,8 +88,12 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
                 Route::get('orders/{order}/edit', [ResellerController::class, 'editOrder'])->name('orders.edit');
                 Route::post('orders/{order}/cancel', [ResellerController::class, 'cancelOrder'])->name('orders.cancel');
                 Route::get('transactions', [ResellerController::class, 'transactions'])->name('transactions');
-                Route::match(['GET', 'POST'], 'checkout', [ResellerController::class, 'checkout'])->name('checkout');
-                Route::get('thank-you', [ResellerController::class, 'thankYou'])->name('thank-you');
+                Route::match(['GET', 'POST'], 'checkout', [ResellerController::class, 'checkout'])
+                    ->name('checkout')
+                    ->middleware('doNotCacheResponse');
+                Route::get('thank-you', [ResellerController::class, 'thankYou'])
+                    ->name('thank-you')
+                    ->middleware('doNotCacheResponse');
             });
         });
     });
@@ -110,20 +114,31 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
         Route::get('/categories', [ApiController::class, 'categories'])->name('categories');
         Route::get('/brands', [ApiController::class, 'brands'])->name('brands');
 
-    Route::get('/', HomeController::class)->name('/');
-    Route::get('/sections/{section}/products', HomeSectionProductController::class)->name('home-sections.products');
-    Route::get('/shop', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
-    Route::get('/categories/{category:slug}/products', CategoryProductController::class)->name('categories.products');
-    Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
+        Route::get('/', HomeController::class)->name('/');
+        Route::get('/sections/{section}/products', HomeSectionProductController::class)->name('home-sections.products');
+        Route::get('/shop', [ProductController::class, 'index'])->name('products.index');
+        Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+        Route::get('/categories/{category:slug}/products', CategoryProductController::class)->name('categories.products');
+        Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
 
         pageRoutes();
     });
 
-    Route::view('/cart', 'cart')->name('cart');
-    Route::match(['get', 'post'], '/checkout', CheckoutController::class)->name('checkout')->middleware(EnsureResellerIsVerified::class);
-    Route::get('/thank-you', OrderTrackController::class)->name('thank-you');
-    Route::match(['get', 'post'], 'track-order', OrderTrackController::class)->name('track-order');
+    Route::view('/cart', 'cart')
+        ->name('cart')
+        ->middleware('doNotCacheResponse');
+
+    Route::match(['get', 'post'], '/checkout', CheckoutController::class)
+        ->name('checkout')
+        ->middleware(['doNotCacheResponse', EnsureResellerIsVerified::class]);
+
+    Route::get('/thank-you', OrderTrackController::class)
+        ->name('thank-you')
+        ->middleware('doNotCacheResponse');
+
+    Route::match(['get', 'post'], 'track-order', OrderTrackController::class)
+        ->name('track-order')
+        ->middleware('doNotCacheResponse');
 
     // Cart API routes (moved from api.php to use same session)
     Route::post('cart/add', [App\Http\Controllers\Api\CartController::class, 'add'])->name('cart.add');
