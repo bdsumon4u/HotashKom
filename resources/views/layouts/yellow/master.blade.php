@@ -719,11 +719,42 @@
                 }
 
                 if (scrollTop > 100) {
-                    $('.departments').removeClass('departments--opened departments--fixed');
-                    $('.departments__body').attr('style', '');
+                    // Close the menu when scrolling down (both fixed and manually opened)
+                    $('.departments').each(function() {
+                        const $departments = $(this);
+                        const instance = $departments.data('departmentsInstance');
+                        
+                        // If menu is opened, close it properly
+                        if ($departments.is('.departments--opened')) {
+                            // Force overflow hidden before closing to ensure clean animation
+                            $departments.find('.departments__body').css('overflow', 'hidden');
+                            $departments.find('.departments__links-wrapper').css('overflow', 'hidden');
+
+                            if (instance && typeof instance.close === 'function') {
+                                // Use the instance close method for animation
+                                instance.close();
+                            } else {
+                                // Fallback: manually reset
+                                $departments.removeClass('departments--opened departments--transition');
+                                $departments.find('.departments__links-wrapper').css('height', '');
+                            }
+                            
+                            // Clean up overflow override after transition (approx 300ms)
+                            setTimeout(() => {
+                                $departments.find('.departments__body').css('overflow', '');
+                                $departments.find('.departments__links-wrapper').css('overflow', '');
+                            }, 350);
+                        }
+                        
+                        // Always remove fixed class and reset body height
+                        $departments.removeClass('departments--fixed');
+                        $departments.find('.departments__body').css('height', '').attr('style', '');
+                    });
                 } else {
                     if ($('.departments').data('departments-fixed-by') !== '') {
                         $('.departments').addClass('departments--opened departments--fixed');
+                        // Ensure we reset any inline overflow styles when reopening/fixing
+                         $('.departments__body, .departments__links-wrapper').css('overflow', '');
                     }
                     $('.departments--opened.departments--fixed .departments__body').css('min-height', '458px');
                 }
@@ -733,8 +764,47 @@
             onScroll();
         });
     </script>
+    <style>
+        /* Ensure category submenus show on hover */
+        .departments__item--menu:hover > .departments__menu {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            z-index: 1000 !important;
+        }
+        
+        /* Nested submenus */
+        .departments__menu .menu > li:hover > .menu__submenu {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            z-index: 1001 !important;
+        }
+
+        /* CRITICAL: Always allow submenus to overflow when opened */
+        /* We handle the closing overflow-hidden via JS now */
+        .departments.departments--opened .departments__body,
+        .departments.departments--opened .departments__links-wrapper {
+            overflow: visible !important;
+        }
+    </style>
     <script data-navigate-once>
         (function () {
+            // Cleanup Departments Transition Class
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.departments__button')) {
+                    setTimeout(() => {
+                        $('.departments').removeClass('departments--transition');
+                        // Only reset height if not in fixed mode, to avoid layout shifts
+                        if (!$('.departments').hasClass('departments--fixed')) {
+                             $('.departments__links-wrapper').css('height', '');
+                        }
+                    }, 350); 
+                }
+            });
+
             if (window.__storefrontComponentsRegistered) {
                 return;
             }
