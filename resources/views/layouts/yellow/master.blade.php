@@ -811,6 +811,87 @@
 
             window.__storefrontComponentsRegistered = true;
 
+            // Global function to handle add to cart functionality
+            window.handleAddToCart = function(button) {
+                const productId = button.getAttribute('data-product-id');
+                const action = button.getAttribute('data-action') || 'add';
+
+                // Disable button temporarily to prevent double clicks
+                button.disabled = true;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+
+                // Make an API call to add to cart
+                fetch('/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: 1,
+                        instance: action === 'kart' ? 'kart' : 'default'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Re-enable button
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+
+                    // Show success message
+                    if (data.success) {
+                        // Update cart count if you have a cart count element
+                        const cartCountElement = document.querySelector('.cart-count');
+                        if (cartCountElement && data.cart_count) {
+                            cartCountElement.textContent = data.cart_count;
+                        }
+
+                        // Dispatch cart updated event for Livewire components
+                        if (window.Livewire) {
+                            window.Livewire.dispatch('cartUpdated');
+                        }
+
+                        // Dispatch jQuery event for notifications
+                        if (window.$) {
+                            const event = new CustomEvent('notify', {
+                                detail: [{ message: 'Product added to cart' }]
+                            });
+                            window.dispatchEvent(event);
+                        }
+
+                        // If this was an "Order Now" action, redirect to checkout
+                        if (action === 'kart' || data.redirect_url) {
+                            // Small delay to show notification first
+                            setTimeout(() => {
+                                window.location.href = data.redirect_url || '/checkout';
+                            }, 500);
+                        }
+                    } else {
+                        console.error('Failed to add product to cart:', data.message);
+
+                        // Show error notification
+                        if (window.$) {
+                            const event = new CustomEvent('notify', {
+                                detail: [{ message: 'Failed to add product to cart: ' + (data.message || 'Unknown error'), type: 'error' }]
+                            });
+                            window.dispatchEvent(event);
+                        } else {
+                            alert('Failed to add product to cart: ' + (data.message || 'Unknown error'));
+                        }
+                    }
+                })
+                .catch(error => {
+                    // Re-enable button on error
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                    console.error('Error adding to cart:', error);
+                    alert('Something went wrong. Please try again.');
+                });
+            };
+
             const registerPaginationLinks = () => {
                 document.querySelectorAll('.pagination a').forEach(link => {
                     if (link.hasAttribute('wire:navigate') || link.hasAttribute('wire:navigate.hover')) {
