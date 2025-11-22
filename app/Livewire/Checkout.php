@@ -431,7 +431,7 @@ class Checkout extends Component
         }
 
         cart()->destroy();
-        session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Recieved. Thanks For Your Order.');
+        session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Received. Thanks For Your Order.');
 
         return to_route($this->getRedirectRoute(), [
             'order' => $this->order?->getKey(),
