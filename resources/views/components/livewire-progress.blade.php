@@ -46,10 +46,62 @@
                         // Listen to Livewire navigation events
                         document.addEventListener('livewire:navigate', () => this.start());
                         document.addEventListener('livewire:navigated', () => this.finish());
-                        document.addEventListener('livewire:navigate-error', () => this.finish());
+                        document.addEventListener('livewire:navigate-error', (e) => {
+                            this.finish();
+                            this.handleNavigationError(e);
+                        });
 
                         // Intercept clicks on links with wire:navigate for immediate feedback
                         this.interceptClicks();
+                        
+                        // Add timeout protection for navigation
+                        this.setupNavigationTimeout();
+                    },
+                    
+                    setupNavigationTimeout() {
+                        let navigationTimeout = null;
+                        
+                        document.addEventListener('livewire:navigate', () => {
+                            // Set a timeout for navigation (3 seconds)
+                            navigationTimeout = setTimeout(() => {
+                                console.warn('Livewire navigation timeout - falling back to full page reload');
+                                if (window.Livewire && window.Livewire.history && window.Livewire.history.currentUrl) {
+                                    window.location.href = window.Livewire.history.currentUrl;
+                                }
+                            }, 3000);
+                        });
+                        
+                        document.addEventListener('livewire:navigated', () => {
+                            if (navigationTimeout) {
+                                clearTimeout(navigationTimeout);
+                                navigationTimeout = null;
+                            }
+                        });
+                        
+                        document.addEventListener('livewire:navigate-error', () => {
+                            if (navigationTimeout) {
+                                clearTimeout(navigationTimeout);
+                                navigationTimeout = null;
+                            }
+                        });
+                    },
+                    
+                    handleNavigationError(e) {
+                        console.error('Livewire navigation error:', e);
+                        
+                        // If it's a server error (520, 522, 500, etc.), fall back to full page reload
+                        const error = e.detail?.error || e.error;
+                        if (error) {
+                            const status = error.status || error.response?.status;
+                            if (status >= 500 || status === 0) {
+                                // Server error or network error - reload the page
+                                const targetUrl = e.detail?.url || window.location.href;
+                                console.warn('Server error during navigation, reloading page:', targetUrl);
+                                setTimeout(() => {
+                                    window.location.href = targetUrl;
+                                }, 1000);
+                            }
+                        }
                     },
 
                     interceptClicks() {

@@ -723,7 +723,7 @@
                     $('.departments').each(function() {
                         const $departments = $(this);
                         const instance = $departments.data('departmentsInstance');
-                        
+
                         // If menu is opened, close it properly
                         if ($departments.is('.departments--opened')) {
                             // Force overflow hidden before closing to ensure clean animation
@@ -738,14 +738,14 @@
                                 $departments.removeClass('departments--opened departments--transition');
                                 $departments.find('.departments__links-wrapper').css('height', '');
                             }
-                            
+
                             // Clean up overflow override after transition (approx 300ms)
                             setTimeout(() => {
                                 $departments.find('.departments__body').css('overflow', '');
                                 $departments.find('.departments__links-wrapper').css('overflow', '');
                             }, 350);
                         }
-                        
+
                         // Always remove fixed class and reset body height
                         $departments.removeClass('departments--fixed');
                         $departments.find('.departments__body').css('height', '').attr('style', '');
@@ -773,7 +773,7 @@
             pointer-events: auto !important;
             z-index: 1000 !important;
         }
-        
+
         /* Nested submenus */
         .departments__menu .menu > li:hover > .menu__submenu {
             display: block !important;
@@ -792,6 +792,73 @@
     </style>
     <script data-navigate-once>
         (function () {
+            // Global error handler for Livewire Navigate to prevent 520/522 errors
+            if (window.Livewire) {
+                // Handle navigation errors globally
+                document.addEventListener('livewire:navigate-error', function(e) {
+                    const error = e.detail?.error || e.error;
+                    const targetUrl = e.detail?.url || window.location.href;
+
+                    if (error) {
+                        const status = error.status || error.response?.status || 0;
+
+                        // If it's a server error (500, 502, 503, 504, 520, 522) or network error, reload
+                        if (status >= 500 || status === 0 || status === 520 || status === 522) {
+                            console.warn('Server error during SPA navigation, falling back to full page reload:', status, targetUrl);
+
+                            // Remove wire:navigate from the link to prevent retry
+                            const activeLink = document.querySelector('a[wire\\:navigate][href="' + targetUrl + '"]');
+                            if (activeLink) {
+                                activeLink.removeAttribute('wire:navigate');
+                            }
+
+                            // Reload after a short delay
+                            setTimeout(() => {
+                                window.location.href = targetUrl;
+                            }, 500);
+                        }
+                    }
+                });
+
+                // Add timeout protection for navigation requests
+                let navigationStartTime = null;
+                let navigationTimeout = null;
+
+                document.addEventListener('livewire:navigate', function(e) {
+                    navigationStartTime = Date.now();
+                    const targetUrl = e.detail?.url || window.location.href;
+
+                    // Clear any existing timeout
+                    if (navigationTimeout) {
+                        clearTimeout(navigationTimeout);
+                    }
+
+                    // Set a timeout (3 seconds)
+                    navigationTimeout = setTimeout(() => {
+                        if (navigationStartTime && (Date.now() - navigationStartTime) > 2900) {
+                            console.warn('Navigation timeout detected (3s), reloading page');
+                            window.location.href = targetUrl;
+                        }
+                    }, 3000);
+                });
+
+                document.addEventListener('livewire:navigated', function() {
+                    navigationStartTime = null;
+                    if (navigationTimeout) {
+                        clearTimeout(navigationTimeout);
+                        navigationTimeout = null;
+                    }
+                });
+
+                document.addEventListener('livewire:navigate-error', function() {
+                    navigationStartTime = null;
+                    if (navigationTimeout) {
+                        clearTimeout(navigationTimeout);
+                        navigationTimeout = null;
+                    }
+                });
+            }
+
             // Cleanup Departments Transition Class
             document.addEventListener('click', function(e) {
                 if (e.target.closest('.departments__button')) {
@@ -801,7 +868,7 @@
                         if (!$('.departments').hasClass('departments--fixed')) {
                              $('.departments__links-wrapper').css('height', '');
                         }
-                    }, 350); 
+                    }, 350);
                 }
             });
 
