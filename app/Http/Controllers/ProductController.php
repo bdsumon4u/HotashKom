@@ -64,7 +64,8 @@ class ProductController extends Controller
                 $products = $query;
             }
 
-            $products = $products->paginate($per_page);
+            // Eager load categories to prevent N+1 queries when accessing $product->category
+            $products = $products->with('categories')->paginate($per_page);
         }
         $products = $products
             ->appends(request()->query());
