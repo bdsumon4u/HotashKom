@@ -12,7 +12,7 @@
     <div class="col-sm-12">
         <div class="form-group">
             <label for="slug">Link</label><span class="text-danger">*</span>
-            <div class="input-group">
+            <div class="input-group @error('slug') is-invalid @enderror">
                 <div class="input-group-prepend">
                     <div class="input-group-text">{{ url('/product') }}/</div>
                 </div>
