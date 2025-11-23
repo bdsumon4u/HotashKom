@@ -31,7 +31,7 @@ class ProductRequest extends FormRequest
     {
         $rules = [
             'name' => 'required|max:255',
-            'slug' => 'required|max:255|regex:/^[a-zA-Z0-9-]+$/|unique:products',
+            'slug' => ['required', 'max:255', 'regex:~^[^\s\[\],!:;{}=+%^()/\\?><`|"\']+$~u', 'unique:products'],
             'description' => 'required',
             'categories' => 'required|array',
             'brand' => 'nullable|integer',
@@ -58,7 +58,7 @@ class ProductRequest extends FormRequest
         ];
 
         if (! $this->isMethod('POST')) {
-            $rules['slug'] = 'required|max:255|regex:/^[a-zA-Z0-9-]+$/|unique:products,slug,'.$this->route('product')->id;
+            $rules['slug'] = ['required', 'max:255', 'regex:~^[^\s\[\],!:;{}=+%^()/\\?><`|"\']+$~u', 'unique:products,slug,'.$this->route('product')->id];
             $rules['sku'] = 'required|unique:products,sku,'.$this->route('product')->id;
         }
 
@@ -68,7 +68,18 @@ class ProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
+            'slug.required' => 'The link field is required.',
+            'slug.max' => 'The link field may not be greater than 255 characters.',
+            'slug.regex' => 'The link field may contain letters (including Bangla), numbers, and hyphens. No spaces or special characters are allowed.',
+            'slug.format' => 'The link field may contain letters (including Bangla), numbers, and hyphens. No spaces or special characters are allowed.',
+            'slug.unique' => 'This link is already in use. Please choose a different one.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'slug' => 'link',
         ];
     }
 
