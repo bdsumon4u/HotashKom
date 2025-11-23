@@ -416,12 +416,23 @@ class Order extends Model
             return [];
         }
 
+        // Try to get from cache first
+        $cached = cacheMemo()->get('pathao_cities');
+        if ($cached !== null) {
+            return $cached;
+        }
+
         $exception = false;
         $cityList = cacheMemo()->remember('pathao_cities', now()->addDay(), function () use (&$exception) {
             try {
                 return Pathao::area()->city()->data;
-            } catch (\Exception) {
+            } catch (\Exception $e) {
                 $exception = true;
+                // Log the error for debugging
+                logger()->warning('Pathao API error when fetching cities', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
 
                 return [];
             }
@@ -444,12 +455,23 @@ class Order extends Model
         $exception = false;
         $cityId ??= $this->data['city_id'] ?? false;
         if ($cityId) {
+            // Try to get from cache first
+            $cached = cacheMemo()->get('pathao_areas:'.$cityId);
+            if ($cached !== null) {
+                return $cached;
+            }
 
             $areaList = cacheMemo()->remember('pathao_areas:'.$cityId, now()->addDay(), function () use (&$exception, &$cityId) {
                 try {
                     return Pathao::area()->zone($cityId)->data;
-                } catch (\Exception) {
+                } catch (\Exception $e) {
                     $exception = true;
+                    // Log the error for debugging
+                    logger()->warning('Pathao API error when fetching areas', [
+                        'city_id' => $cityId,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
 
                     return [];
                 }

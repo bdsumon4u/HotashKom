@@ -30,6 +30,8 @@ class BaseApi
         $this->request = new Client([
             'base_uri' => $this->baseUrl,
             'headers' => $this->headers,
+            'timeout' => 5, // 5 second timeout
+            'connect_timeout' => 3, // 3 second connection timeout
         ]);
     }
 
