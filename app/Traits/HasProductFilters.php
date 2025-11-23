@@ -104,29 +104,40 @@ trait HasProductFilters
     {
         $cacheKey = 'filters'.($category ? ':category:'.$category->id : '');
 
-        return cacheRememberNamespaced('product_filters', $cacheKey, now()->addHour(), function () use ($category): array {
-            // Get categories that have products
+        return cacheRememberNamespaced('product_filters', $cacheKey, now()->addHours(6), function () use ($category): array {
+            // Optimize: Pre-fetch active product IDs to avoid repeated queries
+            $activeProductIds = Product::whereIsActive(1)
+                ->whereNull('parent_id')
+                ->pluck('id')
+                ->toArray();
+
+            if (empty($activeProductIds)) {
+                return [
+                    'categories' => collect(),
+                    'attributes' => collect(),
+                ];
+            }
+
+            // Get categories that have products - optimized with pre-fetched IDs
             $categories = Category::nested(0, true)
-                ->filter(function ($category) {
+                ->filter(function ($category) use ($activeProductIds) {
+                    // Use whereHas with pre-filtered product IDs for better performance
                     $hasProducts = $category->products()
-                        ->whereIsActive(1)
-                        ->whereNull('parent_id')
+                        ->whereIn('products.id', $activeProductIds)
                         ->exists();
 
-                    $hasChildProducts = $category->childrens->some(function ($child) {
+                    $hasChildProducts = $category->childrens->some(function ($child) use ($activeProductIds) {
                         return $child->products()
-                            ->whereIsActive(1)
-                            ->whereNull('parent_id')
+                            ->whereIn('products.id', $activeProductIds)
                             ->exists();
                     });
 
                     return $hasProducts || $hasChildProducts;
                 })
-                ->map(function ($category) {
-                    $category->setRelation('childrens', $category->childrens->filter(function ($child) {
+                ->map(function ($category) use ($activeProductIds) {
+                    $category->setRelation('childrens', $category->childrens->filter(function ($child) use ($activeProductIds) {
                         return $child->products()
-                            ->whereIsActive(1)
-                            ->whereNull('parent_id')
+                            ->whereIn('products.id', $activeProductIds)
                             ->exists();
                     }));
 
@@ -135,62 +146,59 @@ trait HasProductFilters
                 ->values();
 
             // Get attributes that have options used in active products
-            // Options are typically linked to variation products (with parent_id), not parent products
-            // So we need to check if the variation's parent product is active and has no parent_id
-            $attributesQuery = Attribute::whereHas('options', function ($query) use ($category): void {
-                $query->whereHas('products', function ($prodQuery) use ($category): void {
-                    $prodQuery->whereIsActive(1)
-                        ->where(function ($q) use ($category): void {
-                            // Options linked directly to parent products (no parent_id)
-                            $q->where(function ($parentQ) use ($category): void {
-                                $parentQ->whereNull('parent_id');
+            // Optimized: Pre-fetch product IDs and use direct joins instead of nested whereHas
+            $attributesQuery = Attribute::query();
 
-                                // If category is provided, filter by category
-                                if ($category) {
-                                    $parentQ->whereHas('categories', function ($catQuery) use ($category): void {
-                                        $catQuery->where('categories.id', $category->id);
-                                    });
-                                }
+            // If category is provided, get product IDs for that category first
+            $categoryProductIds = $activeProductIds;
+            if ($category) {
+                $categoryProductIds = DB::table('category_product')
+                    ->where('category_id', $category->id)
+                    ->whereIn('product_id', $activeProductIds)
+                    ->pluck('product_id')
+                    ->toArray();
+            }
+
+            // Get variation product IDs (products with parent_id) whose parents are active
+            $variationProductIds = Product::whereIn('parent_id', $activeProductIds)
+                ->pluck('id')
+                ->toArray();
+
+            // Get all product IDs (parent + variations) that should be considered
+            $allProductIds = array_merge($activeProductIds, $variationProductIds);
+            if ($category && ! empty($categoryProductIds)) {
+                $allProductIds = array_intersect($allProductIds, array_merge($categoryProductIds, $variationProductIds));
+            }
+
+            // Optimized: Use whereHas with pre-filtered product IDs
+            $attributesQuery->whereHas('options', function ($query) use ($allProductIds, $categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
+                $query->whereHas('products', function ($prodQuery) use ($allProductIds, $categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
+                    $prodQuery->whereIn('products.id', $allProductIds)
+                        ->where(function ($q) use ($categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
+                            // Options linked directly to parent products
+                            $q->where(function ($parentQ) use ($categoryProductIds, $activeProductIds, $category): void {
+                                $parentQ->whereIn('products.id', $category ? $categoryProductIds : $activeProductIds)
+                                    ->whereNull('products.parent_id');
                             })
-                                // OR options linked to variations - check if parent is active
-                                ->orWhereHas('parent', function ($parentQuery) use ($category): void {
-                                    $parentQuery->whereIsActive(1)->whereNull('parent_id');
-
-                                    // If category is provided, filter by category
-                                    if ($category) {
-                                        $parentQuery->whereHas('categories', function ($catQuery) use ($category): void {
-                                            $catQuery->where('categories.id', $category->id);
-                                        });
-                                    }
+                                // OR options linked to variations
+                                ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $category): void {
+                                    $varQ->whereIn('products.id', $variationProductIds)
+                                        ->whereIn('products.parent_id', $category ? $categoryProductIds : $activeProductIds);
                                 });
                         });
                 });
             })
-                ->with(['options' => function ($query) use ($category): void {
-                    $query->whereHas('products', function ($prodQuery) use ($category): void {
-                        $prodQuery->whereIsActive(1)
-                            ->where(function ($q) use ($category): void {
-                                // Options linked directly to parent products (no parent_id)
-                                $q->where(function ($parentQ) use ($category): void {
-                                    $parentQ->whereNull('parent_id');
-
-                                    // If category is provided, filter by category
-                                    if ($category) {
-                                        $parentQ->whereHas('categories', function ($catQuery) use ($category): void {
-                                            $catQuery->where('categories.id', $category->id);
-                                        });
-                                    }
+                ->with(['options' => function ($query) use ($allProductIds, $categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
+                    $query->whereHas('products', function ($prodQuery) use ($allProductIds, $categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
+                        $prodQuery->whereIn('products.id', $allProductIds)
+                            ->where(function ($q) use ($categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
+                                $q->where(function ($parentQ) use ($categoryProductIds, $activeProductIds, $category): void {
+                                    $parentQ->whereIn('products.id', $category ? $categoryProductIds : $activeProductIds)
+                                        ->whereNull('products.parent_id');
                                 })
-                                    // OR options linked to variations - check if parent is active
-                                    ->orWhereHas('parent', function ($parentQuery) use ($category): void {
-                                        $parentQuery->whereIsActive(1)->whereNull('parent_id');
-
-                                        // If category is provided, filter by category
-                                        if ($category) {
-                                            $parentQuery->whereHas('categories', function ($catQuery) use ($category): void {
-                                                $catQuery->where('categories.id', $category->id);
-                                            });
-                                        }
+                                    ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $category): void {
+                                        $varQ->whereIn('products.id', $variationProductIds)
+                                            ->whereIn('products.parent_id', $category ? $categoryProductIds : $activeProductIds);
                                     });
                             });
                     });

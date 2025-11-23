@@ -53,14 +53,14 @@
 
                         // Intercept clicks on links with wire:navigate for immediate feedback
                         this.interceptClicks();
-                        
+
                         // Add timeout protection for navigation
                         this.setupNavigationTimeout();
                     },
-                    
+
                     setupNavigationTimeout() {
                         let navigationTimeout = null;
-                        
+
                         document.addEventListener('livewire:navigate', () => {
                             // Set a timeout for navigation (3 seconds)
                             navigationTimeout = setTimeout(() => {
@@ -70,14 +70,14 @@
                                 }
                             }, 3000);
                         });
-                        
+
                         document.addEventListener('livewire:navigated', () => {
                             if (navigationTimeout) {
                                 clearTimeout(navigationTimeout);
                                 navigationTimeout = null;
                             }
                         });
-                        
+
                         document.addEventListener('livewire:navigate-error', () => {
                             if (navigationTimeout) {
                                 clearTimeout(navigationTimeout);
@@ -85,10 +85,10 @@
                             }
                         });
                     },
-                    
+
                     handleNavigationError(e) {
                         console.error('Livewire navigation error:', e);
-                        
+
                         // If it's a server error (520, 522, 500, etc.), fall back to full page reload
                         const error = e.detail?.error || e.error;
                         if (error) {
