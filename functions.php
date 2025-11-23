@@ -101,6 +101,33 @@ if (! function_exists('cacheRememberForeverNamespaced')) {
     }
 }
 
+if (! function_exists('cacheFlexibleNamespaced')) {
+    /**
+     * Cache with stale-while-revalidate strategy using namespaced keys.
+     *
+     * @param  string  $namespace  Cache namespace for invalidation
+     * @param  string  $key  Cache key
+     * @param  array{fresh: int, stale: int}|array{0: int, 1: int}  $ttl  Array with 'fresh' and 'stale' durations in seconds, or [fresh, stale] numeric array
+     * @param  callable  $callback  Callback to generate cache data
+     */
+    function cacheFlexibleNamespaced(string $namespace, string $key, array $ttl, callable $callback): mixed
+    {
+        $cacheKey = cacheNamespaceKey($key, $namespace);
+
+        // Convert associative array to numeric array if needed
+        // Laravel's flexible() expects [fresh, stale] format
+        if (isset($ttl['fresh']) && isset($ttl['stale'])) {
+            $ttl = [$ttl['fresh'], $ttl['stale']];
+        }
+
+        if (cacheSupportsTags()) {
+            return cache()->tags($namespace)->flexible($key, $ttl, $callback);
+        }
+
+        return cacheMemo()->flexible($cacheKey, $ttl, $callback);
+    }
+}
+
 if (! function_exists('cacheInvalidateNamespace')) {
     function cacheInvalidateNamespace(string $namespace): void
     {

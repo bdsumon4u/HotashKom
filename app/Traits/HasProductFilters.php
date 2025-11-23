@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use App\Models\Attribute;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -104,7 +105,13 @@ trait HasProductFilters
     {
         $cacheKey = 'filters'.($category ? ':category:'.$category->id : '');
 
-        return cacheRememberNamespaced('product_filters', $cacheKey, now()->addHours(6), function () use ($category): array {
+        // Use flexible caching: 2 hours fresh, 4 hours stale (total 6 hours)
+        // Fresh: Data is served immediately from cache
+        // Stale: Data is served from cache while background revalidation happens
+        return cacheFlexibleNamespaced('product_filters', $cacheKey, [
+            'fresh' => 7200, // 2 hours in seconds
+            'stale' => 14400, // 4 hours in seconds (total 6 hours)
+        ], function () use ($category): array {
             // Optimize: Pre-fetch active product IDs to avoid repeated queries
             $activeProductIds = Product::whereIsActive(1)
                 ->whereNull('parent_id')
@@ -181,7 +188,7 @@ trait HasProductFilters
                                     ->whereNull('products.parent_id');
                             })
                                 // OR options linked to variations
-                                ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $category): void {
+                                ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $categoryProductIds, $category): void {
                                     $varQ->whereIn('products.id', $variationProductIds)
                                         ->whereIn('products.parent_id', $category ? $categoryProductIds : $activeProductIds);
                                 });
@@ -196,7 +203,7 @@ trait HasProductFilters
                                     $parentQ->whereIn('products.id', $category ? $categoryProductIds : $activeProductIds)
                                         ->whereNull('products.parent_id');
                                 })
-                                    ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $category): void {
+                                    ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $categoryProductIds, $category): void {
                                         $varQ->whereIn('products.id', $variationProductIds)
                                             ->whereIn('products.parent_id', $category ? $categoryProductIds : $activeProductIds);
                                     });
