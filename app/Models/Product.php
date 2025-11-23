@@ -153,8 +153,18 @@ class Product extends Model
     protected function category(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+            // Use already-loaded relationship if available to avoid N+1 queries
             if ($this->parent_id) {
+                if ($this->relationLoaded('parent') && $this->parent && $this->parent->relationLoaded('categories')) {
+                    return $this->parent->categories->first()?->name ?? 'Uncategorized';
+                }
+
                 return $this->parent->categories()->inRandomOrder()->first(['name'])->name ?? 'Uncategorized';
+            }
+
+            // Use already-loaded relationship if available
+            if ($this->relationLoaded('categories')) {
+                return $this->categories->first()?->name ?? 'Uncategorized';
             }
 
             return $this->categories()->inRandomOrder()->first(['name'])->name ?? 'Uncategorized';
