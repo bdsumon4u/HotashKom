@@ -125,28 +125,42 @@ trait HasProductFilters
                 ];
             }
 
+            // Pre-calculate product counts for all categories in a single query
+            $categoryProductCounts = DB::table('category_product')
+                ->join('products', 'category_product.product_id', '=', 'products.id')
+                ->whereIn('products.id', $activeProductIds)
+                ->where('products.is_active', 1)
+                ->whereNull('products.parent_id')
+                ->groupBy('category_product.category_id')
+                ->pluck(DB::raw('count(*) as count'), 'category_product.category_id')
+                ->toArray();
+
             // Get categories that have products - optimized with pre-fetched IDs
             $categories = Category::nested(0, true)
-                ->filter(function ($category) use ($activeProductIds) {
-                    // Use whereHas with pre-filtered product IDs for better performance
-                    $hasProducts = $category->products()
-                        ->whereIn('products.id', $activeProductIds)
-                        ->exists();
+                ->filter(function ($category) use ($categoryProductCounts) {
+                    // Check if category has products using pre-calculated counts
+                    $hasProducts = isset($categoryProductCounts[$category->id]);
 
-                    $hasChildProducts = $category->childrens->some(function ($child) use ($activeProductIds) {
-                        return $child->products()
-                            ->whereIn('products.id', $activeProductIds)
-                            ->exists();
+                    // Check if any child has products
+                    $hasChildProducts = $category->childrens->some(function ($child) use ($categoryProductCounts) {
+                        return isset($categoryProductCounts[$child->id]);
                     });
 
                     return $hasProducts || $hasChildProducts;
                 })
-                ->map(function ($category) use ($activeProductIds) {
-                    $category->setRelation('childrens', $category->childrens->filter(function ($child) use ($activeProductIds) {
-                        return $child->products()
-                            ->whereIn('products.id', $activeProductIds)
-                            ->exists();
+                ->map(function ($category) use ($categoryProductCounts) {
+                    // Filter children and attach product counts
+                    $category->setRelation('childrens', $category->childrens->filter(function ($child) use ($categoryProductCounts) {
+                        return isset($categoryProductCounts[$child->id]);
+                    })->map(function ($child) use ($categoryProductCounts) {
+                        // Attach pre-calculated count
+                        $child->product_count = $categoryProductCounts[$child->id] ?? 0;
+
+                        return $child;
                     }));
+
+                    // Attach pre-calculated count to parent category
+                    $category->product_count = $categoryProductCounts[$category->id] ?? 0;
 
                     return $category;
                 })

@@ -58,14 +58,11 @@ class ProductController extends Controller
                     $q->whereIsActive(1)->whereNull('parent_id');
                     $this->applyProductFilters($q, $request);
                     $this->applyProductSorting($q);
-                });
+                })->paginate($per_page);
             } else {
                 $this->applyProductSorting($query);
-                $products = $query;
+                $products = $query->paginate($per_page);
             }
-
-            // Eager load categories to prevent N+1 queries when accessing $product->category
-            $products = $products->with('categories')->paginate($per_page);
         }
         $products = $products
             ->appends(request()->query());
