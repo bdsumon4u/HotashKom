@@ -20,6 +20,22 @@
                 @php
                     $category = request()->route()->parameter('category');
                     $brand = request()->route()->parameter('brand');
+                    $categoryFilters = request('filter_category');
+                    if (is_string($categoryFilters)) {
+                        $categoryFilters = array_map('intval', array_filter(explode(',', $categoryFilters)));
+                    } elseif (is_array($categoryFilters)) {
+                        $categoryFilters = array_map('intval', array_filter($categoryFilters));
+                    } else {
+                        $categoryFilters = [];
+                    }
+                    $optionFilters = request('filter_option');
+                    if (is_string($optionFilters)) {
+                        $optionFilters = array_map('intval', array_filter(explode(',', $optionFilters)));
+                    } elseif (is_array($optionFilters)) {
+                        $optionFilters = array_map('intval', array_filter($optionFilters));
+                    } else {
+                        $optionFilters = [];
+                    }
                 @endphp
                 <div
                     x-data="{
@@ -69,6 +85,8 @@
                             :brand-id="$brand?->id"
                             :search="request('search')"
                             :hide-category-filter="$hideCategoryFilter ?? false"
+                            :selected-categories="$categoryFilters"
+                            :selected-options="$optionFilters"
                             lazy
                             wire:key="filter-sidebar-{{ $category?->id ?? 'all' }}-{{ $brand?->id ?? 'all' }}-{{ request('search') ?? 'all' }}" />
                     </div>

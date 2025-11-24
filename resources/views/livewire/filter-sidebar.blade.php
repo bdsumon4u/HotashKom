@@ -31,18 +31,6 @@
                     <i class="fa" :class="categoriesOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                 </div>
                 <div class="filter-block__content" x-show="categoriesOpen" x-transition>
-                    @php
-                        $filterCategory = request('filter_category');
-                        $selectedCategories = [];
-
-                        if ($filterCategory) {
-                            if (is_array($filterCategory)) {
-                                $selectedCategories = array_map('intval', array_filter($filterCategory));
-                            } elseif (is_numeric(str_replace(',', '', $filterCategory))) {
-                                $selectedCategories = array_map('intval', explode(',', $filterCategory));
-                            }
-                        }
-                    @endphp
                     @foreach($categories ?? [] as $category)
                         <div class="filter-item">
                             <label class="filter-checkbox">
@@ -76,18 +64,9 @@
             @endif
 
             <!-- Attributes Filter -->
-            @php
-                $filterOption = request('filter_option');
-                $selectedOptions = [];
-
-                if ($filterOption) {
-                    if (is_array($filterOption)) {
-                        $selectedOptions = array_map('intval', array_filter($filterOption));
-                    } else {
-                        $selectedOptions = array_map('intval', explode(',', $filterOption));
-                    }
-                }
-            @endphp
+                            @php
+                                $selectedOptionsList = $selectedOptions;
+                            @endphp
             @foreach($attributes ?? [] as $attribute)
                 <div class="filter-block">
                     <div class="filter-block__header" @click="attributesOpen['{{ $attribute->id }}'] = !attributesOpen['{{ $attribute->id }}']">
@@ -100,7 +79,7 @@
                                 <input type="checkbox"
                                        name="filter_option[]"
                                        value="{{ $option->id }}"
-                                       @if(in_array((int)$option->id, $selectedOptions)) checked @endif
+                                       @if(in_array((int)$option->id, $selectedOptionsList)) checked @endif
                                        @change="updateFilter()">
                                 <span class="filter-checkbox__label">{{ $option->name }}</span>
                             </label>
