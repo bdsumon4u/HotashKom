@@ -7,10 +7,10 @@
         </div>
 
         <form method="GET" action="{{
-            $categoryId
-                ? route('categories.products', $categoryId)
-                : ($brandId
-                    ? route('brands.products', $brandId)
+            $categorySlug
+                ? route('categories.products', $categorySlug)
+                : ($brandSlug
+                    ? route('brands.products', $brandSlug)
                     : route('products.index'))
         }}" id="filter-form"
               x-show="mobileOpen || isDesktop"
@@ -64,9 +64,6 @@
             @endif
 
             <!-- Attributes Filter -->
-                            @php
-                                $selectedOptionsList = $selectedOptions;
-                            @endphp
             @foreach($attributes ?? [] as $attribute)
                 <div class="filter-block">
                     <div class="filter-block__header" @click="attributesOpen['{{ $attribute->id }}'] = !attributesOpen['{{ $attribute->id }}']">
@@ -79,7 +76,7 @@
                                 <input type="checkbox"
                                        name="filter_option[]"
                                        value="{{ $option->id }}"
-                                       @if(in_array((int)$option->id, $selectedOptionsList)) checked @endif
+                                       @if(in_array((int)$option->id, $selectedOptions)) checked @endif
                                        @change="updateFilter()">
                                 <span class="filter-checkbox__label">{{ $option->name }}</span>
                             </label>
@@ -92,10 +89,10 @@
             <div class="filter-actions">
                 <button type="submit" class="btn btn-primary">Filter</button>
                 <a href="{{
-                    $categoryId
-                        ? route('categories.products', $categoryId)
-                        : ($brandId
-                            ? route('brands.products', $brandId)
+                    $categorySlug
+                        ? route('categories.products', $categorySlug)
+                        : ($brandSlug
+                            ? route('brands.products', $brandSlug)
                             : route('products.index', ($search && $search !== '') ? ['search' => $search] : []))
                 }}" class="btn btn-secondary">Reset</a>
             </div>

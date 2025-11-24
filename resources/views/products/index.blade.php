@@ -18,8 +18,8 @@
             <div class="row">
                 <!-- Filter Sidebar - Lazy Loaded -->
                 @php
-                    $category = request()->route()->parameter('category');
-                    $brand = request()->route()->parameter('brand');
+                    $categoryModel = request()->route()->parameter('category');
+                    $brandModel = request()->route()->parameter('brand');
                     $categoryFilters = request('filter_category');
                     if (is_string($categoryFilters)) {
                         $categoryFilters = array_map('intval', array_filter(explode(',', $categoryFilters)));
@@ -81,8 +81,10 @@
 
                     <div :class="{ 'invisible': !loaded }">
                         <livewire:filter-sidebar
-                            :category-id="$category?->id"
-                            :brand-id="$brand?->id"
+                            :category-id="$categoryModel?->id"
+                            :category-slug="$categoryModel?->slug"
+                            :brand-id="$brandModel?->id"
+                            :brand-slug="$brandModel?->slug"
                             :search="request('search')"
                             :hide-category-filter="$hideCategoryFilter ?? false"
                             :selected-categories="$categoryFilters"

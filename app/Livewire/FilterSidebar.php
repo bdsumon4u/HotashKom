@@ -22,17 +22,24 @@ class FilterSidebar extends Component
 
     public array $selectedOptions = [];
 
+    public ?string $categorySlug = null;
+
+    public ?string $brandSlug = null;
+
     public function mount(
         ?int $categoryId = null,
+        ?string $categorySlug = null,
         ?int $brandId = null,
+        ?string $brandSlug = null,
         ?string $search = null,
         bool $hideCategoryFilter = false,
         array $selectedCategories = [],
         array $selectedOptions = [],
-    ): void
-    {
+    ): void {
         $this->categoryId = $categoryId;
+        $this->categorySlug = $categorySlug;
         $this->brandId = $brandId;
+        $this->brandSlug = $brandSlug;
         $this->search = $search;
         $this->hideCategoryFilter = $hideCategoryFilter;
         $this->selectedCategories = array_map('intval', array_filter($selectedCategories));
@@ -48,7 +55,9 @@ class FilterSidebar extends Component
 
         return view('livewire.filter-sidebar', $filterData + [
             'categoryId' => $this->categoryId,
+            'categorySlug' => $this->categorySlug,
             'brandId' => $this->brandId,
+            'brandSlug' => $this->brandSlug,
             'search' => $this->search,
             'hideCategoryFilter' => $this->hideCategoryFilter,
         ]);
