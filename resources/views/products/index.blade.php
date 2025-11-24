@@ -16,131 +16,61 @@
     <div class="products-view">
         <div class="container">
             <div class="row">
-                <!-- Filter Sidebar -->
-                <div class="pr-md-1 col-lg-3 col-md-4" x-data="filterSidebar(@json(($attributes ?? collect())->pluck('id')))">
-                    <div class="p-3 filter-sidebar">
-                        <div class="filter-sidebar__header">
-                            <h3 class="filter-sidebar__title">Filters</h3>
-                            <button type="button" class="filter-sidebar__toggle d-md-none" @click="mobileOpen = !mobileOpen">
-                                <i class="fa" :class="mobileOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                            </button>
-                        </div>
+                <!-- Filter Sidebar - Lazy Loaded -->
+                @php
+                    $category = request()->route()->parameter('category');
+                    $brand = request()->route()->parameter('brand');
+                @endphp
+                <div
+                    x-data="{
+                        loaded: window.__filterSidebarLoaded ?? false,
+                        init() {
+                            if (this.loaded) {
+                                return;
+                            }
 
-                        <form method="GET" action="{{
-                            ($category = request()->route()->parameter('category'))
-                                ? route('categories.products', $category)
-                                : (($brand = request()->route()->parameter('brand'))
-                                    ? route('brands.products', $brand)
-                                    : route('products.index'))
-                        }}" id="filter-form"
-                              x-show="mobileOpen || isDesktop"
-                              x-transition
-                              class="filter-sidebar__content"
-                              x-init="checkDesktop()">
-
-                            <!-- Preserve search parameter -->
-                            @if(request('search'))
-                                <input type="hidden" name="search" value="{{ request('search') }}">
-                            @endif
-
-                            <!-- Categories Filter -->
-                            @if(!isset($hideCategoryFilter) || !$hideCategoryFilter)
-                            <div class="filter-block">
-                                <div class="filter-block__header" @click="categoriesOpen = !categoriesOpen">
-                                    <h4 class="filter-block__title">Categories</h4>
-                                    <i class="fa" :class="categoriesOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                                </div>
-                                <div class="filter-block__content" x-show="categoriesOpen" x-transition>
-                                    @php
-                                        $filterCategory = request('filter_category');
-                                        $selectedCategories = [];
-
-                                        if ($filterCategory) {
-                                            if (is_array($filterCategory)) {
-                                                $selectedCategories = array_map('intval', array_filter($filterCategory));
-                                            } elseif (is_numeric(str_replace(',', '', $filterCategory))) {
-                                                $selectedCategories = array_map('intval', explode(',', $filterCategory));
-                                            }
-                                        }
-                                    @endphp
-                                    @foreach($categories ?? [] as $category)
-                                        <div class="filter-item">
-                                            <label class="filter-checkbox">
-                                                <input type="checkbox"
-                                                       name="filter_category[]"
-                                                       value="{{ $category->id }}"
-                                                       @if(in_array((int)$category->id, $selectedCategories)) checked @endif
-                                                       @change="updateFilter()">
-                                                <span class="filter-checkbox__label">{{ $category->name }}</span>
-                                                <span class="filter-checkbox__count">({{ $category->products()->whereIsActive(1)->whereNull('parent_id')->count() }})</span>
-                                            </label>
-                                            @if($category->childrens->isNotEmpty())
-                                                <div class="ml-3 filter-item__children">
-                                                    @foreach($category->childrens as $child)
-                                                        <label class="filter-checkbox">
-                                                            <input type="checkbox"
-                                                                   name="filter_category[]"
-                                                                   value="{{ $child->id }}"
-                                                                   @if(in_array((int)$child->id, $selectedCategories)) checked @endif
-                                                                   @change="updateFilter()">
-                                                            <span class="filter-checkbox__label">{{ $child->name }}</span>
-                                                            <span class="filter-checkbox__count">({{ $child->products()->whereIsActive(1)->whereNull('parent_id')->count() }})</span>
-                                                        </label>
-                                                    @endforeach
-                                                </div>
-                                            @endif
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endif
-
-                            <!-- Attributes Filter -->
-                            @php
-                                $filterOption = request('filter_option');
-                                $selectedOptions = [];
-
-                                if ($filterOption) {
-                                    if (is_array($filterOption)) {
-                                        $selectedOptions = array_map('intval', array_filter($filterOption));
-                                    } else {
-                                        $selectedOptions = array_map('intval', explode(',', $filterOption));
-                                    }
+                            const markLoaded = () => {
+                                if (this.loaded) {
+                                    return;
                                 }
-                            @endphp
-                            @foreach($attributes ?? [] as $attribute)
-                                <div class="filter-block">
-                                    <div class="filter-block__header" @click="attributesOpen['{{ $attribute->id }}'] = !attributesOpen['{{ $attribute->id }}']">
-                                        <h4 class="filter-block__title">{{ $attribute->name }}</h4>
-                                        <i class="fa" :class="attributesOpen['{{ $attribute->id }}'] ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                                    </div>
-                                    <div class="filter-block__content" x-show="attributesOpen['{{ $attribute->id }}']" x-transition>
-                                        @foreach($attribute->options as $option)
-                                            <label class="filter-checkbox">
-                                                <input type="checkbox"
-                                                       name="filter_option[]"
-                                                       value="{{ $option->id }}"
-                                                       @if(in_array((int)$option->id, $selectedOptions)) checked @endif
-                                                       @change="updateFilter()">
-                                                <span class="filter-checkbox__label">{{ $option->name }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endforeach
 
-                            <!-- Filter Actions -->
-                            <div class="filter-actions">
-                                <button type="submit" class="btn btn-primary">Filter</button>
-                                <a href="{{
-                                    ($category = request()->route()->parameter('category'))
-                                        ? route('categories.products', $category)
-                                        : (($brand = request()->route()->parameter('brand'))
-                                            ? route('brands.products', $brand)
-                                            : route('products.index', request()->only('search')))
-                                }}" class="btn btn-secondary">Reset</a>
-                            </div>
-                        </form>
+                                this.loaded = true;
+                                window.__filterSidebarLoaded = true;
+                            };
+
+                            if (window.Livewire?.on) {
+                                window.Livewire.on('filter-sidebar-loaded', markLoaded);
+                            } else {
+                                document.addEventListener('livewire:init', () => {
+                                    window.Livewire.on('filter-sidebar-loaded', markLoaded);
+                                }, { once: true });
+                            }
+                        },
+                    }"
+                    class="pr-md-1 col-lg-3 col-md-4 w-100 position-relative">
+                    <div
+                        x-show="!loaded"
+                        class="p-3 mb-4 bg-white rounded border filter-sidebar placeholder-glow"
+                        style="min-height: 420px;">
+                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                            <div class="placeholder w-50" style="height: 24px;"></div>
+                            <div class="rounded-circle placeholder" style="width: 24px; height: 24px;"></div>
+                        </div>
+                        <div class="mb-2 placeholder w-75" style="height: 18px;"></div>
+                        <div class="mb-2 placeholder w-100" style="height: 18px;"></div>
+                        <div class="mb-2 w-60 placeholder" style="height: 18px;"></div>
+                        <div class="mb-2 w-80 placeholder" style="height: 18px;"></div>
+                        <div class="mb-2 placeholder w-50" style="height: 18px;"></div>
+                    </div>
+
+                    <div :class="{ 'invisible': !loaded }">
+                        <livewire:filter-sidebar
+                            :category-id="$category?->id"
+                            :brand-id="$brand?->id"
+                            :search="request('search')"
+                            :hide-category-filter="$hideCategoryFilter ?? false"
+                            lazy
+                            wire:key="filter-sidebar-{{ $category?->id ?? 'all' }}-{{ $brand?->id ?? 'all' }}-{{ request('search') ?? 'all' }}" />
                     </div>
                 </div>
 
@@ -148,8 +78,8 @@
                 <div class="pl-md-1 col-lg-9 col-md-8">
                     <div class="products-view__options">
                         <div class="view-options">
-                            <div class="view-options__legend" 
-                                 @if(config('app.infinite_scroll_section', false)) 
+                            <div class="view-options__legend"
+                                 @if(config('app.infinite_scroll_section', false))
                                  x-data="productCountDisplay({{ $products->total() }}, {{ $products->count() }})"
                                  x-text="getDisplayText()"
                                  id="product-count-display"
@@ -170,11 +100,11 @@
                     </div>
 
                     @if(config('app.infinite_scroll_section', false))
-                        <div class="products-view__list products-list" 
-                             data-layout="grid-4-full" 
-                             data-with-features="false" 
+                        <div class="products-view__list products-list"
+                             data-layout="grid-4-full"
+                             data-with-features="false"
                              data-shuffle="{{ request('shuffle') }}"
-                             x-data="shopInfiniteScroll({{ $products->currentPage() }}, @json($products->hasMorePages()), {{ $per_page ?? 20 }}, {{ $products->total() }})" 
+                             x-data="shopInfiniteScroll({{ $products->currentPage() }}, @json($products->hasMorePages()), {{ $per_page ?? 20 }}, {{ $products->total() }})"
                              x-init="init()">
                             <div class="products-list__body"
                                  id="products-container-shop"
@@ -231,9 +161,6 @@
     border: 1px solid #e9ecef;
     border-radius: 8px;
     padding: 1.5rem;
-    position: sticky;
-    top: 20px;
-    max-height: calc(100vh - 40px);
     display: flex;
     flex-direction: column;
     overflow: hidden;
