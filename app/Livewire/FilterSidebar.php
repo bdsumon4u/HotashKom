@@ -18,12 +18,25 @@ class FilterSidebar extends Component
 
     public bool $hideCategoryFilter = false;
 
-    public function mount(?int $categoryId = null, ?int $brandId = null, ?string $search = null, bool $hideCategoryFilter = false): void
+    public array $selectedCategories = [];
+
+    public array $selectedOptions = [];
+
+    public function mount(
+        ?int $categoryId = null,
+        ?int $brandId = null,
+        ?string $search = null,
+        bool $hideCategoryFilter = false,
+        array $selectedCategories = [],
+        array $selectedOptions = [],
+    ): void
     {
         $this->categoryId = $categoryId;
         $this->brandId = $brandId;
         $this->search = $search;
         $this->hideCategoryFilter = $hideCategoryFilter;
+        $this->selectedCategories = array_map('intval', array_filter($selectedCategories));
+        $this->selectedOptions = array_map('intval', array_filter($selectedOptions));
     }
 
     public function render()
