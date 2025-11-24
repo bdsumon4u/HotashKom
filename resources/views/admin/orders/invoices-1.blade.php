@@ -129,6 +129,16 @@
                 <!-- End InvoiceTop-->
                 <div class="row">
                     <div class="col-6">
+                        <div class="media customer-info">
+                            <div class="media-body m-l-20">
+                                <h6 class="mb-0">Customer Information:</h6>
+                                <div class="media-heading">Name: {{ $order->name }}</div>
+                                <div>Phone: {{ without88($order->phone) }}</div>
+                                <div>Address: {{ $order->address }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
                         <div class="media">
                             <div class="media-body">
                                 <h6 class="mb-0">Company Information:</h6>
@@ -147,16 +157,6 @@
                             </div>
                         </div>
                         @endif
-                    </div>
-                    <div class="col-6">
-                        <div class="media customer-info">
-                            <div class="media-body m-l-20">
-                                <h6 class="mb-0">Customer Information:</h6>
-                                <div class="media-heading">Name: {{ $order->name }}</div>
-                                <div>Phone: {{ without88($order->phone) }}</div>
-                                <div>Address: {{ $order->address }}</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 @if(isOninda() && (setting('show_option')->resellers_invoice ?? false))
