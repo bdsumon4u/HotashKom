@@ -149,14 +149,14 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="shipping_inside">Inside Dhaka</label>
+                            <label for="shipping_inside">{{ __('checkout.inside_dhaka') }}</label>
                             <x-input name="shipping_inside" :value="$product->shipping_inside" />
                             <x-error field="shipping_inside" />
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="shipping_outside">Outside Dhaka</label>
+                            <label for="shipping_outside">{{ __('checkout.outside_dhaka') }}</label>
                             <x-input name="shipping_outside" :value="$product->shipping_outside" />
                             <x-error field="shipping_outside" />
                         </div>
