@@ -90,6 +90,16 @@
     .customer-info div {
         font-size: 20px !important;
     }
+    .company-info {
+        font-size: 16px !important;
+    }
+    .company-info h6 {
+        font-size: 18px !important;
+        font-weight: bold;
+    }
+    .company-info div {
+        font-size: 16px !important;
+    }
 }
 </style>
   </head>
@@ -139,7 +149,7 @@
                         </div>
                     </div>
                     <div class="col-6">
-                        <div class="media">
+                        <div class="media company-info">
                             <div class="media-body">
                                 <h6 class="mb-0">Company Information:</h6>
                                 <div class="media-heading">{{ $companyName }}</div>
@@ -148,7 +158,7 @@
                             </div>
                         </div>
                         @if(isOninda() && !(setting('show_option')->resellers_invoice ?? false))
-                        <div class="mt-3 media">
+                        <div class="mt-3 media company-info">
                             <div class="media-body">
                                 <h6 class="mb-0">Sender's Information:</h6>
                                 <div class="media-heading">Name: {{ $senderName }}</div>
