@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\ImageController;
+use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\MoneyRequestController;
@@ -99,6 +100,9 @@ Route::group(['as' => 'admin.'], function (): void {
         // Coupon additional routes
         Route::get('coupons/generate-code', [CouponController::class, 'generateCode'])->name('coupons.generate-code');
         Route::post('coupons/{coupon}/toggle-status', [CouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
+
+        Route::get('leads', [LeadController::class, 'index'])->name('leads.index');
+        Route::delete('leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
 
         // Bulk variations update route
         Route::patch('products/{product}/variations/bulk-update', [ProductVariationController::class, 'bulkUpdate'])->name('products.variations.bulk-update');

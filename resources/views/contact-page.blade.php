@@ -62,7 +62,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-xl-7 col-lg-7 col-md-6 p-0">
+        <div class="p-0 col-xl-7 col-lg-7 col-md-6">
             <div class="contact-form">
                 <div class="map">
                     {!! $company->gmap_ecode ?? '[CONTACT_FORM]' !!}

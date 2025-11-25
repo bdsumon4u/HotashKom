@@ -200,7 +200,23 @@
                     <li class="sidebar-title">
                         <h6>Users</h6>
                     </li>
-
+                    <li>
+                        @php
+                            $todayLeadCount = \App\Models\Lead::whereDate('created_at', now()->toDateString())->count();
+                        @endphp
+                        <a class="nav-link menu-title link-nav d-flex align-items-center {{ request()->is('admin/leads*') ? 'active' : '' }}"
+                            href="{{ route('admin.leads.index') }}">
+                            <span class="d-flex align-items-center">
+                                <i class="me-2" data-feather="inbox"> </i>
+                                <span>Leads</span>
+                            </span>
+                            @if ($todayLeadCount > 0)
+                                <span class="ml-auto text-white d-flex badge badge-primary align-items-center">
+                                    {{ $todayLeadCount }}
+                                </span>
+                            @endif
+                        </a>
+                    </li>
                     <li>
                         <a class="nav-link menu-title link-nav {{ request()->is('admin/staffs') ? 'active' : '' }}"
                             href="{{ route('admin.staffs.index') }}">

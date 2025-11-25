@@ -14,7 +14,7 @@
 
 <div class="block">
     <div class="container">
-        <div class="document mce-content-body p-4">
+        <div class="p-4 document mce-content-body">
             {!! $page->content !!}
         </div>
     </div>

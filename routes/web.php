@@ -7,6 +7,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSectionProductController;
+use App\Http\Controllers\LeadController;
 use App\Http\Controllers\OrderTrackController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ResellerController;
@@ -103,6 +104,10 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
     Route::get('/categories/{category:slug}/products', CategoryProductController::class)->name('categories.products');
     Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
+    Route::view('/lead-form', 'leads.form')->name('leads.form');
+    Route::post('/leads', [LeadController::class, 'store'])
+        ->middleware('throttle:1,10')
+        ->name('leads.store');
 
     Route::view('/cart', 'cart')->name('cart');
     Route::match(['get', 'post'], '/checkout', CheckoutController::class)->name('checkout')->middleware(EnsureResellerIsVerified::class);
