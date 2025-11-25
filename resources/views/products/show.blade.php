@@ -238,7 +238,9 @@
              'discount_text' => setting('discount_text') ?? '<small>Discount:</small> [percent]%',
          ]) }}"
          data-is-oninda="{{ isOninda() ? 'true' : 'false' }}"
-         data-guest-can-see-price="{{ (bool)(setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}">
+         data-guest-can-see-price="{{ (bool)(setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}"
+         data-user-guest="{{ auth('user')->guest() ? 'true' : 'false' }}"
+         data-user-verified="{{ (auth('user')->check() && auth('user')->user()->is_verified) ? 'true' : 'false' }}">
         <div class="block block-products-carousel">
             <div class="container">
                 <div class="block-header">

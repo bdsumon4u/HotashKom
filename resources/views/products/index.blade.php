@@ -138,7 +138,9 @@
                                  ]) }}"
                                  data-initial-products='@json($products->pluck("id"))'
                                  data-is-oninda="{{ isOninda() ? 'true' : 'false' }}"
-                                 data-guest-can-see-price="{{ (bool)(setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}">
+                                 data-guest-can-see-price="{{ (bool)(setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}"
+                                 data-user-guest="{{ auth('user')->guest() ? 'true' : 'false' }}"
+                                 data-user-verified="{{ (auth('user')->check() && auth('user')->user()->is_verified) ? 'true' : 'false' }}">
                                 @foreach($products as $product)
                                     <div class="products-list__item">
                                         <livewire:product-card :product="$product" :key="$product->id" />

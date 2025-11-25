@@ -1,13 +1,17 @@
 <div class="product-card" data-id="{{ $product->id }}"
     data-max="{{ $product->should_track ? $product->stock_count : -1 }}">
-    @php($in_stock = !$product->should_track || $product->stock_count > 0)
+    @php
+        $in_stock = ! $product->should_track || $product->stock_count > 0;
+    @endphp
     <div class="product-card__badges-list">
         @if (!$in_stock)
             <div class="product-card__badge product-card__badge--sale">Sold</div>
         @endif
         @if ($product->price != $product->selling_price)
+            @php
+                $percent = round((($product->price - $product->selling_price) * 100) / $product->price, 0, PHP_ROUND_HALF_UP);
+            @endphp
             <div class="product-card__badge product-card__badge--sale">
-                @php($percent = round((($product->price - $product->selling_price) * 100) / $product->price, 0, PHP_ROUND_HALF_UP))
                 {!! str_replace('[percent]', $percent, setting('discount_text') ?? '<small>Discount:</small> [percent]%') !!}
             </div>
         @endif
@@ -32,13 +36,18 @@
                     Stock</span>
             @endif
         </div>
-        @php($show_option = setting('show_option'))
-        @php($guest_can_see_price = (bool)($show_option->guest_can_see_price ?? false))
+        @php
+            $show_option = setting('show_option');
+            $guest_can_see_price = (bool) ($show_option->guest_can_see_price ?? false);
+            $should_hide_price = isOninda()
+                && ! $guest_can_see_price
+                && (auth('user')->guest() || (auth('user')->check() && ! auth('user')->user()->is_verified));
+        @endphp
         <div class="product-card__prices {{ $product->selling_price == $product->price ? '' : 'has-special' }}">
-            @if(isOninda() && auth('user')->guest() && !$guest_can_see_price)
-                <span class="product-card__new-price text-danger">Login to see price</span>
-            @elseif(isOninda() && auth('user')->user() && !auth('user')->user()->is_verified && !$guest_can_see_price)
-                <small class="product-card__new-price text-danger">Verify account to see price</small>
+            @if($should_hide_price)
+                <span class="product-card__new-price text-danger">
+                    {{ auth('user')->guest() ? 'Login to see price' : 'Verify account to see price' }}
+                </span>
             @elseif ($product->selling_price == $product->price)
                 {!! $product->price ? theMoney($product->price) : 'Contact for price' !!}
             @else
