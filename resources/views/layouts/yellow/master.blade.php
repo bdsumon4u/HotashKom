@@ -690,16 +690,61 @@
         })();
     </script>
     <script>
-        runWhenJQueryReady(function ($) {
-            $(window)
-                .off('notify.storefront')
-                .on('notify.storefront', function (ev) {
-                    for (let item of ev.detail) {
-                        $.notify(item.message, {
-                            type: item.type ?? 'info',
-                        });
+        (function registerGlobalNotifyHandler() {
+            if (window.__notifyListenerRegistered) {
+                return;
+            }
+            window.__notifyListenerRegistered = true;
+
+            const queue = [];
+            let flushScheduled = false;
+
+            const flushQueue = () => {
+                if (!window.$ || typeof window.$.notify !== 'function') {
+                    // jQuery notify not ready yet, try again shortly.
+                    flushScheduled = false;
+                    setTimeout(flushQueue, 100);
+                    return;
+                }
+
+                while (queue.length) {
+                    const items = queue.shift();
+                    const itemArray = Array.isArray(items) ? items : [items];
+
+                    for (let item of itemArray) {
+                        const data = Array.isArray(item) ? item[0] : item;
+                        const message = typeof data === 'object' ? data.message : data;
+                        const type = typeof data === 'object' ? (data.type ?? 'info') : 'info';
+
+                        window.$.notify(message, { type });
                     }
-                });
+                }
+
+                flushScheduled = false;
+            };
+
+            const pushToQueue = (items) => {
+                queue.push(items);
+                if (!flushScheduled) {
+                    flushScheduled = true;
+                    queueMicrotask(flushQueue);
+                }
+            };
+
+            const registerLivewireListener = () => {
+                if (window.Livewire && window.Livewire.on) {
+                    window.Livewire.on('notify', pushToQueue);
+                }
+            };
+
+            if (window.Livewire) {
+                registerLivewireListener();
+            } else {
+                document.addEventListener('livewire:load', registerLivewireListener, { once: true });
+            }
+        })();
+
+        runWhenJQueryReady(function ($) {
 
             $(window)
                 .off('dataLayer.storefront')
@@ -921,12 +966,12 @@
                             window.Livewire.dispatch('cartUpdated');
                         }
 
-                        // Dispatch jQuery event for notifications
-                        if (window.$) {
-                            const event = new CustomEvent('notify', {
-                                detail: [{ message: 'Product added to cart' }]
-                            });
-                            window.dispatchEvent(event);
+                        if (window.Livewire) {
+                            window.Livewire.dispatch('notify', { message: 'Product added to cart' });
+                        } else if (window.$) {
+                            window.$.notify('Product added to cart');
+                        } else {
+                            alert('Product added to cart');
                         }
 
                         // If this was an "Order Now" action, redirect to checkout
@@ -940,13 +985,13 @@
                         console.error('Failed to add product to cart:', data.message);
 
                         // Show error notification
-                        if (window.$) {
-                            const event = new CustomEvent('notify', {
-                                detail: [{ message: 'Failed to add product to cart: ' + (data.message || 'Unknown error'), type: 'error' }]
-                            });
-                            window.dispatchEvent(event);
+                        const errorMessage = 'Failed to add product to cart: ' + (data.message || 'Unknown error');
+                        if (window.Livewire) {
+                            window.Livewire.dispatch('notify', { message: errorMessage, type: 'error' });
+                        } else if (window.$) {
+                            window.$.notify(errorMessage, { type: 'error' });
                         } else {
-                            alert('Failed to add product to cart: ' + (data.message || 'Unknown error'));
+                            alert(errorMessage);
                         }
                     }
                 })

@@ -227,6 +227,10 @@ class Checkout extends Component
 
     public function mount(): void
     {
+        if (isOninda() && auth('user')->guest()) {
+            $this->redirect(route('user.login'), navigate: true);
+        }
+
         // if (!(setting('show_option')->hide_phone_prefix ?? false)) {
         //     $this->phone = '+880';
         // }
@@ -266,12 +270,6 @@ class Checkout extends Component
 
     public function checkout()
     {
-        if (isOninda() && auth('user')->guest()) {
-            $this->dispatch('notify', ['message' => 'Please login to add product to cart', 'type' => 'error']);
-
-            return to_route('user.login')->with('danger', 'Please login to add product to cart');
-        }
-
         if (! ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)) {
             if (Str::startsWith($this->phone, '01')) {
                 $this->phone = Str::after($this->phone, '0');
