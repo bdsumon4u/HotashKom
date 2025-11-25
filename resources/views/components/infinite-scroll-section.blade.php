@@ -30,7 +30,9 @@
                                      'order_now_text' => setting('show_option')->order_now_text ?? 'Order Now',
                                  ]) }}"
                                  data-is-oninda="{{ isOninda() ? 'true' : 'false' }}"
-                                 data-guest-can-see-price="{{ (bool)(setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}">
+                                 data-guest-can-see-price="{{ (bool)(setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}"
+                                 data-user-guest="{{ auth('user')->guest() ? 'true' : 'false' }}"
+                                 data-user-verified="{{ (auth('user')->check() && auth('user')->user()->is_verified) ? 'true' : 'false' }}">
                                 <!-- Products will be loaded here by Alpine.js -->
                             </div>
                         </div>
@@ -191,12 +193,15 @@ function infiniteScroll(sectionId) {
                          }
                      }
 
-                     // Generate price HTML based on platform and settings
+                     const userIsGuest = this.getUserIsGuest();
+                     const userIsVerified = this.getUserIsVerified();
+                     const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !userIsVerified);
+
                      let priceHTML = '';
-                     if (isOninda && !guestCanSeePrice) {
-                         priceHTML = '<span class="product-card__new-price text-danger">Login to see price</span>';
-                     } else if (isOninda && guestCanSeePrice) {
-                         priceHTML = '<small class="product-card__new-price text-danger">Verify account to see price</small>';
+                     if (shouldHidePrice) {
+                         priceHTML = `<span class="product-card__new-price text-danger">${
+                             userIsGuest ? 'Login to see price' : 'Verify account to see price'
+                         }</span>`;
                      } else if (hasDiscount) {
                          priceHTML = `<span class="product-card__new-price">Tk. ${productSellingPrice}</span><span class="product-card__old-price">Tk. ${productPrice}</span>`;
                      } else {
@@ -260,6 +265,16 @@ function infiniteScroll(sectionId) {
                      // Get guest_can_see_price value from the component's data attributes
                      const container = document.querySelector(`#products-container-${this.sectionId}`);
                      return container && container.dataset.guestCanSeePrice === 'true';
+                 },
+
+                 getUserIsGuest() {
+                     const container = document.querySelector(`#products-container-${this.sectionId}`);
+                     return container && container.dataset.userGuest === 'true';
+                 },
+
+                 getUserIsVerified() {
+                     const container = document.querySelector(`#products-container-${this.sectionId}`);
+                     return container && container.dataset.userVerified === 'true';
                  },
 
 

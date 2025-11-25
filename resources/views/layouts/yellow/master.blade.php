@@ -456,6 +456,9 @@
                             const showOption = JSON.parse(this.$el.dataset.showOption || '{}');
                             const isOninda = this.$el.dataset.isOninda === 'true';
                             const guestCanSeePrice = this.$el.dataset.guestCanSeePrice === 'true';
+                            const userIsGuest = this.$el.dataset.userGuest === 'true';
+                            const userIsVerified = this.$el.dataset.userVerified === 'true';
+                            const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !userIsVerified);
 
                             const formatPrice = (price) => {
                                 return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
@@ -490,10 +493,10 @@
                             }
 
                             let priceHTML = '';
-                            if (isOninda && !guestCanSeePrice) {
-                                priceHTML = '<span class="product-card__new-price text-danger">Login to see price</span>';
-                            } else if (isOninda && guestCanSeePrice) {
-                                priceHTML = '<small class="product-card__new-price text-danger">Verify account to see price</small>';
+                            if (shouldHidePrice) {
+                                priceHTML = `<span class="product-card__new-price text-danger">${
+                                    userIsGuest ? 'Login to see price' : 'Verify account to see price'
+                                }</span>`;
                             } else if (hasDiscount) {
                                 priceHTML = `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
                             } else {
@@ -1291,6 +1294,9 @@
                         const showOption = this.getShowOption();
                         const isOninda = this.getIsOninda();
                         const guestCanSeePrice = this.getGuestCanSeePrice();
+                        const userIsGuest = this.getUserIsGuest();
+                        const userIsVerified = this.getUserIsVerified();
+                        const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !userIsVerified);
 
                         const formatPrice = (price) => {
                             return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
@@ -1324,12 +1330,12 @@
                             }
                         }
 
-                        let priceHTML = '';
-                        if (isOninda && !guestCanSeePrice) {
-                            priceHTML = '<span class="product-card__new-price text-danger">Login to see price</span>';
-                        } else if (isOninda && guestCanSeePrice) {
-                            priceHTML = '<small class="product-card__new-price text-danger">Verify account to see price</small>';
-                        } else if (hasDiscount) {
+                            let priceHTML = '';
+                            if (shouldHidePrice) {
+                                priceHTML = `<span class="product-card__new-price text-danger">${
+                                    userIsGuest ? 'Login to see price' : 'Verify account to see price'
+                                }</span>`;
+                            } else if (hasDiscount) {
                             priceHTML = `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
                         } else {
                             priceHTML = formatPrice(productSellingPrice);
@@ -1389,6 +1395,16 @@
                     getGuestCanSeePrice() {
                         const container = this.getContainer();
                         return container && container.dataset.guestCanSeePrice === 'true';
+                    },
+
+                    getUserIsGuest() {
+                        const container = this.getContainer();
+                        return container && container.dataset.userGuest === 'true';
+                    },
+
+                    getUserIsVerified() {
+                        const container = this.getContainer();
+                        return container && container.dataset.userVerified === 'true';
                     },
 
                     getShuffleSeed() {

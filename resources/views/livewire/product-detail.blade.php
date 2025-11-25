@@ -15,14 +15,19 @@
             </div>
         </div>
         @php $show_option = setting('show_option') @endphp
-        @php $guest_can_see_price = (bool)($show_option->guest_can_see_price ?? false) @endphp
+        @php
+            $guest_can_see_price = (bool) ($show_option->guest_can_see_price ?? false);
+            $should_hide_price = isOninda()
+                && ! $guest_can_see_price
+                && (auth('user')->guest() || (auth('user')->check() && ! auth('user')->user()->is_verified));
+        @endphp
         <div
             class="product__prices mb-1 {{ ($selling = $selectedVar->getPrice($quantity)) == $selectedVar->price ? '' : 'has-special' }}">
             Price:
-            @if(isOninda() && auth('user')->guest() && !$guest_can_see_price)
-                <span class="product-card__new-price text-danger">Login to see price</span>
-            @elseif(isOninda() && auth('user')->user() && !auth('user')->user()->is_verified && !$guest_can_see_price)
-                <span class="product-card__new-price text-danger">Verify account to see price</span>
+            @if($should_hide_price)
+                <span class="product-card__new-price text-danger">
+                    {{ auth('user')->guest() ? 'Login to see price' : 'Verify account to see price' }}
+                </span>
             @elseif ($selling == $selectedVar->price)
                 {!! $selling ? theMoney($selectedVar->price) : 'Contact Us' !!}
             @else
