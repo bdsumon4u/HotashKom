@@ -1,6 +1,89 @@
 @extends('layouts.light.master')
 @section('title', 'Leads')
 
+@push('css')
+    <style>
+        @media print {
+            html,
+            body {
+                height: 100vh;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden;
+            }
+
+            .main-nav,
+            .page-main-header,
+            .footer,
+            .card-header,
+            .dt-buttons,
+            .dataTables_paginate,
+            .dataTables_info,
+            .dataTables_filter,
+            .dataTables_length,
+            .no-print {
+                display: none !important;
+                width: 0 !important;
+            }
+
+            .page-body {
+                font-size: 16px;
+                margin-top: 0 !important;
+                margin-left: 0 !important;
+                page-break-after: always;
+            }
+
+            .container-fluid {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .card-body {
+                padding: 10px 0 !important;
+            }
+
+            .table {
+                border-collapse: collapse !important;
+                width: 100% !important;
+            }
+
+            .table th,
+            .table td {
+                border: 1px solid #000 !important;
+                padding: 8px !important;
+                text-align: left !important;
+            }
+
+            .table thead th {
+                background-color: #f8f9fa !important;
+                font-weight: bold !important;
+            }
+
+            .table th:last-child,
+            .table td:last-child {
+                display: none !important;
+            }
+
+            /* Force-hide any card headers and their contents on print */
+            .card-header,
+            .card-header * {
+                display: none !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+@endpush
+
 @section('breadcrumb-title')
 <h3>Leads</h3>
 @endsection
@@ -13,7 +96,7 @@
 <div class="mb-5 row">
     <div class="col-sm-12">
         <div class="shadow-sm card rounded-0">
-            <div class="gap-2 card-header d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+            <div class="gap-2 card-header d-flex flex-column flex-md-row align-items-md-center justify-content-between no-print">
                 <div>
                     <strong>Lead</strong><small>Submissions</small>
                 </div>
