@@ -102,6 +102,7 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::post('coupons/{coupon}/toggle-status', [CouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
 
         Route::get('leads', [LeadController::class, 'index'])->name('leads.index');
+        Route::delete('leads/bulk-destroy', [LeadController::class, 'bulkDestroy'])->name('leads.bulk-destroy');
         Route::delete('leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
 
         // Bulk variations update route

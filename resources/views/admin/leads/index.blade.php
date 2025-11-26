@@ -81,12 +81,39 @@
                 padding: 0 !important;
             }
         }
+
+        /* Slightly larger checkboxes for leads table */
+        #select-all-leads,
+        .lead-select {
+            width: 1.1rem;
+            height: 1.1rem;
+        }
+        }
     </style>
 @endpush
 
 @section('breadcrumb-title')
 <h3>Leads</h3>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var selectAll = document.getElementById('select-all-leads');
+            var checkboxes = document.querySelectorAll('.lead-select');
+
+            if (!selectAll) {
+                return;
+            }
+
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = selectAll.checked;
+                });
+            });
+        });
+    </script>
+@endpush
 
 @section('breadcrumb-items')
 <li class="breadcrumb-item">Leads</li>
@@ -113,49 +140,75 @@
                     {{ session('status') }}
                 </div>
                 @endif
-                <div class="table-responsive">
-                    <table class="table align-middle table-bordered table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Shop</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Message</th>
-                                <th>Submitted At</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($leads as $lead)
-                            <tr>
-                                <td>{{ $leads->firstItem() + $loop->index }}</td>
-                                <td>{{ $lead->name }}</td>
-                                <td>{{ $lead->shop_name ?? '—' }}</td>
-                                <td>{{ $lead->email ?? '—' }}</td>
-                                <td>{{ $lead->phone }}</td>
-                                <td style="max-width: 320px;">{{ $lead->message }}</td>
-                                <td>{{ $lead->created_at->format('d M Y h:i A') }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('admin.leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('Delete this lead?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="8" class="text-center text-danger">No leads found.</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-3">
-                    {{ $leads->links() }}
-                </div>
+                <form action="{{ route('admin.leads.bulk-destroy') }}" method="POST" id="bulk-delete-form">
+                    @csrf
+                    @method('DELETE')
+                    <div class="table-responsive">
+                        <table class="table align-middle table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="select-all-leads">
+                                    </th>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Shop</th>
+                                    <th>District</th>
+                                    <th>Contact</th>
+                                    <th>Submitted At</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($leads as $lead)
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="ids[]" value="{{ $lead->id }}" class="lead-select">
+                                    </td>
+                                    <td>{{ $leads->firstItem() + $loop->index }}</td>
+                                    <td>{{ $lead->name }}</td>
+                                    <td>{{ $lead->shop_name ?? '—' }}</td>
+                                    <td>{{ $lead->district ?? '—' }}</td>
+                                    <td>
+                                        @if($lead->email)
+                                            <div>{{ $lead->email }}</div>
+                                        @endif
+                                        @if($lead->phone)
+                                            <div>{{ $lead->phone }}</div>
+                                        @endif
+                                        @if(! $lead->email && ! $lead->phone)
+                                            —
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div>{{ $lead->created_at->format('d M Y') }}</div>
+                                        <div>{{ $lead->created_at->format('h:i A') }}</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <form action="{{ route('admin.leads.destroy', $lead) }}" method="POST" onsubmit="return confirm('Delete this lead?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="9" class="text-center text-danger">No leads found.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete selected leads?');">
+                            Delete Selected
+                        </button>
+                        <div>
+                            {{ $leads->links() }}
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="p-3 card-footer">
                 Lead Form: <a href="{{ route('leads.form') }}" target="_blank">

@@ -30,6 +30,7 @@ class StoreLeadRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:120'],
             'shop_name' => ['nullable', 'string', 'max:150'],
+            'district' => ['required', 'string', 'max:120'],
             'email' => ['nullable', 'email', 'max:150'],
             'phone' => $phoneRules,
             'message' => ['nullable', 'string', 'max:1000'],

@@ -3,8 +3,8 @@
 @section('content')
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="border-0 shadow-sm card">
+        <div class="col-lg-10">
+            <div class="shadow-sm card">
                 <div class="p-4 card-body p-md-5">
                     <h1 class="mb-1 h4">Register Your Interest</h1>
                     <p class="mb-4 text-muted">Share your details and we will reach out with the next steps.</p>
@@ -18,7 +18,7 @@
                     <form action="{{ route('leads.store') }}" method="POST" novalidate>
                         @csrf
                         <div class="row">
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-4 form-group">
                                 <label for="lead-name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input
                                     type="text"
@@ -33,7 +33,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-4 form-group">
                                 <label for="lead-shop-name" class="form-label">Shop Name</label>
                                 <input
                                     type="text"
@@ -44,6 +44,20 @@
                                     placeholder="Business name (optional)"
                                 >
                                 @error('shop_name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label for="lead-district" class="form-label">District <span class="text-danger">*</span></label>
+                                <input
+                                    type="text"
+                                    id="lead-district"
+                                    name="district"
+                                    class="form-control @error('district') is-invalid @enderror"
+                                    value="{{ old('district') }}"
+                                    placeholder="District"
+                                >
+                                @error('district')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -73,19 +87,6 @@
                                     required
                                 >
                                 @error('phone')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12 form-group">
-                                <label for="lead-message" class="form-label">Message To Us</label>
-                                <textarea
-                                    id="lead-message"
-                                    name="message"
-                                    rows="5"
-                                    class="form-control @error('message') is-invalid @enderror"
-                                    placeholder="Tell us about your business, requirements or questions"
-                                >{{ old('message') }}</textarea>
-                                @error('message')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

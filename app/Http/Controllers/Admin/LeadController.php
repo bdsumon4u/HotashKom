@@ -30,6 +30,20 @@ class LeadController extends Controller
         return view('admin.leads.index', compact('leads', 'search'));
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'ids' => ['required', 'array'],
+            'ids.*' => ['integer', 'exists:leads,id'],
+        ]);
+
+        Lead::whereIn('id', $validated['ids'])->delete();
+
+        return redirect()
+            ->route('admin.leads.index')
+            ->with('status', 'Selected leads removed successfully.');
+    }
+
     public function destroy(Lead $lead): RedirectResponse
     {
         $lead->delete();
