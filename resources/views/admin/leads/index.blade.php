@@ -88,6 +88,9 @@
             width: 1.1rem;
             height: 1.1rem;
         }
+
+        .lead-header-action {
+            min-width: 130px;
         }
     </style>
 @endpush
@@ -101,16 +104,35 @@
         document.addEventListener('DOMContentLoaded', function () {
             var selectAll = document.getElementById('select-all-leads');
             var checkboxes = document.querySelectorAll('.lead-select');
+            var printButton = document.getElementById('printButton');
+            var printHeader = document.querySelector('.print-header');
+            var elementsToToggle = document.querySelectorAll('.main-nav, .page-main-header, .footer, .card-header, .dt-buttons, .dataTables_paginate, .dataTables_info, .dataTables_filter, .dataTables_length');
 
-            if (!selectAll) {
-                return;
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    checkboxes.forEach(function (checkbox) {
+                        checkbox.checked = selectAll.checked;
+                    });
+                });
             }
 
-            selectAll.addEventListener('change', function () {
-                checkboxes.forEach(function (checkbox) {
-                    checkbox.checked = selectAll.checked;
+            if (printButton && printHeader) {
+                printButton.addEventListener('click', function () {
+                    printHeader.style.display = 'block';
+                    elementsToToggle.forEach(function (el) {
+                        el?.classList?.add('no-print');
+                    });
+
+                    window.print();
+
+                    setTimeout(function () {
+                        printHeader.style.display = 'none';
+                        elementsToToggle.forEach(function (el) {
+                            el?.classList?.remove('no-print');
+                        });
+                    }, 500);
                 });
-            });
+            }
         });
     </script>
 @endpush
@@ -127,14 +149,23 @@
                 <div>
                     <strong>Lead</strong><small>Submissions</small>
                 </div>
-                <form action="{{ route('admin.leads.index') }}" method="GET" class="w-100 w-md-auto">
-                    <div class="input-group">
-                        <input type="text" name="search" value="{{ $search }}" class="form-control" placeholder="Search name, shop, email or phone">
-                        <button class="btn btn-primary" type="submit">Search</button>
-                    </div>
-                </form>
+                <div class="gap-2 d-flex flex-column flex-md-row align-items-stretch w-100 w-md-auto" style="gap: 0.5rem;">
+                    <form action="{{ route('admin.leads.index') }}" method="GET" class="flex-fill">
+                        <div class="gap-2 d-flex flex-column flex-md-row" style="gap: 0.5rem;">
+                            <input type="text" name="search" value="{{ $search }}" class="form-control" placeholder="Search name, shop, email or phone">
+                            <button class="btn btn-primary lead-header-action" type="submit">Search</button>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-outline-primary lead-header-action" id="printButton">
+                        <i class="fa fa-print me-1"></i> Print
+                    </button>
+                </div>
             </div>
             <div class="p-3 card-body">
+                <div class="mb-3 print-header" style="display: none;">
+                    <h1 class="mb-1 h4">Leads Report</h1>
+                    <div class="text-muted">Generated on: {{ now()->format('F j, Y \a\t g:i A') }}</div>
+                </div>
                 @if (session('status'))
                 <div class="mb-3 alert alert-success" role="alert">
                     {{ session('status') }}
@@ -219,4 +250,3 @@
     </div>
 </div>
 @endsection
-
