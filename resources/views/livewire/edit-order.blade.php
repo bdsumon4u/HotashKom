@@ -326,11 +326,17 @@
 
                 @if ($order->exists && config('services.courier_report.cheap'))
                 <h5 class="mt-3">Courier Report</h5>
-                <div style="height: 645px; overflow: hidden; position: relative;">
-                    @if (Carbon::parse(config('services.courier_report.expires'))->isPast())
-                    <div class="alert alert-danger">Courier Report API Expired</div>
+                <div wire:init="loadCheapCourierReport">
+                    @if ($cheapCourierReportLoaded)
+                        <div style="height: 645px; overflow: hidden; position: relative;">
+                            @if (Carbon::parse(config('services.courier_report.expires'))->isPast())
+                                <div class="alert alert-danger">Courier Report API Expired</div>
+                            @else
+                                <iframe src="https://www.bdcommerce.app/tools/delivery-fraud-check/{{ $order->phone }}" width="1200" height="800" scrolling="no" style="position: absolute; top: -110px; left: -580px; overflow: hidden;"></iframe>
+                            @endif
+                        </div>
                     @else
-                    <iframe src="https://www.bdcommerce.app/tools/delivery-fraud-check/{{$order->phone}}" width="1200" height="800" scrolling="no" style="position: absolute; top: -110px; left: -580px; overflow: hidden;"></iframe>
+                        <div class="py-4 text-center text-muted">Loading courier report...</div>
                     @endif
                 </div>
                 @endif
@@ -503,116 +509,124 @@
                 </div>
             </div>
             @endif
-            <div class="shadow-sm card rounded-0">
+            <div class="shadow-sm card rounded-0" wire:init="loadActivities">
                 <div class="p-3 card-header">
                     <h5 class="card-title">Activities</h5>
                 </div>
                 <div class="p-3 card-body">
-                    {{-- Accordion --}}
-                    <div id="accordion">
-                        @foreach ($order->activities()->latest()->get() as $activity)
-                            <div class="mb-1 shadow-sm card rounded-0">
-                                <div class="px-3 py-2 card-header" id="heading{{ $activity->id }}">
-                                    <a class="text-dark" data-toggle="collapse"
-                                        href="#collapse-{{ $activity->id }}">
-                                        <div class="pb-1 mb-1 border-bottom text-primary">{{ $activity->description }}
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <div><i
-                                                    class="mr-1 fa fa-user"></i>{{ $activity->causer->name ?? 'System' }}
+                    @if ($activitiesLoaded)
+                        {{-- Accordion --}}
+                        <div id="accordion">
+                            @foreach ($activities as $activity)
+                                <div class="mb-1 shadow-sm card rounded-0">
+                                    <div class="px-3 py-2 card-header" id="heading{{ $activity->id }}">
+                                        <a class="text-dark" data-toggle="collapse"
+                                            href="#collapse-{{ $activity->id }}">
+                                            <div class="pb-1 mb-1 border-bottom text-primary">{{ $activity->description }}
                                             </div>
-                                            <div><i
-                                                    class="mr-1 fa fa-clock-o"></i>{{ $activity->created_at->format('d-M-Y h:i A') }}
+                                            <div class="d-flex justify-content-between">
+                                                <div><i
+                                                        class="mr-1 fa fa-user"></i>{{ $activity->causer->name ?? 'System' }}
+                                                </div>
+                                                <div><i
+                                                        class="mr-1 fa fa-clock-o"></i>{{ $activity->created_at->format('d-M-Y h:i A') }}
+                                                </div>
                                             </div>
-                                        </div>
-                                    </a>
-                                </div>
+                                        </a>
+                                    </div>
 
-                                <div id="collapse-{{ $activity->id }}" class="collapse" data-parent="#accordion">
-                                    <div class="p-3 card-body">
-                                        <table class="table table-responsive">
-                                            <tbody>
-                                                @if ($activity->changes['old'] ?? false)
-                                                    <tr>
-                                                        <th class="text-center">OLD</th>
-                                                        <th class="text-center">NEW</th>
-                                                    </tr>
-                                                @endif
-                                                <tr>
+                                    <div id="collapse-{{ $activity->id }}" class="collapse" data-parent="#accordion">
+                                        <div class="p-3 card-body">
+                                            <table class="table table-responsive">
+                                                <tbody>
                                                     @if ($activity->changes['old'] ?? false)
-                                                        <td>
-                                                            <pre><div class="language-php">{{ getData($activity->changes['old'] ?? []) }}</div></pre>
-                                                        </td>
+                                                        <tr>
+                                                            <th class="text-center">OLD</th>
+                                                            <th class="text-center">NEW</th>
+                                                        </tr>
                                                     @endif
-                                                    <td>
-                                                        <pre><div class="language-php">{{ getData($activity->changes['attributes'] ?? []) }}</div></pre>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                    <tr>
+                                                        @if ($activity->changes['old'] ?? false)
+                                                            <td>
+                                                                <pre><div class="language-php">{{ getData($activity->changes['old'] ?? []) }}</div></pre>
+                                                            </td>
+                                                        @endif
+                                                        <td>
+                                                            <pre><div class="language-php">{{ getData($activity->changes['attributes'] ?? []) }}</div></pre>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
-                    </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="py-4 text-center text-muted">Loading activities...</div>
+                    @endif
                 </div>
             </div>
             @if (config('services.courier_report.url') && config('services.courier_report.key'))
-                <div class="shadow-sm card rounded-0">
+                <div class="shadow-sm card rounded-0" wire:init="loadCourierReport">
                     <div class="p-3 card-header">
                         <h5 class="card-title">Courier Report</h5>
                     </div>
                     <div class="p-3 card-body">
-                        @if (is_string($this->courier_report))
-                            <div class="alert alert-danger">{{ $this->courier_report }}</div>
-                            <div class="alert alert-danger">Please wait 5 minutes</div>
-                        @else
-                            <div class="flex-wrap d-flex" style="column-gap: 1rem;">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Courier</th>
-                                                <th>Total</th>
-                                                <th class="bg-success">Delivered</th>
-                                                <th class="bg-danger">Failed</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (['Pathao', 'SteadFast', 'RedX', 'PaperFly'] as $provider)
-                                                @php($report = $this->courier_report['courierData'][strtolower($provider)])
+                        @if ($courierReportLoaded)
+                            @if (is_string($this->courier_report))
+                                <div class="alert alert-danger">{{ $this->courier_report }}</div>
+                                <div class="alert alert-danger">Please wait 5 minutes</div>
+                            @else
+                                <div class="flex-wrap d-flex" style="column-gap: 1rem;">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
                                                 <tr>
-                                                    <th>{{ $provider }}</th>
-                                                    <td class="font-weight-bold">{{ $report['total_parcel'] }}</td>
-                                                    <td class="font-weight-bold bg-success">
-                                                        {{ $report['success_parcel'] }}</td>
-                                                    <td class="font-weight-bold bg-danger">
-                                                        {{ $report['cancelled_parcel'] }}</td>
+                                                    <th>Courier</th>
+                                                    <th>Total</th>
+                                                    <th class="bg-success">Delivered</th>
+                                                    <th class="bg-danger">Failed</th>
                                                 </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div style="flex: 1;display: flex;flex-direction: column;justify-content: center;"
-                                    class="p-2 border font-weight-bold">
-                                    @php($summary = $this->courier_report['courierData']['summary'])
-                                    @php($failure = $summary['total_parcel'] > 0 ? number_format(($summary['cancelled_parcel'] / $summary['total_parcel']) * 100, 2) : 0)
-                                    <div class="px-3 py-1 my-1 text-center border border-secondary">Summary:</div>
-                                    <div class="px-3 py-2 my-1 bg-success">Delivered: {{ $summary['success_parcel'] }}
-                                        ({{ $summary['success_ratio'] }}%)</div>
-                                    <div class="px-3 py-2 my-1 bg-danger">Failed: {{ $summary['cancelled_parcel'] }}
-                                        ({{ $failure }}%)</div>
-                                    <div class="d-flex">
-                                        <div class="px-1 py-2 my-1 text-center bg-success text-nowrap w-100"
-                                            @if (round($summary['success_ratio']) > 0) style="width: {{ $summary['success_ratio'] }}% !important;" @endif
-                                            title="Success Rate: {{ $summary['success_ratio'] }}%">
-                                            {{ $summary['success_ratio'] }}%</div>
-                                        <div class="px-1 py-2 my-1 text-center bg-danger text-nowrap w-100"
-                                            @if (round($failure) > 0) style="width: {{ $failure }}% !important;" @endif
-                                            title="Failure Rate: {{ $failure }}%">{{ $failure }}%</div>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (['Pathao', 'SteadFast', 'RedX', 'PaperFly'] as $provider)
+                                                    @php($report = data_get($this->courier_report, 'courierData.' . strtolower($provider)))
+                                                    <tr>
+                                                        <th>{{ $provider }}</th>
+                                                        <td class="font-weight-bold">{{ data_get($report, 'total_parcel', 0) }}</td>
+                                                        <td class="font-weight-bold bg-success">
+                                                            {{ data_get($report, 'success_parcel', 0) }}</td>
+                                                        <td class="font-weight-bold bg-danger">
+                                                            {{ data_get($report, 'cancelled_parcel', 0) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div style="flex: 1;display: flex;flex-direction: column;justify-content: center;"
+                                        class="p-2 border font-weight-bold">
+                                        @php($summary = data_get($this->courier_report, 'courierData.summary'))
+                                        @php($failure = data_get($summary, 'total_parcel', 0) > 0 ? number_format((data_get($summary, 'cancelled_parcel', 0) / data_get($summary, 'total_parcel', 1)) * 100, 2) : 0)
+                                        <div class="px-3 py-1 my-1 text-center border border-secondary">Summary:</div>
+                                        <div class="px-3 py-2 my-1 bg-success">Delivered: {{ data_get($summary, 'success_parcel', 0) }}
+                                            ({{ data_get($summary, 'success_ratio', 0) }}%)</div>
+                                        <div class="px-3 py-2 my-1 bg-danger">Failed: {{ data_get($summary, 'cancelled_parcel', 0) }}
+                                            ({{ $failure }}%)</div>
+                                        <div class="d-flex">
+                                            <div class="px-1 py-2 my-1 text-center bg-success text-nowrap w-100"
+                                                @if (round(data_get($summary, 'success_ratio', 0)) > 0) style="width: {{ data_get($summary, 'success_ratio', 0) }}% !important;" @endif
+                                                title="Success Rate: {{ data_get($summary, 'success_ratio', 0) }}%">
+                                                {{ data_get($summary, 'success_ratio', 0) }}%</div>
+                                            <div class="px-1 py-2 my-1 text-center bg-danger text-nowrap w-100"
+                                                @if (round($failure) > 0) style="width: {{ $failure }}% !important;" @endif
+                                                title="Failure Rate: {{ $failure }}%">{{ $failure }}%</div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
+                        @else
+                            <div class="py-4 text-center text-muted">Loading courier report...</div>
                         @endif
                     </div>
                 </div>
