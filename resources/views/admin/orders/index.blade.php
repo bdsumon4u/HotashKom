@@ -128,13 +128,13 @@
                                     @if(isOninda() || isReseller())
                                     <th width="80">Source</th>
                                     @endif
-                                    <th>Customer</th>
-                                    <th style="min-width: 250px;">Products</th>
+                                    <th style="min-width: 150px; max-width: 250px;">Customer</th>
+                                    <th style="min-width: 250px; max-width: 350px;">Products</th>
                                     <th width="10">Amount</th>
                                     <th>Status</th>
                                     <th>Courier</th>
                                     <th>Staff</th>
-                                    <th style="white-space: nowrap; min-width: 150px;">Date and Time</th>
+                                    <th style="white-space: nowrap; min-width: 125px;">Date and Time</th>
                                     @if(auth()->user()->is('admin'))
                                     <th width="10">Action</th>
                                     @endif

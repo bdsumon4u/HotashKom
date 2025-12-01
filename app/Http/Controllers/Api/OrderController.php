@@ -138,7 +138,7 @@ class OrderController extends Controller
                     <div>
                         <div style='white-space:nowrap;'><i class='mr-1 fa fa-user'></i>{$row->name}</div>
                         <div style='white-space:nowrap;'><i class='mr-1 fa fa-phone'></i><a href='tel:{$row->phone}'>".without88($row->phone)."</a></div>
-                        <div style='white-space:nowrap;'><i class='mr-1 fa fa-map-marker'></i>{$row->address}</div>".
+                        <div style=''><i class='mr-1 fa fa-map-marker'></i>{$row->address}</div>".
                 ($row->note ? "<div class='text-danger'><i class='mr-1 fa fa-sticky-note-o'></i>{$row->note}</div>" : '').
                 '</div>')
             ->editColumn('products', function ($row) {
