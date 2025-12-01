@@ -113,6 +113,7 @@ $(function() {
         serverSide: true,
         ajax: $('#product-table').data('url'),
         columns: columns,
+        lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
         // No default order, use backend or DataTable default
     });
 });

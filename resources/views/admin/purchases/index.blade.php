@@ -175,6 +175,7 @@ $(document).ready(function() {
         ],
         order: [[0, 'desc']],
         pageLength: 15,
+        lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
         language: {
             processing: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>'
         }

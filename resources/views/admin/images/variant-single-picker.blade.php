@@ -77,6 +77,7 @@
         order: [
             [0, 'desc']
         ],
+        lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
     });
 
     tableVariantSingle{{ $variationId }}.on('draw', function () {

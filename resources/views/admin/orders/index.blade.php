@@ -322,6 +322,7 @@
                 // [1, 'desc']
             ],
             pageLength: 50,
+            lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
         });
 
         $(document).on('change', '.status-column', changeStatus);

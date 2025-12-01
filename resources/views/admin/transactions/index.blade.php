@@ -225,6 +225,7 @@
                 [3, 'desc']
             ],
             pageLength: 50,
+            lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
         });
 
         // Handle withdraw form submission
