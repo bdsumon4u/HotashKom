@@ -36,7 +36,22 @@ class OrderController extends Controller
             $orders->where('orders.phone', $request->phone);
         }
 
-        if ($request->status) {
+        // Check if any search is active in DataTables
+        $hasSearch = ! empty($request->input('search.value'));
+
+        // Check if any column has a search value
+        if (! $hasSearch && $request->has('columns')) {
+            $columns = $request->input('columns', []);
+            foreach ($columns as $column) {
+                if (! empty($column['search']['value'] ?? '')) {
+                    $hasSearch = true;
+                    break;
+                }
+            }
+        }
+
+        // Only apply status filter if no search is active
+        if ($request->status && ! $hasSearch) {
             $orders->where('orders.status', $request->status);
         }
 
