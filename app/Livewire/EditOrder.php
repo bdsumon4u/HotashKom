@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
@@ -84,6 +85,14 @@ class EditOrder extends Component
 
     public $options = [];
 
+    public bool $activitiesLoaded = false;
+
+    public Collection $activities;
+
+    public bool $courierReportLoaded = false;
+
+    public bool $cheapCourierReportLoaded = false;
+
     public function getCourierReportProperty()
     {
         $expires = config('services.courier_report.expires');
@@ -128,6 +137,7 @@ class EditOrder extends Component
     {
         $this->order = $order;
         $this->fill($this->order->only($this->attrs));
+        $this->activities = collect();
 
         // Cast meta data to proper types
         $this->discount = (int) ($this->order->data['discount'] ?? 0);
@@ -408,6 +418,31 @@ class EditOrder extends Component
                 'remember_token' => Str::random(10),
             ])
         );
+    }
+
+    public function loadActivities(): void
+    {
+        if ($this->activitiesLoaded) {
+            return;
+        }
+
+        $this->activities = $this->order
+            ->activities()
+            ->with('causer')
+            ->latest()
+            ->get();
+
+        $this->activitiesLoaded = true;
+    }
+
+    public function loadCourierReport(): void
+    {
+        $this->courierReportLoaded = true;
+    }
+
+    public function loadCheapCourierReport(): void
+    {
+        $this->cheapCourierReportLoaded = true;
     }
 
     public function render()
