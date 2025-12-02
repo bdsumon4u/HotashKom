@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8e8d004c74616f169cd25550551426f4",
+    "content-hash": "8ca0afa910a76bb6fa2683afff5d3378",
     "packages": [
         {
             "name": "amidesfahani/filament-tinyeditor",
@@ -887,6 +887,73 @@
                 }
             ],
             "time": "2024-02-09T16:56:22+00:00"
+        },
+        {
+            "name": "codebyray/laravel-review-rateable",
+            "version": "v2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/codebyray/laravel-review-rateable.git",
+                "reference": "b80d6d82673482480496ede490024c0de67007f7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/codebyray/laravel-review-rateable/zipball/b80d6d82673482480496ede490024c0de67007f7",
+                "reference": "b80d6d82673482480496ede490024c0de67007f7",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "^10.0 || ^11.0 || ^12.0",
+                "illuminate/database": "^10.0 || ^11.0 || ^12.0",
+                "illuminate/support": "^10.0 || ^11.0 || ^12.0",
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.23 || ^7.0 || ^8.0 || ^9.0 || ^10.0",
+                "pestphp/pest": "^1.20 || ^2.0 || ^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Codebyray\\ReviewRateable\\ReviewRateableServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Codebyray\\ReviewRateable\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CodebyRay",
+                    "email": "dev@codebyray.com"
+                }
+            ],
+            "description": "Review & Rating system for Laravel 10, 11 & 12",
+            "keywords": [
+                "Ratable",
+                "Rating",
+                "Review-Rateable",
+                "laravel",
+                "reviewable"
+            ],
+            "support": {
+                "issues": "https://github.com/codebyray/laravel-review-rateable/issues",
+                "source": "https://github.com/codebyray/laravel-review-rateable/tree/v2.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/codebyray",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-07-15T00:47:54+00:00"
         },
         {
             "name": "composer/pcre",

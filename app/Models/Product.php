@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Codebyray\ReviewRateable\Traits\ReviewRateable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Laravel\Scout\Searchable;
 use Nicolaslopezj\Searchable\SearchableTrait;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
@@ -14,6 +16,7 @@ class Product extends Model
 {
     use HasFactory;
     use HasSEO;
+    use ReviewRateable;
     use Searchable;
     // use SearchableTrait;
 
@@ -394,5 +397,13 @@ class Product extends Model
             'new_arrival' => 'boolean',
             'should_track' => 'boolean',
         ];
+    }
+
+    /**
+     * Override the reviews relationship to use our custom Review model.
+     */
+    public function reviews(): MorphMany
+    {
+        return $this->morphMany(\App\Models\Review::class, 'reviewable');
     }
 }

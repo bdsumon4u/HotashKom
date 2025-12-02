@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\ProductVariationController;
 use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ResellerController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShipmentReportController;
 use App\Http\Controllers\Admin\SlideController;
@@ -110,6 +111,13 @@ Route::group(['as' => 'admin.'], function (): void {
 
         // SEO update route
         Route::patch('products/{product}/seo', [ProductController::class, 'updateSeo'])->name('products.seo.update');
+
+        // Review management routes
+        Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+        Route::post('reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+        Route::post('reviews/bulk-approve', [ReviewController::class, 'bulkApprove'])->name('reviews.bulk-approve');
+        Route::post('reviews/bulk-delete', [ReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
+        Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
         Route::resources([
             'staffs' => StaffController::class,

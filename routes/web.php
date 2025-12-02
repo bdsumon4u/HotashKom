@@ -11,6 +11,7 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\OrderTrackController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ResellerController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Middleware\EnsureResellerIsVerified;
 use App\Http\Middleware\GoogleTagManagerMiddleware;
 use Hotash\FacebookPixel\MetaPixelMiddleware;
@@ -104,6 +105,8 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::get('/sections/{section}/products', HomeSectionProductController::class)->name('home-sections.products');
     Route::get('/shop', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
+    Route::post('/products/{product:slug}/reviews', [ReviewController::class, 'store'])->name('products.reviews.store');
+    Route::get('/products/{product:slug}/reviews', [ReviewController::class, 'index'])->name('products.reviews.index');
     Route::get('/categories/{category:slug}/products', CategoryProductController::class)->name('categories.products');
     Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
     Route::view('/lead-form', 'leads.form')->name('leads.form');

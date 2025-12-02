@@ -76,6 +76,23 @@
                         </a>
                     </li>
                     <li>
+                        @php
+                            $pendingReviewsCount = \App\Models\Review::where('approved', false)->count();
+                        @endphp
+                        <a class="nav-link menu-title link-nav d-flex align-items-center {{ request()->is('admin/reviews*') ? 'active' : '' }}"
+                            href="{{ route('admin.reviews.index') }}">
+                            <span class="d-flex align-items-center">
+                                <i data-feather="message-square"> </i>
+                                <span>Reviews</span>
+                            </span>
+                            @if ($pendingReviewsCount > 0)
+                                <span class="ml-auto text-white badge badge-warning">
+                                    {{ $pendingReviewsCount }}
+                                </span>
+                            @endif
+                        </a>
+                    </li>
+                    <li>
                         <a class="nav-link menu-title link-nav {{ request()->is('admin/purchases*') && !request()->is('admin/purchases/create*') ? 'active' : '' }}"
                             href="{{ route('admin.purchases.index') }}">
                             <i data-feather="shopping-bag"></i>

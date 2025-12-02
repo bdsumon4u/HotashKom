@@ -16,6 +16,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "bavix/laravel-wallet": "^11.4",
         "blade-ui-kit/blade-ui-kit": "^0.7",
+        "codebyray/laravel-review-rateable": "^2.1",
         "facebook/php-business-sdk": "^19.0",
         "filament/filament": "^3.2",
         "hotash/laravel-facebook-pixel": "dev-master",

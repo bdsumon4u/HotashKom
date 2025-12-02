@@ -1,7 +1,30 @@
 <div class="product__info">
-    <h3 class="mb-2 product__name" data-name="{{ $selectedVar->var_name }}">{{ $product->name }}</h1>
+    <h3 class="mb-1 product__name" data-name="{{ $selectedVar->var_name }}">{{ $product->name }}</h1>
         @if ($product->short_description)
             <p class="mb-2">{{ $product->short_description }}</p>
+        @endif
+        @php
+            $averageRating = $product->averageRating('overall');
+            $totalReviews = $product->totalReviews();
+        @endphp
+        @if ($averageRating > 0)
+            <div class="gap-2 mb-1 d-flex align-items-center">
+                <div class="d-flex align-items-center" style="margin-top: -1px;">
+                    @for ($i = 1; $i <= 5; $i++)
+                        @if ($i <= floor($averageRating))
+                            <i class="fa fa-star text-warning"></i>
+                        @elseif($i - 0.5 <= $averageRating)
+                            <i class="fa fa-star-half-alt text-warning"></i>
+                        @else
+                            <i class="far fa-star text-muted"></i>
+                        @endif
+                    @endfor
+                </div>
+                <span class="text-muted small" style="margin-top: 1px;">
+                    <strong>{{ number_format($averageRating, 1) }}</strong>
+                    ({{ $totalReviews }} {{ Str::plural('review', $totalReviews) }})
+                </span>
+            </div>
         @endif
         <div class="pt-2 mb-2 d-flex-justify-content-between border-top">
             <div>Product Code: <strong>{{ $selectedVar->sku }}</strong></div>
