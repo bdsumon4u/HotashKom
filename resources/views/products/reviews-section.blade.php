@@ -40,7 +40,8 @@
         </div>
     @endif
 
-    <div class="mb-4 review-form-container" id="review-form-container">
+    <div class="mb-4 review-form-container" id="review-form-container"
+        data-review-submitted="{{ session('review_submitted') ? 'true' : 'false' }}">
         <h6 class="mb-3">Write a Review</h6>
         <p class="mb-3 text-muted small">To submit a review, please provide your order ID and phone number to verify
             your purchase.</p>
@@ -76,13 +77,14 @@
                         <div class="rating-input">
                             @for ($i = 5; $i >= 1; $i--)
                                 <input type="radio" name="rating" value="{{ $i }}"
-                                    id="rating-{{ $i }}" required
-                                    {{ old('rating') == $i ? 'checked' : '' }}>
+                                    id="rating-{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}
+                                    class="rating-radio">
                                 <label for="rating-{{ $i }}" class="star-label">
                                     <i class="far fa-star"></i>
                                 </label>
                             @endfor
                         </div>
+                        <input type="hidden" name="rating_required" value="1" id="rating-required-field">
                         @error('rating')
                             <small class="text-danger d-block">{{ $message }}</small>
                         @enderror
@@ -206,8 +208,28 @@
             gap: 5px;
         }
 
-        .rating-input input[type="radio"] {
-            display: none;
+        .rating-input .rating-radio {
+            position: absolute;
+            opacity: 0;
+            width: 1px;
+            height: 1px;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .rating-input .rating-radio:focus+label {
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        .rating-input .rating-radio:focus-visible+label {
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
         }
 
         .rating-input label {
@@ -294,7 +316,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Star rating interaction
-            const ratingInputs = document.querySelectorAll('.rating-input input[type="radio"]');
+            const ratingInputs = document.querySelectorAll('.rating-input .rating-radio');
             ratingInputs.forEach(input => {
                 input.addEventListener('change', function() {
                     const value = parseInt(this.value);
@@ -310,7 +332,66 @@
                         }
                     });
                 });
+
+                // Set initial state for checked inputs
+                if (input.checked) {
+                    const value = parseInt(input.value);
+                    const labels = document.querySelectorAll('.rating-input label');
+                    labels.forEach((label, index) => {
+                        const labelIndex = 5 - index;
+                        if (labelIndex <= value) {
+                            label.querySelector('i').classList.remove('far');
+                            label.querySelector('i').classList.add('fa');
+                        }
+                    });
+                }
             });
+
+            // Handle form validation - ensure rating is selected before submit
+            const reviewForm = document.getElementById('review-form');
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', function(e) {
+                    const selectedRating = document.querySelector('.rating-input .rating-radio:checked');
+                    if (!selectedRating) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // Show error message
+                        const ratingGroup = document.querySelector('.rating-input').closest('.form-group');
+                        let errorMsg = ratingGroup.querySelector('.rating-error');
+                        if (!errorMsg) {
+                            errorMsg = document.createElement('small');
+                            errorMsg.className = 'text-danger d-block rating-error';
+                            errorMsg.textContent = 'Please select a rating before submitting your review.';
+                            ratingGroup.appendChild(errorMsg);
+                        }
+
+                        // Focus on the first rating input for accessibility
+                        const firstRating = document.querySelector('.rating-input .rating-radio');
+                        if (firstRating) {
+                            firstRating.focus();
+                        }
+
+                        // Scroll to rating section
+                        const ratingContainer = document.querySelector('.rating-input');
+                        if (ratingContainer) {
+                            ratingContainer.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                        }
+
+                        return false;
+                    } else {
+                        // Remove error message if rating is selected
+                        const ratingGroup = document.querySelector('.rating-input').closest('.form-group');
+                        const errorMsg = ratingGroup.querySelector('.rating-error');
+                        if (errorMsg) {
+                            errorMsg.remove();
+                        }
+                    }
+                });
+            }
 
             // Load more reviews
             const loadMoreBtn = document.getElementById('load-more-reviews');
@@ -425,14 +506,19 @@
                 return div.innerHTML;
             }
 
-            // Scroll to review form if there are success/error messages
+            // Scroll to review form only if review was just submitted
             const reviewFormContainer = document.getElementById('review-form-container');
             if (reviewFormContainer) {
+                // Check if review was submitted by checking the data attribute set from session flash
+                const reviewSubmitted = reviewFormContainer.getAttribute('data-review-submitted') === 'true';
                 const hasSuccess = reviewFormContainer.querySelector('.alert-success');
                 const hasErrors = reviewFormContainer.querySelector('.alert-danger') || reviewFormContainer
                     .querySelector('.text-danger');
 
-                if (hasSuccess || hasErrors) {
+                // Only scroll if review was submitted AND we have success/error messages
+                const shouldScroll = reviewSubmitted && (hasSuccess || hasErrors);
+
+                if (shouldScroll) {
                     // Check if the reviews accordion is collapsed and expand it
                     const collapseThree = document.getElementById('collapseThree');
                     let needsExpansion = false;

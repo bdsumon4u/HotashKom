@@ -48,7 +48,7 @@ class ReviewController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return back()->withErrors($validator)->withInput();
+                return back()->withErrors($validator)->withInput()->with('review_submitted', true);
             }
 
             // Skip to review submission
@@ -57,7 +57,7 @@ class ReviewController extends Controller
             $validator = Validator::make($request->all(), [
                 'review' => 'required|string|min:10|max:1000',
                 'rating' => 'required|integer|min:1|max:5',
-                'order_id' => 'required|integer|exists:orders,id',
+                'order_id' => 'required|string|max:20',
                 'phone_number' => 'required|string|max:20',
                 'recommend' => 'sometimes|boolean',
             ], [
@@ -73,19 +73,19 @@ class ReviewController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return back()->withErrors($validator)->withInput();
+                return back()->withErrors($validator)->withInput()->with('review_submitted', true);
             }
 
             // Validate order exists and contains the product
             $order = Order::find($request->order_id);
 
             if (! $order) {
-                return back()->withErrors(['order_id' => 'The order ID you provided does not exist.'])->withInput();
+                return back()->withErrors(['order_id' => 'The order ID you provided does not exist.'])->withInput()->with('review_submitted', true);
             }
 
             // Validate phone number matches the order
             if ($order->phone !== $request->phone_number) {
-                return back()->withErrors(['phone_number' => 'The phone number does not match the order.'])->withInput();
+                return back()->withErrors(['phone_number' => 'The phone number does not match the order.'])->withInput()->with('review_submitted', true);
             }
 
             // Check if order contains this product
@@ -93,7 +93,7 @@ class ReviewController extends Controller
             $productIds = array_keys($orderProducts);
 
             if (! in_array($product->id, $productIds)) {
-                return back()->withErrors(['order_id' => 'This order does not contain the product you are reviewing.'])->withInput();
+                return back()->withErrors(['order_id' => 'This order does not contain the product you are reviewing.'])->withInput()->with('review_submitted', true);
             }
 
             // Find or create user with this phone number
@@ -114,7 +114,7 @@ class ReviewController extends Controller
             ->first();
 
         if ($existingReview) {
-            return back()->withErrors(['error' => 'This user has already reviewed this product.'])->withInput();
+            return back()->withErrors(['error' => 'This user has already reviewed this product.'])->withInput()->with('review_submitted', true);
         }
 
         // Add review with rating
@@ -135,7 +135,7 @@ class ReviewController extends Controller
             ? 'Your review has been submitted and approved.'
             : 'Your review has been submitted and is pending approval.';
 
-        return back()->with('success', $successMessage);
+        return back()->with('success', $successMessage)->with('review_submitted', true);
     }
 
     /**
