@@ -172,11 +172,25 @@
         background-color: {{$color->order_now->background_color ?? null}} !important;
         border-color: {{$color->order_now->background_color ?? null}} !important;
         color: {{$color->order_now->text_color ?? null}} !important;
+        animation: driftZoom 2s ease-in-out infinite;
     }
     .product-card__ordernow:hover, .product__ordernow:hover {
         background-color: {{$color->order_now->background_hover ?? null}} !important;
         border-color: {{$color->order_now->background_hover ?? null}} !important;
         color: {{$color->order_now->text_hover ?? null}} !important;
+        animation-play-state: paused;
+    }
+    .product-card__ordernow:disabled, .product__ordernow:disabled {
+        animation: none;
+    }
+
+    @keyframes driftZoom {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
     }
     .input-radio-label__list input:checked~span, .input-radio-label__list input:not(:checked):not(:disabled)~span:hover {
         border-color: {{$color->primary->background_color ?? null}} !important;
