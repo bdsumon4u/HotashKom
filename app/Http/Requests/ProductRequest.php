@@ -91,8 +91,8 @@ class ProductRequest extends FormRequest
             'new_arrival' => 0,
         ];
 
-        $data['brand_id'] = $data['brand'];
-        $data['stock_count'] = intval($data['stock_count']);
+        $data['brand_id'] = $data['brand'] ?? null;
+        $data['stock_count'] = intval($data['stock_count'] ?? 0);
 
         return $data;
     }

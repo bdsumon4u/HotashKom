@@ -53,6 +53,7 @@ class CategoryProductController extends Controller
         return view('products.index', [
             'products' => $products,
             'per_page' => $per_page,
+            'category' => $category,
             'hideCategoryFilter' => true,
         ] + $filterData);
     }

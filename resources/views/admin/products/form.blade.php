@@ -24,6 +24,14 @@
     </div>
     <div class="col-sm-12">
         <div class="form-group">
+            <x-label for="short_description" />
+            <x-textarea name="short_description" cols="30" rows="3" placeholder="Brief description for product listings">{{ old('short_description', $product->short_description) }}</x-textarea>
+            <x-error field="short_description" />
+            <small class="form-text text-muted">Optional: A brief description that will be displayed on product cards and listings.</small>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="form-group">
             <x-label for="description" /><span class="text-danger">*</span>
             <x-textarea editor name="description" cols="30" rows="10">{!! $product->description !!}</x-textarea>
             <x-error field="description" />

@@ -51,10 +51,7 @@ class ApiController extends Controller
 
     public function clearCache()
     {
-        Artisan::call('cache:clear');
-        Artisan::call('config:clear');
-        Artisan::call('view:clear');
-        Artisan::call('route:clear');
+        Artisan::call('optimize:clear');
 
         // Only clear response cache if it's enabled
         if (config('cache.response_cache.enabled', false)) {
@@ -65,6 +62,8 @@ class ApiController extends Controller
                 // This prevents errors when Redis is not configured
             }
         }
+
+        Artisan::call('optimize');
 
         return back()->with('success', 'Cache has been cleared');
     }

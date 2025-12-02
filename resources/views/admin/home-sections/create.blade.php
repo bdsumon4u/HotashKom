@@ -88,6 +88,38 @@
                         <div class="col-md-12">
                             <livewire:section-product />
                         </div>
+                        <div class="col-md-12">
+                            <hr>
+                            <h6 class="mb-2">SEO Settings <small class="text-muted">(Optional)</small></h6>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="seo-title">SEO Title</label>
+                                        <input type="text" name="seo[title]" value="{{ old('seo.title') }}"
+                                            id="seo-title" class="form-control"
+                                            placeholder="Leave empty to use section title">
+                                        <small class="form-text text-muted">Recommended: 50-60 characters</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="seo-description">SEO Description</label>
+                                        <textarea name="seo[description]" id="seo-description" rows="2"
+                                            class="form-control" placeholder="Leave empty to use section title">{{ old('seo.description') }}</textarea>
+                                        <small class="form-text text-muted">Recommended: 150-160 characters</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="seo-image">SEO Image (Open Graph)</label>
+                                        <input type="text" name="seo[image]" value="{{ old('seo.image') }}"
+                                            id="seo-image" class="form-control"
+                                            placeholder="Full URL to image (optional)">
+                                        <small class="form-text text-muted">Recommended: 1200x630px</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <button type="submit" class="mt-2 btn btn-success">
                         Submit

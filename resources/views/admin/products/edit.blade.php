@@ -338,6 +338,41 @@
                 </x-form>
             </div>
         </div>
+
+        <div class="shadow-sm card rounded-0">
+            <div class="px-3 py-2 card-header">
+                <strong>SEO Settings</strong>
+            </div>
+            <div class="p-2 card-body">
+                <small class="text-muted d-block mb-3">These fields are optional. If left empty, the system will use default values based on the product name and description.</small>
+                <x-form method="PATCH" action="{{ route('admin.products.seo.update', $product) }}">
+                    @if ($message = Session::get('success'))
+                        <div class="py-2 alert alert-info"><strong>{{ $message }}</strong></div>
+                    @endif
+                    <div class="form-group">
+                        <label for="seo_title">SEO Title</label>
+                        <x-input name="seo[title]" :value="old('seo.title', $product->seo?->title)" placeholder="Leave empty to use product name" />
+                        <x-error field="seo.title" />
+                        <small class="form-text text-muted">Recommended: 50-60 characters. If empty, product name will be used.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="seo_description">SEO Description</label>
+                        <x-textarea name="seo[description]" cols="30" rows="3" placeholder="Leave empty to use short description or product description">{{ old('seo.description', $product->seo?->description) }}</x-textarea>
+                        <x-error field="seo.description" />
+                        <small class="form-text text-muted">Recommended: 150-160 characters. If empty, short description or description will be used.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="seo_image">SEO Image (Open Graph)</label>
+                        <x-input name="seo[image]" :value="old('seo.image', $product->seo?->image)" placeholder="Full URL to image" />
+                        <x-error field="seo.image" />
+                        <small class="form-text text-muted">Optional: Full URL to an image for social media sharing. Recommended: 1200x630px. If empty, product base image will be used.</small>
+                    </div>
+                    <button type="submit" class="btn btn-block btn-success">
+                        <i class="fas fa-save"></i> Save SEO Settings
+                    </button>
+                </x-form>
+            </div>
+        </div>
     </div>
     @endunless
 </div>

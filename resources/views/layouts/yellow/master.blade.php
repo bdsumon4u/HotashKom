@@ -271,6 +271,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet">
 {!! $scripts ?? null !!}
+@stack('head')
 </head>
 
 <body class="header-fixed" style="margin: 0; padding: 0;">

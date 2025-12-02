@@ -108,6 +108,9 @@ Route::group(['as' => 'admin.'], function (): void {
         // Bulk variations update route
         Route::patch('products/{product}/variations/bulk-update', [ProductVariationController::class, 'bulkUpdate'])->name('products.variations.bulk-update');
 
+        // SEO update route
+        Route::patch('products/{product}/seo', [ProductController::class, 'updateSeo'])->name('products.seo.update');
+
         Route::resources([
             'staffs' => StaffController::class,
             'slides' => SlideController::class,

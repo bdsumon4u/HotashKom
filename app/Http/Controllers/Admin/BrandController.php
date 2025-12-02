@@ -47,13 +47,25 @@ class BrandController extends Controller
             'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:brands'],
             'base_image' => ['nullable', 'integer'],
             'is_enabled' => ['boolean'],
+            'seo.title' => ['nullable', 'string', 'max:255'],
+            'seo.description' => ['nullable', 'string', 'max:500'],
+            'seo.image' => ['nullable', 'url', 'max:500'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
 
-        Brand::create($data);
+        // Extract SEO data before creating
+        $seoData = $request->input('seo', []);
+        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+
+        $brand = Brand::create($data);
+
+        // Handle SEO data
+        if (! empty($seoData)) {
+            $brand->seo()->updateOrCreate([], $seoData);
+        }
 
         return back()->with('success', 'Brand Has Been Created.');
     }
@@ -71,13 +83,28 @@ class BrandController extends Controller
             'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:brands,slug,'.$brand->id],
             'base_image' => ['nullable', 'integer'],
             'is_enabled' => ['boolean'],
+            'seo.title' => ['nullable', 'string', 'max:255'],
+            'seo.description' => ['nullable', 'string', 'max:500'],
+            'seo.image' => ['nullable', 'url', 'max:500'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
 
+        // Extract SEO data before updating
+        $seoData = $request->input('seo', []);
+        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+
         $brand->update($data);
+
+        // Handle SEO data
+        if (! empty($seoData)) {
+            $brand->seo()->updateOrCreate([], $seoData);
+        } elseif ($request->has('seo')) {
+            // If seo key exists but is empty, delete SEO data
+            $brand->seo?->delete();
+        }
 
         return back()->with('success', 'Brand Has Been Updated.');
     }

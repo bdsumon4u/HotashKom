@@ -102,7 +102,7 @@
                                         @if ($message = Session::get('success'))
                                             <div class="py-2 alert alert-info"><strong>{{ $message }}</strong></div>
                                         @endif
-                                        @php $active = \App\Models\Brand::find(request('active_id')) @endphp
+                                        @php $active = \App\Models\Brand::with('seo')->find(request('active_id')) @endphp
                                         <div class="tab-content">
                                             <div class="tab-pane @unless (request('active_id')) active @endunless" id="create-brand" role="tabpanel">
                                                 <p class="text-info">Create Brand</p>
@@ -161,6 +161,28 @@
                                                                 :checked="old('is_enabled', true)" />
                                                             <label for="create-is-enabled" class="m-0">Enable Brand</label>
                                                         </div>
+                                                    </div>
+                                                    <hr>
+                                                    <h6 class="mb-2">SEO Settings <small class="text-muted">(Optional)</small></h6>
+                                                    <div class="form-group">
+                                                        <label for="create-seo-title">SEO Title</label>
+                                                        <input type="text" name="seo[title]" value="{{ old('seo.title') }}"
+                                                            id="create-seo-title" class="form-control"
+                                                            placeholder="Leave empty to use brand name">
+                                                        <small class="form-text text-muted">Recommended: 50-60 characters</small>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="create-seo-description">SEO Description</label>
+                                                        <textarea name="seo[description]" id="create-seo-description" rows="2"
+                                                            class="form-control" placeholder="Leave empty to use brand name">{{ old('seo.description') }}</textarea>
+                                                        <small class="form-text text-muted">Recommended: 150-160 characters</small>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="create-seo-image">SEO Image (Open Graph)</label>
+                                                        <input type="text" name="seo[image]" value="{{ old('seo.image') }}"
+                                                            id="create-seo-image" class="form-control"
+                                                            placeholder="Full URL to image (optional)">
+                                                        <small class="form-text text-muted">Recommended: 1200x630px. If empty, brand image will be used.</small>
                                                     </div>
                                                     <button type="submit" class="ml-auto btn btn-sm btn-success d-block"><i
                                                             class="fa fa-check"></i> Submit</button>
@@ -231,6 +253,30 @@
                                                                     :checked="old('is_enabled', $active->is_enabled)" />
                                                                 <label for="edit-is-enabled" class="m-0">Enable Brand</label>
                                                             </div>
+                                                        </div>
+                                                        <hr>
+                                                        <h6 class="mb-2">SEO Settings <small class="text-muted">(Optional)</small></h6>
+                                                        <div class="form-group">
+                                                            <label for="edit-seo-title">SEO Title</label>
+                                                            <input type="text" name="seo[title]"
+                                                                value="{{ old('seo.title', $active->seo?->title) }}"
+                                                                id="edit-seo-title" class="form-control"
+                                                                placeholder="Leave empty to use brand name">
+                                                            <small class="form-text text-muted">Recommended: 50-60 characters</small>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-seo-description">SEO Description</label>
+                                                            <textarea name="seo[description]" id="edit-seo-description" rows="2"
+                                                                class="form-control" placeholder="Leave empty to use brand name">{{ old('seo.description', $active->seo?->description) }}</textarea>
+                                                            <small class="form-text text-muted">Recommended: 150-160 characters</small>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-seo-image">SEO Image (Open Graph)</label>
+                                                            <input type="text" name="seo[image]"
+                                                                value="{{ old('seo.image', $active->seo?->image) }}"
+                                                                id="edit-seo-image" class="form-control"
+                                                                placeholder="Full URL to image (optional)">
+                                                            <small class="form-text text-muted">Recommended: 1200x630px. If empty, brand image will be used.</small>
                                                         </div>
                                                         <button type="submit"
                                                             class="ml-auto btn btn-sm btn-success d-block"><i

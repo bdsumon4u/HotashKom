@@ -23,7 +23,10 @@ class HomeSectionController extends Controller
             $orders = request('orders');
             DB::statement('UPDATE home_sections SET `order` = CASE id '.implode(' ', array_map(fn ($id): string => "WHEN $id THEN $orders[$id] ", array_keys($orders))).'END');
 
-            cacheMemo()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
+            // Clear cache after reordering (model events don't fire for direct DB updates)
+            cacheMemo()->forget('homesections');
+            cacheMemo()->forget('api_sections');
+            cacheInvalidateNamespace('api_sections');
 
             return response()->json(['message' => 'Sections Have Been Reordered.']);
         }
@@ -66,11 +69,22 @@ class HomeSectionController extends Controller
 
         $data = $request->validated();
         $categories = Arr::pull($data, 'categories');
+
+        // Extract SEO data before creating
+        $seoData = $request->input('seo', []);
+        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+
         $homeSection = HomeSection::create($data);
+
+        // Handle SEO data
+        if (! empty($seoData)) {
+            $homeSection->seo()->updateOrCreate([], $seoData);
+        }
+
         if ($categories) {
             $homeSection->categories()->sync($categories);
         }
-        cacheMemo()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
+        // Cache is cleared automatically by model events
 
         return to_route('admin.home-sections.edit', $homeSection)->with('success', 'Section Has Been Created.');
     }
@@ -100,7 +114,7 @@ class HomeSectionController extends Controller
         }
 
         return $this->view([
-            'section' => $homeSection,
+            'section' => $homeSection->load('seo'),
             'categories' => Category::nested(),
             'pages' => \App\Models\Page::all(),
         ], $view);
@@ -116,9 +130,23 @@ class HomeSectionController extends Controller
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validated();
         $categories = Arr::pull($data, 'categories');
+
+        // Extract SEO data before updating
+        $seoData = $request->input('seo', []);
+        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+
         $homeSection->update($data);
+
+        // Handle SEO data
+        if (! empty($seoData)) {
+            $homeSection->seo()->updateOrCreate([], $seoData);
+        } elseif ($request->has('seo')) {
+            // If seo key exists but is empty, delete SEO data
+            $homeSection->seo?->delete();
+        }
+
         $homeSection->categories()->sync($categories);
-        cacheMemo()->put('homesections', HomeSection::orderBy('order', 'asc')->get());
+        // Cache is cleared automatically by model events
 
         return to_route('admin.home-sections.index')->with('success', 'Section Has Been Updated.');
     }

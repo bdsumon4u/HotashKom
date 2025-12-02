@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
 
 class Category extends Model
 {
+    use HasSEO;
+
     protected $fillable = [
         'parent_id', 'image_id', 'name', 'slug', 'order', 'is_enabled',
     ];
@@ -13,17 +16,12 @@ class Category extends Model
     #[\Override]
     public static function booted(): void
     {
+        static::created(function ($category): void {
+            static::clearCategoryCaches($category);
+        });
+
         static::saved(function ($category): void {
-            cacheMemo()->forget('categories:nested:');
-            cacheMemo()->forget('categories:nested:1');
-            cacheMemo()->forget('homesections');
-            cacheMemo()->forget('product_filter_data');
-            cacheMemo()->forget('product_filter_data:category:'.$category->id);
-            cacheMemo()->forget('api_categories:all');
-            cacheMemo()->forget('api_category:'.$category->slug);
-            for ($i = 0; $i <= 5; $i++) {
-                cacheMemo()->forget("api_categories:nested:{$i}");
-            }
+            static::clearCategoryCaches($category);
 
             // Dispatch job to copy category to reseller databases
             if (isOninda() && $category->wasRecentlyCreated) {
@@ -42,17 +40,49 @@ class Category extends Model
         });
 
         static::deleted(function ($category): void {
-            cacheMemo()->forget('categories:nested:');
-            cacheMemo()->forget('categories:nested:1');
-            cacheMemo()->forget('homesections');
-            cacheMemo()->forget('product_filter_data');
-            cacheMemo()->forget('product_filter_data:category:'.$category->id);
-            cacheMemo()->forget('api_categories:all');
-            cacheMemo()->forget('api_category:'.$category->slug);
-            for ($i = 0; $i <= 5; $i++) {
-                cacheMemo()->forget("api_categories:nested:{$i}");
-            }
+            static::clearCategoryCaches($category);
         });
+    }
+
+    /**
+     * Clear all category-related caches.
+     */
+    private static function clearCategoryCaches($category): void
+    {
+        // Clear nested categories cache (all variations)
+        cacheMemo()->forget('categories:nested:');
+        cacheMemo()->forget('categories:nested:0');
+        cacheMemo()->forget('categories:nested:1');
+        // Clear all possible nested cache variations
+        for ($i = 0; $i <= 10; $i++) {
+            cacheMemo()->forget("categories:nested:{$i}");
+        }
+
+        // Clear home sections cache (categories affect sections)
+        cacheMemo()->forget('homesections');
+
+        // Clear product filter data
+        cacheMemo()->forget('product_filter_data');
+        if ($category->id) {
+            cacheMemo()->forget('product_filter_data:category:'.$category->id);
+        }
+
+        // Clear API category caches
+        cacheMemo()->forget('api_categories:all');
+        if ($category->slug) {
+            cacheMemo()->forget('api_category:'.$category->slug);
+        }
+        // Clear all possible nested API category cache variations
+        for ($i = 0; $i <= 10; $i++) {
+            cacheMemo()->forget("api_categories:nested:{$i}");
+        }
+
+        // Clear namespaced caches
+        cacheInvalidateNamespace('api_categories');
+        cacheInvalidateNamespace('api_category');
+        cacheInvalidateNamespace('api_sections');
+        cacheInvalidateNamespace('product_filters');
+        cacheInvalidateNamespace('related_products');
     }
 
     public function childrens()

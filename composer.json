@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.2",
         "amidesfahani/filament-tinyeditor": "^2.1",
+        "artesaos/seotools": "^1.3",
         "awcodes/filament-tiptap-editor": "^3.0",
         "azmolla/laravelcart": "^1.1",
         "barryvdh/laravel-dompdf": "^3.1",
@@ -31,6 +32,7 @@
         "livewire/livewire": "^3.5",
         "loilo/fuse": "^7.0",
         "meilisearch/meilisearch-php": "^1.11",
+        "ralphjsmit/laravel-seo": "^1.7",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-googletagmanager": "^2.7",
         "spatie/laravel-responsecache": "^7.7",

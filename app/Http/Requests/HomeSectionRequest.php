@@ -87,6 +87,13 @@ class HomeSectionRequest extends FormRequest
             ];
         }
 
+        // Add SEO validation rules
+        $rules += [
+            'seo.title' => ['nullable', 'string', 'max:255'],
+            'seo.description' => ['nullable', 'string', 'max:500'],
+            'seo.image' => ['nullable', 'url', 'max:500'],
+        ];
+
         return $rules;
     }
 }

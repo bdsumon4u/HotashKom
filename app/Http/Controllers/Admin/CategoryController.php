@@ -77,13 +77,25 @@ class CategoryController extends Controller
             'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:categories'],
             'base_image' => ['nullable', 'integer'],
             'is_enabled' => ['boolean'],
+            'seo.title' => ['nullable', 'string', 'max:255'],
+            'seo.description' => ['nullable', 'string', 'max:500'],
+            'seo.image' => ['nullable', 'url', 'max:500'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
 
-        Category::create($data);
+        // Extract SEO data before creating
+        $seoData = $request->input('seo', []);
+        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+
+        $category = Category::create($data);
+
+        // Handle SEO data
+        if (! empty($seoData)) {
+            $category->seo()->updateOrCreate([], $seoData);
+        }
 
         return back()->with('success', 'Category Has Been Created.');
     }
@@ -144,6 +156,9 @@ class CategoryController extends Controller
             'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:categories,slug,'.$category->id],
             'base_image' => ['nullable', 'integer'],
             'is_enabled' => ['boolean'],
+            'seo.title' => ['nullable', 'string', 'max:255'],
+            'seo.description' => ['nullable', 'string', 'max:500'],
+            'seo.image' => ['nullable', 'url', 'max:500'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
@@ -163,7 +178,19 @@ class CategoryController extends Controller
 
         $data['image_id'] = Arr::pull($data, 'base_image');
 
+        // Extract SEO data before updating
+        $seoData = $request->input('seo', []);
+        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+
         $category->update($data);
+
+        // Handle SEO data
+        if (! empty($seoData)) {
+            $category->seo()->updateOrCreate([], $seoData);
+        } elseif ($request->has('seo')) {
+            // If seo key exists but is empty, delete SEO data
+            $category->seo?->delete();
+        }
 
         return back()->with('success', 'Category Has Been Updated.');
     }

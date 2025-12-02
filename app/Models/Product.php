@@ -8,17 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Scout\Searchable;
 use Nicolaslopezj\Searchable\SearchableTrait;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
 
 class Product extends Model
 {
     use HasFactory;
+    use HasSEO;
     use Searchable;
     // use SearchableTrait;
 
     protected $with = ['images'];
 
     protected $fillable = [
-        'brand_id', 'name', 'slug', 'description', 'price', 'average_purchase_price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
+        'brand_id', 'name', 'slug', 'description', 'short_description', 'price', 'average_purchase_price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
         'source_id', 'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'hot_sale', 'new_arrival', 'shipping_inside', 'shipping_outside', 'delivery_text',
     ];
 
@@ -48,26 +50,12 @@ class Product extends Model
     #[\Override]
     public static function booted(): void
     {
+        static::created(function ($product): void {
+            static::clearProductCaches($product);
+        });
+
         static::saved(function ($product): void {
-            // Clear related caches
-            cacheMemo()->forget('product_filter_data');
-            cacheMemo()->forget('related_products:'.$product->slug);
-
-            // Clear category-specific filter data for all categories this product belongs to
-            $product->categories->each(function ($category) {
-                cacheMemo()->forget('product_filter_data:category:'.$category->id);
-            });
-
-            if ($product->parent_id) {
-                $parent = $product->parent;
-                if ($parent) {
-                    cacheMemo()->forget('related_products:'.$parent->slug);
-                    // Also clear category-specific caches for parent product's categories
-                    $parent->categories->each(function ($category) {
-                        cacheMemo()->forget('product_filter_data:category:'.$category->id);
-                    });
-                }
-            }
+            static::clearProductCaches($product);
 
             // Dispatch job to sync stock attributes if they were changed
             if (isOninda() && $product->isDirty(['should_track', 'stock_count'])) {
@@ -84,18 +72,7 @@ class Product extends Model
             // throw_if(isReseller() && $record->source_id !== null, \Exception::class, 'Cannot delete a resource that has been sourced.');
 
             // Clear related caches before deletion
-            cacheMemo()->forget('product_filter_data');
-            cacheMemo()->forget('related_products:'.$record->slug);
-            if ($record->parent_id) {
-                $parent = $record->parent;
-                if ($parent) {
-                    cacheMemo()->forget('related_products:'.$parent->slug);
-                }
-            } else {
-                // Clear related products cache for all products that might have been related
-                // We clear all category-specific filter data since this product might have been in those categories
-                cacheMemo()->forget('product_filter_data');
-            }
+            static::clearProductCaches($record);
 
             // Dispatch job to remove product from reseller databases
             if (! $record->parent_id && isOninda()) { // not a variation
@@ -104,9 +81,50 @@ class Product extends Model
             $record->variations->each->delete();
         });
 
+        static::deleted(function ($record): void {
+            static::clearProductCaches($record);
+        });
+
         static::addGlobalScope('latest', function (Builder $builder): void {
             $builder->latest('products.created_at');
         });
+    }
+
+    /**
+     * Clear all product-related caches.
+     */
+    private static function clearProductCaches($product): void
+    {
+        // Clear general product filter data
+        cacheMemo()->forget('product_filter_data');
+
+        // Clear related products cache
+        if ($product->slug) {
+            cacheMemo()->forget('related_products:'.$product->slug);
+            cacheInvalidateNamespace('related_products');
+        }
+
+        // Clear category-specific filter data for all categories this product belongs to
+        $product->categories->each(function ($category) {
+            cacheMemo()->forget('product_filter_data:category:'.$category->id);
+        });
+
+        // If this is a variation, also clear parent product caches
+        if ($product->parent_id) {
+            $parent = $product->parent;
+            if ($parent) {
+                cacheMemo()->forget('related_products:'.$parent->slug);
+                cacheInvalidateNamespace('related_products');
+                // Also clear category-specific caches for parent product's categories
+                $parent->categories->each(function ($category) {
+                    cacheMemo()->forget('product_filter_data:category:'.$category->id);
+                });
+            }
+        }
+
+        // Clear API-related caches
+        cacheInvalidateNamespace('api_sections');
+        cacheInvalidateNamespace('product_filters');
     }
 
     protected function varName(): \Illuminate\Database\Eloquent\Casts\Attribute

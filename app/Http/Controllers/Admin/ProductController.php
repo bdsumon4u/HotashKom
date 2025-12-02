@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Events\ProductUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductSeoRequest;
 use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
@@ -130,6 +131,30 @@ class ProductController extends Controller
         return redirect()
             ->action([static::class, 'index'])
             ->with('success', 'Product Has Been Updated. <a href="'.route('products.show', $product).'" target="_blank">View the Product</a> or <a href="'.route('admin.products.edit', $product).'">Edit the Product</a> again.');
+    }
+
+    /**
+     * Update the SEO settings for a product.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function updateSeo(ProductSeoRequest $request, Product $product)
+    {
+        abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
+
+        $seoData = $request->input('seo', []);
+
+        // Remove empty values
+        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+
+        if (! empty($seoData)) {
+            $product->seo()->updateOrCreate([], $seoData);
+        } else {
+            // If all SEO fields are empty, delete SEO data
+            $product->seo?->delete();
+        }
+
+        return back()->with('success', 'SEO Settings Have Been Updated.');
     }
 
     /**

@@ -1,5 +1,8 @@
 <div class="product__info">
     <h3 class="mb-2 product__name" data-name="{{ $selectedVar->var_name }}">{{ $product->name }}</h1>
+        @if ($product->short_description)
+            <p class="mb-2">{{ $product->short_description }}</p>
+        @endif
         <div class="pt-2 mb-2 d-flex-justify-content-between border-top">
             <div>Product Code: <strong>{{ $selectedVar->sku }}</strong></div>
             <div>Availability:
@@ -17,14 +20,15 @@
         @php $show_option = setting('show_option') @endphp
         @php
             $guest_can_see_price = (bool) ($show_option->guest_can_see_price ?? false);
-            $should_hide_price = isOninda()
-                && ! $guest_can_see_price
-                && (auth('user')->guest() || (auth('user')->check() && ! auth('user')->user()->is_verified));
+            $should_hide_price =
+                isOninda() &&
+                !$guest_can_see_price &&
+                (auth('user')->guest() || (auth('user')->check() && !auth('user')->user()->is_verified));
         @endphp
         <div
             class="product__prices mb-1 {{ ($selling = $selectedVar->getPrice($quantity)) == $selectedVar->price ? '' : 'has-special' }}">
             Price:
-            @if($should_hide_price)
+            @if ($should_hide_price)
                 <span class="product-card__new-price text-danger">
                     {{ auth('user')->guest() ? 'Login to see price' : 'Verify account to see price' }}
                 </span>
@@ -35,20 +39,22 @@
                 <span class="product-card__old-price">{!! theMoney($selectedVar->price) !!}</span>
             @endif
         </div>
-        @if(isOninda())
-        <div class="px-3 py-2 pt-1 product__actions-item d-flex justify-content-between align-items-center" style="border: 3px double #000;">
-            <div class="mr-2 font-weight-bold text-danger" style="white-space:nowrap;">Retail Price</div>
-            <div class="input-group input-group-sm">
-                <input type="number" class="form-control form-control-sm" wire:model="retailPrice" min="0" @focus="$event.target.select()" required>
-                <div class="input-group-append">
-                    <span class="input-group-text">৳</span>
+        @if (isOninda())
+            <div class="px-3 py-2 pt-1 product__actions-item d-flex justify-content-between align-items-center"
+                style="border: 3px double #000;">
+                <div class="mr-2 font-weight-bold text-danger" style="white-space:nowrap;">Retail Price</div>
+                <div class="input-group input-group-sm">
+                    <input type="number" class="form-control form-control-sm" wire:model="retailPrice" min="0"
+                        @focus="$event.target.select()" required>
+                    <div class="input-group-append">
+                        <span class="input-group-text">৳</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="mt-1 small text-muted">
-            <i class="fa fa-info-circle"></i> Suggested retail price:
-            <strong>{{ $selectedVar->suggestedRetailPrice() }}</strong>
-        </div>
+            <div class="mt-1 small text-muted">
+                <i class="fa fa-info-circle"></i> Suggested retail price:
+                <strong>{{ $selectedVar->suggestedRetailPrice() }}</strong>
+            </div>
         @endif
 
         @foreach ($attributes as $attribute)
@@ -84,7 +90,8 @@
                                     <input type="radio" wire:model.live="options.{{ $attribute->id }}"
                                         name="options[{{ $attribute->id }}]" value="{{ $option->id }}"
                                         class="option-picker">
-                                    <span class="p-1 @if(($options[$attribute->id] ?? null) == $option->id) border-primary @endif">{{ $option->name }}</span>
+                                    <span
+                                        class="p-1 @if (($options[$attribute->id] ?? null) == $option->id) border-primary @endif">{{ $option->name }}</span>
                                 </label>
                             @endforeach
                         </div>
@@ -158,15 +165,15 @@
                     $messenger = $company->messenger ?? '';
                 @endphp
                 <div class="gap-2 my-2 d-flex justify-content-center">
-                    @if(strlen($messenger) > 13)
-                    <a href="{{$messenger}}" target="_blank" rel="noopener"
-                        class="mr-1 btn btn-primary d-flex align-items-center" style="min-width: 140px;">
-                        <i class="mr-2 fab fa-facebook-messenger"></i> Messenger
-                    </a>
+                    @if (strlen($messenger) > 13)
+                        <a href="{{ $messenger }}" target="_blank" rel="noopener"
+                            class="mr-1 btn btn-primary d-flex align-items-center" style="min-width: 140px;">
+                            <i class="mr-2 fab fa-facebook-messenger"></i> Messenger
+                        </a>
                     @endif
                     <a href="https://api.whatsapp.com/send?phone={{ $phone }}&text=Hello+%0D%0AI+am+interested+in+ordering+%22{{ $product->name }}%22.%0D%0A%0D%0A{{ url()->current() }}"
-                        target="_blank" rel="noopener"
-                        class="ml-1 btn btn-success d-flex align-items-center" style="min-width: 140px;">
+                        target="_blank" rel="noopener" class="ml-1 btn btn-success d-flex align-items-center"
+                        style="min-width: 140px;">
                         <i class="mr-2 fab fa-whatsapp"></i> WhatsApp
                     </a>
                 </div>
@@ -183,7 +190,8 @@
                             @if ($product->brand)
                                 <p class="mb-0 text-secondary">
                                     Brand: <a href="{{ route('brands.products', $product->brand) }}"
-                                        class="text-primary badge badge-light" wire:navigate.hover><big>{{ $product->brand->name }}</big></a>
+                                        class="text-primary badge badge-light"
+                                        wire:navigate.hover><big>{{ $product->brand->name }}</big></a>
                                 </p>
                             @endif
                             <div class="mt-2">

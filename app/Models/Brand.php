@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
 
 class Brand extends Model
 {
     use HasFactory;
+    use HasSEO;
 
     protected $fillable = [
         'image_id', 'name', 'slug', 'is_enabled',
@@ -16,10 +18,12 @@ class Brand extends Model
     #[\Override]
     public static function booted(): void
     {
+        static::created(function ($brand): void {
+            static::clearBrandCaches();
+        });
+
         static::saved(function ($brand): void {
-            cacheMemo()->forget('brands');
-            // Clear product filter data since brands are part of filters
-            cacheMemo()->forget('product_filter_data');
+            static::clearBrandCaches();
 
             // Dispatch job to copy brand to reseller databases
             if (isOninda() && $brand->wasRecentlyCreated) {
@@ -34,10 +38,30 @@ class Brand extends Model
             if (isOninda()) {
                 dispatch(new \App\Jobs\RemoveResourceFromResellers($brand->getTable(), $brand->id));
             }
-            cacheMemo()->forget('brands');
-            // Clear product filter data since brands are part of filters
-            cacheMemo()->forget('product_filter_data');
         });
+
+        static::deleted(function (): void {
+            static::clearBrandCaches();
+        });
+    }
+
+    /**
+     * Clear all brand-related caches.
+     */
+    private static function clearBrandCaches(): void
+    {
+        // Clear brands cache
+        cacheMemo()->forget('brands');
+
+        // Clear product filter data since brands are part of filters
+        cacheMemo()->forget('product_filter_data');
+
+        // Clear home sections cache (brands might be used in sections)
+        cacheMemo()->forget('homesections');
+
+        // Clear namespaced caches
+        cacheInvalidateNamespace('api_sections');
+        cacheInvalidateNamespace('product_filters');
     }
 
     public static function cached()

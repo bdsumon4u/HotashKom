@@ -90,7 +90,7 @@
 
 @section('content')
 <div class="row mb-5">
-    <div class="col-sm-12">
+    <div class="col-md-8">
         <div class="card rounded-0 shadow-sm">
             <div class="card-header p-3">Add New <strong>Product</strong></div>
             <div class="card-body p-3">
@@ -105,6 +105,17 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="shadow-sm card rounded-0">
+            <div class="px-3 py-2 card-header">
+                <strong>SEO Settings</strong>
+            </div>
+            <div class="p-2 card-body">
+                <small class="text-muted d-block mb-3">These fields are optional. If left empty, the system will use default values based on the product name and description.</small>
+                <p class="text-info small">Note: SEO settings can be updated after creating the product.</p>
             </div>
         </div>
     </div>

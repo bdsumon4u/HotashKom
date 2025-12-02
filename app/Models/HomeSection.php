@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
 
 class HomeSection extends Model
 {
+    use HasSEO;
+
     protected $fillable = [
         'title', 'type', 'items', 'order', 'data',
     ];
@@ -15,15 +18,36 @@ class HomeSection extends Model
     #[\Override]
     public static function booted(): void
     {
+        static::created(function (): void {
+            static::clearHomeSectionCaches();
+        });
+
         static::saved(function (): void {
-            cacheMemo()->forget('homesections');
-            cacheMemo()->forget('api_sections');
+            static::clearHomeSectionCaches();
         });
 
         static::deleted(function (): void {
-            cacheMemo()->forget('homesections');
-            cacheMemo()->forget('api_sections');
+            static::clearHomeSectionCaches();
         });
+    }
+
+    /**
+     * Clear all home section-related caches.
+     */
+    private static function clearHomeSectionCaches(): void
+    {
+        // Clear home sections cache
+        cacheMemo()->forget('homesections');
+
+        // Clear API sections cache (both direct and namespaced)
+        cacheMemo()->forget('api_sections');
+        cacheInvalidateNamespace('api_sections');
+
+        // Clear product filter data since sections affect product listings
+        cacheMemo()->forget('product_filter_data');
+
+        // Clear related namespaced caches
+        cacheInvalidateNamespace('product_filters');
     }
 
     public function categories()
