@@ -9,6 +9,15 @@
     <link rel="stylesheet" href="{{ asset('strokya/vendor/xzoom/xzoom.css') }}">
     <link rel="stylesheet" href="{{ asset('strokya/vendor/xZoom-master/example/css/demo.css') }}">
     <style>
+        .review-rating-link {
+            transition: opacity 0.2s ease;
+        }
+        .review-rating-link:hover {
+            opacity: 0.7;
+        }
+        .review-rating-link:active {
+            opacity: 0.5;
+        }
         #accordion .card-link {
             display: block;
             font-size: 20px;
@@ -307,3 +316,44 @@
     </div>
     <!-- .block-products-carousel / end -->
 @endsection
+
+@push('scripts')
+<script>
+    function scrollToReviews(event) {
+        event.preventDefault();
+        
+        const reviewFormContainer = document.getElementById('review-form-container');
+        if (!reviewFormContainer) {
+            return;
+        }
+        
+        // Check if the reviews accordion is collapsed and expand it
+        const collapseThree = document.getElementById('collapseThree');
+        let needsExpansion = false;
+        
+        if (collapseThree && collapseThree.classList.contains('collapse') && !collapseThree.classList.contains('show')) {
+            needsExpansion = true;
+            // Expand the accordion if it's collapsed (using jQuery if available, otherwise Bootstrap 5)
+            if (typeof jQuery !== 'undefined' && jQuery.fn.collapse) {
+                jQuery(collapseThree).collapse('show');
+            } else if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+                const bsCollapse = new bootstrap.Collapse(collapseThree, {
+                    toggle: true
+                });
+            } else {
+                // Fallback: manually add show class
+                collapseThree.classList.add('show');
+            }
+        }
+        
+        // Scroll to the review form after a delay to allow accordion to expand
+        setTimeout(function() {
+            reviewFormContainer.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+            });
+        }, needsExpansion ? 400 : 100);
+    }
+</script>
+@endpush

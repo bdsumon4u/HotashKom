@@ -9,7 +9,10 @@
         @endphp
         @if ($averageRating > 0)
             <div class="gap-2 mb-1 d-flex align-items-center">
-                <div class="d-flex align-items-center" style="margin-top: -1px;">
+                <a href="#review-form-container" 
+                   class="d-flex align-items-center text-decoration-none review-rating-link" 
+                   style="margin-top: -1px; cursor: pointer;"
+                   onclick="scrollToReviews(event)">
                     @for ($i = 1; $i <= 5; $i++)
                         @if ($i <= floor($averageRating))
                             <i class="fa fa-star text-warning"></i>
@@ -19,11 +22,14 @@
                             <i class="far fa-star text-muted"></i>
                         @endif
                     @endfor
-                </div>
-                <span class="text-muted small" style="margin-top: 1px;">
+                </a>
+                <a href="#review-form-container" 
+                   class="text-muted small text-decoration-none review-rating-link" 
+                   style="margin-top: 1px; cursor: pointer;"
+                   onclick="scrollToReviews(event)">
                     <strong>{{ number_format($averageRating, 1) }}</strong>
                     ({{ $totalReviews }} {{ Str::plural('review', $totalReviews) }})
-                </span>
+                </a>
             </div>
         @endif
         <div class="pt-2 mb-2 d-flex-justify-content-between border-top">
