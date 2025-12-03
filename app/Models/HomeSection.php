@@ -112,9 +112,19 @@ class HomeSection extends Model
             }
         }
 
-        return $paginate
-            ? $query->paginate($paginate)
-            : $query->get();
+        $result = $paginate
+            ? $query->with([
+                'reviews' => function ($q): void {
+                    $q->where('approved', true)->with('ratings');
+                },
+            ])->paginate($paginate)
+            : $query->with([
+                'reviews' => function ($q): void {
+                    $q->where('approved', true)->with('ratings');
+                },
+            ])->get();
+
+        return $result;
     }
 
     protected function casts(): array

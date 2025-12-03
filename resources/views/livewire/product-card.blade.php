@@ -32,8 +32,20 @@
                 data-name="{{ $product->var_name }}">{{ $product->name }}</a>
         </div>
         @php
-            $averageRating = $product->averageRating('overall');
-            $totalReviews = $product->totalReviews();
+            // Use loaded reviews if available to avoid N+1 queries
+            $approvedReviews = $product->relationLoaded('reviews') ? $product->reviews : collect();
+            if ($product->relationLoaded('reviews')) {
+                $totalReviews = $approvedReviews->count();
+                $overallRatings = $approvedReviews->flatMap(
+                    fn($review) => $review->relationLoaded('ratings')
+                        ? $review->ratings->where('key', 'overall')
+                        : collect(),
+                );
+                $averageRating = $overallRatings->count() > 0 ? $overallRatings->avg('value') : 0;
+            } else {
+                $averageRating = $product->averageRating('overall') ?? 0;
+                $totalReviews = $product->totalReviews() ?? 0;
+            }
         @endphp
         @if ($averageRating > 0)
             <div class="gap-2 d-flex align-items-center" style="font-size: 0.875rem;">

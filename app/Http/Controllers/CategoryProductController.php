@@ -27,8 +27,13 @@ class CategoryProductController extends Controller
         // Apply sorting
         $this->applyProductSorting($query);
 
-        // Eager load categories to prevent N+1 queries when accessing $product->category
-        $products = $query->with('categories')->paginate($per_page)->appends(request()->query());
+        // Eager load categories and reviews to prevent N+1 queries
+        $products = $query->with([
+            'categories',
+            'reviews' => function ($q): void {
+                $q->where('approved', true)->with('ratings');
+            },
+        ])->paginate($per_page)->appends(request()->query());
 
         if (GoogleTagManagerFacade::isEnabled()) {
             GoogleTagManagerFacade::set([

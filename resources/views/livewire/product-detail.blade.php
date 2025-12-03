@@ -4,15 +4,25 @@
             <p class="mb-2">{{ $product->short_description }}</p>
         @endif
         @php
-            $averageRating = $product->averageRating('overall');
-            $totalReviews = $product->totalReviews();
+            // Use loaded reviews if available to avoid N+1 queries
+            if ($product->relationLoaded('reviews')) {
+                $approvedReviews = $product->reviews->where('approved', true);
+                $totalReviews = $approvedReviews->count();
+                $overallRatings = $approvedReviews->flatMap(
+                    fn($review) => $review->relationLoaded('ratings')
+                        ? $review->ratings->where('key', 'overall')
+                        : collect(),
+                );
+                $averageRating = $overallRatings->count() > 0 ? $overallRatings->avg('value') : 0;
+            } else {
+                $averageRating = $product->averageRating('overall') ?? 0;
+                $totalReviews = $product->totalReviews() ?? 0;
+            }
         @endphp
         @if ($averageRating > 0)
             <div class="gap-2 mb-1 d-flex align-items-center">
-                <a href="#review-form-container"
-                   class="d-flex align-items-center text-decoration-none review-rating-link"
-                   style="margin-top: -1px; cursor: pointer;"
-                   onclick="scrollToReviews(event)">
+                <a href="#review-form-container" class="d-flex align-items-center text-decoration-none review-rating-link"
+                    style="margin-top: -1px; cursor: pointer;" onclick="scrollToReviews(event)">
                     @for ($i = 1; $i <= 5; $i++)
                         @if ($i <= floor($averageRating))
                             <i class="fa fa-star text-warning"></i>
@@ -23,10 +33,8 @@
                         @endif
                     @endfor
                 </a>
-                <a href="#review-form-container"
-                   class="text-muted small text-decoration-none review-rating-link"
-                   style="margin-top: 1px; cursor: pointer;"
-                   onclick="scrollToReviews(event)">
+                <a href="#review-form-container" class="text-muted small text-decoration-none review-rating-link"
+                    style="margin-top: 1px; cursor: pointer;" onclick="scrollToReviews(event)">
                     <strong>{{ number_format($averageRating, 1) }}</strong>
                     ({{ $totalReviews }} {{ Str::plural('review', $totalReviews) }})
                 </a>

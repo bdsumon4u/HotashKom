@@ -26,7 +26,12 @@ class BrandProductController extends Controller
         // Apply sorting
         $this->applyProductSorting($query);
 
-        $products = $query->paginate($per_page)->appends(request()->query());
+        // Eager load reviews to prevent N+1 queries
+        $products = $query->with([
+            'reviews' => function ($q): void {
+                $q->where('approved', true)->with('ratings');
+            },
+        ])->paginate($per_page)->appends(request()->query());
 
         // Get filter data
         $filterData = $this->getProductFilterData();

@@ -61,9 +61,29 @@ class ProductController extends Controller
                 })->paginate($per_page);
             } else {
                 $this->applyProductSorting($query);
-                $products = $query->paginate($per_page);
+                $products = $query->with([
+                    'reviews' => function ($q): void {
+                        $q->where('approved', true)->with('ratings');
+                    },
+                ])->paginate($per_page);
             }
         }
+
+        // Eager load reviews for products if not already loaded
+        if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+            $products->getCollection()->loadMissing([
+                'reviews' => function ($q): void {
+                    $q->where('approved', true)->with('ratings');
+                },
+            ]);
+        } else {
+            $products->loadMissing([
+                'reviews' => function ($q): void {
+                    $q->where('approved', true)->with('ratings');
+                },
+            ]);
+        }
+
         $products = $products
             ->appends(request()->query());
 
@@ -87,7 +107,14 @@ class ProductController extends Controller
         if ($product->parent_id) {
             $product = $product->parent;
         }
-        $product->load(['brand', 'categories', 'variations.options']);
+        $product->load([
+            'brand',
+            'categories',
+            'variations.options',
+            'reviews' => function ($q): void {
+                $q->where('approved', true)->with('ratings');
+            },
+        ]);
 
         if (GoogleTagManagerFacade::isEnabled()) {
             GoogleTagManagerFacade::set([

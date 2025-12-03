@@ -129,9 +129,22 @@ class ApiController extends Controller
                 // Explicitly select all columns
                 $q->select('products.*');
             })->paginate(perPage: $perPage, pageName: 'page', page: $page);
+
+            // Eager load reviews for search results
+            if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+                $products->getCollection()->loadMissing([
+                    'reviews' => function ($q): void {
+                        $q->where('approved', true)->with('ratings');
+                    },
+                ]);
+            }
         } else {
-            // Paginate the query
-            $products = $query->paginate(perPage: $perPage, columns: ['*'], pageName: 'page', page: $page);
+            // Paginate the query with eager loading
+            $products = $query->with([
+                'reviews' => function ($q): void {
+                    $q->where('approved', true)->with('ratings');
+                },
+            ])->paginate(perPage: $perPage, columns: ['*'], pageName: 'page', page: $page);
         }
 
         // Load relationships and add base image URL
@@ -140,6 +153,20 @@ class ApiController extends Controller
 
         // Transform products to match the format expected by the frontend
         $transformedProducts = $products->getCollection()->map(function ($product) {
+            // Calculate rating and review count from loaded relationships (avoid N+1)
+            $approvedReviews = $product->reviews ?? collect();
+            $totalReviews = $approvedReviews->count();
+            $averageRating = 0;
+
+            if ($totalReviews > 0) {
+                $overallRatings = $approvedReviews->flatMap(function ($review) {
+                    return $review->ratings->where('key', 'overall');
+                });
+                $averageRating = $overallRatings->count() > 0
+                    ? $overallRatings->avg('value')
+                    : 0;
+            }
+
             return [
                 'id' => $product->id,
                 'name' => $product->name,
@@ -150,8 +177,8 @@ class ApiController extends Controller
                 'stock_count' => $product->stock_count,
                 'base_image_url' => $product->base_image_url ?? '/images/placeholder.jpg',
                 'var_name' => $product->var_name ?? $product->name,
-                'average_rating' => $product->averageRating('overall') ?? 0,
-                'total_reviews' => $product->totalReviews() ?? 0,
+                'average_rating' => $averageRating,
+                'total_reviews' => $totalReviews,
             ];
         });
 
@@ -233,6 +260,10 @@ class ApiController extends Controller
             },
             'categories:id,name,slug',
             'brand:id,name,slug',
+            'reviews' => function ($query): void {
+                $query->where('approved', true)
+                    ->with('ratings');
+            },
         ]);
     }
 
@@ -245,9 +276,20 @@ class ApiController extends Controller
         $collection->transform(function ($product) {
             $product->base_image_url = cdn($product->base_image?->src) ?? '/images/placeholder.jpg';
 
-            // Add rating and review count
-            $product->average_rating = $product->averageRating('overall') ?? 0;
-            $product->total_reviews = $product->totalReviews() ?? 0;
+            // Calculate rating and review count from loaded relationships (avoid N+1)
+            $approvedReviews = $product->reviews ?? collect();
+            $product->total_reviews = $approvedReviews->count();
+
+            if ($product->total_reviews > 0) {
+                $overallRatings = $approvedReviews->flatMap(function ($review) {
+                    return $review->ratings->where('key', 'overall');
+                });
+                $product->average_rating = $overallRatings->count() > 0
+                    ? $overallRatings->avg('value')
+                    : 0;
+            } else {
+                $product->average_rating = 0;
+            }
 
             return $product;
         });
@@ -289,6 +331,10 @@ class ApiController extends Controller
                     'images' => function ($query): void {
                         $query->select('images.id', 'images.path')->withPivot(['img_type', 'order']);
                     },
+                    'reviews' => function ($query): void {
+                        $query->where('approved', true)
+                            ->with('ratings');
+                    },
                 ])
                 ->select([
                     'id', 'name', 'slug', 'price', 'selling_price',
@@ -296,21 +342,37 @@ class ApiController extends Controller
                 ])
                 ->limit(config('services.products_count.related', 20))
                 ->get()
-                ->transform(fn ($product): array => array_merge($product->toArray(), [
-                    'images' => $product->images->pluck('src')->toArray(),
-                    'base_image_url' => $product->base_image ? asset($product->base_image->src) : null,
-                    'price' => $product->selling_price,
-                    'compareAtPrice' => $product->price,
-                    'badges' => [],
-                    'brand' => [],
-                    'categories' => [],
-                    'reviews' => $product->totalReviews() ?? 0,
-                    'rating' => $product->averageRating('overall') ?? 0,
-                    'average_rating' => $product->averageRating('overall') ?? 0,
-                    'total_reviews' => $product->totalReviews() ?? 0,
-                    'attributes' => [],
-                    'availability' => $product->should_track ? $product->stock_count : 'In Stock',
-                ]));
+                ->transform(function ($product): array {
+                    // Calculate rating and review count from loaded relationships (avoid N+1)
+                    $approvedReviews = $product->reviews ?? collect();
+                    $totalReviews = $approvedReviews->count();
+                    $averageRating = 0;
+
+                    if ($totalReviews > 0) {
+                        $overallRatings = $approvedReviews->flatMap(function ($review) {
+                            return $review->ratings->where('key', 'overall');
+                        });
+                        $averageRating = $overallRatings->count() > 0
+                            ? $overallRatings->avg('value')
+                            : 0;
+                    }
+
+                    return array_merge($product->toArray(), [
+                        'images' => $product->images->pluck('src')->toArray(),
+                        'base_image_url' => $product->base_image ? asset($product->base_image->src) : null,
+                        'price' => $product->selling_price,
+                        'compareAtPrice' => $product->price,
+                        'badges' => [],
+                        'brand' => [],
+                        'categories' => [],
+                        'reviews' => $totalReviews,
+                        'rating' => $averageRating,
+                        'average_rating' => $averageRating,
+                        'total_reviews' => $totalReviews,
+                        'attributes' => [],
+                        'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+                    ]);
+                });
         });
     }
 
