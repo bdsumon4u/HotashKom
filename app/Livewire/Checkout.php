@@ -373,7 +373,7 @@ class Checkout extends Component
 
             $data += [
                 'source_id' => config('app.instant_order_forwarding') ? 0 : null,
-                'admin_id' => $admin->id,
+                'admin_id' => $admin->id ?? Admin::query()->inRandomOrder()->first()->id,
                 'user_id' => $user->id, // If User Logged In
                 'status' => $status,
                 'status_at' => now()->toDateTimeString(),
