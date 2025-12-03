@@ -225,6 +225,7 @@
                                  <div class="product-card__name">
                                      <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
                                  </div>
+                                 ${this.getRatingHTML(product)}
                              </div>
                              <div class="product-card__actions">
                                  <div class="product-card__availability">Availability:
@@ -284,6 +285,39 @@
                 return container && container.dataset.userVerified === 'true';
             },
 
+            getRatingHTML(product) {
+                const averageRating = product.average_rating || 0;
+                const totalReviews = product.total_reviews || 0;
+
+                if (averageRating <= 0) {
+                    return '';
+                }
+
+                let starsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= Math.floor(averageRating)) {
+                        starsHTML += '<i class="fa fa-star text-warning" style="font-size: 0.75rem;"></i>';
+                    } else if (i - 0.5 <= averageRating) {
+                        starsHTML += '<i class="fa fa-star-half-alt text-warning" style="font-size: 0.75rem;"></i>';
+                    } else {
+                        starsHTML += '<i class="far fa-star text-muted" style="font-size: 0.75rem;"></i>';
+                    }
+                }
+
+                const reviewText = totalReviews === 1 ? 'review' : 'reviews';
+
+                return `
+                    <div class="gap-2 d-flex align-items-center" style="font-size: 0.875rem;">
+                        <div class="d-flex align-items-center" style="margin-top: -1px;">
+                            ${starsHTML}
+                        </div>
+                        <span class="text-muted small" style="margin-top: 1px;">
+                            <strong>${averageRating.toFixed(1)}</strong>
+                            (${totalReviews} ${reviewText})
+                        </span>
+                    </div>
+                `;
+            },
 
             setupIntersectionObserver() {
                 this.observer = new IntersectionObserver((entries) => {

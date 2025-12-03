@@ -150,6 +150,8 @@ class ApiController extends Controller
                 'stock_count' => $product->stock_count,
                 'base_image_url' => $product->base_image_url ?? '/images/placeholder.jpg',
                 'var_name' => $product->var_name ?? $product->name,
+                'average_rating' => $product->averageRating('overall') ?? 0,
+                'total_reviews' => $product->totalReviews() ?? 0,
             ];
         });
 
@@ -243,6 +245,10 @@ class ApiController extends Controller
         $collection->transform(function ($product) {
             $product->base_image_url = cdn($product->base_image?->src) ?? '/images/placeholder.jpg';
 
+            // Add rating and review count
+            $product->average_rating = $product->averageRating('overall') ?? 0;
+            $product->total_reviews = $product->totalReviews() ?? 0;
+
             return $product;
         });
     }
@@ -298,8 +304,10 @@ class ApiController extends Controller
                     'badges' => [],
                     'brand' => [],
                     'categories' => [],
-                    'reviews' => 0,
-                    'rating' => 0,
+                    'reviews' => $product->totalReviews() ?? 0,
+                    'rating' => $product->averageRating('overall') ?? 0,
+                    'average_rating' => $product->averageRating('overall') ?? 0,
+                    'total_reviews' => $product->totalReviews() ?? 0,
                     'attributes' => [],
                     'availability' => $product->should_track ? $product->stock_count : 'In Stock',
                 ]));

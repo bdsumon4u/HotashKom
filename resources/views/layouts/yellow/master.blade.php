@@ -32,7 +32,7 @@
     <link rel="preload" href="{{ $jqueryJs }}" as="script" crossorigin="anonymous">
 
     {{-- Preconnect to CDN domains for faster DNS resolution --}}
-    @if(config('cdn.enabled', true))
+    @if (config('cdn.enabled', true))
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
         <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -40,15 +40,10 @@
     @endif
 
     {{-- Global jQuery (needed for SPA navigation) --}}
-    <script
-        src="{{ $jqueryJs }}"
-        data-navigate-once
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"
-        onerror="window.__loadLocalAsset && window.__loadLocalAsset('jquery')"
-    ></script>
+    <script src="{{ $jqueryJs }}" data-navigate-once crossorigin="anonymous" referrerpolicy="no-referrer"
+        onerror="window.__loadLocalAsset && window.__loadLocalAsset('jquery')"></script>
     <script data-navigate-once>
-        (function () {
+        (function() {
             if (window.runWhenJQueryReady) {
                 window.__flushRunWhenJQueryQueue && window.__flushRunWhenJQueryQueue();
                 return;
@@ -77,7 +72,7 @@
 
             window.__flushRunWhenJQueryQueue = flushQueue;
 
-            window.runWhenJQueryReady = function (callback) {
+            window.runWhenJQueryReady = function(callback) {
                 if (typeof window.jQuery !== 'undefined') {
                     callback(window.jQuery);
                 } else {
@@ -85,7 +80,9 @@
                 }
             };
 
-            document.addEventListener('DOMContentLoaded', scheduleFlush, { once: true });
+            document.addEventListener('DOMContentLoaded', scheduleFlush, {
+                once: true
+            });
             document.addEventListener('livewire:navigate', scheduleFlush);
             scheduleFlush();
             if (document.readyState !== 'loading') {
@@ -97,25 +94,33 @@
 
     <!-- css -->
     @include('googletagmanager::head')
-    <x-metapixel-head/>
+    <x-metapixel-head />
     @include('layouts.yellow.css')
     <!-- js -->
     <!-- font - fontawesome -->
-    <link rel="stylesheet" href="{{ $fontawesomeCss }}" crossorigin="anonymous" referrerpolicy="no-referrer"><!-- font - stroyka -->
+    <link rel="stylesheet" href="{{ $fontawesomeCss }}" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- font - stroyka -->
     <link rel="stylesheet" href="{{ asset('strokya/fonts/stroyka/stroyka.css') }}">
     @include('layouts.yellow.color')
     <style>
-        [x-cloak] { display: none !important; }
+        [x-cloak] {
+            display: none !important;
+        }
+
         .topbar__item {
             flex: none;
         }
+
         .page-header__container {
             padding-bottom: 12px;
         }
+
         .products-list__item {
             justify-content: space-between;
         }
+
         @media (max-width: 479px) {
+
             /* .products-list[data-layout=grid-5-full] .products-list__item {
                 width: 46%;
                 margin: 8px 6px;
@@ -124,45 +129,57 @@
                 font-size: 0.75rem;
             }
         }
+
         @media (max-width: 575px) {
             .mobile-header__search {
                 top: 55px;
             }
+
             .mobile-header__search-form .aa-input-icon {
                 display: none;
             }
-            .mobile-header__search-form .aa-hint, .mobile-header__search-form .aa-input {
+
+            .mobile-header__search-form .aa-hint,
+            .mobile-header__search-form .aa-input {
                 padding-right: 15px !important;
             }
+
             .block-products-carousel[data-layout=grid-4] .product-card .product-card__buttons .btn {
                 height: auto;
             }
         }
+
         .product-card:before,
         .owl-carousel {
             z-index: 0;
         }
+
         .block-products-carousel[data-layout^=grid-] .product-card .product-card__info,
         .products-list[data-layout^=grid-] .product-card .product-card__info {
             padding: 0 14px;
         }
+
         .block-products-carousel[data-layout^=grid-] .product-card .product-card__actions,
         .products-list[data-layout^=grid-] .product-card .product-card__actions {
             padding: 0 14px 14px 14px;
         }
+
         .product-card__badges-list {
             flex-direction: row;
         }
+
         .product-card__name {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
         .product-card__buttons {
             margin-right: -12px !important;
             /* margin-bottom: -12px !important; */
             margin-left: -12px !important;
         }
+
         .product-card__buttons .btn {
             height: auto !important;
             font-size: 20px !important;
@@ -171,67 +188,84 @@
             display: block;
             width: 100%;
         }
+
         .aa-input-container {
             width: 100%;
         }
+
         .algolia-autocomplete {
             width: 100%;
             display: flex !important;
         }
+
         #aa-search-input {
             box-shadow: none;
         }
+
         .indicator__area {
             padding: 0 8px;
         }
+
         .mobile-header__search.mobile-header__search--opened {
             height: 100%;
             display: flex;
             align-items: center;
         }
+
         .mobile-header__search-form {
             width: 100%;
         }
+
         .mobile-header__search-form .aa-input-container {
             display: flex;
         }
+
         .mobile-header__search-form .aa-input-search {
             box-shadow: none;
         }
+
         .mobile-header__search-form .aa-hint,
         .mobile-header__search-form .aa-input {
             height: 54px;
             padding-right: 32px;
         }
+
         .mobile-header__search-form .aa-input-icon {
             right: 62px;
         }
+
         .mobile-header__search-form .aa-dropdown-menu {
             background-color: #f7f8f9;
             z-index: 9999 !important;
         }
+
         .aa-input-container input {
             font-size: 15px;
 
         }
+
         .toast {
             position: absolute;
             top: 10%;
             right: 10%;
             z-index: 9999;
         }
+
         .header-fixed .site__body {
             padding-top: 11rem;
         }
+
         @media (max-width: 991px) {
             .header-fixed .site__header {
                 position: fixed;
                 width: 100%;
                 z-index: 9999;
             }
+
             .header-fixed .site__body {
                 padding-top: 85px;
             }
+
             .header-fixed .mobilemenu__body {
                 top: 85px;
             }
@@ -248,36 +282,361 @@
             top: 0;
             min-width: 100%;
         }
+
         .site-header.sticky .site-header__middle {
             height: 65px;
         }
+
         /*.site-header.sticky .site-header__nav-panel,*/
         .site-header.sticky .site-header__topbar {
             display: none;
         }
+
         ::placeholder {
             color: #777 !important;
         }
 
 
-        .widget-connect{position:fixed;bottom:30px;z-index:99 !important;cursor:pointer}.widget-connect-right{right:27px;bottom:22px}.widget-connect-left{left:20px}@media (max-width:768px){.widget-connect-left{left:10px;bottom:10px}}.widget-connect.active .widget-connect__button{display:grid;place-content:center;padding-top:5px}.widget-connect__button{display:none;height:55px;width:55px;margin:auto;margin-bottom:15px;border-radius:50%;overflow:hidden;box-shadow:2px 2px 6px rgba(0, 0, 0, .4);font-size:28px;text-align:center;line-height:50px;color:#fff;outline:0
-!important;background-position:center center;background-repeat:no-repeat;transition:all;transition-duration: .2s}@media (max-width:768px){.widget-connect__button{height:50px;width:50px}}.widget-connect__button-activator:hover,.widget-connect__button:hover{box-shadow:2px 2px 8px 2px rgba(0,0,0,.4)}.widget-connect__button:active{height:48px;width:48px;box-shadow:2px 2px 6px rgba(0, 0, 0, 0);transition:all;transition-duration: .2s}@media (max-width:768px){.widget-connect__button:active{height:45px;width:45px}}.widget-connect__button-activator{margin:auto;border-radius:50%;box-shadow:2px 2px 6px rgba(0, 0, 0, .4);background-position:center center;background-repeat:no-repeat;transition:all;transition-duration: .2s;text-align:right;z-index:99!important}.widget-connect__button-activator-icon{height:55px;width:55px;background-image:url(/multi-chat.svg);background-size:55%;background-position:center center;background-repeat:no-repeat;-webkit-transition-duration: .2s;-moz-transition-duration: .2s;-o-transition-duration: .2s;transition-duration: .2s}@media (max-width:768px){.widget-connect__button-activator-icon{height:50px;width:50px}}.widget-connect__button-activator-icon.active{background-image:url(/multi-chat.svg);background-size:45%;transform:rotate(90deg)}.widget-connect__button-telephone{background-color:#FFB200;background-image:url(/catalog/view/theme/default/image/widget-multi-chat/call.svg);background-size:55%}.widget-connect__button-messenger{background-color:#0866FF;background-image:url(/catalog/view/theme/default/image/widget-multi-chat/messenger.svg);background-size:65%;background-position-x:9px}.widget-connect__button-whatsapp{background-color:#25d366;background-image:url(/catalog/view/theme/default/image/widget-multi-chat/whatsapp.svg);background-size:65%}@-webkit-keyframes button-slide{0%{opacity:0;display:none;margin-top:0;margin-bottom:0;-ms-transform:translateY(15px);-webkit-transform:translateY(15px);-moz-transform:translateY(15px);-o-transform:translateY(15px);transform:translateY(15px)}to{opacity:1;display:block;margin-top:0;margin-bottom:10px;-ms-transform:translateY(0);-webkit-transform:translateY(0);-moz-transform:translateY(0);-o-transform:translateY(0);transform:translateY(0)}}@-moz-keyframes button-slide{0%{opacity:0;display:none;margin-top:0;margin-bottom:0;-ms-transform:translateY(15px);-webkit-transform:translateY(15px);-moz-transform:translateY(15px);-o-transform:translateY(15px);transform:translateY(15px)}to{opacity:1;display:block;margin-top:0;margin-bottom:9px;-ms-transform:translateY(0);-webkit-transform:translateY(0);-moz-transform:translateY(0);-o-transform:translateY(0);transform:translateY(0)}}@-o-keyframes button-slide{0%{opacity:0;display:none;margin-top:0;margin-bottom:0;-ms-transform:translateY(15px);-webkit-transform:translateY(15px);-moz-transform:translateY(15px);-o-transform:translateY(15px);transform:translateY(15px)}to{opacity:1;display:block;margin-top:0;margin-bottom:10px;-ms-transform:translateY(0);-webkit-transform:translateY(0);-moz-transform:translateY(0);-o-transform:translateY(0);transform:translateY(0)}}@keyframes button-slide{0%{opacity:0;display:none;margin-top:0;margin-bottom:0;-ms-transform:translateY(15px);-webkit-transform:translateY(15px);-moz-transform:translateY(15px);-o-transform:translateY(15px);transform:translateY(15px)}to{opacity:1;display:block;margin-top:0;margin-bottom:10px;-ms-transform:translateY(0);-webkit-transform:translateY(0);-moz-transform:translateY(0);-o-transform:translateY(0);transform:translateY(0)}}.button-slide{-webkit-animation-name:button-slide;-moz-animation-name:button-slide;-o-animation-name:button-slide;animation-name:button-slide;-webkit-animation-duration: .2s;-moz-animation-duration: .2s;-o-animation-duration: .2s;animation-duration: .2s;-webkit-animation-fill-mode:forwards;-moz-animation-fill-mode:forwards;-o-animation-fill-mode:forwards;animation-fill-mode:forwards}.button-slide-out{-webkit-animation-name:button-slide;-moz-animation-name:button-slide;-o-animation-name:button-slide;animation-name:button-slide;-webkit-animation-duration: .2s;-moz-animation-duration: .2s;-o-animation-duration: .2s;animation-duration: .2s;-webkit-animation-fill-mode:forwards;-moz-animation-fill-mode:forwards;-o-animation-fill-mode:forwards;animation-fill-mode:forwards;-webkit-animation-direction:reverse;-moz-animation-direction:reverse;-o-animation-direction:reverse;animation-direction:reverse}.widget-connect
-.tooltip{position:absolute;z-index:99 !important;display:block;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:12px;font-style:normal;font-weight:400;line-height:1.42857143;text-align:left;text-align:start;text-decoration:none;text-shadow:none;text-transform:none;letter-spacing:normal;word-break:normal;word-spacing:normal;word-wrap:normal;white-space:normal;filter:alpha(opacity=0);opacity:0;line-break:auto;padding:5px}.tooltip-inner{max-width:200px;padding:5px
-10px;color:#fff;text-align:center;background-color:#333;border-radius:4px}.tooltip.left .tooltip-arrow{top:50%;right:0;margin-top:-5px;border-width:5px 0 5px 5px;border-left-color:#333}.tooltip.right .tooltip-arrow{top:50%;left:0;margin-top:-5px;border-width:5px 5px 5px 0;border-right-color:#333}@media only screen and (max-width: 575px){.widget-connect-right{bottom:50px !important}}
+        .widget-connect {
+            position: fixed;
+            bottom: 30px;
+            z-index: 99 !important;
+            cursor: pointer
+        }
+
+        .widget-connect-right {
+            right: 27px;
+            bottom: 22px
+        }
+
+        .widget-connect-left {
+            left: 20px
+        }
+
+        @media (max-width:768px) {
+            .widget-connect-left {
+                left: 10px;
+                bottom: 10px
+            }
+        }
+
+        .widget-connect.active .widget-connect__button {
+            display: grid;
+            place-content: center;
+            padding-top: 5px
+        }
+
+        .widget-connect__button {
+            display: none;
+            height: 55px;
+            width: 55px;
+            margin: auto;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
+            font-size: 28px;
+            text-align: center;
+            line-height: 50px;
+            color: #fff;
+            outline: 0 !important;
+            background-position: center center;
+            background-repeat: no-repeat;
+            transition: all;
+            transition-duration: .2s
+        }
+
+        @media (max-width:768px) {
+            .widget-connect__button {
+                height: 50px;
+                width: 50px
+            }
+        }
+
+        .widget-connect__button-activator:hover,
+        .widget-connect__button:hover {
+            box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, .4)
+        }
+
+        .widget-connect__button:active {
+            height: 48px;
+            width: 48px;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0);
+            transition: all;
+            transition-duration: .2s
+        }
+
+        @media (max-width:768px) {
+            .widget-connect__button:active {
+                height: 45px;
+                width: 45px
+            }
+        }
+
+        .widget-connect__button-activator {
+            margin: auto;
+            border-radius: 50%;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
+            background-position: center center;
+            background-repeat: no-repeat;
+            transition: all;
+            transition-duration: .2s;
+            text-align: right;
+            z-index: 99 !important
+        }
+
+        .widget-connect__button-activator-icon {
+            height: 55px;
+            width: 55px;
+            background-image: url(/multi-chat.svg);
+            background-size: 55%;
+            background-position: center center;
+            background-repeat: no-repeat;
+            -webkit-transition-duration: .2s;
+            -moz-transition-duration: .2s;
+            -o-transition-duration: .2s;
+            transition-duration: .2s
+        }
+
+        @media (max-width:768px) {
+            .widget-connect__button-activator-icon {
+                height: 50px;
+                width: 50px
+            }
+        }
+
+        .widget-connect__button-activator-icon.active {
+            background-image: url(/multi-chat.svg);
+            background-size: 45%;
+            transform: rotate(90deg)
+        }
+
+        .widget-connect__button-telephone {
+            background-color: #FFB200;
+            background-image: url(/catalog/view/theme/default/image/widget-multi-chat/call.svg);
+            background-size: 55%
+        }
+
+        .widget-connect__button-messenger {
+            background-color: #0866FF;
+            background-image: url(/catalog/view/theme/default/image/widget-multi-chat/messenger.svg);
+            background-size: 65%;
+            background-position-x: 9px
+        }
+
+        .widget-connect__button-whatsapp {
+            background-color: #25d366;
+            background-image: url(/catalog/view/theme/default/image/widget-multi-chat/whatsapp.svg);
+            background-size: 65%
+        }
+
+        @-webkit-keyframes button-slide {
+            0% {
+                opacity: 0;
+                display: none;
+                margin-top: 0;
+                margin-bottom: 0;
+                -ms-transform: translateY(15px);
+                -webkit-transform: translateY(15px);
+                -moz-transform: translateY(15px);
+                -o-transform: translateY(15px);
+                transform: translateY(15px)
+            }
+
+            to {
+                opacity: 1;
+                display: block;
+                margin-top: 0;
+                margin-bottom: 10px;
+                -ms-transform: translateY(0);
+                -webkit-transform: translateY(0);
+                -moz-transform: translateY(0);
+                -o-transform: translateY(0);
+                transform: translateY(0)
+            }
+        }
+
+        @-moz-keyframes button-slide {
+            0% {
+                opacity: 0;
+                display: none;
+                margin-top: 0;
+                margin-bottom: 0;
+                -ms-transform: translateY(15px);
+                -webkit-transform: translateY(15px);
+                -moz-transform: translateY(15px);
+                -o-transform: translateY(15px);
+                transform: translateY(15px)
+            }
+
+            to {
+                opacity: 1;
+                display: block;
+                margin-top: 0;
+                margin-bottom: 9px;
+                -ms-transform: translateY(0);
+                -webkit-transform: translateY(0);
+                -moz-transform: translateY(0);
+                -o-transform: translateY(0);
+                transform: translateY(0)
+            }
+        }
+
+        @-o-keyframes button-slide {
+            0% {
+                opacity: 0;
+                display: none;
+                margin-top: 0;
+                margin-bottom: 0;
+                -ms-transform: translateY(15px);
+                -webkit-transform: translateY(15px);
+                -moz-transform: translateY(15px);
+                -o-transform: translateY(15px);
+                transform: translateY(15px)
+            }
+
+            to {
+                opacity: 1;
+                display: block;
+                margin-top: 0;
+                margin-bottom: 10px;
+                -ms-transform: translateY(0);
+                -webkit-transform: translateY(0);
+                -moz-transform: translateY(0);
+                -o-transform: translateY(0);
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes button-slide {
+            0% {
+                opacity: 0;
+                display: none;
+                margin-top: 0;
+                margin-bottom: 0;
+                -ms-transform: translateY(15px);
+                -webkit-transform: translateY(15px);
+                -moz-transform: translateY(15px);
+                -o-transform: translateY(15px);
+                transform: translateY(15px)
+            }
+
+            to {
+                opacity: 1;
+                display: block;
+                margin-top: 0;
+                margin-bottom: 10px;
+                -ms-transform: translateY(0);
+                -webkit-transform: translateY(0);
+                -moz-transform: translateY(0);
+                -o-transform: translateY(0);
+                transform: translateY(0)
+            }
+        }
+
+        .button-slide {
+            -webkit-animation-name: button-slide;
+            -moz-animation-name: button-slide;
+            -o-animation-name: button-slide;
+            animation-name: button-slide;
+            -webkit-animation-duration: .2s;
+            -moz-animation-duration: .2s;
+            -o-animation-duration: .2s;
+            animation-duration: .2s;
+            -webkit-animation-fill-mode: forwards;
+            -moz-animation-fill-mode: forwards;
+            -o-animation-fill-mode: forwards;
+            animation-fill-mode: forwards
+        }
+
+        .button-slide-out {
+            -webkit-animation-name: button-slide;
+            -moz-animation-name: button-slide;
+            -o-animation-name: button-slide;
+            animation-name: button-slide;
+            -webkit-animation-duration: .2s;
+            -moz-animation-duration: .2s;
+            -o-animation-duration: .2s;
+            animation-duration: .2s;
+            -webkit-animation-fill-mode: forwards;
+            -moz-animation-fill-mode: forwards;
+            -o-animation-fill-mode: forwards;
+            animation-fill-mode: forwards;
+            -webkit-animation-direction: reverse;
+            -moz-animation-direction: reverse;
+            -o-animation-direction: reverse;
+            animation-direction: reverse
+        }
+
+        .widget-connect .tooltip {
+            position: absolute;
+            z-index: 99 !important;
+            display: block;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 1.42857143;
+            text-align: left;
+            text-align: start;
+            text-decoration: none;
+            text-shadow: none;
+            text-transform: none;
+            letter-spacing: normal;
+            word-break: normal;
+            word-spacing: normal;
+            word-wrap: normal;
+            white-space: normal;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            line-break: auto;
+            padding: 5px
+        }
+
+        .tooltip-inner {
+            max-width: 200px;
+            padding: 5px 10px;
+            color: #fff;
+            text-align: center;
+            background-color: #333;
+            border-radius: 4px
+        }
+
+        .tooltip.left .tooltip-arrow {
+            top: 50%;
+            right: 0;
+            margin-top: -5px;
+            border-width: 5px 0 5px 5px;
+            border-left-color: #333
+        }
+
+        .tooltip.right .tooltip-arrow {
+            top: 50%;
+            left: 0;
+            margin-top: -5px;
+            border-width: 5px 5px 5px 0;
+            border-right-color: #333
+        }
+
+        @media only screen and (max-width: 575px) {
+            .widget-connect-right {
+                bottom: 50px !important
+            }
+        }
     </style>
     @stack('styles')
     @livewireStyles
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet">
-{!! $scripts ?? null !!}
-@stack('head')
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet">
+    {!! $scripts ?? null !!}
+    @stack('head')
 </head>
 
 <body class="header-fixed" style="margin: 0; padding: 0;">
     <x-livewire-progress bar-class="bg-warning" track-class="bg-white/50" />
     @include('googletagmanager::body')
-    <x-metapixel-body/>
+    <x-metapixel-body />
     <!-- quickview-modal -->
     <div id="quickview-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -297,7 +656,8 @@
                 </button>
             </div>
             <div class="mobilemenu__content">
-                <ul class="mobile-links mobile-links--level--0" data-collapse data-collapse-opened-class="mobile-links__item--open">
+                <ul class="mobile-links mobile-links--level--0" data-collapse
+                    data-collapse-opened-class="mobile-links__item--open">
                     @include('partials.mobile-menu-categories')
                     @include('partials.header.menu.mobile')
                 </ul>
@@ -315,8 +675,8 @@
         <!-- site__body -->
         <div class="site__body">
             <div class="container">
-                @if(!request()->routeIs('/'))
-                <x-reseller-verification-alert />
+                @if (!request()->routeIs('/'))
+                    <x-reseller-verification-alert />
                 @endif
                 <x-alert-box class="mt-2 row" />
             </div>
@@ -333,7 +693,7 @@
     <script src="{{ asset('strokya/vendor/xZoom-master/example/js/vendor/modernizr.js') }}"></script>
     <script src="{{ asset('strokya/vendor/xZoom-master/example/js/setup.js') }}"></script>
     <script>
-        (function () {
+        (function() {
             function registerLazyRelatedProductsComponent() {
                 if (window.__lazyRelatedProductsComponentRegistered) {
                     return;
@@ -356,7 +716,8 @@
                         init() {
                             this.observer = new IntersectionObserver((entries) => {
                                 entries.forEach(entry => {
-                                    if (entry.isIntersecting && !this.loaded && !this.loading) {
+                                    if (entry.isIntersecting && !this.loaded && !this
+                                        .loading) {
                                         this.loadProducts();
                                     }
                                 });
@@ -385,7 +746,9 @@
                             }
 
                             try {
-                                const response = await fetch(`/api/products/${encodeURIComponent(this.productId)}/related.json`);
+                                const response = await fetch(
+                                    `/api/products/${encodeURIComponent(this.productId)}/related.json`
+                                    );
 
                                 if (response.ok) {
                                     const products = await response.json();
@@ -393,11 +756,13 @@
                                     this.loaded = true;
                                     this.observer?.disconnect();
                                 } else {
-                                    container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
+                                    container.innerHTML =
+                                        '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
                                 }
                             } catch (error) {
                                 console.error('Error loading related products:', error);
-                                container.innerHTML = '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
+                                container.innerHTML =
+                                    '<div class="py-5 text-center text-muted">Unable to load related products.</div>';
                             }
 
                             this.loading = false;
@@ -405,7 +770,8 @@
 
                         renderProducts(products, container) {
                             if (!products || products.length === 0) {
-                                container.innerHTML = '<div class="py-5 text-center text-muted">No related products found.</div>';
+                                container.innerHTML =
+                                    '<div class="py-5 text-center text-muted">No related products found.</div>';
                                 return;
                             }
 
@@ -426,11 +792,13 @@
                         },
 
                         attachNavigationHandlers(element) {
-                            const productLinks = element.querySelectorAll('a.product-link[data-navigate]');
+                            const productLinks = element.querySelectorAll(
+                                'a.product-link[data-navigate]');
                             productLinks.forEach(link => {
                                 link.addEventListener('click', (e) => {
                                     const href = link.getAttribute('href');
-                                    if (href && window.Livewire && window.Livewire.navigate) {
+                                    if (href && window.Livewire && window.Livewire
+                                        .navigate) {
                                         e.preventDefault();
                                         window.Livewire.navigate(href);
                                     }
@@ -444,22 +812,30 @@
                             const productSlug = product.slug || productId;
                             const productPrice = product.compareAtPrice || product.price || 0;
                             const productSellingPrice = product.price || productPrice;
-                            const productImage = product.base_image_url || (product.images && product.images.length > 0
-                                ? `/storage/${product.images[0]}`
-                                : '/images/placeholder.jpg');
+                            const productImage = product.base_image_url || (product.images && product
+                                .images.length > 0 ?
+                                `/storage/${product.images[0]}` :
+                                '/images/placeholder.jpg');
                             const productUrl = `/products/${encodeURIComponent(productSlug)}`;
-                            const inStock = product.availability !== 'Out of Stock' && (product.availability === 'In Stock' || (product.availability && parseInt(product.availability) > 0));
-                            const stockCount = typeof product.availability === 'number' ? product.availability : (product.availability === 'In Stock' ? null : 0);
-                            const shouldTrack = typeof product.availability === 'number' || product.availability !== 'In Stock';
-                            const hasDiscount = productPrice !== productSellingPrice && productPrice > 0;
-                            const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
+                            const inStock = product.availability !== 'Out of Stock' && (product
+                                .availability === 'In Stock' || (product.availability && parseInt(
+                                    product.availability) > 0));
+                            const stockCount = typeof product.availability === 'number' ? product
+                                .availability : (product.availability === 'In Stock' ? null : 0);
+                            const shouldTrack = typeof product.availability === 'number' || product
+                                .availability !== 'In Stock';
+                            const hasDiscount = productPrice !== productSellingPrice && productPrice >
+                            0;
+                            const discountPercent = hasDiscount ? Math.round(((productPrice -
+                                productSellingPrice) * 100) / productPrice) : 0;
 
                             const showOption = JSON.parse(this.$el.dataset.showOption || '{}');
                             const isOninda = this.$el.dataset.isOninda === 'true';
                             const guestCanSeePrice = this.$el.dataset.guestCanSeePrice === 'true';
                             const userIsGuest = this.$el.dataset.userGuest === 'true';
                             const userIsVerified = this.$el.dataset.userVerified === 'true';
-                            const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !userIsVerified);
+                            const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !
+                                userIsVerified);
 
                             const formatPrice = (price) => {
                                 return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
@@ -499,12 +875,52 @@
                                     userIsGuest ? 'Login to see price' : 'Verify account to see price'
                                 }</span>`;
                             } else if (hasDiscount) {
-                                priceHTML = `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
+                                priceHTML =
+                                    `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
                             } else {
                                 priceHTML = formatPrice(productSellingPrice);
                             }
 
-                            const discountText = (showOption.discount_text || '<small>Discount:</small> [percent]%').replace('[percent]', discountPercent);
+                            const discountText = (showOption.discount_text ||
+                                '<small>Discount:</small> [percent]%').replace('[percent]',
+                                discountPercent);
+
+                            const getRatingHTML = (product) => {
+                                const averageRating = product.average_rating || product.rating || 0;
+                                const totalReviews = product.total_reviews || product.reviews || 0;
+
+                                if (averageRating <= 0) {
+                                    return '';
+                                }
+
+                                let starsHTML = '';
+                                for (let i = 1; i <= 5; i++) {
+                                    if (i <= Math.floor(averageRating)) {
+                                        starsHTML +=
+                                            '<i class="fa fa-star text-warning" style="font-size: 0.75rem;"></i>';
+                                    } else if (i - 0.5 <= averageRating) {
+                                        starsHTML +=
+                                            '<i class="fa fa-star-half-alt text-warning" style="font-size: 0.75rem;"></i>';
+                                    } else {
+                                        starsHTML +=
+                                            '<i class="far fa-star text-muted" style="font-size: 0.75rem;"></i>';
+                                    }
+                                }
+
+                                const reviewText = totalReviews === 1 ? 'review' : 'reviews';
+
+                                return `
+                                    <div class="gap-2 d-flex align-items-center" style="font-size: 0.875rem;">
+                                        <div class="d-flex align-items-center" style="margin-top: -1px;">
+                                            ${starsHTML}
+                                        </div>
+                                        <span class="text-muted small" style="margin-top: 1px;">
+                                            <strong>${averageRating.toFixed(1)}</strong>
+                                            (${totalReviews} ${reviewText})
+                                        </span>
+                                    </div>
+                                `;
+                            };
 
                             return `
                                 <div class="product-card" data-id="${productId}" data-max="${shouldTrack ? (stockCount || 0) : -1}">
@@ -521,6 +937,7 @@
                                         <div class="product-card__name">
                                             <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
                                         </div>
+                                        ${getRatingHTML(product)}
                                     </div>
                                     <div class="product-card__actions">
                                         <div class="product-card__availability">Availability:
@@ -543,7 +960,9 @@
                 if (window.Alpine) {
                     initComponent();
                 } else {
-                    document.addEventListener('alpine:init', initComponent, { once: true });
+                    document.addEventListener('alpine:init', initComponent, {
+                        once: true
+                    });
                 }
             }
 
@@ -565,13 +984,13 @@
                     const namespace = '.productShow';
                     const $galleries = $('.xzoom-gallery');
 
-                    if (! $galleries.length) {
+                    if (!$galleries.length) {
                         return;
                     }
 
                     if (typeof $.fn.xzoom === 'function') {
                         // Destroy existing xZoom instances to prevent conflicts on SPA navigation
-                        $('.xzoom, .xzoom-gallery').each(function () {
+                        $('.xzoom, .xzoom-gallery').each(function() {
                             const xzoom = $(this).data('xzoom');
                             if (xzoom && typeof xzoom.destroy === 'function') {
                                 try {
@@ -595,7 +1014,7 @@
                     let autoNavigationTimer = null;
 
                     function updateActiveIndex() {
-                        $galleries.each(function (g, e) {
+                        $galleries.each(function(g, e) {
                             if ($(e).hasClass('xactive')) {
                                 activeG = g;
                             }
@@ -621,27 +1040,27 @@
                         scheduleNextNavigation();
                     }
 
-                    $('.zoom-control.left').off('click'+namespace).on('click'+namespace, function () {
+                    $('.zoom-control.left').off('click' + namespace).on('click' + namespace, function() {
                         updateActiveIndex();
                         const prev = activeG === 0 ? lastG : (activeG - 1);
                         $galleries.eq(prev).trigger('click');
                         resetAutoNavigation();
                     });
 
-                    $('.zoom-control.right').off('click'+namespace).on('click'+namespace, function () {
+                    $('.zoom-control.right').off('click' + namespace).on('click' + namespace, function() {
                         navigateToNext();
                         resetAutoNavigation();
                     });
 
-                    $galleries.off('click'+namespace).on('click'+namespace, function () {
+                    $galleries.off('click' + namespace).on('click' + namespace, function() {
                         resetAutoNavigation();
                     });
 
                     scheduleNextNavigation();
 
-                    window.__handleVariantChange = function (event) {
+                    window.__handleVariantChange = function(event) {
                         const variantId = event.variantId;
-                        const variantImage = $('.variant-image').filter(function () {
+                        const variantImage = $('.variant-image').filter(function() {
                             const ids = $(this).data('variant-ids');
                             return Array.isArray(ids) && ids.includes(variantId);
                         }).first();
@@ -669,15 +1088,17 @@
                         if (window.Livewire) {
                             registerVariantListener();
                         } else {
-                            document.addEventListener('livewire:load', registerVariantListener, { once: true });
+                            document.addEventListener('livewire:load', registerVariantListener, {
+                                once: true
+                            });
                         }
                     }
 
-                    window.__productShowCleanup = function () {
+                    window.__productShowCleanup = function() {
                         clearTimeout(autoNavigationTimer);
-                        $('.zoom-control.left').off('click'+namespace);
-                        $('.zoom-control.right').off('click'+namespace);
-                        $galleries.off('click'+namespace);
+                        $('.zoom-control.left').off('click' + namespace);
+                        $('.zoom-control.right').off('click' + namespace);
+                        $galleries.off('click' + namespace);
                     };
                 });
             }
@@ -720,7 +1141,9 @@
                         const message = typeof data === 'object' ? data.message : data;
                         const type = typeof data === 'object' ? (data.type ?? 'info') : 'info';
 
-                        window.$.notify(message, { type });
+                        window.$.notify(message, {
+                            type
+                        });
                     }
                 }
 
@@ -744,15 +1167,17 @@
             if (window.Livewire) {
                 registerLivewireListener();
             } else {
-                document.addEventListener('livewire:load', registerLivewireListener, { once: true });
+                document.addEventListener('livewire:load', registerLivewireListener, {
+                    once: true
+                });
             }
         })();
 
-        runWhenJQueryReady(function ($) {
+        runWhenJQueryReady(function($) {
 
             $(window)
                 .off('dataLayer.storefront')
-                .on('dataLayer.storefront', function (ev) {
+                .on('dataLayer.storefront', function(ev) {
                     for (let item of ev.detail) {
                         window.dataLayer.push(item);
                     }
@@ -791,7 +1216,8 @@
                             // Clean up overflow override after transition (approx 300ms)
                             setTimeout(() => {
                                 $departments.find('.departments__body').css('overflow', '');
-                                $departments.find('.departments__links-wrapper').css('overflow', '');
+                                $departments.find('.departments__links-wrapper').css('overflow',
+                                '');
                             }, 350);
                         }
 
@@ -803,7 +1229,7 @@
                     if ($('.departments').data('departments-fixed-by') !== '') {
                         $('.departments').addClass('departments--opened departments--fixed');
                         // Ensure we reset any inline overflow styles when reopening/fixing
-                         $('.departments__body, .departments__links-wrapper').css('overflow', '');
+                        $('.departments__body, .departments__links-wrapper').css('overflow', '');
                     }
                     $('.departments--opened.departments--fixed .departments__body').css('min-height', '458px');
                 }
@@ -815,7 +1241,7 @@
     </script>
     <style>
         /* Ensure category submenus show on hover */
-        .departments__item--menu:hover > .departments__menu {
+        .departments__item--menu:hover>.departments__menu {
             display: block !important;
             opacity: 1 !important;
             visibility: visible !important;
@@ -824,7 +1250,7 @@
         }
 
         /* Nested submenus */
-        .departments__menu .menu > li:hover > .menu__submenu {
+        .departments__menu .menu>li:hover>.menu__submenu {
             display: block !important;
             opacity: 1 !important;
             visibility: visible !important;
@@ -840,7 +1266,7 @@
         }
     </style>
     <script data-navigate-once>
-        (function () {
+        (function() {
             // Global error handler for Livewire Navigate to prevent 520/522 errors
             if (window.Livewire) {
                 // Handle navigation errors globally
@@ -853,10 +1279,13 @@
 
                         // If it's a server error (500, 502, 503, 504, 520, 522) or network error, reload
                         if (status >= 500 || status === 0 || status === 520 || status === 522) {
-                            console.warn('Server error during SPA navigation, falling back to full page reload:', status, targetUrl);
+                            console.warn(
+                                'Server error during SPA navigation, falling back to full page reload:',
+                                status, targetUrl);
 
                             // Remove wire:navigate from the link to prevent retry
-                            const activeLink = document.querySelector('a[wire\\:navigate][href="' + targetUrl + '"]');
+                            const activeLink = document.querySelector('a[wire\\:navigate][href="' + targetUrl +
+                                '"]');
                             if (activeLink) {
                                 activeLink.removeAttribute('wire:navigate');
                             }
@@ -915,7 +1344,7 @@
                         $('.departments').removeClass('departments--transition');
                         // Only reset height if not in fixed mode, to avoid layout shifts
                         if (!$('.departments').hasClass('departments--fixed')) {
-                             $('.departments__links-wrapper').css('height', '');
+                            $('.departments__links-wrapper').css('height', '');
                         }
                     }, 350);
                 }
@@ -935,77 +1364,87 @@
                 // Disable button temporarily to prevent double clicks
                 button.disabled = true;
                 const originalText = button.innerHTML;
-                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+                button.innerHTML =
+                    '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
 
                 // Make an API call to add to cart
                 fetch('/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        product_id: productId,
-                        quantity: 1,
-                        instance: action === 'kart' ? 'kart' : 'default'
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                                'content') || '',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            product_id: productId,
+                            quantity: 1,
+                            instance: action === 'kart' ? 'kart' : 'default'
+                        })
                     })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Re-enable button
-                    button.disabled = false;
-                    button.innerHTML = originalText;
+                    .then(response => response.json())
+                    .then(data => {
+                        // Re-enable button
+                        button.disabled = false;
+                        button.innerHTML = originalText;
 
-                    // Show success message
-                    if (data.success) {
-                        // Update cart count if you have a cart count element
-                        const cartCountElement = document.querySelector('.cart-count');
-                        if (cartCountElement && data.cart_count) {
-                            cartCountElement.textContent = data.cart_count;
-                        }
+                        // Show success message
+                        if (data.success) {
+                            // Update cart count if you have a cart count element
+                            const cartCountElement = document.querySelector('.cart-count');
+                            if (cartCountElement && data.cart_count) {
+                                cartCountElement.textContent = data.cart_count;
+                            }
 
-                        // Dispatch cart updated event for Livewire components
-                        if (window.Livewire) {
-                            window.Livewire.dispatch('cartUpdated');
-                        }
+                            // Dispatch cart updated event for Livewire components
+                            if (window.Livewire) {
+                                window.Livewire.dispatch('cartUpdated');
+                            }
 
-                        if (window.Livewire) {
-                            window.Livewire.dispatch('notify', { message: 'Product added to cart' });
-                        } else if (window.$) {
-                            window.$.notify('Product added to cart');
+                            if (window.Livewire) {
+                                window.Livewire.dispatch('notify', {
+                                    message: 'Product added to cart'
+                                });
+                            } else if (window.$) {
+                                window.$.notify('Product added to cart');
+                            } else {
+                                alert('Product added to cart');
+                            }
+
+                            // If this was an "Order Now" action, redirect to checkout
+                            if (action === 'kart' || data.redirect_url) {
+                                // Small delay to show notification first
+                                setTimeout(() => {
+                                    window.location.href = data.redirect_url || '/checkout';
+                                }, 500);
+                            }
                         } else {
-                            alert('Product added to cart');
-                        }
+                            console.error('Failed to add product to cart:', data.message);
 
-                        // If this was an "Order Now" action, redirect to checkout
-                        if (action === 'kart' || data.redirect_url) {
-                            // Small delay to show notification first
-                            setTimeout(() => {
-                                window.location.href = data.redirect_url || '/checkout';
-                            }, 500);
+                            // Show error notification
+                            const errorMessage = 'Failed to add product to cart: ' + (data.message ||
+                                'Unknown error');
+                            if (window.Livewire) {
+                                window.Livewire.dispatch('notify', {
+                                    message: errorMessage,
+                                    type: 'error'
+                                });
+                            } else if (window.$) {
+                                window.$.notify(errorMessage, {
+                                    type: 'error'
+                                });
+                            } else {
+                                alert(errorMessage);
+                            }
                         }
-                    } else {
-                        console.error('Failed to add product to cart:', data.message);
-
-                        // Show error notification
-                        const errorMessage = 'Failed to add product to cart: ' + (data.message || 'Unknown error');
-                        if (window.Livewire) {
-                            window.Livewire.dispatch('notify', { message: errorMessage, type: 'error' });
-                        } else if (window.$) {
-                            window.$.notify(errorMessage, { type: 'error' });
-                        } else {
-                            alert(errorMessage);
-                        }
-                    }
-                })
-                .catch(error => {
-                    // Re-enable button on error
-                    button.disabled = false;
-                    button.innerHTML = originalText;
-                    console.error('Error adding to cart:', error);
-                    alert('Something went wrong. Please try again.');
-                });
+                    })
+                    .catch(error => {
+                        // Re-enable button on error
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                        console.error('Error adding to cart:', error);
+                        alert('Something went wrong. Please try again.');
+                    });
             };
 
             const registerPaginationLinks = () => {
@@ -1069,7 +1508,8 @@
                 Alpine.data('sumPrices', (initialState = {}) => ({
                     retail: initialState.retail ?? {},
                     advanced: Number(initialState.advanced ?? 0),
-                    retail_delivery: Number(initialState.retail_delivery ?? initialState.retailDeliveryFee ?? 0),
+                    retail_delivery: Number(initialState.retail_delivery ?? initialState
+                        .retailDeliveryFee ?? 0),
                     retailDiscount: Number(initialState.retailDiscount ?? 0),
 
                     init() {
@@ -1079,7 +1519,9 @@
                             }
                         };
 
-                        this.$watch('retail', (value) => sync('retail', value), { deep: true });
+                        this.$watch('retail', (value) => sync('retail', value), {
+                            deep: true
+                        });
                         this.$watch('advanced', (value) => sync('advanced', value));
                         this.$watch('retail_delivery', (value) => sync('retailDeliveryFee', value));
                         this.$watch('retailDiscount', (value) => sync('retailDiscount', value));
@@ -1095,16 +1537,20 @@
                                 return total;
                             }
 
-                            return total + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0);
+                            return total + (parseFloat(item.price) || 0) * (parseInt(
+                                item.quantity) || 0);
                         }, 0);
                     },
 
                     format(price) {
-                        return 'TK ' + (parseFloat(price) || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+                        return 'TK ' + (parseFloat(price) || 0).toLocaleString('en-US', {
+                            maximumFractionDigits: 0
+                        });
                     },
                 }));
 
-                Alpine.data('shopInfiniteScroll', (initialPage = 1, initialHasMore = false, perPage = 20, totalProducts = 0) => ({
+                Alpine.data('shopInfiniteScroll', (initialPage = 1, initialHasMore = false, perPage = 20,
+                    totalProducts = 0) => ({
                     currentPage: initialPage,
                     hasMore: !!initialHasMore,
                     loading: false,
@@ -1158,12 +1604,13 @@
                                 params.set('shuffle', shuffleSeed);
                             }
 
-                            const response = await fetch(`/api/shop/products?${params.toString()}`, {
-                                headers: {
-                                    'Accept': 'application/json',
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                },
-                            });
+                            const response = await fetch(
+                                `/api/shop/products?${params.toString()}`, {
+                                    headers: {
+                                        'Accept': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                    },
+                                });
 
                             if (response.ok) {
                                 const data = await response.json();
@@ -1199,7 +1646,8 @@
                         const after = this.loadedProductIds.size;
                         const newlyAdded = after - before;
 
-                        if (!hasMorePages || after >= this.totalProducts || (newlyAdded === 0 && after >= this.totalProducts * 0.95)) {
+                        if (!hasMorePages || after >= this.totalProducts || (newlyAdded === 0 &&
+                                after >= this.totalProducts * 0.95)) {
                             this.hasMore = false;
                             this.disconnectObserver();
                         } else {
@@ -1233,7 +1681,8 @@
                                 if (!this.observer) {
                                     return;
                                 }
-                                const trigger = this.$refs.loadMoreTrigger || this.$el.querySelector('.load-more-trigger');
+                                const trigger = this.$refs.loadMoreTrigger || this.$el
+                                    .querySelector('.load-more-trigger');
                                 if (trigger) {
                                     try {
                                         this.observer.unobserve(trigger);
@@ -1241,7 +1690,7 @@
                                         console.error(error);
                                     }
                                     if (this.observer) {
-                                    this.observer.observe(trigger);
+                                        this.observer.observe(trigger);
                                     }
                                 }
                             });
@@ -1252,7 +1701,8 @@
 
                     updateProductCount() {
                         const countElement = document.getElementById('product-count-display');
-                        if (countElement && countElement._x_dataStack && countElement._x_dataStack[0]) {
+                        if (countElement && countElement._x_dataStack && countElement._x_dataStack[
+                                0]) {
                             const alpineData = countElement._x_dataStack[0];
                             if (alpineData && typeof alpineData.updateCount === 'function') {
                                 alpineData.updateCount(this.loadedProductIds.size);
@@ -1268,11 +1718,13 @@
                     },
 
                     attachNavigationHandlers(element) {
-                        const productLinks = element.querySelectorAll('a.product-link[data-navigate]');
+                        const productLinks = element.querySelectorAll(
+                            'a.product-link[data-navigate]');
                         productLinks.forEach(link => {
                             link.addEventListener('click', (e) => {
                                 const href = link.getAttribute('href');
-                                if (href && window.Livewire && window.Livewire.navigate) {
+                                if (href && window.Livewire && window.Livewire
+                                    .navigate) {
                                     e.preventDefault();
                                     window.Livewire.navigate(href);
                                 }
@@ -1289,15 +1741,18 @@
                         const productImage = product.base_image_url || '/images/placeholder.jpg';
                         const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                         const inStock = !product.should_track || (product.stock_count || 0) > 0;
-                        const hasDiscount = productPrice !== productSellingPrice && productPrice > 0;
-                        const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
+                        const hasDiscount = productPrice !== productSellingPrice && productPrice >
+                        0;
+                        const discountPercent = hasDiscount ? Math.round(((productPrice -
+                            productSellingPrice) * 100) / productPrice) : 0;
 
                         const showOption = this.getShowOption();
                         const isOninda = this.getIsOninda();
                         const guestCanSeePrice = this.getGuestCanSeePrice();
                         const userIsGuest = this.getUserIsGuest();
                         const userIsVerified = this.getUserIsVerified();
-                        const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !userIsVerified);
+                        const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !
+                            userIsVerified);
 
                         const formatPrice = (price) => {
                             return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
@@ -1331,18 +1786,21 @@
                             }
                         }
 
-                            let priceHTML = '';
-                            if (shouldHidePrice) {
-                                priceHTML = `<span class="product-card__new-price text-danger">${
+                        let priceHTML = '';
+                        if (shouldHidePrice) {
+                            priceHTML = `<span class="product-card__new-price text-danger">${
                                     userIsGuest ? 'Login to see price' : 'Verify account to see price'
                                 }</span>`;
-                            } else if (hasDiscount) {
-                            priceHTML = `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
+                        } else if (hasDiscount) {
+                            priceHTML =
+                                `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
                         } else {
                             priceHTML = formatPrice(productSellingPrice);
                         }
 
-                        const discountText = (showOption.discount_text || '<small>Discount:</small> [percent]%').replace(/\[percent\]/g, discountPercent);
+                        const discountText = (showOption.discount_text ||
+                            '<small>Discount:</small> [percent]%').replace(/\[percent\]/g,
+                            discountPercent);
 
                         return `
                             <div class="product-card" data-id="${productId}" data-max="${product.should_track ? (product.stock_count || 0) : -1}">
@@ -1415,7 +1873,8 @@
                     setupIntersectionObserver() {
                         this.observer = new IntersectionObserver((entries) => {
                             entries.forEach(entry => {
-                                if (entry.isIntersecting && !this.loading && this.hasMore) {
+                                if (entry.isIntersecting && !this.loading && this
+                                    .hasMore) {
                                     this.loadProducts();
                                 } else if (!this.hasMore) {
                                     this.disconnectObserver();
@@ -1428,7 +1887,8 @@
                         });
 
                         this.$nextTick(() => {
-                            const trigger = this.$refs.loadMoreTrigger || this.$el.querySelector('.load-more-trigger');
+                            const trigger = this.$refs.loadMoreTrigger || this.$el
+                                .querySelector('.load-more-trigger');
                             if (trigger && this.observer) {
                                 this.observer.observe(trigger);
                             }
@@ -1451,7 +1911,8 @@
     </script>
     @stack('scripts')
     @php
-        function phone88($phone) {
+        function phone88($phone)
+        {
             $phone = preg_replace('/[^\d]/', '', $phone);
             if (strlen($phone) == 11) {
                 $phone = '88' . $phone;
@@ -1462,41 +1923,42 @@
         $phone = phone88($company->whatsapp ?? '');
     @endphp
     @if ($phone && strlen($messenger) > 13)
-    <div class="widget-connect widget-connect-right">
-        @if($messenger)
-        <a class="widget-connect__button widget-connect__button-telemessenger button-slide-out" style="background: white; color: blue;" href="{{$messenger}}" data-toggle="tooltip" data-placement="left" title="" target="_blank" data-original-title="Messenger">
-            <i class="fab fa-facebook-messenger"></i>
-        </a>
-        @endif
-        @if($phone)
-        <a class="widget-connect__button widget-connect__button-whatsapp button-slide-out" style="background: white; color: green;" href="https://wa.me/{{$phone}}" data-toggle="tooltip" data-placement="left" title="" target="_blank" data-original-title="WhatsApp">
-            <i class="fab fa-whatsapp"></i>
-        </a>
-        @endif
-        <div class="widget-connect__button-activator" style="background-color: #ff0000;">
-            <div class="widget-connect__button-activator-icon"></div>
+        <div class="widget-connect widget-connect-right">
+            @if ($messenger)
+                <a class="widget-connect__button widget-connect__button-telemessenger button-slide-out"
+                    style="background: white; color: blue;" href="{{ $messenger }}" data-toggle="tooltip"
+                    data-placement="left" title="" target="_blank" data-original-title="Messenger">
+                    <i class="fab fa-facebook-messenger"></i>
+                </a>
+            @endif
+            @if ($phone)
+                <a class="widget-connect__button widget-connect__button-whatsapp button-slide-out"
+                    style="background: white; color: green;" href="https://wa.me/{{ $phone }}"
+                    data-toggle="tooltip" data-placement="left" title="" target="_blank"
+                    data-original-title="WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            @endif
+            <div class="widget-connect__button-activator" style="background-color: #ff0000;">
+                <div class="widget-connect__button-activator-icon"></div>
+            </div>
         </div>
-    </div>
     @elseif ($phone)
-    <a
-        href="https://api.whatsapp.com/send?phone={{$phone}}" target="_blank"
-        style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;"
-    >
-        <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>
-    </a>
+        <a href="https://api.whatsapp.com/send?phone={{ $phone }}" target="_blank"
+            style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;">
+            <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>
+        </a>
     @elseif (strlen($messenger) > 13)
-    <a
-        href="{{$messenger}}" target="_blank"
-        style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#0084ff;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;"
-    >
-        <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
-    </a>
+        <a href="{{ $messenger }}" target="_blank"
+            style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#0084ff;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;">
+            <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
+        </a>
     @endif
     <script>
-        runWhenJQueryReady(function ($) {
+        runWhenJQueryReady(function($) {
             $(".widget-connect__button-activator-icon")
                 .off('click.widgetConnect')
-                .on('click.widgetConnect', function () {
+                .on('click.widgetConnect', function() {
                     $(this).toggleClass("active");
                     $(".widget-connect").toggleClass("active");
                     $("a.widget-connect__button").toggleClass("button-slide-out button-slide");
@@ -1504,7 +1966,7 @@
         });
     </script>
     <script>
-        document.addEventListener('click', function (event) {
+        document.addEventListener('click', function(event) {
             const zoomThumb = event.target.closest('.xzoom-thumbs a');
 
             if (zoomThumb) {
@@ -1521,7 +1983,11 @@
                 return;
             }
 
-            const { eventName, customData, eventId } = event.detail[0];
+            const {
+                eventName,
+                customData,
+                eventId
+            } = event.detail[0];
 
             // Track event with fbq
             fbq('track', eventName, customData, eventId);
