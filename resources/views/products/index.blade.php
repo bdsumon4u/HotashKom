@@ -1,11 +1,11 @@
 @extends('layouts.yellow.master')
 
 @push('head')
-    @if (isset($category))
+    @if (isset($category) && $category instanceof \Illuminate\Database\Eloquent\Model)
         {!! seo()->for($category) !!}
-    @elseif(isset($brand))
+    @elseif(isset($brand) && $brand instanceof \Illuminate\Database\Eloquent\Model)
         {!! seo()->for($brand) !!}
-    @elseif(isset($section))
+    @elseif(isset($section) && $section instanceof \Illuminate\Database\Eloquent\Model)
         {!! seo()->for($section) !!}
     @endif
 @endpush
