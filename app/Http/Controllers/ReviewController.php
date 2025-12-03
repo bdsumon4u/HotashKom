@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Spatie\ResponseCache\Facades\ResponseCache;
 
 class ReviewController extends Controller
 {
@@ -48,7 +49,16 @@ class ReviewController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return back()->withErrors($validator)->withInput()->with('review_submitted', true);
+                // Clear cache and redirect with cache-busting parameter
+                if (config('responsecache.enabled', false)) {
+                    ResponseCache::forget(route('products.show', $product->slug));
+                }
+
+                return redirect()
+                    ->to(route('products.show', $product->slug).'?review_submitted='.time().'#review-form-container')
+                    ->withErrors($validator)
+                    ->withInput()
+                    ->with('review_submitted', true);
             }
 
             // Skip to review submission
@@ -73,19 +83,44 @@ class ReviewController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return back()->withErrors($validator)->withInput()->with('review_submitted', true);
+                // Clear cache and redirect with cache-busting parameter
+                if (config('responsecache.enabled', false)) {
+                    ResponseCache::forget(route('products.show', $product->slug));
+                }
+
+                return redirect()
+                    ->to(route('products.show', $product->slug).'?review_submitted='.time().'#review-form-container')
+                    ->withErrors($validator)
+                    ->withInput()
+                    ->with('review_submitted', true);
             }
 
             // Validate order exists and contains the product
             $order = Order::find($request->order_id);
 
             if (! $order) {
-                return back()->withErrors(['order_id' => 'The order ID you provided does not exist.'])->withInput()->with('review_submitted', true);
+                if (config('responsecache.enabled', false)) {
+                    ResponseCache::forget(route('products.show', $product->slug));
+                }
+
+                return redirect()
+                    ->to(route('products.show', $product->slug).'?review_submitted='.time().'#review-form-container')
+                    ->withErrors(['order_id' => 'The order ID you provided does not exist.'])
+                    ->withInput()
+                    ->with('review_submitted', true);
             }
 
             // Validate phone number matches the order
             if ($order->phone !== $request->phone_number) {
-                return back()->withErrors(['phone_number' => 'The phone number does not match the order.'])->withInput()->with('review_submitted', true);
+                if (config('responsecache.enabled', false)) {
+                    ResponseCache::forget(route('products.show', $product->slug));
+                }
+
+                return redirect()
+                    ->to(route('products.show', $product->slug).'?review_submitted='.time().'#review-form-container')
+                    ->withErrors(['phone_number' => 'The phone number does not match the order.'])
+                    ->withInput()
+                    ->with('review_submitted', true);
             }
 
             // Check if order contains this product
@@ -93,7 +128,15 @@ class ReviewController extends Controller
             $productIds = array_keys($orderProducts);
 
             if (! in_array($product->id, $productIds)) {
-                return back()->withErrors(['order_id' => 'This order does not contain the product you are reviewing.'])->withInput()->with('review_submitted', true);
+                if (config('responsecache.enabled', false)) {
+                    ResponseCache::forget(route('products.show', $product->slug));
+                }
+
+                return redirect()
+                    ->to(route('products.show', $product->slug).'?review_submitted='.time().'#review-form-container')
+                    ->withErrors(['order_id' => 'This order does not contain the product you are reviewing.'])
+                    ->withInput()
+                    ->with('review_submitted', true);
             }
 
             // Find or create user with this phone number
@@ -114,7 +157,15 @@ class ReviewController extends Controller
             ->first();
 
         if ($existingReview) {
-            return back()->withErrors(['error' => 'This user has already reviewed this product.'])->withInput()->with('review_submitted', true);
+            if (config('responsecache.enabled', false)) {
+                ResponseCache::forget(route('products.show', $product->slug));
+            }
+
+            return redirect()
+                ->to(route('products.show', $product->slug).'?review_submitted='.time().'#review-form-container')
+                ->withErrors(['error' => 'This user has already reviewed this product.'])
+                ->withInput()
+                ->with('review_submitted', true);
         }
 
         // Add review with rating
@@ -131,11 +182,28 @@ class ReviewController extends Controller
             ],
         ], $user->id);
 
+        // Clear response cache for the product page to show the new review
+        if (config('responsecache.enabled', false)) {
+            // Clear cache for the product detail page
+            $productUrl = route('products.show', $product->slug);
+            ResponseCache::forget($productUrl);
+
+            // Also clear the products index page in case reviews are shown there
+            ResponseCache::forget(route('products.index'));
+        }
+
         $successMessage = $isSecretCode
             ? 'Your review has been submitted and approved.'
             : 'Your review has been submitted and is pending approval.';
 
-        return back()->with('success', $successMessage)->with('review_submitted', true);
+        // Add cache-busting parameter and headers to ensure redirect bypasses cache
+        return redirect()
+            ->to(route('products.show', $product->slug).'?review_submitted='.time().'#review-form-container')
+            ->with('success', $successMessage)
+            ->with('review_submitted', true)
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Spatie\ResponseCache\Facades\ResponseCache;
 
 class ReviewController extends Controller
 {
@@ -56,6 +57,12 @@ class ReviewController extends Controller
 
         $product->approveReview($review->id);
 
+        // Clear response cache for the product page to show the approved review
+        if (config('responsecache.enabled', false)) {
+            ResponseCache::forget(route('products.show', $product->slug));
+            ResponseCache::forget(route('products.index'));
+        }
+
         return back()->with('success', 'Review has been approved.');
     }
 
@@ -73,6 +80,12 @@ class ReviewController extends Controller
         }
 
         $product->deleteReview($review->id);
+
+        // Clear response cache for the product page to remove the deleted review
+        if (config('responsecache.enabled', false)) {
+            ResponseCache::forget(route('products.show', $product->slug));
+            ResponseCache::forget(route('products.index'));
+        }
 
         return back()->with('success', 'Review has been deleted.');
     }
@@ -93,10 +106,21 @@ class ReviewController extends Controller
             ->with('reviewable')
             ->get();
 
+        $productsToClear = [];
+
         foreach ($reviews as $review) {
             if ($review->reviewable instanceof Product) {
                 $review->reviewable->approveReview($review->id);
+                $productsToClear[$review->reviewable->slug] = $review->reviewable;
             }
+        }
+
+        // Clear response cache for all affected product pages
+        if (config('responsecache.enabled', false)) {
+            foreach ($productsToClear as $product) {
+                ResponseCache::forget(route('products.show', $product->slug));
+            }
+            ResponseCache::forget(route('products.index'));
         }
 
         return back()->with('success', count($reviews).' reviews have been approved.');
@@ -118,10 +142,21 @@ class ReviewController extends Controller
             ->with('reviewable')
             ->get();
 
+        $productsToClear = [];
+
         foreach ($reviews as $review) {
             if ($review->reviewable instanceof Product) {
                 $review->reviewable->deleteReview($review->id);
+                $productsToClear[$review->reviewable->slug] = $review->reviewable;
             }
+        }
+
+        // Clear response cache for all affected product pages
+        if (config('responsecache.enabled', false)) {
+            foreach ($productsToClear as $product) {
+                ResponseCache::forget(route('products.show', $product->slug));
+            }
+            ResponseCache::forget(route('products.index'));
         }
 
         return back()->with('success', count($reviews).' reviews have been deleted.');
