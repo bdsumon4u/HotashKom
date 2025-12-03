@@ -9,8 +9,8 @@
         @endphp
         @if ($averageRating > 0)
             <div class="gap-2 mb-1 d-flex align-items-center">
-                <a href="#review-form-container" 
-                   class="d-flex align-items-center text-decoration-none review-rating-link" 
+                <a href="#review-form-container"
+                   class="d-flex align-items-center text-decoration-none review-rating-link"
                    style="margin-top: -1px; cursor: pointer;"
                    onclick="scrollToReviews(event)">
                     @for ($i = 1; $i <= 5; $i++)
@@ -23,8 +23,8 @@
                         @endif
                     @endfor
                 </a>
-                <a href="#review-form-container" 
-                   class="text-muted small text-decoration-none review-rating-link" 
+                <a href="#review-form-container"
+                   class="text-muted small text-decoration-none review-rating-link"
                    style="margin-top: 1px; cursor: pointer;"
                    onclick="scrollToReviews(event)">
                     <strong>{{ number_format($averageRating, 1) }}</strong>

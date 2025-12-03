@@ -321,16 +321,16 @@
 <script>
     function scrollToReviews(event) {
         event.preventDefault();
-        
+
         const reviewFormContainer = document.getElementById('review-form-container');
         if (!reviewFormContainer) {
             return;
         }
-        
+
         // Check if the reviews accordion is collapsed and expand it
         const collapseThree = document.getElementById('collapseThree');
         let needsExpansion = false;
-        
+
         if (collapseThree && collapseThree.classList.contains('collapse') && !collapseThree.classList.contains('show')) {
             needsExpansion = true;
             // Expand the accordion if it's collapsed (using jQuery if available, otherwise Bootstrap 5)
@@ -345,7 +345,7 @@
                 collapseThree.classList.add('show');
             }
         }
-        
+
         // Scroll to the review form after a delay to allow accordion to expand
         setTimeout(function() {
             reviewFormContainer.scrollIntoView({
