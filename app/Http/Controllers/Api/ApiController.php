@@ -446,7 +446,11 @@ class ApiController extends Controller
                 ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
         }
 
+        info('pathao webhook consignment id: '.$request->merchant_order_id);
+
         if (! $order = Order::find($request->merchant_order_id)/* ->orWhere('data->consignment_id', $request->consignment_id)->first() */) {
+            info('order not found');
+
             return response()->json(['message' => 'Webhook processed'], 202)
                 ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
         }
@@ -461,6 +465,7 @@ class ApiController extends Controller
         // ]);
         // $order->forceFill(['courier' => ['booking' => 'Pathao'] + $courier]);
 
+        info('event: '.$request->event);
         if (in_array($request->event, ['order.created', 'order.pickup-requested'])) {
             $order->fill([
                 'status' => 'SHIPPING',

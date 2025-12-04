@@ -748,7 +748,7 @@
                             try {
                                 const response = await fetch(
                                     `/api/products/${encodeURIComponent(this.productId)}/related.json`
-                                    );
+                                );
 
                                 if (response.ok) {
                                     const products = await response.json();
@@ -825,7 +825,7 @@
                             const shouldTrack = typeof product.availability === 'number' || product
                                 .availability !== 'In Stock';
                             const hasDiscount = productPrice !== productSellingPrice && productPrice >
-                            0;
+                                0;
                             const discountPercent = hasDiscount ? Math.round(((productPrice -
                                 productSellingPrice) * 100) / productPrice) : 0;
 
@@ -1217,7 +1217,7 @@
                             setTimeout(() => {
                                 $departments.find('.departments__body').css('overflow', '');
                                 $departments.find('.departments__links-wrapper').css('overflow',
-                                '');
+                                    '');
                             }, 350);
                         }
 
@@ -1742,7 +1742,7 @@
                         const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                         const inStock = !product.should_track || (product.stock_count || 0) > 0;
                         const hasDiscount = productPrice !== productSellingPrice && productPrice >
-                        0;
+                            0;
                         const discountPercent = hasDiscount ? Math.round(((productPrice -
                             productSellingPrice) * 100) / productPrice) : 0;
 
@@ -1934,8 +1934,9 @@
             @if ($phone)
                 <a class="widget-connect__button widget-connect__button-whatsapp button-slide-out"
                     style="background: white; color: green;" href="https://wa.me/{{ $phone }}"
-                    data-toggle="tooltip" data-placement="left" title="" target="_blank"
-                    data-original-title="WhatsApp">
+                    data-toggle="tooltip" data-placement="left" title="" data-original-title="WhatsApp"
+                    data-whatsapp-url="https://wa.me/{{ $phone }}"
+                    onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
                     <i class="fab fa-whatsapp"></i>
                 </a>
             @endif
@@ -1944,8 +1945,10 @@
             </div>
         </div>
     @elseif ($phone)
-        <a href="https://api.whatsapp.com/send?phone={{ $phone }}" target="_blank"
-            style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;">
+        <a href="https://api.whatsapp.com/send?phone={{ $phone }}"
+            style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;cursor:pointer;"
+            data-whatsapp-url="https://api.whatsapp.com/send?phone={{ $phone }}"
+            onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
             <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>
         </a>
     @elseif (strlen($messenger) > 13)
@@ -1963,7 +1966,167 @@
                     $(".widget-connect").toggleClass("active");
                     $("a.widget-connect__button").toggleClass("button-slide-out button-slide");
                 });
+
+            // Detect WebView environment
+            function isWebView() {
+                var ua = navigator.userAgent || navigator.vendor || window.opera;
+                return /wv|WebView/i.test(ua) ||
+                    (window.Android !== undefined) ||
+                    (window.webkit && window.webkit.messageHandlers) ||
+                    !window.chrome;
+            }
+
+            // Convert WhatsApp URL to Android Intent format if needed
+            function getWhatsAppUrl(originalUrl) {
+                if (!isWebView()) {
+                    return originalUrl;
+                }
+
+                // Check if Android WebView
+                var ua = navigator.userAgent || navigator.vendor || window.opera;
+                if (/android/i.test(ua)) {
+                    // Extract phone number from URL
+                    var phoneMatch = originalUrl.match(/phone=([^&]+)/);
+                    if (phoneMatch) {
+                        var phone = phoneMatch[1];
+                        // Try Android Intent URL format
+                        return 'intent://send?phone=' + phone + '#Intent;scheme=https;package=com.whatsapp;end';
+                    }
+                }
+
+                return originalUrl;
+            }
+
+            // Fix WhatsApp button clicks in WebView
+            function handleWhatsAppClick(e, element) {
+                var url = $(element).data('whatsapp-url') || $(element).attr('href');
+                if (!url) return true;
+
+                // Get the appropriate URL for WebView
+                var finalUrl = getWhatsAppUrl(url);
+
+                // Update the href to ensure it's correct
+                $(element).attr('href', finalUrl);
+
+                // For WebView, force navigation
+                if (isWebView()) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    // Try immediate navigation
+                    window.location.href = finalUrl;
+
+                    // Backup: create anchor and click
+                    setTimeout(function() {
+                        var link = document.createElement('a');
+                        link.href = finalUrl;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        setTimeout(function() {
+                            if (link.parentNode) {
+                                document.body.removeChild(link);
+                            }
+                        }, 100);
+                    }, 10);
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            $(".widget-connect__button-whatsapp")
+                .off('click.whatsapp')
+                .on('click.whatsapp', function(e) {
+                    return handleWhatsAppClick(e, this);
+                });
         });
+
+        // Detect WebView environment (shared function)
+        function isWebViewEnv() {
+            var ua = navigator.userAgent || navigator.vendor || window.opera;
+            return /wv|WebView/i.test(ua) ||
+                (window.Android !== undefined) ||
+                (window.webkit && window.webkit.messageHandlers) ||
+                (!window.chrome && /safari/i.test(ua));
+        }
+
+        // Convert WhatsApp URL to Android Intent format if needed
+        function getWhatsAppUrlForWebView(originalUrl) {
+            if (!isWebViewEnv()) {
+                return originalUrl;
+            }
+
+            var ua = navigator.userAgent || navigator.vendor || window.opera;
+            if (/android/i.test(ua)) {
+                var phoneMatch = originalUrl.match(/phone=([^&]+)/);
+                if (phoneMatch) {
+                    var phone = phoneMatch[1];
+                    return 'intent://send?phone=' + phone + '#Intent;scheme=https;package=com.whatsapp;end';
+                }
+            }
+
+            return originalUrl;
+        }
+
+        // Handle standalone WhatsApp buttons for WebView compatibility
+        function handleStandaloneWhatsApp(e) {
+            var url = this.getAttribute('data-whatsapp-url') || this.getAttribute('href');
+            if (!url) return true;
+
+            var finalUrl = getWhatsAppUrlForWebView(url);
+
+            // Update href to ensure it's correct
+            this.setAttribute('href', finalUrl);
+
+            if (isWebViewEnv()) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+
+                // Force immediate navigation
+                window.location.href = finalUrl;
+
+                // Backup: create anchor and click
+                setTimeout(function() {
+                    var link = document.createElement('a');
+                    link.href = finalUrl;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    setTimeout(function() {
+                        if (link.parentNode) {
+                            document.body.removeChild(link);
+                        }
+                    }, 100);
+                }, 10);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        function attachWhatsAppHandlers() {
+            var whatsappButtons = document.querySelectorAll(
+                'a[href*="api.whatsapp.com"]:not(.widget-connect__button-whatsapp), a[href*="wa.me"]:not(.widget-connect__button-whatsapp), a[data-whatsapp-url], a.whatsapp-link'
+            );
+            whatsappButtons.forEach(function(btn) {
+                // Remove existing listeners to avoid duplicates
+                btn.removeEventListener('click', handleStandaloneWhatsApp, true);
+                // Use capture phase (true) to ensure our handler runs first
+                btn.addEventListener('click', handleStandaloneWhatsApp, true);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', attachWhatsAppHandlers);
+
+        // Also handle dynamically loaded content (for Livewire)
+        if (typeof Livewire !== 'undefined') {
+            Livewire.hook('morph.updated', function() {
+                setTimeout(attachWhatsAppHandlers, 100);
+            });
+        }
     </script>
     <script>
         document.addEventListener('click', function(event) {

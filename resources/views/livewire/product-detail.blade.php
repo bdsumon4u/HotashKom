@@ -209,8 +209,10 @@
                         </a>
                     @endif
                     <a href="https://api.whatsapp.com/send?phone={{ $phone }}&text=Hello+%0D%0AI+am+interested+in+ordering+%22{{ $product->name }}%22.%0D%0A%0D%0A{{ url()->current() }}"
-                        target="_blank" rel="noopener" class="ml-1 btn btn-success d-flex align-items-center"
-                        style="min-width: 140px;">
+                        rel="noopener" class="ml-1 btn btn-success d-flex align-items-center whatsapp-link"
+                        style="min-width: 140px;"
+                        data-whatsapp-url="https://api.whatsapp.com/send?phone={{ $phone }}&text=Hello+%0D%0AI+am+interested+in+ordering+%22{{ $product->name }}%22.%0D%0A%0D%0A{{ url()->current() }}"
+                        onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
                         <i class="mr-2 fab fa-whatsapp"></i> WhatsApp
                     </a>
                 </div>
