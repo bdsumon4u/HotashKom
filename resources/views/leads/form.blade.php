@@ -33,7 +33,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-4 form-group">
+                            <div class="col-md-4 form-group d-none">
                                 <label for="lead-shop-name" class="form-label">Shop Name</label>
                                 <input
                                     type="text"
@@ -61,7 +61,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6 form-group">
+                            <div class="col-md-6 form-group d-none">
                                 <label for="lead-email" class="form-label">Email</label>
                                 <input
                                     type="email"
