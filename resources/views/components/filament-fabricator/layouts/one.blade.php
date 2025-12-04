@@ -10,9 +10,11 @@
     <link rel="profile" href="http://gmpg.org/xfn/11">
     <title>{{ $page->title }}</title>
 
+    <x-metapixel-head />
+
     <link rel='stylesheet' id='wcf-frontend-global-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/frontend.css?ver=2.0.12') }}' media='all' />
-    
+
     <link rel='stylesheet' id='widget-image-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=3.25.9') }}'
         media='all' />
@@ -27,7 +29,7 @@
         media='all' />
     <link rel='stylesheet' id='elementor-post-7-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/uploads/elementor/css/post-7.css?ver=1736836498') }}' media='all' />
-    
+
     <link rel='stylesheet' id='widget-animated-headline-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor-pro/assets/css/widget-animated-headline.min.css?ver=3.25.2') }}'
         media='all' />
@@ -42,7 +44,7 @@
     <link rel='stylesheet' id='wcf-checkout-template-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/checkout-template.css?ver=2.0.12') }}'
         media='all' />
-    
+
     <link rel='stylesheet' id='wcf-pro-checkout-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows-pro/assets/css/checkout-styles.css?ver=2.0.10') }}'
         media='all' />
@@ -59,12 +61,13 @@
 </head>
 
 <body
-    class="cartflows_step-template cartflows_step-template-cartflows-canvas single single-cartflows_step postid-459 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12  cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-459 cartflows-canvas">
+    class="cartflows_step-template cartflows_step-template-cartflows-canvas single single-cartflows_step postid-459 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12 cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-459 cartflows-canvas">
+    <x-metapixel-body />
     <div class="cartflows-container">
         <div data-elementor-type="wp-post" data-elementor-id="459" class="elementor elementor-459"
             data-elementor-settings="{&quot;element_pack_global_tooltip_width&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;element_pack_global_tooltip_width_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;element_pack_global_tooltip_width_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:&quot;&quot;,&quot;sizes&quot;:[]},&quot;element_pack_global_tooltip_padding&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;top&quot;:&quot;&quot;,&quot;right&quot;:&quot;&quot;,&quot;bottom&quot;:&quot;&quot;,&quot;left&quot;:&quot;&quot;,&quot;isLinked&quot;:true},&quot;element_pack_global_tooltip_padding_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;top&quot;:&quot;&quot;,&quot;right&quot;:&quot;&quot;,&quot;bottom&quot;:&quot;&quot;,&quot;left&quot;:&quot;&quot;,&quot;isLinked&quot;:true},&quot;element_pack_global_tooltip_padding_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;top&quot;:&quot;&quot;,&quot;right&quot;:&quot;&quot;,&quot;bottom&quot;:&quot;&quot;,&quot;left&quot;:&quot;&quot;,&quot;isLinked&quot;:true},&quot;element_pack_global_tooltip_border_radius&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;top&quot;:&quot;&quot;,&quot;right&quot;:&quot;&quot;,&quot;bottom&quot;:&quot;&quot;,&quot;left&quot;:&quot;&quot;,&quot;isLinked&quot;:true},&quot;element_pack_global_tooltip_border_radius_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;top&quot;:&quot;&quot;,&quot;right&quot;:&quot;&quot;,&quot;bottom&quot;:&quot;&quot;,&quot;left&quot;:&quot;&quot;,&quot;isLinked&quot;:true},&quot;element_pack_global_tooltip_border_radius_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;top&quot;:&quot;&quot;,&quot;right&quot;:&quot;&quot;,&quot;bottom&quot;:&quot;&quot;,&quot;left&quot;:&quot;&quot;,&quot;isLinked&quot;:true}}"
             data-elementor-post-type="cartflows_step">
-            
+
 
             <section
                 class="elementor-section elementor-top-section elementor-element elementor-element-e52e0d5 elementor-section-boxed elementor-section-height-default"
@@ -99,7 +102,7 @@
                     </div>
                 </div>
             </section>
-            
+
             <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
 
             <livewire:fabricator.checkout :product="$page->product" />

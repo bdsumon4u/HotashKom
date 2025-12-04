@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="profile" href="http://gmpg.org/xfn/11">
     <title>{{ $page->title }}</title>
+    <x-metapixel-head />
     <meta name='robots' content='max-image-preview:large' />
     <style>
         img:is([sizes="auto" i], [sizes^="auto," i]) {
@@ -664,7 +665,7 @@
 <body
     class="wp-singular cartflows_step-template cartflows_step-template-cartflows-canvas single single-cartflows_step postid-31816 wp-theme-astra theme-astra woocommerce-checkout woocommerce-page woocommerce-no-js ast-desktop ast-separate-container ast-left-sidebar astra-4.11.12 ast-blog-single-style-1 ast-custom-post-type ast-single-post ast-replace-site-logo-transparent ast-inherit-site-logo-transparent ast-hfb-header ast-full-width-primary-header cartflows-2.1.14 cartflows-pro-2.0.3 elementor-default elementor-kit-22 elementor-page elementor-page-31816 cartflows-canvas">
 
-
+    <x-metapixel-body />
     <div class="cartflows-container">
 
         <div data-elementor-type="wp-post" data-elementor-id="31816" class="elementor elementor-31816">

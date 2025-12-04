@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="profile" href="https://gmpg.org/xfn/11">
     <title>{{ $page->title }}</title>
+    <x-metapixel-head />
     <link rel='stylesheet' id='woocommerce-general-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/css/woocommerce.css?ver=9.4.2') }}'
         media='all' />
@@ -77,7 +78,7 @@
 <body
     class="cartflows_step-template-default single single-cartflows_step postid-120 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12 cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-120">
 
-
+    <x-metapixel-body />
     <a class="skip-link screen-reader-text" href="#content">Skip to content</a>
 
     <header id="site-header" class="site-header dynamic-header">

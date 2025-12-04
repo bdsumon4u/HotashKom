@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="profile" href="http://gmpg.org/xfn/11">
     <title>{{ $page->title }}</title>
+    <x-metapixel-head />
     <link rel='stylesheet' id='woocommerce-general-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/css/woocommerce.css?ver=9.4.2') }}'
         media='all' />
@@ -17,10 +18,10 @@
         media='all' />
     <link rel='stylesheet' id='elementor-post-7-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/uploads/elementor/css/post-7.css?ver=1736836498') }}' media='all' />
-    
+
     <link rel='stylesheet' id='wcf-frontend-global-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/frontend.css?ver=2.0.12') }}' media='all' />
-    
+
     <link rel='stylesheet' id='swiper-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=8.4.5') }}'
         media='all' />
@@ -53,11 +54,11 @@
     <link rel='stylesheet' id='wcf-checkout-template-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows/assets/css/checkout-template.css?ver=2.0.12') }}'
         media='all' />
-    
+
     <link rel='stylesheet' id='wcf-pro-checkout-css'
         href='{{ asset('assets/demo.orioit.com/wp-content/plugins/cartflows-pro/assets/css/checkout-styles.css?ver=2.0.10') }}'
         media='all' />
-    
+
     <link rel='stylesheet' id='google-fonts-1-css'
         href='https://fonts.googleapis.com/css?family=Roboto%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CRoboto+Slab%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CHind+Siliguri%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CMontserrat%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&#038;display=swap&#038;ver=6.7.1'
         media='all' />
@@ -68,7 +69,7 @@
     <script
         src="{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/js/js-cookie/js.cookie.min.js?ver=2.1.4-wc.9.4.2') }}"
         id="js-cookie-js" defer data-wp-strategy="defer"></script>
-    
+
     <script
         src="{{ asset('assets/demo.orioit.com/wp-content/plugins/woocommerce/assets/js/jquery-cookie/jquery.cookie.min.js?ver=1.4.1-wc.9.4.2') }}"
         id="jquery-cookie-js" data-wp-strategy="defer"></script>
@@ -76,9 +77,9 @@
 </head>
 
 <body
-    class="cartflows_step-template cartflows_step-template-cartflows-canvas single single-cartflows_step postid-168 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12  cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-168 cartflows-canvas">
+    class="cartflows_step-template cartflows_step-template-cartflows-canvas single single-cartflows_step postid-168 theme-hello-elementor woocommerce-checkout woocommerce-page woocommerce-no-js cartflows-2.0.12 cartflows-pro-2.0.10 elementor-default elementor-kit-7 elementor-page elementor-page-168 cartflows-canvas">
 
-
+    <x-metapixel-body />
     <div class="cartflows-container">
 
         <div data-elementor-type="wp-post" data-elementor-id="168" class="elementor elementor-168"
@@ -122,7 +123,7 @@
 
             <x-filament-fabricator::page-blocks :blocks="$page->blocks" />
 
-            
+
             <livewire:fabricator.checkout :product="$page->product" />
         </div>
     </div>
@@ -139,7 +140,7 @@
         id="elementor-frontend-modules-js"></script>
     <script src="{{ asset('assets/demo.orioit.com/wp-includes/js/dist/hooks.min.js?ver=4d63a3d491d11ffd8ac6') }}" id="wp-hooks-js">
     </script>
-    
+
     <script id="elementor-pro-frontend-js-before">
         var ElementorProFrontendConfig = {
             "ajaxurl": "https:\/\/demo.orioit.com\/wp-admin\/admin-ajax.php",
@@ -454,7 +455,7 @@
     <script
         src="{{ asset('assets/demo.orioit.com/wp-content/plugins/elementskit-lite/widgets/init/assets/js/animate-circle.min.js?ver=3.3.2') }}"
         id="animate-circle-js"></script>
-    
+
 </body>
 
 </html>
