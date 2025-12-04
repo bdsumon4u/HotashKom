@@ -196,7 +196,7 @@
                                     <td>
                                         <input type="checkbox" name="ids[]" value="{{ $lead->id }}" class="lead-select">
                                     </td>
-                                    <td>{{ $leads->firstItem() + $loop->index }}</td>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $lead->name }}</td>
                                     <td>{{ $lead->shop_name ?? '—' }}</td>
                                     <td>{{ $lead->district ?? '—' }}</td>
@@ -231,13 +231,10 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                    <div class="mt-3 d-flex justify-content-start align-items-center">
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete selected leads?');">
                             Delete Selected
                         </button>
-                        <div>
-                            {{ $leads->links() }}
-                        </div>
                     </div>
                 </form>
             </div>

@@ -24,8 +24,7 @@ class LeadController extends Controller
                 });
             })
             ->latest()
-            ->paginate(25)
-            ->withQueryString();
+            ->get();
 
         return view('admin.leads.index', compact('leads', 'search'));
     }
