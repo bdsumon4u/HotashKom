@@ -6,10 +6,8 @@
         @media print {
             html,
             body {
-                height: 100vh;
                 margin: 0 !important;
                 padding: 0 !important;
-                overflow: hidden;
             }
 
             .main-nav,
@@ -30,7 +28,6 @@
                 font-size: 16px;
                 margin-top: 0 !important;
                 margin-left: 0 !important;
-                page-break-after: always;
             }
 
             .container-fluid {
