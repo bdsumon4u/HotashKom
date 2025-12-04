@@ -297,6 +297,61 @@
     @stack('scripts')
     @livewireScripts
     <script>
+        // Register shared Alpine components (mirrors storefront behavior)
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('sumPrices', (initialState = {}) => ({
+                retail: initialState.retail ?? {},
+                advanced: Number(initialState.advanced ?? 0),
+                retail_delivery: Number(initialState.retail_delivery ?? initialState
+                    .retailDeliveryFee ?? 0),
+                retailDiscount: Number(initialState.retailDiscount ?? 0),
+
+                init() {
+                    const sync = (field, value) => {
+                        if (this?.$wire && typeof this.$wire.updateField === 'function') {
+                            this.$wire.updateField(field, value);
+                        }
+                    };
+
+                    // Keep UI fully client-side reactive; sync scalar fields to backend in the background.
+                    this.$watch('advanced', (value) => sync('advanced', value));
+                    this.$watch('retail_delivery', (value) => sync('retailDeliveryFee', value));
+                    this.$watch('retailDiscount', (value) => sync('retailDiscount', value));
+                },
+
+                get subtotal() {
+                    if (!this.retail || typeof this.retail !== 'object') {
+                        return 0;
+                    }
+
+                    return Object.values(this.retail).reduce((total, item) => {
+                        if (!item || typeof item !== 'object') {
+                            return total;
+                        }
+
+                        return total + (parseFloat(item.price) || 0) * (parseInt(item
+                            .quantity) || 0);
+                    }, 0);
+                },
+
+                get sellingTotal() {
+                    return (
+                        this.subtotal +
+                        Number(this.retail_delivery || 0) -
+                        Number(this.advanced || 0) -
+                        Number(this.retailDiscount || 0)
+                    );
+                },
+
+                format(price) {
+                    return 'TK ' + (parseFloat(price) || 0).toLocaleString('en-US', {
+                        maximumFractionDigits: 0,
+                    });
+                },
+            }));
+        });
+    </script>
+    <script>
         runWhenJQueryReady(function($) {
             // Clear any old inline styles that might have been set previously
             $('.main-nav').attr('style', '');

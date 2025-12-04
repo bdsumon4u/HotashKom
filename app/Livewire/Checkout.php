@@ -53,6 +53,12 @@ class Checkout extends Component
     #[Validate('nullable|numeric|min:0')]
     public $retailDiscount = 0;
 
+    /**
+     * When true, `retailDeliveryFee` was explicitly set by the user and
+     * should not be overridden by automatic shipping updates.
+     */
+    public bool $retailDeliveryFeeManuallySet = false;
+
     protected $facebookService;
 
     public function boot(FacebookPixelService $facebookService): void
@@ -98,6 +104,13 @@ class Checkout extends Component
         longCookie('area_id', $value);
     }
 
+    public function updatedRetailDeliveryFee($value): void
+    {
+        // Mark the delivery fee as manually overridden so that subsequent
+        // shipping updates (e.g. changing area or cart) don't reset it.
+        $this->retailDeliveryFeeManuallySet = true;
+    }
+
     public function remove($id): void
     {
         cart()->remove($id);
@@ -112,7 +125,9 @@ class Checkout extends Component
             $content = cart()->content();
             $product = Product::find($item->id);
             $item->price = $price = $product->getPrice($qty);
-            $item->options->retail_price = $price;
+            if (! isOninda() || ! config('app.resell')) {
+                $item->options['retail_price'] = $price;
+            }
             $content->put($item->rowId, $item);
             // session()->put(cart()->currentInstance(), $content);
 
@@ -129,7 +144,9 @@ class Checkout extends Component
             $content = cart()->content();
             $product = Product::find($item->id);
             $item->price = $price = $product->getPrice($qty);
-            $item->options->retail_price = $price;
+            if (! isOninda() || ! config('app.resell')) {
+                $item->options['retail_price'] = $price;
+            }
             $content->put($item->rowId, $item);
             // session()->put(cart()->currentInstance(), $content);
 
@@ -206,7 +223,12 @@ class Checkout extends Component
             cart()->addCost('deliveryFee', $this->shippingCost($this->shipping));
         }
 
-        if (isOninda() && config('app.resell') && auth('user')->check()) {
+        if (
+            isOninda()
+            && config('app.resell')
+            && auth('user')->check()
+            && ! $this->retailDeliveryFeeManuallySet
+        ) {
             /** @var User $reseller */
             $reseller = auth('user')->user();
             $this->retailDeliveryFee = $reseller->getShippingCost($this->shipping) ?: cart()->getCost('deliveryFee');
@@ -218,7 +240,7 @@ class Checkout extends Component
         $this->updatedShipping();
         $this->retail = cart()->content()->mapWithKeys(fn ($item): array => [
             (string) $item->id => [
-                'price' => $this->retail[$item->id]['price'] ?? $item->options->retail_price ?? 0,
+                'price' => $this->retail[(string) $item->id]['price'] ?? $item->options['retail_price'] ?? 0,
                 'quantity' => $item->qty,
             ],
         ])->all();
@@ -238,11 +260,15 @@ class Checkout extends Component
         $default_area = setting('default_area');
         if ($default_area->inside ?? false) {
             $shipping = 'Inside Dhaka';
-            $this->retailDeliveryFee = $this->shippingCost($shipping);
+            if (! $this->retailDeliveryFeeManuallySet) {
+                $this->retailDeliveryFee = $this->shippingCost($shipping);
+            }
         }
         if ($default_area->outside ?? false) {
             $shipping = 'Outside Dhaka';
-            $this->retailDeliveryFee = $this->shippingCost($shipping);
+            if (! $this->retailDeliveryFeeManuallySet) {
+                $this->retailDeliveryFee = $this->shippingCost($shipping);
+            }
         }
 
         if ((! isOninda() || ! config('app.resell')) && $user = auth('user')->user()) {

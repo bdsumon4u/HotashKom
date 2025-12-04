@@ -11,6 +11,20 @@ class ResellerCheckout extends Checkout
         $tempOrder = new \App\Models\Order;
         $this->cartUpdated();
 
+        $cartItems = cart()->content();
+
+        $sellingSubtotal = $cartItems->sum(function ($item): float|int {
+            $id = $item->id;
+            $price = $this->retail[$id]['price'] ?? $item->options->retail_price ?? $item->price;
+
+            return $price * $item->qty;
+        });
+
+        $sellingTotal = $sellingSubtotal
+            + (float) $this->retailDeliveryFee
+            - (float) $this->advanced
+            - (float) $this->retailDiscount;
+
         return view('livewire.reseller-checkout', [
             'user' => optional(auth('user')->user()),
             'pathaoCities' => collect($tempOrder->pathaoCityList()),
@@ -19,6 +33,8 @@ class ResellerCheckout extends Checkout
             'advanced' => $this->advanced,
             'retailDeliveryFee' => $this->retailDeliveryFee,
             'retailDiscount' => $this->retailDiscount,
+            'sellingSubtotal' => $sellingSubtotal,
+            'sellingTotal' => $sellingTotal,
         ]);
     }
 
