@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}488}$$ 🔥 domains are live now
+These 🔥 $${\color{red}490}$$ 🔥 domains are live now
 
-_Last updated: **2025-12-03 09:21:44 Asia/Dhaka**_
+_Last updated: **2025-12-04 09:23:57 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -587,3 +587,5 @@ _Last updated: **2025-12-03 09:21:44 Asia/Dhaka**_
 | 486 | [humayraeshop.com](http://humayraeshop.com) |
 | 487 | [hellomedicinebd.com](http://hellomedicinebd.com) |
 | 488 | [sellvion24.com](http://sellvion24.com) |
+| 489 | [riyamartbd.com](http://riyamartbd.com) |
+| 490 | [clickbuy24.com](http://clickbuy24.com) |
