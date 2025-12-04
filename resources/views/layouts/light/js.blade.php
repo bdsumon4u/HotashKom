@@ -1,7 +1,9 @@
 <!-- jQuery (required by Bootstrap and other plugins) -->
-<script src="{{ cdnAsset('jquery', 'strokya/vendor/jquery-3.3.1/jquery.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="window.__loadLocalAsset && window.__loadLocalAsset('jquery')"></script>
+<script src="{{ cdnAsset('jquery', 'strokya/vendor/jquery-3.3.1/jquery.min.js') }}" crossorigin="anonymous"
+    referrerpolicy="no-referrer" onerror="window.__loadLocalAsset && window.__loadLocalAsset('jquery')"></script>
 <!-- Bootstrap js-->
-<script src="{{ cdnAsset('popper', 'assets/js/bootstrap/popper.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="window.__loadLocalAsset && window.__loadLocalAsset('popper')"></script>
+<script src="{{ cdnAsset('popper', 'assets/js/bootstrap/popper.min.js') }}" crossorigin="anonymous"
+    referrerpolicy="no-referrer" onerror="window.__loadLocalAsset && window.__loadLocalAsset('popper')"></script>
 <script src="{{ versionedAsset('assets/js/bootstrap/bootstrap.js') }}"></script>
 <!--Bootstrap notify-->
 <script src="{{ versionedAsset('assets/js/notify/bootstrap-notify.min.js') }}"></script>
