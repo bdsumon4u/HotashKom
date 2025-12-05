@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}490}$$ 🔥 domains are live now
+These 🔥 $${\color{red}493}$$ 🔥 domains are live now
 
-_Last updated: **2025-12-04 09:23:57 Asia/Dhaka**_
+_Last updated: **2025-12-05 09:23:24 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -589,3 +589,6 @@ _Last updated: **2025-12-04 09:23:57 Asia/Dhaka**_
 | 488 | [sellvion24.com](http://sellvion24.com) |
 | 489 | [riyamartbd.com](http://riyamartbd.com) |
 | 490 | [clickbuy24.com](http://clickbuy24.com) |
+| 491 | [proyozon24.com](http://proyozon24.com) |
+| 492 | [esell24.com](http://esell24.com) |
+| 493 | [afraemart.com](http://afraemart.com) |
