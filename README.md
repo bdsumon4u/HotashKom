@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}493}$$ 🔥 domains are live now
+These 🔥 $${\color{red}497}$$ 🔥 domains are live now
 
-_Last updated: **2025-12-05 09:23:24 Asia/Dhaka**_
+_Last updated: **2025-12-06 09:14:23 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -592,3 +592,7 @@ _Last updated: **2025-12-05 09:23:24 Asia/Dhaka**_
 | 491 | [proyozon24.com](http://proyozon24.com) |
 | 492 | [esell24.com](http://esell24.com) |
 | 493 | [afraemart.com](http://afraemart.com) |
+| 494 | [mixmartbd.com](http://mixmartbd.com) |
+| 495 | [armart24.com](http://armart24.com) |
+| 496 | [amazanhub.com](http://amazanhub.com) |
+| 497 | [sellora24.com](http://sellora24.com) |
