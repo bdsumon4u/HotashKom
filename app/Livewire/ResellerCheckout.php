@@ -17,7 +17,7 @@ class ResellerCheckout extends Checkout
             $id = $item->id;
             $price = $this->retail[$id]['price'] ?? $item->options->retail_price ?? $item->price;
 
-            return $price * $item->qty;
+            return (float) $price * $item->qty;
         });
 
         $sellingTotal = $sellingSubtotal
