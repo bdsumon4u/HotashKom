@@ -149,7 +149,14 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="invoice-prefix">Invoice Prefix</label>
+                <x-input name="show_option[invoice_prefix]" id="invoice-prefix" :value="$show_option->invoice_prefix ?? ''" />
+                <x-error field="show_option[invoice_prefix]" />
+            </div>
+        </div>
+        <div class="col-md-12">
             <div class="flex-wrap mt-2 d-flex" style="row-gap: .25rem; column-gap: .75rem;">
                 <div class="checkbox checkbox-secondary">
                     <input type="hidden" name="show_option[topbar_phone]" value="0">

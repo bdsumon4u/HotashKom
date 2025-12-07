@@ -440,7 +440,7 @@ class OrderController extends Controller
             return 0;
         }
         $orders = Order::whereIn('id', $order_ids)->where('data->courier', 'SteadFast')->get()->map(fn ($order): array => [
-            'invoice' => $order->id,
+            'invoice' => (setting('show_option')->invoice_prefix ?? '').$order->id,
             'recipient_name' => $order->name ?? 'N/A',
             'recipient_address' => $order->address ?? 'N/A',
             'recipient_phone' => $order->phone ?? '',
@@ -459,7 +459,8 @@ class OrderController extends Controller
         $data = json_decode($response->getBody()->getContents(), true);
 
         foreach ($data['data'] ?? [] as $item) {
-            if (! $order = Order::find($item['invoice'])) {
+            $invoiceId = (int) preg_replace('/\D/', '', $item['invoice']);
+            if (! $order = Order::find($invoiceId)) {
                 continue;
             }
 
