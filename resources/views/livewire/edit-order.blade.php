@@ -329,7 +329,7 @@
                 <div wire:init="loadCheapCourierReport">
                     @if ($cheapCourierReportLoaded)
                         <div style="height: 645px; overflow: hidden; position: relative;">
-                            @if (Carbon::parse(config('services.courier_report.expires'))->isPast())
+                            @if (\Illuminate\Support\Carbon::parse(config('services.courier_report.expires'))->isPast())
                                 <div class="alert alert-danger">Courier Report API Expired</div>
                             @else
                                 <iframe src="https://www.bdcommerce.app/tools/delivery-fraud-check/{{ $order->phone }}" width="1200" height="800" scrolling="no" style="position: absolute; top: -110px; left: -580px; overflow: hidden;"></iframe>
