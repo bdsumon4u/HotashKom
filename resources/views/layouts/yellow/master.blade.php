@@ -780,7 +780,6 @@
                             products.forEach((product) => {
                                 const productElement = this.createProductElement(product);
                                 container.appendChild(productElement);
-                                this.attachNavigationHandlers(productElement);
                             });
                         },
 
@@ -791,20 +790,6 @@
                             return div;
                         },
 
-                        attachNavigationHandlers(element) {
-                            const productLinks = element.querySelectorAll(
-                                'a.product-link[data-navigate]');
-                            productLinks.forEach(link => {
-                                link.addEventListener('click', (e) => {
-                                    const href = link.getAttribute('href');
-                                    if (href && window.Livewire && window.Livewire
-                                        .navigate) {
-                                        e.preventDefault();
-                                        window.Livewire.navigate(href);
-                                    }
-                                });
-                            });
-                        },
 
                         getProductHTML(product) {
                             const productId = product.id;
@@ -929,13 +914,13 @@
                                         ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                                     </div>
                                     <div class="product-card__image">
-                                        <a href="${productUrl}" class="product-link" data-navigate>
+                                        <a href="${productUrl}" class="product-link" wire:navigate.hover>
                                             <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;">
                                         </a>
                                     </div>
                                     <div class="product-card__info">
                                         <div class="product-card__name">
-                                            <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
+                                            <a href="${productUrl}" class="product-link" wire:navigate.hover data-name="${product.var_name || productName}">${productName}</a>
                                         </div>
                                         ${getRatingHTML(product)}
                                     </div>
@@ -1311,13 +1296,13 @@
                         clearTimeout(navigationTimeout);
                     }
 
-                    // Set a timeout (3 seconds)
+                    // Set a timeout (1 seconds)
                     navigationTimeout = setTimeout(() => {
-                        if (navigationStartTime && (Date.now() - navigationStartTime) > 2900) {
-                            console.warn('Navigation timeout detected (3s), reloading page');
+                        if (navigationStartTime && (Date.now() - navigationStartTime) > 900) {
+                            console.warn('Navigation timeout detected (1s), reloading page');
                             window.location.href = targetUrl;
                         }
-                    }, 3000);
+                    }, 1000);
                 });
 
                 document.addEventListener('livewire:navigated', function() {
@@ -1671,7 +1656,6 @@
                             this.loadedProductIds.add(productId);
                             const element = this.createProductElement(product, index);
                             container.appendChild(element);
-                            this.attachNavigationHandlers(element);
                         });
 
                         this.updateProductCount();
@@ -1717,20 +1701,6 @@
                         return div;
                     },
 
-                    attachNavigationHandlers(element) {
-                        const productLinks = element.querySelectorAll(
-                            'a.product-link[data-navigate]');
-                        productLinks.forEach(link => {
-                            link.addEventListener('click', (e) => {
-                                const href = link.getAttribute('href');
-                                if (href && window.Livewire && window.Livewire
-                                    .navigate) {
-                                    e.preventDefault();
-                                    window.Livewire.navigate(href);
-                                }
-                            });
-                        });
-                    },
 
                     getProductHTML(product, index) {
                         const productId = product.id || index;
@@ -1809,13 +1779,13 @@
                                     ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                                 </div>
                                 <div class="product-card__image">
-                                    <a href="${productUrl}" class="product-link" data-navigate>
+                                    <a href="${productUrl}" class="product-link" wire:navigate.hover>
                                         <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;" loading="lazy">
                                     </a>
                                 </div>
                                 <div class="product-card__info">
                                     <div class="product-card__name">
-                                        <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
+                                        <a href="${productUrl}" class="product-link" wire:navigate.hover data-name="${product.var_name || productName}">${productName}</a>
                                     </div>
                                 </div>
                                 <div class="product-card__actions">

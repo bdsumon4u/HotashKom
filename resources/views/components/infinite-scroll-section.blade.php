@@ -122,7 +122,6 @@
                     this.loadedProductIds.add(productId);
                     const element = this.createProductElement(product, index);
                     container.appendChild(element);
-                    this.attachNavigationHandlers(element);
                 });
             },
 
@@ -133,18 +132,6 @@
                 return div;
             },
 
-            attachNavigationHandlers(element) {
-                const productLinks = element.querySelectorAll('a.product-link[data-navigate]');
-                productLinks.forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        const href = link.getAttribute('href');
-                        if (href && window.Livewire && window.Livewire.navigate) {
-                            e.preventDefault();
-                            window.Livewire.navigate(href);
-                        }
-                    });
-                });
-            },
 
             getProductHTML(product, index) {
                 const productId = product.id || index;
@@ -217,13 +204,13 @@
                                  ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale"><small>Discount:</small> ${discountPercent}%</div>` : ''}
                              </div>
                              <div class="product-card__image">
-                                 <a href="${productUrl}" class="product-link" data-navigate>
+                                 <a href="${productUrl}" class="product-link" wire:navigate.hover>
                                      <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;">
                                  </a>
                              </div>
                              <div class="product-card__info">
                                  <div class="product-card__name">
-                                     <a href="${productUrl}" class="product-link" data-navigate data-name="${product.var_name || productName}">${productName}</a>
+                                     <a href="${productUrl}" class="product-link" wire:navigate.hover data-name="${product.var_name || productName}">${productName}</a>
                                  </div>
                                  ${this.getRatingHTML(product)}
                              </div>
