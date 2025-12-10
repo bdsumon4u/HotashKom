@@ -98,7 +98,76 @@
     @include('layouts.yellow.css')
     <!-- js -->
     <!-- font - fontawesome -->
+    @php
+        $cdnProvider = config('cdn.provider', 'jsdelivr');
+        $fontAwesomeVersion = config('cdn.assets.fontawesome.version', '6.5.1');
+
+        // Determine base URL based on CDN provider
+        $fontBaseUrl = match($cdnProvider) {
+            'jsdelivr' => "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@{$fontAwesomeVersion}/webfonts",
+            'cdnjs' => "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/{$fontAwesomeVersion}/webfonts",
+            'unpkg' => "https://unpkg.com/@fortawesome/fontawesome-free@{$fontAwesomeVersion}/webfonts",
+            default => "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@{$fontAwesomeVersion}/webfonts",
+        };
+    @endphp
+
+    {{-- Preload critical Font Awesome fonts for faster rendering --}}
+    @if(config('cdn.enabled', true))
+        <link rel="preload" href="{{ $fontBaseUrl }}/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" href="{{ $fontBaseUrl }}/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" href="{{ $fontBaseUrl }}/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    @endif
+
     <link rel="stylesheet" href="{{ $fontawesomeCss }}" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <!-- Optimize Font Awesome font loading with font-display: swap -->
+    <style>
+        /* Override Font Awesome @font-face declarations to add font-display: swap */
+        /* This ensures text is visible immediately while fonts load in the background */
+        @font-face {
+            font-family: 'Font Awesome 6 Brands';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('{{ $fontBaseUrl }}/fa-brands-400.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('{{ $fontBaseUrl }}/fa-regular-400.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 900;
+            font-display: swap;
+            src: url('{{ $fontBaseUrl }}/fa-solid-900.woff2') format('woff2');
+        }
+        /* Font Awesome 5 compatibility */
+        @font-face {
+            font-family: 'Font Awesome 5 Brands';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('{{ $fontBaseUrl }}/fa-brands-400.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 5 Free';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('{{ $fontBaseUrl }}/fa-regular-400.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 5 Free';
+            font-style: normal;
+            font-weight: 900;
+            font-display: swap;
+            src: url('{{ $fontBaseUrl }}/fa-solid-900.woff2') format('woff2');
+        }
+    </style>
     <!-- font - stroyka -->
     <link rel="stylesheet" href="{{ asset('strokya/fonts/stroyka/stroyka.css') }}">
     @include('layouts.yellow.color')
