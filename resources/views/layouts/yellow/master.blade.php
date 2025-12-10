@@ -39,6 +39,108 @@
         <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     @endif
 
+    {{-- Polyfill for async CSS loading (preload with onload) --}}
+    <script data-navigate-once>
+        /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+        (function(w) {
+            "use strict";
+            var loadCSS = function(href, before, media) {
+                var doc = w.document;
+                var ss = doc.createElement("link");
+                var ref;
+                if (before) {
+                    ref = before;
+                } else {
+                    var refs = (doc.body || doc.getElementsByTagName("head")[0]).childNodes;
+                    ref = refs[refs.length - 1];
+                }
+                var sheets = doc.styleSheets;
+                ss.rel = "stylesheet";
+                ss.href = href;
+                ss.media = "only x";
+                function ready(cb) {
+                    if (doc.body) {
+                        return cb();
+                    }
+                    setTimeout(function() {
+                        ready(cb);
+                    });
+                }
+                ready(function() {
+                    ref.parentNode.insertBefore(ss, (before ? ref : ref.nextSibling));
+                });
+                var onloadcssdefined = function(cb) {
+                    var resolvedHref = ss.href;
+                    var i = sheets.length;
+                    while (i--) {
+                        if (sheets[i].href === resolvedHref) {
+                            return cb();
+                        }
+                    }
+                    setTimeout(function() {
+                        onloadcssdefined(cb);
+                    });
+                };
+                ss.onloadcssdefined = onloadcssdefined;
+                onloadcssdefined(function() {
+                    ss.media = media || "all";
+                });
+                return ss;
+            };
+            if (typeof exports !== "undefined") {
+                exports.loadCSS = loadCSS;
+            } else {
+                w.loadCSS = loadCSS;
+            }
+        }(typeof global !== "undefined" ? global : this));
+
+        // Polyfill for browsers that don't support preload with onload
+        (function() {
+            function processPreloadLinks() {
+                var preloadLinks = document.querySelectorAll('link[rel="preload"][as="style"]');
+                preloadLinks.forEach(function(link) {
+                    // If onload handler wasn't set or doesn't work, provide fallback
+                    if (!link.hasAttribute('data-async-processed')) {
+                        link.setAttribute('data-async-processed', 'true');
+                        var href = link.href;
+                        var originalOnload = link.onload;
+
+                        // Enhanced onload handler
+                        link.onload = function() {
+                            if (originalOnload) {
+                                try {
+                                    originalOnload.call(this);
+                                } catch(e) {
+                                    console.warn('Error in original onload handler:', e);
+                                }
+                            }
+                            this.onload = null;
+                            this.rel = 'stylesheet';
+                        };
+
+                        // Fallback: if onload doesn't fire within 3 seconds, load synchronously
+                        setTimeout(function() {
+                            if (link && link.rel === 'preload') {
+                                if (typeof loadCSS !== 'undefined') {
+                                    loadCSS(href);
+                                    link.remove();
+                                } else {
+                                    link.rel = 'stylesheet';
+                                }
+                            }
+                        }, 3000);
+                    }
+                });
+            }
+
+            // Process immediately and also after DOM is ready
+            processPreloadLinks();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', processPreloadLinks);
+            }
+        })();
+    </script>
+
     {{-- Global jQuery (needed for SPA navigation) --}}
     <script src="{{ $jqueryJs }}" data-navigate-once crossorigin="anonymous" referrerpolicy="no-referrer"
         onerror="window.__loadLocalAsset && window.__loadLocalAsset('jquery')"></script>
@@ -169,7 +271,12 @@
         }
     </style>
     <!-- font - stroyka -->
-    <link rel="stylesheet" href="{{ asset('strokya/fonts/stroyka/stroyka.css') }}">
+    {{-- Defer Stroyka font CSS to prevent render blocking - load asynchronously --}}
+    @php
+        $stroykaCss = asset('strokya/fonts/stroyka/stroyka.css');
+    @endphp
+    <link rel="preload" href="{{ $stroykaCss }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ $stroykaCss }}"></noscript>
     @include('layouts.yellow.color')
     <style>
         [x-cloak] {
@@ -695,9 +802,12 @@
     </style>
     @stack('styles')
     @livewireStyles
+    {{-- Optimize Google Fonts loading - preconnect and async load --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet">
+    {{-- Load Google Fonts asynchronously to prevent render blocking --}}
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet"></noscript>
     {!! $scripts ?? null !!}
     @stack('head')
 </head>

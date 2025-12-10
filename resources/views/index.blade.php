@@ -3,7 +3,9 @@
 @section('title', 'Home')
 
 @push('styles')
-  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  {{-- Defer AOS CSS to prevent render blocking - load asynchronously --}}
+  <link rel="preload" href="https://unpkg.com/aos@next/dist/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css"></noscript>
   <style>
     .content-accordion .card {
       border: 1px solid #e3e3e3;

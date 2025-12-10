@@ -2,7 +2,7 @@
     $fontawesomeCss = cdnAsset('fontawesome.css', 'assets/css/fontawesome.css');
     $cdnProvider = config('cdn.provider', 'jsdelivr');
     $fontAwesomeVersion = config('cdn.assets.fontawesome.version', '6.5.1');
-    
+
     // Determine base URL based on CDN provider
     $fontBaseUrl = match($cdnProvider) {
         'jsdelivr' => "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@{$fontAwesomeVersion}/webfonts",
