@@ -1,5 +1,21 @@
 @props(['section'])
 
+@push('styles')
+<style>
+    @keyframes skeleton-pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+    .product-card-skeleton {
+        animation: skeleton-pulse 1.5s ease-in-out infinite;
+    }
+</style>
+@endpush
+
 <div class="infinite-scroll-section" x-data="infiniteScroll({{ $section->id }})" x-init="init()" data-section-id="{{ $section->id }}">
 
     @if ($section->type == 'pure-grid')
@@ -33,6 +49,18 @@
                         data-user-guest="{{ auth('user')->guest() ? 'true' : 'false' }}"
                         data-user-verified="{{ auth('user')->check() && auth('user')->user()->is_verified ? 'true' : 'false' }}">
                         <!-- Products will be loaded here by Alpine.js -->
+                        <!-- Skeleton placeholders to prevent layout shift -->
+                        <div class="products-skeleton" style="display: grid; grid-template-columns: repeat({{ optional($section->data)->cols ?? 5 }}, 1fr); gap: 1rem;">
+                            @for($i = 0; $i < (optional($section->data)->cols ?? 5); $i++)
+                                <div class="product-card-skeleton" style="aspect-ratio: 1 / 1.2; background: #f0f0f0; border-radius: 8px; animation: pulse 1.5s ease-in-out infinite;">
+                                    <div style="aspect-ratio: 1 / 1; background: #e0e0e0; border-radius: 8px 8px 0 0;"></div>
+                                    <div style="padding: 0.75rem;">
+                                        <div style="height: 16px; background: #e0e0e0; border-radius: 4px; margin-bottom: 0.5rem;"></div>
+                                        <div style="height: 14px; background: #e0e0e0; border-radius: 4px; width: 60%;"></div>
+                                    </div>
+                                </div>
+                            @endfor
+                        </div>
                     </div>
                 </div>
             </div>
@@ -113,6 +141,12 @@
             appendProducts(products) {
                 const container = document.querySelector(`#products-container-${this.sectionId}`);
                 if (!container) return;
+
+                // Remove skeleton on first product load
+                const skeleton = container.querySelector('.products-skeleton');
+                if (skeleton && products.length > 0) {
+                    skeleton.remove();
+                }
 
                 products.forEach((product, index) => {
                     const productId = product.id || index;
@@ -203,9 +237,9 @@
                                  ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
                                  ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale"><small>Discount:</small> ${discountPercent}%</div>` : ''}
                              </div>
-                             <div class="product-card__image">
-                                 <a href="${productUrl}" class="product-link" wire:navigate.hover>
-                                     <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;">
+                             <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
+                                 <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
+                                     <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
                                  </a>
                              </div>
                              <div class="product-card__info">

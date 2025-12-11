@@ -6,14 +6,14 @@
         <div class="site-header__middle container">
             <div class="site-header__logo">
                 <a href="{{ url('/') }}" wire:navigate.hover>
-                    <img src="{{ asset($logo->desktop ?? '') }}" alt="Logo" style="max-width: 100%; max-height: 84px;">
+                    <img src="{{ asset($logo->desktop ?? '') }}" alt="Logo" style="max-width: 100%; max-height: 84px; width: auto; height: auto; display: block;" width="auto" height="84">
                 </a>
             </div>
             <div class="site-header__search">
                 <div class="search">
-                    
-                    
-                    
+
+
+
                     <form action="/shop">
                         <div style="grid-area:search" class="md:ml-4"><div class="Searchbar__CustomCombobox-xnx3kr-6 joXPnU transition-all duration-75 ease-linear overflow-initial" data-reach-combobox="" data-state="idle"><div class="Searchbar__Container-xnx3kr-1 kWQExC" style="
     display: flex;
@@ -69,7 +69,7 @@
                 </div>
             </div>
             <div class="site-header__phone d-flex align-items-center">
-                <img style="height: 35px;" class="img-responsive mr-1" src="{{ asset('call-now.gif') }}">
+                <img style="height: 35px; width: auto; display: block;" class="img-responsive mr-1" src="{{ asset('call-now.gif') }}" width="auto" height="35">
                 <div>
                     <div class="site-header__phone-title mb-0">Help Line</div>
                     <div class="site-header__phone-number">

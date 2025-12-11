@@ -20,10 +20,10 @@
             </div>
         @endif
     </div>
-    <div class="product-card__image">
-        <a href="{{ route('products.show', $product) }}" wire:navigate.hover>
+    <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
+        <a href="{{ route('products.show', $product) }}" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
             <img src="{{ cdn(optional($product->base_image)->src) }}" alt="Base Image" loading="lazy"
-                style="width: 100%; height: 100%;">
+                style="width: 100%; height: 100%; object-fit: cover;">
         </a>
     </div>
     <div class="product-card__info">

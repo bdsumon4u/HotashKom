@@ -11,7 +11,7 @@
                         </svg>
                     </button>
                     <a class="mobile-header__logo" href="{{ url('/') }}" wire:navigate.hover>
-                        <img src="{{ asset($logo->mobile ?? '') }}" alt="Logo" style="max-width: 100%; max-height: 54px;">
+                        <img src="{{ asset($logo->mobile ?? '') }}" alt="Logo" style="max-width: 100%; max-height: 54px; width: auto; height: auto; display: block;" width="auto" height="54">
                     </a>
                     <div class="mobile-header__search">
                         <div class="search mobile-header__search-form">

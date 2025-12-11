@@ -1092,9 +1092,9 @@
                                         ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
                                         ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                                     </div>
-                                    <div class="product-card__image">
-                                        <a href="${productUrl}" class="product-link" wire:navigate.hover>
-                                            <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;">
+                                    <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
+                                        <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
+                                            <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
                                         </a>
                                     </div>
                                     <div class="product-card__info">
@@ -1957,9 +1957,9 @@
                                     ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
                                     ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                                 </div>
-                                <div class="product-card__image">
-                                    <a href="${productUrl}" class="product-link" wire:navigate.hover>
-                                        <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%;" loading="lazy">
+                                <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
+                                    <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
+                                        <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
                                     </a>
                                 </div>
                                 <div class="product-card__info">

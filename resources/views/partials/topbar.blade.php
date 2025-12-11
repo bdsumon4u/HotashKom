@@ -3,7 +3,7 @@
         <div class="topbar__row">
             @if ($show_option->topbar_phone ?? false)
             <div class="topbar__item topbar__item--link d-md-none">
-                <img style="height: 35px;" class="img-responsive " src="https://www.himelshop.com/front_asset/call-now.gif" alt="Call 7colors" title="7colors">&nbsp;
+                <img style="height: 35px; width: auto; display: block;" class="img-responsive " src="https://www.himelshop.com/front_asset/call-now.gif" alt="Call 7colors" title="7colors" width="auto" height="35">&nbsp;
                 <a style="font-family: monospace;" class="topbar-link" href="tel:{{ $company->phone ?? '' }}">{{ $company->phone ?? '' }}</a>
             </div>
             @endif
