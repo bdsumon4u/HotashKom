@@ -200,6 +200,10 @@
                     $phone = preg_replace('/[^\d]/', '', $company->whatsapp ?? '');
                     $phone = strlen($phone) == 11 ? '88' . $phone : $phone;
                     $messenger = $company->messenger ?? '';
+                    $whatsappMessage = rawurlencode(
+                        "Hello\r\nI am interested in ordering \"{$product->name}\".\r\n\r\n" . url()->current()
+                    );
+                    $whatsappLink = "https://api.whatsapp.com/send?phone={$phone}&text={$whatsappMessage}";
                 @endphp
                 <div class="gap-2 my-2 d-flex justify-content-center">
                     @if (strlen($messenger) > 13)
@@ -208,10 +212,10 @@
                             <i class="mr-2 fab fa-facebook-messenger"></i> Messenger
                         </a>
                     @endif
-                    <a href="https://api.whatsapp.com/send?phone={{ $phone }}&text=Hello+%0D%0AI+am+interested+in+ordering+%22{{ $product->name }}%22.%0D%0A%0D%0A{{ url()->current() }}"
+                    <a href="{{ $whatsappLink }}"
                         rel="noopener" class="ml-1 btn btn-success d-flex align-items-center whatsapp-link"
                         style="min-width: 140px;"
-                        data-whatsapp-url="https://api.whatsapp.com/send?phone={{ $phone }}&text=Hello+%0D%0AI+am+interested+in+ordering+%22{{ $product->name }}%22.%0D%0A%0D%0A{{ url()->current() }}"
+                        data-whatsapp-url="{{ $whatsappLink }}"
                         onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
                         <i class="mr-2 fab fa-whatsapp"></i> WhatsApp
                     </a>
