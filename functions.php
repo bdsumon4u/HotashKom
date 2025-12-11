@@ -337,7 +337,7 @@ function cdn(?string $url, int $w = 150, int $h = 150)
     }
 
     if ($username = config('services.cloudinary.username')) {
-        return 'https://res.cloudinary.com/'.$username.'/image/fetch/w_'.$w.',h_'.$h.',c_thumb/'.asset($url);
+        return 'https://res.cloudinary.com/'.$username.'/image/fetch/w_'.$w.',h_'.$h.',c_thumb/f_webp/'.asset($url);
     }
 
     if ($username = config('services.imagekit.username')) {
