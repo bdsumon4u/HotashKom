@@ -31,13 +31,14 @@
     {{-- Preload critical JavaScript --}}
     <link rel="preload" href="{{ $jqueryJs }}" as="script" crossorigin="anonymous">
 
-    {{-- Preconnect to CDN domains for faster DNS resolution --}}
+    {{-- Preconnect to critical CDN domains only (max 4 to avoid warnings) --}}
     @if (config('cdn.enabled', true))
         <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
         <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     @endif
+    {{-- Preconnect to analytics domains for faster loading when deferred scripts execute --}}
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://www.google.com">
 
     {{-- Polyfill for async CSS loading (preload with onload) --}}
     <script data-navigate-once>
@@ -207,19 +208,22 @@
             function loadDeferredAnalytics() {
                 const headDiv = document.getElementById('deferred-analytics-head');
                 if (headDiv) {
-                    // Move scripts from hidden div to head
+                    // Move scripts from hidden div to head, delaying inline script execution
                     const scripts = headDiv.querySelectorAll('script');
                     scripts.forEach(function(script) {
                         const newScript = document.createElement('script');
                         if (script.src) {
+                            // For external scripts, use async to delay loading
                             newScript.src = script.src;
-                            newScript.async = script.async;
+                            newScript.async = true;
+                            newScript.defer = false; // Don't defer, just async
                         } else {
-                            newScript.textContent = script.textContent;
+                            // For inline scripts, wrap in setTimeout to delay execution
+                            newScript.textContent = 'setTimeout(function(){' + script.textContent + '}, 100);';
                         }
                         document.head.appendChild(newScript);
                     });
-                    // Move noscript tags
+                    // Move noscript tags (these don't block execution)
                     const noscripts = headDiv.querySelectorAll('noscript');
                     noscripts.forEach(function(noscript) {
                         document.head.appendChild(noscript.cloneNode(true));
@@ -228,14 +232,14 @@
                 }
             }
 
-            // Load after page is interactive (requestIdleCallback or setTimeout fallback)
+            // Load after page is interactive (requestIdleCallback with longer timeout)
             if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadDeferredAnalytics, { timeout: 3000 });
+                requestIdleCallback(loadDeferredAnalytics, { timeout: 5000 });
             } else if (document.readyState === 'complete') {
-                setTimeout(loadDeferredAnalytics, 2000);
+                setTimeout(loadDeferredAnalytics, 3000);
             } else {
                 window.addEventListener('load', function() {
-                    setTimeout(loadDeferredAnalytics, 2000);
+                    setTimeout(loadDeferredAnalytics, 3000);
                 }, { once: true });
             }
         })();
@@ -845,9 +849,7 @@
     </style>
     @stack('styles')
     @livewireStyles
-    {{-- Optimize Google Fonts loading - preconnect and async load --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {{-- Google Fonts are loaded asynchronously, no preconnect needed (reduces preconnect count) --}}
     {{-- Load Google Fonts asynchronously to prevent render blocking --}}
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet"></noscript>
@@ -868,15 +870,17 @@
             function loadDeferredAnalyticsBody() {
                 const bodyDiv = document.getElementById('deferred-analytics-body');
                 if (bodyDiv) {
-                    // Move scripts from hidden div to body
+                    // Move scripts from hidden div to body, delaying inline script execution
                     const scripts = bodyDiv.querySelectorAll('script');
                     scripts.forEach(function(script) {
                         const newScript = document.createElement('script');
                         if (script.src) {
+                            // For external scripts, use async to delay loading
                             newScript.src = script.src;
-                            newScript.async = script.async;
+                            newScript.async = true;
                         } else {
-                            newScript.textContent = script.textContent;
+                            // For inline scripts, wrap in setTimeout to delay execution
+                            newScript.textContent = 'setTimeout(function(){' + script.textContent + '}, 100);';
                         }
                         document.body.appendChild(newScript);
                     });
@@ -889,14 +893,14 @@
                 }
             }
 
-            // Load after page is interactive (requestIdleCallback or setTimeout fallback)
+            // Load after page is interactive (requestIdleCallback with longer timeout)
             if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadDeferredAnalyticsBody, { timeout: 3000 });
+                requestIdleCallback(loadDeferredAnalyticsBody, { timeout: 5000 });
             } else if (document.readyState === 'complete') {
-                setTimeout(loadDeferredAnalyticsBody, 2000);
+                setTimeout(loadDeferredAnalyticsBody, 3000);
             } else {
                 window.addEventListener('load', function() {
-                    setTimeout(loadDeferredAnalyticsBody, 2000);
+                    setTimeout(loadDeferredAnalyticsBody, 3000);
                 }, { once: true });
             }
         })();

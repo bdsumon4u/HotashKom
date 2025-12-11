@@ -851,17 +851,24 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
         });
 
         // Send data to the server before the user leaves
-        window.addEventListener("beforeunload", function(event) {
-            navigator.sendBeacon(
-                "/save-checkout-progress",
-                new Blob([JSON.stringify({
-                    name: document.getElementById('billing_first_name').value,
-                    phone: document.getElementById('billing_phone').value,
-                    address: document.getElementById('billing_address_1').value,
-                })], {
-                    type: 'application/json'
-                })
-            );
+        // Use pagehide instead of beforeunload to avoid blocking bfcache
+        window.addEventListener("pagehide", function(event) {
+            // Use sendBeacon for reliable delivery even during page unload
+            const firstNameEl = document.getElementById('billing_first_name');
+            const phoneEl = document.getElementById('billing_phone');
+            const addressEl = document.getElementById('billing_address_1');
+            if (firstNameEl && phoneEl && addressEl) {
+                navigator.sendBeacon(
+                    "/save-checkout-progress",
+                    new Blob([JSON.stringify({
+                        name: firstNameEl.value,
+                        phone: phoneEl.value,
+                        address: addressEl.value,
+                    })], {
+                        type: 'application/json'
+                    })
+                );
+            }
         });
     </script>
 </section>

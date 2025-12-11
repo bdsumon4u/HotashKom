@@ -42,6 +42,16 @@ final class EnsureSpaResponse
             $response->headers->set('X-Content-Type-Options', 'nosniff');
         }
 
+        // Enable text compression for text-based responses
+        if ($response->headers->get('Content-Type') &&
+            (str_contains($response->headers->get('Content-Type'), 'text/html') ||
+             str_contains($response->headers->get('Content-Type'), 'text/css') ||
+             str_contains($response->headers->get('Content-Type'), 'application/javascript') ||
+             str_contains($response->headers->get('Content-Type'), 'application/json'))) {
+            // Set Vary header for compression
+            $response->headers->set('Vary', 'Accept-Encoding');
+        }
+
         return $response;
     }
 }
