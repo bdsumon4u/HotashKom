@@ -2232,22 +2232,31 @@
                     !window.chrome;
             }
 
-            // Convert WhatsApp URL to Android Intent format if needed
-            function getWhatsAppUrl(originalUrl) {
+            // Normalize WhatsApp URL for WebView without breaking in-app browsers (FB/IG)
+            function normalizeWhatsAppUrl(originalUrl) {
                 if (!isWebView()) {
                     return originalUrl;
                 }
 
-                // Check if Android WebView
                 var ua = navigator.userAgent || navigator.vendor || window.opera;
-                if (/android/i.test(ua)) {
-                    // Extract phone number from URL
-                    var phoneMatch = originalUrl.match(/phone=([^&]+)/);
-                    if (phoneMatch) {
-                        var phone = phoneMatch[1];
-                        // Try Android Intent URL format
-                        return 'intent://send?phone=' + phone + '#Intent;scheme=https;package=com.whatsapp;end';
-                    }
+                var isAndroid = /android/i.test(ua);
+                var isFacebookOrInstagram = /FB_IAB|FBAN|Instagram/i.test(ua);
+
+                var phoneMatch = originalUrl.match(/phone=([^&]+)/) || originalUrl.match(/wa\.me\/(\d+)/);
+                var phone = phoneMatch ? phoneMatch[1] : null;
+
+                if (!phone) {
+                    return originalUrl;
+                }
+
+                // Facebook/Instagram in-app browsers do not handle intent://, keep https
+                if (isFacebookOrInstagram) {
+                    return 'https://wa.me/' + phone;
+                }
+
+                // For Android WebView use whatsapp:// scheme (handled in native WebView)
+                if (isAndroid) {
+                    return 'whatsapp://send?phone=' + phone;
                 }
 
                 return originalUrl;
@@ -2259,7 +2268,7 @@
                 if (!url) return true;
 
                 // Get the appropriate URL for WebView
-                var finalUrl = getWhatsAppUrl(url);
+                var finalUrl = normalizeWhatsAppUrl(url);
 
                 // Update the href to ensure it's correct
                 $(element).attr('href', finalUrl);
@@ -2308,19 +2317,28 @@
                 (!window.chrome && /safari/i.test(ua));
         }
 
-        // Convert WhatsApp URL to Android Intent format if needed
+        // Convert WhatsApp URL for WebView without intent:// (in-app browsers block it)
         function getWhatsAppUrlForWebView(originalUrl) {
             if (!isWebViewEnv()) {
                 return originalUrl;
             }
 
             var ua = navigator.userAgent || navigator.vendor || window.opera;
-            if (/android/i.test(ua)) {
-                var phoneMatch = originalUrl.match(/phone=([^&]+)/);
-                if (phoneMatch) {
-                    var phone = phoneMatch[1];
-                    return 'intent://send?phone=' + phone + '#Intent;scheme=https;package=com.whatsapp;end';
-                }
+            var isAndroid = /android/i.test(ua);
+            var isFacebookOrInstagram = /FB_IAB|FBAN|Instagram/i.test(ua);
+            var phoneMatch = originalUrl.match(/phone=([^&]+)/) || originalUrl.match(/wa\.me\/(\d+)/);
+            var phone = phoneMatch ? phoneMatch[1] : null;
+
+            if (!phone) {
+                return originalUrl;
+            }
+
+            if (isFacebookOrInstagram) {
+                return 'https://wa.me/' + phone;
+            }
+
+            if (isAndroid) {
+                return 'whatsapp://send?phone=' + phone;
             }
 
             return originalUrl;
