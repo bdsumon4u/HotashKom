@@ -1,3 +1,16 @@
+@php
+    // Get first slide for LCP optimization
+    $firstSlide = slides()->first();
+    $lcpImageUrl = $firstSlide ? cdn(asset($firstSlide->desktop_src), 840, 395) : null;
+@endphp
+
+@push('head')
+    @if($lcpImageUrl)
+        {{-- Preload LCP image for faster discovery and loading --}}
+        <link rel="preload" as="image" href="{{ $lcpImageUrl }}" fetchpriority="high">
+    @endif
+@endpush
+
 @push('styles')
 <style>
     @if(!(setting('show_option')->category_dropdown ?? false))
@@ -53,6 +66,15 @@
             margin-top: 5px !important;
         }
     }
+    /* Ensure img-based slides maintain proper dimensions */
+    .block-slideshow__slide-image img {
+        display: block;
+    }
+    .block-slideshow__slide-image--desktop img,
+    .block-slideshow__slide-image--mobile img {
+        min-width: 100%;
+        min-height: 100%;
+    }
     @media (max-width: 767px) {
         .block-slideshow__body, .block-slideshow__slide {
             height: 180px !important;
@@ -77,12 +99,32 @@
             <div class="col-12 @if(setting('show_option')->category_dropdown ?? false) col-lg-9 offset-lg-3 @endif">
                 <div class="block-slideshow__body">
                     <div class="owl-carousel">
-                        @foreach(slides() as $slide)
+                        @foreach(slides() as $index => $slide)
+                        @php
+                            $desktopImageUrl = cdn(asset($slide->desktop_src), 840, 395);
+                            $mobileImageUrl = cdn(asset($slide->mobile_src), 360, 180);
+                            $isFirstSlide = $index === 0;
+                        @endphp
                         <a class="block-slideshow__slide" href="{{ $slide->btn_href ?? '#' }}">
-                            <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop"
-                                style="background-image: url({{ cdn(asset($slide->desktop_src), 840, 395) }}); background-position: center;"></div>
-                            <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile"
-                                style="background-image: url({{ cdn(asset($slide->mobile_src), 360, 180) }}); background-position: center;"></div>
+                            {{-- Use <img> tag for first slide to enable fetchpriority="high" for LCP optimization --}}
+                            @if($isFirstSlide)
+                                <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop" style="position: relative; overflow: hidden;">
+                                    <img src="{{ $desktopImageUrl }}" alt="{{ $slide->title ?? 'Slide' }}"
+                                         fetchpriority="high"
+                                         loading="eager"
+                                         style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+                                </div>
+                                <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile" style="position: relative; overflow: hidden;">
+                                    <img src="{{ $mobileImageUrl }}" alt="{{ $slide->title ?? 'Slide' }}"
+                                         loading="eager"
+                                         style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+                                </div>
+                            @else
+                                <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop"
+                                    style="background-image: url({{ $desktopImageUrl }}); background-position: center;"></div>
+                                <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile"
+                                    style="background-image: url({{ $mobileImageUrl }}); background-position: center;"></div>
+                            @endif
                             <div class="block-slideshow__slide-content">
                                 <div class="block-slideshow__slide-title">{!! $slide->title !!}</div>
                                 <div class="block-slideshow__slide-text">{!! $slide->text !!}</div>
