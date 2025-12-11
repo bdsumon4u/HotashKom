@@ -195,8 +195,51 @@
     </script>
 
     <!-- css -->
-    @include('googletagmanager::head')
-    <x-metapixel-head />
+    {{-- Analytics scripts will be loaded after page is interactive to reduce main-thread blocking --}}
+    {{-- Store analytics HTML in hidden divs, then move to proper location after page is interactive --}}
+    <div id="deferred-analytics-head" style="display: none !important;">
+        @include('googletagmanager::head')
+        <x-metapixel-head />
+    </div>
+    <script data-navigate-once>
+        // Defer analytics scripts to reduce main-thread blocking
+        (function() {
+            function loadDeferredAnalytics() {
+                const headDiv = document.getElementById('deferred-analytics-head');
+                if (headDiv) {
+                    // Move scripts from hidden div to head
+                    const scripts = headDiv.querySelectorAll('script');
+                    scripts.forEach(function(script) {
+                        const newScript = document.createElement('script');
+                        if (script.src) {
+                            newScript.src = script.src;
+                            newScript.async = script.async;
+                        } else {
+                            newScript.textContent = script.textContent;
+                        }
+                        document.head.appendChild(newScript);
+                    });
+                    // Move noscript tags
+                    const noscripts = headDiv.querySelectorAll('noscript');
+                    noscripts.forEach(function(noscript) {
+                        document.head.appendChild(noscript.cloneNode(true));
+                    });
+                    headDiv.remove();
+                }
+            }
+
+            // Load after page is interactive (requestIdleCallback or setTimeout fallback)
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(loadDeferredAnalytics, { timeout: 3000 });
+            } else if (document.readyState === 'complete') {
+                setTimeout(loadDeferredAnalytics, 2000);
+            } else {
+                window.addEventListener('load', function() {
+                    setTimeout(loadDeferredAnalytics, 2000);
+                }, { once: true });
+            }
+        })();
+    </script>
     @include('layouts.yellow.css')
     <!-- js -->
     <!-- font - fontawesome -->
@@ -814,8 +857,50 @@
 
 <body class="header-fixed" style="margin: 0; padding: 0;">
     <x-livewire-progress bar-class="bg-warning" track-class="bg-white/50" />
-    @include('googletagmanager::body')
-    <x-metapixel-body />
+    {{-- Analytics scripts will be loaded after page is interactive to reduce main-thread blocking --}}
+    <div id="deferred-analytics-body" style="display: none !important;">
+        @include('googletagmanager::body')
+        <x-metapixel-body />
+    </div>
+    <script data-navigate-once>
+        // Defer analytics body scripts to reduce main-thread blocking
+        (function() {
+            function loadDeferredAnalyticsBody() {
+                const bodyDiv = document.getElementById('deferred-analytics-body');
+                if (bodyDiv) {
+                    // Move scripts from hidden div to body
+                    const scripts = bodyDiv.querySelectorAll('script');
+                    scripts.forEach(function(script) {
+                        const newScript = document.createElement('script');
+                        if (script.src) {
+                            newScript.src = script.src;
+                            newScript.async = script.async;
+                        } else {
+                            newScript.textContent = script.textContent;
+                        }
+                        document.body.appendChild(newScript);
+                    });
+                    // Move noscript and iframe tags
+                    const noscripts = bodyDiv.querySelectorAll('noscript');
+                    noscripts.forEach(function(noscript) {
+                        document.body.appendChild(noscript.cloneNode(true));
+                    });
+                    bodyDiv.remove();
+                }
+            }
+
+            // Load after page is interactive (requestIdleCallback or setTimeout fallback)
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(loadDeferredAnalyticsBody, { timeout: 3000 });
+            } else if (document.readyState === 'complete') {
+                setTimeout(loadDeferredAnalyticsBody, 2000);
+            } else {
+                window.addEventListener('load', function() {
+                    setTimeout(loadDeferredAnalyticsBody, 2000);
+                }, { once: true });
+            }
+        })();
+    </script>
     <!-- quickview-modal -->
     <div id="quickview-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -1400,6 +1485,23 @@
                 }
             }
 
+            // Use passive listener for better scroll performance
+            // jQuery doesn't support passive option, so we use native addEventListener for better performance
+            let scrollHandler = null;
+            if (typeof onScroll === 'function') {
+                scrollHandler = function(e) {
+                    try {
+                        onScroll.call(window, e);
+                    } catch(err) {
+                        console.error('Scroll handler error:', err);
+                    }
+                };
+                // Remove any existing listener
+                window.removeEventListener('scroll', scrollHandler, { passive: true });
+                // Add passive scroll listener
+                window.addEventListener('scroll', scrollHandler, { passive: true });
+            }
+            // Also keep jQuery handler for compatibility with existing code that might depend on it
             $(window).off('scroll.siteHeader').on('scroll.siteHeader', onScroll);
             onScroll();
         });

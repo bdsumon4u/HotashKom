@@ -3,7 +3,7 @@
         <!-- .topbar -->
         @include('partials.topbar')
         <!-- .topbar / end -->
-        <div class="site-header__middle container">
+        <div class="container site-header__middle">
             <div class="site-header__logo">
                 <a href="{{ url('/') }}" wire:navigate.hover>
                     <img src="{{ asset($logo->desktop ?? '') }}" alt="Logo" style="max-width: 100%; max-height: 84px; width: auto; height: auto; display: block;" width="auto" height="84">
@@ -15,7 +15,7 @@
 
 
                     <form action="/shop">
-                        <div style="grid-area:search" class="md:ml-4"><div class="Searchbar__CustomCombobox-xnx3kr-6 joXPnU transition-all duration-75 ease-linear overflow-initial" data-reach-combobox="" data-state="idle"><div class="Searchbar__Container-xnx3kr-1 kWQExC" style="
+                        <div style="grid-area:search" class="md:ml-4"><div class="transition-all duration-75 ease-linear Searchbar__CustomCombobox-xnx3kr-6 joXPnU overflow-initial" data-reach-combobox="" data-state="idle"><div class="Searchbar__Container-xnx3kr-1 kWQExC" style="
     display: flex;
 "><input name="search" aria-autocomplete="both" aria-controls="listbox--1" aria-expanded="false" aria-haspopup="listbox" aria-labelledby="demo" role="combobox" placeholder="Search for..." data-reach-combobox-input="" data-state="idle" value="{{ request('search') }}" style="
     letter-spacing: 0.025em;
@@ -69,9 +69,10 @@
                 </div>
             </div>
             <div class="site-header__phone d-flex align-items-center">
-                <img style="height: 35px; width: auto; display: block;" class="img-responsive mr-1" src="{{ asset('call-now.gif') }}" width="auto" height="35">
+                {{-- Lazy load call-now.gif - it's 279KB and not critical for initial render --}}
+                <img style="height: 35px; width: auto; display: block;" class="mr-1 img-responsive" src="{{ asset('call-now.gif') }}" width="auto" height="35" loading="lazy" decoding="async">
                 <div>
-                    <div class="site-header__phone-title mb-0">Help Line</div>
+                    <div class="mb-0 site-header__phone-title">Help Line</div>
                     <div class="site-header__phone-number">
                         <div class="topbar__item topbar__item--link">
                             <a style="font-family: monospace; font-size: 16px;" class="topbar-link" href="tel:{{ $company->phone ?? '' }}">{{ $company->phone ?? '' }}</a>
@@ -82,7 +83,7 @@
         </div>
         <div class="site-header__nav-panel">
             <div class="nav-panel">
-                <div class="nav-panel__container container">
+                <div class="container nav-panel__container">
                     <div class="nav-panel__row">
                         @include('partials.departments')
                         <!-- .nav-links -->

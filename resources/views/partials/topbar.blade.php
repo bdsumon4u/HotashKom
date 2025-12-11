@@ -1,9 +1,10 @@
 <div class="site-header__topbar topbar text-nowrap">
-    <div class="topbar__container container">
+    <div class="container topbar__container">
         <div class="topbar__row">
             @if ($show_option->topbar_phone ?? false)
             <div class="topbar__item topbar__item--link d-md-none">
-                <img style="height: 35px; width: auto; display: block;" class="img-responsive " src="https://www.himelshop.com/front_asset/call-now.gif" alt="Call 7colors" title="7colors" width="auto" height="35">&nbsp;
+                {{-- Lazy load call-now.gif - it's 279KB and not critical for initial render --}}
+                <img style="height: 35px; width: auto; display: block;" class="img-responsive" src="{{ asset('call-now.gif') }}" width="auto" height="35" loading="lazy" decoding="async">&nbsp;
                 <a style="font-family: monospace;" class="topbar-link" href="tel:{{ $company->phone ?? '' }}">{{ $company->phone ?? '' }}</a>
             </div>
             @endif
@@ -17,7 +18,7 @@
                 <a class="topbar-link" href="{{ $href }}" @unless($isExternal) wire:navigate.hover @endunless>{!! $item->name !!}</a>
             </div>
             @endforeach
-            <marquee class="d-flex align-items-center h-100 mx-2" behavior="" direction="">{!! $scroll_text ?? '' !!}</marquee>
+            <marquee class="mx-2 d-flex align-items-center h-100" behavior="" direction="">{!! $scroll_text ?? '' !!}</marquee>
             <div class="topbar__spring"></div>
             @if($show_option->track_order ?? false)
             <div class="topbar__item topbar__item--link">

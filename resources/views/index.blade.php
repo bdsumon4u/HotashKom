@@ -161,7 +161,7 @@
                         <div class="product-card">
                             <div class="product-card__image">
                                 <a href="{{ route('categories.products', $category) }}" wire:navigate.hover>
-                                    <img src="{{ cdn($category->image_src, 100, 100) }}" alt="Product Image">
+                                    <img src="{{ cdn($category->image_src, 100, 100) }}" alt="Product Image" loading="lazy" decoding="async">
                                 </a>
                             </div>
                             <div class="product-card__info">

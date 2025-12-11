@@ -76,8 +76,10 @@
                 window.removeEventListener('beforeunload', window.__checkoutBeforeUnloadHandler);
             }
 
+            // Only add beforeunload on checkout page to avoid blocking bfcache on other pages
+            // Note: beforeunload must be non-passive to work, but it's only on checkout page
             window.__checkoutBeforeUnloadHandler = sendCheckoutProgress;
-            window.addEventListener('beforeunload', window.__checkoutBeforeUnloadHandler);
+            window.addEventListener('beforeunload', window.__checkoutBeforeUnloadHandler, { passive: false });
 
             document.querySelectorAll('[place-order]').forEach((button) => {
                 if (button.__checkoutClickHandler) {
