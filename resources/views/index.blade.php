@@ -2,6 +2,12 @@
 
 @section('title', 'Home')
 
+@push('head')
+  {{-- Preconnect to unpkg.com for AOS.js to reduce latency --}}
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="dns-prefetch" href="https://unpkg.com">
+@endpush
+
 @push('styles')
   {{-- Defer AOS CSS to prevent render blocking - load asynchronously --}}
   <link rel="preload" href="https://unpkg.com/aos@next/dist/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -304,8 +310,34 @@
 @endsection
 
 @push('scripts')
-  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-  <script>
-    AOS.init();
+  {{-- Defer AOS.js - it's only for animations, not critical for initial render --}}
+  <script src="https://unpkg.com/aos@next/dist/aos.js" defer></script>
+  <script defer>
+    // Wait for AOS to load before initializing
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof AOS !== 'undefined') {
+          AOS.init();
+        } else {
+          // Fallback: wait for script to load
+          window.addEventListener('load', function() {
+            if (typeof AOS !== 'undefined') {
+              AOS.init();
+            }
+          });
+        }
+      });
+    } else {
+      // DOM already loaded
+      if (typeof AOS !== 'undefined') {
+        AOS.init();
+      } else {
+        window.addEventListener('load', function() {
+          if (typeof AOS !== 'undefined') {
+            AOS.init();
+          }
+        });
+      }
+    }
   </script>
 @endpush

@@ -868,9 +868,10 @@
     </div><!-- site / end -->
     @livewireScripts
     @include('layouts.yellow.js')
-    <script src="{{ asset('strokya/vendor/xzoom/xzoom.min.js') }}"></script>
-    <script src="{{ asset('strokya/vendor/xZoom-master/example/js/vendor/modernizr.js') }}"></script>
-    <script src="{{ asset('strokya/vendor/xZoom-master/example/js/setup.js') }}"></script>
+    {{-- Defer xzoom scripts - only needed on product detail pages, not critical for initial render --}}
+    <script src="{{ asset('strokya/vendor/xzoom/xzoom.min.js') }}" defer></script>
+    <script src="{{ asset('strokya/vendor/xZoom-master/example/js/vendor/modernizr.js') }}" defer></script>
+    <script src="{{ asset('strokya/vendor/xZoom-master/example/js/setup.js') }}" defer></script>
     <script>
         (function() {
             function registerLazyRelatedProductsComponent() {
