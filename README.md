@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}508}$$ 🔥 domains are live now
+These 🔥 $${\color{red}509}$$ 🔥 domains are live now
 
-_Last updated: **2025-12-11 09:37:51 Asia/Dhaka**_
+_Last updated: **2025-12-12 09:37:14 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -607,3 +607,4 @@ _Last updated: **2025-12-11 09:37:51 Asia/Dhaka**_
 | 506 | [humayraeshop.com](http://humayraeshop.com) |
 | 507 | [dailybdbazar.com](http://dailybdbazar.com) |
 | 508 | [bayazidenterprise.com](http://bayazidenterprise.com) |
+| 509 | [suzasbd.com](http://suzasbd.com) |
