@@ -98,7 +98,15 @@ class Order extends Model
             }
         });
 
+        static::created(function (Order $order): void {
+            // Clear EditOrder component caches (activities cache will be empty initially, but clear to be safe)
+            cacheMemo()->forget('order_activities:'.$order->id);
+        });
+
         static::updated(function (Order $order): void {
+            // Clear EditOrder component caches
+            cacheMemo()->forget('order_activities:'.$order->id);
+
             if (! isOninda()) {
                 return;
             }

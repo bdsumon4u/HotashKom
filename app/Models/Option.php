@@ -14,6 +14,8 @@ class Option extends Model
         static::saved(function ($option): void {
             // Clear product filter data since options are part of filters
             cacheMemo()->forget('product_filter_data');
+            // Clear attributes cache (since options are part of attributes)
+            cacheMemo()->forget('attributes_with_options');
 
             // Dispatch job to copy option to reseller databases
             if (isOninda() && $option->wasRecentlyCreated) {
@@ -26,6 +28,8 @@ class Option extends Model
 
             // Clear product filter data since options are part of filters
             cacheMemo()->forget('product_filter_data');
+            // Clear attributes cache (since options are part of attributes)
+            cacheMemo()->forget('attributes_with_options');
 
             // Dispatch job to remove option from reseller databases
             if (isOninda()) {

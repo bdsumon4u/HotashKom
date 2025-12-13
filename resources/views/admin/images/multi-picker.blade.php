@@ -1,6 +1,5 @@
 @push('css')
-<!--<link rel="stylesheet" type="text/css" href="{{asset('assets/css/dropzone.css')}}">-->
-<!--<link rel="stylesheet" type="text/css" href="{{asset('assets/css/datatables.css')}}">-->
+<!-- dropzone and datatables css are already loaded globally -->
 @endpush
 
 <!-- The Modal -->
@@ -58,80 +57,79 @@
     </div>
 </div>
 
-@push('js')
-<!--<script src="{{asset('assets/js/dropzone/dropzone.js')}}"></script>-->
-<!--<script src="{{asset('assets/js/dropzone/dropzone-script.js')}}"></script>-->
-<!--<script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}"></script>-->
-@endpush
-
 @push('scripts')
 <script>
-    var tableMulti = $('.multi-picker').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{!! route('api.images.multiple') !!}",
-        columns: [
-            { data: 'id' },
-            { data: 'preview' },
-            { data: 'filename', name: 'filename' },
-            { data: 'action' },
-            // { data: 'mime', name: 'mime' },
-            // { data: 'size_human', name: 'size' },
-        ],
-        order: [
-            [0, 'desc']
-        ],
-        lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
-    });
+    function initMultiPicker() {
+        if ($.fn.dataTable.isDataTable('.multi-picker')) {
+            $('.multi-picker').DataTable().destroy();
+        }
 
-    var selected = @json($selected ?? []);
+        const tableMulti = $('.multi-picker').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{!! route('api.images.multiple') !!}",
+            columns: [
+                { data: 'id' },
+                { data: 'preview' },
+                { data: 'filename', name: 'filename' },
+                { data: 'action' },
+            ],
+            order: [[0, 'desc']],
+            lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
+        });
 
-    $('#multi-picker').on('click', '.select-image', function (ev) {
-        // if not selected $(this).data('id')
-        if (selected.includes($(this).data('id'))) {
-            return $.notify('<i class="fa fa-bell-o mr-1"></i> Additional image already selected', {
+        var selected = @json($selected ?? []);
+
+        $('#multi-picker').on('click', '.select-image', function (ev) {
+            if (selected.includes($(this).data('id'))) {
+                return $.notify('<i class="fa fa-bell-o mr-1"></i> Additional image already selected', {
+                    type: 'success',
+                    allow_dismiss: true,
+                    showProgressbar: true,
+                    timer: 300,
+                    z_index: 9999,
+                    animate:{ enter:'animated fadeInDown', exit:'animated fadeOutUp' }
+                });
+            }
+            selected.push($(this).data('id'));
+            $('.additional_images-previews').append('<div id="preview-'+$(this).data('id')+`" class="additional_images-preview position-relative" style="height: 150px; width: 150px; margin: 5px;">
+                <i class="fa fa-times text-danger position-absolute" style="font-size: large; top: 0; right: 0; background: #ddd; padding: 2px; border-radius: 3px; cursor: pointer;" onclick="this.parentNode.remove()"></i>
+                <img src="`+$(this).data('src')+`" alt="Additional Image" data-toggle="modal" data-target="#multi-picker" id="additional_image-preview" class="img-thumbnail img-responsive">
+                <input type="hidden" name="additional_images[]" value="`+$(this).data('id')+`">
+                <input type="hidden" name="additional_images_srcs[]" value="`+$(this).data('src')+`">
+            </div>`);
+            $.notify('<i class="fa fa-bell-o mr-1"></i> Additional image selected', {
                 type: 'success',
                 allow_dismiss: true,
-                // delay: 2000,
                 showProgressbar: true,
                 timer: 300,
                 z_index: 9999,
-                animate:{
-                    enter:'animated fadeInDown',
-                    exit:'animated fadeOutUp'
-                }
+                animate:{ enter:'animated fadeInDown', exit:'animated fadeOutUp' }
             });
-        }
-        selected.push($(this).data('id'));
-        $('.additional_images-previews').append('<div id="preview-'+$(this).data('id')+`" class="additional_images-preview position-relative" style="height: 150px; width: 150px; margin: 5px;">
-            <i class="fa fa-times text-danger position-absolute" style="font-size: large; top: 0; right: 0; background: #ddd; padding: 2px; border-radius: 3px; cursor: pointer;" onclick="this.parentNode.remove()"></i>
-            <img src="`+$(this).data('src')+`" alt="Additional Image" data-toggle="modal" data-target="#multi-picker" id="additional_image-preview" class="img-thumbnail img-responsive">
-            <input type="hidden" name="additional_images[]" value="`+$(this).data('id')+`">
-            <input type="hidden" name="additional_images_srcs[]" value="`+$(this).data('src')+`">
-        </div>`);
-        $.notify('<i class="fa fa-bell-o mr-1"></i> Additional image selected', {
-            type: 'success',
-            allow_dismiss: true,
-            // delay: 2000,
-            showProgressbar: true,
-            timer: 300,
-            z_index: 9999,
-            animate:{
-                enter:'animated fadeInDown',
-                exit:'animated fadeOutUp'
-            }
         });
-    })
-    
-    Dropzone.options.imageDropzoneMulti = {
-        init: function () {
-            this.on('complete', function(){
-                if(this.getQueuedFiles().length == 0 && this.getUploadingFiles().length == 0) {
-                    console.log('yes');
-                    tableMulti.ajax.reload();
+        
+        if (window.Dropzone) {
+            if (Array.isArray(Dropzone.instances)) {
+                Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
+                Dropzone.instances = [];
+            }
+            Dropzone.autoDiscover = false;
+            new Dropzone("#image-dropzone-multi", {
+                clickable: "#image-dropzone-multi, #image-dropzone-multi .dz-message",
+                init: function () {
+                    this.on('complete', function(){
+                        if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
+                            tableMulti.ajax.reload(null, false);
+                        }
+                    });
                 }
             });
         }
-    };
+    }
+
+    document.addEventListener('DOMContentLoaded', initMultiPicker, { once: true });
+    if (document.readyState !== 'loading') {
+        initMultiPicker();
+    }
 </script>
 @endpush

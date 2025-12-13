@@ -150,16 +150,16 @@
 @endsection
 
 @push('js')
-    <script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{asset('assets/js/datatable/datatable-extension/dataTables.buttons.min.js')}}"></script>
-    <script src="{{asset('assets/js/datatable/datatable-extension/buttons.bootstrap4.min.js')}}"></script>
-    <script src="{{asset('assets/js/product-list-custom.js')}}"></script>
+    <script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}" defer></script>
+    <script src="{{asset('assets/js/datatable/datatable-extension/dataTables.buttons.min.js')}}" defer></script>
+    <script src="{{asset('assets/js/datatable/datatable-extension/buttons.bootstrap4.min.js')}}" defer></script>
+    <script src="{{asset('assets/js/product-list-custom.js')}}" defer></script>
 @endpush
 
 @php($parameters = array_merge(request()->query(), request('status') && auth()->user()->is('salesman') ? ['staff_id' => auth()->id()] : []))
 
 @push('scripts')
-    <script>
+    <script data-push-script>
         var checklist = new Set();
         function updateBulkMenu() {
             $('[name="check_all"]').prop('checked', true);
@@ -195,7 +195,30 @@
             updateBulkMenu();
         });
 
-        var table = $('.datatable').DataTable({
+        // Wait for DataTable to be available before initializing
+        var table; // Make table accessible globally for this page
+        function initializeDataTable() {
+            // Guard against multiple init calls that can trigger duplicate Ajax requests
+            if (window.__ordersTableInitStarted) {
+                return;
+            }
+            window.__ordersTableInitStarted = true;
+
+            if (typeof $.fn.DataTable === 'undefined') {
+                // DataTable not loaded yet, wait and retry
+                setTimeout(initializeDataTable, 100);
+                return;
+            }
+
+            // Check if DataTable is already initialized on this element
+            if ($.fn.dataTable.isDataTable('.datatable')) {
+                // Already initialized, get the instance and refresh
+                table = $('.datatable').DataTable();
+                table.ajax.reload();
+                return;
+            }
+
+            table = $('.datatable').DataTable({
             search: [
                 {
                     bRegex: true,
@@ -205,20 +228,20 @@
             // aoColumns: [{ "bSortable": false }, null, null, { "sType": "numeric" }, { "sType": "date" }, null, { "bSortable": false}],
             dom: 'lBftip',
             buttons: [
-                @foreach(config('app.orders', []) as $status)
+@foreach(config('app.orders', []) as $status)
                 {
                     text: '{{ $status }}',
-                    className: 'px-1 py-1 {{ request('status') == $status ? 'btn-secondary' : '' }}',
+                    className: "px-1 py-1 {{ request('status') == $status ? 'btn-secondary' : '' }}",
                     action: function ( e, dt, node, config ) {
-                        window.location = '{!! request()->fullUrlWithQuery(['status' => $status]) !!}'
+                        window.location = '{!! request()->fullUrlWithQuery(['status' => $status]) !!}';
                     }
                 },
-                @endforeach
+@endforeach
                 {
                     text: 'All',
-                    className: 'px-1 py-1 {{ request('status') == '' ? 'btn-secondary' : '' }}',
+                    className: "px-1 py-1 {{ request('status') == '' ? 'btn-secondary' : '' }}",
                     action: function ( e, dt, node, config ) {
-                        window.location = '{!! request()->fullUrlWithQuery(['status' => '']) !!}'
+                        window.location = '{!! request()->fullUrlWithQuery(['status' => '']) !!}';
                     }
                 },
             ],
@@ -255,16 +278,16 @@
                     var th = $(this.header()).parents('thead').find('tr').eq(1).find('th').eq(i);
                     $(th).empty();
 
-                    var forbidden = [0]
+                    var forbidden = [0];
                     @if(isOninda()||isReseller())
                         forbidden.push(5);
-                        dateTimeColumn = 9;
+                        var dateTimeColumn = 9;
                         @if(auth()->user()->is('admin'))
                             forbidden.push(10);
                         @endif
                     @else
                         forbidden.push(4);
-                        dateTimeColumn = 8;
+                        var dateTimeColumn = 8;
                         @if(auth()->user()->is('admin'))
                             forbidden.push(9);
                         @endif
@@ -323,6 +346,12 @@
             ],
             pageLength: 50,
             lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
+        });
+        }
+
+        // Start initialization - wrap in jQuery ready to ensure DOM is ready
+        $(document).ready(function() {
+            initializeDataTable();
         });
 
         $(document).on('change', '.status-column', changeStatus);
@@ -427,14 +456,19 @@
             });
         }
 
-        setInterval(function () {
-            $('.datatable').DataTable().ajax.reload(function (res) {
-                if (res.recordsTotal > window.ordersTotal) {
-                    window.ordersTotal = res.recordsTotal;
-                    $.notify('New orders found', 'success');
+        // Single interval guard to avoid duplicate refresh timers
+        if (!window.__ordersTableRefreshInterval) {
+            window.__ordersTableRefreshInterval = setInterval(function () {
+                if (typeof $.fn.DataTable !== 'undefined' && $.fn.dataTable.isDataTable('.datatable') && table) {
+                    table.ajax.reload(function (res) {
+                        if (res.recordsTotal > window.ordersTotal) {
+                            window.ordersTotal = res.recordsTotal;
+                            $.notify('New orders found', 'success');
+                        }
+                    }, false);
                 }
-            }, false);
-        }, 60*1000);
+            }, 60*1000);
+        }
 
         function printInvoice() {
             window.open('{{ route('admin.orders.invoices') }}?order_id=' + $('[name="order_id[]"]:checked').map(function () {

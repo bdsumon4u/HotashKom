@@ -78,21 +78,24 @@
 </div>
 @endsection
 
-@push('js')
-<script src="{{asset('assets/js/dropzone/dropzone.js')}}"></script>
-<script src="{{asset('assets/js/dropzone/dropzone-script.js')}}"></script>
-@endpush
-
 @push('scripts')
 <script>
-    Dropzone.options.slidesDropzone = {
-        init: function () {
-            this.on('complete', function(){
-                if(this.getQueuedFiles().length == 0 && this.getUploadingFiles().length == 0) {
-                    location.reload();
-                }
-            });
-        }
-    };
+    // Destroy any existing instances (SPA nav safety)
+    if (window.Dropzone && Dropzone.instances) {
+        Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
+        Dropzone.instances = [];
+    }
+
+    if (window.Dropzone) {
+        new Dropzone("#slides-dropzone", {
+            init: function () {
+                this.on('complete', function(){
+                    if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
+                        window.location.reload();
+                    }
+                });
+            }
+        });
+    }
 </script>
 @endpush

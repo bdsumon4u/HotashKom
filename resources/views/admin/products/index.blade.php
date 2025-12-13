@@ -97,7 +97,7 @@
 @endsection
 
 @push('js')
-<script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}"></script>
+<script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}" defer></script>
 <script>
 $(function() {
     var columns = [

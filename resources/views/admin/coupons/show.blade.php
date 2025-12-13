@@ -6,7 +6,7 @@
 @endsection
 
 @section('breadcrumb-items')
-    <li class="breadcrumb-item"><a href="{{ route('admin.coupons.index') }}" wire:navigate.hover>Coupons</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('admin.coupons.index') }}">Coupons</a></li>
     <li class="breadcrumb-item">{{ $coupon->name }}</li>
 @endsection
 

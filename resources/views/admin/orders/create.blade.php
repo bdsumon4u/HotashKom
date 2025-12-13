@@ -2,6 +2,7 @@
 @section('title', 'Create Order')
 
 @push('css')
+    <link rel="stylesheet" type="text/css" href="{{asset('assets/css/select2.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/prism.css') }}">
 @endpush
 
@@ -30,6 +31,11 @@
         </div>
     </div>
 @endsection
+
+@push('js')
+    <script src="{{asset('assets/js/select2/select2.full.min.js')}}" defer></script>
+    <script src="{{asset('assets/js/select2/select2-custom.js')}}" defer></script>
+@endpush
 
 @push('scripts')
     <script>

@@ -7,7 +7,7 @@
 @endsection
 
 @section('breadcrumb-items')
-<li class="breadcrumb-item"><a href="{{ route('admin.purchases.index') }}" wire:navigate.hover>Purchases</a></li>
+<li class="breadcrumb-item"><a href="{{ route('admin.purchases.index') }}">Purchases</a></li>
 <li class="breadcrumb-item active">Edit Purchase</li>
 @endsection
 

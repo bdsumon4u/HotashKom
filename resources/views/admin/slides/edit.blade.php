@@ -67,6 +67,6 @@
 @endsection
 
 @push('js')
-<script src="{{asset('assets/js/dropzone/dropzone.js')}}"></script>
-<script src="{{asset('assets/js/dropzone/dropzone-script.js')}}"></script>
+<script src="{{asset('assets/js/dropzone/dropzone.js')}}" defer></script>
+<script src="{{asset('assets/js/dropzone/dropzone-script.js')}}" defer></script>
 @endpush

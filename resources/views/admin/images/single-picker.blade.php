@@ -58,62 +58,66 @@
     </div>
 </div>
 
-@push('js')
-<script src="{{asset('assets/js/dropzone/dropzone.js')}}"></script>
-<script src="{{asset('assets/js/dropzone/dropzone-script.js')}}"></script>
-<script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}"></script>
-@endpush
-
 @push('scripts')
 <script>
-    var tableSingle = $('.single-picker').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{!! route('api.images.single') !!}",
-        columns: [
-            { data: 'id' },
-            { data: 'preview' },
-            { data: 'filename', name: 'filename' },
-            { data: 'action' },
-            // { data: 'mime', name: 'mime' },
-            // { data: 'size_human', name: 'size' },
-        ],
-        order: [
-            [0, 'desc']
-        ],
-        lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
-    });
+    function initSinglePicker() {
+        if ($.fn.dataTable.isDataTable('.single-picker')) {
+            $('.single-picker').DataTable().destroy();
+        }
 
-    tableSingle.on('draw', function () {
-        $('#single-select-{{ $selected ?? 0 }}').prop('checked', true);
-    });
-
-    $('#single-picker').on('click', '.select-image', function (ev) {
-        $('.base_image-preview').html('<img src="'+$(this).data('src')+'" alt="Base Image" data-toggle="modal" data-target="#single-picker" id="base_image-preview" class="img-thumbnail img-responsive" style="width: 100%; margin: 5px; margin-left: 0;"><input type="hidden" name="base_image" value="'+$(this).data('id')+'"><input type="hidden" name="base_image_src" value="'+$(this).data('src')+'">').removeClass('d-none');
-        $(this).parents('.modal').modal('hide');
-        $.notify('<i class="mr-1 fa fa-bell-o"></i> Base image selected', {
-            type: 'success',
-            allow_dismiss: true,
-            // delay: 2000,
-            showProgressbar: true,
-            timer: 300,
-            z_index: 9999,
-            animate:{
-                enter:'animated fadeInDown',
-                exit:'animated fadeOutUp'
-            }
+        const tableSingle = $('.single-picker').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{!! route('api.images.single') !!}",
+            columns: [
+                { data: 'id' },
+                { data: 'preview' },
+                { data: 'filename', name: 'filename' },
+                { data: 'action' },
+            ],
+            order: [[0, 'desc']],
+            lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
         });
-    });
 
-    Dropzone.options.imageDropzoneSingle = {
-        init: function () {
-            this.on('complete', function(){
-                if(this.getQueuedFiles().length == 0 && this.getUploadingFiles().length == 0) {
-                    console.log('yes');
-                    tableSingle.ajax.reload();
+        tableSingle.on('draw', function () {
+            $('#single-select-{{ $selected ?? 0 }}').prop('checked', true);
+        });
+
+        $('#single-picker').on('click', '.select-image', function (ev) {
+            $('.base_image-preview').html('<img src="'+$(this).data('src')+'" alt="Base Image" data-toggle="modal" data-target="#single-picker" id="base_image-preview" class="img-thumbnail img-responsive" style="width: 100%; margin: 5px; margin-left: 0;"><input type="hidden" name="base_image" value="'+$(this).data('id')+'"><input type="hidden" name="base_image_src" value="'+$(this).data('src')+'">').removeClass('d-none');
+            $(this).parents('.modal').modal('hide');
+            $.notify('<i class="mr-1 fa fa-bell-o"></i> Base image selected', {
+                type: 'success',
+                allow_dismiss: true,
+                showProgressbar: true,
+                timer: 300,
+                z_index: 9999,
+                animate:{ enter:'animated fadeInDown', exit:'animated fadeOutUp' }
+            });
+        });
+
+        if (window.Dropzone) {
+            if (Array.isArray(Dropzone.instances)) {
+                Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
+                Dropzone.instances = [];
+            }
+            Dropzone.autoDiscover = false;
+            new Dropzone("#image-dropzone-single", {
+                clickable: "#image-dropzone-single, #image-dropzone-single .dz-message",
+                init: function () {
+                    this.on('complete', function(){
+                        if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
+                            tableSingle.ajax.reload(null, false);
+                        }
+                    });
                 }
             });
         }
-    };
+    }
+
+    document.addEventListener('DOMContentLoaded', initSinglePicker, { once: true });
+    if (document.readyState !== 'loading') {
+        initSinglePicker();
+    }
 </script>
 @endpush

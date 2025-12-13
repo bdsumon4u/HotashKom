@@ -540,8 +540,8 @@
 @endpush
 
 @push('js')
-    <script src="{{ asset('assets/js/datepicker/daterange-picker/moment.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datepicker/daterange-picker/daterangepicker.js') }}"></script>
+    <script src="{{ asset('assets/js/datepicker/daterange-picker/moment.min.js') }}" defer></script>
+    <script src="{{ asset('assets/js/datepicker/daterange-picker/daterangepicker.js') }}" defer></script>
     <script src="{{ asset('assets/js/datepicker/daterange-picker/daterange-picker.custom.js') }}"></script>
     <script>
         window._start = moment('{{ $start }}');

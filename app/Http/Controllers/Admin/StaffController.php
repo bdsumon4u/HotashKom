@@ -62,6 +62,9 @@ class StaffController extends Controller
 
         Admin::create($data);
 
+        // Clear staff cache
+        cacheMemo()->forget('admin_staffs_online_offline');
+
         return back()->with('success', 'Staff Has Been Created.');
     }
 
@@ -120,6 +123,9 @@ class StaffController extends Controller
         }
         $staff->update($data);
 
+        // Clear staff cache
+        cacheMemo()->forget('admin_staffs_online_offline');
+
         return back()->with('success', 'Staff Has Been Updated.');
     }
 
@@ -134,6 +140,9 @@ class StaffController extends Controller
         abort_if(str_ends_with($staff->email, '@hotash.tech'), 403, 'You cannot delete staff with @hotash.tech email.');
 
         $staff->delete();
+
+        // Clear staff cache
+        cacheMemo()->forget('admin_staffs_online_offline');
 
         return back()->with('success', 'Staff Has Been Deleted.');
     }

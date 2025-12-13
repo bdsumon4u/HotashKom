@@ -55,7 +55,7 @@
 @endsection
 
 @push('js')
-<script src="{{ asset('js/tinymce.js') }}"></script>
+<script src="{{ asset('js/tinymce.js') }}" defer></script>
 @endpush
 
 @push('scripts')

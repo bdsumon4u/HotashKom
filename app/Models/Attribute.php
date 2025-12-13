@@ -14,6 +14,8 @@ class Attribute extends Model
         static::saved(function ($attribute): void {
             // Clear product filter data since attributes are part of filters
             cacheMemo()->forget('product_filter_data');
+            // Clear attributes cache
+            cacheMemo()->forget('attributes_with_options');
 
             // Dispatch job to copy attribute to reseller databases
             if (isOninda() && $attribute->wasRecentlyCreated) {
@@ -26,6 +28,8 @@ class Attribute extends Model
 
             // Clear product filter data since attributes are part of filters
             cacheMemo()->forget('product_filter_data');
+            // Clear attributes cache
+            cacheMemo()->forget('attributes_with_options');
 
             // Dispatch job to remove attribute from reseller databases
             if (isOninda()) {

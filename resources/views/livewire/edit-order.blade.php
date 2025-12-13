@@ -326,17 +326,11 @@
 
                 @if ($order->exists && config('services.courier_report.cheap'))
                 <h5 class="mt-3">Courier Report</h5>
-                <div wire:init="loadCheapCourierReport">
-                    @if ($cheapCourierReportLoaded)
-                        <div style="height: 645px; overflow: hidden; position: relative;">
-                            @if (\Illuminate\Support\Carbon::parse(config('services.courier_report.expires'))->isPast())
-                                <div class="alert alert-danger">Courier Report API Expired</div>
-                            @else
-                                <iframe src="https://www.bdcommerce.app/tools/delivery-fraud-check/{{ $order->phone }}" width="1200" height="800" scrolling="no" style="position: absolute; top: -110px; left: -580px; overflow: hidden;"></iframe>
-                            @endif
-                        </div>
+                <div style="height: 645px; overflow: hidden; position: relative;">
+                    @if (\Illuminate\Support\Carbon::parse(config('services.courier_report.expires'))->isPast())
+                        <div class="alert alert-danger">Courier Report API Expired</div>
                     @else
-                        <div class="py-4 text-center text-muted">Loading courier report...</div>
+                        <iframe src="https://www.bdcommerce.app/tools/delivery-fraud-check/{{ $order->phone }}" width="1200" height="800" scrolling="no" style="position: absolute; top: -110px; left: -580px; overflow: hidden;"></iframe>
                     @endif
                 </div>
                 @endif
@@ -481,7 +475,7 @@
             @if(isOninda())
             <div class="shadow-sm card rounded-0">
                 <div class="p-3 card-header">
-                    <h5 class="card-title">Reseller</h5>
+                    <h5 class="mb-0 card-title">Reseller</h5>
                 </div>
                 <div class="p-3 card-body">
                     <table class="table table-responsive table-borderless w-100">
@@ -509,11 +503,13 @@
                 </div>
             </div>
             @endif
+
             <div class="shadow-sm card rounded-0" wire:init="loadActivities">
                 <div class="p-3 card-header">
-                    <h5 class="card-title">Activities</h5>
+                    <h5 class="mb-0 card-title">Activities</h5>
                 </div>
                 <div class="p-3 card-body">
+                    <div wire:loading wire:target="loadActivities" class="py-4 text-center text-muted">Loading activities...</div>
                     @if ($activitiesLoaded)
                         {{-- Accordion --}}
                         <div id="accordion">
@@ -563,16 +559,18 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="py-4 text-center text-muted">Loading activities...</div>
+                        <div class="py-4 text-center text-muted" wire:loading.remove wire:target="loadActivities">Loading activities...</div>
                     @endif
                 </div>
             </div>
+
             @if (config('services.courier_report.url') && config('services.courier_report.key'))
                 <div class="shadow-sm card rounded-0" wire:init="loadCourierReport">
                     <div class="p-3 card-header">
-                        <h5 class="card-title">Courier Report</h5>
+                        <h5 class="mb-0 card-title">Courier Report</h5>
                     </div>
                     <div class="p-3 card-body">
+                        <div wire:loading wire:target="loadCourierReport" class="py-4 text-center text-muted">Loading courier report...</div>
                         @if ($courierReportLoaded)
                             @if (is_string($this->courier_report))
                                 <div class="alert alert-danger">{{ $this->courier_report }}</div>
@@ -626,7 +624,7 @@
                                 </div>
                             @endif
                         @else
-                            <div class="py-4 text-center text-muted">Loading courier report...</div>
+                            <div class="py-4 text-center text-muted" wire:loading.remove wire:target="loadCourierReport">Loading courier report...</div>
                         @endif
                     </div>
                 </div>
@@ -636,13 +634,72 @@
 </div>
 @push('scripts')
     <script>
-        function selector () {
-            $('[selector]').select2();
-            $('[selector]').on('change', function() {
+        function selector() {
+            // Check if Select2 is available and element exists
+            if (typeof $.fn.select2 === 'undefined') {
+                // Select2 not loaded yet, wait and retry
+                setTimeout(selector, 100);
+                return;
+            }
+
+            const $selector = $('[selector]');
+            if ($selector.length === 0) {
+                // No selector element found, nothing to initialize
+                return;
+            }
+
+            // Initialize Select2 if not already initialized
+            if (!$selector.hasClass('select2-hidden-accessible')) {
+                $selector.select2();
+            }
+
+            // Remove existing change handlers to prevent duplicates
+            $selector.off('change.select2-init');
+
+            // Add change handler
+            $selector.on('change.select2-init', function() {
                 @this.set('area_id', this.value);
             });
         }
-        Livewire.hook('morphed', selector);
-        selector();
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', selector);
+        } else {
+            selector();
+        }
+
+        // Also initialize after Livewire updates
+        if (typeof Livewire !== 'undefined') {
+            Livewire.hook('morphed', function() {
+                setTimeout(selector, 50);
+            });
+        }
+    </script>
+    <script>
+        // Auto-trigger lazy loads without user interaction
+        (function () {
+            const loadLazy = function() {
+                // Avoid repeated calls
+                if (window.__editOrderLazyLoaded) {
+                    return;
+                }
+                window.__editOrderLazyLoaded = true;
+
+                if (typeof $wire !== 'undefined') {
+                    if (typeof $wire.loadActivities === 'function') {
+                        $wire.loadActivities();
+                    }
+                }
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(loadLazy, 50);
+                }, { once: true });
+            } else {
+                setTimeout(loadLazy, 50);
+            }
+        })();
     </script>
 @endpush

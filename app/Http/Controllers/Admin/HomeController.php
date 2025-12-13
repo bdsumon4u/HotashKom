@@ -78,22 +78,25 @@ class HomeController extends Controller
             $this->recalculateAmountsWithRetailPricing($orderQ, $amounts);
         }
 
-        $query = DB::table('admins')
-            ->select('admins.id', 'admins.name', 'admins.email', 'admins.role_id', 'admins.is_active', DB::raw('MAX(sessions.last_activity) as last_activity'))
-            ->leftJoin('sessions', 'sessions.userable_id', '=', 'admins.id')
-            ->where('sessions.userable_type', Admin::class)
-            ->groupBy('admins.id', 'admins.name', 'admins.email', 'admins.role_id', 'admins.is_active'); // Add all selected non-aggregated columns to GROUP BY
+        $staffs = cacheMemo()->remember('admin_staffs_online_offline', now()->addMinutes(1), function () {
+            $query = DB::table('admins')
+                ->select('admins.id', 'admins.name', 'admins.email', 'admins.role_id', 'admins.is_active', DB::raw('MAX(sessions.last_activity) as last_activity'))
+                ->leftJoin('sessions', 'sessions.userable_id', '=', 'admins.id')
+                ->where('sessions.userable_type', Admin::class)
+                ->groupBy('admins.id', 'admins.name', 'admins.email', 'admins.role_id', 'admins.is_active');
 
-        // Get online admins
-        $online = $query->having('last_activity', '>=', now()->subMinutes(5)->timestamp)->get();
+            // Get online admins
+            $online = $query->having('last_activity', '>=', now()->subMinutes(5)->timestamp)->get();
 
-        // Get offline admins
-        $offline = DB::table('admins')->whereNotIn('email', $online->pluck('email'))->get();
-        $staffs = compact('online', 'offline');
+            // Get offline admins
+            $offline = DB::table('admins')->whereNotIn('email', $online->pluck('email'))->get();
 
-        $productsCount = Product::whereNull('parent_id')->count();
-        $inactiveProducts = Product::whereIsActive(0)->whereNull('parent_id')->get();
-        $lowStockProducts = Product::whereShouldTrack(1)->where('stock_count', '<', 10)->get();
+            return compact('online', 'offline');
+        });
+
+        $productsCount = cacheMemo()->remember('admin_products_count', now()->addMinutes(5), fn () => Product::whereNull('parent_id')->count());
+        $inactiveProducts = cacheMemo()->remember('admin_inactive_products', now()->addMinutes(5), fn () => Product::whereIsActive(0)->whereNull('parent_id')->get());
+        $lowStockProducts = cacheMemo()->remember('admin_low_stock_products', now()->addMinutes(5), fn () => Product::whereShouldTrack(1)->where('stock_count', '<', 10)->get());
 
         // Get total pending withdrawal amount
         $pendingWithdrawalAmount = cacheMemo()->remember('pending_withdrawal_amount', 300, fn (): float|int => abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')

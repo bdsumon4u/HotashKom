@@ -57,9 +57,9 @@
 </div>
 
 @push('js')
-<script src="{{asset('assets/js/dropzone/dropzone.js')}}"></script>
-<script src="{{asset('assets/js/dropzone/dropzone-script.js')}}"></script>
-<script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}"></script>
+<script src="{{asset('assets/js/dropzone/dropzone.js')}}" defer></script>
+<script src="{{asset('assets/js/dropzone/dropzone-script.js')}}" defer></script>
+<script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}" defer></script>
 @endpush
 
 @push('scripts')

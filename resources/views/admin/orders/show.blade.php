@@ -134,35 +134,7 @@
                     </div>
                 </div>
                 <div class="card-footer d-print-none">
-                    <h5 class="text-center">Other Orders</h5>
-                    <table class="table table-bordered table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Product</th>
-                                <th>Note</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($orders as $order)
-                            <tr>
-                                <td>
-                                    <a target="_blank" href="{{ route('admin.orders.show', $order) }}">{{ $order->id }}</a>
-                                </td>
-                                <td>{{ $order->created_at->format('d-M-Y') }}</td>
-                                <td>{{ $order->status }}</td>
-                                <td>
-                                    @foreach ($order->products as $product)
-                                        <div>{{ $product->quantity }} x {{ $product->name }}</div>
-                                    @endforeach
-                                </td>
-                                <td>{{ $order->note }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <livewire:order-related :order-id="$order->id" />
                 </div>
             </div>
         </div>

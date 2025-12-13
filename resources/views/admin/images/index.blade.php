@@ -36,7 +36,7 @@
 @endpush
 
 @section('content')
-<div class="row mb-5">
+<div class="mb-5 row">
     <div class="col-sm-12">
         <div class="card rounded-0">
             <div class="card-body">
@@ -72,42 +72,56 @@
 
 @endsection
 
-@push('js')
-<script src="{{asset('assets/js/dropzone/dropzone.js')}}"></script>
-<script src="{{asset('assets/js/dropzone/dropzone-script.js')}}"></script>
-<script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}"></script>
-@endpush
-
 @push('scripts')
 <script>
-    var table = $('.datatable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{!! route('api.images.index') !!}",
-        columns: [
-            { data: 'id' },
-            { data: 'preview' },
-            { data: 'filename', name: 'filename' },
-            { data: 'mime', name: 'mime' },
-            { data: 'size_human', name: 'size' },
-            { data: 'action' },
-        ],
-        order: [
-            [0, 'desc']
-        ],
-        pageLength: 50,
-        lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
-    });
+    function initImagesIndex() {
+        // Destroy existing table if any (SPA safety)
+        if ($.fn.dataTable.isDataTable('.datatable')) {
+            $('.datatable').DataTable().destroy();
+        }
 
-    Dropzone.options.imageDropzone = {
-        init: function () {
-            this.on('complete', function(){
-                if(this.getQueuedFiles().length == 0 && this.getUploadingFiles().length == 0) {
-                    console.log('yes');
-                    $('.datatable').DataTable().ajax.reload();
+        const table = $('.datatable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{!! route('api.images.index') !!}",
+            columns: [
+                { data: 'id' },
+                { data: 'preview' },
+                { data: 'filename', name: 'filename' },
+                { data: 'mime', name: 'mime' },
+                { data: 'size_human', name: 'size' },
+                { data: 'action' },
+            ],
+            order: [[0, 'desc']],
+            pageLength: 50,
+            lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
+        });
+
+        if (window.Dropzone) {
+            // Clean up existing Dropzones
+            if (Array.isArray(Dropzone.instances)) {
+                Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
+                Dropzone.instances = [];
+            }
+            Dropzone.autoDiscover = false;
+            // Manual init with explicit clickable target
+            new Dropzone("#image-dropzone", {
+                // Target both the form and the message area for clicks
+                clickable: "#image-dropzone, #image-dropzone .dz-message",
+                init: function () {
+                    this.on('complete', function(){
+                        if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
+                            table.ajax.reload(null, false);
+                        }
+                    });
                 }
             });
         }
-    };
+    }
+
+    document.addEventListener('DOMContentLoaded', initImagesIndex, { once: true });
+    if (document.readyState !== 'loading') {
+        initImagesIndex();
+    }
 </script>
 @endpush

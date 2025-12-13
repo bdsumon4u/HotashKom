@@ -52,7 +52,7 @@ class OrderController extends Controller
     {
         $order->load('user');
 
-        // Get reseller data if applicable
+        // Get reseller data if applicable (needed for invoice display)
         $resellerData = [];
         if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $order->user && $order->user->db_username && $order->user->db_password) {
             // Reseller is connected - fetch from their database
@@ -82,13 +82,8 @@ class OrderController extends Controller
             }
         }
 
+        // Other orders are now loaded lazily via Livewire component
         return $this->view([
-            'orders' => Order::with('admin')
-                // ->where('user_id', $order->user_id)
-                ->where('phone', $order->phone)
-                ->where('id', '!=', $order->id)
-                ->orderBy('id', 'desc')
-                ->get(),
             'resellerData' => $resellerData,
         ]);
     }
@@ -101,14 +96,8 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
-        return $this->view([
-            'orders' => Order::with('admin')
-                // ->where('user_id', $order->user_id)
-                ->where('phone', $order->phone)
-                ->where('id', '!=', $order->id)
-                ->orderBy('id', 'desc')
-                ->get(),
-        ]);
+        // Other orders and reseller data are now loaded lazily via Livewire component
+        return $this->view();
     }
 
     public function filter(Request $request)

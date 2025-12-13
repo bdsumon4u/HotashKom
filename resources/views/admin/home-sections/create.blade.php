@@ -132,8 +132,8 @@
 @endsection
 
 @push('js')
-<script src="{{asset('assets/js/select2/select2.full.min.js')}}"></script>
-<script src="{{asset('assets/js/select2/select2-custom.js')}}"></script>
+<script src="{{asset('assets/js/select2/select2.full.min.js')}}" defer></script>
+<script src="{{asset('assets/js/select2/select2-custom.js')}}" defer></script>
 @endpush
 
 @push('scripts')

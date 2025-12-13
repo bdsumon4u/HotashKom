@@ -128,6 +128,20 @@ class Product extends Model
         // Clear API-related caches
         cacheInvalidateNamespace('api_sections');
         cacheInvalidateNamespace('product_filters');
+
+        // Clear admin dashboard caches
+        cacheMemo()->forget('admin_products_count');
+        cacheMemo()->forget('admin_inactive_products');
+        cacheMemo()->forget('admin_low_stock_products');
+
+        // Clear EditOrder component caches
+        cacheMemo()->forget('product_with_variations:'.$product->id);
+        cacheMemo()->forget('product_with_options:'.$product->id);
+        if ($product->parent_id) {
+            cacheMemo()->forget('product_with_variations:'.$product->parent_id);
+        }
+        // Clear product search caches (using namespace pattern)
+        cacheInvalidateNamespace('edit_order_product_search');
     }
 
     protected function varName(): \Illuminate\Database\Eloquent\Casts\Attribute

@@ -84,7 +84,7 @@ class ProductController extends Controller
         return $this->view(compact('product'), '', [
             'categories' => Category::nested(),
             'brands' => Brand::cached(),
-            'attributes' => Attribute::with('options')->get(),
+            'attributes' => cacheMemo()->remember('attributes_with_options', now()->addHours(24), fn () => Attribute::with('options')->get()),
         ]);
     }
 

@@ -91,8 +91,6 @@ class EditOrder extends Component
 
     public bool $courierReportLoaded = false;
 
-    public bool $cheapCourierReportLoaded = false;
-
     public function getCourierReportProperty()
     {
         $expires = config('services.courier_report.expires');
@@ -166,7 +164,13 @@ class EditOrder extends Component
             } else {
                 // If selected_options not stored, try to determine from the product
                 // Load the product to check if it's a variation
-                $productModel = Product::with('options')->find($product['id']);
+                $productModel = cacheMemo()->remember(
+                    'product_with_options:'.$product['id'],
+                    now()->addMinutes(2),
+                    function () use ($product) {
+                        return Product::with('options')->find($product['id']);
+                    }
+                );
                 if ($productModel) {
                     // If it's a variation (has parent_id in database), get its options
                     if ($productModel->parent_id) {
@@ -174,7 +178,13 @@ class EditOrder extends Component
                     } elseif ($parentId != $product['id']) {
                         // If parent_id is set in order data but product is not a variation in DB
                         // This means the stored product ID might be a variation that was added
-                        $parentProduct = Product::with('variations.options')->find($parentId);
+                        $parentProduct = cacheMemo()->remember(
+                            'product_with_variations:'.$parentId,
+                            now()->addMinutes(2),
+                            function () use ($parentId) {
+                                return Product::with('variations.options')->find($parentId);
+                            }
+                        );
                         if ($parentProduct && $parentProduct->variations->isNotEmpty()) {
                             // Try to find the variation that matches this product ID
                             $variation = $parentProduct->variations->firstWhere('id', $product['id']);
@@ -227,7 +237,13 @@ class EditOrder extends Component
         $parentId = $selectedProduct['parent_id'] ?? $productId;
 
         // Get the parent product
-        $parentProduct = Product::with('variations.options')->find($parentId);
+        $parentProduct = cacheMemo()->remember(
+            'product_with_variations:'.$parentId,
+            now()->addMinutes(2),
+            function () use ($parentId) {
+                return Product::with('variations.options')->find($parentId);
+            }
+        );
         if (! $parentProduct) {
             return;
         }
@@ -426,11 +442,17 @@ class EditOrder extends Component
             return;
         }
 
-        $this->activities = $this->order
-            ->activities()
-            ->with('causer')
-            ->latest()
-            ->get();
+        $this->activities = cacheMemo()->remember(
+            'order_activities:'.$this->order->id,
+            now()->addMinutes(2),
+            function () {
+                return $this->order
+                    ->activities()
+                    ->with('causer')
+                    ->latest()
+                    ->get();
+            }
+        );
 
         $this->activitiesLoaded = true;
     }
@@ -440,22 +462,24 @@ class EditOrder extends Component
         $this->courierReportLoaded = true;
     }
 
-    public function loadCheapCourierReport(): void
-    {
-        $this->cheapCourierReportLoaded = true;
-    }
-
     public function render()
     {
         $products = collect();
         if (strlen((string) $this->search) > 2) {
-            $products = Product::with('variations.options')
-                ->whereNotIn('id', array_keys($this->selectedProducts))
-                ->where(fn ($q) => $q->where('name', 'like', "%$this->search%")->orWhere('sku', $this->search))
-                ->whereNull('parent_id')
-                ->whereIsActive(1)
-                ->take(5)
-                ->get();
+            $products = cacheRememberNamespaced(
+                'edit_order_product_search',
+                md5($this->search.':'.implode(',', array_keys($this->selectedProducts))),
+                now()->addMinute(),
+                function () {
+                    return Product::with('variations.options')
+                        ->whereNotIn('id', array_keys($this->selectedProducts))
+                        ->where(fn ($q) => $q->where('name', 'like', "%$this->search%")->orWhere('sku', $this->search))
+                        ->whereNull('parent_id')
+                        ->whereIsActive(1)
+                        ->take(5)
+                        ->get();
+                }
+            );
 
             foreach ($products as $product) {
                 if ($product->variations->isNotEmpty() && ! isset($this->options[$product->id])) {
@@ -469,7 +493,13 @@ class EditOrder extends Component
         foreach ($this->selectedProducts as $selectedProduct) {
             $parentId = $selectedProduct['parent_id'] ?? $selectedProduct['id'];
             if (! $selectedProductParents->has($parentId)) {
-                $parent = Product::with('variations.options')->find($parentId);
+                $parent = cacheMemo()->remember(
+                    'product_with_variations:'.$parentId,
+                    now()->addMinutes(2),
+                    function () use ($parentId) {
+                        return Product::with('variations.options')->find($parentId);
+                    }
+                );
                 if ($parent) {
                     $selectedProductParents[$parentId] = $parent;
                 }
