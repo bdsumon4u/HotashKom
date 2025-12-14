@@ -104,10 +104,13 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::get('/', HomeController::class)->name('/');
     Route::get('/sections/{section}/products', HomeSectionProductController::class)->name('home-sections.products');
     Route::get('/shop', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
     Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
     Route::post('/products/{product:slug}/reviews', [ReviewController::class, 'store'])->name('products.reviews.store');
     Route::get('/products/{product:slug}/reviews', [ReviewController::class, 'index'])->name('products.reviews.index');
+    Route::get('/category/{category:slug}', CategoryProductController::class)->name('category.show');
     Route::get('/categories/{category:slug}/products', CategoryProductController::class)->name('categories.products');
+    Route::get('/brand/{brand:slug}', BrandProductController::class)->name('brand.show');
     Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
     Route::view('/lead-form', 'leads.form')->name('leads.form');
     Route::post('/leads', [LeadController::class, 'store'])
