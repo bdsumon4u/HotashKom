@@ -1,5 +1,5 @@
 @extends('layouts.errors.master')
-@section('title', 'Bad Request')
+@section('title', 'Forbidden')
 
 @section('css')
 @endsection
@@ -14,7 +14,7 @@
         font-size: 8rem;
         font-weight: 700;
         line-height: 1;
-        color: #17a2b8;
+        color: #dc3545;
         margin-bottom: 1rem;
     }
     .error-page__subtitle {
@@ -84,10 +84,10 @@
                 <div class="col-lg-8 col-md-10 text-center">
                     <div class="error-page">
                         <div class="error-page__content mb-4">
-                            <h1 class="error-page__title">400</h1>
-                            <h2 class="error-page__subtitle">Bad Request</h2>
+                            <h1 class="error-page__title">403</h1>
+                            <h2 class="error-page__subtitle">Access Forbidden</h2>
                             <p class="error-page__text">
-                                The request you sent was invalid or malformed. Please check your input and try again.
+                                You don't have permission to access this resource. If you believe this is an error, please contact support.
                             </p>
                         </div>
                         <div class="error-page__actions">

@@ -1,31 +1,110 @@
 @extends('layouts.errors.master')
-@section('title', 'Error 503')
+@section('title', 'Service Unavailable')
 
 @section('css')
 @endsection
 
 @section('style')
+<style>
+    .error-page {
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+    .error-page__title {
+        font-size: 8rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #ffc107;
+        margin-bottom: 1rem;
+    }
+    .error-page__subtitle {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    .error-page__text {
+        font-size: 1.125rem;
+        color: #666;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    .error-page__actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+    @media (min-width: 576px) {
+        .error-page__actions {
+            flex-direction: row;
+            justify-content: center;
+        }
+    }
+    .btn-custom {
+        min-width: 200px;
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+        border-radius: 0.375rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .btn-primary-custom {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+    .btn-primary-custom:hover {
+        background-color: #0056b3;
+        color: white;
+        text-decoration: none;
+    }
+    .btn-secondary-custom {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+    }
+    .btn-secondary-custom:hover {
+        background-color: #545b62;
+        color: white;
+        text-decoration: none;
+    }
+</style>
 @endsection
-
 
 @section('content')
 <div class="page-wrapper compact-wrapper" id="pageWrapper">
-  <!-- error-503 start-->
-  <div class="error-wrapper">
-    <div class="container"><img class="img-100" src="{{asset('assets/images/other-images/sad.png')}}" alt="">
-      <div class="error-heading">
-        <h2 class="headline font-secondary">503</h2>
-      </div>
-      <div class="col-md-8 offset-md-2">
-        <p class="sub-content">The page you are attempting to reach is currently not available. This may be because the page does not exist or has been moved.</p>
-      </div>
-      <div><a class="btn btn-secondary-gradien btn-lg" href="{{route('/')}}">BACK TO HOME PAGE</a></div>
+    <div class="error-wrapper" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10 text-center">
+                    <div class="error-page">
+                        <div class="error-page__content mb-4">
+                            <h1 class="error-page__title">503</h1>
+                            <h2 class="error-page__subtitle">Service Unavailable</h2>
+                            <p class="error-page__text">
+                                We're currently performing maintenance or experiencing high traffic. Please check back in a few moments.
+                            </p>
+                        </div>
+                        <div class="error-page__actions">
+                            <a href="{{ url('/') }}" class="btn-custom btn-primary-custom">
+                                <i class="fas fa-home"></i> Go to Homepage
+                            </a>
+                            <button onclick="window.location.reload()" class="btn-custom btn-secondary-custom">
+                                <i class="fas fa-redo"></i> Try Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <!-- error-503 end-->
 </div>
 @endsection
 
 @section('script')
-
 @endsection

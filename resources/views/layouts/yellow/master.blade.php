@@ -199,7 +199,26 @@
     {{-- Analytics scripts will be loaded after page is interactive to reduce main-thread blocking --}}
     {{-- Store analytics HTML in hidden divs, then move to proper location after page is interactive --}}
     <div id="deferred-analytics-head" style="display: none !important;">
-        @include('googletagmanager::head')
+        @php
+            $gtmId = config('googletagmanager.id');
+            $gtmEnabled = false;
+            if ($gtmId) {
+                try {
+                    $gtmEnabled = \Spatie\GoogleTagManager\GoogleTagManagerFacade::isEnabled();
+                } catch (\Exception $e) {
+                    $gtmEnabled = false;
+                }
+            }
+        @endphp
+        @if($gtmEnabled)
+            @php
+                try {
+                    echo view('googletagmanager::head')->render();
+                } catch (\Exception $e) {
+                    // GTM not properly configured, skip
+                }
+            @endphp
+        @endif
         <x-metapixel-head />
     </div>
     <script data-navigate-once>
@@ -861,7 +880,26 @@
     <x-livewire-progress bar-class="bg-warning" track-class="bg-white/50" />
     {{-- Analytics scripts will be loaded after page is interactive to reduce main-thread blocking --}}
     <div id="deferred-analytics-body" style="display: none !important;">
-        @include('googletagmanager::body')
+        @php
+            $gtmId = config('googletagmanager.id');
+            $gtmEnabled = false;
+            if ($gtmId) {
+                try {
+                    $gtmEnabled = \Spatie\GoogleTagManager\GoogleTagManagerFacade::isEnabled();
+                } catch (\Exception $e) {
+                    $gtmEnabled = false;
+                }
+            }
+        @endphp
+        @if($gtmEnabled)
+            @php
+                try {
+                    echo view('googletagmanager::body')->render();
+                } catch (\Exception $e) {
+                    // GTM not properly configured, skip
+                }
+            @endphp
+        @endif
         <x-metapixel-body />
     </div>
     <script data-navigate-once>
