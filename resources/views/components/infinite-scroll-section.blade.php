@@ -177,8 +177,15 @@
                 const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                 const inStock = !product.should_track || (product.stock_count || 0) > 0;
                 const hasDiscount = productPrice !== productSellingPrice;
-                const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) /
-                    productPrice) : 0;
+                let discountText = '';
+                if (hasDiscount && productPrice > 0) {
+                    const discountPercent = Math.round(((productPrice - productSellingPrice) * 100) / productPrice);
+                    const template = (window.discountTextTemplate || '').toString();
+                    discountText = template.replace('[percent]', discountPercent);
+                    if (!discountText.trim()) {
+                        discountText = '';
+                    }
+                }
 
                 // Get button configuration from PHP (passed via data attributes)
                 const showOption = this.getShowOption();
@@ -234,8 +241,8 @@
                 return `
                          <div class="product-card" data-id="${productId}" data-max="${product.should_track ? (product.stock_count || 0) : -1}">
                              <div class="product-card__badges-list">
-                                 ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
-                                 ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale"><small>Discount:</small> ${discountPercent}%</div>` : ''}
+                                ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
+                                ${discountText ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                              </div>
                              <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
                                  <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">

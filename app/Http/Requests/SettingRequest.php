@@ -109,7 +109,7 @@ class SettingRequest extends FormRequest
             'related_products' => 'required|array',
             'scroll_text' => 'nullable',
             'show_option' => 'required|array',
-            'discount_text' => 'required',
+            'discount_text' => 'nullable',
             'services' => 'required|array',
         ];
     }

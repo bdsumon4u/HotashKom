@@ -14,10 +14,13 @@
                     0,
                     PHP_ROUND_HALF_UP,
                 );
+                $discountText = str_replace('[percent]', $percent, setting('discount_text') ?? '');
             @endphp
-            <div class="product-card__badge product-card__badge--sale">
-                {!! str_replace('[percent]', $percent, setting('discount_text') ?? '<small>Discount:</small> [percent]%') !!}
-            </div>
+            @if (! empty(trim($discountText)))
+                <div class="product-card__badge product-card__badge--sale">
+                    {!! $discountText !!}
+                </div>
+            @endif
         @endif
     </div>
     <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">

@@ -88,8 +88,8 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label for="discount-text">Discount Text</label>
-                <x-input name="discount_text" id="discount-text" :value="$discount_text ?? '<small>Discount:</small> [percent]%'" />
-                <small>Short Code: <strong>[percent]</strong></small>
+                <x-input name="discount_text" id="discount-text" :value="$discount_text ?? ''" />
+                &lt;small&gt;Discount:&lt;/small&gt; [percent]%
             </div>
         </div>
         <div class="col-6">
