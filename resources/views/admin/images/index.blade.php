@@ -14,6 +14,10 @@
 <li class="breadcrumb-item">Images</li>
 @endsection
 
+@push('js')
+<script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}" defer></script>
+@endpush
+
 @push('styles')
 <style>
     form#drop-imgs {
@@ -76,7 +80,7 @@
 <script>
     function initImagesIndex() {
         // Destroy existing table if any (SPA safety)
-        if ($.fn.dataTable.isDataTable('.datatable')) {
+        if ($.fn.dataTable && $.fn.dataTable.isDataTable && $.fn.dataTable.isDataTable('.datatable')) {
             $('.datatable').DataTable().destroy();
         }
 

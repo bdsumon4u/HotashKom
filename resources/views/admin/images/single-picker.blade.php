@@ -1,6 +1,12 @@
 @push('css')
-<link rel="stylesheet" type="text/css" href="{{asset('assets/css/dropzone.css')}}">
-<link rel="stylesheet" type="text/css" href="{{asset('assets/css/datatables.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/dropzone.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/datatables.css') }}">
+@endpush
+
+@push('js')
+<script src="{{ asset('assets/js/dropzone/dropzone.js') }}" defer></script>
+<script src="{{ asset('assets/js/dropzone/dropzone-script.js') }}" defer></script>
+<script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}" defer></script>
 @endpush
 
 
@@ -61,7 +67,7 @@
 @push('scripts')
 <script>
     function initSinglePicker() {
-        if ($.fn.dataTable.isDataTable('.single-picker')) {
+        if ($.fn.dataTable && $.fn.dataTable.isDataTable && $.fn.dataTable.isDataTable('.single-picker')) {
             $('.single-picker').DataTable().destroy();
         }
 
