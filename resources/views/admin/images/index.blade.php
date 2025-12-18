@@ -15,6 +15,7 @@
 @endsection
 
 @push('js')
+<script src="{{ asset('assets/js/dropzone/dropzone.js') }}" defer></script>
 <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}" defer></script>
 @endpush
 
@@ -101,26 +102,33 @@
             lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
         });
 
-        if (window.Dropzone) {
-            // Clean up existing Dropzones
-            if (Array.isArray(Dropzone.instances)) {
-                Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
-                Dropzone.instances = [];
-            }
-            Dropzone.autoDiscover = false;
-            // Manual init with explicit clickable target
-            new Dropzone("#image-dropzone", {
-                // Target both the form and the message area for clicks
-                clickable: "#image-dropzone, #image-dropzone .dz-message",
-                init: function () {
-                    this.on('complete', function(){
-                        if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
-                            table.ajax.reload(null, false);
-                        }
-                    });
+        // Wait for Dropzone to be available (since it's loaded with defer)
+        function initDropzone() {
+            if (window.Dropzone) {
+                // Clean up existing Dropzones
+                if (Array.isArray(Dropzone.instances)) {
+                    Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
+                    Dropzone.instances = [];
                 }
-            });
+                Dropzone.autoDiscover = false;
+                // Manual init with explicit clickable target
+                new Dropzone("#image-dropzone", {
+                    // Make the entire dropzone clickable
+                    clickable: true,
+                    init: function () {
+                        this.on('complete', function(){
+                            if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
+                                table.ajax.reload(null, false);
+                            }
+                        });
+                    }
+                });
+            } else {
+                // Retry after a short delay if Dropzone isn't loaded yet
+                setTimeout(initDropzone, 100);
+            }
         }
+        initDropzone();
     }
 
     document.addEventListener('DOMContentLoaded', initImagesIndex, { once: true });

@@ -66,12 +66,15 @@
 
 @push('scripts')
 <script>
+    let tableSingle = null;
+    let dropzoneSingle = null;
+
     function initSinglePicker() {
         if ($.fn.dataTable && $.fn.dataTable.isDataTable && $.fn.dataTable.isDataTable('.single-picker')) {
             $('.single-picker').DataTable().destroy();
         }
 
-        const tableSingle = $('.single-picker').DataTable({
+        tableSingle = $('.single-picker').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{!! route('api.images.single') !!}",
@@ -102,23 +105,47 @@
             });
         });
 
-        if (window.Dropzone) {
-            if (Array.isArray(Dropzone.instances)) {
-                Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
-                Dropzone.instances = [];
-            }
-            Dropzone.autoDiscover = false;
-            new Dropzone("#image-dropzone-single", {
-                clickable: "#image-dropzone-single, #image-dropzone-single .dz-message",
-                init: function () {
-                    this.on('complete', function(){
-                        if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
-                            tableSingle.ajax.reload(null, false);
+        // Initialize Dropzone when modal is shown
+        $('#single-picker').on('shown.bs.modal', function () {
+            // Wait for Dropzone to be available (since it's loaded with defer)
+            function initDropzone() {
+                if (window.Dropzone) {
+                    // Destroy existing instance if any
+                    if (dropzoneSingle) {
+                        try {
+                            dropzoneSingle.destroy();
+                        } catch(e) {}
+                        dropzoneSingle = null;
+                    }
+
+                    // Clean up any other instances on this element
+                    const element = document.getElementById('image-dropzone-single');
+                    if (element && element.dropzone) {
+                        try {
+                            element.dropzone.destroy();
+                        } catch(e) {}
+                    }
+
+                    Dropzone.autoDiscover = false;
+                    dropzoneSingle = new Dropzone("#image-dropzone-single", {
+                        clickable: true,
+                        init: function () {
+                            this.on('complete', function(){
+                                if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
+                                    if (tableSingle) {
+                                        tableSingle.ajax.reload(null, false);
+                                    }
+                                }
+                            });
                         }
                     });
+                } else {
+                    // Retry after a short delay if Dropzone isn't loaded yet
+                    setTimeout(initDropzone, 100);
                 }
-            });
-        }
+            }
+            initDropzone();
+        });
     }
 
     document.addEventListener('DOMContentLoaded', initSinglePicker, { once: true });

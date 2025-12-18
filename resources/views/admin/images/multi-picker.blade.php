@@ -2,6 +2,10 @@
 <!-- dropzone and datatables css are already loaded globally -->
 @endpush
 
+@push('js')
+<script src="{{ asset('assets/js/dropzone/dropzone.js') }}" defer></script>
+@endpush
+
 <!-- The Modal -->
 <div class="modal" id="multi-picker">
     <div class="modal-dialog modal-xl">
@@ -59,12 +63,15 @@
 
 @push('scripts')
 <script>
+    let tableMulti = null;
+    let dropzoneMulti = null;
+
     function initMultiPicker() {
         if ($.fn.dataTable.isDataTable('.multi-picker')) {
             $('.multi-picker').DataTable().destroy();
         }
 
-        const tableMulti = $('.multi-picker').DataTable({
+        tableMulti = $('.multi-picker').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{!! route('api.images.multiple') !!}",
@@ -107,24 +114,48 @@
                 animate:{ enter:'animated fadeInDown', exit:'animated fadeOutUp' }
             });
         });
-        
-        if (window.Dropzone) {
-            if (Array.isArray(Dropzone.instances)) {
-                Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
-                Dropzone.instances = [];
-            }
-            Dropzone.autoDiscover = false;
-            new Dropzone("#image-dropzone-multi", {
-                clickable: "#image-dropzone-multi, #image-dropzone-multi .dz-message",
-                init: function () {
-                    this.on('complete', function(){
-                        if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
-                            tableMulti.ajax.reload(null, false);
+
+        // Initialize Dropzone when modal is shown
+        $('#multi-picker').on('shown.bs.modal', function () {
+            // Wait for Dropzone to be available (since it's loaded with defer)
+            function initDropzone() {
+                if (window.Dropzone) {
+                    // Destroy existing instance if any
+                    if (dropzoneMulti) {
+                        try {
+                            dropzoneMulti.destroy();
+                        } catch(e) {}
+                        dropzoneMulti = null;
+                    }
+
+                    // Clean up any other instances on this element
+                    const element = document.getElementById('image-dropzone-multi');
+                    if (element && element.dropzone) {
+                        try {
+                            element.dropzone.destroy();
+                        } catch(e) {}
+                    }
+
+                    Dropzone.autoDiscover = false;
+                    dropzoneMulti = new Dropzone("#image-dropzone-multi", {
+                        clickable: true,
+                        init: function () {
+                            this.on('complete', function(){
+                                if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
+                                    if (tableMulti) {
+                                        tableMulti.ajax.reload(null, false);
+                                    }
+                                }
+                            });
                         }
                     });
+                } else {
+                    // Retry after a short delay if Dropzone isn't loaded yet
+                    setTimeout(initDropzone, 100);
                 }
-            });
-        }
+            }
+            initDropzone();
+        });
     }
 
     document.addEventListener('DOMContentLoaded', initMultiPicker, { once: true });
