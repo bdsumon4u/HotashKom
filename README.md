@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}497}$$ 🔥 domains are live now
+These 🔥 $${\color{red}500}$$ 🔥 domains are live now
 
-_Last updated: **2025-12-17 09:24:35 Asia/Dhaka**_
+_Last updated: **2025-12-18 09:25:28 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -596,3 +596,6 @@ _Last updated: **2025-12-17 09:24:35 Asia/Dhaka**_
 | 495 | [sellora24.com](http://sellora24.com) |
 | 496 | [armart24.com](http://armart24.com) |
 | 497 | [akshopbd.com](http://akshopbd.com) |
+| 498 | [aminbazar24.com](http://aminbazar24.com) |
+| 499 | [aroggomart.com](http://aroggomart.com) |
+| 500 | [dhakamode.com](http://dhakamode.com) |
