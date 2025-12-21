@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Bavix\Wallet\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class ResellerController extends Controller
@@ -21,8 +23,30 @@ class ResellerController extends Controller
         // Only load orders count if not pending view (to avoid unnecessary query
         $resellers = ! $isPendingView ? User::withCount('orders') : User::query();
 
+        // Eager load wallets to avoid N+1 queries when accessing balance
+        $resellers = $resellers->with(['wallet' => function ($query): void {
+            $query->where('slug', 'default');
+        }]);
+
         // Filter by status if provided
         $resellers = $isPendingView ? $resellers->where('is_verified', false) : $resellers->where('is_verified', true);
+
+        // Add subquery to calculate pending withdrawal amounts to avoid N+1 queries
+        if (! $isPendingView) {
+            $transactionTable = (new Transaction)->getTable();
+            $userMorphClass = (new User)->getMorphClass();
+
+            $resellers = $resellers->addSelect([
+                'pending_withdrawal_amount' => DB::table($transactionTable)
+                    ->selectRaw('COALESCE(ABS(SUM(amount)), 0)')
+                    ->where('payable_type', $userMorphClass)
+                    ->whereColumn('payable_id', 'users.id')
+                    ->where('type', 'withdraw')
+                    ->where('confirmed', false)
+                    ->whereNull('deleted_at')
+                    ->limit(1),
+            ]);
+        }
 
         $dataTable = DataTables::of($resellers)
             ->addIndexColumn()
@@ -37,8 +61,9 @@ class ResellerController extends Controller
         if (! $isPendingView) {
             $dataTable = $dataTable
                 ->editColumn('balance', function ($row): string {
-                    $availableBalance = $row->getAvailableBalance();
-                    $pendingAmount = $row->getPendingWithdrawalAmount();
+                    // Use pre-calculated pending_withdrawal_amount from subquery instead of querying
+                    $pendingAmount = (float) ($row->pending_withdrawal_amount ?? 0);
+                    $availableBalance = $row->balance - $pendingAmount;
 
                     $balanceText = number_format($availableBalance, 2);
                     if ($pendingAmount > 0) {
