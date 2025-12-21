@@ -43,6 +43,7 @@
                             'add_to_cart_text' => setting('show_option')->add_to_cart_text ?? 'Add to Cart',
                             'order_now_icon' => setting('show_option')->order_now_icon ?? '',
                             'order_now_text' => setting('show_option')->order_now_text ?? 'Order Now',
+                            'discount_text' => setting('discount_text') ?? '',
                         ]) }}"
                         data-is-oninda="{{ isOninda() ? 'true' : 'false' }}"
                         data-guest-can-see-price="{{ (bool) (setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}"
@@ -177,6 +178,10 @@
                 const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                 const inStock = !product.should_track || (product.stock_count || 0) > 0;
                 const hasDiscount = productPrice !== productSellingPrice;
+
+                // Get button configuration from PHP (passed via data attributes)
+                const showOption = this.getShowOption();
+
                 let discountText = '';
                 if (hasDiscount && productPrice > 0) {
                     const discountPercent = Math.round(((productPrice - productSellingPrice) * 100) / productPrice);
@@ -186,9 +191,6 @@
                         discountText = '';
                     }
                 }
-
-                // Get button configuration from PHP (passed via data attributes)
-                const showOption = this.getShowOption();
                 const isOninda = this.getIsOninda();
                 const guestCanSeePrice = this.getGuestCanSeePrice();
 

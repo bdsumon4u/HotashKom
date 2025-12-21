@@ -1173,9 +1173,14 @@
                                 priceHTML = formatPrice(productSellingPrice);
                             }
 
-                            const discountText = (showOption.discount_text ||
-                                '<small>Discount:</small> [percent]%').replace('[percent]',
-                                discountPercent);
+                            let discountText = '';
+                            if (hasDiscount) {
+                                const template = (showOption.discount_text || '').toString();
+                                discountText = template.replace('[percent]', discountPercent);
+                                if (!discountText.trim()) {
+                                    discountText = '';
+                                }
+                            }
 
                             const getRatingHTML = (product) => {
                                 const averageRating = product.average_rating || product.rating || 0;
@@ -1218,7 +1223,7 @@
                                 <div class="product-card" data-id="${productId}" data-max="${shouldTrack ? (stockCount || 0) : -1}">
                                     <div class="product-card__badges-list">
                                         ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
-                                        ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
+                                        ${discountText ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                                     </div>
                                     <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
                                         <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">

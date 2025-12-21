@@ -287,7 +287,7 @@
             'add_to_cart_text' => setting('show_option')->add_to_cart_text ?? 'Add to Cart',
             'order_now_icon' => setting('show_option')->order_now_icon ?? '',
             'order_now_text' => setting('show_option')->order_now_text ?? 'Order Now',
-            'discount_text' => setting('discount_text') ?? '<small>Discount:</small> [percent]%',
+            'discount_text' => setting('discount_text') ?? '',
         ]) }}"
         data-is-oninda="{{ isOninda() ? 'true' : 'false' }}"
         data-guest-can-see-price="{{ (bool) (setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}"
