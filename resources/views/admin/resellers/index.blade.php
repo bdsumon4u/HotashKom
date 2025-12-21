@@ -88,8 +88,18 @@
 @endpush
 
 @push('scripts')
-    <script>
-        var table = $('.datatable').DataTable({
+<script>
+    var table = null;
+
+    function initResellersTable() {
+        // Wait for DataTable to be available (since it's loaded with defer)
+        if (typeof $.fn.DataTable !== 'undefined') {
+            // Destroy existing table if any
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable && $.fn.dataTable.isDataTable('.datatable')) {
+                $('.datatable').DataTable().destroy();
+            }
+
+            table = $('.datatable').DataTable({
             search: [{
                 bRegex: true,
                 bSmart: false,
@@ -208,54 +218,69 @@
             ],
             pageLength: 50,
             lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
-        });
+            });
+        } else {
+            // Retry after a short delay if DataTable isn't loaded yet
+            setTimeout(initResellersTable, 100);
+        }
+    }
 
-        // Toggle Verification
-        $(document).on('click', '.toggle-verify', function() {
-            var id = $(this).data('id');
-            var isVerified = $(this).data('verified');
-            var button = $(this);
-            var action = isVerified ? 'unverify' : 'verify';
+    // Set up event handlers (these use delegated events so they work even before table is initialized)
+    $(document).on('click', '.toggle-verify', function() {
+        var id = $(this).data('id');
+        var isVerified = $(this).data('verified');
+        var button = $(this);
+        var action = isVerified ? 'unverify' : 'verify';
 
-            if (confirm('Are you sure you want to ' + action + ' this reseller?')) {
-                $.ajax({
-                    url: '/api/resellers/' + id + '/toggle-verify',
-                    type: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
+        if (confirm('Are you sure you want to ' + action + ' this reseller?')) {
+            $.ajax({
+                url: '/api/resellers/' + id + '/toggle-verify',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (table) {
                         table.ajax.reload();
-                        $.notify('Verification status updated successfully', 'success');
-                    },
-                    error: function(xhr) {
-                        $.notify('Error updating verification status', 'error');
                     }
-                });
-            }
-        });
+                    $.notify('Verification status updated successfully', 'success');
+                },
+                error: function(xhr) {
+                    $.notify('Error updating verification status', 'error');
+                }
+            });
+        }
+    });
 
-        // Delete Reseller (only shown for unverified/pending view)
-        $(document).on('click', '.delete-reseller', function() {
-            var id = $(this).data('id');
+    // Delete Reseller (only shown for unverified/pending view)
+    $(document).on('click', '.delete-reseller', function() {
+        var id = $(this).data('id');
 
-            if (confirm('Are you sure you want to delete this unverified reseller? This action cannot be undone.')) {
-                $.ajax({
-                    url: '/api/resellers/' + id,
-                    type: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
+        if (confirm('Are you sure you want to delete this unverified reseller? This action cannot be undone.')) {
+            $.ajax({
+                url: '/api/resellers/' + id,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (table) {
                         table.ajax.reload();
-                        $.notify(response.message || 'Reseller deleted successfully', 'success');
-                    },
-                    error: function(xhr) {
-                        var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to delete reseller';
-                        $.notify(msg, 'error');
                     }
-                });
-            }
-        });
+                    $.notify(response.message || 'Reseller deleted successfully', 'success');
+                },
+                error: function(xhr) {
+                    var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to delete reseller';
+                    $.notify(msg, 'error');
+                }
+            });
+        }
+    });
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', initResellersTable, { once: true });
+    if (document.readyState !== 'loading') {
+        initResellersTable();
+    }
     </script>
 @endpush
