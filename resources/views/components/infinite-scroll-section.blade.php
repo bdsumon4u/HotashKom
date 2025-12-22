@@ -185,7 +185,7 @@
                 let discountText = '';
                 if (hasDiscount && productPrice > 0) {
                     const discountPercent = Math.round(((productPrice - productSellingPrice) * 100) / productPrice);
-                    const template = (window.discountTextTemplate || '').toString();
+                    const template = (showOption.discount_text || '').toString();
                     discountText = template.replace('[percent]', discountPercent);
                     if (!discountText.trim()) {
                         discountText = '';
