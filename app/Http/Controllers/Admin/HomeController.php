@@ -95,8 +95,18 @@ class HomeController extends Controller
         });
 
         $productsCount = cacheMemo()->remember('admin_products_count', now()->addMinutes(5), fn () => Product::whereNull('parent_id')->count());
-        $inactiveProducts = cacheMemo()->remember('admin_inactive_products', now()->addMinutes(5), fn () => Product::whereIsActive(0)->whereNull('parent_id')->get());
-        $lowStockProducts = cacheMemo()->remember('admin_low_stock_products', now()->addMinutes(5), fn () => Product::whereShouldTrack(1)->where('stock_count', '<', 10)->get());
+
+        $inactiveProductsQuery = Product::whereIsActive(0)->whereNull('parent_id');
+        $inactiveProductsCount = (clone $inactiveProductsQuery)->count();
+        $inactiveProducts = $inactiveProductsCount > 20
+            ? $inactiveProductsQuery->get()
+            : cacheMemo()->remember('admin_inactive_products', now()->addMinutes(5), fn () => $inactiveProductsQuery->get());
+
+        $lowStockProductsQuery = Product::whereShouldTrack(1)->where('stock_count', '<', 10)->whereNull('parent_id');
+        $lowStockProductsCount = (clone $lowStockProductsQuery)->count();
+        $lowStockProducts = $lowStockProductsCount > 20
+            ? $lowStockProductsQuery->get()
+            : cacheMemo()->remember('admin_low_stock_products', now()->addMinutes(5), fn () => $lowStockProductsQuery->get());
 
         // Get total pending withdrawal amount
         $pendingWithdrawalAmount = cacheMemo()->remember('pending_withdrawal_amount', 300, fn (): float|int => abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
