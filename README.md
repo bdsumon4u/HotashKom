@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}500}$$ 🔥 domains are live now
+These 🔥 $${\color{red}501}$$ 🔥 domains are live now
 
-_Last updated: **2025-12-22 09:47:02 Asia/Dhaka**_
+_Last updated: **2025-12-23 09:40:19 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -593,9 +593,10 @@ _Last updated: **2025-12-22 09:47:02 Asia/Dhaka**_
 | 492 | [aroggomart.com](http://aroggomart.com) |
 | 493 | [modernmart24.com](http://modernmart24.com) |
 | 494 | [soberbazaar.com](http://soberbazaar.com) |
-| 495 | [meyabhai.com](http://meyabhai.com) |
-| 496 | [sellvally24.com](http://sellvally24.com) |
-| 497 | [proyzonmart.com](http://proyzonmart.com) |
-| 498 | [swapnovalley.com](http://swapnovalley.com) |
-| 499 | [dhakamode.com](http://dhakamode.com) |
-| 500 | [rahimonlinesupershop.com](http://rahimonlinesupershop.com) |
+| 495 | [bismillaheshop.com](http://bismillaheshop.com) |
+| 496 | [meyabhai.com](http://meyabhai.com) |
+| 497 | [sellvally24.com](http://sellvally24.com) |
+| 498 | [proyzonmart.com](http://proyzonmart.com) |
+| 499 | [swapnovalley.com](http://swapnovalley.com) |
+| 500 | [dhakamode.com](http://dhakamode.com) |
+| 501 | [rahimonlinesupershop.com](http://rahimonlinesupershop.com) |
