@@ -189,7 +189,7 @@
     }
 
     .product-card:hover:before {
-        box-shadow: inset 0 0 0 2px {{ $color->primary->background_color ?? null }} !important;
+        box-shadow: inset 0 0 0 1px {{ $color->primary->background_color ?? null }} !important;
     }
 
     .product-card__badge.product-card__badge--sale {

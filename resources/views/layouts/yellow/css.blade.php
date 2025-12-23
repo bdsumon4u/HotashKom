@@ -12,4 +12,27 @@
     .notify-alert {
         max-width: 350px !important;
     }
+
+    .product-card {
+        position: relative;
+        background-color: #ffffff;
+        border-radius: 4px;
+        box-shadow:
+            /* warm colored layer, close to card */
+            rgba(125, 110, 76, 0.35) 3px 3px,
+            /* soft dark layer, further away */
+            rgba(0, 0, 0, 0.10) 6px 6px 2px;
+        transform: translate3d(0, 0, 0);
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+        will-change: transform, box-shadow;
+    }
+
+    .product-card:hover {
+        transform: translate3d(-2px, -2px, 0);
+        box-shadow:
+            rgba(125, 110, 76, 0.40) 6px 6px,
+            rgba(0, 0, 0, 0.14) 10px 10px 2px;
+    }
 </style>
