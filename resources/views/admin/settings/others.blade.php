@@ -33,9 +33,12 @@
                 </div>
                 <div class="col-6">
                     <label for="show_option-checkout_template">Checkout Template</label>
+                    @php
+                        $checkoutTemplate = $show_option->checkout_template ?? config('app.checkout_template', 'legacy');
+                    @endphp
                     <select class="form-control" name="show_option[checkout_template]" id="show_option-checkout_template">
-                        <option value="legacy" @if ($show_option->checkout_template == 'legacy') selected @endif>Legacy</option>
-                        <option value="simple" @if ($show_option->checkout_template == 'simple') selected @endif>Simple</option>
+                        <option value="legacy" @if ($checkoutTemplate == 'legacy') selected @endif>Legacy</option>
+                        <option value="simple" @if ($checkoutTemplate == 'simple') selected @endif>Simple</option>
                     </select>
                     <x-error field="show_option.checkout_template" />
                 </div>
