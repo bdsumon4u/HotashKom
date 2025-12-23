@@ -26,10 +26,18 @@
                 </div>
             </div>
             <div class="py-2 row borderr">
-                <div class="col-12">
+                <div class="col-6">
                     <label for="show_option-checkout_button_text">`Checkout Button` text</label>
                     <x-input name="show_option[checkout_button_text]" id="show_option-checkout_button_text" :value="$show_option->checkout_button_text ?? 'কনফার্ম অর্ডার'" />
                     <x-error field="show_option.checkout_button_text" />
+                </div>
+                <div class="col-6">
+                    <label for="show_option-checkout_template">Checkout Template</label>
+                    <select class="form-control" name="show_option[checkout_template]" id="show_option-checkout_template">
+                        <option value="legacy" @if ($show_option->checkout_template == 'legacy') selected @endif>Legacy</option>
+                        <option value="simple" @if ($show_option->checkout_template == 'simple') selected @endif>Simple</option>
+                    </select>
+                    <x-error field="show_option.checkout_template" />
                 </div>
             </div>
         </div>
