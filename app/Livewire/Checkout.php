@@ -486,7 +486,14 @@ class Checkout extends Component
         $tempOrder = new \App\Models\Order;
         $this->cartUpdated();
 
-        return view('livewire.checkout', [
+        $template = setting('show_option')->checkout_template
+            ?? config('app.checkout_template', 'legacy');
+
+        $view = $template === 'simple'
+            ? 'livewire.checkout-simple'
+            : 'livewire.checkout';
+
+        return view($view, [
             'user' => optional(auth('user')->user()),
             'pathaoCities' => collect($tempOrder->pathaoCityList()),
             'pathaoAreas' => collect($tempOrder->pathaoAreaList($this->city_id)),

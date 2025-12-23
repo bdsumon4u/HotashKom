@@ -178,4 +178,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Checkout Template
+    |--------------------------------------------------------------------------
+    |
+    | Default checkout template to use when no admin setting is present.
+    | Supported values: "legacy", "simple".
+    |
+    */
+
+    'checkout_template' => env('CHECKOUT_TEMPLATE', 'legacy'),
+
 ];

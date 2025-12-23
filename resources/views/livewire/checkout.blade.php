@@ -165,22 +165,27 @@
                         <tr>
                             <th style="white-space:nowrap;">Your Delivery Charge</th>
                             <td>
-                                <input type="number" @focus="$event.target.select()" step="10"
-                                    class="form-control form-control-sm" x-model="retail_delivery" />
+                                <input type="text" @focus="$event.target.select()" step="10"
+                                    class="form-control form-control-sm"
+                                    x-model="retail_delivery"
+                                    wire:model.live="retailDeliveryFee" />
                             </td>
                         </tr>
                         <tr>
                             <th>Advanced</th>
                             <td>
-                                <input type="number" @focus="$event.target.select()" step="10"
-                                    class="form-control form-control-sm" x-model="advanced" />
+                                <input type="text" @focus="$event.target.select()" step="10"
+                                    class="form-control form-control-sm"
+                                    x-model="advanced"
+                                    wire:model.live="advanced" />
                             </td>
                         </tr>
                         <tr>
                             <th>Discount (TK)</th>
                             <td>
-                                <input type="number" @focus="$event.target.select()" x-model="retailDiscount" step="10"
-                                    min="0" class="form-control form-control-sm" />
+                                <input type="text" @focus="$event.target.select()" x-model="retailDiscount" step="10"
+                                    min="0" class="form-control form-control-sm"
+                                    wire:model.live="retailDiscount" />
                                 <x-error field="retailDiscount" />
                             </td>
                         </tr>
@@ -256,22 +261,27 @@
                         <tr>
                             <th style="white-space:nowrap;font-size:14px;">Your Delivery Charge</th>
                             <td>
-                                <input type="number" @focus="$event.target.select()" step="10"
-                                    class="form-control form-control-sm" x-model="retail_delivery" />
+                                <input type="text" @focus="$event.target.select()" step="10"
+                                    class="form-control form-control-sm"
+                                    x-model="retail_delivery"
+                                    wire:model.live="retailDeliveryFee" />
                             </td>
                         </tr>
                         <tr>
                             <th style="font-size:14px;">Advanced</th>
                             <td>
-                                <input type="number" @focus="$event.target.select()" step="10"
-                                    class="form-control form-control-sm" x-model="advanced" />
+                                <input type="text" @focus="$event.target.select()" step="10"
+                                    class="form-control form-control-sm"
+                                    x-model="advanced"
+                                    wire:model.live="advanced" />
                             </td>
                         </tr>
                         <tr>
                             <th style="font-size:14px;">Discount (TK)</th>
                             <td>
-                                <input type="number" @focus="$event.target.select()" x-model="retailDiscount" step="10"
-                                    min="0" class="form-control form-control-sm" />
+                                <input type="text" @focus="$event.target.select()" x-model="retailDiscount" step="10"
+                                    min="0" class="form-control form-control-sm"
+                                    wire:model.live="retailDiscount" />
                                 <x-error field="retailDiscount" />
                             </td>
                         </tr>
