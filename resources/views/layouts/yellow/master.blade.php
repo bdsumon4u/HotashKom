@@ -224,42 +224,85 @@
     <script data-navigate-once>
         // Defer analytics scripts to reduce main-thread blocking
         (function() {
-            function loadDeferredAnalytics() {
-                const headDiv = document.getElementById('deferred-analytics-head');
-                if (headDiv) {
-                    // Move scripts from hidden div to head, delaying inline script execution
-                    const scripts = headDiv.querySelectorAll('script');
-                    scripts.forEach(function(script) {
-                        const newScript = document.createElement('script');
-                        if (script.src) {
-                            // For external scripts, use async to delay loading
-                            newScript.src = script.src;
-                            newScript.async = true;
-                            newScript.defer = false; // Don't defer, just async
-                        } else {
-                            // For inline scripts, wrap in setTimeout to delay execution
-                            newScript.textContent = 'setTimeout(function(){' + script.textContent + '}, 100);';
-                        }
-                        document.head.appendChild(newScript);
-                    });
-                    // Move noscript tags (these don't block execution)
-                    const noscripts = headDiv.querySelectorAll('noscript');
-                    noscripts.forEach(function(noscript) {
-                        document.head.appendChild(noscript.cloneNode(true));
-                    });
-                    headDiv.remove();
-                }
+            // Track loaded scripts to prevent duplicates during SPA navigation
+            if (!window.__analyticsLoaded) {
+                window.__analyticsLoaded = new Set();
             }
 
-            // Load after page is interactive (requestIdleCallback with longer timeout)
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadDeferredAnalytics, { timeout: 5000 });
-            } else if (document.readyState === 'complete') {
-                setTimeout(loadDeferredAnalytics, 3000);
-            } else {
-                window.addEventListener('load', function() {
+            function loadDeferredAnalytics() {
+                const headDiv = document.getElementById('deferred-analytics-head');
+                if (!headDiv) {
+                    return; // Already processed or doesn't exist
+                }
+
+                // Move scripts from hidden div to head, delaying inline script execution
+                const scripts = headDiv.querySelectorAll('script');
+                scripts.forEach(function(script) {
+                    // Check if script already exists to prevent duplicates
+                    if (script.src) {
+                        // Check if script with same src already exists
+                        const existingScript = document.querySelector('script[src="' + script.src + '"]');
+                        if (existingScript || window.__analyticsLoaded.has(script.src)) {
+                            return; // Skip if already loaded
+                        }
+                        window.__analyticsLoaded.add(script.src);
+                    } else {
+                        // For inline scripts, check by data attribute or content hash
+                        const scriptId = script.getAttribute('data-gtm-id') || script.getAttribute('id');
+                        if (scriptId && window.__analyticsLoaded.has(scriptId)) {
+                            return; // Skip if already loaded
+                        }
+                        if (scriptId) {
+                            window.__analyticsLoaded.add(scriptId);
+                        }
+                    }
+
+                    const newScript = document.createElement('script');
+                    if (script.src) {
+                        // For external scripts, use async to delay loading
+                        newScript.src = script.src;
+                        newScript.async = true;
+                        newScript.defer = false; // Don't defer, just async
+                    } else {
+                        // For inline scripts, wrap in setTimeout to delay execution
+                        newScript.textContent = 'setTimeout(function(){' + script.textContent + '}, 100);';
+                    }
+                    // Copy data attributes
+                    Array.from(script.attributes).forEach(function(attr) {
+                        if (attr.name.startsWith('data-')) {
+                            newScript.setAttribute(attr.name, attr.value);
+                        }
+                    });
+                    document.head.appendChild(newScript);
+                });
+                // Move noscript tags (these don't block execution)
+                const noscripts = headDiv.querySelectorAll('noscript');
+                noscripts.forEach(function(noscript) {
+                    // Check if noscript already exists
+                    const noscriptContent = noscript.textContent || noscript.innerHTML;
+                    const existingNoscript = Array.from(document.head.querySelectorAll('noscript')).find(function(ns) {
+                        return (ns.textContent || ns.innerHTML) === noscriptContent;
+                    });
+                    if (!existingNoscript) {
+                        document.head.appendChild(noscript.cloneNode(true));
+                    }
+                });
+                headDiv.remove();
+            }
+
+            // Only load if not already loaded (prevent duplicate execution during SPA navigation)
+            if (!window.__analyticsHeadLoaded) {
+                window.__analyticsHeadLoaded = true;
+                // Load after page is interactive (requestIdleCallback with longer timeout)
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadDeferredAnalytics, { timeout: 5000 });
+                } else if (document.readyState === 'complete') {
                     setTimeout(loadDeferredAnalytics, 3000);
-                }, { once: true });
+                } else {
+                    window.addEventListener('load', function() {
+                        setTimeout(loadDeferredAnalytics, 3000);
+                    }, { once: true });
+                }
             }
         })();
     </script>
@@ -905,41 +948,84 @@
     <script data-navigate-once>
         // Defer analytics body scripts to reduce main-thread blocking
         (function() {
-            function loadDeferredAnalyticsBody() {
-                const bodyDiv = document.getElementById('deferred-analytics-body');
-                if (bodyDiv) {
-                    // Move scripts from hidden div to body, delaying inline script execution
-                    const scripts = bodyDiv.querySelectorAll('script');
-                    scripts.forEach(function(script) {
-                        const newScript = document.createElement('script');
-                        if (script.src) {
-                            // For external scripts, use async to delay loading
-                            newScript.src = script.src;
-                            newScript.async = true;
-                        } else {
-                            // For inline scripts, wrap in setTimeout to delay execution
-                            newScript.textContent = 'setTimeout(function(){' + script.textContent + '}, 100);';
-                        }
-                        document.body.appendChild(newScript);
-                    });
-                    // Move noscript and iframe tags
-                    const noscripts = bodyDiv.querySelectorAll('noscript');
-                    noscripts.forEach(function(noscript) {
-                        document.body.appendChild(noscript.cloneNode(true));
-                    });
-                    bodyDiv.remove();
-                }
+            // Track loaded scripts to prevent duplicates during SPA navigation
+            if (!window.__analyticsLoaded) {
+                window.__analyticsLoaded = new Set();
             }
 
-            // Load after page is interactive (requestIdleCallback with longer timeout)
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadDeferredAnalyticsBody, { timeout: 5000 });
-            } else if (document.readyState === 'complete') {
-                setTimeout(loadDeferredAnalyticsBody, 3000);
-            } else {
-                window.addEventListener('load', function() {
+            function loadDeferredAnalyticsBody() {
+                const bodyDiv = document.getElementById('deferred-analytics-body');
+                if (!bodyDiv) {
+                    return; // Already processed or doesn't exist
+                }
+
+                // Move scripts from hidden div to body, delaying inline script execution
+                const scripts = bodyDiv.querySelectorAll('script');
+                scripts.forEach(function(script) {
+                    // Check if script already exists to prevent duplicates
+                    if (script.src) {
+                        // Check if script with same src already exists
+                        const existingScript = document.querySelector('script[src="' + script.src + '"]');
+                        if (existingScript || window.__analyticsLoaded.has(script.src)) {
+                            return; // Skip if already loaded
+                        }
+                        window.__analyticsLoaded.add(script.src);
+                    } else {
+                        // For inline scripts, check by data attribute or content hash
+                        const scriptId = script.getAttribute('data-gtm-id') || script.getAttribute('id');
+                        if (scriptId && window.__analyticsLoaded.has(scriptId)) {
+                            return; // Skip if already loaded
+                        }
+                        if (scriptId) {
+                            window.__analyticsLoaded.add(scriptId);
+                        }
+                    }
+
+                    const newScript = document.createElement('script');
+                    if (script.src) {
+                        // For external scripts, use async to delay loading
+                        newScript.src = script.src;
+                        newScript.async = true;
+                    } else {
+                        // For inline scripts, wrap in setTimeout to delay execution
+                        newScript.textContent = 'setTimeout(function(){' + script.textContent + '}, 100);';
+                    }
+                    // Copy data attributes
+                    Array.from(script.attributes).forEach(function(attr) {
+                        if (attr.name.startsWith('data-')) {
+                            newScript.setAttribute(attr.name, attr.value);
+                        }
+                    });
+                    document.body.appendChild(newScript);
+                });
+                // Move noscript and iframe tags
+                const noscripts = bodyDiv.querySelectorAll('noscript');
+                noscripts.forEach(function(noscript) {
+                    // Check if noscript already exists
+                    const noscriptContent = noscript.textContent || noscript.innerHTML;
+                    const existingNoscript = Array.from(document.body.querySelectorAll('noscript')).find(function(ns) {
+                        return (ns.textContent || ns.innerHTML) === noscriptContent;
+                    });
+                    if (!existingNoscript) {
+                        document.body.appendChild(noscript.cloneNode(true));
+                    }
+                });
+                bodyDiv.remove();
+            }
+
+            // Only load if not already loaded (prevent duplicate execution during SPA navigation)
+            if (!window.__analyticsBodyLoaded) {
+                window.__analyticsBodyLoaded = true;
+                // Load after page is interactive (requestIdleCallback with longer timeout)
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadDeferredAnalyticsBody, { timeout: 5000 });
+                } else if (document.readyState === 'complete') {
                     setTimeout(loadDeferredAnalyticsBody, 3000);
-                }, { once: true });
+                } else {
+                    window.addEventListener('load', function() {
+                        setTimeout(loadDeferredAnalyticsBody, 3000);
+                    }, { once: true });
+                }
             }
         })();
     </script>
