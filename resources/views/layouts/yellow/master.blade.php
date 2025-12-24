@@ -196,29 +196,31 @@
     </script>
 
     <!-- css -->
-    {{-- Analytics scripts will be loaded after page is interactive to reduce main-thread blocking --}}
-    {{-- Store analytics HTML in hidden divs, then move to proper location after page is interactive --}}
-    <div id="deferred-analytics-head" style="display: none !important;">
+    {{-- Google Tag Manager: load once (not deferred) to avoid duplicate injections with SPA navigation --}}
+    @php
+        $gtmId = config('googletagmanager.id');
+        $gtmEnabled = false;
+        if ($gtmId) {
+            try {
+                $gtmEnabled = \Spatie\GoogleTagManager\GoogleTagManagerFacade::isEnabled();
+            } catch (\Exception $e) {
+                $gtmEnabled = false;
+            }
+        }
+    @endphp
+    @if ($gtmEnabled)
         @php
-            $gtmId = config('googletagmanager.id');
-            $gtmEnabled = false;
-            if ($gtmId) {
-                try {
-                    $gtmEnabled = \Spatie\GoogleTagManager\GoogleTagManagerFacade::isEnabled();
-                } catch (\Exception $e) {
-                    $gtmEnabled = false;
-                }
+            try {
+                echo view('googletagmanager::head')->render();
+            } catch (\Exception $e) {
+                // GTM not properly configured, skip
             }
         @endphp
-        @if($gtmEnabled)
-            @php
-                try {
-                    echo view('googletagmanager::head')->render();
-                } catch (\Exception $e) {
-                    // GTM not properly configured, skip
-                }
-            @endphp
-        @endif
+    @endif
+
+    {{-- Non-GTM analytics scripts will be loaded after page is interactive to reduce main-thread blocking --}}
+    {{-- Store Meta Pixel HTML in hidden div, then move to proper location after page is interactive --}}
+    <div id="deferred-analytics-head" style="display: none !important;">
         <x-metapixel-head />
     </div>
     <script data-navigate-once>
@@ -915,7 +917,7 @@
     {{-- Load Google Fonts asynchronously to prevent render blocking --}}
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet"></noscript>
-    {!! $scripts ?? null !!}
+{!! $scripts ?? null !!}
     @stack('head')
 </head>
 
@@ -1068,7 +1070,7 @@
         <div class="site__body">
             <div class="container">
                 @if (!request()->routeIs('/'))
-                    <x-reseller-verification-alert />
+                <x-reseller-verification-alert />
                 @endif
                 <x-alert-box class="mt-2 row" />
             </div>
@@ -1561,10 +1563,10 @@
             $(window)
                 .off('dataLayer.storefront')
                 .on('dataLayer.storefront', function(ev) {
-                    for (let item of ev.detail) {
-                        window.dataLayer.push(item);
-                    }
-                });
+            for (let item of ev.detail) {
+                window.dataLayer.push(item);
+            }
+        });
 
             function onScroll() {
                 const scrollTop = $(window).scrollTop();
@@ -1590,7 +1592,7 @@
                             if (instance && typeof instance.close === 'function') {
                                 // Use the instance close method for animation
                                 instance.close();
-                            } else {
+                } else {
                                 // Fallback: manually reset
                                 $departments.removeClass('departments--opened departments--transition');
                                 $departments.find('.departments__links-wrapper').css('height', '');
@@ -2308,49 +2310,49 @@
         $phone = phone88($company->whatsapp ?? '');
     @endphp
     @if ($phone && strlen($messenger) > 13)
-        <div class="widget-connect widget-connect-right">
+    <div class="widget-connect widget-connect-right">
             @if ($messenger)
                 <a class="widget-connect__button widget-connect__button-telemessenger button-slide-out"
                     style="background: white; color: blue;" href="{{ $messenger }}" data-toggle="tooltip"
                     data-placement="left" title="" target="_blank" data-original-title="Messenger">
-                    <i class="fab fa-facebook-messenger"></i>
-                </a>
-            @endif
+            <i class="fab fa-facebook-messenger"></i>
+        </a>
+        @endif
             @if ($phone)
                 <a class="widget-connect__button widget-connect__button-whatsapp button-slide-out"
                     style="background: white; color: green;" href="https://wa.me/{{ $phone }}"
                     data-toggle="tooltip" data-placement="left" title="" data-original-title="WhatsApp"
                     data-whatsapp-url="https://wa.me/{{ $phone }}"
                     onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-            @endif
-            <div class="widget-connect__button-activator" style="background-color: #ff0000;">
-                <div class="widget-connect__button-activator-icon"></div>
-            </div>
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        @endif
+        <div class="widget-connect__button-activator" style="background-color: #ff0000;">
+            <div class="widget-connect__button-activator-icon"></div>
         </div>
+    </div>
     @elseif ($phone)
         <a href="https://api.whatsapp.com/send?phone={{ $phone }}"
             style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;cursor:pointer;"
             data-whatsapp-url="https://api.whatsapp.com/send?phone={{ $phone }}"
             onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
-            <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>
-        </a>
+        <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>
+    </a>
     @elseif (strlen($messenger) > 13)
         <a href="{{ $messenger }}" target="_blank"
             style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#0084ff;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;">
-            <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
-        </a>
+        <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
+    </a>
     @endif
     <script>
         runWhenJQueryReady(function($) {
             $(".widget-connect__button-activator-icon")
                 .off('click.widgetConnect')
                 .on('click.widgetConnect', function() {
-                    $(this).toggleClass("active");
-                    $(".widget-connect").toggleClass("active");
-                    $("a.widget-connect__button").toggleClass("button-slide-out button-slide");
-                });
+                $(this).toggleClass("active");
+                $(".widget-connect").toggleClass("active");
+                $("a.widget-connect__button").toggleClass("button-slide-out button-slide");
+            });
 
             // Detect WebView environment
             function isWebView() {
