@@ -2,7 +2,11 @@
 @section('title', 'Slides')
 
 @push('css')
-<link rel="stylesheet" type="text/css" href="{{asset('assets/css/dropzone.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/dropzone.css') }}">
+@endpush
+
+@push('js')
+<script src="{{ asset('assets/js/dropzone/dropzone.js') }}" defer></script>
 @endpush
 
 @section('breadcrumb-title')
@@ -80,22 +84,45 @@
 
 @push('scripts')
 <script>
-    // Destroy any existing instances (SPA nav safety)
-    if (window.Dropzone && Dropzone.instances) {
-        Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
-        Dropzone.instances = [];
+    // Wait for Dropzone to be available (since it's loaded with defer)
+    function initSlidesDropzone() {
+        if (window.Dropzone) {
+            // Destroy any existing instances (SPA nav safety)
+            if (Array.isArray(Dropzone.instances)) {
+                Dropzone.instances.forEach(function (dz) { try { dz.destroy(); } catch(e) {} });
+                Dropzone.instances = [];
+            }
+
+            // Clean up any existing instance on this element
+            const element = document.getElementById('slides-dropzone');
+            if (element && element.dropzone) {
+                try {
+                    element.dropzone.destroy();
+                } catch(e) {}
+            }
+
+            Dropzone.autoDiscover = false;
+            new Dropzone("#slides-dropzone", {
+                clickable: true,
+                init: function () {
+                    this.on('complete', function(){
+                        if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
+                            window.location.reload();
+                        }
+                    });
+                }
+            });
+        } else {
+            // Retry after a short delay if Dropzone isn't loaded yet
+            setTimeout(initSlidesDropzone, 100);
+        }
     }
 
-    if (window.Dropzone) {
-        new Dropzone("#slides-dropzone", {
-            init: function () {
-                this.on('complete', function(){
-                    if(this.getQueuedFiles().length === 0 && this.getUploadingFiles().length === 0) {
-                        window.location.reload();
-                    }
-                });
-            }
-        });
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSlidesDropzone);
+    } else {
+        initSlidesDropzone();
     }
 </script>
 @endpush
