@@ -57,6 +57,11 @@
                         value="order_now" @if (old('show_option.product_grid_button', $show_option->product_grid_button ?? false) == 'order_now') checked @endif />
                     <label for="product-grid-order-now">`Order Now`</label>
                 </div>
+                <div class="ml-3 radio radio-secondary">
+                    <input type="radio" id="product-grid-none" name="show_option[product_grid_button]"
+                        value="none" @if (old('show_option.product_grid_button', $show_option->product_grid_button ?? false) == 'none') checked @endif />
+                    <label for="product-grid-none">`None`</label>
+                </div>
             </div>
             <label for="" class="my-1 d-inline-flex align-items-center">
                 <span class="mr-1">Product Detail Button(s)</span>
