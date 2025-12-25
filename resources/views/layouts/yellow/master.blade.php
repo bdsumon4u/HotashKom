@@ -1353,39 +1353,50 @@
 
             function initializeProductShowScripts() {
                 if (!document.querySelector('.xzoom-container')) {
-                    if (typeof window.__productShowCleanup === 'function') {
+                    if (window.__productShowCleanup) {
                         window.__productShowCleanup();
                         window.__productShowCleanup = null;
                     }
                     return;
                 }
 
-                runWhenJQueryReady(($) => {
-                    if (typeof window.__productShowCleanup === 'function') {
+                // Wait for jQuery and xzoom
+                function waitForDeps(callback, retries = 0) {
+                    const $ = window.jQuery || window.$;
+                    if (!$ || typeof $ !== 'function') {
+                        return retries < 100 ? setTimeout(() => waitForDeps(callback, retries + 1), 50) : null;
+                    }
+                    if (typeof $.fn.xzoom === 'function') {
+                        callback($);
+                    } else {
+                        retries < 100 ? setTimeout(() => waitForDeps(callback, retries + 1), 100) : callback($);
+                    }
+                }
+
+                waitForDeps(($) => {
+                    if (window.__productShowCleanup) {
                         window.__productShowCleanup();
                         window.__productShowCleanup = null;
                     }
 
                     const namespace = '.productShow';
-                    const $galleries = $('.xzoom-gallery');
-
-                    if (!$galleries.length) {
+                    const $galleryLinks = $('.xzoom-thumbs a');
+                    if (!$galleryLinks.length) {
                         return;
                     }
 
-                    if (typeof $.fn.xzoom === 'function') {
-                        // Destroy existing xZoom instances to prevent conflicts on SPA navigation
-                        $('.xzoom, .xzoom-gallery').each(function() {
-                            const xzoom = $(this).data('xzoom');
-                            if (xzoom && typeof xzoom.destroy === 'function') {
-                                try {
-                                    xzoom.destroy();
-                                } catch (e) {
-                                    // Ignore errors during cleanup
-                                }
-                            }
-                        });
+                    // Cleanup existing instances
+                    $('.xzoom, .xzoom-gallery').each(function() {
+                        const xzoom = $(this).data('xzoom');
+                        if (xzoom?.destroy) {
+                            try {
+                                xzoom.destroy();
+                            } catch (e) {}
+                        }
+                    });
 
+                    // Initialize xzoom
+                    if (typeof $.fn.xzoom === 'function') {
                         $('.xzoom, .xzoom-gallery').xzoom({
                             zoomWidth: 400,
                             title: true,
@@ -1394,97 +1405,122 @@
                         });
                     }
 
-                    let activeG = 0;
-                    let lastG = 0;
-                    let autoNavigationTimer = null;
+                    // Set up navigation after xzoom initializes
+                    setTimeout(() => {
+                        // Cache selectors
+                        const $mainXzoom = $('.xzoom');
+                        const $leftBtn = $('.zoom-control.left');
+                        const $rightBtn = $('.zoom-control.right');
+                        const linksCount = $galleryLinks.length;
+                        const lastG = linksCount - 1;
 
-                    function updateActiveIndex() {
-                        $galleries.each(function(g, e) {
-                            if ($(e).hasClass('xactive')) {
-                                activeG = g;
+                        let activeG = 0;
+                        let autoNavigationTimer = null;
+                        let isProgrammaticClick = false;
+
+                        function updateActiveIndex() {
+                            if (!$mainXzoom.length) {
+                                return;
                             }
-                            lastG = g;
-                        });
-                    }
-
-                    function navigateToNext() {
-                        updateActiveIndex();
-                        const next = activeG === lastG ? 0 : (activeG + 1);
-                        $galleries.eq(next).trigger('click');
-                    }
-
-                    function scheduleNextNavigation() {
-                        clearTimeout(autoNavigationTimer);
-                        autoNavigationTimer = setTimeout(() => {
-                            navigateToNext();
-                        }, 3000);
-                    }
-
-                    function resetAutoNavigation() {
-                        clearTimeout(autoNavigationTimer);
-                        scheduleNextNavigation();
-                    }
-
-                    $('.zoom-control.left').off('click' + namespace).on('click' + namespace, function() {
-                        updateActiveIndex();
-                        const prev = activeG === 0 ? lastG : (activeG - 1);
-                        $galleries.eq(prev).trigger('click');
-                        resetAutoNavigation();
-                    });
-
-                    $('.zoom-control.right').off('click' + namespace).on('click' + namespace, function() {
-                        navigateToNext();
-                        resetAutoNavigation();
-                    });
-
-                    $galleries.off('click' + namespace).on('click' + namespace, function() {
-                        resetAutoNavigation();
-                    });
-
-                    scheduleNextNavigation();
-
-                    window.__handleVariantChange = function(event) {
-                        const variantId = event.variantId;
-                        const variantImage = $('.variant-image').filter(function() {
-                            const ids = $(this).data('variant-ids');
-                            return Array.isArray(ids) && ids.includes(variantId);
-                        }).first();
-
-                        if (variantImage.length) {
-                            resetAutoNavigation();
-                            setTimeout(() => {
-                                variantImage.trigger('click');
-                                updateActiveIndex();
-                            }, 100);
-                        }
-                    };
-
-                    if (!window.__variantChangeListenerRegistered) {
-                        window.__variantChangeListenerRegistered = true;
-
-                        const registerVariantListener = () => {
-                            Livewire.on('variantChanged', (event) => {
-                                if (typeof window.__handleVariantChange === 'function') {
-                                    window.__handleVariantChange(event);
+                            const currentSrc = $mainXzoom.attr('src') || $mainXzoom.attr('xoriginal');
+                            $galleryLinks.each(function(index) {
+                                const $link = $(this);
+                                const $img = $link.find('img');
+                                if ($link.attr('href') === currentSrc || $img.attr('src') === currentSrc ||
+                                    $img.hasClass('xactive') || $link.hasClass('xactive')) {
+                                    activeG = index;
+                                    return false; // Break loop
                                 }
                             });
+                        }
+
+                        function navigate(direction) {
+                            updateActiveIndex();
+                            const target = direction === 'next'
+                                ? (activeG >= lastG ? 0 : activeG + 1)
+                                : (activeG <= 0 ? lastG : activeG - 1);
+                            const $targetLink = $galleryLinks.eq(target);
+                            if ($targetLink.length) {
+                                isProgrammaticClick = true;
+                                $targetLink[0].click();
+                                isProgrammaticClick = false;
+                            }
+                            resetAutoNavigation();
+                        }
+
+                        function scheduleNextNavigation() {
+                            clearTimeout(autoNavigationTimer);
+                            autoNavigationTimer = setTimeout(() => navigate('next'), 3000);
+                        }
+
+                        function resetAutoNavigation() {
+                            clearTimeout(autoNavigationTimer);
+                            scheduleNextNavigation();
+                        }
+
+                        // Arrow button handlers
+                        $leftBtn.off('click' + namespace).on('click' + namespace, (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigate('prev');
+                        });
+
+                        $rightBtn.off('click' + namespace).on('click' + namespace, (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            navigate('next');
+                        });
+
+                        // Reset auto-navigation on manual gallery click
+                        $galleryLinks.off('click' + namespace).on('click' + namespace, () => {
+                            if (!isProgrammaticClick) {
+                                resetAutoNavigation();
+                            }
+                        });
+
+                        updateActiveIndex();
+                        scheduleNextNavigation();
+
+                        // Variant change handler
+                        window.__handleVariantChange = function(event) {
+                            const variantId = event.variantId;
+                            const $variantImage = $('.variant-image').filter(function() {
+                                const ids = $(this).data('variant-ids');
+                                return Array.isArray(ids) && ids.includes(variantId);
+                            }).first();
+
+                            if ($variantImage.length) {
+                                resetAutoNavigation();
+                                const $link = $variantImage.closest('a');
+                                if ($link.length) {
+                                    setTimeout(() => {
+                                        isProgrammaticClick = true;
+                                        $link[0].click();
+                                        isProgrammaticClick = false;
+                                        updateActiveIndex();
+                                    }, 100);
+                                }
+                            }
                         };
 
-                        if (window.Livewire) {
-                            registerVariantListener();
-                        } else {
-                            document.addEventListener('livewire:load', registerVariantListener, {
-                                once: true
-                            });
+                        if (!window.__variantChangeListenerRegistered) {
+                            window.__variantChangeListenerRegistered = true;
+                            const registerVariantListener = () => {
+                                Livewire.on('variantChanged', (event) => {
+                                    window.__handleVariantChange?.(event);
+                                });
+                            };
+                            window.Livewire ? registerVariantListener()
+                                : document.addEventListener('livewire:load', registerVariantListener, { once: true });
                         }
-                    }
 
-                    window.__productShowCleanup = function() {
-                        clearTimeout(autoNavigationTimer);
-                        $('.zoom-control.left').off('click' + namespace);
-                        $('.zoom-control.right').off('click' + namespace);
-                        $galleries.off('click' + namespace);
-                    };
+                        window.__productShowCleanup = function() {
+                            clearTimeout(autoNavigationTimer);
+                            $leftBtn.off('click' + namespace);
+                            $rightBtn.off('click' + namespace);
+                            $galleryLinks.off('click' + namespace);
+                        };
+                    }, 200);
                 });
             }
 
