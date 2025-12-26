@@ -103,6 +103,25 @@
         .zoom-control:focus {
             outline: none;
         }
+
+        @media (max-width: 768px) {
+            .zoom-control {
+                height: 48px;
+                width: 48px;
+                margin: 0 5px;
+                opacity: 0.9;
+                background: rgba(255, 255, 255, 0.8);
+                z-index: 10;
+                position: relative;
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+            }
+
+            .zoom-control:active {
+                opacity: 1;
+                background: rgba(255, 255, 255, 0.95);
+            }
+        }
     </style>
 @endpush
 
