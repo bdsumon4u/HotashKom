@@ -96,6 +96,14 @@
     .customer-info div {
         font-size: 20px !important;
     }
+    .invoice-note {
+        display: inline-block;
+        font-size: 18px;
+        font-weight: 600;
+        border: 1px dashed currentColor;
+        padding: 0.35rem 0.5rem;
+        margin-top: 0.25rem;
+    }
 }
 </style>
   </head>
@@ -165,19 +173,6 @@
                         </div>
                     </div>
                 </div>
-                @if(isOninda() && (setting('show_option')->resellers_invoice ?? false))
-                <div class="row">
-                    <div class="col-12">
-                        <span class="text-danger">{{$order->note ?? null}}</span>
-                    </div>
-                </div>
-                @else
-                <div class="row">
-                    <div class="col-12">
-                        <span class="text-danger">{{$order->note ?? null}}</span>
-                    </div>
-                </div>
-                @endif
                 <!-- End Invoice Mid-->
                 <div>
                     <div class="table-responsive invoice-table" id="table">
@@ -212,6 +207,9 @@
                             <tr>
                                 <th class="py-1" rowspan="5" colspan="{{(setting('show_option')->hide_invoice_image ?? false)?2:3}}" style="text-align: center; vertical-align: middle; font-size: 24px;">
                                     <span style="font-weight: 400;">Condition</span>: TK. {{ $order->condition }}
+                                    @if($order->note)
+                                        <br><span class="text-danger invoice-note">{{ $order->note }}</span>
+                                    @endif
                                 </th>
                             </tr>
                             <tr>
