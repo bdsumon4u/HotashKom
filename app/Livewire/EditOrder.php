@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -168,7 +169,7 @@ class EditOrder extends Component
                     'product_with_options:'.$product['id'],
                     now()->addMinutes(2),
                     function () use ($product) {
-                        return Product::with('options')->find($product['id']);
+                        return $this->productWithOptionsQuery()->find($product['id']);
                     }
                 );
                 if ($productModel) {
@@ -196,6 +197,16 @@ class EditOrder extends Component
                 }
             }
         }
+    }
+
+    protected function productWithOptionsQuery(): Builder
+    {
+        return Product::with('options');
+    }
+
+    protected function productWithVariationsQuery(): Builder
+    {
+        return Product::with('variations.options');
     }
 
     public function addProduct(Product $product)
@@ -466,20 +477,13 @@ class EditOrder extends Component
     {
         $products = collect();
         if (strlen((string) $this->search) > 2) {
-            $products = cacheRememberNamespaced(
-                'edit_order_product_search',
-                md5($this->search.':'.implode(',', array_keys($this->selectedProducts))),
-                now()->addMinute(),
-                function () {
-                    return Product::with('variations.options')
-                        ->whereNotIn('id', array_keys($this->selectedProducts))
-                        ->where(fn ($q) => $q->where('name', 'like', "%$this->search%")->orWhere('sku', $this->search))
-                        ->whereNull('parent_id')
-                        ->whereIsActive(1)
-                        ->take(5)
-                        ->get();
-                }
-            );
+            $products = Product::with('variations.options')
+                ->whereNotIn('id', array_keys($this->selectedProducts))
+                ->where(fn ($q) => $q->where('name', 'like', "%$this->search%")->orWhere('sku', $this->search))
+                ->whereNull('parent_id')
+                ->whereIsActive(1)
+                ->take(5)
+                ->get();
 
             foreach ($products as $product) {
                 if ($product->variations->isNotEmpty() && ! isset($this->options[$product->id])) {
@@ -497,7 +501,7 @@ class EditOrder extends Component
                     'product_with_variations:'.$parentId,
                     now()->addMinutes(2),
                     function () use ($parentId) {
-                        return Product::with('variations.options')->find($parentId);
+                        return $this->productWithVariationsQuery()->find($parentId);
                     }
                 );
                 if ($parent) {
