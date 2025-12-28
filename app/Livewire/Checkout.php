@@ -114,7 +114,7 @@ class Checkout extends Component
     public function remove($id): void
     {
         cart()->remove($id);
-        // $this->cartUpdated();
+        $this->cartUpdated();
     }
 
     public function increaseQuantity($id): void
@@ -132,7 +132,7 @@ class Checkout extends Component
             // session()->put(cart()->currentInstance(), $content);
 
             cart()->update($id, $item->qty + 1);
-            // $this->cartUpdated();
+            $this->cartUpdated();
         }
     }
 
@@ -151,7 +151,7 @@ class Checkout extends Component
             // session()->put(cart()->currentInstance(), $content);
 
             cart()->update($id, $qty);
-            // $this->cartUpdated();
+            $this->cartUpdated();
         }
     }
 

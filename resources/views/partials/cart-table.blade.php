@@ -40,7 +40,6 @@
                     <td class="cart-table__column cart-table__column--quantity" data-title="Quantity">
                         <div class="input-number product__quantity">
                             <input class="form-control input-number__input" type="number" min="1"
-                                x-model="retail['{{$product->id}}'].quantity"
                                 value="{{ $product->qty }}" max="{{ $product->max }}" readonly />
                             <div class="input-number__add" wire:click="increaseQuantity('{{ $product->rowId }}')"></div>
                             <div class="input-number__sub" wire:click="decreaseQuantity('{{ $product->rowId }}')"></div>
