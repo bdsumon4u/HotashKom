@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}500}$$ 🔥 domains are live now
+These 🔥 $${\color{red}501}$$ 🔥 domains are live now
 
-_Last updated: **2025-12-27 09:35:43 Asia/Dhaka**_
+_Last updated: **2025-12-28 09:51:43 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -115,21 +115,21 @@ _Last updated: **2025-12-27 09:35:43 Asia/Dhaka**_
 | 14 | [knakata.com](http://knakata.com) |
 | 15 | [djkshop.com](http://djkshop.com) |
 | 16 | [smartbuybd.com](http://smartbuybd.com) |
-| 17 | [bdstore7.com](http://bdstore7.com) |
-| 18 | [supersaversbd.com](http://supersaversbd.com) |
-| 19 | [rsliveshopping.com](http://rsliveshopping.com) |
-| 20 | [greatzonebd.com](http://greatzonebd.com) |
-| 21 | [adhunikbazarbd.com](http://adhunikbazarbd.com) |
-| 22 | [knmartbd.com](http://knmartbd.com) |
-| 23 | [anikamart.com](http://anikamart.com) |
-| 24 | [jkshopbd24.com](http://jkshopbd24.com) |
-| 25 | [sohozkenakata.com](http://sohozkenakata.com) |
-| 26 | [kbenterprisebd.com](http://kbenterprisebd.com) |
-| 27 | [e-bajar.com](http://e-bajar.com) |
-| 28 | [nooronlinemart.com](http://nooronlinemart.com) |
-| 29 | [sonjitaonlineshop.com](http://sonjitaonlineshop.com) |
-| 30 | [emela-24.com](http://emela-24.com) |
-| 31 | [standardcollectionbd.com](http://standardcollectionbd.com) |
+| 17 | [supersaversbd.com](http://supersaversbd.com) |
+| 18 | [rsliveshopping.com](http://rsliveshopping.com) |
+| 19 | [greatzonebd.com](http://greatzonebd.com) |
+| 20 | [adhunikbazarbd.com](http://adhunikbazarbd.com) |
+| 21 | [knmartbd.com](http://knmartbd.com) |
+| 22 | [anikamart.com](http://anikamart.com) |
+| 23 | [jkshopbd24.com](http://jkshopbd24.com) |
+| 24 | [sohozkenakata.com](http://sohozkenakata.com) |
+| 25 | [kbenterprisebd.com](http://kbenterprisebd.com) |
+| 26 | [e-bajar.com](http://e-bajar.com) |
+| 27 | [nooronlinemart.com](http://nooronlinemart.com) |
+| 28 | [sonjitaonlineshop.com](http://sonjitaonlineshop.com) |
+| 29 | [emela-24.com](http://emela-24.com) |
+| 30 | [standardcollectionbd.com](http://standardcollectionbd.com) |
+| 31 | [supersell24.com](http://supersell24.com) |
 | 32 | [eshrakenterprise.com](http://eshrakenterprise.com) |
 | 33 | [sweetybazarbd.com](http://sweetybazarbd.com) |
 | 34 | [merazonlineshop.com](http://merazonlineshop.com) |
@@ -598,4 +598,5 @@ _Last updated: **2025-12-27 09:35:43 Asia/Dhaka**_
 | 497 | [anurupshop.com](http://anurupshop.com) |
 | 498 | [mollabajar.com](http://mollabajar.com) |
 | 499 | [emela24.com](http://emela24.com) |
-| 500 | [akshopbd.com](http://akshopbd.com) |
+| 500 | [onlinerbazar.com](http://onlinerbazar.com) |
+| 501 | [akshopbd.com](http://akshopbd.com) |
