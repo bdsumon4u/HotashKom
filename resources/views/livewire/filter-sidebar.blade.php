@@ -31,7 +31,7 @@
                     <i class="fa" :class="categoriesOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
                 </div>
                 <div class="filter-block__content" x-show="categoriesOpen" x-transition>
-                    @foreach($categories ?? [] as $category)
+                    @forelse($categories ?? [] as $category)
                         <div class="filter-item">
                             <label class="filter-checkbox">
                                 <input type="checkbox"
@@ -58,7 +58,9 @@
                                 </div>
                             @endif
                         </div>
-                    @endforeach
+                    @empty
+                        <p class="mb-3 text-muted small">No categories available for filter.</p>
+                    @endforelse
                 </div>
             </div>
             @endif
@@ -84,6 +86,16 @@
                     </div>
                 </div>
             @endforeach
+
+
+            @php
+                $hasCategoryFilters = !$hideCategoryFilter && collect($categories ?? [])->isNotEmpty();
+                $hasAttributeFilters = collect($attributes ?? [])->isNotEmpty();
+            @endphp
+
+            @if(! $hasCategoryFilters && ! $hasAttributeFilters)
+                <p class="mb-3 text-muted small">No attribute found for filter.</p>
+            @endif
 
             <!-- Filter Actions -->
             <div class="filter-actions">
