@@ -36,7 +36,7 @@
         </table>
     </div>
     <div class="dropcart__buttons">
-        <a class="btn btn-outline-primary btn-sm" href="{{ route('reseller.checkout') }}" wire:navigate.hover>View Cart</a>
+        <a class="btn btn-outline-primary btn-sm d-none" href="{{ route('reseller.checkout') }}" wire:navigate.hover>View Cart</a>
         <a class="btn btn-primary" href="{{ auth('user')->check() ? route('reseller.checkout') : route('checkout') }}" wire:navigate.hover>Checkout</a>
     </div>
 </div><!-- .dropcart / end -->
