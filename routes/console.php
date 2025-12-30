@@ -37,3 +37,8 @@ Schedule::command('oninda:dispatch-orders')
     ->everyThirtyMinutes()
     ->withoutOverlapping()
     ->runInBackground();
+
+Schedule::command('sitemap:generate')
+    ->daily()
+    ->withoutOverlapping()
+    ->runInBackground();
