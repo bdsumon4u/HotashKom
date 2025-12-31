@@ -13,6 +13,25 @@
     .product-card-skeleton {
         animation: skeleton-pulse 1.5s ease-in-out infinite;
     }
+
+    .infinite-scroll-section .products-skeleton {
+        display: grid;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        gap: 1rem;
+        grid-template-columns: repeat(var(--skeleton-cols, 5), minmax(0, 1fr));
+    }
+
+    .infinite-scroll-section .products-skeleton > * {
+        min-width: 0;
+    }
+
+    @media (max-width: 767.98px) {
+        .infinite-scroll-section .products-skeleton {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
 </style>
 @endpush
 
@@ -51,9 +70,9 @@
                         data-user-verified="{{ auth('user')->check() && auth('user')->user()->is_verified ? 'true' : 'false' }}">
                         <!-- Products will be loaded here by Alpine.js -->
                         <!-- Skeleton placeholders to prevent layout shift -->
-                        <div class="products-skeleton" style="display: grid; grid-template-columns: repeat({{ optional($section->data)->cols ?? 5 }}, 1fr); gap: 1rem;">
+                        <div class="products-skeleton" style="--skeleton-cols: {{ optional($section->data)->cols ?? 5 }};">
                             @for($i = 0; $i < (optional($section->data)->cols ?? 5); $i++)
-                                <div class="product-card-skeleton" style="aspect-ratio: 1 / 1.2; background: #f0f0f0; border-radius: 8px; animation: pulse 1.5s ease-in-out infinite;">
+                                <div class="product-card-skeleton" style="aspect-ratio: 1 / 1.2; background: #f0f0f0; border-radius: 8px;">
                                     <div style="aspect-ratio: 1 / 1; background: #e0e0e0; border-radius: 8px 8px 0 0;"></div>
                                     <div style="padding: 0.75rem;">
                                         <div style="height: 16px; background: #e0e0e0; border-radius: 4px; margin-bottom: 0.5rem;"></div>
@@ -146,6 +165,15 @@
                 // Remove skeleton on first product load
                 const skeleton = container.querySelector('.products-skeleton');
                 if (skeleton && products.length > 0) {
+                    skeleton.remove();
+                }
+
+                if (
+                    skeleton &&
+                    products.length === 0 &&
+                    this.loadedProductIds.size === 0 &&
+                    this.hasMore === false
+                ) {
                     skeleton.remove();
                 }
 
