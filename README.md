@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}499}$$ 🔥 domains are live now
+These 🔥 $${\color{red}500}$$ 🔥 domains are live now
 
-_Last updated: **2025-12-31 09:41:05 Asia/Dhaka**_
+_Last updated: **2026-01-01 09:54:24 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -598,3 +598,4 @@ _Last updated: **2025-12-31 09:41:05 Asia/Dhaka**_
 | 497 | [proyzonmart.com](http://proyzonmart.com) |
 | 498 | [arishashopbd.com](http://arishashopbd.com) |
 | 499 | [samiyasmartshop.com](http://samiyasmartshop.com) |
+| 500 | [sellzone24.com](http://sellzone24.com) |
