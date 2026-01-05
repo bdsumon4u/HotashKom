@@ -18,6 +18,21 @@
         margin-left: 0;
     }
     @endif
+
+    .block-slideshow__slide-image--mobile {
+        display: none;
+    }
+
+    @media (max-width: 767px) {
+        .block-slideshow__slide-image--desktop {
+            display: none;
+        }
+
+        .block-slideshow__slide-image--mobile {
+            display: block;
+        }
+    }
+
     .block-slideshow__body .owl-carousel .owl-nav {
         /* position: absolute; */
         height: 100%;
