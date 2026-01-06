@@ -1,12 +1,14 @@
 // Storefront components: scroll handlers, add to cart, pagination, Alpine components
 runWhenJQueryReady(function($) {
-    $(window)
-        .off('dataLayer.storefront')
-        .on('dataLayer.storefront', function(ev) {
+    // Attach dataLayer event listener only once globally
+    if (!window.__dataLayerListenerAttached) {
+        $(window).on('dataLayer.storefront', function(ev) {
             for (let item of ev.detail) {
                 window.dataLayer.push(item);
             }
         });
+        window.__dataLayerListenerAttached = true;
+    }
 
     function onScroll() {
         const scrollTop = $(window).scrollTop();
