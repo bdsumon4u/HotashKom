@@ -15,17 +15,13 @@
                                 <div class="elementor-element elementor-element-77b2b10 elementor-widget elementor-widget-heading"
                                     data-id="77b2b10" data-element_type="widget" data-widget_type="heading.default">
                                     <div class="elementor-widget-container">
-                                        <h2 class="elementor-heading-title elementor-size-default">Rice Skin Beauty
-                                            Serum 15ML</h2>
+                                        <h2 class="elementor-heading-title elementor-size-default">{{ $title }}</h2>
                                     </div>
                                 </div>
                                 <div class="elementor-element elementor-element-5bb578b elementor-widget elementor-widget-text-editor"
                                     data-id="5bb578b" data-element_type="widget" data-widget_type="text-editor.default">
                                     <div class="elementor-widget-container">
-                                        <p>ব্রনের কারনে ত্বকে গর্তের মতো হয়, আর একে pores বলে। আর এই pores দূর করতে
-                                            সবচেয়ে বেস্ট হলো<span style="color: #ff0000;">&nbsp;Rice Serum</span>. এটা
-                                            শুধু pores remove করে না, স্কিনটাইট ও গ্লোয়িং করে Damage Skin Repair করে।
-                                        </p>
+                                        {!! $content !!}
                                     </div>
                                 </div>
                                 <div class="elementor-element elementor-element-ae527d0 elementor-mobile-align-justify elementor-widget elementor-widget-button"
