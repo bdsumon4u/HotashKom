@@ -46,7 +46,7 @@ class MetaPixel
     {
         $this->enabled = config('meta-pixel.enabled');
         $this->advancedMatchingEnabled = config('meta-pixel.advanced_matching_enabled');
-        $this->pixelId = config('meta-pixel.pixel_id');
+        $this->pixelId = setting('pixel_ids'); // config('meta-pixel.pixel_id');
         $this->token = config('meta-pixel.token');
         $this->sessionKey = config('meta-pixel.session_key');
         $this->testEventCode = config('meta-pixel.test_event_code');
@@ -78,7 +78,7 @@ class MetaPixel
 
     public function isEnabled(): bool
     {
-        return $this->enabled;
+        return $this->enabled && !empty($this->pixelId);
     }
 
     public function isAdvancedMatchingEnabled(): bool

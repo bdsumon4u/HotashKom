@@ -24,7 +24,7 @@
             fbq('init', '{{ $metaPixel->pixelId() }}');
         @endif
     @else
-        @foreach(explode(' ', setting('pixel_ids')) as $id)
+        @foreach(explode(' ', $metaPixel->pixelId()) as $id)
             @if($id)
                 fbq('init', '{{ $id }}');
             @endif

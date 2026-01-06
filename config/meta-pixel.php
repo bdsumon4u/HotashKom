@@ -6,7 +6,7 @@ return [
     /*
      * The Meta pixel id, should be a code that looks something like "1202417153106158".
      */
-    'pixel_id' => env('META_PIXEL_ID', '-'),
+    'pixel_id' => env('META_PIXEL_ID', ''),
 
     /*
      * The key under which data is saved to the session with flash.
