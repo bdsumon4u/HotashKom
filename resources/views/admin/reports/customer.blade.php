@@ -46,11 +46,11 @@
 @endpush
 
 @section('content')
-<div class="row mb-5">
-    <div class="col-md-8 mx-auto">
+<div class="mb-5 row">
+    <div class="mx-auto col-md-11">
         <div class="reports-table">
-            <div class="card rounded-0 shadow-sm">
-                <div class="card-header p-3">
+            <div class="shadow-sm card rounded-0">
+                <div class="p-3 card-header">
                     <form action="">
                         <div class="row">
                             {{-- <div class="col-auto pr-1">
@@ -70,13 +70,13 @@
                                     <option value="order_count" @if(request('top_by') == 'order_count') selected @endif>Top by Order-Count</option>
                                 </select>
                             </div>
-                            <div class="col pl-1">
+                            <div class="pl-1 col">
                                 <button class="btn btn-primary" type="submit">Filter</button>
                             </div>
                         </div>
                     </form>
                 </div>
-                <div class="card-body p-3">
+                <div class="p-3 card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
                             <thead>

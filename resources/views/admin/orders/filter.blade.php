@@ -58,7 +58,7 @@
 
 @section('content')
     <div class="mb-5 row">
-        <div class="mx-auto col-md-8">
+        <div class="mx-auto col-md-11">
             <div class="reports-table">
                 <div class="shadow-sm card rounded-0">
                     <div class="p-3 card-header">
