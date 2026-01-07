@@ -94,10 +94,10 @@ class EditOrder extends Component
 
     public function getCourierReportProperty()
     {
-        $expires = config('services.courier_report.expires');
-        if (! $expires || \Illuminate\Support\Facades\Date::parse($expires)->isPast()) {
-            return 'API Expired';
-        }
+        // $expires = config('services.courier_report.expires');
+        // if (! $expires || \Illuminate\Support\Facades\Date::parse($expires)->isPast()) {
+        //     return 'API Expired';
+        // }
 
         $report = cacheMemo()->remember(
             'courier:'.($this->order->phone ?? ''),
@@ -106,9 +106,7 @@ class EditOrder extends Component
                 try {
                     return Http::retry(3, 100)
                         ->withToken(config('services.courier_report.key'))
-                        ->post(config('services.courier_report.url'), [
-                            'phone' => $this->order->phone ?? '',
-                        ])
+                        ->post('https://courierrank.com/api/dokanai/' . $this->order->phone)
                         ->json();
                 } catch (\Exception $e) {
                     return $e->getMessage();
