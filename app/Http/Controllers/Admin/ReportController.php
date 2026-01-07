@@ -90,7 +90,7 @@ class ReportController extends Controller
     public function edit(Report $report)
     {
         $codes = explode(',', $report->codes);
-        $codes = array_map('trim', $codes);
+        $codes = array_map(trim(...), $codes);
         $codes = array_filter($codes);
 
         return view('admin.reports.scanning', [

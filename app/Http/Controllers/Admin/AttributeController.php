@@ -45,7 +45,7 @@ class AttributeController extends Controller
             'name' => ['required'],
         ]));
 
-        return redirect()->action([static::class, 'index']);
+        return redirect()->action(static::index(...));
     }
 
     /**
@@ -76,7 +76,7 @@ class AttributeController extends Controller
             'name' => ['required'],
         ]));
 
-        return redirect()->action([static::class, 'index']);
+        return redirect()->action(static::index(...));
     }
 
     /**

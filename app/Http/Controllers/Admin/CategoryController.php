@@ -88,7 +88,7 @@ class CategoryController extends Controller
 
         // Extract SEO data before creating
         $seoData = $request->input('seo', []);
-        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+        $seoData = array_filter($seoData, fn ($value): bool => ! empty($value));
 
         $category = Category::create($data);
 
@@ -180,7 +180,7 @@ class CategoryController extends Controller
 
         // Extract SEO data before updating
         $seoData = $request->input('seo', []);
-        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+        $seoData = array_filter($seoData, fn ($value): bool => ! empty($value));
 
         $category->update($data);
 

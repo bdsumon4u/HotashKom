@@ -108,7 +108,7 @@ class Product extends Model
         }
 
         // Clear category-specific filter data for all categories this product belongs to
-        $product->categories->each(function ($category) {
+        $product->categories->each(function ($category): void {
             cacheMemo()->forget('product_filter_data:category:'.$category->id);
         });
 
@@ -119,7 +119,7 @@ class Product extends Model
                 cacheMemo()->forget('related_products:'.$parent->slug);
                 cacheInvalidateNamespace('related_products');
                 // Also clear category-specific caches for parent product's categories
-                $parent->categories->each(function ($category) {
+                $parent->categories->each(function ($category): void {
                     cacheMemo()->forget('product_filter_data:category:'.$category->id);
                 });
             }

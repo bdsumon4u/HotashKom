@@ -78,7 +78,7 @@ class MetaPixel
 
     public function isEnabled(): bool
     {
-        return $this->enabled && !empty($this->pixelId);
+        return $this->enabled && ! empty($this->pixelId);
     }
 
     public function isAdvancedMatchingEnabled(): bool

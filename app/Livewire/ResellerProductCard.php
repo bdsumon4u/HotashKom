@@ -34,7 +34,7 @@ class ResellerProductCard extends Component
 
     public function mount(): void
     {
-        $this->facebookService ??= app(FacebookPixelService::class);
+        $this->facebookService ??= resolve(FacebookPixelService::class);
         $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         $this->maxQuantity = $this->product->should_track ? min($this->product->stock_count, $maxPerProduct) : $maxPerProduct;
         $this->retailPrice = $this->product->retailPrice();

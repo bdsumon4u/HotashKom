@@ -67,13 +67,11 @@ class ApiController extends Controller
 
     public function sections(Request $request)
     {
-        return cacheRememberNamespaced('api_sections', 'sections', now()->addHours(6), function () {
-            return sections()->transform(fn ($section): array => array_merge($section->toArray(), [
-                'categories' => $section->categories->map(fn ($category): array => array_merge($category->toArray(), [
-                    'sectionId' => $section->id,
-                ]))->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => $section->type == 'pure-grid' ? 'View All' : 'All']),
-            ]));
-        });
+        return cacheRememberNamespaced('api_sections', 'sections', now()->addHours(6), fn () => sections()->transform(fn ($section): array => array_merge($section->toArray(), [
+            'categories' => $section->categories->map(fn ($category): array => array_merge($category->toArray(), [
+                'sectionId' => $section->id,
+            ]))->prepend(['id' => 0, 'sectionId' => $section->id, 'name' => $section->type == 'pure-grid' ? 'View All' : 'All']),
+        ])));
     }
 
     public function sectionProducts(Request $request, HomeSection $section)
@@ -159,9 +157,7 @@ class ApiController extends Controller
             $averageRating = 0;
 
             if ($totalReviews > 0) {
-                $overallRatings = $approvedReviews->flatMap(function ($review) {
-                    return $review->ratings->where('key', 'overall');
-                });
+                $overallRatings = $approvedReviews->flatMap(fn ($review) => $review->ratings->where('key', 'overall'));
                 $averageRating = $overallRatings->count() > 0
                     ? $overallRatings->avg('value')
                     : 0;
@@ -281,9 +277,7 @@ class ApiController extends Controller
             $product->total_reviews = $approvedReviews->count();
 
             if ($product->total_reviews > 0) {
-                $overallRatings = $approvedReviews->flatMap(function ($review) {
-                    return $review->ratings->where('key', 'overall');
-                });
+                $overallRatings = $approvedReviews->flatMap(fn ($review) => $review->ratings->where('key', 'overall'));
                 $product->average_rating = $overallRatings->count() > 0
                     ? $overallRatings->avg('value')
                     : 0;
@@ -349,9 +343,7 @@ class ApiController extends Controller
                     $averageRating = 0;
 
                     if ($totalReviews > 0) {
-                        $overallRatings = $approvedReviews->flatMap(function ($review) {
-                            return $review->ratings->where('key', 'overall');
-                        });
+                        $overallRatings = $approvedReviews->flatMap(fn ($review) => $review->ratings->where('key', 'overall'));
                         $averageRating = $overallRatings->count() > 0
                             ? $overallRatings->avg('value')
                             : 0;
@@ -389,22 +381,18 @@ class ApiController extends Controller
             return cacheRememberNamespaced('api_categories', 'nested:'.$count, now()->addHours(12), fn () => Category::nested($count));
         }
 
-        return cacheRememberNamespaced('api_categories', 'all', now()->addHours(12), function () {
-            return Category::all()
-                ->transform(fn ($category): array => $category->toArray() + [
-                    'type' => 'shop',
-                ])
-                ->toJson();
-        });
+        return cacheRememberNamespaced('api_categories', 'all', now()->addHours(12), fn () => Category::all()
+            ->transform(fn ($category): array => $category->toArray() + [
+                'type' => 'shop',
+            ])
+            ->toJson());
     }
 
     public function category($slug)
     {
         $decodedSlug = rawurldecode((string) $slug);
 
-        return cacheRememberNamespaced('api_category', 'slug:'.$decodedSlug, now()->addHours(12), function () use ($decodedSlug) {
-            return Category::where('slug', $decodedSlug)->firstOrFail()->toArray();
-        });
+        return cacheRememberNamespaced('api_category', 'slug:'.$decodedSlug, now()->addHours(12), fn () => Category::where('slug', $decodedSlug)->firstOrFail()->toArray());
     }
 
     public function order(Order $order)

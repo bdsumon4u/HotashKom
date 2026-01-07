@@ -41,7 +41,7 @@ class YouTubeHeader extends PageBlock
         }
 
         // Escape special characters in the words for regex
-        $escapedWords = array_map('trim', array_map('preg_quote', explode('|', $highlights)));
+        $escapedWords = array_map(trim(...), array_map(preg_quote(...), explode('|', $highlights)));
 
         // Create a regex pattern to match the words
         $pattern = '/('.implode('|', $escapedWords).')/i';

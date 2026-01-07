@@ -72,7 +72,7 @@ class HomeSectionController extends Controller
 
         // Extract SEO data before creating
         $seoData = $request->input('seo', []);
-        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+        $seoData = array_filter($seoData, fn ($value): bool => ! empty($value));
 
         $homeSection = HomeSection::create($data);
 
@@ -133,7 +133,7 @@ class HomeSectionController extends Controller
 
         // Extract SEO data before updating
         $seoData = $request->input('seo', []);
-        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+        $seoData = array_filter($seoData, fn ($value): bool => ! empty($value));
 
         $homeSection->update($data);
 

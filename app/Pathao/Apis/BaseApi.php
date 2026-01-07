@@ -76,7 +76,7 @@ class BaseApi
     private function authenticate(): void
     {
         try {
-            $Pathao = optional(app(SettingRepository::class)->first('Pathao')->value);
+            $Pathao = optional(resolve(SettingRepository::class)->first('Pathao')->value);
             $response = $this->send('POST', 'aladdin/api/v1/issue-token', [
                 'client_id' => $Pathao->client_id,
                 'client_secret' => $Pathao->client_secret,

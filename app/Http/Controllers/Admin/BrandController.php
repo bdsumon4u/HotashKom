@@ -58,7 +58,7 @@ class BrandController extends Controller
 
         // Extract SEO data before creating
         $seoData = $request->input('seo', []);
-        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+        $seoData = array_filter($seoData, fn ($value): bool => ! empty($value));
 
         $brand = Brand::create($data);
 
@@ -94,7 +94,7 @@ class BrandController extends Controller
 
         // Extract SEO data before updating
         $seoData = $request->input('seo', []);
-        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+        $seoData = array_filter($seoData, fn ($value): bool => ! empty($value));
 
         $brand->update($data);
 
@@ -125,7 +125,7 @@ class BrandController extends Controller
         $brand->delete();
 
         return redirect()
-            ->action([static::class, 'index'])
+            ->action(static::index(...))
             ->with('success', 'Brand Has Been Deleted.');
     }
 }

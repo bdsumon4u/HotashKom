@@ -78,7 +78,7 @@ trait HasProductFilters
                 request()->merge(['shuffle' => $seed]);
             }
 
-            $seedInt = abs((int) crc32((string) $seed));
+            $seedInt = abs(crc32((string) $seed));
             $driver = DB::connection()->getDriverName();
 
             if ($driver === 'mysql') {
@@ -103,7 +103,7 @@ trait HasProductFilters
      */
     protected function getProductFilterData(?Category $category = null): array
     {
-        $cacheKey = 'filters'.($category ? ':category:'.$category->id : '');
+        $cacheKey = 'filters'.($category instanceof \App\Models\Category ? ':category:'.$category->id : '');
 
         // Use flexible caching: 2 hours fresh, 4 hours stale (total 6 hours)
         // Fresh: Data is served immediately from cache
@@ -142,17 +142,13 @@ trait HasProductFilters
                     $hasProducts = isset($categoryProductCounts[$category->id]);
 
                     // Check if any child has products
-                    $hasChildProducts = $category->childrens->some(function ($child) use ($categoryProductCounts) {
-                        return isset($categoryProductCounts[$child->id]);
-                    });
+                    $hasChildProducts = $category->childrens->some(fn ($child): bool => isset($categoryProductCounts[$child->id]));
 
                     return $hasProducts || $hasChildProducts;
                 })
                 ->map(function ($category) use ($categoryProductCounts) {
                     // Filter children and attach product counts
-                    $category->setRelation('childrens', $category->childrens->filter(function ($child) use ($categoryProductCounts) {
-                        return isset($categoryProductCounts[$child->id]);
-                    })->map(function ($child) use ($categoryProductCounts) {
+                    $category->setRelation('childrens', $category->childrens->filter(fn ($child): bool => isset($categoryProductCounts[$child->id]))->map(function ($child) use ($categoryProductCounts) {
                         // Attach pre-calculated count
                         $child->product_count = $categoryProductCounts[$child->id] ?? 0;
 
@@ -172,7 +168,7 @@ trait HasProductFilters
 
             // If category is provided, get product IDs for that category first
             $categoryProductIds = $activeProductIds;
-            if ($category) {
+            if ($category instanceof \App\Models\Category) {
                 $categoryProductIds = DB::table('category_product')
                     ->where('category_id', $category->id)
                     ->whereIn('product_id', $activeProductIds)
@@ -198,13 +194,13 @@ trait HasProductFilters
                         ->where(function ($q) use ($categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
                             // Options linked directly to parent products
                             $q->where(function ($parentQ) use ($categoryProductIds, $activeProductIds, $category): void {
-                                $parentQ->whereIn('products.id', $category ? $categoryProductIds : $activeProductIds)
+                                $parentQ->whereIn('products.id', $category instanceof \App\Models\Category ? $categoryProductIds : $activeProductIds)
                                     ->whereNull('products.parent_id');
                             })
                                 // OR options linked to variations
                                 ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $categoryProductIds, $category): void {
                                     $varQ->whereIn('products.id', $variationProductIds)
-                                        ->whereIn('products.parent_id', $category ? $categoryProductIds : $activeProductIds);
+                                        ->whereIn('products.parent_id', $category instanceof \App\Models\Category ? $categoryProductIds : $activeProductIds);
                                 });
                         });
                 });
@@ -214,22 +210,22 @@ trait HasProductFilters
                         $prodQuery->whereIn('products.id', $allProductIds)
                             ->where(function ($q) use ($categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
                                 $q->where(function ($parentQ) use ($categoryProductIds, $activeProductIds, $category): void {
-                                    $parentQ->whereIn('products.id', $category ? $categoryProductIds : $activeProductIds)
+                                    $parentQ->whereIn('products.id', $category instanceof \App\Models\Category ? $categoryProductIds : $activeProductIds)
                                         ->whereNull('products.parent_id');
                                 })
                                     ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $categoryProductIds, $category): void {
                                         $varQ->whereIn('products.id', $variationProductIds)
-                                            ->whereIn('products.parent_id', $category ? $categoryProductIds : $activeProductIds);
+                                            ->whereIn('products.parent_id', $category instanceof \App\Models\Category ? $categoryProductIds : $activeProductIds);
                                     });
                             });
                     });
                 }]);
 
             $attributes = $attributesQuery->get()
-                ->filter(function ($attribute) {
+                ->filter(
                     // Only include attributes that have at least one option with products
-                    return $attribute->options->isNotEmpty();
-                })
+
+                    fn ($attribute) => $attribute->options->isNotEmpty())
                 ->values();
 
             return [

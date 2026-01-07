@@ -14,27 +14,27 @@ return new class extends Migration
         // Products table indexes
         Schema::table('products', function (Blueprint $table): void {
             // Composite index for common query: is_active + parent_id
-            if (!$this->indexExists('products', 'products_is_active_parent_id_index')) {
+            if (! $this->indexExists('products', 'products_is_active_parent_id_index')) {
                 $table->index(['is_active', 'parent_id'], 'products_is_active_parent_id_index');
             }
 
             // Index for parent_id lookups (variations)
-            if (!$this->indexExists('products', 'products_parent_id_index')) {
+            if (! $this->indexExists('products', 'products_parent_id_index')) {
                 $table->index('parent_id', 'products_parent_id_index');
             }
 
             // Index for sorting queries
-            if (!$this->indexExists('products', 'products_updated_at_index')) {
+            if (! $this->indexExists('products', 'products_updated_at_index')) {
                 $table->index('updated_at', 'products_updated_at_index');
             }
 
             // Index for selling_price sorting
-            if (!$this->indexExists('products', 'products_selling_price_index')) {
+            if (! $this->indexExists('products', 'products_selling_price_index')) {
                 $table->index('selling_price', 'products_selling_price_index');
             }
 
             // Composite index for hot_sale and new_arrival
-            if (!$this->indexExists('products', 'products_featured_index')) {
+            if (! $this->indexExists('products', 'products_featured_index')) {
                 $table->index(['hot_sale', 'new_arrival'], 'products_featured_index');
             }
         });
@@ -42,12 +42,12 @@ return new class extends Migration
         // Category_product pivot table indexes
         Schema::table('category_product', function (Blueprint $table): void {
             // Index on category_id for filtering
-            if (!$this->indexExists('category_product', 'category_product_category_id_index')) {
+            if (! $this->indexExists('category_product', 'category_product_category_id_index')) {
                 $table->index('category_id', 'category_product_category_id_index');
             }
 
             // Index on product_id for reverse lookups
-            if (!$this->indexExists('category_product', 'category_product_product_id_index')) {
+            if (! $this->indexExists('category_product', 'category_product_product_id_index')) {
                 $table->index('product_id', 'category_product_product_id_index');
             }
         });
@@ -56,12 +56,12 @@ return new class extends Migration
         if (Schema::hasTable('option_product')) {
             Schema::table('option_product', function (Blueprint $table): void {
                 // Index on option_id for filtering
-                if (!$this->indexExists('option_product', 'option_product_option_id_index')) {
+                if (! $this->indexExists('option_product', 'option_product_option_id_index')) {
                     $table->index('option_id', 'option_product_option_id_index');
                 }
 
                 // Index on product_id for reverse lookups
-                if (!$this->indexExists('option_product', 'option_product_product_id_index')) {
+                if (! $this->indexExists('option_product', 'option_product_product_id_index')) {
                     $table->index('product_id', 'option_product_product_id_index');
                 }
             });
@@ -70,12 +70,12 @@ return new class extends Migration
         // Categories table indexes
         Schema::table('categories', function (Blueprint $table): void {
             // Index on parent_id for nested queries
-            if (!$this->indexExists('categories', 'categories_parent_id_index')) {
+            if (! $this->indexExists('categories', 'categories_parent_id_index')) {
                 $table->index('parent_id', 'categories_parent_id_index');
             }
 
             // Index on slug for lookups
-            if (!$this->indexExists('categories', 'categories_slug_index')) {
+            if (! $this->indexExists('categories', 'categories_slug_index')) {
                 $table->index('slug', 'categories_slug_index');
             }
         });
@@ -84,7 +84,7 @@ return new class extends Migration
         if (Schema::hasTable('attributes')) {
             Schema::table('attributes', function (Blueprint $table): void {
                 // Index on name for lookups
-                if (!$this->indexExists('attributes', 'attributes_name_index')) {
+                if (! $this->indexExists('attributes', 'attributes_name_index')) {
                     $table->index('name', 'attributes_name_index');
                 }
             });
@@ -94,7 +94,7 @@ return new class extends Migration
         if (Schema::hasTable('options')) {
             Schema::table('options', function (Blueprint $table): void {
                 // Index on attribute_id for filtering
-                if (!$this->indexExists('options', 'options_attribute_id_index')) {
+                if (! $this->indexExists('options', 'options_attribute_id_index')) {
                     $table->index('attribute_id', 'options_attribute_id_index');
                 }
             });
@@ -154,8 +154,8 @@ return new class extends Migration
         $tableName = $connection->getTablePrefix().$table;
 
         $result = $connection->select(
-            "SELECT COUNT(*) as count FROM information_schema.statistics 
-             WHERE table_schema = ? AND table_name = ? AND index_name = ?",
+            'SELECT COUNT(*) as count FROM information_schema.statistics 
+             WHERE table_schema = ? AND table_name = ? AND index_name = ?',
             [$database, $tableName, $index]
         );
 

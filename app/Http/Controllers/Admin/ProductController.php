@@ -60,7 +60,7 @@ class ProductController extends Controller
         // Handle relationships and dispatch copy job
         $this->handleProductRelationships($product, $data);
 
-        return redirect()->action([static::class, 'edit'], $product)->with('success', 'Product Has Been Created.');
+        return redirect()->action(static::edit(...), $product)->with('success', 'Product Has Been Created.');
     }
 
     /**
@@ -129,7 +129,7 @@ class ProductController extends Controller
         event(new ProductUpdated($product, $data));
 
         return redirect()
-            ->action([static::class, 'index'])
+            ->action(static::index(...))
             ->with('success', 'Product Has Been Updated. <a href="'.route('products.show', $product).'" target="_blank">View the Product</a> or <a href="'.route('admin.products.edit', $product).'">Edit the Product</a> again.');
     }
 
@@ -145,7 +145,7 @@ class ProductController extends Controller
         $seoData = $request->input('seo', []);
 
         // Remove empty values
-        $seoData = array_filter($seoData, fn ($value) => ! empty($value));
+        $seoData = array_filter($seoData, fn ($value): bool => ! empty($value));
 
         if (! empty($seoData)) {
             $product->seo()->updateOrCreate([], $seoData);

@@ -112,7 +112,7 @@ class HomeSection extends Model
             }
         }
 
-        $result = $paginate
+        return $paginate
             ? $query->with([
                 'reviews' => function ($q): void {
                     $q->where('approved', true)->with('ratings');
@@ -123,8 +123,6 @@ class HomeSection extends Model
                     $q->where('approved', true)->with('ratings');
                 },
             ])->get();
-
-        return $result;
     }
 
     protected function casts(): array

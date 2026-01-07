@@ -229,7 +229,7 @@ class OrderController extends Controller
     {
         $request->validate(['order_id' => ['required']]);
         $order_ids = explode(',', $request->order_id);
-        $order_ids = array_map('trim', $order_ids);
+        $order_ids = array_map(trim(...), $order_ids);
         $order_ids = array_filter($order_ids);
 
         // Eager load user relationship
@@ -286,7 +286,7 @@ class OrderController extends Controller
     {
         $request->validate(['order_id' => ['required']]);
         $order_ids = explode(',', $request->order_id);
-        $order_ids = array_map('trim', $order_ids);
+        $order_ids = array_map(trim(...), $order_ids);
         $order_ids = array_filter($order_ids);
 
         $orders = Order::with('user')->whereIn('id', $order_ids)->get();
@@ -315,7 +315,7 @@ class OrderController extends Controller
     {
         $request->validate(['order_id' => ['required']]);
         $order_ids = explode(',', $request->order_id);
-        $order_ids = array_map('trim', $order_ids);
+        $order_ids = array_map(trim(...), $order_ids);
         $order_ids = array_filter($order_ids);
 
         $booked = 0;
@@ -448,7 +448,7 @@ class OrderController extends Controller
         $data = json_decode($response->getBody()->getContents(), true);
 
         foreach ($data['data'] ?? [] as $item) {
-            $invoiceId = (int) preg_replace('/\D/', '', $item['invoice']);
+            $invoiceId = (int) preg_replace('/\D/', '', (string) $item['invoice']);
             if (! $order = Order::find($invoiceId)) {
                 continue;
             }

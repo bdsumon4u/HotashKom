@@ -57,7 +57,7 @@ class ApiController extends Controller
         if (config('cache.response_cache.enabled', false)) {
             try {
                 Artisan::call('responsecache:clear');
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // Silently fail if Redis is not available
                 // This prevents errors when Redis is not configured
             }

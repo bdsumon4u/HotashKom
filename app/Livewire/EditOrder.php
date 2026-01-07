@@ -168,9 +168,7 @@ class EditOrder extends Component
                 $productModel = cacheMemo()->remember(
                     'product_with_options:'.$product['id'],
                     now()->addMinutes(2),
-                    function () use ($product) {
-                        return $this->productWithOptionsQuery()->find($product['id']);
-                    }
+                    fn () => $this->productWithOptionsQuery()->find($product['id'])
                 );
                 if ($productModel) {
                     // If it's a variation (has parent_id in database), get its options
@@ -182,9 +180,7 @@ class EditOrder extends Component
                         $parentProduct = cacheMemo()->remember(
                             'product_with_variations:'.$parentId,
                             now()->addMinutes(2),
-                            function () use ($parentId) {
-                                return Product::with('variations.options')->find($parentId);
-                            }
+                            fn () => Product::with('variations.options')->find($parentId)
                         );
                         if ($parentProduct && $parentProduct->variations->isNotEmpty()) {
                             // Try to find the variation that matches this product ID
@@ -251,9 +247,7 @@ class EditOrder extends Component
         $parentProduct = cacheMemo()->remember(
             'product_with_variations:'.$parentId,
             now()->addMinutes(2),
-            function () use ($parentId) {
-                return Product::with('variations.options')->find($parentId);
-            }
+            fn () => Product::with('variations.options')->find($parentId)
         );
         if (! $parentProduct) {
             return;
@@ -266,12 +260,10 @@ class EditOrder extends Component
         $this->options[$parentId][$attributeId] = (int) $optionId;
 
         // Find the matching variation
-        $variation = $parentProduct->variations->first(function ($item) use ($parentId) {
-            return $item->options
-                ->pluck('id')
-                ->diff($this->options[$parentId] ?? [])
-                ->isEmpty();
-        });
+        $variation = $parentProduct->variations->first(fn ($item) => $item->options
+            ->pluck('id')
+            ->diff($this->options[$parentId] ?? [])
+            ->isEmpty());
 
         // If no variation found, use parent product
         $product = $variation ?? $parentProduct;
@@ -456,13 +448,11 @@ class EditOrder extends Component
         $this->activities = cacheMemo()->remember(
             'order_activities:'.$this->order->id,
             now()->addMinutes(2),
-            function () {
-                return $this->order
-                    ->activities()
-                    ->with('causer')
-                    ->latest()
-                    ->get();
-            }
+            fn () => $this->order
+                ->activities()
+                ->with('causer')
+                ->latest()
+                ->get()
         );
 
         $this->activitiesLoaded = true;
@@ -500,9 +490,7 @@ class EditOrder extends Component
                 $parent = cacheMemo()->remember(
                     'product_with_variations:'.$parentId,
                     now()->addMinutes(2),
-                    function () use ($parentId) {
-                        return $this->productWithVariationsQuery()->find($parentId);
-                    }
+                    fn () => $this->productWithVariationsQuery()->find($parentId)
                 );
                 if ($parent) {
                     $selectedProductParents[$parentId] = $parent;
