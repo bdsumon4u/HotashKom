@@ -125,7 +125,7 @@ class BrandController extends Controller
         $brand->delete();
 
         return redirect()
-            ->action(static::index(...))
+            ->action([static::class, 'index'])
             ->with('success', 'Brand Has Been Deleted.');
     }
 }

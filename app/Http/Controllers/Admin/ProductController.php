@@ -60,7 +60,7 @@ class ProductController extends Controller
         // Handle relationships and dispatch copy job
         $this->handleProductRelationships($product, $data);
 
-        return redirect()->action(static::edit(...), $product)->with('success', 'Product Has Been Created.');
+        return redirect()->action([static::class, 'edit'], $product)->with('success', 'Product Has Been Created.');
     }
 
     /**
@@ -129,7 +129,7 @@ class ProductController extends Controller
         event(new ProductUpdated($product, $data));
 
         return redirect()
-            ->action(static::index(...))
+            ->action([static::class, 'index'])
             ->with('success', 'Product Has Been Updated. <a href="'.route('products.show', $product).'" target="_blank">View the Product</a> or <a href="'.route('admin.products.edit', $product).'">Edit the Product</a> again.');
     }
 
