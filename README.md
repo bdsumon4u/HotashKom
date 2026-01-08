@@ -93,9 +93,9 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}503}$$ 🔥 domains are live now
+These 🔥 $${\color{red}507}$$ 🔥 domains are live now
 
-_Last updated: **2026-01-06 09:42:53 Asia/Dhaka**_
+_Last updated: **2026-01-08 09:43:15 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
@@ -597,8 +597,12 @@ _Last updated: **2026-01-06 09:42:53 Asia/Dhaka**_
 | 496 | [ekingdombd.com](http://ekingdombd.com) |
 | 497 | [cozyyards.com](http://cozyyards.com) |
 | 498 | [alefaenterprise.com](http://alefaenterprise.com) |
-| 499 | [easybuyingbd.com](http://easybuyingbd.com) |
-| 500 | [shohozbajar.com](http://shohozbajar.com) |
-| 501 | [needvally.com](http://needvally.com) |
-| 502 | [redmoon24.com](http://redmoon24.com) |
-| 503 | [bondhonbazar04.com](http://bondhonbazar04.com) |
+| 499 | [smarttechnologiespro.com](http://smarttechnologiespro.com) |
+| 500 | [easybuyingbd.com](http://easybuyingbd.com) |
+| 501 | [shohozbajar.com](http://shohozbajar.com) |
+| 502 | [needvally.com](http://needvally.com) |
+| 503 | [redmoon24.com](http://redmoon24.com) |
+| 504 | [bondhonbazar04.com](http://bondhonbazar04.com) |
+| 505 | [touchnpick.com](http://touchnpick.com) |
+| 506 | [marjanmartbd.com](http://marjanmartbd.com) |
+| 507 | [caregivershealthcareinstituteltd.com](http://caregivershealthcareinstituteltd.com) |
