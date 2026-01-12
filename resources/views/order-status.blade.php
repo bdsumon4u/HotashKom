@@ -13,8 +13,7 @@
                                 <div class="d-flex justify-content-center">
                                     <img width="100" height="100" src="{{ asset('tik-mark.png') }}" alt="Tick Mark">
                                 </div>
-                                <h4 class="text-center text-success">আপনার অর্ডারটি সাবমিট করা হয়েছে।</h4>
-                                <h4 class="text-center text-success">ধন্যবাদ।</h4>
+                                <h4 class="text-center text-success">আপনার অর্ডারটি সাবমিট করা হয়েছে; ধন্যবাদ।</h4>
                             </div>
                         @endif
                         <div class="order-header">
