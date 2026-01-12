@@ -8,7 +8,7 @@
             <div class="row justify-content-center">
                 <div class="col-md-8">
                     <div class="card">
-                        @if (session()->has('completed'))
+                        @if (request()->is('thank-you'))
                             <div class="card-header">
                                 <div class="d-flex justify-content-center">
                                     <img width="100" height="100" src="{{ asset('tik-mark.png') }}" alt="Tick Mark">
