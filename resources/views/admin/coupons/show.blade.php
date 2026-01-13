@@ -39,6 +39,16 @@
                                         <td>{{ $coupon->name }}</td>
                                     </tr>
                                     <tr>
+                                        <th>Coupon Type:</th>
+                                        <td>
+                                            @if($coupon->coupon_type === 'subscription')
+                                                Subscription
+                                            @else
+                                                Purchase
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <th>Description:</th>
                                         <td>{{ $coupon->description ?: 'No description' }}</td>
                                     </tr>

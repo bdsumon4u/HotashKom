@@ -219,9 +219,15 @@
                                         <td><strong>Discount:</strong></td>
                                         <td>{!! theMoney($order->data['discount'] ?? 0) !!}</td>
                                     </tr>
+                                    @if(($couponDiscount = (float) ($order->data['coupon_discount'] ?? 0)) > 0)
+                                    <tr>
+                                        <td><strong>Coupon Discount:</strong></td>
+                                        <td class="text-success">{!! theMoney($couponDiscount) !!}</td>
+                                    </tr>
+                                    @endif
                                     <tr>
                                         <td><strong>Total:</strong></td>
-                                        <td><strong>{!! theMoney((float) ($order->data['subtotal'] ?? 0) + (float) ($order->data['shipping_cost'] ?? 0) + (isOninda() && config('app.resell') ? (float) ($order->data['packaging_charge'] ?? 25) : 0) - (float) ($order->data['discount'] ?? 0)) !!}</strong></td>
+                                        <td><strong>{!! theMoney((float) ($order->data['subtotal'] ?? 0) + (float) ($order->data['shipping_cost'] ?? 0) + (isOninda() && config('app.resell') ? (float) ($order->data['packaging_charge'] ?? 25) : 0) - (float) ($order->data['discount'] ?? 0) - (float) $couponDiscount) !!}</strong></td>
                                     </tr>
                                 </table>
                             </div>

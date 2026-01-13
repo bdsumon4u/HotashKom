@@ -332,6 +332,15 @@
                                         @endif
                                     </tr>
                                     @endif
+                                    @if(($couponDiscount = (float) ($data['coupon_discount'] ?? 0)) > 0)
+                                    <tr>
+                                        <th>Coupon Discount</th>
+                                        <td class="text-success">{!! theMoney($couponDiscount) !!}</td>
+                                        @if(isOninda() && config('app.resell'))
+                                        <td>{!! theMoney(0) !!}</td>
+                                        @endif
+                                    </tr>
+                                    @endif
                                     @if(isOninda() && config('app.resell'))
                                     <tr>
                                         <th>Packaging Charge</th>
@@ -353,12 +362,12 @@
                                         <th>Grand Total</th>
                                         @if(isOninda() && config('app.resell'))
                                         <td>{!! theMoney((float) ($data['subtotal'] ?? 0) + (float) ($data['shipping_cost'] ?? 0) +
-                                            (float) ($data['packaging_charge'] ?? 25) - (float) ($data['discount'] ?? 0)) !!}</td>
+                                            (float) ($data['packaging_charge'] ?? 25) - (float) ($data['discount'] ?? 0) - (float) ($couponDiscount ?? 0)) !!}</td>
                                         <td>{!! theMoney((float) $retail + (float) ($data['retail_delivery_fee'] ?? 0) - (float) ($data['advanced'] ?? 0) -
                                             (float) ($data['retail_discount'] ?? 0)) !!}</td>
                                         @else
                                         <td>{!! theMoney((float) ($data['subtotal'] ?? 0) + (float) ($data['shipping_cost'] ?? 0) - (float) ($data['discount']
-                                            ?? 0)) !!}</td>
+                                            ?? 0) - (float) ($couponDiscount ?? 0)) !!}</td>
                                         @endif
                                     </tr>
                                 </tfoot>

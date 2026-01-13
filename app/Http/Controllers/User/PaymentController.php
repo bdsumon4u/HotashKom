@@ -23,7 +23,7 @@ class PaymentController extends Controller
         // Check if coupon is applied
         if ($request->has('coupon_code')) {
             $coupon = Coupon::findByCode($request->coupon_code);
-            if ($coupon && $coupon->isValid()) {
+            if ($coupon && $coupon->isValid() && $coupon->coupon_type === 'subscription') {
                 $appliedCoupon = $coupon;
                 $discountAmount = $coupon->calculateDiscount($verificationFee);
                 $finalAmount = $verificationFee - $discountAmount;
@@ -50,7 +50,7 @@ class PaymentController extends Controller
 
         $coupon = Coupon::findByCode($request->coupon_code);
 
-        if (! $coupon instanceof \App\Models\Coupon) {
+        if (! $coupon instanceof \App\Models\Coupon || $coupon->coupon_type !== 'subscription') {
             return to_route('user.payment.verification')
                 ->with('error', 'Invalid coupon code.');
         }
@@ -82,7 +82,7 @@ class PaymentController extends Controller
         // Apply coupon if provided
         if ($request->coupon_code) {
             $coupon = Coupon::findByCode($request->coupon_code);
-            if ($coupon && $coupon->isValid()) {
+            if ($coupon && $coupon->isValid() && $coupon->coupon_type === 'subscription') {
                 $appliedCoupon = $coupon;
                 $discountAmount = $coupon->calculateDiscount($verificationFee);
                 $finalAmount = $verificationFee - $discountAmount;

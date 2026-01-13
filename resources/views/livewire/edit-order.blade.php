@@ -424,6 +424,12 @@
                                     wire:model.live.debounce.500ms="discount" class="form-control" @disabled(isReseller() && !is_null($order->source_id))>
                             </td>
                         </tr>
+                        @if(($couponDiscount = (float) ($order->data['coupon_discount'] ?? 0)) > 0)
+                        <tr>
+                            <th style="font-size:14px;white-space:nowrap;vertical-align:middle;">Coupon Discount</th>
+                            <td class="text-success">{!! theMoney($couponDiscount) !!}</td>
+                        </tr>
+                        @endif
                         @if(isOninda() && config('app.resell'))
                         <tr>
                             <th style="font-size:14px;white-space:nowrap;vertical-align:middle;">Packaging Charge</th>
@@ -437,7 +443,7 @@
                         <tr>
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
-                                <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost + (float) ($order->data['packaging_charge'] ?? 25) - (float) $discount) !!}</strong> (buy)<br>
+                                <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost + (float) ($order->data['packaging_charge'] ?? 25) - (float) $discount - (float) ($couponDiscount ?? 0)) !!}</strong> (buy)<br>
                                 <strong>{!! theMoney((float) $retail + (float) ($order->data['retail_delivery_fee'] ?? $shipping_cost) - (float) $advanced - (float) ($order->data['retail_discount'] ?? 0)) !!}</strong> (sell)
                             </td>
                         </tr>
@@ -448,7 +454,7 @@
                                 @if(isOninda())
                                 <strong>{!! theMoney((float) $retail + (float) ($order->data['retail_delivery_fee'] ?? 0) - (float) $advanced - (float) ($order->data['discount'] ?? 0)) !!}</strong>
                                 @else
-                                <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost - (float) $discount - (float) $advanced) !!}</strong>
+                                <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost - (float) $discount - (float) $advanced - (float) ($couponDiscount ?? 0)) !!}</strong>
                                 @endif
                             </td>
                         </tr>

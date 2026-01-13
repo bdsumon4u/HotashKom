@@ -38,6 +38,7 @@
                                     <tr>
                                         <th>Code</th>
                                         <th>Name</th>
+                                        <th>Type</th>
                                         <th>Discount</th>
                                         <th>Usage</th>
                                         <th>Expires</th>
@@ -55,6 +56,13 @@
                                                 @endif
                                             </td>
                                             <td>{{ $coupon->name }}</td>
+                                            <td>
+                                                @if($coupon->coupon_type === 'subscription')
+                                                    <span class="badge badge-info">Subscription</span>
+                                                @else
+                                                    <span class="badge badge-primary">Purchase</span>
+                                                @endif
+                                            </td>
                                             <td>{{ $coupon->discount_text }}</td>
                                             <td>
                                                 {{ $coupon->used_count }}

@@ -78,6 +78,7 @@
                                     </tbody>
                                     <tbody class="card-table__body card-table__body--merge-rows">
                                         @php($data = $order->data)
+                                        @php($couponDiscount = (float) ($data['coupon_discount'] ?? 0))
                                         <tr>
                                             <th>Subtotal</th>
                                                                                             <td>{!! theMoney((float) ($data['subtotal'] ?? 0)) !!}</td>
@@ -94,12 +95,21 @@
                                                 @endif
                                             </tr>
                                         @endif
-                                                                                @if ($data['retail_discount'])
+                                        @if ($data['retail_discount'])
                                         <tr>
                                             <th>Discount</th>
                                             <td>{!! theMoney($data['discount'] ?? 0) !!}</td>
                                             @if(isOninda() && config('app.resell'))
                                                                                             <td>{!! theMoney((float) ($data['retail_discount'] ?? 0)) !!}</td>
+                                            @endif
+                                        </tr>
+                                        @endif
+                                        @if ($couponDiscount > 0)
+                                        <tr>
+                                            <th>Coupon Discount</th>
+                                            <td>- {!! theMoney($couponDiscount) !!}</td>
+                                            @if(isOninda() && config('app.resell'))
+                                            <td>{!! theMoney(0) !!}</td>
                                             @endif
                                         </tr>
                                         @endif
@@ -123,10 +133,10 @@
                                         <tr>
                                             <th>Grand Total</th>
                                             @if(isOninda() && config('app.resell'))
-                                            <td>{!! theMoney((float) ($data['subtotal'] ?? 0) + (float) ($data['shipping_cost'] ?? 0) + (float) ($data['packaging_charge'] ?? 25) - (float) ($data['discount'] ?? 0)) !!}</td>
+                                            <td>{!! theMoney((float) ($data['subtotal'] ?? 0) + (float) ($data['shipping_cost'] ?? 0) + (float) ($data['packaging_charge'] ?? 25) - $couponDiscount) !!}</td>
                                             <td>{!! theMoney((float) $retail + (float) ($data['retail_delivery_fee'] ?? 0) - (float) ($data['advanced'] ?? 0) - (float) ($data['retail_discount'] ?? 0)) !!}</td>
                                             @else
-                                            <td>{!! theMoney((float) ($data['subtotal'] ?? 0) + (float) ($data['shipping_cost'] ?? 0) - (float) ($data['discount'] ?? 0)) !!}</td>
+                                            <td>{!! theMoney((float) ($data['subtotal'] ?? 0) + (float) ($data['shipping_cost'] ?? 0) - $couponDiscount) !!}</td>
                                             @endif
                                         </tr>
                                     </tfoot>

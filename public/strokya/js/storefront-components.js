@@ -283,6 +283,7 @@ runWhenJQueryReady(function($) {
             advanced: Number(initialState.advanced ?? 0),
             retail_delivery: Number(initialState.retail_delivery ?? initialState.retailDeliveryFee ?? 0),
             retailDiscount: Number(initialState.retailDiscount ?? 0),
+            couponDiscount: Number(initialState.couponDiscount ?? 0),
 
             init() {
                 const sync = (field, value) => {
@@ -297,6 +298,7 @@ runWhenJQueryReady(function($) {
                 this.$watch('advanced', (value) => sync('advanced', value));
                 this.$watch('retail_delivery', (value) => sync('retailDeliveryFee', value));
                 this.$watch('retailDiscount', (value) => sync('retailDiscount', value));
+                this.$watch('couponDiscount', (value) => sync('coupon_discount', value));
             },
 
             get subtotal() {

@@ -163,7 +163,7 @@
                             @php($retail += $amount)
                             @endforeach
                             <tr>
-                                <th class="py-1" rowspan="5" colspan="{{(setting('show_option')->hide_invoice_image ?? false)?2:3}}" style="text-align: center; vertical-align: middle; font-size: 24px;">
+                                <th class="py-1" rowspan="{{ ($couponDiscount = (float) ($order->data['coupon_discount'] ?? 0)) > 0 ? 6 : 5 }}" colspan="{{(setting('show_option')->hide_invoice_image ?? false)?2:3}}" style="text-align: center; vertical-align: middle; font-size: 24px;">
                                     <span style="font-weight: 400;">Condition</span>: TK. {{ $order->condition }}
                                     @if($order->note)
                                         <br><span class="text-danger invoice-note">{{ $order->note }}</span>
@@ -186,6 +186,12 @@
                                 <th class="py-1">Discount</th>
                                 <th class="py-1">{{ (isOninda() && config('app.resell')) ? ($order->data['retail_discount'] ?? 0) : ($order->data['discount'] ?? 0) }}</th>
                             </tr>
+                            @if(($couponDiscount = (float) ($order->data['coupon_discount'] ?? 0)) > 0)
+                            <tr>
+                                <th class="py-1">Coupon</th>
+                                <th class="py-1">{{ $couponDiscount }}</th>
+                            </tr>
+                            @endif
                             </tbody>
                         </table>
                     </div>

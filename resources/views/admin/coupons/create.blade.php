@@ -23,7 +23,7 @@
                             @csrf
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="name">Coupon Name <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('name') is-invalid @enderror"
@@ -34,7 +34,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="code">Coupon Code <span class="text-danger">*</span></label>
                                         <div class="input-group">
@@ -51,6 +51,17 @@
                                         @enderror
                                     </div>
                                 </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="expires_at">Expiry Date</label>
+                                        <input type="datetime-local" class="form-control @error('expires_at') is-invalid @enderror"
+                                               id="expires_at" name="expires_at" value="{{ old('expires_at') }}">
+                                        @error('expires_at')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group">
@@ -63,9 +74,37 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="discount">Discount Amount (৳) <span class="text-danger">*</span></label>
+                                        <label for="coupon_type">Coupon Type <span class="text-danger">*</span></label>
+                                        <select id="coupon_type" name="coupon_type" class="form-control @error('coupon_type') is-invalid @enderror" required>
+                                            <option value="purchase" {{ old('coupon_type', 'purchase') === 'purchase' ? 'selected' : '' }}>Purchase</option>
+                                            @if(isOninda() && config('app.resell'))
+                                            <option value="subscription" {{ old('coupon_type') === 'subscription' ? 'selected' : '' }}>Subscription</option>
+                                            @endif
+                                        </select>
+                                        @error('coupon_type')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="discount_type">Discount Type <span class="text-danger">*</span></label>
+                                        <select id="discount_type" name="discount_type" class="form-control @error('discount_type') is-invalid @enderror" required>
+                                            <option value="fixed" {{ old('discount_type', 'fixed') === 'fixed' ? 'selected' : '' }}>Fixed (৳)</option>
+                                            <option value="percent" {{ old('discount_type') === 'percent' ? 'selected' : '' }}>Percent (%)</option>
+                                        </select>
+                                        @error('discount_type')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="discount">Discount Value <span class="text-danger">*</span></label>
                                         <input type="number" step="0.01" class="form-control @error('discount') is-invalid @enderror"
                                                id="discount" name="discount" value="{{ old('discount') }}" required>
                                         @error('discount')
@@ -74,24 +113,13 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="max_usages">Maximum Usages</label>
                                         <input type="number" class="form-control @error('max_usages') is-invalid @enderror"
                                                id="max_usages" name="max_usages" value="{{ old('max_usages') }}"
                                                placeholder="Leave empty for unlimited">
                                         @error('max_usages')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="expires_at">Expiry Date</label>
-                                        <input type="datetime-local" class="form-control @error('expires_at') is-invalid @enderror"
-                                               id="expires_at" name="expires_at" value="{{ old('expires_at') }}">
-                                        @error('expires_at')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>

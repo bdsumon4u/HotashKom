@@ -16,6 +16,8 @@ return [
 
     'infinite_scroll_section' => env('APP_INFINITE_SCROLL_SECTION', false),
 
+    'coupon' => env('APP_COUPON', env('APP_ONINDA', false) && env('APP_RESELL', true)),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

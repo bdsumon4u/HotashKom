@@ -3,6 +3,7 @@
         advanced: @js($advanced ?? 0),
         retail_delivery: @js($retailDeliveryFee ?? 0),
         retailDiscount: @js($retailDiscount ?? 0),
+        couponDiscount: @js($coupon_discount ?? 0),
     })" class="row simple-checkout-row no-gutters">
     @if (session()->has('error'))
         <div class="col-12">
@@ -175,11 +176,38 @@
 
                 @include('partials.cart-table-simple')
 
+                <div class="simple-form-group">
+                    <label class="simple-label d-block">Coupon Code</label>
+                    <div class="input-group">
+                        <input type="text"
+                            wire:model.live="coupon_code"
+                            wire:change="applyCoupon"
+                            class="form-control @error('coupon_code') is-invalid @enderror"
+                            placeholder="Enter coupon code" />
+                        <div class="input-group-append">
+                            <button type="button"
+                                wire:click="applyCoupon"
+                                wire:loading.attr="disabled"
+                                class="btn btn-outline-primary">
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                    <x-error field="coupon_code" />
+                    @if ($applied_coupon)
+                        <div class="mt-1 text-success">
+                            Coupon "{{ $applied_coupon->name }}" applied. Discount: {!! theMoney($coupon_discount) !!}
+                            <button type="button" wire:click="removeCoupon" class="p-0 btn btn-link btn-sm text-danger">Remove</button>
+                        </div>
+                    @endif
+                </div>
+
                 <div class="mt-3 simple-order-totals">
                     @php
                         $deliveryFee = cart()->getCost('deliveryFee') ?: 0;
                         $sellingSubtotal = 0;
                         $sellingTotal = 0;
+                        $couponDiscount = $coupon_discount ?? 0;
 
                         if (isOninda()) {
                             $cartItems = cart()->content();
@@ -222,11 +250,20 @@
                         </span>
                     </div>
 
+                    @if ($applied_coupon)
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <span class="simple-total-label">Coupon Discount</span>
+                            <span class="simple-total-value text-success">
+                                {!! theMoney($couponDiscount) !!}
+                            </span>
+                        </div>
+                    @endif
+
                     @unless (isOninda())
                         <div class="d-flex justify-content-between align-items-center simple-total-final">
                             <span class="simple-total-label">Total</span>
                             <span class="simple-total-value simple-total-value--red">
-                                {!! theMoney(cart()->total() + (isOninda() && config('app.resell') ? 25 : 0)) !!}
+                                {!! theMoney(max(cart()->total() - $couponDiscount, 0) + (isOninda() && config('app.resell') ? 25 : 0)) !!}
                             </span>
                         </div>
                     @endunless
@@ -280,7 +317,7 @@
                         <div class="mt-2 d-flex justify-content-between align-items-center simple-total-final">
                             <span class="simple-total-label">Buying Total</span>
                             <span class="simple-total-value simple-total-value--red">
-                                {!! theMoney(cart()->total() + (isOninda() && config('app.resell') ? 25 : 0)) !!}
+                                {!! theMoney(max(cart()->total() - $couponDiscount, 0) + (isOninda() && config('app.resell') ? 25 : 0)) !!}
                             </span>
                         </div>
 

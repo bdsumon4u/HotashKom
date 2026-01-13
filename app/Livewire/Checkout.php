@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Http\Resources\ProductResource;
 use App\Models\Admin;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -52,6 +53,12 @@ class Checkout extends Component
 
     #[Validate('nullable|numeric|min:0')]
     public $retailDiscount = 0;
+
+    public $coupon_code = '';
+
+    public $applied_coupon = null;
+
+    public $coupon_discount = 0;
 
     /**
      * When true, `retailDeliveryFee` was explicitly set by the user and
@@ -104,11 +111,107 @@ class Checkout extends Component
         longCookie('area_id', $value);
     }
 
+    protected function refreshCouponDiscount(): void
+    {
+        if (! $this->applied_coupon) {
+            $this->coupon_discount = 0;
+
+            return;
+        }
+
+        if (! $this->applied_coupon->isValid()) {
+            $this->removeCoupon();
+
+            return;
+        }
+
+        $this->coupon_discount = $this->applied_coupon->calculateDiscount(cart()->subTotal());
+        longCookie('coupon_discount', $this->coupon_discount);
+    }
+
     public function updatedRetailDeliveryFee($value): void
     {
         // Mark the delivery fee as manually overridden so that subsequent
         // shipping updates (e.g. changing area or cart) don't reset it.
         $this->retailDeliveryFeeManuallySet = true;
+    }
+
+    public function applyCoupon(): void
+    {
+        $this->validate([
+            'coupon_code' => 'required|string|min:1',
+        ]);
+
+        $coupon = Coupon::findByCode($this->coupon_code);
+
+        if (! $coupon) {
+            $this->addError('coupon_code', 'Invalid coupon code.');
+
+            return;
+        }
+
+        if ($coupon->coupon_type !== 'purchase') {
+            $this->addError('coupon_code', 'This coupon can only be used for subscription payments.');
+
+            return;
+        }
+
+        if (! $coupon->isValid()) {
+            $this->addError('coupon_code', 'Coupon has expired or reached its usage limit.');
+
+            return;
+        }
+
+        $subtotal = cart()->subTotal();
+        $discount = $coupon->calculateDiscount($subtotal);
+
+        if ($discount <= 0) {
+            $this->addError('coupon_code', 'This coupon does not apply to the current cart.');
+
+            return;
+        }
+
+        $this->applied_coupon = $coupon;
+        $this->coupon_discount = $discount;
+        longCookie('coupon_code', $this->coupon_code);
+        longCookie('coupon_discount', $discount);
+        $this->resetErrorBag('coupon_code');
+
+        session()->flash('message', 'Coupon applied successfully.');
+    }
+
+    public function removeCoupon(): void
+    {
+        $this->applied_coupon = null;
+        $this->coupon_discount = 0;
+        $this->coupon_code = '';
+        longCookie('coupon_code', '');
+        longCookie('coupon_discount', 0);
+        $this->resetErrorBag('coupon_code');
+    }
+
+    public function updatedCouponCode($value): void
+    {
+        longCookie('coupon_code', $value);
+    }
+
+    protected function restoreCouponFromCookie(): void
+    {
+        if (! $this->coupon_code) {
+            return;
+        }
+
+        $coupon = Coupon::findByCode($this->coupon_code);
+
+        if (! $coupon || ! $coupon->isValid() || $coupon->coupon_type !== 'purchase') {
+            $this->removeCoupon();
+
+            return;
+        }
+
+        $this->applied_coupon = $coupon;
+        $this->coupon_discount = $coupon->calculateDiscount(cart()->subTotal());
+        longCookie('coupon_discount', $this->coupon_discount);
     }
 
     public function remove($id): void
@@ -244,6 +347,7 @@ class Checkout extends Component
                 'quantity' => $item->qty,
             ],
         ])->all();
+        $this->refreshCouponDiscount();
         $this->dispatch('cartUpdated');
     }
 
@@ -286,10 +390,13 @@ class Checkout extends Component
             $this->address = Cookie::get('address', '');
             $this->note = Cookie::get('note', '');
             $this->retailDiscount = Cookie::get('retail_discount', 0);
+            $this->coupon_code = Cookie::get('coupon_code', '');
+            $this->coupon_discount = Cookie::get('coupon_discount', 0);
             $this->city_id = Cookie::get('city_id', '');
             $this->area_id = Cookie::get('area_id', '');
         }
 
+        $this->restoreCouponFromCookie();
         // Initialize retail array properly
         $this->cartUpdated();
     }
@@ -386,6 +493,9 @@ class Checkout extends Component
                 'retail_delivery_fee' => $this->retailDeliveryFee,
                 'advanced' => $this->advanced,
                 'retail_discount' => $this->retailDiscount,
+                'coupon_discount' => $this->coupon_discount,
+                'coupon_id' => $this->applied_coupon?->id,
+                'coupon_code' => $this->applied_coupon?->code,
                 'subtotal' => cart()->subtotal(),
                 'purchase_cost' => cart()->content()->sum(fn ($item): int|float => ($item->options->purchase_price ?: $item->options->price) * $item->qty),
             ];
@@ -412,6 +522,11 @@ class Checkout extends Component
             defer(function () use ($admin, $user, $order): void {
                 $admin->update(['last_order_received_at' => now()]);
                 $user->notify(new OrderPlaced($order));
+
+                // Increment coupon usage if applied
+                if ($this->applied_coupon) {
+                    $this->applied_coupon->incrementUsage();
+                }
 
                 deleteOrUpdateCart();
 
@@ -533,6 +648,8 @@ class Checkout extends Component
             'retailDeliveryFee' => $this->retailDeliveryFee,
             'advanced' => $this->advanced,
             'retailDiscount' => $this->retailDiscount,
+            'coupon_code' => $this->coupon_code,
+            'coupon_discount' => $this->coupon_discount,
         ];
     }
 }

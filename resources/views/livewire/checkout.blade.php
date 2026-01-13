@@ -3,6 +3,7 @@
         advanced: @js($advanced ?? 0),
         retail_delivery: @js($retailDeliveryFee ?? 0),
         retailDiscount: @js($retailDiscount ?? 0),
+        couponDiscount: @js($coupon_discount ?? 0),
     })" class="row">
     @if (session()->has('error'))
     <div class="col-12">
@@ -137,6 +138,25 @@
             <div class="card-body d-md-none">
                 <h3 class="mb-0 card-title">Your Order</h3>
                 <div class="ordered-products"></div>
+                <div class="mb-3">
+                    <label class="d-block">Coupon Code</label>
+                    <div class="input-group">
+                        <input type="text" wire:model.live="coupon_code" wire:change="applyCoupon"
+                            class="form-control @error('coupon_code') is-invalid @enderror"
+                            placeholder="Enter coupon code" />
+                        <div class="input-group-append">
+                            <button type="button" wire:click="applyCoupon" wire:loading.attr="disabled"
+                                class="btn btn-outline-primary">Apply</button>
+                        </div>
+                    </div>
+                    <x-error field="coupon_code" />
+                    @if($applied_coupon)
+                        <div class="mt-1 text-success">
+                            Coupon "{{ $applied_coupon->name }}" applied. Discount: {!! theMoney($coupon_discount) !!}
+                            <button type="button" wire:click="removeCoupon" class="p-0 btn btn-link btn-sm text-danger">Remove</button>
+                        </div>
+                    @endif
+                </div>
                 <table class="checkout__totals">
                     <tbody class="checkout__totals-subtotals">
                         <tr>
@@ -190,11 +210,17 @@
                             </td>
                         </tr>
                         @endif
+                        @if($applied_coupon)
+                        <tr>
+                            <th>Coupon Discount</th>
+                            <td class="text-success">{!! theMoney($coupon_discount) !!}</td>
+                        </tr>
+                        @endif
                     </tbody>
                     <tfoot class="checkout__totals-footer">
                         <tr>
                             <th>Buying</th>
-                            <td>{!! theMoney(cart()->total() + (isOninda() && config('app.resell') ? 25 : 0)) !!}</td>
+                            <td>{!! theMoney(max(cart()->total() - $coupon_discount, 0) + (isOninda() && config('app.resell') ? 25 : 0)) !!}</td>
                         </tr>
                         @if (isOninda())
                         <tr>
@@ -232,6 +258,25 @@
             <div class="card-body">
                 <h3 class="card-title">Your Order</h3>
                 <div class="ordered-products"></div>
+                <div class="mb-3">
+                    <label class="d-block">Coupon Code</label>
+                    <div class="input-group">
+                        <input type="text" wire:model.live="coupon_code" wire:change="applyCoupon"
+                            class="form-control @error('coupon_code') is-invalid @enderror"
+                            placeholder="Enter coupon code" />
+                        <div class="input-group-append">
+                            <button type="button" wire:click="applyCoupon" wire:loading.attr="disabled"
+                                class="btn btn-outline-primary">Apply</button>
+                        </div>
+                    </div>
+                    <x-error field="coupon_code" />
+                    @if($applied_coupon)
+                        <div class="mt-1 text-success">
+                            Coupon "{{ $applied_coupon->name }}" applied. Discount: {!! theMoney($coupon_discount) !!}
+                            <button type="button" wire:click="removeCoupon" class="p-0 btn btn-link btn-sm text-danger">Remove</button>
+                        </div>
+                    @endif
+                </div>
                 <table class="checkout__totals">
                     <tbody class="checkout__totals-subtotals">
                         <tr>
@@ -286,12 +331,18 @@
                             </td>
                         </tr>
                         @endif
+                        @if($applied_coupon)
+                        <tr>
+                            <th style="font-size:14px;">Coupon Discount</th>
+                            <td class="text-success">{!! theMoney($coupon_discount) !!}</td>
+                        </tr>
+                        @endif
                     </tbody>
                     <tfoot class="checkout__totals-footer">
                         <tr>
                             <th style="white-space:nowrap;font-size:18px;">Buying Total</th>
                             <td style="font-size:14px;">
-                                <span>{!! theMoney(cart()->total() + (isOninda() && config('app.resell') ? 25 : 0)) !!}</span>
+                                <span>{!! theMoney(max(cart()->total() - $coupon_discount, 0) + (isOninda() && config('app.resell') ? 25 : 0)) !!}</span>
                             </td>
                         </tr>
                         @if (isOninda())

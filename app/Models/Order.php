@@ -279,9 +279,15 @@ class Order extends Model
                 : ($this->data['discount'] ?? 0);
             $discount = (float) $discount;
 
+            $couponDiscount = (float) ($this->data['coupon_discount'] ?? 0);
+            if (isOninda() && config('app.resell')) {
+                // Coupon discount only applies on buying price, not reseller selling price.
+                $couponDiscount = 0.0;
+            }
+
             $advanced = (float) ($this->data['advanced'] ?? 0);
 
-            return (int) round($retail + $deliveryFee - $discount - $advanced);
+            return (int) round($retail + $deliveryFee - $discount - $advanced - $couponDiscount);
         });
     }
 

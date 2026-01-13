@@ -10,7 +10,9 @@ class Coupon extends Model
         'code',
         'name',
         'description',
+        'coupon_type',
         'discount',
+        'discount_type',
         'max_usages',
         'used_count',
         'expires_at',
@@ -34,11 +36,17 @@ class Coupon extends Model
     }
 
     /**
-     * Calculate discount amount
+     * Calculate discount amount (returns rounded integer)
      */
-    public function calculateDiscount(float $amount): float
+    public function calculateDiscount(float $amount): int
     {
-        return min($this->discount, $amount);
+        if ($this->discount_type === 'percent') {
+            $calculated = ($amount * $this->discount) / 100;
+
+            return (int) round(min($calculated, $amount));
+        }
+
+        return (int) round(min($this->discount, $amount));
     }
 
     /**
@@ -54,7 +62,15 @@ class Coupon extends Model
      */
     protected function discountText(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn (): string => '৳'.number_format($this->discount, 2));
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: function (): string {
+                if ($this->discount_type === 'percent') {
+                    return number_format($this->discount, 2).'%';
+                }
+
+                return '৳'.number_format($this->discount, 2);
+            }
+        );
     }
 
     /**

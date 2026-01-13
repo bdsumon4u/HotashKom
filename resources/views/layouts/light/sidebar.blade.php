@@ -124,7 +124,7 @@
                         </a>
                     </li>
 
-                    @if (isOninda() && config('app.resell'))
+                    @if (config('app.coupon'))
                     <li>
                         <a class="nav-link menu-title link-nav {{ request()->is('admin/coupons*') ? 'active' : '' }}"
                             href="{{ route('admin.coupons.index') }}">

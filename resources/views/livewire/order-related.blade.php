@@ -30,7 +30,7 @@
                                         <div>{{ $product->quantity }} x {{ $product->name }}</div>
                                     @endforeach
                                 </td>
-                                <td>{{ intval($order->data['subtotal']) + intval($order->data['shipping_cost']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0) }}</td>
+                                <td>{{ intval($order->data['subtotal']) + intval($order->data['shipping_cost']) - intval($order->data['advanced'] ?? 0) - intval($order->data['discount'] ?? 0) - intval($order->data['coupon_discount'] ?? 0) }}</td>
                                 <td>{{ $order->status }}</td>
                                 <td>{{ $order->courier }}</td>
                                 <td>{{ $order->admin->name }}</td>
