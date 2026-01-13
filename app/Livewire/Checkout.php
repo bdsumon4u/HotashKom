@@ -519,14 +519,14 @@ class Checkout extends Component
 
             $order = Order::create($data);
 
+            // Increment coupon usage if applied
+            if ($this->applied_coupon) {
+                $this->applied_coupon->incrementUsage();
+            }
+
             defer(function () use ($admin, $user, $order): void {
                 $admin->update(['last_order_received_at' => now()]);
                 $user->notify(new OrderPlaced($order));
-
-                // Increment coupon usage if applied
-                if ($this->applied_coupon) {
-                    $this->applied_coupon->incrementUsage();
-                }
 
                 deleteOrUpdateCart();
 
