@@ -452,7 +452,7 @@
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
                                 @if(isOninda())
-                                <strong>{!! theMoney((float) $retail + (float) ($order->data['retail_delivery_fee'] ?? 0) - (float) $advanced - (float) ($order->data['discount'] ?? 0)) !!}</strong>
+                                <strong>{!! theMoney((float) $retail + (float) ($order->data['retail_delivery_fee'] ?? 0) - (float) $advanced - (float) ($order->data['discount'] ?? 0) - (float) ($couponDiscount ?? 0)) !!}</strong>
                                 @else
                                 <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost - (float) $discount - (float) $advanced - (float) ($couponDiscount ?? 0)) !!}</strong>
                                 @endif
