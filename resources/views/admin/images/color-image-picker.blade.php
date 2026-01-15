@@ -78,7 +78,7 @@
         previewContainer.find('.no-image-text').remove();
         previewContainer.find('img').remove();
         previewContainer.append(`<img src="${selectedImageSrc}" alt="{{ $colorOptionName }}" data-toggle="modal" data-target="#color-image-picker-{{ $colorOptionId }}" class="img-thumbnail" style="max-width: 100px; cursor: pointer;">`);
-        
+
         $('.color-image-input-{{ $colorOptionId }}').val(selectedImageId);
 
         $(this).parents('.modal').modal('hide');
