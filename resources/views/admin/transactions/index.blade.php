@@ -160,122 +160,164 @@
 @endsection
 
 @push('js')
-    <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}" defer></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.buttons.min.js') }}" defer></script>
-    <script src="{{ asset('assets/js/datatable/datatable-extension/buttons.bootstrap4.min.js') }}" defer></script>
+    <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatable/datatable-extension/buttons.bootstrap4.min.js') }}"></script>
 @endpush
 
 @push('scripts')
     <script>
-        var table = $('.datatable').DataTable({
-            search: [{
-                bRegex: true,
-                bSmart: false,
-            }],
-            dom: 'lBftip',
-            buttons: [{
-                text: 'Export',
-                className: 'px-1 py-1',
-                action: function(e, dt, node, config) {
-                    // Add export functionality if needed
-                }
-            }],
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ route('admin.transactions.index', $user) }}",
-                data: function(d) {
-                    // No need to pass user_id since we're using route-model binding
-                }
-            },
-            columns: [{
-                    data: 'DT_RowIndex',
-                    name: 'DT_RowIndex',
-                    orderable: false,
-                    searchable: false
-                },
-                {
-                    data: 'type',
-                    name: 'type'
-                },
-                {
-                    data: 'amount',
-                    name: 'amount'
-                },
-                {
-                    data: 'created_at',
-                    name: 'created_at'
-                },
-                {
-                    data: 'status',
-                    name: 'status'
-                },
-                {
-                    data: 'meta',
-                    name: 'meta'
-                },
-                {
-                    data: 'actions',
-                    name: 'actions',
-                    orderable: false,
-                    searchable: false
-                }
-            ],
-            order: [
-                [3, 'desc']
-            ],
-            pageLength: 50,
-            lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
-        });
+        runWhenJQueryReady(function($) {
+            var table;
 
-        // Handle withdraw form submission
-        $('#withdrawForm').on('submit', function(e) {
-            e.preventDefault();
+            // Ensure DataTables is loaded before initialization
+            function initDataTable() {
+                if (typeof $.fn.DataTable === 'undefined') {
+                    // Wait a bit and try again if DataTables isn't loaded yet
+                    setTimeout(initDataTable, 50);
+                    return;
+                }
 
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'POST',
-                data: $(this).serialize(),
-                success: function(response) {
-                    $('#withdrawModal').modal('hide');
-                    table.ajax.reload();
-                    $.notify('Withdrawal successful', 'success');
-                    // Reload page to update balance
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 1000);
-                },
-                error: function(xhr) {
-                    $.notify(xhr.responseJSON.message || 'Error processing withdrawal', 'error');
+                table = $('.datatable').DataTable({
+                    search: [{
+                        bRegex: true,
+                        bSmart: false,
+                    }],
+                    dom: 'lBftip',
+                    buttons: [{
+                        text: 'Export',
+                        className: 'px-1 py-1',
+                        action: function(e, dt, node, config) {
+                            // Add export functionality if needed
+                        }
+                    }],
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('admin.transactions.index', $user) }}",
+                        data: function(d) {
+                            // No need to pass user_id since we're using route-model binding
+                        }
+                    },
+                    columns: [{
+                            data: 'DT_RowIndex',
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'type',
+                            name: 'type'
+                        },
+                        {
+                            data: 'amount',
+                            name: 'amount'
+                        },
+                        {
+                            data: 'created_at',
+                            name: 'created_at'
+                        },
+                        {
+                            data: 'status',
+                            name: 'status'
+                        },
+                        {
+                            data: 'meta',
+                            name: 'meta'
+                        },
+                        {
+                            data: 'actions',
+                            name: 'actions',
+                            orderable: false,
+                            searchable: false
+                        }
+                    ],
+                    order: [
+                        [3, 'desc']
+                    ],
+                    pageLength: 50,
+                    lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
+                });
+            }
+
+            // Handle withdraw form submission
+            $('#withdrawForm').on('submit', function(e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#withdrawModal').modal('hide');
+                        if (table) {
+                            table.ajax.reload();
+                        }
+                        $.notify('Withdrawal successful', 'success');
+                        // Reload page to update balance
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    },
+                    error: function(xhr) {
+                        $.notify(xhr.responseJSON.message || 'Error processing withdrawal', 'error');
+                    }
+                });
+            });
+
+            // Handle confirm withdraw button click
+            $(document).on('click', '.confirm-withdraw', function() {
+                var transactionId = $(this).data('id');
+                var amount = $(this).data('amount');
+
+                $('#transaction-id').val(transactionId);
+                $('#confirm-amount').val(amount);
+                $('#confirmWithdrawModal').modal('show');
+            });
+
+            // Handle delete withdraw button click
+            $(document).on('click', '.delete-withdraw', function() {
+                var transactionId = $(this).data('id');
+                var amount = $(this).data('amount');
+
+                if (confirm('Are you sure you want to delete this withdrawal request for ' + amount + ' tk?')) {
+                    $.ajax({
+                        url: "{{ route('admin.transactions.delete-withdraw', $user) }}",
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            transaction_id: transactionId
+                        },
+                        success: function(response) {
+                            if (table) {
+                                table.ajax.reload();
+                            }
+                            $.notify(response.message, 'success');
+                            // Reload page to update balance
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+                        },
+                        error: function(xhr) {
+                            $.notify(xhr.responseJSON.message || 'Error deleting withdrawal request', 'error');
+                        }
+                    });
                 }
             });
-        });
 
-        // Handle confirm withdraw button click
-        $(document).on('click', '.confirm-withdraw', function() {
-            var transactionId = $(this).data('id');
-            var amount = $(this).data('amount');
+            // Handle confirm withdraw form submission
+            $('#confirmWithdrawForm').on('submit', function(e) {
+                e.preventDefault();
 
-            $('#transaction-id').val(transactionId);
-            $('#confirm-amount').val(amount);
-            $('#confirmWithdrawModal').modal('show');
-        });
-
-        // Handle delete withdraw button click
-        $(document).on('click', '.delete-withdraw', function() {
-            var transactionId = $(this).data('id');
-            var amount = $(this).data('amount');
-
-            if (confirm('Are you sure you want to delete this withdrawal request for ' + amount + ' tk?')) {
                 $.ajax({
-                    url: "{{ route('admin.transactions.delete-withdraw', $user) }}",
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        transaction_id: transactionId
-                    },
+                    url: "{{ route('admin.transactions.confirm-withdraw', $user) }}",
+                    type: 'POST',
+                    data: $(this).serialize(),
                     success: function(response) {
-                        table.ajax.reload();
+                        $('#confirmWithdrawModal').modal('hide');
+                        if (table) {
+                            table.ajax.reload();
+                        }
                         $.notify(response.message, 'success');
                         // Reload page to update balance
                         setTimeout(function() {
@@ -283,33 +325,13 @@
                         }, 1000);
                     },
                     error: function(xhr) {
-                        $.notify(xhr.responseJSON.message || 'Error deleting withdrawal request', 'error');
+                        $.notify(xhr.responseJSON.message || 'Error confirming withdrawal', 'error');
                     }
                 });
-            }
-        });
-
-        // Handle confirm withdraw form submission
-        $('#confirmWithdrawForm').on('submit', function(e) {
-            e.preventDefault();
-
-            $.ajax({
-                url: "{{ route('admin.transactions.confirm-withdraw', $user) }}",
-                type: 'POST',
-                data: $(this).serialize(),
-                success: function(response) {
-                    $('#confirmWithdrawModal').modal('hide');
-                    table.ajax.reload();
-                    $.notify(response.message, 'success');
-                    // Reload page to update balance
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 1000);
-                },
-                error: function(xhr) {
-                    $.notify(xhr.responseJSON.message || 'Error confirming withdrawal', 'error');
-                }
             });
+
+            // Start initialization
+            initDataTable();
         });
     </script>
 @endpush
