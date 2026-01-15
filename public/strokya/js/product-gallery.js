@@ -331,14 +331,45 @@
                     return 0;
                 };
 
+                // Helper to detect when the user is typing (e.g. in the search box)
+                const isUserTyping = () => {
+                    const active = document.activeElement;
+                    if (!active) {
+                        return false;
+                    }
+
+                    const tag = active.tagName;
+                    if (tag === 'INPUT' || tag === 'TEXTAREA') {
+                        return true;
+                    }
+
+                    if (active.isContentEditable) {
+                        return true;
+                    }
+
+                    return false;
+                };
+
+                // Change slide, but skip when the user is typing to avoid closing the keyboard/search box
+                const changeSlide = (targetIndex) => {
+                    if (isUserTyping()) {
+                        return;
+                    }
+
+                    const $targetLink = $galleryLinks.eq(targetIndex);
+                    if (!$targetLink.length) {
+                        return;
+                    }
+
+                    // Use the original xzoom click behaviour
+                    $targetLink[0].click();
+                };
+
                 // Navigate to next slide
                 const goToNextSlide = () => {
                     const currentIndex = getCurrentSlideIndex();
                     const nextIndex = currentIndex >= lastG ? 0 : currentIndex + 1;
-                    const $nextLink = $galleryLinks.eq(nextIndex);
-                    if ($nextLink.length) {
-                        $nextLink[0].click();
-                    }
+                    changeSlide(nextIndex);
                 };
 
                 // Start auto-navigation timer
@@ -362,10 +393,7 @@
                     const targetIndex = direction === 'next'
                         ? (currentIndex >= lastG ? 0 : currentIndex + 1)
                         : (currentIndex <= 0 ? lastG : currentIndex - 1);
-                    const $targetLink = $galleryLinks.eq(targetIndex);
-                    if ($targetLink.length) {
-                        $targetLink[0].click();
-                    }
+                    changeSlide(targetIndex);
                     resetAutoNavigation();
                 };
 
@@ -398,10 +426,14 @@
                     if ($variantImage.length) {
                         const $link = $variantImage.closest('a');
                         if ($link.length) {
-                            setTimeout(() => {
-                                $link[0].click();
-                            }, 100);
-                            resetAutoNavigation();
+                            // Find the index of this link in the gallery
+                            const targetIndex = $galleryLinks.index($link);
+                            if (targetIndex >= 0) {
+                                setTimeout(() => {
+                                    changeSlide(targetIndex);
+                                }, 100);
+                                resetAutoNavigation();
+                            }
                         }
                     }
                 };
