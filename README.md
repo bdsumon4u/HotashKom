@@ -95,30 +95,30 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
 ## Active Deployments
 These 🔥 $${\color{red}497}$$ 🔥 domains are live now
 
-_Last updated: **2026-01-19 09:55:12 Asia/Dhaka**_
+_Last updated: **2026-01-20 09:48:26 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
 | 1 | [bsbazarbd.com](http://bsbazarbd.com) |
 | 2 | [iuddokta.com](http://iuddokta.com) |
-| 3 | [ramboshopping.com](http://ramboshopping.com) |
-| 4 | [bikroyjogot.com](http://bikroyjogot.com) |
-| 5 | [honestshop24.com](http://honestshop24.com) |
-| 6 | [emaxbd.com](http://emaxbd.com) |
-| 7 | [ecom.sebaitsolutions.com](http://ecom.sebaitsolutions.com) |
-| 8 | [crazycartz.com](http://crazycartz.com) |
-| 9 | [homeneedsbd.com](http://homeneedsbd.com) |
-| 10 | [liberaltradersbd.com](http://liberaltradersbd.com) |
-| 11 | [monpurabazar.com](http://monpurabazar.com) |
-| 12 | [djkshop.com](http://djkshop.com) |
-| 13 | [smartbuybd.com](http://smartbuybd.com) |
-| 14 | [supersaversbd.com](http://supersaversbd.com) |
-| 15 | [rsliveshopping.com](http://rsliveshopping.com) |
-| 16 | [greatzonebd.com](http://greatzonebd.com) |
-| 17 | [adhunikbazarbd.com](http://adhunikbazarbd.com) |
-| 18 | [knmartbd.com](http://knmartbd.com) |
-| 19 | [anikamart.com](http://anikamart.com) |
-| 20 | [jkshopbd24.com](http://jkshopbd24.com) |
+| 3 | [kroymela.com](http://kroymela.com) |
+| 4 | [ramboshopping.com](http://ramboshopping.com) |
+| 5 | [bikroyjogot.com](http://bikroyjogot.com) |
+| 6 | [honestshop24.com](http://honestshop24.com) |
+| 7 | [emaxbd.com](http://emaxbd.com) |
+| 8 | [ecom.sebaitsolutions.com](http://ecom.sebaitsolutions.com) |
+| 9 | [crazycartz.com](http://crazycartz.com) |
+| 10 | [homeneedsbd.com](http://homeneedsbd.com) |
+| 11 | [liberaltradersbd.com](http://liberaltradersbd.com) |
+| 12 | [monpurabazar.com](http://monpurabazar.com) |
+| 13 | [djkshop.com](http://djkshop.com) |
+| 14 | [smartbuybd.com](http://smartbuybd.com) |
+| 15 | [supersaversbd.com](http://supersaversbd.com) |
+| 16 | [rsliveshopping.com](http://rsliveshopping.com) |
+| 17 | [greatzonebd.com](http://greatzonebd.com) |
+| 18 | [adhunikbazarbd.com](http://adhunikbazarbd.com) |
+| 19 | [knmartbd.com](http://knmartbd.com) |
+| 20 | [anikamart.com](http://anikamart.com) |
 | 21 | [sohozkenakata.com](http://sohozkenakata.com) |
 | 22 | [e-bajar.com](http://e-bajar.com) |
 | 23 | [merazonlineshop.com](http://merazonlineshop.com) |
