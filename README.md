@@ -93,19 +93,19 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
   - Password policies
   - Two-factor authentication
 ## Active Deployments
-These 🔥 $${\color{red}497}$$ 🔥 domains are live now
+These 🔥 $${\color{red}498}$$ 🔥 domains are live now
 
-_Last updated: **2026-01-24 09:40:33 Asia/Dhaka**_
+_Last updated: **2026-01-25 09:58:18 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
 | 1 | [bsbazarbd.com](http://bsbazarbd.com) |
 | 2 | [iuddokta.com](http://iuddokta.com) |
-| 3 | [kroymela.com](http://kroymela.com) |
-| 4 | [ramboshopping.com](http://ramboshopping.com) |
-| 5 | [bikroyjogot.com](http://bikroyjogot.com) |
-| 6 | [honestshop24.com](http://honestshop24.com) |
-| 7 | [emaxbd.com](http://emaxbd.com) |
+| 3 | [ramboshopping.com](http://ramboshopping.com) |
+| 4 | [bikroyjogot.com](http://bikroyjogot.com) |
+| 5 | [honestshop24.com](http://honestshop24.com) |
+| 6 | [emaxbd.com](http://emaxbd.com) |
+| 7 | [banglashop24.com](http://banglashop24.com) |
 | 8 | [ecom.sebaitsolutions.com](http://ecom.sebaitsolutions.com) |
 | 9 | [crazycartz.com](http://crazycartz.com) |
 | 10 | [homeneedsbd.com](http://homeneedsbd.com) |
@@ -596,3 +596,4 @@ _Last updated: **2026-01-24 09:40:33 Asia/Dhaka**_
 | 495 | [merazonlineshop.com](http://merazonlineshop.com) |
 | 496 | [assamsitenterprise.com](http://assamsitenterprise.com) |
 | 497 | [benimoy.com](http://benimoy.com) |
+| 498 | [astherghor.com](http://astherghor.com) |
