@@ -174,7 +174,7 @@ class ProductVariationController extends Controller
             'variations.*.stock_count' => ['required', 'numeric', 'min:0'],
             'variations.*.wholesale.quantity' => ['sometimes', 'array'],
             'variations.*.wholesale.price' => ['sometimes', 'array'],
-            'variations.*.wholesale.quantity.*' => ['required', 'integer', 'gt:1'],
+            'variations.*.wholesale.quantity.*' => ['required', 'integer', 'ge:0'],
             'variations.*.wholesale.price.*' => ['required', 'integer', 'min:1'],
             'color_images' => ['sometimes', 'array'],
             'color_images.*' => ['nullable', 'exists:images,id'],
