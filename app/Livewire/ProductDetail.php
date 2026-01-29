@@ -79,6 +79,7 @@ class ProductDetail extends Component
 
             return false;
         }
+
         return $this->addToKart($this->selectedVar, $this->quantity, $instance, $this->retailPrice);
     }
 
