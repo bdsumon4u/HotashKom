@@ -6,6 +6,7 @@ use App\Models\Attribute;
 use App\Models\Product;
 use App\Services\FacebookPixelService;
 use App\Traits\HasCart;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -64,13 +65,20 @@ class ProductDetail extends Component
 
     public function decrement(): void
     {
-        if ($this->quantity > 1) {
+        if ($this->quantity >= 1) {
             $this->quantity--;
         }
     }
 
     public function addToCart($instance = 'default')
     {
+        if ($this->selectedVar->should_track && $this->selectedVar->stock_count < 1) {
+            throw ValidationException::withMessages([
+                'quantity' => 'This product is out of stock.',
+            ]);
+
+            return false;
+        }
         return $this->addToKart($this->selectedVar, $this->quantity, $instance, $this->retailPrice);
     }
 
