@@ -329,7 +329,7 @@ class EditOrder extends Component
             'subtotal' => $subtotal = $this->order->getSubtotal($this->selectedProducts),
             'shipping_cost' => $this->order->getShippingCost($this->selectedProducts, $subtotal, $value),
         ]);
-        if (isOninda() && ! config('app.resell')) {
+        if (! isOninda() || ! config('app.resell')) {
             $this->fill(['retail_delivery_fee' => $this->shipping_cost]);
             $this->updatedRetailDeliveryFee($this->shipping_cost);
         }
