@@ -512,6 +512,7 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
 
 
                                             <div id="order_review" class="woocommerce-checkout-review-order">
+                                                @unless($errors->has('quantity') || cart()->content()->isEmpty())
                                                 <table class="shop_table woocommerce-checkout-review-order-table"
                                                     data-update-time="1737164735">
                                                     <thead>
@@ -569,6 +570,7 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
 
                                                     </tfoot>
                                                 </table>
+                                                @endunless
                                                 <div id="payment" class="woocommerce-checkout-payment">
                                                     <ul class="wc_payment_methods payment_methods methods">
                                                         <li class="wc_payment_method payment_method_cod">
@@ -611,12 +613,20 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
                                                         </div>
 
 
-                                                        <button type="submit" class="button alt"
-                                                            wire:loading.attr="disabled"
-                                                            name="woocommerce_checkout_place_order" id="place_order"
-                                                            value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00"
-                                                            data-value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00">Place
-                                                            Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;{{ cart()->total() }}</button>
+                                                        @if($errors->has('quantity'))
+                                                            <div style="padding: 1rem; background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; border-radius: 4px; text-align: center;">
+                                                                <strong>{{ $errors->first('quantity') }}</strong>
+                                                            </div>
+                                                        @elseif(cart()->content()->isEmpty())
+                                                            <button type="button" class="button alt" disabled>Stock out / No product selected</button>
+                                                        @else
+                                                            <button type="submit" class="button alt"
+                                                                wire:loading.attr="disabled"
+                                                                name="woocommerce_checkout_place_order" id="place_order"
+                                                                value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00"
+                                                                data-value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00">Place
+                                                                Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;{{ cart()->total() }}</button>
+                                                        @endif
 
                                                         <input type="hidden" id="woocommerce-process-checkout-nonce"
                                                             name="woocommerce-process-checkout-nonce"
