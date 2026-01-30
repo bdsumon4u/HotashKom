@@ -512,64 +512,64 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
 
 
                                             <div id="order_review" class="woocommerce-checkout-review-order">
-                                                @unless($errors->has('quantity') || cart()->content()->isEmpty())
-                                                <table class="shop_table woocommerce-checkout-review-order-table"
-                                                    data-update-time="1737164735">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="product-name">Product</th>
-                                                            <th class="product-total">Subtotal</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (cart()->content() as $item)
-                                                            <tr class="cart_item">
-                                                                <td class="product-name">{{ $item->name }}&nbsp;
-                                                                    <strong
-                                                                        class="product-quantity">&times;&nbsp;{{ $item->qty }}</strong>
-                                                                </td>
-                                                                <td class="product-total">
-                                                                    <span class="woocommerce-Price-amount amount"><bdi><span
-                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $item->qty * $item->price }}</bdi></span>
+                                                @unless ($errors->has('quantity') || cart()->content()->isEmpty())
+                                                    <table class="shop_table woocommerce-checkout-review-order-table"
+                                                        data-update-time="1737164735">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="product-name">Product</th>
+                                                                <th class="product-total">Subtotal</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (cart()->content() as $item)
+                                                                <tr class="cart_item">
+                                                                    <td class="product-name">{{ $item->name }}&nbsp;
+                                                                        <strong
+                                                                            class="product-quantity">&times;&nbsp;{{ $item->qty }}</strong>
+                                                                    </td>
+                                                                    <td class="product-total">
+                                                                        <span class="woocommerce-Price-amount amount"><bdi><span
+                                                                                    class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ $item->qty * $item->price }}</bdi></span>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                        <tfoot>
+
+                                                            <tr class="cart-subtotal" style="display: none;">
+                                                                <th>Subtotal</th>
+                                                                <td><span class="woocommerce-Price-amount amount"><bdi><span
+                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ cart()->subtotal() }}</bdi></span>
                                                                 </td>
                                                             </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                    <tfoot>
-
-                                                        <tr class="cart-subtotal" style="display: none;">
-                                                            <th>Subtotal</th>
-                                                            <td><span class="woocommerce-Price-amount amount"><bdi><span
-                                                                            class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ cart()->subtotal() }}</bdi></span>
-                                                            </td>
-                                                        </tr>
 
 
 
 
-                                                        <tr class="woocommerce-shipping-totals shipping">
-                                                            <th>Shipping</th>
-                                                            <td><span class="woocommerce-Price-amount amount"><bdi><span
-                                                                            class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ cart()->getCost('deliveryFee') }}</bdi></span>
-                                                            </td>
-                                                        </tr>
+                                                            <tr class="woocommerce-shipping-totals shipping">
+                                                                <th>Shipping</th>
+                                                                <td><span class="woocommerce-Price-amount amount"><bdi><span
+                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ cart()->getCost('deliveryFee') }}</bdi></span>
+                                                                </td>
+                                                            </tr>
 
 
 
 
 
 
-                                                        <tr class="order-total">
-                                                            <th>Total</th>
-                                                            <td><strong><span
-                                                                        class="woocommerce-Price-amount amount"><bdi><span
-                                                                                class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ cart()->total() }}</bdi></span></strong>
-                                                            </td>
-                                                        </tr>
+                                                            <tr class="order-total">
+                                                                <th>Total</th>
+                                                                <td><strong><span
+                                                                            class="woocommerce-Price-amount amount"><bdi><span
+                                                                                    class="woocommerce-Price-currencySymbol">&#2547;&nbsp;</span>&nbsp;{{ cart()->total() }}</bdi></span></strong>
+                                                                </td>
+                                                            </tr>
 
 
-                                                    </tfoot>
-                                                </table>
+                                                        </tfoot>
+                                                    </table>
                                                 @endunless
                                                 <div id="payment" class="woocommerce-checkout-payment">
                                                     <ul class="wc_payment_methods payment_methods methods">
@@ -613,16 +613,19 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
                                                         </div>
 
 
-                                                        @if($errors->has('quantity'))
-                                                            <div style="padding: 1rem; background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; border-radius: 4px; text-align: center;">
+                                                        @if ($errors->has('quantity'))
+                                                            <div
+                                                                style="padding: 1rem; background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; border-radius: 4px; text-align: center;">
                                                                 <strong>{{ $errors->first('quantity') }}</strong>
                                                             </div>
                                                         @elseif(cart()->content()->isEmpty())
-                                                            <button type="button" class="button alt" disabled>Stock out / No product selected</button>
+                                                            <button type="button" class="button alt" disabled>Stock
+                                                                out / No product selected</button>
                                                         @else
                                                             <button type="submit" class="button alt"
                                                                 wire:loading.attr="disabled"
-                                                                name="woocommerce_checkout_place_order" id="place_order"
+                                                                name="woocommerce_checkout_place_order"
+                                                                id="place_order"
                                                                 value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00"
                                                                 data-value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00">Place
                                                                 Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;{{ cart()->total() }}</button>
