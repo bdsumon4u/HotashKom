@@ -173,7 +173,7 @@
                 <div class="row">
                     @foreach ($colorOptions as $colorOption)
                     <div class="mb-3 col-md-6">
-                        <div class="p-2 rounded border">
+                        <div class="p-2 border rounded">
                             <label class="mb-2 d-block">
                                 <strong>{{ $colorOption->name }}</strong>
                                 <button type="button" class="px-2 btn btn-sm btn-light" data-toggle="modal" data-target="#color-image-picker-{{$colorOption->id}}" style="background: transparent; margin-left: 5px;">
@@ -344,7 +344,7 @@
                 <strong>SEO Settings</strong>
             </div>
             <div class="p-2 card-body">
-                <small class="text-muted d-block mb-3">These fields are optional. If left empty, the system will use default values based on the product name and description.</small>
+                <small class="mb-3 text-muted d-block">These fields are optional. If left empty, the system will use default values based on the product name and description.</small>
                 <x-form method="PATCH" action="{{ route('admin.products.seo.update', $product) }}">
                     @if ($message = Session::get('success'))
                         <div class="py-2 alert alert-info"><strong>{{ $message }}</strong></div>

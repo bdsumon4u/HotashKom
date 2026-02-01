@@ -73,6 +73,12 @@ class ProductDetail extends Component
     public function addToCart($instance = 'default')
     {
         if ($this->selectedVar->should_track && $this->selectedVar->stock_count < 1) {
+            if ($this->selectedVar->parent_id) {
+                $attributes = $this->selectedVar->load('options.attribute')->options->pluck('attribute.name')->implode(', ');
+                throw ValidationException::withMessages([
+                    'quantity' => 'The selected variation is out of stock. Select different options for ('.$attributes.').',
+                ]);
+            }
             throw ValidationException::withMessages([
                 'quantity' => 'This product is out of stock.',
             ]);

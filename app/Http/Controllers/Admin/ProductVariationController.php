@@ -156,7 +156,11 @@ class ProductVariationController extends Controller
         // Process variations data to handle disabled fields
         foreach ($variations as $index => $variation) {
             // If should_track is false, set stock_count to 0
-            if (! isset($variation['should_track']) || ! $variation['should_track']) {
+            if (! $variation['should_track']) {
+                $variations[$index]['stock_count'] = 0;
+            } else if ($variations[$index]['stock_count'] === null) {
+                $variations[$index]['stock_count'] = 0;
+            } else if ($variations[$index]['stock_count'] === '') {
                 $variations[$index]['stock_count'] = 0;
             }
         }
