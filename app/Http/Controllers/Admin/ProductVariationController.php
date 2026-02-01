@@ -162,6 +162,10 @@ class ProductVariationController extends Controller
                 $variations[$index]['stock_count'] = 0;
             } else if ($variations[$index]['stock_count'] === '') {
                 $variations[$index]['stock_count'] = 0;
+            } else if (! is_numeric($variations[$index]['stock_count'])) {
+                $variations[$index]['stock_count'] = 0;
+            } else if ($variations[$index]['stock_count'] < 0) {
+                $variations[$index]['stock_count'] = 0;
             }
         }
 
