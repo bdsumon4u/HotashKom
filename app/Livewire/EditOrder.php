@@ -338,6 +338,9 @@ class EditOrder extends Component
     public function updatedRetailDeliveryFee($value): void
     {
         $this->order->fill(['data' => array_merge($this->order->data, ['retail_delivery_fee' => $value])]);
+        if (isOninda() && ! config('app.resell')) {
+            $this->fill(['shipping_cost' => $value]);
+        }
     }
 
     public function updatedPackagingCharge($value): void
