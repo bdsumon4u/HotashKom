@@ -44,7 +44,7 @@
                <strong>All Sections</strong>
                <div>
                     <a href="{{ route('admin.home-sections.create') }}" class="btn btn-primary">Product Section</a>
-                    <a href="{{ route('admin.home-sections.create', ['banner' => true]) }}" class="btn btn-primary">Banner Section</a>
+                    <a href="{{ route('admin.home-sections.create', ['banner' => true]) }}" class="btn d-none btn-primary">Banner Section</a>
                     <a href="{{ route('admin.home-sections.create', ['content' => true]) }}" class="btn btn-primary">Content Section</a>
                </div>
            </div>
