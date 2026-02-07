@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\ShipmentReportController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Middleware\CheckForMaintenanceDue;
 use Hotash\LaravelMultiUi\Facades\MultiUi;
 use Illuminate\Support\Facades\Route;
 
@@ -58,7 +59,7 @@ Route::group(['as' => 'admin.'], function (): void {
     // Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
 
     Route::permanentRedirect('/admin', '/admin/dashboard'); // Permanent Redirect
-    Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin']], function (): void {
+    Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', CheckForMaintenanceDue::class]], function (): void {
         // Admin Level Namespace & 'admin' Prefix
         Route::get('carts', [CartController::class, 'index'])->name('carts.index');
         Route::delete('carts/{identifier}', [CartController::class, 'destroy'])->name('carts.destroy');

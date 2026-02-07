@@ -8,6 +8,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSectionProductController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\MaintenancePaymentController;
 use App\Http\Controllers\OrderTrackController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ResellerController;
@@ -27,6 +28,10 @@ use Illuminate\Support\Facades\Session;
 //     Session::put('locale', $locale);
 //     return redirect()->back();
 // })->name('lang');
+
+Route::get('maintenance-payment', MaintenancePaymentController::class)->name('maintenance.payment');
+Route::post('maintenance-payment/pay', [MaintenancePaymentController::class, 'pay'])->name('maintenance.payment.pay');
+Route::post('maintenance-payment/defer', [MaintenancePaymentController::class, 'defer'])->name('maintenance.payment.defer');
 
 Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class])->group(function (): void {
     Route::group(['as' => 'user.'], function (): void {
