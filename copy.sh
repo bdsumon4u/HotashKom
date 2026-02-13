@@ -1,185 +1,220 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Define the name and public key
-KEY_NAME="GACD"
-ssh_private_key="$HOME/.ssh/$KEY_NAME"
+####################################
+# CONFIG
+####################################
+KEY_NAME="HOTASH"
+SSH_KEY="$HOME/.ssh/$KEY_NAME"
+DEFAULT_ROOT_DIR="public_html"
 
-# Define the variables you want to extract
-variables=("DB_USERNAME" "DB_DATABASE" "DB_PASSWORD")
-# Read the .env file line by line
-while IFS='=' read -r key value; do
-    # Check if the key is one of the variables you want to extract
-    if [[ " ${variables[@]} " =~ " $key " ]]; then
-        # Remove leading/trailing whitespace from the value
-        # value=$(echo "$value" | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//")
+####################################
+# LOAD SOURCE DB FROM .env
+####################################
+ENV_FILE=".env"
+if [[ ! -f "$ENV_FILE" ]]; then
+    echo "❌ .env not found in source project"
+    exit 1
+fi
 
-        if [[ $value == \"*\" || $value == \'*\' ]]; then
-            export "$key"=$value
-        else
-            export "$key"="$value"
-        fi
-    fi
-done < ".env"
+for v in DB_USERNAME DB_DATABASE DB_PASSWORD; do
+    export "$v"=$(grep "^$v=" "$ENV_FILE" | cut -d= -f2- | tr -d '"' | tr -d "'")
+done
 
-# Variables of `source` are now available in the shell
-
-# Set default values if not provided as command-line arguments
-default_root_dir="public_html"
-
-# Parse command-line arguments
+####################################
+# ARGUMENT PARSING
+####################################
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -s|--site)
-            target_site="$2"
-            shift 2
-            ;;
-        -d|--domain)
-            target_domain="$2"
-            shift 2
-            ;;
-        -h|--host)
-            ssh_host="$2"
-            shift 2
-            ;;
-        -u|--uname)
-            target_username="$2"
-            shift 2
-            ;;
-        -db|--dbname)
-            target_db_dbase="$2"
-            shift 2
-            ;;
-        -dbu|--dbuser)
-            target_db_uname="$2"
-            shift 2
-            ;;
-        -dbp|--dbpass)
-            target_db_upass="$2"
-            shift 2
-            ;;
-        -mu|--mailuser)
-            target_mail_user="$2"
-            shift 2
-            ;;
-        -mp|--mailpass)
-            target_mail_pass="$2"
-            shift 2
-            ;;
-        -r|--rootdir)
-            target_root_dir="$2"
-            shift 2
-            ;;
-        *)
-            echo "Unknown option: $1"
-            exit 1
-            ;;
+        -s|--site) target_site="$2"; shift 2 ;;
+        -d|--domain) target_domain="$2"; shift 2 ;;
+        -h|--host) ssh_host="$2"; shift 2 ;;
+        -u|--uname) target_username="$2"; shift 2 ;;
+        -db|--dbname) target_db_dbase="$2"; shift 2 ;;
+        -dbu|--dbuser) target_db_uname="$2"; shift 2 ;;
+        -dbp|--dbpass) target_db_upass="$2"; shift 2 ;;
+        -mu|--mailuser) target_mail_user="$2"; shift 2 ;;
+        -mp|--mailpass) target_mail_pass="$2"; shift 2 ;;
+        -r|--rootdir) target_root_dir="$2"; shift 2 ;;
+        *) echo "❌ Unknown option: $1"; exit 1 ;;
     esac
 done
 
-# Prompt for missing values if not provided as arguments
-[[ -z $target_site ]] && read -p "Enter target site name: " target_site
-[[ -z $target_domain ]] && read -p "Enter target site domain: " target_domain
-[[ -z $target_username ]] && read -p "Enter target cPanel username: " target_username
-[[ -z $ssh_host ]] && read -p "Enter target server IP address: " ssh_host
-[[ -z $target_db_dbase ]] && read -p "Enter target database name: " -ei "${target_username}_" target_db_dbase
-[[ -z $target_db_uname ]] && read -p "Enter target database username: " -ei "${target_username}_" target_db_uname
-[[ -z $target_db_upass ]] && read -p "Enter target database password: " target_db_upass
-[[ -z $target_mail_user ]] && read -p "Enter target email address: " target_mail_user
-[[ -z $target_mail_pass ]] && read -p "Enter target email password: " target_mail_pass
-[[ -z $target_root_dir ]] && read -p "Enter target site root directory: " -ei "$default_root_dir" target_root_dir
+####################################
+# VALIDATION & PROMPTS
+####################################
+: "${target_site:?Missing --site}"
+: "${target_domain:?Missing --domain}"
+: "${ssh_host:?Missing --host}"
+: "${target_username:?Missing --uname}"
+: "${target_db_dbase:?Missing --dbname}"
+: "${target_db_uname:?Missing --dbuser}"
+: "${target_db_upass:?Missing --dbpass}"
+: "${target_mail_user:?Missing --mailuser}"
+: "${target_mail_pass:?Missing --mailpass}"
+target_root_dir="${target_root_dir:-$DEFAULT_ROOT_DIR}"
 
-# Function to add SSH host to known_hosts if not already present
-add_ssh_host_to_known_hosts() {
-    if ! grep -q "$ssh_host" ~/.ssh/known_hosts; then
-        echo "Adding $ssh_host to known_hosts..."
-        ssh-keyscan -H "$ssh_host" >> ~/.ssh/known_hosts
-    fi
-}
+####################################
+# SSH SETUP (PERSISTENT CONNECTION)
+####################################
+TARGET="$target_username@$ssh_host"
+SSH_OPTS="-T -i $SSH_KEY \
+-o ControlMaster=auto \
+-o ControlPersist=10m \
+-o ControlPath=~/.ssh/cm-%r@%h:%p \
+-o Compression=yes"
 
-# Function to check if the public key is installed on the target server
-check_public_key_installed() {
-    # Check if the public key exists in the authorized_keys file on the server
-    ssh -i $ssh_private_key $target_username@$ssh_host "grep -q '$(cat $ssh_private_key.pub)' .ssh/authorized_keys"
-
-    # Return the exit status of the previous command
-    return $?
-}
-
-# Function to connect to target server via SSH
-connect_to_target() {
-    # Attempt to connect to target server via SSH
-    ssh -i $ssh_private_key $target_username@$ssh_host "exit"
-
-    # Check the exit status of the previous command
-    if [ $? -eq 0 ]; then
-        echo "Successfully connected to the target server."
-    else
-        echo "Failed to connect to the target server."
-        return 1
-    fi
-}
-
-# Add SSH host to known_hosts if not already present
-add_ssh_host_to_known_hosts
-
-# Try to connect to the target server
-connect_to_target || {
-    # Check if the public key is installed on the target server
-    check_public_key_installed
-    
-    # If the public key is not installed, prompt the user to add it
-    if [ $? -ne 0 ]; then
-        echo
-        echo "Please add the following public key to the target server:"
-        echo "Name: $KEY_NAME"
-        echo "Public Key:"
-        cat "$ssh_private_key.pub"
-        echo
-        read -p "Press Enter after authorizing the public key, or enter 'q' to quit: " response
-
-        # If the user enters 'q', exit the script
-        if [ "$response" = "q" ]; then
-            exit 1
-        fi
-    fi
-
-    # Retry connecting to the target server
-    connect_to_target
-}
+ssh-keyscan -H "$ssh_host" >> ~/.ssh/known_hosts 2>/dev/null || true
 
 # Transfer SSH Private Key to target
-scp -i $ssh_private_key $ssh_private_key $target_username@$ssh_host:.ssh
-ssh -i $ssh_private_key $target_username@$ssh_host "chmod 600 .ssh/$KEY_NAME"
+echo "🔑 Setting up SSH key on target..."
+scp $SSH_OPTS "$SSH_KEY" "$TARGET:.ssh/"
+ssh $SSH_OPTS "$TARGET" "chmod 600 .ssh/$KEY_NAME"
 
-# Transfer database and files from source to target
-mysqldump -u $DB_USERNAME -p$DB_PASSWORD $DB_DATABASE > database_backup.sql
-zip -r -1 -y -9 site_backup.zip . -x "storage/app/pathao*" "storage/app/mpdf" "storage/debugbar" "storage/framework" "storage/logs"
-scp -i $ssh_private_key site_backup.zip $target_username@$ssh_host:site_backup.zip
-rm site_backup.zip database_backup.sql
+####################################
+# CLEAR SOURCE CACHE BEFORE COPYING
+####################################
+echo "🧹 Clearing source cache..."
+php artisan optimize:clear 2>/dev/null || true
 
-# Unzip files, import database, update .env, and run deployment commands in a single SSH session
-ssh -i $ssh_private_key $target_username@$ssh_host <<EOF
-  # Unzip files and remove the backup
-  unzip -o site_backup.zip -d $target_root_dir && rm site_backup.zip
+####################################
+# STREAM FILES (NO INTERMEDIATE FILE)
+####################################
+echo "📦 Copying files..."
 
-  # Import the database
-  cd $target_root_dir
-  mysql -u $target_db_uname -p$target_db_upass $target_db_dbase < database_backup.sql && rm database_backup.sql
+tar \
+  --exclude=storage/framework/sessions \
+  --exclude=storage/framework/views \
+  --exclude=storage/framework/cache \
+  --exclude=storage/framework/testing \
+  --exclude=storage/logs \
+  --exclude=storage/debugbar \
+  --exclude=storage/app/pathao* \
+  --exclude=storage/app/mpdf \
+  --exclude=bootstrap/cache \
+  -czf - . \
+| ssh $SSH_OPTS "$TARGET" "
+    mkdir -p '$target_root_dir'
+    cd '$target_root_dir'
+    tar -xzf -
+    
+    # Create Laravel directories that were excluded
+    mkdir -p storage/framework/{sessions,views,cache,cache/data,testing}
+    mkdir -p storage/logs
+    mkdir -p storage/debugbar
+    mkdir -p bootstrap/cache
+    
+    # Fix ownership and permissions
+    chown -R \$(whoami):\$(whoami) storage bootstrap/cache
+    chmod -R 775 storage bootstrap/cache
+    find storage -type f -exec chmod 664 {} \\;
+    find storage -type d -exec chmod 775 {} \\;
+"
 
-  # Update .env file
-  sed -i "s/APP_NAME=.*/APP_NAME='$target_site'/" .env
-  sed -i "s|APP_URL=.*|APP_URL=https://www.$target_domain|" .env
-  sed -i "s/DB_DATABASE=.*/DB_DATABASE=$target_db_dbase/" .env
-  sed -i "s/DB_USERNAME=.*/DB_USERNAME=$target_db_uname/" .env
-  sed -i "s|DB_PASSWORD=.*|DB_PASSWORD='$(echo $target_db_upass | sed 's/|/\\|/g')'|" .env
-  sed -i "s/MAIL_HOST=.*/MAIL_HOST=mail.$target_domain/" .env
-  sed -i "s/MAIL_USERNAME=.*/MAIL_USERNAME=$target_mail_user/" .env
-  sed -i "s|MAIL_PASSWORD=.*|MAIL_PASSWORD='$(echo $target_mail_pass | sed 's/|/\\|/g')'|" .env
-  sed -i "s/MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=$target_mail_user/" .env
+####################################
+# STREAM DATABASE (PIPE DIRECTLY)
+####################################
+echo "🗄️  Copying database..."
 
-  # Run deployment commands
-  ./server_deploy.sh
-  rm -rf public/storage storage/app/pathao*
-  /opt/alt/php83/usr/bin/php artisan storage:link
-  # /opt/alt/php83/usr/bin/php artisan optimize:clear
+mysqldump --single-transaction \
+  -u "$DB_USERNAME" -p"$DB_PASSWORD" "$DB_DATABASE" \
+| ssh $SSH_OPTS "$TARGET" "
+    /usr/bin/mysql -u '$target_db_uname' -p'$target_db_upass' '$target_db_dbase'
+"
+
+####################################
+# HELPER: Escape for sed substitution
+####################################
+escape_sed() {
+    printf '%s\n' "$1" | sed -e 's/[\/&]/\\&/g'
+}
+
+escape_sed_pipe() {
+    printf '%s\n' "$1" | sed -e 's/[\/&|]/\\&/g'
+}
+
+####################################
+# REMOTE DEPLOY (SINGLE SSH SESSION)
+####################################
+echo "🚀 Deploying on remote server..."
+
+ssh $SSH_OPTS "$TARGET" <<EOF
+set -e
+
+cd "$target_root_dir"
+
+if [[ ! -f .env ]]; then
+    echo "❌ ERROR: .env not found"
+    exit 1
+fi
+
+####################################
+# HELPER FUNCTIONS
+####################################
+escape_sed() {
+    printf '%s\n' "\$1" | sed -e 's/[\/&]/\\&/g'
+}
+
+escape_sed_pipe() {
+    printf '%s\n' "\$1" | sed -e 's/[\/&|]/\\&/g'
+}
+
+####################################
+# UPDATE .env FILE FIRST (CRITICAL)
+####################################
+sed -i "s/APP_NAME=.*/APP_NAME='$(escape_sed "$target_site")'/g" .env
+sed -i "s|APP_URL=.*|APP_URL=https://www.$target_domain|g" .env
+sed -i "s/DB_DATABASE=.*/DB_DATABASE=$(escape_sed "$target_db_dbase")/g" .env
+sed -i "s/DB_USERNAME=.*/DB_USERNAME=$(escape_sed "$target_db_uname")/g" .env
+sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=$(escape_sed_pipe "$target_db_upass")|g" .env
+sed -i "s/MAIL_HOST=.*/MAIL_HOST=mail.$target_domain/g" .env
+sed -i "s/MAIL_USERNAME=.*/MAIL_USERNAME=$(escape_sed "$target_mail_user")/g" .env
+sed -i "s|MAIL_PASSWORD=.*|MAIL_PASSWORD=$(escape_sed_pipe "$target_mail_pass")|g" .env
+sed -i "s/MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=$(escape_sed "$target_mail_user")/g" .env
+
+####################################
+# FIND WORKING PHP BINARY
+####################################
+find_php() {
+    for php in /opt/cpanel/ea-php84/root/usr/bin/php /opt/alt/php84/usr/bin/php /usr/bin/php; do
+        if [[ -x "\$php" ]]; then
+            echo "\$php"
+            return 0
+        fi
+    done
+    return 1
+}
+
+PHP=\$(find_php) || {
+    echo "❌ No PHP binary found"
+    exit 1
+}
+
+echo "▶ Using PHP: \$PHP"
+
+####################################
+# REGENERATE AUTOLOADER (CRITICAL)
+####################################
+# Composer caches absolute paths, must regenerate for new location
+if [[ -f composer.json ]]; then
+    \$PHP "\$([ -f "./composer.phar" ] && echo "./composer.phar" || command -v composer || echo /opt/cpanel/composer/bin/composer)" dump-autoload -o 2>/dev/null || echo "⚠️  Could not regenerate autoloader"
+fi
+
+####################################
+# RUN LARAVEL COMMANDS
+####################################
+# Remove old symlink/directory first so storage:link can create fresh one
+rm -rf public/storage storage/app/pathao*
+
+\$PHP artisan key:generate --force
+\$PHP artisan migrate --force
+\$PHP artisan storage:link
+
+# Run custom deployment script if it exists
+if [[ -f ./server_deploy.sh ]]; then
+    ./server_deploy.sh
+fi
+
 EOF
+
+echo "✅ Deployment completed successfully"
