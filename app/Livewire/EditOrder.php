@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
@@ -94,19 +95,31 @@ class EditOrder extends Component
 
     public function getCourierReportProperty()
     {
-        // $expires = config('services.courier_report.expires');
-        // if (! $expires || \Illuminate\Support\Facades\Date::parse($expires)->isPast()) {
-        //     return 'API Expired';
-        // }
+        $expires = config('services.courier_report.expires');
+        if (! $expires || \Illuminate\Support\Facades\Date::parse($expires)->isPast()) {
+            return 'API Expired';
+        }
 
         $report = cacheMemo()->remember(
             'courier:'.($this->order->phone ?? ''),
             now()->addHours(4),
             function () {
                 try {
+                    $nextToken = function () {
+                        $cacheKey = 'bdcourier:token:rotating';
+                        $apiKeys = Cache::pull($cacheKey, explode('|', config('services.courier_report.key')));
+                        $current = array_shift($apiKeys);
+                        array_push($apiKeys, $current);
+                        Cache::put($cacheKey, $apiKeys, now()->addDay());
+                        return $current;
+                    };
+
                     return Http::retry(3, 100)
-                        ->withToken(config('services.courier_report.key'))
-                        ->post('https://courierrank.com/api/dokanai/' . $this->order->phone)
+                        ->withToken($nextToken())
+                        // ->post('https://courierrank.com/api/dokanai/' . $this->order->phone)
+                        ->post(config('services.courier_report.url'), [
+                            'phone' => $this->order->phone ?? '',
+                        ])
                         ->json();
                 } catch (\Exception $e) {
                     return $e->getMessage();
