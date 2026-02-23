@@ -32,7 +32,7 @@
                                     </svg>
                                 </button>
                                 <div id="mobile-search-suggestions" class="search-suggestions-dropdown"
-                                    style="display:none;position:absolute;top:100%;left:0;width:100%;z-index:9999;background:#fff;border:1px solid #eee;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:0;max-height:320px;overflow-y:auto;">
+                                    style="display:none;position:absolute;top:100%;left:0;width:100%;z-index:9999;background:#fff;border:1px solid #eee;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:0;max-height:320px;height:220px;overflow-y:auto;">
                                 </div>
                             </form>
                         </div>

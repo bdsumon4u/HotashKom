@@ -416,6 +416,14 @@
             }
         }
 
+        .mobile-header__search div {
+            pointer-events: all;
+        }
+
+        .aa-input-icon {
+            padding: .5rem;
+        }
+
         @media (max-width: 575px) {
             .mobile-header__search {
                 top: 55px;
