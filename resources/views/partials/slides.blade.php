@@ -23,7 +23,7 @@
         display: none;
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: 1023px) {
         .block-slideshow__slide-image--desktop {
             display: none;
         }
@@ -90,7 +90,7 @@
         min-width: 100%;
         min-height: 100%;
     }
-    @media (max-width: 767px) {
+    @media (max-width: 1023px) {
         .block-slideshow__body, .block-slideshow__slide {
             height: 180px !important;
         }
