@@ -27,9 +27,10 @@ class ApiController extends Controller
 
     public function searchSuggestions(Request $request)
     {
-        return Product::search($request->get('query'), fn ($query) => $query->whereNull('parent_id')->whereIsActive(1))
-            ->take($request->get('limit'))->get()->transform(fn ($product): array => array_merge($product->toArray(), [
+        return Product::search($request->get('query', $request->get('q', '')), fn ($query) => $query->whereNull('parent_id')->whereIsActive(1))
+            ->take($request->get('limit', 5))->get()->transform(fn ($product): array => array_merge($product->toArray(), [
                 'images' => $product->images->pluck('src')->toArray(),
+                'thumbnail' => $product->base_image ? asset($product->base_image->src) : null,
                 'price' => $product->selling_price,
                 'compareAtPrice' => $product->price,
                 'badges' => [],

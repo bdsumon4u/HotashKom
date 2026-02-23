@@ -1,3 +1,83 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(function() {
+    // Desktop search
+    var $desktopInput = $("input[name='search']").filter(function() {
+        return $(this).closest('.site-header__search').length > 0;
+    });
+    var $desktopSuggestions = $('#desktop-search-suggestions');
+    $desktopInput.on('input', function() {
+        var query = $(this).val();
+        if (query.length < 2) {
+            $desktopSuggestions.hide();
+            return;
+        }
+        $.get('/api/search/suggestions.json', { q: query }, function(data) {
+            var html = '';
+            if (data && data.length) {
+                html += '<ul style="list-style:none;margin:0;padding:0">';
+                data.forEach(function(item) {
+                    html += '<li style="padding:8px 12px;border-bottom:1px solid #eee">';
+                    html += '<a href="/products/' + item.slug + '" style="display:flex;align-items:center;text-decoration:none;color:#222">';
+                    if (item.thumbnail) html += '<img src="' + item.thumbnail + '" style="width:32px;height:32px;margin-right:8px">';
+                    html += '<span>' + item.name + '</span>';
+                    html += '</a>';
+                    html += '</li>';
+                });
+                html += '</ul>';
+            } else {
+                html = '<div style="padding:12px;color:#888">No products found</div>';
+            }
+            $desktopSuggestions.html(html).show();
+            $desktopSuggestions.css({
+                width: $desktopInput.outerWidth() || $desktopInput[0].offsetWidth,
+                left: $desktopInput.position().left,
+                top: $desktopInput.position().top + $desktopInput.outerHeight()
+            });
+        });
+    });
+    $desktopInput.on('blur', function() {
+        setTimeout(function() { $desktopSuggestions.hide(); }, 200);
+    });
+
+    // Mobile search
+    var $mobileInput = $('#bb-search-input');
+    var $mobileSuggestions = $('#mobile-search-suggestions');
+    $mobileInput.on('input', function() {
+        var query = $(this).val();
+        if (query.length < 2) {
+            $mobileSuggestions.hide();
+            return;
+        }
+        $.get('/api/search/suggestions.json', { q: query }, function(data) {
+            var html = '';
+            if (data && data.length) {
+                html += '<ul style="list-style:none;margin:0;padding:0">';
+                data.forEach(function(item) {
+                    html += '<li style="padding:8px 12px;border-bottom:1px solid #eee">';
+                    html += '<a href="/products/' + item.slug + '" style="display:flex;align-items:center;text-decoration:none;color:#222">';
+                    if (item.thumbnail) html += '<img src="' + item.thumbnail + '" style="width:32px;height:32px;margin-right:8px">';
+                    html += '<span>' + item.name + '</span>';
+                    html += '</a>';
+                    html += '</li>';
+                });
+                html += '</ul>';
+            } else {
+                html = '<div style="padding:12px;color:#888">No products found</div>';
+            }
+            $mobileSuggestions.html(html).show();
+            $mobileSuggestions.css({
+                width: $mobileInput.outerWidth() || $mobileInput[0].offsetWidth,
+                left: $mobileInput.position().left,
+                top: $mobileInput.position().top + $mobileInput.outerHeight()
+            });
+        });
+    });
+    $mobileInput.on('blur', function() {
+        setTimeout(function() { $mobileSuggestions.hide(); }, 200);
+    });
+});
+</script>
 {{-- Bootstrap is needed early for UI components, but can be deferred --}}
 <script src="{{ cdnAsset('bootstrap.js', 'strokya/vendor/bootstrap-4.2.1/js/bootstrap.bundle.min.js') }}" crossorigin="anonymous" referrerpolicy="no-referrer" defer onerror="window.__loadLocalAsset && window.__loadLocalAsset('bootstrap')"></script>
 {{-- Owl Carousel can be deferred - carousels load after initial render --}}
