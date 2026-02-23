@@ -17,35 +17,37 @@
 
 
                     <form action="/shop">
-                                            <div style="grid-area:search" class="md:ml-4 position-relative">
-                                                <div class="transition-all duration-75 ease-linear Searchbar__CustomCombobox-xnx3kr-6 joXPnU overflow-initial"
-                                                    data-reach-combobox="" data-state="idle">
-                                                    <div class="Searchbar__Container-xnx3kr-1 kWQExC" style="display: flex;">
-                                                        <input
-                                                            name="search" aria-autocomplete="both" aria-controls="listbox--1"
-                                                            aria-expanded="false" aria-haspopup="listbox" aria-labelledby="demo"
-                                                            role="combobox" placeholder="Search for..." data-reach-combobox-input=""
-                                                            data-state="idle" value="{{ request('search') }}"
-                                                            style="letter-spacing: 0.025em;font-weight: 500;font-size: 0.875rem;height: 40px;display: flex;flex: 1 1 0%;padding: 0px 17px;border: 2px solid;border-radius: 4px 0px 0px 4px;outline: none;width: 100%;">
-                                                        <button type="submit" style="border: none; padding: 0;">
-                                                            <figure color="black" class="Searchbar__Button-xnx3kr-3 duKdNo"
-                                                                style="cursor: pointer;display: flex;-webkit-box-align: center;align-items: center;padding-right: 29px;padding-left: 29px;color: rgb(255, 255, 255);height: 40px;min-height: 100%;margin: 0;">
-                                                                <svg stroke="currentColor" fill="currentColor" stroke-width="0"
-                                                                    viewBox="0 0 24 24"
-                                                                    class="Searchbar___StyledMdSearch-xnx3kr-5 fHBAIp" height="1em"
-                                                                    width="1em" xmlns="http://www.w3.org/2000/svg"
-                                                                    style="font-size: 25px;">
-                                                                    <path
-                                                                        d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
-                                                                    </path>
-                                                                </svg>
-                                                            </figure>
-                                                        </button>
-                                                    </div>
-                                                    <div id="desktop-search-suggestions" class="search-suggestions-dropdown" style="display:none;position:absolute;top:100%;left:0;width:100%;z-index:9999;background:#fff;border:1px solid #eee;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:0;max-height:320px;overflow-y:auto;"></div>
-                                                                                                    <div id="desktop-search-suggestions" class="search-suggestions-dropdown" style="display:none;position:absolute;top:100%;left:0;width:100%;z-index:9999;background:#fff;border:1px solid #eee;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:0;max-height:320px;overflow-y:auto;"></div>
-                                                </div>
-                                            </div>
+                        <div style="grid-area:search" class="md:ml-4 position-relative">
+                            <div class="transition-all duration-75 ease-linear Searchbar__CustomCombobox-xnx3kr-6 joXPnU overflow-initial"
+                                data-reach-combobox="" data-state="idle">
+                                <div class="Searchbar__Container-xnx3kr-1 kWQExC" style="display: flex;">
+                                    <input name="search" aria-autocomplete="both" aria-controls="listbox--1"
+                                        aria-expanded="false" aria-haspopup="listbox" aria-labelledby="demo"
+                                        role="combobox" placeholder="Search for..." data-reach-combobox-input=""
+                                        data-state="idle" value="{{ request('search') }}"
+                                        style="letter-spacing: 0.025em;font-weight: 500;font-size: 0.875rem;height: 40px;display: flex;flex: 1 1 0%;padding: 0px 17px;border: 2px solid;border-radius: 4px 0px 0px 4px;outline: none;width: 100%;">
+                                    <button type="submit" style="border: none; padding: 0;">
+                                        <figure color="black" class="Searchbar__Button-xnx3kr-3 duKdNo"
+                                            style="cursor: pointer;display: flex;-webkit-box-align: center;align-items: center;padding-right: 29px;padding-left: 29px;color: rgb(255, 255, 255);height: 40px;min-height: 100%;margin: 0;">
+                                            <svg stroke="currentColor" fill="currentColor" stroke-width="0"
+                                                viewBox="0 0 24 24" class="Searchbar___StyledMdSearch-xnx3kr-5 fHBAIp"
+                                                height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"
+                                                style="font-size: 25px;">
+                                                <path
+                                                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                                                </path>
+                                            </svg>
+                                        </figure>
+                                    </button>
+                                </div>
+                                <div id="desktop-search-suggestions" class="search-suggestions-dropdown"
+                                    style="display:none;position:absolute;top:100%;left:0;width:100%;z-index:9999;background:#fff;border:1px solid #eee;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:0;max-height:320px;overflow-y:auto;">
+                                </div>
+                                <div id="desktop-search-suggestions" class="search-suggestions-dropdown"
+                                    style="display:none;position:absolute;top:100%;left:0;width:100%;z-index:9999;background:#fff;border:1px solid #eee;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:0;max-height:320px;overflow-y:auto;">
+                                </div>
+                            </div>
+                        </div>
                     </form>
 
 
