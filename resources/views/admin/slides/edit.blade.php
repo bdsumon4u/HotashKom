@@ -18,11 +18,11 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row justify-content-center mb-5">
+    <div class="mb-5 row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header p-3">Edit Slide</div>
-                <div class="card-body p-3">
+                <div class="p-3 card-header">Edit Slide</div>
+                <div class="p-3 card-body">
                     <x-form method="patch" :action="route('admin.slides.update', $slide)" has-files>
                         <div class="form-group">
                             <x-label for="title" />
@@ -40,6 +40,27 @@
                                 <x-checkbox name="is_active" value="1" :checked="$slide->is_active" />
                                 <x-label for="is_active" />
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="object_fit">Image fit (object-fit)</label>
+                            <div>
+                                @foreach(['contain', 'cover', 'fill', 'none', 'scale-down'] as $value)
+                                    <div class="form-check form-check-inline">
+                                        <input
+                                            class="form-check-input"
+                                            type="radio"
+                                            name="object_fit"
+                                            id="object_fit_{{ $value }}"
+                                            value="{{ $value }}"
+                                            {{ ($slide->object_fit ?? 'cover') === $value ? 'checked' : '' }}
+                                        >
+                                        <label class="form-check-label" for="object_fit_{{ $value }}">
+                                            {{ $value }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <small class="form-text text-muted">How the slide image fits within its container. Default: Cover.</small>
                         </div>
                         <div class="row">
                             <div class="col-md-6">

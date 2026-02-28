@@ -72,8 +72,19 @@ return [
     ],
 
     'slides' => [
-        'mobile' => [360, 180],
-        'desktop' => [1125, 395],
+        'object_fit' => env('SLIDES_OBJECT_FIT', 'cover'),
+        'mobile' => [
+            'width' => 360,
+            'height' => 180,
+            'resize' => env('SLIDES_MOBILE_RESIZE', true),
+            'method' => env('SLIDES_MOBILE_METHOD', 'resize'),
+        ],
+        'desktop' => [
+            'width' => 1125,
+            'height' => 395,
+            'resize' => env('SLIDES_DESKTOP_RESIZE', true),
+            'method' => env('SLIDES_DESKTOP_METHOD', 'resize'),
+        ],
     ],
 
     'bdwebs' => [

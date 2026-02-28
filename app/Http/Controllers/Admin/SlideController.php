@@ -51,14 +51,19 @@ class SlideController extends Controller
 
         return Slide::create([
             'is_active' => true,
+            'object_fit' => config('services.slides.object_fit', 'cover'),
             'mobile_src' => $this->uploadImage($file, [
-                'width' => config('services.slides.mobile.0', 360),
-                'height' => config('services.slides.mobile.1', 180),
+                'width' => config('services.slides.mobile.width', 360),
+                'height' => config('services.slides.mobile.height', 180),
+                'resize' => config('services.slides.mobile.resize', true),
+                'method' => config('services.slides.mobile.method', 'resize'),
                 'dir' => 'slides/mobile',
             ]),
             'desktop_src' => $this->uploadImage($file, [
-                'width' => config('services.slides.desktop.0', 1125),
-                'height' => config('services.slides.desktop.1', 395),
+                'width' => config('services.slides.desktop.width', 1125),
+                'height' => config('services.slides.desktop.height', 395),
+                'resize' => config('services.slides.desktop.resize', true),
+                'method' => config('services.slides.desktop.method', 'resize'),
                 'dir' => 'slides/desktop',
             ]),
         ]);
@@ -98,6 +103,7 @@ class SlideController extends Controller
             'btn_name' => ['nullable', 'max:20'],
             'btn_href' => ['nullable', 'max:255'],
             'is_active' => ['sometimes', 'boolean'],
+            'object_fit' => ['nullable', 'string', 'in:contain,cover,fill,none,scale-down,inherit,initial,revert,revert-layer,unset'],
         ]);
 
         $slide->update($data);

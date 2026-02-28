@@ -119,6 +119,7 @@
                             $desktopImageUrl = cdn(asset($slide->desktop_src), 840, 395);
                             $mobileImageUrl = cdn(asset($slide->mobile_src), 360, 180);
                             $isFirstSlide = $index === 0;
+                            $objectFit = $slide->object_fit ?? 'cover';
                         @endphp
                         <a class="block-slideshow__slide" href="{{ $slide->btn_href ?? '#' }}">
                             {{-- Use <img> tag for first slide to enable fetchpriority="high" for LCP optimization --}}
@@ -127,18 +128,24 @@
                                     <img src="{{ $desktopImageUrl }}" alt="{{ $slide->title ?? 'Slide' }}"
                                          fetchpriority="high"
                                          loading="eager"
-                                         style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+                                         style="width: 100%; height: 100%; object-fit: {{ $objectFit }}; position: absolute; top: 0; left: 0;">
                                 </div>
                                 <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile" style="position: relative; overflow: hidden;">
                                     <img src="{{ $mobileImageUrl }}" alt="{{ $slide->title ?? 'Slide' }}"
                                          loading="eager"
-                                         style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+                                         style="width: 100%; height: 100%; object-fit: {{ $objectFit }}; position: absolute; top: 0; left: 0;">
                                 </div>
                             @else
-                                <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop"
-                                    style="background-image: url({{ $desktopImageUrl }}); background-position: center;"></div>
-                                <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile"
-                                    style="background-image: url({{ $mobileImageUrl }}); background-position: center;"></div>
+                                <div class="block-slideshow__slide-image block-slideshow__slide-image--desktop" style="position: relative; overflow: hidden;">
+                                    <img src="{{ $desktopImageUrl }}" alt="{{ $slide->title ?? 'Slide' }}"
+                                         loading="lazy"
+                                         style="width: 100%; height: 100%; object-fit: {{ $objectFit }}; position: absolute; top: 0; left: 0;">
+                                </div>
+                                <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile" style="position: relative; overflow: hidden;">
+                                    <img src="{{ $mobileImageUrl }}" alt="{{ $slide->title ?? 'Slide' }}"
+                                         loading="lazy"
+                                         style="width: 100%; height: 100%; object-fit: {{ $objectFit }}; position: absolute; top: 0; left: 0;">
+                                </div>
                             @endif
                             <div class="block-slideshow__slide-content">
                                 <div class="block-slideshow__slide-title">{!! $slide->title !!}</div>
