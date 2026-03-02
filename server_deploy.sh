@@ -10,7 +10,8 @@ echo "Deploying application ..."
     # git reset --hard origin/production
     git pull origin master --force
 
-    /opt/alt/php83/usr/bin/php "$([ -f "./composer.phar" ] && echo "./composer.phar" || command -v composer || echo /opt/cpanel/composer/bin/composer)" install \
+    COMPOSER="$([ -f "./composer.phar" ] && echo "./composer.phar" || command -v composer || echo /opt/cpanel/composer/bin/composer)"
+    ./php "$COMPOSER" install \
         --no-interaction --prefer-dist --optimize-autoloader --no-progress \
         $(if [ "$1" = "--no-dev" ]; then echo "--no-dev"; fi)
 
