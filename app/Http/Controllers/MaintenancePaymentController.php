@@ -6,7 +6,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class MaintenancePaymentController extends Controller
@@ -62,16 +61,7 @@ class MaintenancePaymentController extends Controller
         Cache::forget('ignore_maintenance_due_check');
         Cache::forget('unpaid_or_overdue_invoice');
 
-        /** @var \Illuminate\Http\Client\Response $response */
-        $response = Http::acceptJson()->get('https://hotash.tech/includes/api/generatehotashpayurl.php', [
-            'invoiceid' => $invoiceId,
-        ]);
-
-        if (! $paymentUrl = $response->json('payment_url')) {
-            return redirect()->route('maintenance.payment')->with('error', 'Payment link is unavailable. Please try again.');
-        }
-
-        return redirect()->away($paymentUrl);
+        return redirect()->away('https://hotash.tech/pay/'.$invoiceId);
     }
 
     public function defer(Request $request): RedirectResponse
