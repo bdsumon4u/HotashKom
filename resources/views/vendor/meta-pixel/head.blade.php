@@ -1,10 +1,8 @@
 @if($metaPixel->isEnabled())
-    <!-- Meta Pixel Code - Deferred to reduce main-thread blocking -->
-    <script>
-        // Defer Facebook Pixel loading until after page is interactive
+    <!-- Meta Pixel Code -->
+    <script id="fb-pixel-init" data-fb-pixel-tracking="init">
         (function() {
-            function loadFacebookPixel() {
-                if (window.fbq) return;
+            if (!window.__fbPixelInitialized) {
                 !function(f,b,e,v,n,t,s)
                 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
                     n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -13,32 +11,29 @@
                     t.src=v;s=b.getElementsByTagName(e)[0];
                     s.parentNode.insertBefore(t,s)}(window, document,'script',
                     'https://connect.facebook.net/en_US/fbevents.js');
-    @if(false)
-        @if($user = $metaPixel->getUser())
-            @if($userIdAsString)
-                fbq('init', '{{ $metaPixel->pixelId() }}', {em: '{{ $user['em'] }}', external_id: '{{ $user['external_id'] }}'});
-            @else
-                fbq('init', '{{ $metaPixel->pixelId() }}', {em: '{{ $user['em'] }}', external_id: {{ $user['external_id'] }}});
-            @endif
-        @else
-            fbq('init', '{{ $metaPixel->pixelId() }}');
-        @endif
-    @else
-        @foreach(explode(' ', $metaPixel->pixelId()) as $id)
-            @if($id)
-                fbq('init', '{{ $id }}');
-            @endif
-        @endforeach
-    @endif
-                fbq('track', 'PageView');
+
+                @if(false)
+                    @if($user = $metaPixel->getUser())
+                        @if($userIdAsString)
+                            fbq('init', '{{ $metaPixel->pixelId() }}', {em: '{{ $user['em'] }}', external_id: '{{ $user['external_id'] }}'});
+                        @else
+                            fbq('init', '{{ $metaPixel->pixelId() }}', {em: '{{ $user['em'] }}', external_id: {{ $user['external_id'] }}});
+                        @endif
+                    @else
+                        fbq('init', '{{ $metaPixel->pixelId() }}');
+                    @endif
+                @else
+                    @foreach(explode(' ', $metaPixel->pixelId()) as $id)
+                        @if($id)
+                            fbq('init', '{{ $id }}');
+                        @endif
+                    @endforeach
+                @endif
+
+                window.__fbPixelInitialized = true;
             }
 
-            // Load after page is interactive (requestIdleCallback or setTimeout fallback)
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadFacebookPixel, { timeout: 2000 });
-            } else {
-                setTimeout(loadFacebookPixel, 2000);
-            }
+            fbq('track', 'PageView');
         })();
     </script>
     <noscript>
