@@ -10,7 +10,10 @@
                 @foreach ($eventLayer as $eventName => $metaPixel)
                     (function() {
                         const eventName = '{{ $eventName }}';
-                        const eventKey = 'fbq_{{ hash('sha256', json_encode($eventLayer)) }}_' + eventName;
+                        const eventData = {{ Js::from($metaPixel['data'] ?? []) }};
+                        const eventId = '{{ $metaPixel['event_id'] ?? '' }}';
+                        // Use content-based hash: stable key for identical events across SPA navigation
+                        const eventKey = 'fbq_' + eventName + '_' + JSON.stringify(eventData) + '_' + eventId;
 
                         if (window.__fbPixelTrackedEvents.has(eventKey)) {
                             return;
@@ -44,7 +47,10 @@
                 @foreach ($customEventLayer as $customEventName => $metaPixel)
                     (function() {
                         const eventName = '{{ $customEventName }}';
-                        const eventKey = 'fbq_custom_{{ hash('sha256', json_encode($customEventLayer)) }}_' + eventName;
+                        const eventData = {{ Js::from($metaPixel['data'] ?? []) }};
+                        const eventId = '{{ $metaPixel['event_id'] ?? '' }}';
+                        // Use content-based hash: stable key for identical events across SPA navigation
+                        const eventKey = 'fbq_custom_' + eventName + '_' + JSON.stringify(eventData) + '_' + eventId;
 
                         if (window.__fbPixelTrackedEvents.has(eventKey)) {
                             return;

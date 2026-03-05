@@ -3,7 +3,9 @@
     // Initialize tracking for custom events
     if (!window.__fbPixelCustomEventListener) {
         window.__fbPixelCustomEventListener = true;
-        window.__fbPixelTrackedCustomEvents = new Set();
+        if (!window.__fbPixelTrackedEvents) {
+            window.__fbPixelTrackedEvents = new Set();
+        }
 
         document.addEventListener("facebookEvent", function (event) {
             if (event.detail.length === 0) {
@@ -12,15 +14,22 @@
 
             const { eventName, customData, eventId } = event.detail[0];
 
+            // Use main tracking store for consistency across all pixel events
+            if (!window.__fbPixelTrackedEvents) {
+                window.__fbPixelTrackedEvents = new Set();
+            }
+
             // Create a unique key for this event to prevent duplicates
             const eventKey =
-                "fbq_custom_" +
+                "fbq_event_" +
                 eventName +
                 "_" +
-                JSON.stringify(customData || {});
+                JSON.stringify(customData || {}) +
+                "_" +
+                (eventId || "");
 
-            // Skip if this exact event was already tracked recently (within current navigation cycle)
-            if (window.__fbPixelTrackedCustomEvents.has(eventKey)) {
+            // Skip if this exact event was already tracked (persistent across SPA navigation)
+            if (window.__fbPixelTrackedEvents.has(eventKey)) {
                 console.log("Facebook Event Skipped (duplicate):", {
                     eventName,
                     customData,
@@ -30,12 +39,7 @@
             }
 
             fbq("track", eventName, customData, eventId);
-            window.__fbPixelTrackedCustomEvents.add(eventKey);
-
-            // Clear tracked events after a delay to allow for new navigation cycles
-            setTimeout(function () {
-                window.__fbPixelTrackedCustomEvents.clear();
-            }, 1000);
+            window.__fbPixelTrackedEvents.add(eventKey);
 
             console.log("Facebook Event Tracked:", {
                 eventName,
