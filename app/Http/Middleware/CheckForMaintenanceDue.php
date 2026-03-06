@@ -57,7 +57,7 @@ class CheckForMaintenanceDue
         /** @var \Illuminate\Http\Client\Response $response */
         $response = Http::asForm()
             ->acceptJson()
-            ->get('https://sites.hotash.tech/api/get-service-id/'.$request->getHost());
+            ->get('https://sites.hotash.tech/api/get-service-id/'.preg_replace('/^www\./', '', request()->getHost()));
 
         if ($serviceId = $response->json('service_id')) {
             Cache::put($key, $serviceId, now()->addWeek());
