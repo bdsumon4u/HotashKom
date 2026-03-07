@@ -98,8 +98,12 @@ class ProductController extends Controller
         abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validationData();
 
+        if (! isset($data['wholesale'])) {
+            $data['wholesale'] = [];
+        }
+
         // Check if price fields are being updated before saving
-        $priceFields = ['price', 'selling_price', 'average_purchase_price', 'suggested_price'];
+        $priceFields = ['price', 'selling_price', 'average_purchase_price', 'suggested_price', 'wholesale'];
         $priceFieldsChanged = false;
         $fieldsToUpdate = [];
 
