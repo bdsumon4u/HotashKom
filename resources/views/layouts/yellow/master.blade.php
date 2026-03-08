@@ -316,7 +316,7 @@
         </a>
         @endif
         @if($phone)
-        <a class="widget-connect__button widget-connect__button-whatsapp button-slide-out" style="background: white; color: green;" href="https://wa.me/{{$phone}}" data-toggle="tooltip" data-placement="left" title="" target="_blank" data-original-title="WhatsApp">
+        <a class="widget-connect__button widget-connect__button-whatsapp button-slide-out" style="background: white; color: green;" href="https://wa.me/{{$company->whatsapp ?? ''}}" data-toggle="tooltip" data-placement="left" title="" target="_blank" data-original-title="WhatsApp">
             <i class="fab fa-whatsapp"></i>
         </a>
         @endif
@@ -326,7 +326,7 @@
     </div>
     @elseif ($phone)
     <a
-        href="https://api.whatsapp.com/send?phone={{$phone}}" target="_blank"
+        href="https://api.whatsapp.com/send?phone={{$company->whatsapp ?? ''}}" target="_blank"
         style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;"
     >
         <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>

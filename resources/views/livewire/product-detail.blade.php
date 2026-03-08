@@ -153,7 +153,7 @@
                         <i class="mr-2 fab fa-facebook-messenger"></i> Messenger
                     </a>
                     @endif
-                    <a href="https://api.whatsapp.com/send?phone={{ $phone }}&text=Hello+%0D%0AI+am+interested+in+ordering+%22{{ $product->name }}%22.%0D%0A%0D%0A{{ url()->current() }}"
+                    <a href="https://api.whatsapp.com/send?phone={{ $company->whatsapp ?? '' }}&text=Hello+%0D%0AI+am+interested+in+ordering+%22{{ $product->name }}%22.%0D%0A%0D%0A{{ url()->current() }}"
                         target="_blank" rel="noopener"
                         class="ml-1 btn btn-success d-flex align-items-center" style="min-width: 140px;">
                         <i class="mr-2 fab fa-whatsapp"></i> WhatsApp
@@ -175,7 +175,7 @@
                                 </p>
                             @endif
                             <div class="mt-2">
-                                <p class="mr-2 mb-0 text-secondary d-inline-block">Categories:</p>
+                                <p class="mb-0 mr-2 text-secondary d-inline-block">Categories:</p>
                                 @foreach ($product->categories as $category)
                                     <a href="{{ route('categories.products', $category) }}"
                                         class="badge badge-primary">{{ $category->name }}</a>
