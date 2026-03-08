@@ -406,6 +406,8 @@ class Checkout extends Component
         if (! ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)) {
             if (Str::startsWith($this->phone, '01')) {
                 $this->phone = Str::after($this->phone, '0');
+            } else if (Str::startsWith($this->phone, '8801')) {
+                $this->phone = Str::after($this->phone, '880');
             }
         } elseif (Str::startsWith($this->phone, '01')) { // hide prefix
             $this->phone = '+88'.$this->phone;
