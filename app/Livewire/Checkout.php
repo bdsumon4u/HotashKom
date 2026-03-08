@@ -409,6 +409,8 @@ class Checkout extends Component
             }
         } elseif (Str::startsWith($this->phone, '01')) { // hide prefix
             $this->phone = '+88'.$this->phone;
+        } else if (Str::startsWith($this->phone, '8801')) {
+            $this->phone = '+'.$this->phone;
         }
 
         $validationRules = [
