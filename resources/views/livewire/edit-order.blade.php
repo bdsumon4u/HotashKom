@@ -31,14 +31,12 @@
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input" id="inside-dhaka" name="shipping"
                                 wire:model.live="shipping_area" value="Inside Dhaka" @disabled(isReseller() && !is_null($order->source_id))>
-                            <label class="custom-control-label" for="inside-dhaka">Inside
-                                Dhaka</label>
+                            <label class="custom-control-label" for="inside-dhaka">Johannesburg City</label>
                         </div>
                         <div class="custom-control custom-radio custom-control-inline">
                             <input type="radio" class="custom-control-input" id="outside-dhaka" name="shipping"
                                 wire:model.live="shipping_area" value="Outside Dhaka" @disabled(isReseller() && !is_null($order->source_id))>
-                            <label class="custom-control-label" for="outside-dhaka">Outside
-                                Dhaka</label>
+                            <label class="custom-control-label" for="outside-dhaka">Outside Johannesburg</label>
                         </div>
                     </div>
                     <x-error field="shipping_area" />
