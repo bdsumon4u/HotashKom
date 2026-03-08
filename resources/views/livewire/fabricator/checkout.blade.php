@@ -428,7 +428,13 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
                                                             <label for="billing_phone" class="">আপনার ফোন
                                                                 নাম্বার (ইংলিশে লিখুন)&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label><span
-                                                                class="woocommerce-input-wrapper"><input
+                                                                class="woocommerce-input-wrapper" style="display: flex; align-items: center; border: 2px solid var(--wcf-field-border-color);">
+                                                                @unless (setting('show_option')->hide_phone_prefix ?? false)
+                                                                <div class="input-group-prepend" style="width: 44px; padding: 6px;">
+                                                                    <span class="input-group-text">+880</span>
+                                                                </div>
+                                                                @endunless
+                                                                <input
                                                                     type="tel" wire:model="phone"
                                                                     class="input-text" name="billing_phone"
                                                                     id="billing_phone" placeholder=""
