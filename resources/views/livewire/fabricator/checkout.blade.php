@@ -427,12 +427,13 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
                                                             id="billing_phone_field" data-priority="100">
                                                             <label for="billing_phone" class="">আপনার ফোন
                                                                 নাম্বার (ইংলিশে লিখুন)&nbsp;<abbr class="required"
-                                                                    title="required">*</abbr></label><span
-                                                                class="woocommerce-input-wrapper" style="display: flex; align-items: center; border: 2px solid var(--wcf-field-border-color);">
-                                                                @unless (setting('show_option')->hide_phone_prefix ?? false)
-                                                                <div class="input-group-prepend" style="width: 44px; padding: 6px;">
+                                                                    title="required">*</abbr></label>
+                                                            <span
+                                                                class="woocommerce-input-wrapper" style="display: flex; align-items: center; border: 1px solid var(--wcf-field-border-color);">
+                                                                @unless ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)
+                                                                <span class="input-group-prepend" style="width: 44px; padding: 6px;">
                                                                     <span class="input-group-text">+880</span>
-                                                                </div>
+                                                                </span>
                                                                 @endunless
                                                                 <input
                                                                     type="tel" wire:model="phone"
@@ -441,6 +442,7 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
                                                                     value="{{ setting('show_option')->hide_phone_prefix ?? false ? '' : '+880' }}"
                                                                     aria-required="true" autocomplete="tel"
                                                                     inputmode="numeric" pattern="[0-9]*"
+                                                                    @unless($hidePrefix) style="border-width: 0; border-left-width: 1px;" @endunless
                                                                     oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                                                                 <span
                                                                     class="wcf-field-required-error">{{ $errors->first('phone') }}</span>
