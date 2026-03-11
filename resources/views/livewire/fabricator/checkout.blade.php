@@ -633,8 +633,7 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
                                                                 name="woocommerce_checkout_place_order"
                                                                 id="place_order"
                                                                 value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00"
-                                                                data-value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00">Place
-                                                                Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;{{ cart()->total() }}</button>
+                                                                data-value="Place Order&nbsp;&nbsp;&#2547;&nbsp;&nbsp;250.00">{{ setting('show_option')->checkout_button_text ?? 'কনফার্ম অর্ডার' }}&nbsp;&nbsp;&#2547;&nbsp;&nbsp;{{ cart()->total() }}</button>
                                                         @endif
 
                                                         <input type="hidden" id="woocommerce-process-checkout-nonce"
