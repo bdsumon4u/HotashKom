@@ -8,7 +8,7 @@
 # FIND WORKING PHP BINARY
 ####################################
 find_php() {
-    for php in /opt/cpanel/ea-php84/root/usr/bin/php /opt/alt/php84/usr/bin/php /usr/bin/php; do
+    for php in /opt/cpanel/ea-php84/root/usr/bin/php /opt/alt/php84/usr/bin/php /opt/php84/usr/bin/php /usr/bin/php; do
         if [[ -x "$php" ]]; then
             echo "$php"
             return 0
