@@ -108,19 +108,38 @@ class EditOrder extends Component
                     $nextToken = function () {
                         $cacheKey = 'bdcourier:token:rotating';
                         $apiKeys = Cache::pull($cacheKey, explode('|', config('services.courier_report.key')));
-                        $current = array_shift($apiKeys);
-                        array_push($apiKeys, $current);
-                        Cache::put($cacheKey, $apiKeys, now()->addDay());
+                        $ignoredKeys = Cache::get($cacheKey.':ignored', []);
+                        $effectiveKeys = array_diff($apiKeys, $ignoredKeys);
+                        if (empty($effectiveKeys)) {
+                            // If all keys are ignored, reset the ignored list and use all keys again
+                            Cache::forget($cacheKey.':ignored');
+                            $effectiveKeys = $apiKeys;
+                        }
+                        $current = array_shift($effectiveKeys);
+                        array_push($effectiveKeys, $current);
+                        Cache::put($cacheKey, $effectiveKeys, now()->addDay());
+
                         return $current;
                     };
 
-                    return Http::retry(3, 100)
-                        ->withToken($nextToken())
+                    $token = $nextToken();
+                    $response = Http::retry(3, 100)
+                        ->withToken($token)
                         // ->post('https://courierrank.com/api/dokanai/' . $this->order->phone)
                         ->post(config('services.courier_report.url'), [
                             'phone' => $this->order->phone ?? '',
-                        ])
-                        ->json();
+                        ]);
+
+                    if ($response->status() === 429) {
+                        $ignoredCacheKey = 'bdcourier:token:rotating:ignored';
+                        $ignoredKeys = Cache::get($ignoredCacheKey, []);
+                        if (! in_array($token, $ignoredKeys)) {
+                            $ignoredKeys[] = $token;
+                        }
+                        Cache::put($ignoredCacheKey, $ignoredKeys, now()->endOfDay());
+                    }
+
+                    return $response->json();
                 } catch (\Exception $e) {
                     return $e->getMessage();
                 }
