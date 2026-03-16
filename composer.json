@@ -32,6 +32,7 @@
         "laravel/tinker": "^2.11",
         "livewire/livewire": "^3.7.3",
         "loilo/fuse": "^7.1.1",
+        "maatwebsite/excel": "4.x-dev",
         "meilisearch/meilisearch-php": "^1.16.1",
         "ralphjsmit/laravel-seo": "^1.7.2",
         "spatie/laravel-activitylog": "^4.10.2",
