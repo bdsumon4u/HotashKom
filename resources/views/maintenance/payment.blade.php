@@ -91,7 +91,7 @@
                                 <form action="{{ route('maintenance.payment.pay') }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-danger btn-lg btn-block">
-                                        <i class="fa fa-credit-card"></i> Make Payment Now
+                                        <i class="fa fa-credit-card"></i> এখন পেমেন্ট করব
                                     </button>
                                 </form>
 
@@ -99,7 +99,7 @@
                                     <form action="{{ route('maintenance.payment.defer') }}" method="POST" class="mt-2">
                                         @csrf
                                         <button type="submit" class="btn btn-outline-secondary btn-block">
-                                            I'll Pay Later
+                                            <i class="fa fa-clock-o"></i> আমি পরে পেমেন্ট করতে চাই
                                         </button>
                                     </form>
                                     <p class="mt-2 mb-0 small text-muted">
