@@ -40,13 +40,11 @@ class OrderController extends Controller
         $hasSearch = ! empty($request->input('search.value'));
 
         // Check if any column has a search value
-        if (! $hasSearch && $request->has('columns')) {
-            $columns = $request->input('columns', []);
-            foreach ($columns as $column) {
-                if (! empty($column['search']['value'] ?? '')) {
-                    $hasSearch = true;
-                    break;
-                }
+        $columns = ['id', 'customer']; // id and customer columns
+        foreach ($columns as $column) {
+            if (! empty($column['search']['value'] ?? '')) {
+                $hasSearch = true;
+                break;
             }
         }
 
