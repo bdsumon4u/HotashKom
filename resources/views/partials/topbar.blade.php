@@ -1,4 +1,47 @@
 <div class="site-header__topbar topbar text-nowrap">
+    @once
+    <style>
+        .topbar__ticker {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .topbar__ticker-track {
+            display: inline-flex;
+            align-items: center;
+            min-width: max-content;
+            animation: topbar-ticker-scroll 24s linear infinite;
+            will-change: transform;
+        }
+
+        .topbar__ticker-text {
+            display: inline-block;
+            padding-right: 4rem;
+        }
+
+        .topbar__ticker:hover .topbar__ticker-track {
+            animation-play-state: paused;
+        }
+
+        @keyframes topbar-ticker-scroll {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .topbar__ticker {
+                display: none;
+            }
+        }
+    </style>
+    @endonce
     <div class="container topbar__container">
         <div class="topbar__row">
             @if ($show_option->topbar_phone ?? false)
@@ -19,7 +62,14 @@
                 <a class="topbar-link" href="{{ $href }}" @unless($isExternal) wire:navigate.hover @endunless>{!! $item->name !!}</a>
             </div>
             @endforeach
-            <marquee class="mx-2 d-flex align-items-center h-100" behavior="" direction="">{!! $scroll_text ?? '' !!}</marquee>
+            @if (!blank($scroll_text ?? null))
+            <div class="topbar__ticker mx-2 d-flex align-items-center h-100" aria-live="polite" aria-label="Topbar announcements">
+                <div class="topbar__ticker-track">
+                    <span class="topbar__ticker-text">{!! $scroll_text !!}</span>
+                    <span class="topbar__ticker-text" aria-hidden="true">{!! $scroll_text !!}</span>
+                </div>
+            </div>
+            @endif
             <div class="topbar__spring"></div>
             @if($show_option->track_order ?? false)
             <div class="topbar__item topbar__item--link">
