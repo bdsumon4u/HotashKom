@@ -24,7 +24,7 @@ class ApiController extends Controller
         }
 
         if (isset($data['phone']) && isset($data['name'])) {
-            storeOrUpdateCart($data['phone'], $data['name']);
+            storeOrUpdateCart($data['phone'], $data['name'], $data['address'] ?? null);
         }
     }
 

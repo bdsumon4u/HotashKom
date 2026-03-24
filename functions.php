@@ -439,11 +439,13 @@ function cart($id = null): CartInstance|CartItem|null
     return $cart->content()->first(fn ($item) => $item->id == $id);
 }
 
-function storeOrUpdateCart($phone = null, $name = '')
+function storeOrUpdateCart($phone = null, $name = '', $address = null)
 {
     if (! $phone = $phone ?? Cookie::get('phone', '')) {
         return;
     }
+
+    $address = $address ?? Cookie::get('address');
 
     if (Str::startsWith($phone, '01')) {
         $phone = '+88'.$phone;
@@ -477,6 +479,7 @@ function storeOrUpdateCart($phone = null, $name = '')
                 'identifier' => session()->getId(),
                 'name' => Cookie::get('name', $name),
                 'phone' => $phone,
+                'address' => $address,
                 'content' => serialize($content->union(unserialize($cart->content))),
                 'updated_at' => now(),
             ]);
@@ -488,6 +491,7 @@ function storeOrUpdateCart($phone = null, $name = '')
         ->insert([
             'name' => Cookie::get('name', $name),
             'phone' => $phone,
+            'address' => $address,
             'instance' => 'default',
             'identifier' => session()->getId(),
             'content' => serialize($content),

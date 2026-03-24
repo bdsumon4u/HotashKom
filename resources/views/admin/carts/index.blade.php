@@ -24,6 +24,7 @@
                         <thead>
                             <tr>
                                 <th>User</th>
+                                <th>Address</th>
                                 <th>Products</th>
                                 <th>Last Update</th>
                                 <th>Action</th>
@@ -35,6 +36,9 @@
                                 <td>
                                     <div><a style="display: flex; column-gap: 5px;" href="{{ route('admin.orders.index', ['status' => '', 'phone' => $cart->phone]) }}" target="_blank">{{ $cart->name }} <i style="width: 15px;" data-feather="link"> </i></a></div>
                                     <div class="mt-2"><a href="tel:{{ $cart->phone }}">{{ $cart->phone }}</a></div>
+                                </td>
+                                <td>
+                                    {{ $cart->address ?: 'N/A' }}
                                 </td>
                                 <td>
                                     @foreach(unserialize($cart->content) as $product)
