@@ -58,6 +58,7 @@
                 ss.rel = "stylesheet";
                 ss.href = href;
                 ss.media = "only x";
+
                 function ready(cb) {
                     if (doc.body) {
                         return cb();
@@ -110,7 +111,7 @@
                             if (originalOnload) {
                                 try {
                                     originalOnload.call(this);
-                                } catch(e) {
+                                } catch (e) {
                                     console.warn('Error in original onload handler:', e);
                                 }
                             }
@@ -286,9 +287,10 @@
                 noscripts.forEach(function(noscript) {
                     // Check if noscript already exists
                     const noscriptContent = noscript.textContent || noscript.innerHTML;
-                    const existingNoscript = Array.from(document.head.querySelectorAll('noscript')).find(function(ns) {
-                        return (ns.textContent || ns.innerHTML) === noscriptContent;
-                    });
+                    const existingNoscript = Array.from(document.head.querySelectorAll('noscript')).find(
+                        function(ns) {
+                            return (ns.textContent || ns.innerHTML) === noscriptContent;
+                        });
                     if (!existingNoscript) {
                         document.head.appendChild(noscript.cloneNode(true));
                     }
@@ -301,13 +303,17 @@
                 window.__analyticsHeadLoaded = true;
                 // Load after page is interactive (requestIdleCallback with longer timeout)
                 if ('requestIdleCallback' in window) {
-                    requestIdleCallback(loadDeferredAnalytics, { timeout: 5000 });
+                    requestIdleCallback(loadDeferredAnalytics, {
+                        timeout: 5000
+                    });
                 } else if (document.readyState === 'complete') {
                     setTimeout(loadDeferredAnalytics, 3000);
                 } else {
                     window.addEventListener('load', function() {
                         setTimeout(loadDeferredAnalytics, 3000);
-                    }, { once: true });
+                    }, {
+                        once: true
+                    });
                 }
             }
         })();
@@ -320,7 +326,7 @@
         $fontAwesomeVersion = config('cdn.assets.fontawesome.version', '6.5.1');
 
         // Determine base URL based on CDN provider
-        $fontBaseUrl = match($cdnProvider) {
+        $fontBaseUrl = match ($cdnProvider) {
             'jsdelivr' => "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@{$fontAwesomeVersion}/webfonts",
             'cdnjs' => "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/{$fontAwesomeVersion}/webfonts",
             'unpkg' => "https://unpkg.com/@fortawesome/fontawesome-free@{$fontAwesomeVersion}/webfonts",
@@ -329,10 +335,13 @@
     @endphp
 
     {{-- Preload critical Font Awesome fonts for faster rendering --}}
-    @if(config('cdn.enabled', true))
-        <link rel="preload" href="{{ $fontBaseUrl }}/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-        <link rel="preload" href="{{ $fontBaseUrl }}/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-        <link rel="preload" href="{{ $fontBaseUrl }}/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    @if (config('cdn.enabled', true))
+        <link rel="preload" href="{{ $fontBaseUrl }}/fa-brands-400.woff2" as="font" type="font/woff2"
+            crossorigin="anonymous">
+        <link rel="preload" href="{{ $fontBaseUrl }}/fa-solid-900.woff2" as="font" type="font/woff2"
+            crossorigin="anonymous">
+        <link rel="preload" href="{{ $fontBaseUrl }}/fa-regular-400.woff2" as="font" type="font/woff2"
+            crossorigin="anonymous">
     @endif
 
     <link rel="stylesheet" href="{{ $fontawesomeCss }}" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -348,6 +357,7 @@
             font-display: swap;
             src: url('{{ $fontBaseUrl }}/fa-brands-400.woff2') format('woff2');
         }
+
         @font-face {
             font-family: 'Font Awesome 6 Free';
             font-style: normal;
@@ -355,6 +365,7 @@
             font-display: swap;
             src: url('{{ $fontBaseUrl }}/fa-regular-400.woff2') format('woff2');
         }
+
         @font-face {
             font-family: 'Font Awesome 6 Free';
             font-style: normal;
@@ -362,6 +373,7 @@
             font-display: swap;
             src: url('{{ $fontBaseUrl }}/fa-solid-900.woff2') format('woff2');
         }
+
         /* Font Awesome 5 compatibility */
         @font-face {
             font-family: 'Font Awesome 5 Brands';
@@ -370,6 +382,7 @@
             font-display: swap;
             src: url('{{ $fontBaseUrl }}/fa-brands-400.woff2') format('woff2');
         }
+
         @font-face {
             font-family: 'Font Awesome 5 Free';
             font-style: normal;
@@ -377,6 +390,7 @@
             font-display: swap;
             src: url('{{ $fontBaseUrl }}/fa-regular-400.woff2') format('woff2');
         }
+
         @font-face {
             font-family: 'Font Awesome 5 Free';
             font-style: normal;
@@ -391,7 +405,9 @@
         $stroykaCss = asset('strokya/fonts/stroyka/stroyka.css');
     @endphp
     <link rel="preload" href="{{ $stroykaCss }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="{{ $stroykaCss }}"></noscript>
+    <noscript>
+        <link rel="stylesheet" href="{{ $stroykaCss }}">
+    </noscript>
     @include('layouts.yellow.color')
     <style>
         [x-cloak] {
@@ -927,9 +943,13 @@
     @livewireStyles
     {{-- Google Fonts are loaded asynchronously, no preconnect needed (reduces preconnect count) --}}
     {{-- Load Google Fonts asynchronously to prevent render blocking --}}
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet"></noscript>
-{!! $scripts ?? null !!}
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap"
+        as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@100..900&display=swap"
+            rel="stylesheet">
+    </noscript>
+    {!! $scripts ?? null !!}
     @stack('head')
 </head>
 
@@ -948,7 +968,7 @@
                 }
             }
         @endphp
-        @if($gtmEnabled)
+        @if ($gtmEnabled)
             @php
                 try {
                     echo view('googletagmanager::body')->render();
@@ -1017,9 +1037,10 @@
                 noscripts.forEach(function(noscript) {
                     // Check if noscript already exists
                     const noscriptContent = noscript.textContent || noscript.innerHTML;
-                    const existingNoscript = Array.from(document.body.querySelectorAll('noscript')).find(function(ns) {
-                        return (ns.textContent || ns.innerHTML) === noscriptContent;
-                    });
+                    const existingNoscript = Array.from(document.body.querySelectorAll('noscript')).find(
+                        function(ns) {
+                            return (ns.textContent || ns.innerHTML) === noscriptContent;
+                        });
                     if (!existingNoscript) {
                         document.body.appendChild(noscript.cloneNode(true));
                     }
@@ -1032,13 +1053,17 @@
                 window.__analyticsBodyLoaded = true;
                 // Load after page is interactive (requestIdleCallback with longer timeout)
                 if ('requestIdleCallback' in window) {
-                    requestIdleCallback(loadDeferredAnalyticsBody, { timeout: 5000 });
+                    requestIdleCallback(loadDeferredAnalyticsBody, {
+                        timeout: 5000
+                    });
                 } else if (document.readyState === 'complete') {
                     setTimeout(loadDeferredAnalyticsBody, 3000);
                 } else {
                     window.addEventListener('load', function() {
                         setTimeout(loadDeferredAnalyticsBody, 3000);
-                    }, { once: true });
+                    }, {
+                        once: true
+                    });
                 }
             }
         })();
@@ -1082,7 +1107,7 @@
         <div class="site__body">
             <div class="container">
                 @if (!request()->routeIs('/'))
-                <x-reseller-verification-alert />
+                    <x-reseller-verification-alert />
                 @endif
                 <x-alert-box class="mt-2 row" />
             </div>
@@ -1148,39 +1173,39 @@
         $phone = phone88($company->whatsapp ?? '');
     @endphp
     @if ($phone && strlen($messenger) > 13)
-    <div class="widget-connect widget-connect-right">
+        <div class="widget-connect widget-connect-right">
             @if ($messenger)
                 <a class="widget-connect__button widget-connect__button-telemessenger button-slide-out"
                     style="background: white; color: blue;" href="{{ $messenger }}" data-toggle="tooltip"
                     data-placement="left" title="" target="_blank" data-original-title="Messenger">
-            <i class="fab fa-facebook-messenger"></i>
-        </a>
-        @endif
+                    <i class="fab fa-facebook-messenger"></i>
+                </a>
+            @endif
             @if ($phone)
                 <a class="widget-connect__button widget-connect__button-whatsapp button-slide-out"
                     style="background: white; color: green;" href="https://wa.me/{{ $phone }}"
                     data-toggle="tooltip" data-placement="left" title="" data-original-title="WhatsApp"
                     data-whatsapp-url="https://wa.me/{{ $phone }}"
                     onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
-            <i class="fab fa-whatsapp"></i>
-        </a>
-        @endif
-        <div class="widget-connect__button-activator" style="background-color: #ff0000;">
-            <div class="widget-connect__button-activator-icon"></div>
+                    <i class="fab fa-whatsapp"></i>
+                </a>
+            @endif
+            <div class="widget-connect__button-activator" style="background-color: #ff0000;">
+                <div class="widget-connect__button-activator-icon"></div>
+            </div>
         </div>
-    </div>
     @elseif ($phone)
         <a href="https://api.whatsapp.com/send?phone={{ $phone }}"
             style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;cursor:pointer;"
             data-whatsapp-url="https://api.whatsapp.com/send?phone={{ $phone }}"
             onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
-        <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>
-    </a>
+            <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>
+        </a>
     @elseif (strlen($messenger) > 13)
         <a href="{{ $messenger }}" target="_blank"
             style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#0084ff;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;">
-        <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
-    </a>
+            <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
+        </a>
     @endif
     {{-- WhatsApp handlers moved to external file: strokya/js/whatsapp-handlers.js --}}
     {{-- Facebook events moved to external file: strokya/js/facebook-events.js --}}
