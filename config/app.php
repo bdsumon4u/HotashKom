@@ -52,6 +52,7 @@ return [
         'SHIPPING',
         'DELIVERED',
         'PARTIAL_DELIVERY',
+        'PAID',
         'RETURNED',
         'PAID_RETURN',
         'LOST',
