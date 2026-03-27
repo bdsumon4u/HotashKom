@@ -217,10 +217,15 @@
         @endphp
     @endif
 
-    {{-- Non-GTM analytics scripts will be loaded after page is interactive to reduce main-thread blocking --}}
-    {{-- Store Meta Pixel HTML in hidden div, then move to proper location after page is interactive --}}
-    <div id="deferred-analytics-head" style="display: none !important;">
+    {{-- Load Meta Pixel immediately (not deferred) so Facebook can detect it during setup --}}
+    {{-- Use data-navigate-once so it doesn't reload during SPA navigation --}}
+    <div data-navigate-once>
         <x-metapixel-head />
+    </div>
+
+    {{-- Non-GTM analytics scripts will be loaded after page is interactive to reduce main-thread blocking --}}
+    {{-- Store Meta Pixel Body HTML in hidden div, then move to proper location after page is interactive --}}
+    <div id="deferred-analytics-head" style="display: none !important;">
     </div>
     <script data-navigate-once>
         // Defer analytics scripts to reduce main-thread blocking
