@@ -220,9 +220,7 @@
 
     {{-- Load Meta Pixel immediately (not deferred) so Facebook can detect it during setup --}}
     {{-- Use data-navigate-once so it doesn't reload during SPA navigation --}}
-    <div data-navigate-once>
-        <x-metapixel-head />
-    </div>
+    <x-metapixel-head />
     @include('layouts.yellow.css')
     <!-- js -->
     <!-- font - fontawesome -->
@@ -881,9 +879,7 @@
             }
         @endphp
     @endif
-    <div data-navigate-once>
-        <x-metapixel-body />
-    </div>
+    <x-metapixel-body />
     <!-- quickview-modal -->
     <div id="quickview-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
