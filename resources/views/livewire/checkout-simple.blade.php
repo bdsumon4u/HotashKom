@@ -117,10 +117,10 @@
                 @if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false))
                     <div class="simple-form-group">
                         <label class="simple-label">
-                            সিটি<span class="text-danger">*</span>
+                            জেলা<span class="text-danger">*</span>
                         </label>
                         <select class="form-control @error('city_id') is-invalid @enderror" wire:model.live="city_id">
-                            <option value="">সিটি নির্বাচন করুন</option>
+                            <option value="">জেলা নির্বাচন করুন</option>
                             @foreach ($pathaoCities as $city)
                                 <option value="{{ $city->city_id }}">{{ $city->city_name }}</option>
                             @endforeach
