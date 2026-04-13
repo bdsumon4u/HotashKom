@@ -425,7 +425,7 @@ class Checkout extends Component
         ];
 
         // Add validation for city and area if Pathao is enabled and user_selects_city_area is checked
-        if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false)) {
+        if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false) && (setting('Pathao')->user_required_city_area ?? false)) {
             $validationRules['city_id'] = 'required';
             $validationRules['area_id'] = 'required';
         }

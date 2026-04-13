@@ -117,7 +117,7 @@
                 @if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false))
                     <div class="simple-form-group">
                         <label class="simple-label">
-                            জেলা<span class="text-danger">*</span>
+                            জেলা@if(setting('Pathao')->user_required_city_area ?? false)<span class="text-danger">*</span>@endif
                         </label>
                         <select class="form-control @error('city_id') is-invalid @enderror" wire:model.live="city_id">
                             <option value="">জেলা নির্বাচন করুন</option>
@@ -130,7 +130,7 @@
 
                     <div class="simple-form-group">
                         <label class="simple-label">
-                            এলাকা<span class="text-danger">*</span>
+                            এলাকা@if(setting('Pathao')->user_required_city_area ?? false)<span class="text-danger">*</span>@endif
                         </label>
                         <div wire:loading.class="d-flex" wire:target="city_id" class="d-none h-100 align-items-center">
                             এলাকা লোড হচ্ছে...

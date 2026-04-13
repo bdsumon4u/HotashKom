@@ -36,6 +36,13 @@
                 <x-label for="PathaoUserSelectsCityArea">User selects city and area during checkout</x-label>
             </div>
         </div>
+        <div class="form-group col-md-auto">
+            <div class="checkbox checkbox-secondary">
+                <input type="hidden" name="Pathao[user_required_city_area]" value="0">
+                <x-checkbox id="PathaoUserRequiredCityArea" name="Pathao[user_required_city_area]" value="1" :checked="!!($Pathao->user_required_city_area ?? false)" />
+                <x-label for="PathaoUserRequiredCityArea">User required city and area during checkout</x-label>
+            </div>
+        </div>
     </div>
     <div class="form-row">
         @php($SteadFast = optional($SteadFast ?? null))
