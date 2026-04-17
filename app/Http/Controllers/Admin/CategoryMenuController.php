@@ -53,7 +53,22 @@ class CategoryMenuController extends Controller
             ]);
 
             collect($data['categories'])
-                ->each(function ($val, $key): void {
+                ->each(function ($val): void {
+                    $menu = CategoryMenu::find($val['id']);
+
+                    // Prevent circular reference: menu cannot be its own parent
+                    if (isset($val['parent_id']) && $val['parent_id'] == $menu->id) {
+                        return; // Skip this update
+                    }
+
+                    // Prevent circular reference: menu cannot be parent of its descendants
+                    if (isset($val['parent_id']) && $val['parent_id'] != 0) {
+                        $isDescendant = $this->isDescendant($menu, $val['parent_id']);
+                        if ($isDescendant) {
+                            return; // Skip this update
+                        }
+                    }
+
                     CategoryMenu::updateOrInsert(['id' => $val['id']], $val);
                 })->toArray();
 
@@ -67,6 +82,31 @@ class CategoryMenuController extends Controller
         cacheMemo()->forget('catmenu:nestedwithparent');
 
         return back();
+    }
+
+    /**
+     * Check if a potential parent is a descendant of the current menu item.
+     * This prevents circular references where a menu item could become its own ancestor.
+     */
+    private function isDescendant(CategoryMenu $menu, int $potentialParentId): bool
+    {
+        $potentialParent = CategoryMenu::find($potentialParentId);
+        if (! $potentialParent) {
+            return false;
+        }
+
+        // Traverse up the potential parent's ancestry chain
+        $current = $potentialParent;
+        while ($current->parent_id) {
+            if ($current->parent_id == $menu->id) {
+                return true; // The potential parent is a descendant of the current menu
+            }
+            if (! $current = CategoryMenu::find($current->parent_id)) {
+                break;
+            }
+        }
+
+        return false;
     }
 
     /**

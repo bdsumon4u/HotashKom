@@ -615,12 +615,12 @@
                         el = $(el);
                         var arri = $.inArray(el.attr('id'), updated);
                         if (arri != -1) {
-                            arr.push(Object.assign({
+                            var parentId = el.attr('data-parent');
+                            arr.push({
                                 id: el.attr('id').replace('space-item-', ''),
                                 order: el.attr('data-order'),
-                            }, el.attr('data-parent') == 0 ? {} : {
-                                parent_id: el.attr('data-parent')
-                            }))
+                                parent_id: parentId == 0 ? null : parseInt(parentId)
+                            });
                         }
                     });
                     // console.log(arr)

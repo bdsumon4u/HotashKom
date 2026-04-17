@@ -42,9 +42,15 @@ class CategoryMenu extends Model
     public static function nested($count = 0)
     {
         $query = self::whereNull('parent_id')
-            ->with(['childrens' => function ($category): void {
-                $category->with('childrens');
-            }])
+            ->with([
+                'childrens' => fn ($q) => $q->orderBy('order')->with([
+                    'childrens' => fn ($q) => $q->orderBy('order')->with([
+                        'childrens' => fn ($q) => $q->orderBy('order')->with([
+                            'childrens' => fn ($q) => $q->orderBy('order'),
+                        ]),
+                    ]),
+                ]),
+            ])
             ->orderBy('order');
         $count && $query->take($count);
 
@@ -54,9 +60,15 @@ class CategoryMenu extends Model
     public static function nestedWithParent($count = 0)
     {
         $query = self::whereNull('parent_id')
-            ->with(['childrens' => function ($category): void {
-                $category->with('parent', 'childrens');
-            }])
+            ->with([
+                'childrens' => fn ($q) => $q->orderBy('order')->with(['parent'])->with([
+                    'childrens' => fn ($q) => $q->orderBy('order')->with(['parent'])->with([
+                        'childrens' => fn ($q) => $q->orderBy('order')->with(['parent'])->with([
+                            'childrens' => fn ($q) => $q->orderBy('order')->with(['parent']),
+                        ]),
+                    ]),
+                ]),
+            ])
             ->orderBy('order');
         $count && $query->take($count);
 
