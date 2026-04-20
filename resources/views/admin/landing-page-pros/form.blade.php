@@ -96,7 +96,7 @@
         ? 'আমাদের প্রতিটি পণ্য এক্সপোর্ট কোয়ালিটি সম্পন্ন। Premium Trousers for Premium Customers.'
         : data_get($landingPagePro->seo, 'description');
 
-    $itemsInitial = old(
+    $itemsInitial = collect(old(
         'items',
         $landingPagePro->items
             ->map(
@@ -107,7 +107,15 @@
             )
             ->values()
             ->all(),
-    );
+    ))
+        ->map(function ($item) {
+            return [
+                'product_id' => data_get($item, 'product_id'),
+                'free_delivery' => filter_var(data_get($item, 'free_delivery', false), FILTER_VALIDATE_BOOL),
+            ];
+        })
+        ->values()
+        ->all();
 
     if (blank($itemsInitial)) {
         $itemsInitial = [['product_id' => null, 'free_delivery' => false]];
