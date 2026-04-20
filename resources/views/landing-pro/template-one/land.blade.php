@@ -294,7 +294,7 @@
                                 <div
                                     class="overflow-hidden border border-gray-100 rounded-md shadow-lg gallery-item snap-start">
                                     <img src="{{ $image }}" alt="Gallery image {{ $index + 1 }}"
-                                        class="object-cover w-full h-64 md:h-80 lg:h-96" loading="lazy">
+                                        class="object-cover w-full" loading="lazy">
                                 </div>
                             @endforeach
                         </div>
@@ -320,7 +320,7 @@
                         @foreach ($galleryImages as $index => $image)
                             <div class="overflow-hidden border border-gray-100 rounded-md shadow-lg">
                                 <img src="{{ $image }}" alt="Gallery image {{ $index + 1 }}"
-                                    class="object-cover w-full h-64 md:h-80 lg:h-96" loading="lazy">
+                                    class="object-cover w-full" loading="lazy">
                             </div>
                         @endforeach
                     </div>
