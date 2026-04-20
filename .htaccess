@@ -78,6 +78,6 @@
 # php -- BEGIN cPanel-generated handler, do not edit
 # Set the “ea-php83” package as the default “PHP” programming language.
 <IfModule mime_module>
-    AddHandler application/x-httpd-alt-php83 .php .php8 .phtml
-    AddHandler application/x-httpd-alt-php83___lsphp .php .php8 .phtml
+    AddHandler application/x-httpd-alt-php84 .php .php8 .phtml
+    AddHandler application/x-httpd-alt-php84___lsphp .php .php8 .phtml
 </IfModule>
