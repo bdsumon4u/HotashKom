@@ -630,12 +630,10 @@
 
                 initSlugSync() {
                     runWhenJQueryReady(function($) {
-                        $('[name="title"]').off('input.landingPageProSlug').on('input.landingPageProSlug',
+                        $('[name="title"]').off('keyup.landingPageProSlug').on('keyup.landingPageProSlug',
                             function() {
                                 const $slug = $($(this).data('target'));
-                                if (!$slug.val()) {
-                                    $slug.val(slugify($(this).val()));
-                                }
+                                $slug.val(slugify($(this).val()));
                             });
                     });
                 },
