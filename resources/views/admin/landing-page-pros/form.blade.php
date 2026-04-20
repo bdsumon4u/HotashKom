@@ -96,18 +96,20 @@
         ? 'আমাদের প্রতিটি পণ্য এক্সপোর্ট কোয়ালিটি সম্পন্ন। Premium Trousers for Premium Customers.'
         : data_get($landingPagePro->seo, 'description');
 
-    $itemsInitial = collect(old(
-        'items',
-        $landingPagePro->items
-            ->map(
-                fn($item) => [
-                    'product_id' => $item->product_id,
-                    'free_delivery' => (bool) $item->free_delivery,
-                ],
-            )
-            ->values()
-            ->all(),
-    ))
+    $itemsInitial = collect(
+        old(
+            'items',
+            $landingPagePro->items
+                ->map(
+                    fn($item) => [
+                        'product_id' => $item->product_id,
+                        'free_delivery' => (bool) $item->free_delivery,
+                    ],
+                )
+                ->values()
+                ->all(),
+        ),
+    )
         ->map(function ($item) {
             return [
                 'product_id' => data_get($item, 'product_id'),
