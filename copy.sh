@@ -75,7 +75,7 @@ ssh $SSH_OPTS "$TARGET" "chmod 600 .ssh/$KEY_NAME"
 # CLEAR SOURCE CACHE BEFORE COPYING
 ####################################
 echo "🧹 Clearing source cache..."
-php artisan optimize:clear 2>/dev/null || true
+./php artisan optimize:clear 2>/dev/null || true
 
 ####################################
 # STREAM FILES (NO INTERMEDIATE FILE)
@@ -173,31 +173,11 @@ sed -i "s|MAIL_PASSWORD=.*|MAIL_PASSWORD=$(escape_sed_pipe "$target_mail_pass")|
 sed -i "s/MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=$(escape_sed "$target_mail_user")/g" .env
 
 ####################################
-# FIND WORKING PHP BINARY
-####################################
-find_php() {
-    for php in /opt/cpanel/ea-php84/root/usr/bin/php /opt/alt/php84/usr/bin/php /opt/php84/usr/bin/php /usr/bin/php; do
-        if [[ -x "\$php" ]]; then
-            echo "\$php"
-            return 0
-        fi
-    done
-    return 1
-}
-
-PHP=\$(find_php) || {
-    echo "❌ No PHP binary found"
-    exit 1
-}
-
-echo "▶ Using PHP: \$PHP"
-
-####################################
 # REGENERATE AUTOLOADER (CRITICAL)
 ####################################
 # Composer caches absolute paths, must regenerate for new location
 if [[ -f composer.json ]]; then
-    \$PHP "\$([ -f "./composer.phar" ] && echo "./composer.phar" || command -v composer || echo /opt/cpanel/composer/bin/composer)" dump-autoload -o 2>/dev/null || echo "⚠️  Could not regenerate autoloader"
+    ./php "\$([ -f "./composer.phar" ] && echo "./composer.phar" || command -v composer || echo /opt/cpanel/composer/bin/composer)" dump-autoload -o 2>/dev/null || echo "⚠️  Could not regenerate autoloader"
 fi
 
 ####################################
@@ -206,9 +186,9 @@ fi
 # Remove old symlink/directory first so storage:link can create fresh one
 rm -rf public/storage storage/app/pathao*
 
-\$PHP artisan key:generate --force
-\$PHP artisan migrate --force
-\$PHP artisan storage:link
+./php artisan key:generate --force
+./php artisan migrate --force
+./php artisan storage:link
 
 # Run custom deployment script if it exists
 if [[ -f ./server_deploy.sh ]]; then

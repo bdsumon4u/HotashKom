@@ -4,7 +4,7 @@ set -e
 echo "Deploying application ..."
 
 # Enter maintenance mode
-(/opt/alt/php83/usr/bin/php artisan down) || true
+(./php artisan down) || true
     # Update codebase
     # git fetch origin production
     # git reset --hard origin/production
@@ -16,25 +16,25 @@ echo "Deploying application ..."
         $(if [ "$1" = "--no-dev" ]; then echo "--no-dev"; fi)
 
     # Ensure all tables use InnoDB before running migrations
-    /opt/alt/php83/usr/bin/php artisan db:convert-innodb || true
+    ./php artisan db:convert-innodb || true
 
     # Migrate database
-    /opt/alt/php83/usr/bin/php artisan migrate --force
+    ./php artisan migrate --force
 
     # Note: If you're using queue workers, this is the place to restart them.
     # ...
 
-    /opt/alt/php83/usr/bin/php artisan responsecache:clear || true
+    ./php artisan responsecache:clear || true
 
     # Clear cache
-    /opt/alt/php83/usr/bin/php artisan optimize:clear
+    ./php artisan optimize:clear
 
     # Warm up caches
-    /opt/alt/php83/usr/bin/php artisan optimize
+    ./php artisan optimize
 
     # Reload PHP to update opcache
     # echo "" | sudo -S service php7.4-fpm reload
 # Exit maintenance mode
-/opt/alt/php83/usr/bin/php artisan up
+./php artisan up
 
 echo "Application deployed!"
