@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Jobs\SyncOrderStatusWithReseller;
+use App\Jobs\SyncProductStockWithResellers;
 use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
+use Fuse\Fuse;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
@@ -52,7 +55,7 @@ class Order extends Model
                 return;
             }
 
-            $fuse = new \Fuse\Fuse([['area' => $order->address]], [
+            $fuse = new Fuse([['area' => $order->address]], [
                 'keys' => ['area'],
                 'includeScore' => true,
                 'includeMatches' => true,
@@ -115,7 +118,7 @@ class Order extends Model
 
             // Dispatch job to sync status with resellers
             if ($status) {
-                dispatch(new \App\Jobs\SyncOrderStatusWithReseller($order->id));
+                dispatch(new SyncOrderStatusWithReseller($order->id));
             }
 
             if (! in_array($status, ['DELIVERED', 'RETURNED'])) {
@@ -228,7 +231,7 @@ class Order extends Model
             $product->increment('stock_count', $increment);
             info('incremented', ['product' => $product->id, 'increment' => $increment]);
             // Dispatch job to sync stock with resellers
-            dispatch(new \App\Jobs\SyncProductStockWithResellers($product));
+            dispatch(new SyncProductStockWithResellers($product));
         }
     }
 
@@ -357,6 +360,18 @@ class Order extends Model
     {
         if (! $products instanceof Collection) {
             $products = collect($products);
+        }
+
+        $hasLandingFreeDelivery = $products->contains(function ($item): bool {
+            $item = (array) $item;
+
+            return (bool) ($item['landing_free_delivery'] ?? false);
+        });
+
+        if ($hasLandingFreeDelivery) {
+            $this->isFreeDelivery = true;
+
+            return 0;
         }
 
         $this->isFreeDelivery = false;

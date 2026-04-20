@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Http\Resources\ProductResource;
+use App\Jobs\CallOnindaOrderApi;
 use App\Models\Admin;
 use App\Models\Coupon;
 use App\Models\Order;
@@ -264,6 +265,16 @@ class Checkout extends Component
             return 0;
         }
 
+        $hasLandingFreeDelivery = cart()->content()->contains(
+            fn ($item): bool => (bool) ($item->options->landing_free_delivery ?? false)
+        );
+
+        if ($hasLandingFreeDelivery) {
+            $this->isFreeDelivery = true;
+
+            return 0;
+        }
+
         $this->isFreeDelivery = false;
         $area ??= $this->shipping;
         $shipping_cost = 0;
@@ -406,12 +417,12 @@ class Checkout extends Component
         if (! ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)) {
             if (Str::startsWith($this->phone, '01')) {
                 $this->phone = Str::after($this->phone, '0');
-            } else if (Str::startsWith($this->phone, '8801')) {
+            } elseif (Str::startsWith($this->phone, '8801')) {
                 $this->phone = Str::after($this->phone, '880');
             }
         } elseif (Str::startsWith($this->phone, '01')) { // hide prefix
             $this->phone = '+88'.$this->phone;
-        } else if (Str::startsWith($this->phone, '8801')) {
+        } elseif (Str::startsWith($this->phone, '8801')) {
             $this->phone = '+'.$this->phone;
         }
 
@@ -461,6 +472,7 @@ class Checkout extends Component
 
                     $productData = (new ProductResource($product))->toCartItem($quantity);
                     $productData['retail_price'] = $this->retail[$id]['price'] ?? $productData['price'];
+                    $productData['landing_free_delivery'] = (bool) (cart($id)?->options?->landing_free_delivery ?? false);
 
                     return [$id => $productData];
                 })->filter()->toArray();
@@ -562,7 +574,7 @@ class Checkout extends Component
             return $order;
         });
 
-        if (! $this->order instanceof \App\Models\Order) {
+        if (! $this->order instanceof Order) {
             return back();
         }
 
@@ -570,7 +582,7 @@ class Checkout extends Component
         // $data['email'] && Mail::to($data['email'])->queue(new OrderPlaced($order));
 
         if (config('app.instant_order_forwarding') && ! config('app.demo')) {
-            dispatch(new \App\Jobs\CallOnindaOrderApi($this->order->id));
+            dispatch(new CallOnindaOrderApi($this->order->id));
         }
 
         cart()->destroy();
@@ -602,7 +614,7 @@ class Checkout extends Component
     public function render()
     {
         // Create a temporary Order instance to use its Pathao methods
-        $tempOrder = new \App\Models\Order;
+        $tempOrder = new Order;
         $this->cartUpdated();
 
         $template = setting('show_option')->checkout_template

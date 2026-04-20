@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\ImageController;
+use App\Http\Controllers\Admin\LandingPageProController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\MenuItemController;
@@ -123,6 +124,7 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::resources([
             'staffs' => StaffController::class,
             'slides' => SlideController::class,
+            'landing-page-pros' => LandingPageProController::class,
             'categories' => CategoryController::class,
             'brands' => BrandController::class,
             'attributes.options' => AttributeOptionController::class,

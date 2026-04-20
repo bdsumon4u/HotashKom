@@ -42,7 +42,9 @@
                             <i class="d-block" data-feather="shopping-cart"> </i>
                             <span class="d-block">Carts</span>
                             @php
-                                $count = DB::table('shopping_cart')->where('updated_at', '<', now()->subDay())->count();
+                                $count = DB::table('shopping_cart')
+                                    ->where('updated_at', '<', now()->subDay())
+                                    ->count();
                             @endphp
                             <span
                                 class="ml-auto text-white d-flex badge badge-primary align-items-center">{{ $count }}</span>
@@ -75,6 +77,17 @@
                             <span>Products</span>
                         </a>
                     </li>
+
+                    <li>
+                        <a class="nav-link d-flex menu-title link-nav {{ request()->is('admin/landing-page-pros*') ? 'active' : '' }}"
+                            href="{{ route('admin.landing-page-pros.index') }}">
+                            <i data-feather="layers"> </i>
+                            <span>Landing Page</span>
+                            <span
+                                class="ml-auto text-white d-flex badge badge-primary align-items-center">Pro</span>
+                        </a>
+                    </li>
+
                     <li>
                         @php
                             $pendingReviewsCount = \App\Models\Review::where('approved', false)->count();
@@ -125,13 +138,13 @@
                     </li>
 
                     @if (config('app.coupon'))
-                    <li>
-                        <a class="nav-link menu-title link-nav {{ request()->is('admin/coupons*') ? 'active' : '' }}"
-                            href="{{ route('admin.coupons.index') }}">
-                            <i data-feather="tag"> </i>
-                            <span>Coupons</span>
-                        </a>
-                    </li>
+                        <li>
+                            <a class="nav-link menu-title link-nav {{ request()->is('admin/coupons*') ? 'active' : '' }}"
+                                href="{{ route('admin.coupons.index') }}">
+                                <i data-feather="tag"> </i>
+                                <span>Coupons</span>
+                            </a>
+                        </li>
                     @endif
 
                     <li>
@@ -250,51 +263,57 @@
                         </a>
                     </li>
                     @if (isOninda())
-                    <li>
-                        <a class="nav-link d-flex menu-title link-nav {{ Route::currentRouteName() == 'admin.resellers.index' && request('status') == '' ? 'active' : '' }}"
-                            href="{{ route('admin.resellers.index') }}">
-                            <i data-feather="users"> </i>
-                            <span>Reseller List</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link d-flex menu-title link-nav {{ request()->is('admin/resellers*') && request('status') == 'pending' ? 'active' : '' }}"
-                            href="{{ route('admin.resellers.index', ['status' => 'pending']) }}">
-                            <i data-feather="user-check"> </i>
-                            <span>Pending Resellers</span>
-                            @if(config('app.resell'))
-                            @php
-                                $pendingResellersCount = \App\Models\User::where('is_verified', false)->count();
-                            @endphp
-                            @if($pendingResellersCount > 0)
-                            <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
-                                {{ $pendingResellersCount }}
-                            </span>
-                            @endif
-                            @endif
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-link d-flex menu-title link-nav {{ request()->is('admin/money-requests*') ? 'active' : '' }}"
-                            href="{{ route('admin.money-requests.index') }}">
-                            <i data-feather="dollar-sign"> </i>
-                            <span>Money Requests</span>
-                            @if(config('app.resell'))
-                            @php
-                                $pendingAmount = cacheMemo()->remember('pending_withdrawal_amount', 300, function () {
-                                    return abs(\Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
-                                        ->where('confirmed', false)
-                                        ->sum('amount'));
-                                });
-                            @endphp
-                            @if($pendingAmount > 0)
-                            <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
-                                {{ number_format($pendingAmount, 0) }} tk
-                            </span>
-                            @endif
-                            @endif
-                        </a>
-                    </li>
+                        <li>
+                            <a class="nav-link d-flex menu-title link-nav {{ Route::currentRouteName() == 'admin.resellers.index' && request('status') == '' ? 'active' : '' }}"
+                                href="{{ route('admin.resellers.index') }}">
+                                <i data-feather="users"> </i>
+                                <span>Reseller List</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link d-flex menu-title link-nav {{ request()->is('admin/resellers*') && request('status') == 'pending' ? 'active' : '' }}"
+                                href="{{ route('admin.resellers.index', ['status' => 'pending']) }}">
+                                <i data-feather="user-check"> </i>
+                                <span>Pending Resellers</span>
+                                @if (config('app.resell'))
+                                    @php
+                                        $pendingResellersCount = \App\Models\User::where('is_verified', false)->count();
+                                    @endphp
+                                    @if ($pendingResellersCount > 0)
+                                        <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
+                                            {{ $pendingResellersCount }}
+                                        </span>
+                                    @endif
+                                @endif
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link d-flex menu-title link-nav {{ request()->is('admin/money-requests*') ? 'active' : '' }}"
+                                href="{{ route('admin.money-requests.index') }}">
+                                <i data-feather="dollar-sign"> </i>
+                                <span>Money Requests</span>
+                                @if (config('app.resell'))
+                                    @php
+                                        $pendingAmount = cacheMemo()->remember(
+                                            'pending_withdrawal_amount',
+                                            300,
+                                            function () {
+                                                return abs(
+                                                    \Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
+                                                        ->where('confirmed', false)
+                                                        ->sum('amount'),
+                                                );
+                                            },
+                                        );
+                                    @endphp
+                                    @if ($pendingAmount > 0)
+                                        <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
+                                            {{ number_format($pendingAmount, 0) }} tk
+                                        </span>
+                                    @endif
+                                @endif
+                            </a>
+                        </li>
                     @endif
                     <li class="sidebar-title">
                         <h6>Settings</h6>

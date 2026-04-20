@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\BrandProductController;
 use App\Http\Controllers\CategoryProductController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSectionProductController;
+use App\Http\Controllers\LandingPageProController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\MaintenancePaymentController;
 use App\Http\Controllers\OrderTrackController;
@@ -19,6 +21,8 @@ use Hotash\FacebookPixel\MetaPixelMiddleware;
 use Hotash\LaravelMultiUi\Facades\MultiUi;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+
+Route::get('land', fn () => view('land'))->name('land');
 
 // Language Change
 // Route::get('lang/{locale}', function ($locale) {
@@ -87,7 +91,7 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
             Route::post('profile', [ResellerController::class, 'updateProfile'])->name('profile.update');
 
             // Routes that require verification
-            Route::middleware(App\Http\Middleware\EnsureResellerIsVerified::class)->group(function (): void {
+            Route::middleware(EnsureResellerIsVerified::class)->group(function (): void {
                 Route::get('products', [ResellerController::class, 'products'])->name('products');
                 Route::get('orders', [ResellerController::class, 'orders'])->name('orders');
                 Route::get('orders/{order}', [ResellerController::class, 'showOrder'])->name('orders.show');
@@ -117,6 +121,8 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::get('/categories/{category:slug}/products', CategoryProductController::class)->name('categories.products');
     Route::get('/brand/{brand:slug}', BrandProductController::class)->name('brand.show');
     Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
+    Route::get('/lp/{landingPagePro:slug}', [LandingPageProController::class, 'show'])->name('landing-pro.show');
+    Route::post('/lp/{landingPagePro:slug}/checkout', [LandingPageProController::class, 'checkout'])->name('landing-pro.checkout');
     Route::view('/lead-form', 'leads.form')->name('leads.form');
     Route::post('/leads', [LeadController::class, 'store'])
         ->middleware('throttle:1,10')
@@ -152,8 +158,8 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
         ->middleware('doNotCacheResponse');
 
     // Cart API routes (moved from api.php to use same session)
-    Route::post('cart/add', [App\Http\Controllers\Api\CartController::class, 'add'])->name('cart.add');
-    Route::get('cart', [App\Http\Controllers\Api\CartController::class, 'get'])->name('cart.get');
+    Route::post('cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::get('cart', [CartController::class, 'get'])->name('cart.get');
 
 });
 

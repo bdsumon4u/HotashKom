@@ -167,9 +167,9 @@
                                     <div class="p-3 card-header">
                                         <ul class="nav nav-tabs" role="tablist">
                                             <li class="nav-item">
-                                                <a class="nav-link @unless (request('active_id')) active @endunless" data-toggle="tab" href="#create-category"
-                                                    role="tab" aria-controls="create-category"
-                                                    aria-selected="false">Create</a>
+                                                <a class="nav-link @unless (request('active_id')) active @endunless"
+                                                    data-toggle="tab" href="#create-category" role="tab"
+                                                    aria-controls="create-category" aria-selected="false">Create</a>
                                             </li>
                                             @if (request('active_id'))
                                                 <li class="nav-item">
@@ -195,9 +195,11 @@
                                         @endif
                                         @php $active = \App\Models\Category::with('seo')->find(request('active_id')) @endphp
                                         <div class="tab-content">
-                                            <div class="tab-pane @unless (request('active_id')) active @endunless" id="create-category" role="tabpanel">
+                                            <div class="tab-pane @unless (request('active_id')) active @endunless"
+                                                id="create-category" role="tabpanel">
                                                 <p class="text-info">Create
-                                                    <strong>{{ $active ? 'Child' : 'Root' }}</strong> Category</p>
+                                                    <strong>{{ $active ? 'Child' : 'Root' }}</strong> Category
+                                                </p>
                                                 <form action="{{ route('admin.categories.store') }}" method="post">
                                                     @csrf
                                                     <div class="form-group">
@@ -210,7 +212,8 @@
                                                         @enderror
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="create-slug">Link</label><span class="text-danger">*</span>
+                                                        <label for="create-slug">Link</label><span
+                                                            class="text-danger">*</span>
                                                         <input type="text" name="slug" value="{{ old('slug') }}"
                                                             id="create-slug"
                                                             class="form-control @error('slug') is-invalid @enderror">
@@ -255,32 +258,39 @@
                                                     <div class="form-group">
                                                         <div class="checkbox checkbox-secondary">
                                                             <input type="hidden" name="is_enabled" value="0">
-                                                            <x-checkbox id="create-is-enabled" name="is_enabled" value="1"
-                                                                :checked="old('is_enabled', true)" />
-                                                            <label for="create-is-enabled" class="m-0">Enable Category</label>
+                                                            <x-checkbox id="create-is-enabled" name="is_enabled"
+                                                                value="1" :checked="old('is_enabled', true)" />
+                                                            <label for="create-is-enabled" class="m-0">Enable
+                                                                Category</label>
                                                         </div>
                                                     </div>
                                                     <hr>
-                                                    <h6 class="mb-2">SEO Settings <small class="text-muted">(Optional)</small></h6>
+                                                    <h6 class="mb-2">SEO Settings <small
+                                                            class="text-muted">(Optional)</small></h6>
                                                     <div class="form-group">
                                                         <label for="create-seo-title">SEO Title</label>
-                                                        <input type="text" name="seo[title]" value="{{ old('seo.title') }}"
-                                                            id="create-seo-title" class="form-control"
+                                                        <input type="text" name="seo[title]"
+                                                            value="{{ old('seo.title') }}" id="create-seo-title"
+                                                            class="form-control"
                                                             placeholder="Leave empty to use category name">
-                                                        <small class="form-text text-muted">Recommended: 50-60 characters</small>
+                                                        <small class="form-text text-muted">Recommended: 50-60
+                                                            characters</small>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="create-seo-description">SEO Description</label>
-                                                        <textarea name="seo[description]" id="create-seo-description" rows="2"
-                                                            class="form-control" placeholder="Leave empty to use category name">{{ old('seo.description') }}</textarea>
-                                                        <small class="form-text text-muted">Recommended: 150-160 characters</small>
+                                                        <textarea name="seo[description]" id="create-seo-description" rows="2" class="form-control"
+                                                            placeholder="Leave empty to use category name">{{ old('seo.description') }}</textarea>
+                                                        <small class="form-text text-muted">Recommended: 150-160
+                                                            characters</small>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="create-seo-image">SEO Image (Open Graph)</label>
-                                                        <input type="text" name="seo[image]" value="{{ old('seo.image') }}"
-                                                            id="create-seo-image" class="form-control"
+                                                        <input type="text" name="seo[image]"
+                                                            value="{{ old('seo.image') }}" id="create-seo-image"
+                                                            class="form-control"
                                                             placeholder="Full URL to image (optional)">
-                                                        <small class="form-text text-muted">Recommended: 1200x630px. If empty, category image will be used.</small>
+                                                        <small class="form-text text-muted">Recommended: 1200x630px. If
+                                                            empty, category image will be used.</small>
                                                     </div>
                                                     <button type="submit"
                                                         class="ml-auto btn btn-sm btn-success d-block"><i
@@ -354,26 +364,30 @@
                                                         <div class="form-group">
                                                             <div class="checkbox checkbox-secondary">
                                                                 <input type="hidden" name="is_enabled" value="0">
-                                                                <x-checkbox id="edit-is-enabled" name="is_enabled" value="1"
-                                                                    :checked="old('is_enabled', $active->is_enabled)" />
-                                                                <label for="edit-is-enabled" class="m-0">Enable Category</label>
+                                                                <x-checkbox id="edit-is-enabled" name="is_enabled"
+                                                                    value="1" :checked="old('is_enabled', $active->is_enabled)" />
+                                                                <label for="edit-is-enabled" class="m-0">Enable
+                                                                    Category</label>
                                                             </div>
                                                         </div>
                                                         <hr>
-                                                        <h6 class="mb-2">SEO Settings <small class="text-muted">(Optional)</small></h6>
+                                                        <h6 class="mb-2">SEO Settings <small
+                                                                class="text-muted">(Optional)</small></h6>
                                                         <div class="form-group">
                                                             <label for="edit-seo-title">SEO Title</label>
                                                             <input type="text" name="seo[title]"
                                                                 value="{{ old('seo.title', $active->seo?->title) }}"
                                                                 id="edit-seo-title" class="form-control"
                                                                 placeholder="Leave empty to use category name">
-                                                            <small class="form-text text-muted">Recommended: 50-60 characters</small>
+                                                            <small class="form-text text-muted">Recommended: 50-60
+                                                                characters</small>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="edit-seo-description">SEO Description</label>
-                                                            <textarea name="seo[description]" id="edit-seo-description" rows="2"
-                                                                class="form-control" placeholder="Leave empty to use category name">{{ old('seo.description', $active->seo?->description) }}</textarea>
-                                                            <small class="form-text text-muted">Recommended: 150-160 characters</small>
+                                                            <textarea name="seo[description]" id="edit-seo-description" rows="2" class="form-control"
+                                                                placeholder="Leave empty to use category name">{{ old('seo.description', $active->seo?->description) }}</textarea>
+                                                            <small class="form-text text-muted">Recommended: 150-160
+                                                                characters</small>
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="edit-seo-image">SEO Image (Open Graph)</label>
@@ -381,7 +395,8 @@
                                                                 value="{{ old('seo.image', $active->seo?->image) }}"
                                                                 id="edit-seo-image" class="form-control"
                                                                 placeholder="Full URL to image (optional)">
-                                                            <small class="form-text text-muted">Recommended: 1200x630px. If empty, category image will be used.</small>
+                                                            <small class="form-text text-muted">Recommended: 1200x630px. If
+                                                                empty, category image will be used.</small>
                                                         </div>
                                                         <button type="submit"
                                                             class="ml-auto btn btn-sm btn-success d-block"><i
@@ -627,7 +642,7 @@
 
                     $(e.target).addClass('disabled')
                     $.ajax({
-                        url: '{{route('admin.categories.store')}}',
+                        url: '{{ route('admin.categories.store') }}',
                         type: 'POST',
                         data: {
                             categories: arr
@@ -656,7 +671,7 @@
                 $(e.target).addClass('disabled')
                 var id = $(this).attr('data-id')
                 $.ajax({
-                    url: '{{route('admin.categories.destroy', ':id')}}'.replace(':id', id),
+                    url: '{{ route('admin.categories.destroy', ':id') }}'.replace(':id', id),
                     type: 'DELETE',
                     _method: 'DELETE',
                     complete: function() {

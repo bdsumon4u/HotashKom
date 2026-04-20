@@ -15,13 +15,72 @@
         .footer {
             z-index: 1;
         }
-        .route {position: relative;list-style-type: none;border: 0;margin: 0;padding: 0;top: 0px;margin-top: 0px;max-height: 100% !important;width: 100%;background: #bcf;border-radius: 2px;z-index: -1;}
-        .route span {position: absolute;top: 6px;left: 12px;-ms-transform: scale(2);z-index: 10;}
-        .route .title {position: absolute;border: 0;margin: 0;padding: 0;padding-top: 4px;font-size: 1rem;height: 30px;text-indent: 50px;background: #4af;border-radius: 2px;box-shadow: 0px 0px 0px 2px #29f;pointer-events: none;}
-        .first-title { margin-left: 10px; }
-        .space{background:white;position: relative;list-style-type: none;border: 0;margin: 0;padding: 0;margin-left: 45px;top: 35px;padding-bottom: 35px;height: 100%;z-index: 1;}
-        .first-space {margin-left: 10px; top: 0;}
-        .space .space{min-height: 4rem;}
+
+        .route {
+            position: relative;
+            list-style-type: none;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            top: 0px;
+            margin-top: 0px;
+            max-height: 100% !important;
+            width: 100%;
+            background: #bcf;
+            border-radius: 2px;
+            z-index: -1;
+        }
+
+        .route span {
+            position: absolute;
+            top: 6px;
+            left: 12px;
+            -ms-transform: scale(2);
+            z-index: 10;
+        }
+
+        .route .title {
+            position: absolute;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            padding-top: 4px;
+            font-size: 1rem;
+            height: 30px;
+            text-indent: 50px;
+            background: #4af;
+            border-radius: 2px;
+            box-shadow: 0px 0px 0px 2px #29f;
+            pointer-events: none;
+        }
+
+        .first-title {
+            margin-left: 10px;
+        }
+
+        .space {
+            background: white;
+            position: relative;
+            list-style-type: none;
+            border: 0;
+            margin: 0;
+            padding: 0;
+            margin-left: 45px;
+            top: 35px;
+            padding-bottom: 35px;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .first-space {
+            margin-left: 10px;
+            top: 0;
+        }
+
+        .space .space {
+            min-height: 4rem;
+        }
+
         .space button[type="button"] {
             z-index: 9999;
             display: block;
@@ -46,34 +105,38 @@
                                 <form action="{{ route('admin.category-menus.store') }}" method="post">
                                     @csrf
                                     <div class="p-2 card-header">
-                                        <button type="submit" class="ml-auto btn btn-sm btn-success d-block">Add To List</button>
+                                        <button type="submit" class="ml-auto btn btn-sm btn-success d-block">Add To
+                                            List</button>
                                     </div>
                                     <div class="p-2 card-body">
                                         <div class="table-responsive">
                                             <table class="table table-bordered table-sm table-striped">
                                                 <thead>
-                                                <tr>
-                                                    <th class="text-center">
-                                                        Select
-                                                    </th>
-                                                    <th>Category</th>
-                                                </tr>
+                                                    <tr>
+                                                        <th class="text-center">
+                                                            Select
+                                                        </th>
+                                                        <th>Category</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
-                                                @foreach($remaining_cats as $category)
-                                                    <tr>
-                                                        <td class="text-center">
-                                                            <input type="checkbox" name="category[{{ $category->id }}]" id="{{ $category->id }}" style="width: 15px; height: 15px;">
-                                                        </td>
-                                                        <td>{{ $category->name }}</td>
-                                                    </tr>
-                                                @endforeach
+                                                    @foreach ($remaining_cats as $category)
+                                                        <tr>
+                                                            <td class="text-center">
+                                                                <input type="checkbox" name="category[{{ $category->id }}]"
+                                                                    id="{{ $category->id }}"
+                                                                    style="width: 15px; height: 15px;">
+                                                            </td>
+                                                            <td>{{ $category->name }}</td>
+                                                        </tr>
+                                                    @endforeach
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
                                     <div class="p-2 card-footer">
-                                        <button type="submit" class="ml-auto btn btn-sm btn-success d-block">Add To List</button>
+                                        <button type="submit" class="ml-auto btn btn-sm btn-success d-block">Add To
+                                            List</button>
                                     </div>
                                 </form>
                             </div>
@@ -104,7 +167,7 @@
 @push('scripts')
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
     <script>
-        $(document).ready(function(){
+        $(document).ready(function() {
 
             // calcWidth($('#title0'));
 
@@ -115,20 +178,20 @@
 
             };
 
-//recursively calculate the Width all titles
-            function calcWidth(obj){
+            //recursively calculate the Width all titles
+            function calcWidth(obj) {
                 console.log('---- calcWidth -----');
 
                 var titles =
                     $(obj).siblings('.space').children('.route').children('.title');
 
-                $(titles).each(function(index, element){
+                $(titles).each(function(index, element) {
                     var pTitleWidth = parseInt($(obj).css('width'));
                     var leftOffset = parseInt($(obj).siblings('.space').css('margin-left'));
 
                     var newWidth = pTitleWidth - leftOffset;
 
-                    if ($(obj).attr('id') == 'title0'){
+                    if ($(obj).attr('id') == 'title0') {
                         console.log("called");
 
                         newWidth = newWidth - 10;
@@ -145,19 +208,18 @@
 
             var updated = [];
             var space = $('.space').sortable({
-                connectWith:'.space',
-// handle:'.title',
-// placeholder: ....,
-                tolerance:'intersect',
-                create:function(event,ui){
+                connectWith: '.space',
+                // handle:'.title',
+                // placeholder: ....,
+                tolerance: 'intersect',
+                create: function(event, ui) {
                     // calcWidth($('#title0'));
                 },
-                over:function(event,ui){
-                },
-                receive:function(event, ui){
+                over: function(event, ui) {},
+                receive: function(event, ui) {
                     // calcWidth($(this).siblings('.title'));
                 },
-                update:function (event, ui) {
+                update: function(event, ui) {
                     $('#space-0 .route').each(function(idx, el) {
                         reorder(idx, $(el));
                     })
@@ -178,20 +240,21 @@
                     ($.inArray(el.attr('id'), updated) == -1) && updated.push(el.attr('id'))
                 }
 
-                el.find('.space .route').each(function (idx, cel) {
+                el.find('.space .route').each(function(idx, cel) {
                     reorder(idx, $(cel));
                 })
             }
 
             $('.space').disableSelection();
 
-            $(document).ready(function () {
-                $(document).on('submit', '#category-menu--form', function (e) {
+            $(document).ready(function() {
+                $(document).on('submit', '#category-menu--form', function(e) {
                     e.preventDefault();
 
-                    var arr = [], uplen = updated.length;
+                    var arr = [],
+                        uplen = updated.length;
 
-                    $('li.route').each(function (idx, el) {
+                    $('li.route').each(function(idx, el) {
                         el = $(el);
                         var arri = $.inArray(el.attr('id'), updated);
                         if (arri != -1) {
@@ -207,9 +270,11 @@
 
                     $(e.target).addClass('disabled')
                     $.ajax({
-                        url: '{{route('admin.category-menus.store')}}',
+                        url: '{{ route('admin.category-menus.store') }}',
                         type: 'POST',
-                        data: {categories: arr},
+                        data: {
+                            categories: arr
+                        },
                         success: function(response) {
                             // console.log(response)
                         },
@@ -229,10 +294,10 @@
                 $(e.target).addClass('disabled')
                 var id = $(this).attr('data-id')
                 $.ajax({
-                    url: '{{route('admin.category-menus.destroy', ':id')}}'.replace(':id', id),
+                    url: '{{ route('admin.category-menus.destroy', ':id') }}'.replace(':id', id),
                     type: 'DELETE',
                     _method: 'DELETE',
-                    complete: function () {
+                    complete: function() {
                         $(e.target).removeClass('disabled')
                         window.location.reload();
                     }
