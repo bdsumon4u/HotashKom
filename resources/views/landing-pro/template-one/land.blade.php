@@ -566,16 +566,22 @@
                                                         <label
                                                             class="block mb-1 text-[11px] font-bold uppercase text-gray-500"
                                                             x-text="attribute.attribute_name"></label>
-                                                        <select
-                                                            class="w-full px-2 py-1 text-sm bg-white border rounded"
-                                                            x-model.number="attribute.selected_option_id"
-                                                            @change="selectVariantByAttributes(index)">
+                                                        <div class="flex flex-wrap gap-2">
                                                             <template x-for="option in attribute.options"
                                                                 :key="`${attribute.attribute_id}-${option.id}`">
-                                                                <option :value="Number(option.id)"
-                                                                    x-text="option.name"></option>
+                                                                <label
+                                                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs bg-white border rounded cursor-pointer"
+                                                                    :class="Number(attribute.selected_option_id) === Number(option.id) ? 'border-green-600 text-green-700' : 'border-gray-200 text-gray-700'">
+                                                                    <input type="radio"
+                                                                        :name="`attr-${product.id}-${attribute.attribute_id}`"
+                                                                        :value="Number(option.id)"
+                                                                        x-model.number="attribute.selected_option_id"
+                                                                        @change="selectVariantByAttributes(index)"
+                                                                        class="accent-green-600">
+                                                                    <span x-text="option.name"></span>
+                                                                </label>
                                                             </template>
-                                                        </select>
+                                                        </div>
                                                     </div>
                                                 </template>
                                             </div>
