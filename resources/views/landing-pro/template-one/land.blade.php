@@ -571,7 +571,10 @@
                                                                 :key="`${attribute.attribute_id}-${option.id}`">
                                                                 <label
                                                                     class="inline-flex items-center gap-1 px-2 py-1 text-xs bg-white border rounded cursor-pointer"
-                                                                    :class="Number(attribute.selected_option_id) === Number(option.id) ? 'border-green-600 text-green-700' : 'border-gray-200 text-gray-700'">
+                                                                    :class="Number(attribute.selected_option_id) === Number(
+                                                                            option.id) ?
+                                                                        'border-green-600 text-green-700' :
+                                                                        'border-gray-200 text-gray-700'">
                                                                     <input type="radio"
                                                                         :name="`attr-${product.id}-${attribute.attribute_id}`"
                                                                         :value="Number(option.id)"
