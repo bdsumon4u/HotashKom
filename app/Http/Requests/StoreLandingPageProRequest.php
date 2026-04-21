@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\LandingPagePro;
 use App\Services\LandingPageProTemplateRegistry;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreLandingPageProRequest extends FormRequest
 {
@@ -37,7 +38,7 @@ class StoreLandingPageProRequest extends FormRequest
             'seo.description' => ['nullable', 'string', 'max:500'],
             'section_settings' => ['nullable', 'array'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.product_id' => ['required', 'exists:products,id', 'distinct'],
+            'items.*.product_id' => ['required', Rule::exists('products', 'id')->whereNull('parent_id'), 'distinct'],
             'items.*.free_delivery' => ['nullable', 'boolean'],
             'items.*.is_active' => ['nullable', 'boolean'],
         ];

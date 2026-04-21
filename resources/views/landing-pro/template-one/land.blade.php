@@ -105,7 +105,7 @@
                     return $images;
                 }
 
-                return [data_get($product, 'image')];
+                return [data_get($product, 'base_product_image')];
             })
             ->filter()
             ->unique()
@@ -196,16 +196,33 @@
     $useReviewCarousel = $reviewCount > 3;
 
     $productsPayload = collect($selectedProducts)
-        ->map(function ($item, $key): array {
-            return [
-                'id' => $item['id'],
-                'name' => $item['name'],
-                'price' => $item['price'],
-                'image' => $item['image'],
-                'selected' => !$key, // select the first one by default
-                'qty' => 1,
-                'free_delivery' => $item['free_delivery'] ?? false,
-            ];
+        ->flatMap(function ($item): array {
+            $landingProductId = (int) data_get($item, 'landing_product_id');
+            $freeDelivery = (bool) data_get($item, 'free_delivery', false);
+
+            return collect(data_get($item, 'cards', []))
+                ->map(function ($card) use ($landingProductId, $freeDelivery): array {
+                    return [
+                        'id' => data_get($card, 'card_id'),
+                        'landing_product_id' => $landingProductId,
+                        'name' => data_get($card, 'title'),
+                        'selected_product_id' => (int) data_get($card, 'selected_product_id'),
+                        'price' => (int) data_get($card, 'price', 0),
+                        'image' => data_get($card, 'image'),
+                        'attributes' => data_get($card, 'attributes', []),
+                        'variants' => data_get($card, 'variants', []),
+                        'selected' => false,
+                        'qty' => 1,
+                        'free_delivery' => $freeDelivery,
+                    ];
+                })
+                ->all();
+        })
+        ->values()
+        ->map(function (array $item, int $index): array {
+            $item['selected'] = $index === 0;
+
+            return $item;
         })
         ->values()
         ->all();
@@ -524,7 +541,7 @@
                                     <img :src="product.image" alt=""
                                         class="object-cover w-16 h-16 transition border rounded-lg group-hover:scale-105">
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-bold text-gray-800 line-clamp-2" x-text="product.name">
+                                        <p class="text-sm font-bold text-gray-800" x-text="product.name">
                                         </p>
                                         <p class="mt-1 text-sm font-black text-green-700"
                                             x-text="product.price + '৳'"></p>
@@ -540,6 +557,29 @@
                                             <button @click="increment(index)" type="button"
                                                 class="px-3 py-1 hover:bg-gray-100">+</button>
                                         </div>
+
+                                        <template x-if="product.attributes.length > 0">
+                                            <div class="grid gap-2 mt-3" @click.stop>
+                                                <template x-for="attribute in product.attributes"
+                                                    :key="`${product.id}-${attribute.attribute_id}`">
+                                                    <div>
+                                                        <label
+                                                            class="block mb-1 text-[11px] font-bold uppercase text-gray-500"
+                                                            x-text="attribute.attribute_name"></label>
+                                                        <select
+                                                            class="w-full px-2 py-1 text-sm bg-white border rounded"
+                                                            x-model.number="attribute.selected_option_id"
+                                                            @change="selectVariantByAttributes(index)">
+                                                            <template x-for="option in attribute.options"
+                                                                :key="`${attribute.attribute_id}-${option.id}`">
+                                                                <option :value="Number(option.id)"
+                                                                    x-text="option.name"></option>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
                                     </div>
                                 </div>
                             </div>
@@ -641,7 +681,7 @@
                                         <div
                                             class="flex items-center justify-between p-2 text-xs border border-gray-100 rounded bg-gray-50">
                                             <div class="min-w-0">
-                                                <span class="font-semibold line-clamp-1"
+                                                <span class="font-semibold"
                                                     x-text="item.name + ' x ' + item.qty"></span>
                                             </div>
                                             <div class="flex items-center gap-2">
@@ -838,6 +878,7 @@
 
                 init() {
                     this.startTimer(new Date().getTime() + 86400000);
+                    this.products.forEach((_, index) => this.selectVariantByAttributes(index));
                     this.$nextTick(() => {
                         this.initCarouselWidths();
                         this.goToReview(0);
@@ -905,8 +946,45 @@
                     }
                 },
 
+                selectVariantByAttributes(index) {
+                    const product = this.products[index];
+                    if (!product || !Array.isArray(product.variants) || product.variants.length === 0) {
+                        return;
+                    }
+
+                    const selectedOptionMap = product.attributes.reduce((carry, attribute) => {
+                        carry[String(attribute.attribute_id)] = Number(attribute.selected_option_id);
+
+                        return carry;
+                    }, {});
+
+                    let matchedVariant = product.variants.find((variant) => {
+                        const optionIds = variant.option_ids || {};
+
+                        return Object.entries(selectedOptionMap).every(([attributeId, optionId]) => {
+                            return Number(optionIds[attributeId]) === Number(optionId);
+                        });
+                    });
+
+                    if (!matchedVariant) {
+                        matchedVariant = product.variants[0];
+
+                        product.attributes.forEach((attribute) => {
+                            const fallbackOptionId = matchedVariant.option_ids?.[String(attribute.attribute_id)];
+                            if (fallbackOptionId) {
+                                attribute.selected_option_id = Number(fallbackOptionId);
+                            }
+                        });
+                    }
+
+                    product.selected_product_id = Number(matchedVariant.id);
+                    product.price = Number(matchedVariant.price || 0);
+                    product.image = matchedVariant.image || product.image;
+                    product.name = matchedVariant.name || product.name;
+                },
+
                 removeSelected(productId) {
-                    const product = this.products.find((item) => Number(item.id) === Number(productId));
+                    const product = this.products.find((item) => String(item.id) === String(productId));
                     if (!product) {
                         return;
                     }
@@ -1034,7 +1112,8 @@
                                 address: this.checkout.address,
                                 delivery_area: this.checkout.deliveryArea,
                                 items: this.selectedItems.map((item) => ({
-                                    product_id: item.id,
+                                    landing_product_id: item.landing_product_id,
+                                    product_id: item.selected_product_id,
                                     quantity: item.qty,
                                 })),
                             }),

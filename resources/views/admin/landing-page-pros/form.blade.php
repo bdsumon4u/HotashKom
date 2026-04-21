@@ -294,7 +294,7 @@
 
         <div class="p-3 mb-3 lp-card">
             <div class="mb-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Selected Product / Variations</h5>
+                <h5 class="mb-0">Selected Product</h5>
                 <button type="button" class="btn btn-sm btn-primary" @click="addItem">Add Row</button>
             </div>
 
@@ -302,7 +302,7 @@
                 <table class="table mb-0 table-bordered">
                     <thead>
                         <tr>
-                            <th style="min-width: 280px; max-width: 280px; width: 280px;">Product / Variation</th>
+                            <th style="min-width: 280px; max-width: 280px; width: 280px;">Product</th>
                             <th style="min-width: 150px;">Free Delivery</th>
                             <th style="min-width: 90px;">Action</th>
                         </tr>
@@ -311,16 +311,11 @@
                         <template x-for="(item, index) in items" :key="index">
                             <tr>
                                 <td style="width: 280px; max-width: 640px;">
-                                    <select class="form-control js-product-variation-select w-100"
+                                    <select class="form-control js-product-select w-100"
                                         :name="`items[${index}][product_id]`" x-model="item.product_id">
-                                        <option value="">Select product or variation</option>
-                                        @foreach ($productChoices as $group)
-                                            <option value="{{ $group['product']['id'] }}">
-                                                {{ $group['product']['label'] }}</option>
-                                            @foreach ($group['variations'] as $variation)
-                                                <option value="{{ $variation['id'] }}">{{ $variation['label'] }}
-                                                </option>
-                                            @endforeach
+                                        <option value="">Select product</option>
+                                        @foreach ($productChoices as $product)
+                                            <option value="{{ $product['id'] }}">{{ $product['label'] }}</option>
                                         @endforeach
                                     </select>
                                 </td>
@@ -651,14 +646,14 @@
                 initSelect2() {
                     runWhenJQueryReady(() => {
                         this.$nextTick(() => {
-                            const $selects = $('.js-product-variation-select');
+                            const $selects = $('.js-product-select');
                             $selects.each(function() {
                                 if ($(this).hasClass('select2-hidden-accessible')) {
                                     return;
                                 }
 
                                 $(this).select2({
-                                    placeholder: 'Search product or variation',
+                                    placeholder: 'Search product',
                                     allowClear: true,
                                 });
                             });

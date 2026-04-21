@@ -11,7 +11,6 @@ use App\Services\LandingPageProTemplateRegistry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 
 class LandingPageProController extends Controller
 {
@@ -127,26 +126,15 @@ class LandingPageProController extends Controller
 
     private function productChoices(): Collection
     {
-        $products = Product::query()
+        return Product::query()
             ->whereNull('parent_id')
             ->where('is_active', true)
-            ->with(['variations' => function ($query): void {
-                $query->where('is_active', true)->orderBy('name');
-            }])
             ->orderBy('name')
-            ->get(['id', 'name', 'sku']);
-
-        return $products->map(function (Product $product): array {
-            return [
-                'product' => [
-                    'id' => $product->id,
-                    'label' => sprintf('%s (Base Product)', $product->name),
-                ],
-                'variations' => $product->variations->map(fn (Product $variation): array => [
-                    'id' => $variation->id,
-                    'label' => sprintf('%s [%s]', $variation->name, $product->name),
-                ])->values()->all(),
-            ];
-        })->values();
+            ->get(['id', 'name', 'sku'])
+            ->map(fn (Product $product): array => [
+                'id' => $product->id,
+                'label' => $product->name,
+            ])
+            ->values();
     }
 }
