@@ -6,7 +6,6 @@ set -euo pipefail
 ####################################
 KEY_NAME="HOTASH"
 SSH_KEY="$HOME/.ssh/$KEY_NAME"
-DEFAULT_ROOT_DIR="public_html"
 
 ####################################
 # LOAD SOURCE DB FROM .env
@@ -26,16 +25,16 @@ done
 ####################################
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -s|--site) target_site="$2"; shift 2 ;;
-        -d|--domain) target_domain="$2"; shift 2 ;;
-        -h|--host) ssh_host="$2"; shift 2 ;;
-        -u|--uname) target_username="$2"; shift 2 ;;
-        -db|--dbname) target_db_dbase="$2"; shift 2 ;;
-        -dbu|--dbuser) target_db_uname="$2"; shift 2 ;;
-        -dbp|--dbpass) target_db_upass="$2"; shift 2 ;;
-        -mu|--mailuser) target_mail_user="$2"; shift 2 ;;
-        -mp|--mailpass) target_mail_pass="$2"; shift 2 ;;
-        -r|--rootdir) target_root_dir="$2"; shift 2 ;;
+        -s|--site) [[ -n "${2-}" && "${2-}" != -* ]] && { target_site="$2"; shift 2; } || shift ;;
+        -d|--domain) [[ -n "${2-}" && "${2-}" != -* ]] && { target_domain="$2"; shift 2; } || shift ;;
+        -h|--host) [[ -n "${2-}" && "${2-}" != -* ]] && { ssh_host="$2"; shift 2; } || shift ;;
+        -u|--uname) [[ -n "${2-}" && "${2-}" != -* ]] && { target_username="$2"; shift 2; } || shift ;;
+        -db|--dbname) [[ -n "${2-}" && "${2-}" != -* ]] && { target_db_dbase="$2"; shift 2; } || shift ;;
+        -dbu|--dbuser) [[ -n "${2-}" && "${2-}" != -* ]] && { target_db_uname="$2"; shift 2; } || shift ;;
+        -dbp|--dbpass) [[ -n "${2-}" && "${2-}" != -* ]] && { target_db_upass="$2"; shift 2; } || shift ;;
+        -mu|--mailuser) [[ -n "${2-}" && "${2-}" != -* ]] && { target_mail_user="$2"; shift 2; } || shift ;;
+        -mp|--mailpass) [[ -n "${2-}" && "${2-}" != -* ]] && { target_mail_pass="$2"; shift 2; } || shift ;;
+        -r|--rootdir) [[ -n "${2-}" && "${2-}" != -* ]] && { target_root_dir="$2"; shift 2; } || shift ;;
         *) echo "❌ Unknown option: $1"; exit 1 ;;
     esac
 done
@@ -43,16 +42,34 @@ done
 ####################################
 # VALIDATION & PROMPTS
 ####################################
-: "${target_site:?Missing --site}"
-: "${target_domain:?Missing --domain}"
-: "${ssh_host:?Missing --host}"
-: "${target_username:?Missing --uname}"
-: "${target_db_dbase:?Missing --dbname}"
-: "${target_db_uname:?Missing --dbuser}"
-: "${target_db_upass:?Missing --dbpass}"
-: "${target_mail_user:?Missing --mailuser}"
-: "${target_mail_pass:?Missing --mailpass}"
-target_root_dir="${target_root_dir:-$DEFAULT_ROOT_DIR}"
+prompt_required() {
+    local var_name="$1"
+    local prompt_text="$2"
+    local is_secret="${3:-false}"
+    local value="${!var_name-}"
+
+    while [[ -z "$value" ]]; do
+        if [[ "$is_secret" == "true" ]]; then
+            read -r -s -p "$prompt_text: " value
+            echo
+        else
+            read -r -p "$prompt_text: " value
+        fi
+    done
+
+    printf -v "$var_name" '%s' "$value"
+}
+
+prompt_required target_site "Target site name (--site)"
+prompt_required target_domain "Target domain (--domain)"
+prompt_required ssh_host "SSH host (--host)"
+prompt_required target_username "Target SSH username (--uname)"
+prompt_required target_db_dbase "Target database name (--dbname)"
+prompt_required target_db_uname "Target database user (--dbuser)"
+prompt_required target_db_upass "Target database password (--dbpass)" true
+prompt_required target_mail_user "Target mail user (--mailuser)"
+prompt_required target_mail_pass "Target mail password (--mailpass)" true
+prompt_required target_root_dir "Target root directory (--rootdir)"
 
 ####################################
 # SSH SETUP (PERSISTENT CONNECTION)
