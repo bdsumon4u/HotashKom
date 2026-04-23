@@ -56,13 +56,31 @@ class StoreLandingPageProRequest extends FormRequest
     private function normalizeSectionSettings(array $raw): array
     {
         $defaults = LandingPagePro::defaultSectionSettings();
+        $sectionKeys = array_keys(LandingPagePro::sectionLabels());
+        $reorderableSectionKeys = array_keys(LandingPagePro::reorderableSectionLabels());
         $normalized = [];
 
-        foreach ($defaults as $section => $config) {
+        foreach ($sectionKeys as $section) {
+            $config = $defaults[$section] ?? ['enabled' => true];
             $current = $raw[$section] ?? [];
             $normalized[$section] = is_array($current) ? $current : [];
             $normalized[$section]['enabled'] = (bool) ($current['enabled'] ?? ($config['enabled'] ?? false));
         }
+
+        $normalizedOrder = collect(data_get($raw, 'section_order', []))
+            ->map(fn ($key): string => (string) $key)
+            ->filter(fn (string $key): bool => in_array($key, $reorderableSectionKeys, true))
+            ->unique()
+            ->values();
+
+        $missingKeys = collect($reorderableSectionKeys)
+            ->reject(fn (string $key): bool => $normalizedOrder->contains($key))
+            ->values();
+
+        $normalized['section_order'] = $normalizedOrder
+            ->concat($missingKeys)
+            ->values()
+            ->all();
 
         return array_replace_recursive($defaults, $normalized);
     }

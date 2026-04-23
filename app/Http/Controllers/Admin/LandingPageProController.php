@@ -37,6 +37,11 @@ class LandingPageProController extends Controller
             ]),
             'templates' => $this->templateRegistry->options(),
             'productChoices' => $this->productChoices(),
+            'accordionSections' => LandingPagePro::sectionLabels(),
+            'sectionOrderLabels' => LandingPagePro::reorderableSectionLabels(),
+            'richTextSections' => LandingPagePro::getRichTextSections(),
+            'sectionsWithoutSubtitle' => LandingPagePro::getSectionsWithoutSubtitle(),
+            'createSectionDefaults' => LandingPagePro::getCreateSectionDefaults(),
         ]);
     }
 
@@ -64,6 +69,11 @@ class LandingPageProController extends Controller
             'landingPagePro' => $landing_page_pro,
             'templates' => $this->templateRegistry->options(),
             'productChoices' => $this->productChoices(),
+            'accordionSections' => LandingPagePro::sectionLabels(),
+            'sectionOrderLabels' => LandingPagePro::reorderableSectionLabels(),
+            'richTextSections' => LandingPagePro::getRichTextSections(),
+            'sectionsWithoutSubtitle' => LandingPagePro::getSectionsWithoutSubtitle(),
+            'createSectionDefaults' => LandingPagePro::getCreateSectionDefaults(),
         ]);
     }
 

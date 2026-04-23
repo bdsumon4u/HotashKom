@@ -4,84 +4,7 @@
     $sectionSettings = old('section_settings', $landingPagePro->mergedSectionSettings());
     $isCreateForm = !$landingPagePro->exists;
 
-    $createSectionDefaults = [
-        'announcement_bar' => [
-            'title' => 'Limited Time Offer! Free Shipping on Orders Over 3 Pieces.',
-        ],
-        'hero' => [
-            'title' => 'Original Exported Guess Trouser',
-            'subtitle' => '100% China Dobbi Fabric | Soft & Comfortable',
-        ],
-        'gallery' => [
-            'title' => 'পণ্যটির আরও কিছু ছবি',
-        ],
-        'cta_after_gallery' => [
-            'title' => 'ছবি দেখলেন, এখন অর্ডার করুন',
-            'subtitle' => 'স্টক সীমিত, অফার শেষ হওয়ার আগে অর্ডার করুন',
-        ],
-        'video' => [
-            'title' => 'ভিডিওতে বিস্তারিত দেখুন',
-            'url' => 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-        ],
-        'cta_after_video' => [
-            'title' => 'ভিডিও দেখলেন, এখন অর্ডার করুন',
-            'subtitle' => 'স্টক সীমিত, অফার শেষ হওয়ার আগে অর্ডার করুন',
-        ],
-        'features' => [
-            'title' => 'কেন আমাদের ট্রাউজার সেরা?',
-            'items_text' => implode(PHP_EOL, [
-                'অরিজিনাল চায়না ডবি ফেব্রিক (১০০%)',
-                'এক্সপোর্ট কোয়ালিটি ফিনিশিং এবং স্টিচিং',
-                'প্রিমিয়াম ফিটিং ও এশিয়ান সাইজ চার্ট',
-                'চেইন সহ গভীর পকেট মোবাইল রাখার জন্য নিরাপদ',
-                'অত্যন্ত আরামদায়ক এবং দীর্ঘস্থায়ী ফেব্রিক',
-            ]),
-        ],
-        'size_guide' => [
-            'title' => 'সাইজ গাইড (Size Chart)',
-            'rows_text' => implode(PHP_EOL, [
-                'L|30-32|38',
-                'XL|32-34|39',
-                '2X|34-36|40',
-                '3XL|36-38|41',
-                '4XL|38-42|42',
-            ]),
-        ],
-        'cta_after_size_guide' => [
-            'title' => 'সাইজ মিলেছে? এখন অর্ডার করুন',
-        ],
-        'faq' => [
-            'title' => 'সাধারণ জিজ্ঞাসা',
-            'items_text' => implode(PHP_EOL, [
-                'ফেব্রিক কি ধোয়ার পর কালার নষ্ট হবে?|জি না, আমরা ১০০% চায়না ডবি প্রিমিয়াম কাপড় ব্যবহার করি যার কালার গ্যারান্টি আছে।',
-                'ঢাকার বাইরে হোম ডেলিভারি পাওয়া যাবে?|জি অবশ্যই, আমরা সারা বাংলাদেশে কুরিয়ারের মাধ্যমে হোম ডেলিভারি দিয়ে থাকি।',
-                'আমি কি ট্রাউজারটি ট্রায়াল দিয়ে নিতে পারবো?|ডেলিভারি ম্যান থাকাকালীন আপনি চেক করে নিতে পারবেন, কোনো সমস্যা থাকলে সাথে সাথেই রিটার্ন করতে পারবেন।',
-                'এটির কোমর কি ইলাস্টিক?|জি, এটিতে হাই-কোয়ালিটি ইলাস্টিক এবং অ্যাডজাস্টেবল ফিতা রয়েছে যা আপনাকে দিবে সর্বোচ্চ আরাম।',
-            ]),
-        ],
-        'cta_after_faq' => [
-            'title' => 'আর প্রশ্ন নয়, অর্ডার দিন',
-        ],
-        'order_form' => [
-            'title' => 'পণ্য ও পরিমাণ নির্বাচন করুন',
-            'subtitle' => 'Choose Products & Quantity',
-        ],
-        'reviews' => [
-            'title' => 'আমাদের কাস্টমারদের মতামত',
-            'items_text' => implode(PHP_EOL, [
-                '1 আসাদুল্লাহ বিন সাইদ|খুবই আরামদায়ক ট্রাউজার। প্রিমিয়াম কোয়ালিটি এক্সপোর্ট কাপড়। রেকমেন্ডেড!',
-                '2 মাশরুর আহমেদ|কোয়ালিটি অনেক ভালো। কালার একদম ছবির মতোই। ডেলিভারিও খুব দ্রুত পেয়েছি।',
-                '3 তানজিল ইসলাম|চায়না ডবি ফেব্রিক টা সত্যিই অনেক সফট। এই বাজেটে সেরা ট্রাউজার।',
-                '4 সাইফুল ইসলাম|২টি অর্ডার করেছিলাম, সাইজ এবং ফিটিং একদম পারফেক্ট হয়েছে। ধন্যবাদ!',
-                '5 রাকিবুল ইসলাম|প্রিমিয়াম ফিনিশিং এবং স্টিচিং দেখে আমি সত্যিই অবাক হয়েছি। এই দামেই এত ভালো কোয়ালিটি পাওয়া যায়, ভাবতাম না!',
-                '6 মেহেদী হাসান|ডেলিভারি ম্যান এসে ট্রাউজার চেক করার সুযোগ দেয়ায় আমি খুবই খুশি। কোনো সমস্যা ছিল না, তাই সাথে সাথেই কনফার্ম করে দিয়েছি।',
-            ]),
-        ],
-        'final_cta' => [
-            'title' => 'রিভিউ দেখলেন, এবার অর্ডার কনফার্ম করুন',
-            'subtitle' => 'আপনার পছন্দের কালার ও সাইজ বেছে এখনই অর্ডার দিন',
-        ],
-    ];
+    $createSectionDefaults ??= \App\Models\LandingPagePro::getCreateSectionDefaults();
 
     if ($isCreateForm) {
         $sectionSettings = array_replace_recursive($createSectionDefaults, $sectionSettings);
@@ -169,21 +92,28 @@
         })
         ->all();
 
-    $sections = [
-        'announcement_bar' => 'Announcement Bar',
-        'hero' => 'Hero',
-        'gallery' => 'Gallery',
-        'video' => 'Video',
-        'features' => 'Features',
-        'size_guide' => 'Size Guide',
-        'faq' => 'FAQ',
-        'order_form' => 'Order Form',
-        'reviews' => 'Reviews',
-        'final_cta' => 'Final CTA',
-    ];
-
-    $richTextSections = ['hero', 'video', 'final_cta'];
-    $sectionsWithoutSubtitle = ['gallery', 'video', 'features', 'size_guide', 'faq', 'reviews'];
+    $sections = $accordionSections ?? \App\Models\LandingPagePro::sectionLabels();
+    $sectionOrderLabels = $sectionOrderLabels ?? \App\Models\LandingPagePro::reorderableSectionLabels();
+    $richTextSections ??= \App\Models\LandingPagePro::getRichTextSections();
+    $sectionsWithoutSubtitle ??= \App\Models\LandingPagePro::getSectionsWithoutSubtitle();
+    $accordionSectionKeys = array_keys($sections);
+    $reorderableSectionKeys = array_keys($sectionOrderLabels);
+    $sectionOrderInitial = collect(old('section_settings.section_order', data_get($sectionSettings, 'section_order', [])))
+        ->map(fn($section) => (string) $section)
+        ->filter(fn($section) => in_array($section, $reorderableSectionKeys, true))
+        ->unique()
+        ->values()
+        ->concat(
+            collect($reorderableSectionKeys)
+                ->reject(fn($section) => collect(old('section_settings.section_order', data_get($sectionSettings, 'section_order', [])))->contains($section))
+                ->values(),
+        )
+        ->unique()
+        ->values()
+        ->all();
+    $sectionOpenInitial = collect($accordionSectionKeys)
+        ->mapWithKeys(fn($key) => [$key => (bool) data_get($sectionSettings, $key . '.enabled', true)])
+        ->all();
 @endphp
 
 @push('css')
@@ -383,13 +313,28 @@
         </div>
 
         <div class="p-3 mb-3 lp-card">
-            <h5 class="mb-3">Per-Section Controls</h5>
+            <div class="mb-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Per-Section Controls</h5>
+                <div class="d-flex" style="gap: 8px;">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllSections">Expand all</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllSections">Collapse all</button>
+                </div>
+            </div>
 
-            @foreach ($sections as $key => $label)
-                <div class="lp-section-card" x-data="{ open: {{ (bool) data_get($sectionSettings, $key . '.enabled', true) ? 'true' : 'false' }} }">
-                    <div class="lp-section-head" @click="open = !open">
+            <template x-for="(sectionKey, index) in sectionOrder" :key="`section-order-${sectionKey}`">
+                <input type="hidden" :name="`section_settings[section_order][${index}]`" :value="sectionKey">
+            </template>
+
+            <div class="lp-sections-sortable">
+                @foreach ($sections as $key => $label)
+                    <div class="lp-section-card" data-section-key="{{ $key }}"
+                        data-reorderable="{{ in_array($key, $reorderableSectionKeys, true) ? '1' : '0' }}">
+                        <div class="lp-section-head" @click="toggleSection('{{ $key }}')">
                         <div class="lp-section-title">
-                            <span class="lp-section-toggle" x-text="open ? '-' : '+'"></span>
+                                @if (in_array($key, $reorderableSectionKeys, true))
+                                    <span class="mr-1 text-muted" title="Drag to reorder" style="cursor: grab;">&#x2630;</span>
+                                @endif
+                                <span class="lp-section-toggle" x-text="sectionOpen['{{ $key }}'] ? '-' : '+'"></span>
                             <div>
                                 <strong>{{ $label }}</strong>
                                 <small class="d-block text-muted">Toggle + custom content</small>
@@ -404,168 +349,169 @@
                             <label for="section-{{ $key }}">Enabled</label>
                         </div>
                     </div>
-                    <div class="lp-section-body" x-show="open" x-cloak>
-                        <div class="row">
-                            @if ($key === 'announcement_bar')
-                                <div class="mb-3 col-md-12">
-                                    <label>Announcement Text</label>
-                                    <input type="text" name="section_settings[announcement_bar][title]"
-                                        value="{{ old('section_settings.announcement_bar.title', data_get($sectionSettings, 'announcement_bar.title')) }}"
-                                        class="form-control"
-                                        placeholder="Limited Time Offer! Free Shipping on Orders Over 3 Pieces.">
-                                </div>
-                            @else
-                                <div class="mb-3 col-md-12">
-                                    <label>Title</label>
-                                    <input type="text" name="section_settings[{{ $key }}][title]"
-                                        value="{{ old("section_settings.$key.title", data_get($sectionSettings, $key . '.title')) }}"
-                                        class="form-control" placeholder="Section heading">
-                                </div>
-                                @if (!in_array($key, $sectionsWithoutSubtitle, true))
+                        <div class="lp-section-body" x-show="sectionOpen['{{ $key }}']" x-cloak>
+                            <div class="row">
+                                @if ($key === 'announcement_bar')
                                     <div class="mb-3 col-md-12">
-                                        <label>Subtitle / Description</label>
-                                        <textarea @if (in_array($key, $richTextSections, true)) editor @endif name="section_settings[{{ $key }}][subtitle]"
-                                            rows="3" class="form-control" placeholder="Short supporting text for this section">{{ old("section_settings.$key.subtitle", data_get($sectionSettings, $key . '.subtitle')) }}</textarea>
+                                        <label>Announcement Text</label>
+                                        <input type="text" name="section_settings[announcement_bar][title]"
+                                            value="{{ old('section_settings.announcement_bar.title', data_get($sectionSettings, 'announcement_bar.title')) }}"
+                                            class="form-control"
+                                            placeholder="Limited Time Offer! Free Shipping on Orders Over 3 Pieces.">
+                                    </div>
+                                @else
+                                    <div class="mb-3 col-md-12">
+                                        <label>Title</label>
+                                        <input type="text" name="section_settings[{{ $key }}][title]"
+                                            value="{{ old("section_settings.$key.title", data_get($sectionSettings, $key . '.title')) }}"
+                                            class="form-control" placeholder="Section heading">
+                                    </div>
+                                    @if (!in_array($key, $sectionsWithoutSubtitle, true))
+                                        <div class="mb-3 col-md-12">
+                                            <label>Subtitle / Description</label>
+                                            <textarea @if (in_array($key, $richTextSections, true)) editor @endif name="section_settings[{{ $key }}][subtitle]"
+                                                rows="3" class="form-control" placeholder="Short supporting text for this section">{{ old("section_settings.$key.subtitle", data_get($sectionSettings, $key . '.subtitle')) }}</textarea>
+                                        </div>
+                                    @endif
+                                @endif
+
+                                @if ($key === 'video')
+                                    <div class="mb-3 col-md-12">
+                                        <label>Video Embed URL</label>
+                                        <input type="text" name="section_settings[video][url]"
+                                            value="{{ old('section_settings.video.url', data_get($sectionSettings, 'video.url')) }}"
+                                            class="form-control" placeholder="https://www.youtube.com/embed/...">
+                                    </div>
+
+                                    <div class="mb-2 col-md-12">
+                                        <div class="pt-3 border-top font-weight-bold">CTA After Video</div>
+                                    </div>
+                                    <div class="mb-3 col-md-4">
+                                        <div class="mt-2 mb-0 checkbox checkbox-success">
+                                            <input type="hidden" name="section_settings[cta_after_video][enabled]"
+                                                value="0">
+                                            <input id="section-cta-after-video" type="checkbox"
+                                                name="section_settings[cta_after_video][enabled]" value="1"
+                                                @checked((bool) data_get($sectionSettings, 'cta_after_video.enabled', true))>
+                                            <label for="section-cta-after-video">Show CTA After Video</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 col-md-8">
+                                        <label>CTA Title</label>
+                                        <input type="text" name="section_settings[cta_after_video][title]"
+                                            value="{{ old('section_settings.cta_after_video.title', data_get($sectionSettings, 'cta_after_video.title')) }}"
+                                            class="form-control" placeholder="Ready to order?">
+                                    </div>
+                                    <div class="mb-3 col-md-12">
+                                        <label>CTA Subtitle</label>
+                                        <textarea name="section_settings[cta_after_video][subtitle]" rows="2" class="form-control"
+                                            placeholder="Complete your order in a few clicks.">{{ old('section_settings.cta_after_video.subtitle', data_get($sectionSettings, 'cta_after_video.subtitle')) }}</textarea>
                                     </div>
                                 @endif
-                            @endif
 
-                            @if ($key === 'video')
-                                <div class="mb-3 col-md-12">
-                                    <label>Video Embed URL</label>
-                                    <input type="text" name="section_settings[video][url]"
-                                        value="{{ old('section_settings.video.url', data_get($sectionSettings, 'video.url')) }}"
-                                        class="form-control" placeholder="https://www.youtube.com/embed/...">
-                                </div>
-
-                                <div class="mb-2 col-md-12">
-                                    <div class="pt-3 border-top font-weight-bold">CTA After Video</div>
-                                </div>
-                                <div class="mb-3 col-md-4">
-                                    <div class="mt-2 mb-0 checkbox checkbox-success">
-                                        <input type="hidden" name="section_settings[cta_after_video][enabled]"
-                                            value="0">
-                                        <input id="section-cta-after-video" type="checkbox"
-                                            name="section_settings[cta_after_video][enabled]" value="1"
-                                            @checked((bool) data_get($sectionSettings, 'cta_after_video.enabled', true))>
-                                        <label for="section-cta-after-video">Show CTA After Video</label>
+                                @if ($key === 'features')
+                                    <div class="mb-3 col-md-12">
+                                        <label>Feature List (one per line)</label>
+                                        <textarea name="section_settings[features][items_text]" rows="4" class="form-control"
+                                            placeholder="Premium quality fabric&#10;Comfort fit&#10;Durable stitching">{{ old('section_settings.features.items_text', data_get($sectionSettings, 'features.items_text')) }}</textarea>
                                     </div>
-                                </div>
-                                <div class="mb-3 col-md-8">
-                                    <label>CTA Title</label>
-                                    <input type="text" name="section_settings[cta_after_video][title]"
-                                        value="{{ old('section_settings.cta_after_video.title', data_get($sectionSettings, 'cta_after_video.title')) }}"
-                                        class="form-control" placeholder="Ready to order?">
-                                </div>
-                                <div class="mb-3 col-md-12">
-                                    <label>CTA Subtitle</label>
-                                    <textarea name="section_settings[cta_after_video][subtitle]" rows="2" class="form-control"
-                                        placeholder="Complete your order in a few clicks.">{{ old('section_settings.cta_after_video.subtitle', data_get($sectionSettings, 'cta_after_video.subtitle')) }}</textarea>
-                                </div>
-                            @endif
+                                @endif
 
-                            @if ($key === 'features')
-                                <div class="mb-3 col-md-12">
-                                    <label>Feature List (one per line)</label>
-                                    <textarea name="section_settings[features][items_text]" rows="4" class="form-control"
-                                        placeholder="Premium quality fabric&#10;Comfort fit&#10;Durable stitching">{{ old('section_settings.features.items_text', data_get($sectionSettings, 'features.items_text')) }}</textarea>
-                                </div>
-                            @endif
-
-                            @if ($key === 'gallery')
-                                <div class="mb-2 col-md-12">
-                                    <div class="pt-3 border-top font-weight-bold">CTA After Gallery</div>
-                                </div>
-                                <div class="mb-3 col-md-4">
-                                    <div class="mt-2 mb-0 checkbox checkbox-success">
-                                        <input type="hidden" name="section_settings[cta_after_gallery][enabled]"
-                                            value="0">
-                                        <input id="section-cta-after-gallery" type="checkbox"
-                                            name="section_settings[cta_after_gallery][enabled]" value="1"
-                                            @checked((bool) data_get($sectionSettings, 'cta_after_gallery.enabled', true))>
-                                        <label for="section-cta-after-gallery">Show CTA After Gallery</label>
+                                @if ($key === 'gallery')
+                                    <div class="mb-2 col-md-12">
+                                        <div class="pt-3 border-top font-weight-bold">CTA After Gallery</div>
                                     </div>
-                                </div>
-                                <div class="mb-3 col-md-8">
-                                    <label>CTA Title</label>
-                                    <input type="text" name="section_settings[cta_after_gallery][title]"
-                                        value="{{ old('section_settings.cta_after_gallery.title', data_get($sectionSettings, 'cta_after_gallery.title')) }}"
-                                        class="form-control" placeholder="Like what you see? Order now.">
-                                </div>
-                                <div class="mb-3 col-md-12">
-                                    <label>CTA Subtitle</label>
-                                    <textarea name="section_settings[cta_after_gallery][subtitle]" rows="2" class="form-control"
-                                        placeholder="Stock is limited.">{{ old('section_settings.cta_after_gallery.subtitle', data_get($sectionSettings, 'cta_after_gallery.subtitle')) }}</textarea>
-                                </div>
-                            @endif
-
-                            @if ($key === 'size_guide')
-                                <div class="mb-3 col-md-12">
-                                    <label>Size Guide Rows (format: SIZE|WAIST|LENGTH, one per line)</label>
-                                    <textarea name="section_settings[size_guide][rows_text]" rows="4" class="form-control"
-                                        placeholder="M|28-30|38&#10;L|30-32|39">{{ old('section_settings.size_guide.rows_text', data_get($sectionSettings, 'size_guide.rows_text')) }}</textarea>
-                                </div>
-
-                                <div class="mb-2 col-md-12">
-                                    <div class="pt-3 border-top font-weight-bold">CTA After Size Guide</div>
-                                </div>
-                                <div class="mb-3 col-md-4">
-                                    <div class="mt-2 mb-0 checkbox checkbox-success">
-                                        <input type="hidden" name="section_settings[cta_after_size_guide][enabled]"
-                                            value="0">
-                                        <input id="section-cta-after-size-guide" type="checkbox"
-                                            name="section_settings[cta_after_size_guide][enabled]" value="1"
-                                            @checked((bool) data_get($sectionSettings, 'cta_after_size_guide.enabled', true))>
-                                        <label for="section-cta-after-size-guide">Show CTA After Size Guide</label>
+                                    <div class="mb-3 col-md-4">
+                                        <div class="mt-2 mb-0 checkbox checkbox-success">
+                                            <input type="hidden" name="section_settings[cta_after_gallery][enabled]"
+                                                value="0">
+                                            <input id="section-cta-after-gallery" type="checkbox"
+                                                name="section_settings[cta_after_gallery][enabled]" value="1"
+                                                @checked((bool) data_get($sectionSettings, 'cta_after_gallery.enabled', true))>
+                                            <label for="section-cta-after-gallery">Show CTA After Gallery</label>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-3 col-md-8">
-                                    <label>CTA Title</label>
-                                    <input type="text" name="section_settings[cta_after_size_guide][title]"
-                                        value="{{ old('section_settings.cta_after_size_guide.title', data_get($sectionSettings, 'cta_after_size_guide.title')) }}"
-                                        class="form-control" placeholder="Size matched? Place your order now.">
-                                </div>
-                            @endif
-
-                            @if ($key === 'faq')
-                                <div class="mb-3 col-md-12">
-                                    <label>FAQ Rows (format: Question|Answer, one per line)</label>
-                                    <textarea name="section_settings[faq][items_text]" rows="4" class="form-control"
-                                        placeholder="How long is delivery?|Inside Dhaka 1-2 days">{{ old('section_settings.faq.items_text', data_get($sectionSettings, 'faq.items_text')) }}</textarea>
-                                </div>
-
-                                <div class="mb-2 col-md-12">
-                                    <div class="pt-3 border-top font-weight-bold">CTA After FAQ</div>
-                                </div>
-                                <div class="mb-3 col-md-4">
-                                    <div class="mt-2 mb-0 checkbox checkbox-success">
-                                        <input type="hidden" name="section_settings[cta_after_faq][enabled]"
-                                            value="0">
-                                        <input id="section-cta-after-faq" type="checkbox"
-                                            name="section_settings[cta_after_faq][enabled]" value="1"
-                                            @checked((bool) data_get($sectionSettings, 'cta_after_faq.enabled', true))>
-                                        <label for="section-cta-after-faq">Show CTA After FAQ</label>
+                                    <div class="mb-3 col-md-8">
+                                        <label>CTA Title</label>
+                                        <input type="text" name="section_settings[cta_after_gallery][title]"
+                                            value="{{ old('section_settings.cta_after_gallery.title', data_get($sectionSettings, 'cta_after_gallery.title')) }}"
+                                            class="form-control" placeholder="Like what you see? Order now.">
                                     </div>
-                                </div>
-                                <div class="mb-3 col-md-8">
-                                    <label>CTA Title</label>
-                                    <input type="text" name="section_settings[cta_after_faq][title]"
-                                        value="{{ old('section_settings.cta_after_faq.title', data_get($sectionSettings, 'cta_after_faq.title')) }}"
-                                        class="form-control" placeholder="No more questions. Place your order now.">
-                                </div>
-                            @endif
+                                    <div class="mb-3 col-md-12">
+                                        <label>CTA Subtitle</label>
+                                        <textarea name="section_settings[cta_after_gallery][subtitle]" rows="2" class="form-control"
+                                            placeholder="Stock is limited.">{{ old('section_settings.cta_after_gallery.subtitle', data_get($sectionSettings, 'cta_after_gallery.subtitle')) }}</textarea>
+                                    </div>
+                                @endif
 
-                            @if ($key === 'reviews')
-                                <div class="mb-3 col-md-12">
-                                    <label>Review Rows (format: Name|Review text, one per line)</label>
-                                    <textarea name="section_settings[reviews][items_text]" rows="4" class="form-control"
-                                        placeholder="Customer One|Amazing quality and fit.">{{ old('section_settings.reviews.items_text', data_get($sectionSettings, 'reviews.items_text')) }}</textarea>
-                                </div>
-                            @endif
+                                @if ($key === 'size_guide')
+                                    <div class="mb-3 col-md-12">
+                                        <label>Size Guide Rows (format: SIZE|WAIST|LENGTH, one per line)</label>
+                                        <textarea name="section_settings[size_guide][rows_text]" rows="4" class="form-control"
+                                            placeholder="M|28-30|38&#10;L|30-32|39">{{ old('section_settings.size_guide.rows_text', data_get($sectionSettings, 'size_guide.rows_text')) }}</textarea>
+                                    </div>
+
+                                    <div class="mb-2 col-md-12">
+                                        <div class="pt-3 border-top font-weight-bold">CTA After Size Guide</div>
+                                    </div>
+                                    <div class="mb-3 col-md-4">
+                                        <div class="mt-2 mb-0 checkbox checkbox-success">
+                                            <input type="hidden" name="section_settings[cta_after_size_guide][enabled]"
+                                                value="0">
+                                            <input id="section-cta-after-size-guide" type="checkbox"
+                                                name="section_settings[cta_after_size_guide][enabled]" value="1"
+                                                @checked((bool) data_get($sectionSettings, 'cta_after_size_guide.enabled', true))>
+                                            <label for="section-cta-after-size-guide">Show CTA After Size Guide</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 col-md-8">
+                                        <label>CTA Title</label>
+                                        <input type="text" name="section_settings[cta_after_size_guide][title]"
+                                            value="{{ old('section_settings.cta_after_size_guide.title', data_get($sectionSettings, 'cta_after_size_guide.title')) }}"
+                                            class="form-control" placeholder="Size matched? Place your order now.">
+                                    </div>
+                                @endif
+
+                                @if ($key === 'faq')
+                                    <div class="mb-3 col-md-12">
+                                        <label>FAQ Rows (format: Question|Answer, one per line)</label>
+                                        <textarea name="section_settings[faq][items_text]" rows="4" class="form-control"
+                                            placeholder="How long is delivery?|Inside Dhaka 1-2 days">{{ old('section_settings.faq.items_text', data_get($sectionSettings, 'faq.items_text')) }}</textarea>
+                                    </div>
+
+                                    <div class="mb-2 col-md-12">
+                                        <div class="pt-3 border-top font-weight-bold">CTA After FAQ</div>
+                                    </div>
+                                    <div class="mb-3 col-md-4">
+                                        <div class="mt-2 mb-0 checkbox checkbox-success">
+                                            <input type="hidden" name="section_settings[cta_after_faq][enabled]"
+                                                value="0">
+                                            <input id="section-cta-after-faq" type="checkbox"
+                                                name="section_settings[cta_after_faq][enabled]" value="1"
+                                                @checked((bool) data_get($sectionSettings, 'cta_after_faq.enabled', true))>
+                                            <label for="section-cta-after-faq">Show CTA After FAQ</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3 col-md-8">
+                                        <label>CTA Title</label>
+                                        <input type="text" name="section_settings[cta_after_faq][title]"
+                                            value="{{ old('section_settings.cta_after_faq.title', data_get($sectionSettings, 'cta_after_faq.title')) }}"
+                                            class="form-control" placeholder="No more questions. Place your order now.">
+                                    </div>
+                                @endif
+
+                                @if ($key === 'reviews')
+                                    <div class="mb-3 col-md-12">
+                                        <label>Review Rows (format: Name|Review text, one per line)</label>
+                                        <textarea name="section_settings[reviews][items_text]" rows="4" class="form-control"
+                                            placeholder="Customer One|Amazing quality and fit.">{{ old('section_settings.reviews.items_text', data_get($sectionSettings, 'reviews.items_text')) }}</textarea>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
 
         <div class="p-3 mb-3 lp-card">
@@ -616,6 +562,7 @@
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/dropzone/dropzone.js') }}" defer></script>
     <script src="{{ asset('js/tinymce.js') }}" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
 @endpush
 
 @push('scripts')
@@ -625,11 +572,64 @@
                 items: @json($itemsInitial),
                 galleryImages: @json($galleryImagesInitial),
                 sectionImages: @json($sectionImagesInitial),
+                sectionOrder: @json($sectionOrderInitial),
+                sectionOpen: @json($sectionOpenInitial),
+                accordionSectionKeys: @json($accordionSectionKeys),
+                reorderableSectionKeys: @json($reorderableSectionKeys),
+                sortableInstance: null,
 
                 init() {
                     this.$nextTick(() => {
                         this.initSlugSync();
                         this.initSelect2();
+                        this.initSectionSortable();
+                    });
+                },
+
+                initSectionSortable(retryCount = 0) {
+                    const container = this.$root.querySelector('.lp-sections-sortable');
+                    if (!container) {
+                        return;
+                    }
+
+                    if (typeof Sortable === 'undefined') {
+                        if (retryCount < 20) {
+                            setTimeout(() => this.initSectionSortable(retryCount + 1), 100);
+                        }
+
+                        return;
+                    }
+
+                    this.sortableInstance = new Sortable(container, {
+                        animation: 150,
+                        draggable: '.lp-section-card[data-reorderable="1"]',
+                        handle: '.lp-section-head',
+                        onEnd: () => this.syncSectionOrderFromDom(),
+                    });
+
+                    this.syncSectionOrderFromDom();
+                },
+
+                syncSectionOrderFromDom() {
+                    const cards = Array.from(this.$root.querySelectorAll('.lp-section-card[data-reorderable="1"]'));
+                    this.sectionOrder = cards
+                        .map((card) => String(card.dataset.sectionKey || ''))
+                        .filter((key) => this.reorderableSectionKeys.includes(key));
+                },
+
+                toggleSection(key) {
+                    this.sectionOpen[key] = !this.sectionOpen[key];
+                },
+
+                expandAllSections() {
+                    this.accordionSectionKeys.forEach((key) => {
+                        this.sectionOpen[key] = true;
+                    });
+                },
+
+                collapseAllSections() {
+                    this.accordionSectionKeys.forEach((key) => {
+                        this.sectionOpen[key] = false;
                     });
                 },
 
