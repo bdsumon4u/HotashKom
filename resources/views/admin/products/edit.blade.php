@@ -148,8 +148,8 @@
                                     <div class="flex-wrap d-flex" style="column-gap: 3rem;">
                                         @foreach ($attribute->options as $option)
                                             <div class="checkbox checkbox-secondary">
-                                                <x-checkbox :id="$option->name" name="attributes[{{$attribute->id}}][]" value="{{ $option->id }}" :checked="$options->contains($option->id)" />
-                                                <x-label :for="$option->name" />
+                                                <x-checkbox id="option-{{$option->id}}" name="attributes[{{$attribute->id}}][]" value="{{ $option->id }}" :checked="$options->contains($option->id)" />
+                                                <x-label for="option-{{$option->id}}">{{ $option->name }}</x-label>
                                             </div>
                                         @endforeach
                                     </div>
@@ -173,7 +173,7 @@
                 <div class="row">
                     @foreach ($colorOptions as $colorOption)
                     <div class="mb-3 col-md-6">
-                        <div class="p-2 border rounded">
+                        <div class="p-2 rounded border">
                             <label class="mb-2 d-block">
                                 <strong>{{ $colorOption->name }}</strong>
                                 <button type="button" class="px-2 btn btn-sm btn-light" data-toggle="modal" data-target="#color-image-picker-{{$colorOption->id}}" style="background: transparent; margin-left: 5px;">
