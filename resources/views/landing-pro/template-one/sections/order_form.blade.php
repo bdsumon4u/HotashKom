@@ -11,10 +11,11 @@
                     <template x-for="(product, index) in products" :key="product.id">
                         <div class="p-3 transition-all bg-white border rounded-md shadow-sm cursor-pointer group"
                             :class="product.selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
-                            @click="product.selected = !product.selected">
+                            @click="toggleProductSelection(index)">
                             <div class="flex gap-3">
-                                <input type="checkbox" x-model="product.selected"
-                                    class="w-4 h-4 mt-1 cursor-pointer accent-blue-600" @click.stop>
+                                <input type="checkbox" :checked="product.selected"
+                                    class="w-4 h-4 mt-1 cursor-pointer accent-blue-600" @click.stop
+                                    @change="toggleProductSelection(index)">
                                 <img :src="product.image" alt=""
                                     class="object-cover w-16 h-16 transition border rounded-lg group-hover:scale-105">
                                 <div class="flex-1 min-w-0">
@@ -63,6 +64,10 @@
                                             </template>
                                         </div>
                                     </template>
+                                    <p x-cloak x-show="product.attribute_warning"
+                                        class="mt-2 text-xs font-semibold text-red-600">
+                                        Select attributes please
+                                    </p>
                                 </div>
                             </div>
                         </div>

@@ -212,17 +212,12 @@
                         'attributes' => data_get($card, 'attributes', []),
                         'variants' => data_get($card, 'variants', []),
                         'selected' => false,
+                        'attribute_warning' => false,
                         'qty' => 1,
                         'free_delivery' => $freeDelivery,
                     ];
                 })
                 ->all();
-        })
-        ->values()
-        ->map(function (array $item, int $index): array {
-            $item['selected'] = $index === 0;
-
-            return $item;
         })
         ->values()
         ->all();
@@ -361,11 +356,54 @@
                     }
                 },
 
+                hasUnselectedAttributes(product) {
+                    if (!product || !Array.isArray(product.attributes) || product.attributes.length === 0) {
+                        return false;
+                    }
+
+                    return product.attributes.some((attribute) => {
+                        return attribute.selected_option_id === null || attribute.selected_option_id === undefined || attribute
+                            .selected_option_id === '';
+                    });
+                },
+
+                toggleProductSelection(index) {
+                    const product = this.products[index];
+                    if (!product) {
+                        return;
+                    }
+
+                    if (!product.selected && this.hasUnselectedAttributes(product)) {
+                        product.attribute_warning = true;
+                        return;
+                    }
+
+                    product.selected = !product.selected;
+                    if (product.selected) {
+                        product.attribute_warning = false;
+                    }
+                },
+
                 selectVariantByAttributes(index) {
                     const product = this.products[index];
                     if (!product || !Array.isArray(product.variants) || product.variants.length === 0) {
                         return;
                     }
+
+                    if (!Array.isArray(product.attributes) || product.attributes.length === 0) {
+                        return;
+                    }
+
+                    const hasUnselectedAttribute = product.attributes.some((attribute) => {
+                        return attribute.selected_option_id === null || attribute.selected_option_id === undefined || attribute
+                            .selected_option_id === '';
+                    });
+
+                    if (hasUnselectedAttribute) {
+                        return;
+                    }
+
+                    product.attribute_warning = false;
 
                     const selectedOptionMap = product.attributes.reduce((carry, attribute) => {
                         carry[String(attribute.attribute_id)] = Number(attribute.selected_option_id);
@@ -382,14 +420,7 @@
                     });
 
                     if (!matchedVariant) {
-                        matchedVariant = product.variants[0];
-
-                        product.attributes.forEach((attribute) => {
-                            const fallbackOptionId = matchedVariant.option_ids?.[String(attribute.attribute_id)];
-                            if (fallbackOptionId) {
-                                attribute.selected_option_id = Number(fallbackOptionId);
-                            }
-                        });
+                        return;
                     }
 
                     product.selected_product_id = Number(matchedVariant.id);

@@ -69,27 +69,9 @@ class LandingPageProController extends Controller
                     $variationSource = $product->variations;
                 }
 
-                $variations = $variationSource->map(function (Product $variation): array {
-                    $optionMap = $variation->options
-                        ->mapWithKeys(fn ($option): array => [
-                            (string) $option->attribute_id => [
-                                'attribute_id' => (int) $option->attribute_id,
-                                'attribute_name' => (string) data_get($option, 'attribute.name', ''),
-                                'option_id' => (int) $option->id,
-                                'option_name' => (string) $option->name,
-                            ],
-                        ])
-                        ->toArray();
-
-                    return [
-                        'id' => $variation->id,
-                        'name' => $variation->varName,
-                        'price' => (int) $variation->selling_price,
-                        'retail_price' => (int) $variation->retailPrice(),
-                        'image' => $variation->base_image?->src,
-                        'option_map' => $optionMap,
-                    ];
-                })->values();
+                $variations = $variationSource
+                    ->map(fn (Product $variation): array => $this->buildVariationPayload($variation))
+                    ->values();
 
                 if ($variations->isEmpty()) {
                     return [
@@ -146,26 +128,7 @@ class LandingPageProController extends Controller
                             ->filter(fn (array $option): bool => strtolower($option['attribute_name']) !== 'color')
                             ->groupBy('attribute_id');
 
-                        $attributes = $attributeGroup
-                            ->map(function (Collection $options) use ($firstVariant): array {
-                                $first = $options->first();
-
-                                return [
-                                    'attribute_id' => (int) data_get($first, 'attribute_id'),
-                                    'attribute_name' => (string) data_get($first, 'attribute_name'),
-                                    'options' => $options
-                                        ->unique('option_id')
-                                        ->map(fn (array $option): array => [
-                                            'id' => (int) $option['option_id'],
-                                            'name' => $option['option_name'],
-                                        ])
-                                        ->values()
-                                        ->all(),
-                                    'selected_option_id' => (int) data_get($firstVariant, 'option_map.'.data_get($first, 'attribute_id').'.option_id', 0),
-                                ];
-                            })
-                            ->values()
-                            ->all();
+                        $attributes = $this->buildAttributes($attributeGroup);
 
                         $cards->push([
                             'card_id' => sprintf('%d-color-%d', $product->id, (int) $colorOptionId),
@@ -175,19 +138,7 @@ class LandingPageProController extends Controller
                             'retail_price' => $firstVariant['retail_price'],
                             'image' => $firstVariant['image'] ?: $product->base_image?->src,
                             'attributes' => $attributes,
-                            'variants' => $groupVariations
-                                ->map(fn (array $variation): array => [
-                                    'id' => $variation['id'],
-                                    'name' => $variation['name'],
-                                    'price' => $variation['price'],
-                                    'retail_price' => $variation['retail_price'],
-                                    'image' => $variation['image'] ?: $product->base_image?->src,
-                                    'option_ids' => collect($variation['option_map'])->mapWithKeys(fn (array $option): array => [
-                                        (string) $option['attribute_id'] => (int) $option['option_id'],
-                                    ])->toArray(),
-                                ])
-                                ->values()
-                                ->all(),
+                            'variants' => $this->buildCardVariants($groupVariations, $product->base_image?->src),
                             'selected' => false,
                             'qty' => 1,
                         ]);
@@ -198,26 +149,7 @@ class LandingPageProController extends Controller
                         ->flatMap(fn (array $variation): array => array_values($variation['option_map']))
                         ->groupBy('attribute_id');
 
-                    $attributes = $attributeGroup
-                        ->map(function (Collection $options) use ($firstVariant): array {
-                            $first = $options->first();
-
-                            return [
-                                'attribute_id' => (int) data_get($first, 'attribute_id'),
-                                'attribute_name' => (string) data_get($first, 'attribute_name'),
-                                'options' => $options
-                                    ->unique('option_id')
-                                    ->map(fn (array $option): array => [
-                                        'id' => (int) $option['option_id'],
-                                        'name' => $option['option_name'],
-                                    ])
-                                    ->values()
-                                    ->all(),
-                                'selected_option_id' => (int) data_get($firstVariant, 'option_map.'.data_get($first, 'attribute_id').'.option_id', 0),
-                            ];
-                        })
-                        ->values()
-                        ->all();
+                    $attributes = $this->buildAttributes($attributeGroup);
 
                     $cards->push([
                         'card_id' => sprintf('%d-attrs', $product->id),
@@ -227,19 +159,7 @@ class LandingPageProController extends Controller
                         'retail_price' => $firstVariant['retail_price'],
                         'image' => $firstVariant['image'] ?: $product->base_image?->src,
                         'attributes' => $attributes,
-                        'variants' => $variations
-                            ->map(fn (array $variation): array => [
-                                'id' => $variation['id'],
-                                'name' => $variation['name'],
-                                'price' => $variation['price'],
-                                'retail_price' => $variation['retail_price'],
-                                'image' => $variation['image'] ?: $product->base_image?->src,
-                                'option_ids' => collect($variation['option_map'])->mapWithKeys(fn (array $option): array => [
-                                    (string) $option['attribute_id'] => (int) $option['option_id'],
-                                ])->toArray(),
-                            ])
-                            ->values()
-                            ->all(),
+                        'variants' => $this->buildCardVariants($variations, $product->base_image?->src),
                         'selected' => false,
                         'qty' => 1,
                     ]);
@@ -255,6 +175,113 @@ class LandingPageProController extends Controller
                 ];
             })
             ->values();
+    }
+
+    private function buildVariationPayload(Product $variation): array
+    {
+        $optionMap = $variation->options
+            ->mapWithKeys(fn ($option): array => [
+                (string) $option->attribute_id => [
+                    'attribute_id' => (int) $option->attribute_id,
+                    'attribute_name' => (string) data_get($option, 'attribute.name', ''),
+                    'option_id' => (int) $option->id,
+                    'option_name' => (string) $option->name,
+                ],
+            ])
+            ->toArray();
+
+        return [
+            'id' => $variation->id,
+            'name' => $variation->varName,
+            'price' => (int) $variation->selling_price,
+            'retail_price' => (int) $variation->retailPrice(),
+            'image' => $variation->base_image?->src,
+            'option_map' => $optionMap,
+        ];
+    }
+
+    private function buildAttributes(Collection $attributeGroup): array
+    {
+        return $attributeGroup
+            ->map(function (Collection $options): array {
+                $first = $options->first();
+                $normalizedOptions = $this->sortAttributeOptions($options->unique('option_id'));
+
+                return [
+                    'attribute_id' => (int) data_get($first, 'attribute_id'),
+                    'attribute_name' => (string) data_get($first, 'attribute_name'),
+                    'options' => $normalizedOptions
+                        ->map(fn (array $option): array => [
+                            'id' => (int) $option['option_id'],
+                            'name' => $option['option_name'],
+                        ])
+                        ->values()
+                        ->all(),
+                    'selected_option_id' => null,
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function buildCardVariants(Collection $variations, ?string $fallbackImage): array
+    {
+        return $variations
+            ->map(fn (array $variation): array => [
+                'id' => $variation['id'],
+                'name' => $variation['name'],
+                'price' => $variation['price'],
+                'retail_price' => $variation['retail_price'],
+                'image' => $variation['image'] ?: $fallbackImage,
+                'option_ids' => collect($variation['option_map'])->mapWithKeys(fn (array $option): array => [
+                    (string) $option['attribute_id'] => (int) $option['option_id'],
+                ])->toArray(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    private function sortAttributeOptions(Collection $options): Collection
+    {
+        return $options
+            ->sortBy(function (array $option): array {
+                $name = (string) data_get($option, 'option_name', '');
+                [$priority, $sizeSequence] = $this->resolveSizeSortMeta($name);
+
+                return [$priority, $sizeSequence, mb_strtoupper(trim($name))];
+            })
+            ->values();
+    }
+
+    private function resolveSizeSortMeta(string $value): array
+    {
+        $normalized = mb_strtoupper(trim($value));
+        $compact = preg_replace('/[^A-Z0-9]/', '', $normalized) ?? '';
+
+        $baseSizes = [
+            'XS' => [0, 0],
+            'S' => [1, 0],
+            'SM' => [1, 0],
+            'M' => [2, 0],
+            'MD' => [2, 0],
+            'L' => [3, 0],
+            'LG' => [3, 0],
+            'XL' => [4, 0],
+        ];
+
+        if (isset($baseSizes[$compact])) {
+            return $baseSizes[$compact];
+        }
+
+        if (preg_match('/^X+L$/', $compact) === 1) {
+            return [5, strlen($compact) - 1];
+        }
+
+        if (preg_match('/^(\d+)XL$/', $compact, $matches) === 1) {
+            return [5, (int) $matches[1]];
+        }
+
+        return [6, 0];
     }
 
     public function checkout(Request $request, LandingPagePro $landingPagePro): JsonResponse
