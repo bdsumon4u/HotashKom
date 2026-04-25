@@ -212,7 +212,7 @@
                         'attributes' => data_get($card, 'attributes', []),
                         'variants' => data_get($card, 'variants', []),
                         'selected' => false,
-                        'attribute_warning' => false,
+                        'attribute_warnings' => [],
                         'qty' => 1,
                         'free_delivery' => $freeDelivery,
                     ];
@@ -367,20 +367,28 @@
                     });
                 },
 
+                getMissingAttributeNames(product) {
+                    if (!product || !Array.isArray(product.attributes)) {
+                        return [];
+                    }
+
+                    return product.attributes
+                        .filter((attribute) => {
+                            return attribute.selected_option_id === null || attribute.selected_option_id === undefined || attribute
+                                .selected_option_id === '';
+                        })
+                        .map((attribute) => String(attribute.attribute_name || 'Attribute'));
+                },
+
                 toggleProductSelection(index) {
                     const product = this.products[index];
                     if (!product) {
                         return;
                     }
 
-                    if (!product.selected && this.hasUnselectedAttributes(product)) {
-                        product.attribute_warning = true;
-                        return;
-                    }
-
                     product.selected = !product.selected;
-                    if (product.selected) {
-                        product.attribute_warning = false;
+                    if (!product.selected) {
+                        product.attribute_warnings = [];
                     }
                 },
 
@@ -403,7 +411,7 @@
                         return;
                     }
 
-                    product.attribute_warning = false;
+                    product.attribute_warnings = [];
 
                     const selectedOptionMap = product.attributes.reduce((carry, attribute) => {
                         carry[String(attribute.attribute_id)] = Number(attribute.selected_option_id);
@@ -436,6 +444,27 @@
                     }
 
                     product.selected = false;
+                    product.attribute_warnings = [];
+                },
+
+                validateSelectedProductAttributes() {
+                    let hasMissingAttributes = false;
+
+                    this.products.forEach((product) => {
+                        if (!product.selected) {
+                            product.attribute_warnings = [];
+                            return;
+                        }
+
+                        const missingNames = this.getMissingAttributeNames(product);
+                        product.attribute_warnings = missingNames;
+
+                        if (missingNames.length > 0) {
+                            hasMissingAttributes = true;
+                        }
+                    });
+
+                    return !hasMissingAttributes;
                 },
 
                 get selectedItems() {
@@ -444,6 +473,15 @@
 
                 get selectedCount() {
                     return this.selectedItems.length;
+                },
+
+                get checkoutAttributeWarnings() {
+                    const warnings = this.selectedItems
+                        .flatMap((item) => {
+                            return (item.attribute_warnings || []).map((warning) => `${warning} সিলেক্ট করুন`);
+                        });
+
+                    return [...new Set(warnings)];
                 },
 
                 get hasFreeDeliveryItem() {
@@ -537,6 +575,10 @@
                     this.checkout.touched.name = true;
                     this.checkout.touched.phone = true;
                     this.checkout.touched.address = true;
+
+                    if (!this.validateSelectedProductAttributes()) {
+                        return;
+                    }
 
                     if (!this.isCheckoutValid || this.loading) {
                         return;
