@@ -414,7 +414,17 @@ if (! function_exists('versionedAsset')) {
      */
     function versionedAsset(string $path, ?bool $secure = null): string
     {
-        $url = asset($path, $secure);
+        $shouldUseSecure = $secure;
+
+        if ($shouldUseSecure === null) {
+            $request = request();
+
+            $shouldUseSecure = $request->isSecure()
+                || str_contains(strtolower((string) $request->header('X-Forwarded-Proto')), 'https')
+                || str_starts_with((string) config('app.url', ''), 'https://');
+        }
+
+        $url = asset($path, $shouldUseSecure);
         $version = config('app.asset_version', '1.0.0');
 
         return $url.(str_contains($url, '?') ? '&' : '?').'v='.$version;
