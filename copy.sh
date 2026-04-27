@@ -234,7 +234,9 @@ rm -rf public/storage storage/app/pathao*
 ./php artisan storage:link
 
 # Ensure final ownership/permissions after root-executed artisan commands.
+cd ../
 chown -R "$target_username:$target_username" "$target_root_dir"
+cd "$target_root_dir"
 if [[ -L public/storage ]]; then
     chown -h "$target_username:$target_username" public/storage || true
 fi
