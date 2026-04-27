@@ -26,16 +26,15 @@ find_composer() {
 
 COMPOSER_BINARY="$(find_composer)"
 
-if [ -n "$COMPOSER_BINARY" ]; then
-    echo "▶ Using Composer: $COMPOSER_BINARY"
-    exec "$COMPOSER_BINARY" "$@"
-fi
+if [ -z "$COMPOSER_BINARY" ]; then
+    echo "⚠ No Composer executable found. Falling back to $COMPOSER_PHAR"
 
-echo "⚠ No Composer executable found. Falling back to $COMPOSER_PHAR"
+    if [ ! -f "$COMPOSER_PHAR" ]; then
+        echo "Error: composer.phar not found at $COMPOSER_PHAR"
+        exit 1
+    fi
 
-if [ ! -f "$COMPOSER_PHAR" ]; then
-    echo "Error: composer.phar not found at $COMPOSER_PHAR"
-    exit 1
+    COMPOSER_BINARY="$COMPOSER_PHAR"
 fi
 
 # Check if our PHP script exists
@@ -50,5 +49,6 @@ if [ ! -x "$PHP_SCRIPT" ]; then
     exit 1
 fi
 
-# Use our PHP script to run composer.phar
-exec "$PHP_SCRIPT" "$COMPOSER_PHAR" "$@"
+# Use our PHP script to run composer executable/phar
+echo "▶ Using Composer: $COMPOSER_BINARY"
+exec "$PHP_SCRIPT" "$COMPOSER_BINARY" "$@"
