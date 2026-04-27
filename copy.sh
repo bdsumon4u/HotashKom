@@ -124,11 +124,6 @@ tar \
     mkdir -p storage/debugbar
     mkdir -p bootstrap/cache
 
-    # Fix ownership and permissions
-    chown -R \$(whoami):\$(whoami) storage bootstrap/cache
-    chmod -R 775 storage bootstrap/cache
-    find storage -type f -exec chmod 664 {} \\;
-    find storage -type d -exec chmod 775 {} \\;
 "
 
 ####################################
@@ -160,8 +155,6 @@ echo "🚀 Deploying on remote server..."
 
 ssh $SSH_OPTS "$TARGET" <<EOF
 set -e
-
-chown -R $target_username:$target_username "$target_root_dir"
 
 cd "$target_root_dir"
 
@@ -217,6 +210,15 @@ rm -rf public/storage storage/app/pathao*
 ./php artisan key:generate --force
 ./php artisan migrate --force
 ./php artisan storage:link
+
+# Ensure final ownership/permissions after root-executed artisan commands.
+chown -R "$target_username:$target_username" "$target_root_dir"
+if [[ -L public/storage ]]; then
+    chown -h "$target_username:$target_username" public/storage || true
+fi
+chmod -R 775 storage bootstrap/cache
+find storage -type f -exec chmod 664 {} \;
+find storage -type d -exec chmod 775 {} \;
 
 # Run custom deployment script if it exists
 if [[ -f ./server_deploy.sh ]]; then
