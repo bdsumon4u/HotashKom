@@ -131,11 +131,28 @@ tar \
 ####################################
 echo "🗄️  Copying database..."
 
-MYSQL_PWD="$DB_PASSWORD" mysqldump --single-transaction \
-  -u "$DB_USERNAME" "$DB_DATABASE" \
-| ssh $SSH_OPTS "$TARGET" "
-    MYSQL_PWD='$target_db_upass' /usr/bin/mysql -u '$target_db_uname' '$target_db_dbase'
-"
+if command -v clpctl >/dev/null 2>&1; then
+    echo "☁️  CloudPanel detected. Exporting database via clpctl..."
+    dump_file="$(mktemp /tmp/cloudpanel-db-export-XXXXXX.sql.gz)"
+    trap 'rm -f "$dump_file"' EXIT
+
+    clpctl db:export --databaseName="$DB_DATABASE" --file="$dump_file"
+
+    gzip -dc "$dump_file" | ssh $SSH_OPTS "$TARGET" "
+        DB_CLIENT=\$(command -v mariadb || command -v mysql)
+        MYSQL_PWD='$target_db_upass' \"\$DB_CLIENT\" -u '$target_db_uname' '$target_db_dbase'
+    "
+
+    rm -f "$dump_file"
+    trap - EXIT
+else
+    MYSQL_PWD="$DB_PASSWORD" mysqldump --single-transaction --no-tablespaces \
+      -u "$DB_USERNAME" "$DB_DATABASE" \
+    | ssh $SSH_OPTS "$TARGET" "
+        DB_CLIENT=\$(command -v mariadb || command -v mysql)
+        MYSQL_PWD='$target_db_upass' \"\$DB_CLIENT\" -u '$target_db_uname' '$target_db_dbase'
+    "
+fi
 
 ####################################
 # HELPER: Escape for sed substitution
