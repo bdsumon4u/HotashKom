@@ -234,9 +234,14 @@ rm -rf public/storage storage/app/pathao*
 ./php artisan storage:link
 
 # Ensure final ownership/permissions after root-executed artisan commands.
-cd ../
-chown -R "$target_username:$target_username" "$target_root_dir"
-cd "$target_root_dir"
+# Change ownership of all files and directories (including hidden ones) in current directory.
+# The dot (.) refers to all regular files/folders, '.[!.]*' matches hidden files/folders except '.' and '..'
+chown -R "$target_username:$target_username" . .[!.]*
+
+# Explanation:
+# 'chown -R "$target_username:$target_username" . .[!.]*' recursively changes ownership of all files and directories,
+# both visible (.) and hidden (.[!.]*) in the current directory,
+# ensuring nothing is missed during the ownership change.
 if [[ -L public/storage ]]; then
     chown -h "$target_username:$target_username" public/storage || true
 fi
