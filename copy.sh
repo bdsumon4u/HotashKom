@@ -78,6 +78,9 @@ prompt_required target_root_dir "Target root directory (--rootdir)"
 ####################################
 TARGET="$ssh_username@$ssh_host"
 echo "TARGET: $TARGET"
+echo "SSH_KEY: $SSH_KEY"
+echo "KEY_CONTENT: $(cat $SSH_KEY)"
+
 SSH_OPTS="-T -i $SSH_KEY \
 -o ControlMaster=auto \
 -o ControlPersist=10m \
