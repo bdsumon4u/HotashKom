@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Order;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -14,14 +17,14 @@ class OrderController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function __invoke(Request $request)
     {
-        $_start = \Illuminate\Support\Facades\Date::parse(\request('start_d'));
-        $_end = \Illuminate\Support\Facades\Date::parse(\request('end_d'));
+        $_start = Date::parse(\request('start_d'));
+        $_end = Date::parse(\request('end_d'));
 
-        $orders = Order::with('admin');
+        $orders = Order::with(['admin', 'latestOrderNote.admin'])->withCount('orderNotes');
         if (strtolower($request->type) === 'online') {
             $orders->where('orders.type', Order::ONLINE);
         } elseif (strtolower($request->type) === 'manual') {
@@ -65,7 +68,7 @@ class OrderController extends Controller
         }
 
         if ($request->shipped_at) {
-            $shippedDate = \Illuminate\Support\Facades\Date::parse($request->shipped_at);
+            $shippedDate = Date::parse($request->shipped_at);
             $orders->whereNotNull('orders.shipped_at')
                 ->whereBetween('orders.shipped_at', [
                     $shippedDate->startOfDay()->toDateTimeString(),
@@ -132,13 +135,33 @@ class OrderController extends Controller
                 return $return.'</select>';
             })
             ->addColumn('checkbox', fn ($row): string => '<input type="checkbox" class="form-control" name="order_id[]" value="'.$row->id.'" '.$this->isDisabled($row).' style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">')
-            ->editColumn('customer', fn ($row): string => "
+            ->editColumn('customer', function ($row): string {
+                $customerNote = $row->note
+                    ? "<div class='text-danger'><i class='mr-1 fa fa-sticky-note-o'></i>".e($row->note).'</div>'
+                    : '';
+
+                $latestAdminNote = '';
+                if ($row->latestOrderNote) {
+                    $latestAdminNote = "<div class='mt-1 text-info'><i class='mr-1 fa fa-user-secret'></i><strong>".
+                        e($row->latestOrderNote->admin->name ?? 'System').':</strong> '.
+                        e($row->latestOrderNote->note).'</div>';
+                }
+
+                $nonLoadedNotesCount = $row->order_notes_count - 1;
+                $seeMoreButton = $nonLoadedNotesCount > 0
+                    ? "<button type='button' class='px-1 py-0 btn btn-link btn-sm text-primary js-order-notes-modal' data-order-id='{$row->id}' title='See all admin notes'>+{$nonLoadedNotesCount} more notes...</button>"
+                    : '';
+
+                return "
                     <div>
                         <div style='white-space:nowrap;'><i class='mr-1 fa fa-user'></i>{$row->name}</div>
                         <div style='white-space:nowrap;'><i class='mr-1 fa fa-phone'></i><a href='tel:{$row->phone}'>".without88($row->phone)."</a></div>
-                        <div style=''><i class='mr-1 fa fa-map-marker'></i>{$row->address}</div>".
-                ($row->note ? "<div class='text-danger'><i class='mr-1 fa fa-sticky-note-o'></i>{$row->note}</div>" : '').
-                '</div>')
+                        <div><i class='mr-1 fa fa-map-marker'></i>{$row->address}</div>
+                        {$customerNote}
+                        {$latestAdminNote}
+                        {$seeMoreButton}
+                    </div>";
+            })
             ->editColumn('products', function ($row) {
                 $products = '<ul style="list-style: none; padding-left: 1rem;">';
                 foreach ((array) ($row->products) ?? [] as $product) {
@@ -247,8 +270,8 @@ class OrderController extends Controller
                 if (str_contains($keyword, ' - ')) {
                     [$start, $end] = explode(' - ', $keyword);
                     $query->whereBetween('orders.created_at', [
-                        \Illuminate\Support\Facades\Date::parse($start)->startOfDay(),
-                        \Illuminate\Support\Facades\Date::parse($end)->endOfDay(),
+                        Date::parse($start)->startOfDay(),
+                        Date::parse($end)->endOfDay(),
                     ]);
                 }
             })
@@ -285,5 +308,29 @@ class OrderController extends Controller
         }
 
         return $status === 'RETURNED' ? 'disabled' : '';
+    }
+
+    public function adminNotes(Order $order): JsonResponse
+    {
+        $orderNotes = $order->orderNotes()->with('admin')->latest()->get();
+        $lastIndex = $orderNotes->count() - 1;
+
+        return response()->json([
+            'order_id' => $order->id,
+            'html' => $orderNotes->values()->map(function ($orderNote, $index) use ($lastIndex): string {
+                $adminName = e($orderNote->admin->name ?? 'System');
+                $note = nl2br(e($orderNote->note));
+                $time = $orderNote->created_at->format('d-M-Y h:i A');
+                $separatorClass = $index === $lastIndex ? '' : ' border-bottom mb-2';
+
+                return "<div class='py-1{$separatorClass}'>
+                    <div class='mb-2 d-flex justify-content-between align-items-center'>
+                        <div class='font-weight-bold text-dark'><i class='mr-1 fa fa-user'></i>{$adminName}</div>
+                        <div class='small text-muted'><i class='mr-1 fa fa-clock-o'></i>{$time}</div>
+                    </div>
+                    <div class='text-dark' style='line-height: 1.6; font-size: 15px;'>{$note}</div>
+                </div>";
+            })->implode(''),
+        ]);
     }
 }

@@ -3,13 +3,16 @@
 namespace App\Livewire;
 
 use App\Http\Resources\ProductResource;
+use App\Jobs\CallOnindaOrderApi;
 use App\Models\Order;
+use App\Models\OrderNote;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
@@ -91,12 +94,17 @@ class EditOrder extends Component
 
     public Collection $activities;
 
+    public Collection $orderNotes;
+
+    #[Validate('nullable|string|max:5000')]
+    public string $adminNote = '';
+
     public bool $courierReportLoaded = false;
 
     public function getCourierReportProperty()
     {
         $expires = config('services.courier_report.expires');
-        if (! $expires || \Illuminate\Support\Facades\Date::parse($expires)->isPast()) {
+        if (! $expires || Date::parse($expires)->isPast()) {
             return 'API Expired';
         }
 
@@ -167,6 +175,11 @@ class EditOrder extends Component
         $this->order = $order;
         $this->fill($this->order->only($this->attrs));
         $this->activities = collect();
+        $this->orderNotes = collect();
+
+        if ($this->order->exists) {
+            $this->loadOrderNotes();
+        }
 
         // Cast meta data to proper types
         $this->discount = (int) ($this->order->data['discount'] ?? 0);
@@ -411,7 +424,7 @@ class EditOrder extends Component
             $this->order->save();
 
             if (config('app.instant_order_forwarding') && ! config('app.demo')) {
-                dispatch(new \App\Jobs\CallOnindaOrderApi($this->order->id));
+                dispatch(new CallOnindaOrderApi($this->order->id));
             }
 
             if ($confirming && ($user = $this->order->user)) {
@@ -489,6 +502,45 @@ class EditOrder extends Component
         );
 
         $this->activitiesLoaded = true;
+    }
+
+    public function loadOrderNotes(): void
+    {
+        if (! $this->order->exists) {
+            $this->orderNotes = collect();
+
+            return;
+        }
+
+        $this->orderNotes = $this->order
+            ->orderNotes()
+            ->with('admin')
+            ->latest()
+            ->get();
+    }
+
+    public function addOrderNote(): void
+    {
+        if (! $this->order->exists) {
+            return;
+        }
+
+        $this->validateOnly('adminNote');
+
+        if (trim($this->adminNote) === '') {
+            return;
+        }
+
+        OrderNote::query()->create([
+            'order_id' => $this->order->id,
+            'admin_id' => auth('admin')->id(),
+            'note' => trim($this->adminNote),
+        ]);
+
+        $this->adminNote = '';
+        $this->loadOrderNotes();
+
+        session()->flash('success', 'Admin note added successfully.');
     }
 
     public function loadCourierReport(): void

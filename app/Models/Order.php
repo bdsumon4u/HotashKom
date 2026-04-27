@@ -9,6 +9,8 @@ use App\Redx\Facade\Redx;
 use Fuse\Fuse;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Spatie\Activitylog\LogOptions;
@@ -330,6 +332,16 @@ class Order extends Model
         return $this->belongsTo(Admin::class)->withDefault([
             'name' => 'System',
         ]);
+    }
+
+    public function orderNotes(): HasMany
+    {
+        return $this->hasMany(OrderNote::class);
+    }
+
+    public function latestOrderNote(): HasOne
+    {
+        return $this->hasOne(OrderNote::class)->latestOfMany();
     }
 
     public function getSubtotal($products)

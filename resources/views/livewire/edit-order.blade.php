@@ -517,6 +517,37 @@
             </div>
             @endif
 
+            <div class="shadow-sm card rounded-0">
+                <div class="p-3 card-header">
+                    <h5 class="mb-0 card-title">Admin Notes</h5>
+                </div>
+                <div class="p-3 card-body">
+                    <div class="form-group">
+                        <x-textarea name="admin_note" wire:model="adminNote" rows="3" placeholder="Write a note for internal tracking..." />
+                        <x-error field="adminNote" />
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" wire:click="addOrderNote">Add Note</button>
+
+                    <div class="mt-3">
+                        @forelse ($orderNotes as $orderNote)
+                            <div class="mb-1 shadow-sm card rounded-0">
+                                <div class="px-3 py-2 card-header">
+                                    <div class="d-flex justify-content-between">
+                                        <div><i class="mr-1 fa fa-user"></i>{{ $orderNote->admin->name }}</div>
+                                        <div><i class="mr-1 fa fa-clock-o"></i>{{ $orderNote->created_at->format('d-M-Y h:i A') }}</div>
+                                    </div>
+                                </div>
+                                <div class="p-3 card-body text-info">
+                                    {!! nl2br(e($orderNote->note)) !!}
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-muted">No admin notes yet.</div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
             <div class="shadow-sm card rounded-0" wire:init="loadActivities">
                 <div class="p-3 card-header">
                     <h5 class="mb-0 card-title">Activities</h5>

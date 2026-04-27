@@ -147,6 +147,22 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="orderAdminNotesModal" tabindex="-1" role="dialog" aria-labelledby="orderAdminNotesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content rounded-0">
+                <div class="p-3 modal-header">
+                    <h5 class="mb-0 modal-title font-weight-bold" id="orderAdminNotesModalLabel">Order Admin Notes</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="p-3 modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <div id="orderAdminNotesModalBody" class="text-muted">Click on a notes count to load notes.</div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
@@ -509,6 +525,30 @@
                 }
             });
         }
+
+        $(document).on('click', '.js-order-notes-modal', function () {
+            var orderId = $(this).data('order-id');
+            var $modal = $('#orderAdminNotesModal');
+            var $body = $('#orderAdminNotesModalBody');
+
+            $body.html('<div class="py-3 text-center text-muted">Loading admin notes...</div>');
+            $modal.modal('show');
+
+            $.get({
+                url: '{{ route('api.orders.admin-notes', ['order' => '__ORDER__']) }}'.replace('__ORDER__', orderId),
+                success: function (response) {
+                    if (response.html && response.html.trim() !== '') {
+                        $body.html(response.html);
+                        return;
+                    }
+
+                    $body.html('<div class="text-muted">No admin notes found.</div>');
+                },
+                error: function () {
+                    $body.html('<div class="text-danger">Failed to load admin notes.</div>');
+                },
+            });
+        });
     </script>
 
     <script src="{{ asset('assets/js/datepicker/daterange-picker/moment.min.js') }}"></script>
