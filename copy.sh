@@ -77,6 +77,7 @@ prompt_required target_root_dir "Target root directory (--rootdir)"
 # SSH SETUP (PERSISTENT CONNECTION)
 ####################################
 TARGET="$ssh_username@$ssh_host"
+echo "TARGET: $TARGET"
 SSH_OPTS="-T -i $SSH_KEY \
 -o ControlMaster=auto \
 -o ControlPersist=10m \
@@ -143,6 +144,7 @@ if command -v clpctl >/dev/null 2>&1; then
         MYSQL_PWD='$target_db_upass' \"\$DB_CLIENT\" -u '$target_db_uname' '$target_db_dbase'
     "
 
+    echo "Removing dump file..."
     rm -f "$dump_file"
     trap - EXIT
 else
