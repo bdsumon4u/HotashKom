@@ -3,18 +3,38 @@
 # Composer executable script that uses the specified Composer binary
 # Usage: ./composer [command] [options]
 
-COMPOSER_BINARY="/opt/cpanel/composer/bin/composer"
 PHP_SCRIPT="./php"
+COMPOSER_PHAR="./composer.phar"
 
-# Check if the Composer binary exists
-if [ ! -f "$COMPOSER_BINARY" ]; then
-    echo "Error: Composer binary not found at $COMPOSER_BINARY"
-    exit 1
+####################################
+# FIND WORKING COMPOSER EXECUTABLE
+####################################
+find_composer() {
+    for composer in \
+        /opt/cpanel/composer/bin/composer \
+        /usr/local/bin/composer \
+        /usr/bin/composer \
+        /opt/composer/bin/composer \
+        /opt/alt/composer/bin/composer; do
+        if [[ -x "$composer" ]]; then
+            echo "$composer"
+            return 0
+        fi
+    done
+    return 1
+}
+
+COMPOSER_BINARY="$(find_composer)"
+
+if [ -n "$COMPOSER_BINARY" ]; then
+    echo "▶ Using Composer: $COMPOSER_BINARY"
+    exec "$COMPOSER_BINARY" "$@"
 fi
 
-# Check if the Composer binary is executable
-if [ ! -x "$COMPOSER_BINARY" ]; then
-    echo "Error: Composer binary is not executable at $COMPOSER_BINARY"
+echo "⚠ No Composer executable found. Falling back to $COMPOSER_PHAR"
+
+if [ ! -f "$COMPOSER_PHAR" ]; then
+    echo "Error: composer.phar not found at $COMPOSER_PHAR"
     exit 1
 fi
 
@@ -30,5 +50,5 @@ if [ ! -x "$PHP_SCRIPT" ]; then
     exit 1
 fi
 
-# Use our PHP script to run the Composer binary
-exec "$PHP_SCRIPT" "$COMPOSER_BINARY" "$@"
+# Use our PHP script to run composer.phar
+exec "$PHP_SCRIPT" "$COMPOSER_PHAR" "$@"
