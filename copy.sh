@@ -29,6 +29,7 @@ while [[ $# -gt 0 ]]; do
         -d|--domain) [[ -n "${2-}" && "${2-}" != -* ]] && { target_domain="$2"; shift 2; } || shift ;;
         -h|--host) [[ -n "${2-}" && "${2-}" != -* ]] && { ssh_host="$2"; shift 2; } || shift ;;
         -u|--uname) [[ -n "${2-}" && "${2-}" != -* ]] && { target_username="$2"; shift 2; } || shift ;;
+        -su|--ssh-uname) [[ -n "${2-}" && "${2-}" != -* ]] && { ssh_username="$2"; shift 2; } || shift ;;
         -db|--dbname) [[ -n "${2-}" && "${2-}" != -* ]] && { target_db_dbase="$2"; shift 2; } || shift ;;
         -dbu|--dbuser) [[ -n "${2-}" && "${2-}" != -* ]] && { target_db_uname="$2"; shift 2; } || shift ;;
         -dbp|--dbpass) [[ -n "${2-}" && "${2-}" != -* ]] && { target_db_upass="$2"; shift 2; } || shift ;;
@@ -64,6 +65,7 @@ prompt_required target_site "Target site name (--site)"
 prompt_required target_domain "Target domain (--domain)"
 prompt_required ssh_host "SSH host (--host)"
 prompt_required target_username "Target SSH username (--uname)"
+prompt_required ssh_username "SSH username (--ssh-uname)"
 prompt_required target_db_dbase "Target database name (--dbname)"
 prompt_required target_db_uname "Target database user (--dbuser)"
 prompt_required target_db_upass "Target database password (--dbpass)" true
@@ -74,11 +76,12 @@ prompt_required target_root_dir "Target root directory (--rootdir)"
 ####################################
 # SSH SETUP (PERSISTENT CONNECTION)
 ####################################
-TARGET="$target_username@$ssh_host"
+TARGET="$ssh_username@$ssh_host"
 SSH_OPTS="-T -i $SSH_KEY \
 -o ControlMaster=auto \
 -o ControlPersist=10m \
 -o ControlPath=~/.ssh/cm-%r@%h:%p \
+-o LogLevel=ERROR \
 -o Compression=yes"
 
 ssh-keyscan -H "$ssh_host" >> ~/.ssh/known_hosts 2>/dev/null || true
@@ -114,13 +117,13 @@ tar \
     mkdir -p '$target_root_dir'
     cd '$target_root_dir'
     tar -xzf -
-    
+
     # Create Laravel directories that were excluded
     mkdir -p storage/framework/{sessions,views,cache,cache/data,testing}
     mkdir -p storage/logs
     mkdir -p storage/debugbar
     mkdir -p bootstrap/cache
-    
+
     # Fix ownership and permissions
     chown -R \$(whoami):\$(whoami) storage bootstrap/cache
     chmod -R 775 storage bootstrap/cache
@@ -133,10 +136,10 @@ tar \
 ####################################
 echo "🗄️  Copying database..."
 
-mysqldump --single-transaction \
-  -u "$DB_USERNAME" -p"$DB_PASSWORD" "$DB_DATABASE" \
+MYSQL_PWD="$DB_PASSWORD" mysqldump --single-transaction \
+  -u "$DB_USERNAME" "$DB_DATABASE" \
 | ssh $SSH_OPTS "$TARGET" "
-    /usr/bin/mysql -u '$target_db_uname' -p'$target_db_upass' '$target_db_dbase'
+    MYSQL_PWD='$target_db_upass' /usr/bin/mysql -u '$target_db_uname' '$target_db_dbase'
 "
 
 ####################################
@@ -158,7 +161,15 @@ echo "🚀 Deploying on remote server..."
 ssh $SSH_OPTS "$TARGET" <<EOF
 set -e
 
+chown -R $target_username:$target_username "$target_root_dir"
+
 cd "$target_root_dir"
+
+echo "Current user: $(whoami)"
+echo "Present working directory: $(pwd)"
+echo "Target root directory: $target_root_dir"
+
+git config --global --add safe.directory "$target_root_dir" || true
 
 if [[ ! -f .env ]]; then
     echo "❌ ERROR: .env not found"
