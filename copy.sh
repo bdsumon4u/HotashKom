@@ -178,6 +178,10 @@ echo "🚀 Deploying on remote server..."
 ssh $SSH_OPTS "$TARGET" <<EOF
 set -e
 
+if command -v clpctl >/dev/null 2>&1; then
+    chown -R $target_username:$target_username "$target_root_dir"
+fi
+
 cd "$target_root_dir"
 
 echo "Current user: $(whoami)"
