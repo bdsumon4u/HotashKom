@@ -164,8 +164,10 @@
                                                                 @foreach ($optionGroup[$attribute->id] as $option)
                                                                     <label>
                                                                         <input type="radio"
+                                                                            name="variation-{{ $product->id }}-{{ $attribute->id }}"
                                                                             wire:model.live="options.{{ $product->id }}.{{ $attribute->id }}"
                                                                             value="{{ $option->id }}"
+                                                                            wire:key="variation-option-{{ $product->id }}-{{ $attribute->id }}-{{ $option->id }}"
                                                                             class="option-picker">
                                                                         <span>{{ $option->name }}</span>
                                                                     </label>
@@ -204,7 +206,7 @@
                                             <del class="text-danger">{!! theMoney($selectedVar->price) !!}</del>
                                             @endif
                                         </div>
-                                        <button type="button" class="btn btn-primary btn-sm" wire:click="addProduct({{ $product->id }})">
+                                        <button type="button" class="btn btn-primary btn-sm" wire:click="addProduct({{ $selectedVar->id }})">
                                             Add to Order
                                         </button>
                                     </td>
