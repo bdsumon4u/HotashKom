@@ -38,22 +38,29 @@ class ResellerEditOrder extends Component
     public ?string $note = '';
 
     // Meta Data
-    public int $discount = 0;
+    #[Validate('numeric|min:0')]
+    public $discount = 0;
 
-    public int $advanced = 0;
+    #[Validate('numeric|min:0')]
+    public $advanced = 0;
 
-    public int $retail_discount = 0;
+    #[Validate('numeric|min:0')]
+    public $retail_discount = 0;
 
-    public int $retail_delivery_fee = 0;
+    #[Validate('numeric|min:0')]
+    public $retail_delivery_fee = 0;
 
     #[Validate('required')]
     public string $shipping_area = '';
 
-    public int $shipping_cost = 0;
+    #[Validate('numeric|min:0')]
+    public $shipping_cost = 0;
 
-    public int $subtotal = 0;
+    #[Validate('numeric|min:0')]
+    public $subtotal = 0;
 
-    public int $sell_subtotal = 0;
+    #[Validate('numeric|min:0')]
+    public $sell_subtotal = 0;
 
     public string $courier = 'Other';
 
@@ -61,8 +68,8 @@ class ResellerEditOrder extends Component
 
     public string $area_id = '';
 
-    #[Validate('numeric')]
-    public float $weight = 0.5;
+    #[Validate('numeric|min:0')]
+    public $weight = 0.5;
 
     public array $selectedProducts = [];
 
