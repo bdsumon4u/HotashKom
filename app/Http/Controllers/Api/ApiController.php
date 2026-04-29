@@ -14,7 +14,9 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Pathao\Facade\Pathao;
 use App\Traits\HasProductFilters;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ApiController extends Controller
 {
@@ -86,7 +88,7 @@ class ApiController extends Controller
         $this->loadProductRelationships($products);
         $this->addBaseImageUrls($products);
 
-        if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+        if ($products instanceof LengthAwarePaginator) {
             return [
                 'data' => $products->items(),
                 'pagination' => [
@@ -130,7 +132,7 @@ class ApiController extends Controller
             })->paginate(perPage: $perPage, pageName: 'page', page: $page);
 
             // Eager load reviews for search results
-            if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+            if ($products instanceof LengthAwarePaginator) {
                 $products->getCollection()->loadMissing([
                     'reviews' => function ($q): void {
                         $q->where('approved', true)->with('ratings');
@@ -266,7 +268,7 @@ class ApiController extends Controller
 
     private function addBaseImageUrls($products): void
     {
-        $collection = $products instanceof \Illuminate\Pagination\LengthAwarePaginator
+        $collection = $products instanceof LengthAwarePaginator
             ? $products->getCollection()
             : $products;
 
@@ -415,11 +417,15 @@ class ApiController extends Controller
         // });
     }
 
-    public function pendingCount(Admin $admin)
+    public function pendingCount(Admin $admin): JsonResponse
     {
-        return Order::where('status', 'PENDING')->when($admin->role_id == Admin::SALESMAN, function ($query) use (&$admin): void {
+        $count = Order::where('status', 'PENDING')->when($admin->role_id == Admin::SALESMAN, function ($query) use (&$admin): void {
             $query->where('admin_id', $admin->id);
         })->count();
+
+        return response()->json([
+            'count' => $count,
+        ]);
     }
 
     public function pathaoWebhook(Request $request)

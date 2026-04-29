@@ -359,8 +359,9 @@
             $.ajax({
               url: "/api/pending-count/"+{{auth('admin')->id()}},
               type: "GET",
+              dataType: "json",
               success: function (data) {
-                $('.pending-count').text(data);
+                $('.pending-count').text(data?.count ?? 0);
               }
             });
           }, 60000);
