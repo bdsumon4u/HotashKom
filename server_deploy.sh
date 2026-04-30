@@ -215,6 +215,7 @@ if [ -f "$APP_DIR/composer.json" ] && [ -n "$COMPOSER_BIN" ]; then
 fi
 
 retry_command "\"$PHP_BIN\" artisan db:convert-innodb" "db convert innodb" || true
+retry_command "\"$PHP_BIN\" artisan storage:migrate-public" "storage migrate public" || true
 
 if ! retry_command "\"$PHP_BIN\" artisan migrate --force" "database migration"; then
   update_status "failed" "Database migration failed." "$local_commit" "$remote_commit" "$sync_state" "$requires_force_reset" "$force_reset_used"

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Slide;
 use App\Traits\ImageUploader;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -16,7 +17,7 @@ class SlideController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -38,7 +39,7 @@ class SlideController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -80,7 +81,7 @@ class SlideController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Slide $slide)
     {
@@ -92,7 +93,7 @@ class SlideController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Slide $slide)
     {
@@ -114,13 +115,13 @@ class SlideController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Slide $slide)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
-        Storage::disk('public')->delete(Str::after($slide->mobile_src, 'storage'));
-        Storage::disk('public')->delete(Str::after($slide->desktop_src, 'storage'));
+        Storage::disk('public')->delete(ltrim(Str::after($slide->mobile_src, '/storage/'), '/'));
+        Storage::disk('public')->delete(ltrim(Str::after($slide->desktop_src, '/storage/'), '/'));
         $slide->delete();
 
         return back()->with('success', 'Slide Has Been Deleted.');

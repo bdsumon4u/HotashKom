@@ -230,12 +230,12 @@ fi
 ####################################
 # RUN LARAVEL COMMANDS
 ####################################
-# Remove old symlink/directory first so storage:link can create fresh one
+# Reset storage target and migrate to real public/storage directory
 rm -rf public/storage storage/app/pathao*
 
 ./php artisan key:generate --force
 ./php artisan migrate --force
-./php artisan storage:link
+./php artisan storage:migrate-public
 
 chown -R "$target_username:$target_username" *
 

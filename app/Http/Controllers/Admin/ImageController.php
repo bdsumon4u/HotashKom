@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Image;
 use App\Traits\ImageUploader;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -16,7 +17,7 @@ class ImageController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -28,7 +29,7 @@ class ImageController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -71,7 +72,7 @@ class ImageController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Image $image)
     {
@@ -83,7 +84,8 @@ class ImageController extends Controller
         }
 
         // $this->delete();
-        $image->delete() && Storage::disk($image->disk)->delete(Str::after($image->path, 'storage'));
+        $imagePath = ltrim(Str::after($image->path, '/storage/'), '/');
+        $image->delete() && Storage::disk($image->disk)->delete($imagePath);
 
         return request()->expectsJson()
             ? response()->json(['success' => 'Image Has Been Deleted.'])
