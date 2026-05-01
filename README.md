@@ -95,7 +95,7 @@ A comprehensive Laravel e-commerce platform designed for the Bangladesh market, 
 ## Active Deployments
 These 🔥 $${\color{red}480}$$ 🔥 domains are live now
 
-_Last updated: **2026-04-30 11:35:30 Asia/Dhaka**_
+_Last updated: **2026-05-01 11:47:29 Asia/Dhaka**_
 
 | # | Domain |
 |---|--------|
