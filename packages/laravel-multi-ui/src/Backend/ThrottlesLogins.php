@@ -41,7 +41,7 @@ trait ThrottlesLogins
      *
      * @return void
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     protected function sendLockoutResponse(Request $request)
     {
@@ -90,7 +90,7 @@ trait ThrottlesLogins
     /**
      * Get the rate limiter instance.
      *
-     * @return \Illuminate\Cache\RateLimiter
+     * @return RateLimiter
      */
     protected function limiter()
     {

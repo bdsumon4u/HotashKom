@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Fabricator\Layouts\DefaultLayout;
 use Closure;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Actions\Action as FormAction;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Hidden;
@@ -80,7 +81,7 @@ class LandingResource extends PageResource
                                     ->afterStateUpdated(function (Set $set): void {
                                         $set('is_slug_changed_manually', true);
                                     })
-                                    ->rule(fn ($state): \Closure => function (string $attribute, $value, Closure $fail) use ($state): void {
+                                    ->rule(fn ($state): Closure => function (string $attribute, $value, Closure $fail) use ($state): void {
                                         if ($state !== '/' && (Str::startsWith($value, '/') || Str::endsWith($value, '/'))) {
                                             $fail(__('filament-fabricator::page-resource.errors.slug_starts_or_ends_with_slash'));
                                         }
@@ -105,7 +106,7 @@ class LandingResource extends PageResource
                                     ->preload()
                                     ->reactive()
                                     ->suffixAction(
-                                        fn ($get, $context): \Filament\Forms\Components\Actions\Action => FormAction::make($context.'-parent')
+                                        fn ($get, $context): Action => FormAction::make($context.'-parent')
                                             ->icon('heroicon-o-arrow-top-right-on-square')
                                             ->url(fn (): string => PageResource::getUrl($context, ['record' => $get('parent_id')]))
                                             ->openUrlInNewTab()

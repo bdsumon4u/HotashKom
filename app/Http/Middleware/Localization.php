@@ -11,7 +11,7 @@ class Localization
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure  $next
+     * @param  Closure  $next
      * @return mixed
      */
     public function __construct(Application $app, Request $request)

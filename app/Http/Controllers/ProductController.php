@@ -7,6 +7,8 @@ use App\Models\HomeSection;
 use App\Models\Product;
 use App\Traits\HasProductFilters;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class ProductController extends Controller
@@ -16,7 +18,7 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -70,7 +72,7 @@ class ProductController extends Controller
         }
 
         // Eager load reviews for products if not already loaded
-        if ($products instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+        if ($products instanceof LengthAwarePaginator) {
             $products->getCollection()->loadMissing([
                 'reviews' => function ($q): void {
                     $q->where('approved', true)->with('ratings');
@@ -100,7 +102,7 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Product $product)
     {

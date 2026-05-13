@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -20,7 +22,7 @@ class Image extends Model
         static::saved(function ($image): void {
             // Dispatch job to copy image to reseller databases
             if (isOninda() && $image->wasRecentlyCreated) {
-                dispatch(new \App\Jobs\CopyResourceToResellers($image));
+                dispatch(new CopyResourceToResellers($image));
             }
         });
 
@@ -29,7 +31,7 @@ class Image extends Model
 
             // Dispatch job to remove image from reseller databases
             if (isOninda()) {
-                dispatch(new \App\Jobs\RemoveResourceFromResellers($image->getTable(), $image->id));
+                dispatch(new RemoveResourceFromResellers($image->getTable(), $image->id));
             }
         });
     }

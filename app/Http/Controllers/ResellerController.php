@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 final class ResellerController extends Controller
 {
@@ -190,7 +191,7 @@ final class ResellerController extends Controller
                     $trackingUrl = '';
                     if ($courier && $consignmentId) {
                         if ($courier === 'Pathao') {
-                            $trackingUrl = 'https://merchant.pathao.com/tracking?consignment_id='.$consignmentId.'&phone='.\Illuminate\Support\Str::after($order->phone, '+88');
+                            $trackingUrl = 'https://merchant.pathao.com/tracking?consignment_id='.$consignmentId.'&phone='.Str::after($order->phone, '+88');
                         } elseif ($courier === 'Redx') {
                             $trackingUrl = 'https://redx.com.bd/track-global-parcel/?trackingId='.$consignmentId;
                         } elseif ($courier === 'SteadFast') {

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
@@ -27,7 +29,7 @@ class Brand extends Model
 
             // Dispatch job to copy brand to reseller databases
             if (isOninda() && $brand->wasRecentlyCreated) {
-                dispatch(new \App\Jobs\CopyResourceToResellers($brand));
+                dispatch(new CopyResourceToResellers($brand));
             }
         });
 
@@ -36,7 +38,7 @@ class Brand extends Model
 
             // Dispatch job to remove brand from reseller databases
             if (isOninda()) {
-                dispatch(new \App\Jobs\RemoveResourceFromResellers($brand->getTable(), $brand->id));
+                dispatch(new RemoveResourceFromResellers($brand->getTable(), $brand->id));
             }
         });
 
@@ -85,7 +87,7 @@ class Brand extends Model
      *
      * @param  mixed  $value
      * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)
     {

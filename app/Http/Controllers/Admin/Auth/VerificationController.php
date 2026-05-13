@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Auth;
 use App\Http\Controllers\Controller;
 use Hotash\LaravelMultiUi\Backend\VerifiesEmails;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class VerificationController extends Controller
 {
@@ -43,7 +44,7 @@ class VerificationController extends Controller
     /**
      * Show the email verification notice.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Request $request)
     {
@@ -55,7 +56,7 @@ class VerificationController extends Controller
     /**
      * Show the email verification notice.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function otpForm(Request $request)
     {

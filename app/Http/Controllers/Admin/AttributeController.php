@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attribute;
 use App\Traits\PreventsSourcedResourceDeletion;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class AttributeController extends Controller
 {
@@ -14,7 +15,7 @@ class AttributeController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -36,7 +37,7 @@ class AttributeController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -67,7 +68,7 @@ class AttributeController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Attribute $attribute)
     {
@@ -82,7 +83,7 @@ class AttributeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Attribute $attribute)
     {

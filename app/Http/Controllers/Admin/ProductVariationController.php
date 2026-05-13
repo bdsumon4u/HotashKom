@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\RemoveProductVariationsFromResellers;
 use App\Models\Option;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -30,7 +32,7 @@ class ProductVariationController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request, Product $product)
     {
@@ -49,7 +51,7 @@ class ProductVariationController extends Controller
                 $product->variations()->delete();
 
                 // Delete variations from reseller databases
-                dispatch(new \App\Jobs\RemoveProductVariationsFromResellers($product->id));
+                dispatch(new RemoveProductVariationsFromResellers($product->id));
 
                 $variations = collect($attributes->first())->crossJoin(...$attributes->splice(1));
                 $newVariations = collect();
@@ -101,7 +103,7 @@ class ProductVariationController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Product $product, Product $variation)
     {
@@ -141,7 +143,7 @@ class ProductVariationController extends Controller
     /**
      * Update multiple variations in bulk.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function bulkUpdate(Request $request, Product $product)
     {
@@ -158,13 +160,13 @@ class ProductVariationController extends Controller
             // If should_track is false, set stock_count to 0
             if (! $variation['should_track']) {
                 $variations[$index]['stock_count'] = 0;
-            } else if ($variations[$index]['stock_count'] === null) {
+            } elseif ($variations[$index]['stock_count'] === null) {
                 $variations[$index]['stock_count'] = 0;
-            } else if ($variations[$index]['stock_count'] === '') {
+            } elseif ($variations[$index]['stock_count'] === '') {
                 $variations[$index]['stock_count'] = 0;
-            } else if (! is_numeric($variations[$index]['stock_count'])) {
+            } elseif (! is_numeric($variations[$index]['stock_count'])) {
                 $variations[$index]['stock_count'] = 0;
-            } else if ($variations[$index]['stock_count'] < 0) {
+            } elseif ($variations[$index]['stock_count'] < 0) {
                 $variations[$index]['stock_count'] = 0;
             }
         }

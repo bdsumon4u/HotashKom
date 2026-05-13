@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 
@@ -25,7 +27,7 @@ class Category extends Model
 
             // Dispatch job to copy category to reseller databases
             if (isOninda() && $category->wasRecentlyCreated) {
-                dispatch(new \App\Jobs\CopyResourceToResellers($category));
+                dispatch(new CopyResourceToResellers($category));
             }
         });
 
@@ -34,7 +36,7 @@ class Category extends Model
 
             // Dispatch job to remove category from reseller databases
             if (isOninda()) {
-                dispatch(new \App\Jobs\RemoveResourceFromResellers($category->getTable(), $category->id));
+                dispatch(new RemoveResourceFromResellers($category->getTable(), $category->id));
             }
             $category->childrens->each->delete();
         });
@@ -133,7 +135,7 @@ class Category extends Model
      *
      * @param  mixed  $value
      * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)
     {

@@ -30,7 +30,7 @@ class FacebookPixelService
     /**
      * Create server-side custom data object
      */
-    protected function createServerCustomData(array $customData): \FacebookAds\Object\ServerSide\CustomData
+    protected function createServerCustomData(array $customData): CustomData
     {
         $customDataObj = new CustomData;
 
@@ -106,7 +106,7 @@ class FacebookPixelService
             // MetaPixel::flashEvent($eventName, $customData, $eventId);
 
             // If component is provided, dispatch event to browser
-            if ($component instanceof \Livewire\Component) {
+            if ($component instanceof Component) {
                 info('dispatching event to browser', [
                     'eventName' => $eventName,
                     'customData' => $customData,

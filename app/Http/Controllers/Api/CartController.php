@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -32,7 +33,7 @@ class CartController extends Controller
             $quantity = min($quantity, $maxQuantity);
 
             // Use ProductResource to get proper cart item data
-            $productData = (new \App\Http\Resources\ProductResource($product))->toCartItem($quantity);
+            $productData = (new ProductResource($product))->toCartItem($quantity);
             $productData['max'] = $maxQuantity;
 
             cart()->instance($instance)->add(

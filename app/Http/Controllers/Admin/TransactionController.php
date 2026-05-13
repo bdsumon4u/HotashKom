@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Yajra\DataTables\Facades\DataTables;
 
 class TransactionController extends Controller
@@ -12,7 +13,7 @@ class TransactionController extends Controller
     /**
      * Display a listing of the transactions.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request, User $user)
     {
@@ -67,7 +68,7 @@ class TransactionController extends Controller
     /**
      * Handle the withdrawal request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function withdraw(Request $request, User $user)
     {
@@ -99,7 +100,7 @@ class TransactionController extends Controller
     /**
      * Delete a pending withdrawal request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function deleteWithdraw(Request $request, User $user)
     {
@@ -129,7 +130,7 @@ class TransactionController extends Controller
     /**
      * Confirm a pending withdrawal request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function confirmWithdraw(Request $request, User $user)
     {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Traits\HasProductFilters;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class CategoryProductController extends Controller
@@ -14,7 +15,7 @@ class CategoryProductController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function __invoke(Request $request, Category $category)
     {

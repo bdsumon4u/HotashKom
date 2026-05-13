@@ -2,13 +2,15 @@
 
 namespace App\Livewire;
 
+use App\Models\Order;
+
 class ResellerCheckout extends Checkout
 {
     #[\Override]
     public function render()
     {
         // Create a temporary Order instance to use its Pathao methods
-        $tempOrder = new \App\Models\Order;
+        $tempOrder = new Order;
         $this->cartUpdated();
 
         $cartItems = cart()->content();

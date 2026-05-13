@@ -14,9 +14,9 @@ trait VerifiesEmails
     /**
      * Mark the authenticated user's email address as verified.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws AuthorizationException
      */
     public function verify(Request $request)
     {
@@ -60,7 +60,7 @@ trait VerifiesEmails
     /**
      * Resend the email verification notification.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function resend(Request $request)
     {

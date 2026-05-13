@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Jobs\RemoveResourceFromResellers;
+use App\Jobs\SyncProductActiveWithResellers;
+use App\Jobs\SyncProductStockWithResellers;
 use Codebyray\ReviewRateable\Traits\ReviewRateable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -62,12 +66,12 @@ class Product extends Model
 
             // Dispatch job to sync stock attributes if they were changed
             if (isOninda() && $product->isDirty(['should_track', 'stock_count'])) {
-                dispatch(new \App\Jobs\SyncProductStockWithResellers($product));
+                dispatch(new SyncProductStockWithResellers($product));
             }
 
             // Dispatch job to sync active status if it was changed
             if (isOninda() && $product->isDirty(['is_active'])) {
-                dispatch(new \App\Jobs\SyncProductActiveWithResellers($product));
+                dispatch(new SyncProductActiveWithResellers($product));
             }
         });
 
@@ -79,7 +83,7 @@ class Product extends Model
 
             // Dispatch job to remove product from reseller databases
             if (! $record->parent_id && isOninda()) { // not a variation
-                dispatch(new \App\Jobs\RemoveResourceFromResellers($record->getTable(), $record->id));
+                dispatch(new RemoveResourceFromResellers($record->getTable(), $record->id));
             }
             $record->variations->each->delete();
         });
@@ -144,9 +148,9 @@ class Product extends Model
         cacheInvalidateNamespace('edit_order_product_search');
     }
 
-    protected function varName(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function varName(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+        return Attribute::make(get: function () {
             if (! $this->parent_id) {
                 return $this->name;
             }
@@ -155,9 +159,9 @@ class Product extends Model
         });
     }
 
-    protected function shippingInside(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function shippingInside(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
+        return Attribute::make(get: function ($value) {
             if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
                 return setting('delivery_charge')->inside_dhaka;
             }
@@ -170,9 +174,9 @@ class Product extends Model
         });
     }
 
-    protected function shippingOutside(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function shippingOutside(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
+        return Attribute::make(get: function ($value) {
             if (! (setting('show_option')->productwise_delivery_charge ?? false)) {
                 return setting('delivery_charge')->outside_dhaka;
             }
@@ -185,9 +189,9 @@ class Product extends Model
         });
     }
 
-    protected function category(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function category(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+        return Attribute::make(get: function () {
             // Use already-loaded relationship if available to avoid N+1 queries
             if ($this->parent_id) {
                 if ($this->relationLoaded('parent') && $this->parent && $this->parent->relationLoaded('categories')) {
@@ -206,9 +210,9 @@ class Product extends Model
         });
     }
 
-    protected function inStock(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function inStock(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn () => $this->track_stock
+        return Attribute::make(get: fn () => $this->track_stock
             ? $this->stock_count
             : true);
     }
@@ -253,9 +257,9 @@ class Product extends Model
             ->withTimestamps();
     }
 
-    protected function wholesale(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function wholesale(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function ($value) {
+        return Attribute::make(get: function ($value) {
             $data = json_decode((string) $value, true) ?? [];
             if (empty($data) && $this->parent_id) {
                 return $this->parent->wholesale;
@@ -317,9 +321,9 @@ class Product extends Model
         return sprintf('৳%d - ৳%d', round($this->selling_price * 1.3), round($this->selling_price * 1.5));
     }
 
-    protected function baseImage(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function baseImage(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+        return Attribute::make(get: function () {
             $images = $this->images ?? collect();
             if ($images->isEmpty()) {
                 $images = $this->parent->images ?? collect();
@@ -329,9 +333,9 @@ class Product extends Model
         });
     }
 
-    protected function additionalImages(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function additionalImages(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: function () {
+        return Attribute::make(get: function () {
             $images = $this->images ?? collect();
             if ($images->isEmpty()) {
                 $images = $this->parent->images ?? collect();
@@ -362,7 +366,7 @@ class Product extends Model
      *
      * @param  mixed  $value
      * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)
     {
@@ -418,6 +422,6 @@ class Product extends Model
      */
     public function reviews(): MorphMany
     {
-        return $this->morphMany(\App\Models\Review::class, 'reviewable');
+        return $this->morphMany(Review::class, 'reviewable');
     }
 }

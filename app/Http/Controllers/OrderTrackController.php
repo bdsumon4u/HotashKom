@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Notifications\User\OrderPlaced;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class OrderTrackController extends Controller
@@ -12,7 +13,7 @@ class OrderTrackController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function __invoke(Request $request)
     {

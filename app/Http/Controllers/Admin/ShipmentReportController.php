@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\ProductReportService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
 class ShipmentReportController extends Controller
@@ -15,8 +16,8 @@ class ShipmentReportController extends Controller
      */
     public function index(Request $request)
     {
-        $start = \Illuminate\Support\Facades\Date::parse($request->get('start_d', now()));
-        $end = \Illuminate\Support\Facades\Date::parse($request->get('end_d', now()));
+        $start = Date::parse($request->get('start_d', now()));
+        $end = Date::parse($request->get('end_d', now()));
 
         $report = $this->generateReport($start->format('Y-m-d'), $end->format('Y-m-d'));
 

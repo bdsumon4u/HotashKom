@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Yajra\DataTables\Facades\DataTables;
 
 class TransactionController extends Controller
@@ -11,7 +12,7 @@ class TransactionController extends Controller
     /**
      * Display a listing of the transactions.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -56,7 +57,7 @@ class TransactionController extends Controller
     /**
      * Request a withdrawal.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function withdrawRequest(Request $request)
     {

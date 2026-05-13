@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutRequest;
+use Illuminate\Http\Response;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class CheckoutController extends Controller
@@ -10,7 +11,7 @@ class CheckoutController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function __invoke(CheckoutRequest $request)
     {

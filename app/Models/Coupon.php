@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class Coupon extends Model
@@ -60,9 +62,9 @@ class Coupon extends Model
     /**
      * Get formatted discount text
      */
-    protected function discountText(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function discountText(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+        return Attribute::make(
             get: function (): string {
                 if ($this->discount_type === 'percent') {
                     return number_format($this->discount, 2).'%';
@@ -76,7 +78,7 @@ class Coupon extends Model
     /**
      * Scope for active coupons
      */
-    #[\Illuminate\Database\Eloquent\Attributes\Scope]
+    #[Scope]
     protected function active($query)
     {
         return $query->where('is_active', true)

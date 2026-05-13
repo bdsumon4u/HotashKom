@@ -2,6 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Models\Attribute;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Image;
+use App\Models\Option;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -29,7 +35,7 @@ class CopyResourceToResellers implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(protected \Illuminate\Database\Eloquent\Model $model)
+    public function __construct(protected Model $model)
     {
         $this->table = $this->model->getTable();
     }
@@ -378,12 +384,12 @@ class CopyResourceToResellers implements ShouldQueue
     {
         // Common model mappings
         $modelMappings = [
-            'attributes' => \App\Models\Attribute::class,
-            'options' => \App\Models\Option::class,
-            'categories' => \App\Models\Category::class,
-            'brands' => \App\Models\Brand::class,
-            'products' => \App\Models\Product::class,
-            'images' => \App\Models\Image::class,
+            'attributes' => Attribute::class,
+            'options' => Option::class,
+            'categories' => Category::class,
+            'brands' => Brand::class,
+            'products' => Product::class,
+            'images' => Image::class,
         ];
 
         return $modelMappings[$table] ?? null;
@@ -396,12 +402,12 @@ class CopyResourceToResellers implements ShouldQueue
     {
         // Multiple unique column mappings
         $uniqueColumnsMappings = [
-            \App\Models\Product::class => ['sku', 'slug'],
-            \App\Models\Attribute::class => ['name'],
-            \App\Models\Option::class => ['name'],
-            \App\Models\Category::class => ['slug', 'name'],
-            \App\Models\Brand::class => ['name', 'slug'],
-            \App\Models\Image::class => ['path'],
+            Product::class => ['sku', 'slug'],
+            Attribute::class => ['name'],
+            Option::class => ['name'],
+            Category::class => ['slug', 'name'],
+            Brand::class => ['name', 'slug'],
+            Image::class => ['path'],
         ];
 
         return $uniqueColumnsMappings[$modelClass] ?? ['id'];

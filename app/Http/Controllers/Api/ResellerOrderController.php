@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\PlaceOnindaOrder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -31,7 +32,7 @@ class ResellerOrderController extends Controller
         // Dispatch job to place order on Oninda
         info('dispatching job', ['request' => $request->all()]);
         foreach ($request->order_id as $orderId) {
-            dispatch(new \App\Jobs\PlaceOnindaOrder($orderId, $request->domain));
+            dispatch(new PlaceOnindaOrder($orderId, $request->domain));
         }
 
         return response()->json([

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Bavix\Wallet\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Yajra\DataTables\Facades\DataTables;
 
 class MoneyRequestController extends Controller
@@ -13,7 +14,7 @@ class MoneyRequestController extends Controller
     /**
      * Display a listing of money requests.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -23,7 +24,7 @@ class MoneyRequestController extends Controller
     /**
      * Get money requests data for DataTables.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function data()
     {
@@ -118,7 +119,7 @@ class MoneyRequestController extends Controller
     /**
      * Confirm a withdrawal request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function confirm(Request $request)
     {
@@ -161,7 +162,7 @@ class MoneyRequestController extends Controller
     /**
      * Delete a withdrawal request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function deleteRequest(Request $request)
     {
@@ -191,7 +192,7 @@ class MoneyRequestController extends Controller
     /**
      * Get summary statistics.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function summary()
     {

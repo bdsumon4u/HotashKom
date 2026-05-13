@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attribute;
 use App\Models\Option;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class AttributeOptionController extends Controller
 {
@@ -28,7 +29,7 @@ class AttributeOptionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request, Attribute $attribute)
     {
@@ -64,7 +65,7 @@ class AttributeOptionController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Attribute $attribute, Option $option)
     {
@@ -84,7 +85,7 @@ class AttributeOptionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Attribute $attribute, Option $option)
     {

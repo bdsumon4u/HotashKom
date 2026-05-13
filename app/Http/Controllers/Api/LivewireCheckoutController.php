@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Livewire\Checkout;
 use App\Models\Product;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -65,7 +66,7 @@ class LivewireCheckoutController extends Controller
         $livewire->shipping = $request->input('shipping');
 
         $livewire->cartUpdated();
-        if ($livewire->checkout() instanceof \Illuminate\Http\RedirectResponse && session('error')) {
+        if ($livewire->checkout() instanceof RedirectResponse && session('error')) {
             return response()->json(['message' => session('error')], 422);
         }
 

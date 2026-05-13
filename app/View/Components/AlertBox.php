@@ -4,6 +4,7 @@ namespace App\View\Components;
 
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\Component;
+use Illuminate\View\View;
 
 class AlertBox extends Component
 {
@@ -30,7 +31,7 @@ class AlertBox extends Component
     /**
      * Get the view / contents that represent the component.
      *
-     * @return \Illuminate\View\View|string
+     * @return View|string
      */
     public function render()
     {

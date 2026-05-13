@@ -4,15 +4,17 @@ namespace Ihasan\Bkash\Http\Controllers;
 
 use Ihasan\Bkash\Facades\Bkash;
 use Ihasan\Bkash\Models\BkashPayment;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\View\View;
 
 class BkashController extends Controller
 {
     /**
      * Handle the callback from bKash
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function callback(Request $request)
     {
@@ -61,7 +63,7 @@ class BkashController extends Controller
     /**
      * Display success page
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function success(Request $request)
     {
@@ -73,7 +75,7 @@ class BkashController extends Controller
     /**
      * Display failed page
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function failed(Request $request)
     {

@@ -8,6 +8,7 @@ use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -98,12 +99,12 @@ trait HasProductFilters
     /**
      * Get filter data for products (categories, attributes with options).
      *
-     * @param  \App\Models\Category|null  $category  Optional category to filter attributes by
-     * @return array{categories: \Illuminate\Database\Eloquent\Collection, attributes: \Illuminate\Database\Eloquent\Collection}
+     * @param  Category|null  $category  Optional category to filter attributes by
+     * @return array{categories: Collection, attributes: Collection}
      */
     protected function getProductFilterData(?Category $category = null): array
     {
-        $cacheKey = 'filters'.($category instanceof \App\Models\Category ? ':category:'.$category->id : '');
+        $cacheKey = 'filters'.($category instanceof Category ? ':category:'.$category->id : '');
 
         // Use flexible caching: 2 hours fresh, 4 hours stale (total 6 hours)
         // Fresh: Data is served immediately from cache
@@ -168,7 +169,7 @@ trait HasProductFilters
 
             // If category is provided, get product IDs for that category first
             $categoryProductIds = $activeProductIds;
-            if ($category instanceof \App\Models\Category) {
+            if ($category instanceof Category) {
                 $categoryProductIds = DB::table('category_product')
                     ->where('category_id', $category->id)
                     ->whereIn('product_id', $activeProductIds)
@@ -194,13 +195,13 @@ trait HasProductFilters
                         ->where(function ($q) use ($categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
                             // Options linked directly to parent products
                             $q->where(function ($parentQ) use ($categoryProductIds, $activeProductIds, $category): void {
-                                $parentQ->whereIn('products.id', $category instanceof \App\Models\Category ? $categoryProductIds : $activeProductIds)
+                                $parentQ->whereIn('products.id', $category instanceof Category ? $categoryProductIds : $activeProductIds)
                                     ->whereNull('products.parent_id');
                             })
                                 // OR options linked to variations
                                 ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $categoryProductIds, $category): void {
                                     $varQ->whereIn('products.id', $variationProductIds)
-                                        ->whereIn('products.parent_id', $category instanceof \App\Models\Category ? $categoryProductIds : $activeProductIds);
+                                        ->whereIn('products.parent_id', $category instanceof Category ? $categoryProductIds : $activeProductIds);
                                 });
                         });
                 });
@@ -210,12 +211,12 @@ trait HasProductFilters
                         $prodQuery->whereIn('products.id', $allProductIds)
                             ->where(function ($q) use ($categoryProductIds, $activeProductIds, $variationProductIds, $category): void {
                                 $q->where(function ($parentQ) use ($categoryProductIds, $activeProductIds, $category): void {
-                                    $parentQ->whereIn('products.id', $category instanceof \App\Models\Category ? $categoryProductIds : $activeProductIds)
+                                    $parentQ->whereIn('products.id', $category instanceof Category ? $categoryProductIds : $activeProductIds)
                                         ->whereNull('products.parent_id');
                                 })
                                     ->orWhere(function ($varQ) use ($variationProductIds, $activeProductIds, $categoryProductIds, $category): void {
                                         $varQ->whereIn('products.id', $variationProductIds)
-                                            ->whereIn('products.parent_id', $category instanceof \App\Models\Category ? $categoryProductIds : $activeProductIds);
+                                            ->whereIn('products.parent_id', $category instanceof Category ? $categoryProductIds : $activeProductIds);
                                     });
                             });
                     });

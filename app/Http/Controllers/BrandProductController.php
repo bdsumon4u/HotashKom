@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Traits\HasProductFilters;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class BrandProductController extends Controller
 {
@@ -13,7 +14,7 @@ class BrandProductController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function __invoke(Request $request, Brand $brand)
     {

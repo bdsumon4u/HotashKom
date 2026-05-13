@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\CleanupDuplicateRelationships;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -22,10 +23,10 @@ Artisan::command('resellers:cleanup-duplicates {--product-id= : Clean up duplica
 
     if ($productId) {
         $this->info("Cleaning up duplicates for product ID: {$productId}");
-        dispatch(new \App\Jobs\CleanupDuplicateRelationships((int) $productId));
+        dispatch(new CleanupDuplicateRelationships((int) $productId));
     } else {
         $this->info('Cleaning up duplicates for all products...');
-        dispatch(new \App\Jobs\CleanupDuplicateRelationships);
+        dispatch(new CleanupDuplicateRelationships);
     }
 
     $this->info('Cleanup job dispatched successfully!');

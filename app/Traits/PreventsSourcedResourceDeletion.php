@@ -3,13 +3,14 @@
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\RedirectResponse;
 
 trait PreventsSourcedResourceDeletion
 {
     /**
      * Prevent deletion of sourced resources
      *
-     * @return \Illuminate\Http\RedirectResponse|true
+     * @return RedirectResponse|true
      */
     protected function preventSourcedResourceDeletion(Model $model)
     {

@@ -80,7 +80,7 @@ if (! function_exists('cacheNamespaceKey')) {
 }
 
 if (! function_exists('cacheRememberNamespaced')) {
-    function cacheRememberNamespaced(string $namespace, string $key, \DateTimeInterface|int|null $ttl, callable $callback): mixed
+    function cacheRememberNamespaced(string $namespace, string $key, DateTimeInterface|int|null $ttl, callable $callback): mixed
     {
         if (cacheSupportsTags()) {
             return cache()->tags($namespace)->remember($key, $ttl, $callback);
@@ -246,7 +246,7 @@ if (! function_exists('pageRoutes')) {
                     ))
                     ->middleware(ShortKodeMiddleware::class)
                     ->name('page');
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             // throw $th;
         }
     }
@@ -473,40 +473,74 @@ function storeOrUpdateCart($phone = null, $name = '', $address = null)
         return;
     }
 
-    $identifier = session()->getId();
-    if ($cart = DB::table('shopping_cart')->where('phone', $phone)->first()) {
-        $identifier = $cart->identifier;
-    }
+    $currentIdentifier = session()->getId();
+    $instance = 'default';
 
-    $cart = DB::table('shopping_cart')
-        ->where('identifier', $identifier)
+    // Check if cart exists with current session identifier
+    $existingCart = DB::table('shopping_cart')
+        ->where('identifier', $currentIdentifier)
+        ->where('instance', $instance)
         ->first();
 
-    if ($cart) {
+    if ($existingCart) {
+        // Update the existing cart with current session - merge content and update details
+        $mergedContent = $content->union(unserialize($existingCart->content));
         DB::table('shopping_cart')
-            ->where('identifier', $identifier)
+            ->where('identifier', $currentIdentifier)
+            ->where('instance', $instance)
             ->update([
-                'identifier' => session()->getId(),
                 'name' => Cookie::get('name', $name),
                 'phone' => $phone,
                 'address' => $address,
-                'content' => serialize($content->union(unserialize($cart->content))),
+                'content' => serialize($mergedContent),
                 'updated_at' => now(),
             ]);
+
+        // Clean up any other carts with the same phone number to avoid duplicates
+        DB::table('shopping_cart')
+            ->where('phone', $phone)
+            ->where('instance', $instance)
+            ->where('identifier', '!=', $currentIdentifier)
+            ->delete();
 
         return;
     }
 
+    // Check if cart with same phone exists (from previous session)
+    $phoneCart = DB::table('shopping_cart')
+        ->where('phone', $phone)
+        ->where('instance', $instance)
+        ->first();
+
+    if ($phoneCart) {
+        // Merge with existing phone cart and delete the old one
+        $mergedContent = $content->union(unserialize($phoneCart->content));
+
+        // Delete old cart with different identifier
+        DB::table('shopping_cart')
+            ->where('phone', $phone)
+            ->where('instance', $instance)
+            ->delete();
+    } else {
+        // Use current cart content if no phone cart exists
+        $mergedContent = $content;
+    }
+
+    // Create or update cart with current session identifier
     DB::table('shopping_cart')
-        ->insert([
-            'name' => Cookie::get('name', $name),
-            'phone' => $phone,
-            'address' => $address,
-            'instance' => 'default',
-            'identifier' => session()->getId(),
-            'content' => serialize($content),
-            'updated_at' => now(),
-        ]);
+        ->updateOrInsert(
+            [
+                'identifier' => $currentIdentifier,
+                'instance' => $instance,
+            ],
+            [
+                'name' => Cookie::get('name', $name),
+                'phone' => $phone,
+                'address' => $address,
+                'content' => serialize($mergedContent),
+                'updated_at' => now(),
+            ]
+        );
 }
 
 function deleteOrUpdateCart()
@@ -524,47 +558,85 @@ function deleteOrUpdateCart()
         return;
     }
 
-    $identifier = session()->getId();
-    $cart = $cart = DB::table('shopping_cart')
-        ->where('phone', $phone)
-        ->first();
-    if ($cart) {
-        $identifier = $cart->identifier;
-    }
+    $currentIdentifier = session()->getId();
+    $instance = 'default';
 
-    $cart = DB::table('shopping_cart')
-        ->where('identifier', $identifier)
+    // Check if cart exists with current session identifier
+    $existingCart = DB::table('shopping_cart')
+        ->where('identifier', $currentIdentifier)
+        ->where('instance', $instance)
         ->first();
 
-    if ($cart) {
-        $content = unserialize($cart->content)->diffKeys($content);
-        if ($content->isEmpty()) {
-            return DB::table('shopping_cart')
-                ->where('identifier', $identifier)
+    if ($existingCart) {
+        $remainingContent = unserialize($existingCart->content)->diffKeys($content);
+        if ($remainingContent->isEmpty()) {
+            DB::table('shopping_cart')
+                ->where('identifier', $currentIdentifier)
+                ->where('instance', $instance)
                 ->delete();
+
+            return;
         }
         DB::table('shopping_cart')
-            ->where('identifier', $identifier)
+            ->where('identifier', $currentIdentifier)
+            ->where('instance', $instance)
             ->update([
                 'name' => Cookie::get('name'),
                 'phone' => $phone,
-                'content' => serialize($content),
-                'identifier' => session()->getId(),
+                'content' => serialize($remainingContent),
                 'updated_at' => now(),
             ]);
 
         return;
     }
 
-    DB::table('shopping_cart')
-        ->insert([
-            'name' => Cookie::get('name'),
-            'phone' => $phone,
-            'instance' => 'default',
-            'identifier' => session()->getId(),
-            'content' => serialize($content),
-            'updated_at' => now(),
-        ]);
+    // Check if cart with same phone exists (from previous session)
+    $phoneCart = DB::table('shopping_cart')
+        ->where('phone', $phone)
+        ->where('instance', $instance)
+        ->first();
+
+    if ($phoneCart) {
+        $remainingContent = unserialize($phoneCart->content)->diffKeys($content);
+        if ($remainingContent->isEmpty()) {
+            DB::table('shopping_cart')
+                ->where('phone', $phone)
+                ->where('instance', $instance)
+                ->delete();
+
+            return;
+        }
+        // Delete old cart and create new one with current session
+        DB::table('shopping_cart')
+            ->where('phone', $phone)
+            ->where('instance', $instance)
+            ->delete();
+
+        DB::table('shopping_cart')
+            ->insert([
+                'name' => Cookie::get('name'),
+                'phone' => $phone,
+                'instance' => $instance,
+                'identifier' => $currentIdentifier,
+                'content' => serialize($remainingContent),
+                'updated_at' => now(),
+            ]);
+
+        return;
+    }
+
+    // No existing cart with phone or current session, create new one
+    if (! $content->isEmpty()) {
+        DB::table('shopping_cart')
+            ->insert([
+                'name' => Cookie::get('name'),
+                'phone' => $phone,
+                'instance' => $instance,
+                'identifier' => $currentIdentifier,
+                'content' => serialize($content),
+                'updated_at' => now(),
+            ]);
+    }
 }
 
 function isOninda(): bool

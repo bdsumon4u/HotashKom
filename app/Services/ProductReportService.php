@@ -30,7 +30,7 @@ final readonly class ProductReportService
             $orderQuery->where('admin_id', $staffId);
         }
 
-        if ($shippedAt instanceof \Illuminate\Support\Carbon) {
+        if ($shippedAt instanceof Carbon) {
             $orderQuery->whereNotNull('shipped_at')
                 ->whereDate('shipped_at', $shippedAt);
         }

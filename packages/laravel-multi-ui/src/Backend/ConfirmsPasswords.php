@@ -2,6 +2,8 @@
 
 namespace Hotash\LaravelMultiUi\Backend;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -12,7 +14,7 @@ trait ConfirmsPasswords
     /**
      * Confirm the given user's password.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @return RedirectResponse|JsonResponse
      */
     public function confirm(Request $request)
     {

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\HomeSectionRequest;
 use App\Models\Category;
 use App\Models\HomeSection;
+use App\Models\Page;
+use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +16,7 @@ class HomeSectionController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -39,7 +41,7 @@ class HomeSectionController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -54,14 +56,14 @@ class HomeSectionController extends Controller
 
         return $this->view([
             'categories' => Category::nested(),
-            'pages' => \App\Models\Page::all(),
+            'pages' => Page::all(),
         ], $view);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(HomeSectionRequest $request)
     {
@@ -100,7 +102,7 @@ class HomeSectionController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(HomeSection $homeSection)
     {
@@ -116,14 +118,14 @@ class HomeSectionController extends Controller
         return $this->view([
             'section' => $homeSection->load('seo'),
             'categories' => Category::nested(),
-            'pages' => \App\Models\Page::all(),
+            'pages' => Page::all(),
         ], $view);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(HomeSectionRequest $request, HomeSection $homeSection)
     {
@@ -154,7 +156,7 @@ class HomeSectionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(HomeSection $homeSection)
     {

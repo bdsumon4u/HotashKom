@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\CallOnindaOrderApi;
 use App\Models\Order;
 use Illuminate\Console\Command;
 
@@ -47,7 +48,7 @@ class DispatchOnindaOrderApi extends Command
         $dispatchedCount = 0;
         foreach ($orders as $order) {
             try {
-                dispatch(new \App\Jobs\CallOnindaOrderApi($order->id));
+                dispatch(new CallOnindaOrderApi($order->id));
                 $dispatchedCount++;
                 $this->line("Dispatched job for order ID: {$order->id}");
             } catch (\Exception $e) {

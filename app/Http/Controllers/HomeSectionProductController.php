@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\HomeSection;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class HomeSectionProductController extends Controller
 {
     /**
      * Handle the incoming request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function __invoke(Request $request, HomeSection $section)
     {

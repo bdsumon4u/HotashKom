@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
 use Hotash\LaravelMultiUi\Backend\ConfirmsPasswords;
+use Illuminate\Http\Response;
 
 class ConfirmPasswordController extends Controller
 {
@@ -40,7 +41,7 @@ class ConfirmPasswordController extends Controller
     /**
      * Display the password confirmation view.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function showConfirmForm()
     {

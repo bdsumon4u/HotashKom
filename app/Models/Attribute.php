@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Attribute extends Model
@@ -19,7 +21,7 @@ class Attribute extends Model
 
             // Dispatch job to copy attribute to reseller databases
             if (isOninda() && $attribute->wasRecentlyCreated) {
-                dispatch(new \App\Jobs\CopyResourceToResellers($attribute));
+                dispatch(new CopyResourceToResellers($attribute));
             }
         });
 
@@ -33,7 +35,7 @@ class Attribute extends Model
 
             // Dispatch job to remove attribute from reseller databases
             if (isOninda()) {
-                dispatch(new \App\Jobs\RemoveResourceFromResellers($record->getTable(), $record->id));
+                dispatch(new RemoveResourceFromResellers($record->getTable(), $record->id));
             }
         });
     }

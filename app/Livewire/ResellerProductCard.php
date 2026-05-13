@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Attribute;
 use App\Models\Product;
 use App\Services\FacebookPixelService;
 use App\Traits\HasCart;
@@ -99,7 +100,7 @@ class ResellerProductCard extends Component
     public function render()
     {
         $optionGroup = $this->product->variations->pluck('options')->flatten()->unique('id')->groupBy('attribute_id');
-        $attributes = \App\Models\Attribute::find($optionGroup->keys());
+        $attributes = Attribute::find($optionGroup->keys());
 
         return view('livewire.reseller-product-card', [
             'optionGroup' => $optionGroup,

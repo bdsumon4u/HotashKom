@@ -10,6 +10,10 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\Slide;
 use App\Observers\ResponseCacheObserver;
+use App\Pathao\Apis\AreaApi;
+use App\Pathao\Apis\OrderApi;
+use App\Pathao\Apis\StoreApi;
+use App\Pathao\Manage\Manage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
@@ -51,10 +55,10 @@ class AppServiceProvider extends ServiceProvider
                 ->with([$relation => $constraint])
         );
 
-        $this->app->bind('pathao', fn (): \App\Pathao\Manage\Manage => new \App\Pathao\Manage\Manage(
-            new \App\Pathao\Apis\AreaApi,
-            new \App\Pathao\Apis\StoreApi,
-            new \App\Pathao\Apis\OrderApi
+        $this->app->bind('pathao', fn (): Manage => new Manage(
+            new AreaApi,
+            new StoreApi,
+            new OrderApi
         ));
 
         $this->app->bind('redx', fn (): \App\Redx\Manage\Manage => new \App\Redx\Manage\Manage(

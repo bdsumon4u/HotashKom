@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\URL;
 
@@ -35,7 +36,7 @@ class VerifyEmail extends Notification
      * Build the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
@@ -62,7 +63,7 @@ class VerifyEmail extends Notification
     {
         return URL::temporarySignedRoute(
             'user.verification.verify',
-            \Illuminate\Support\Facades\Date::now()->addMinutes(Config::get('auth.verification.expire', 60)),
+            Date::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
                 'id' => $notifiable->getKey(),
                 'hash' => sha1((string) $notifiable->getEmailForVerification()),

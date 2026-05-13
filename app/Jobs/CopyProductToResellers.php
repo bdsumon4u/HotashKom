@@ -27,7 +27,7 @@ class CopyProductToResellers implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(protected \App\Models\Product $product) {}
+    public function __construct(protected Product $product) {}
 
     /**
      * Handle a job failure.

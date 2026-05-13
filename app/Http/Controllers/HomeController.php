@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class HomeController extends Controller
@@ -10,7 +11,7 @@ class HomeController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function __invoke(Request $request)
     {

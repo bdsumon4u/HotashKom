@@ -8,13 +8,15 @@ use App\Models\Product;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Date;
 
 class ReportController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -28,7 +30,7 @@ class ReportController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -55,7 +57,7 @@ class ReportController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -85,7 +87,7 @@ class ReportController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Report $report)
     {
@@ -101,7 +103,7 @@ class ReportController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, Report $report)
     {
@@ -123,7 +125,7 @@ class ReportController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Report $report)
     {
@@ -148,9 +150,9 @@ class ReportController extends Controller
     public function customer(Request $request)
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
-        $_start = \Illuminate\Support\Facades\Date::parse(\request('start_d', date('Y-m-d')));
+        $_start = Date::parse(\request('start_d', date('Y-m-d')));
         $start = $_start->format('Y-m-d');
-        $_end = \Illuminate\Support\Facades\Date::parse(\request('end_d'));
+        $_end = Date::parse(\request('end_d'));
         $end = $_end->format('Y-m-d');
         $type = $request->get('date_type', 'status_at');
         $top = $request->get('top_by', 'order_amount');

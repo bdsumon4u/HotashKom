@@ -8,8 +8,14 @@ use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use App\Models\Product;
 use App\Notifications\User\OrderConfirmed;
+use App\Pathao\Exceptions\PathaoException;
+use App\Pathao\Facade\Pathao;
+use App\Redx\Exceptions\RedxException;
+use App\Redx\Facade\Redx;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -23,7 +29,7 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -46,7 +52,7 @@ class OrderController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Admin\Order  $order
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show(Order $order)
     {
@@ -92,7 +98,7 @@ class OrderController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Admin\Order  $order
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit(Order $order)
     {
@@ -103,9 +109,9 @@ class OrderController extends Controller
     public function filter(Request $request)
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
-        $_start = \Illuminate\Support\Facades\Date::parse(\request('start_d', date('Y-m-d')));
+        $_start = Date::parse(\request('start_d', date('Y-m-d')));
         $start = $_start->format('Y-m-d');
-        $_end = \Illuminate\Support\Facades\Date::parse(\request('end_d'));
+        $_end = Date::parse(\request('end_d'));
         $end = $_end->format('Y-m-d');
 
         $totalSQL = 'COUNT(*) as order_count, SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.subtotal"))) + SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.shipping_cost"))) - COALESCE(SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.discount"))), 0) as total_amount';
@@ -336,7 +342,7 @@ class OrderController extends Controller
                 try {
                     $this->pathao($order);
                     $booked++;
-                } catch (\App\Pathao\Exceptions\PathaoException $e) {
+                } catch (PathaoException $e) {
                     $errors = collect($e->errors)->values()->flatten()->toArray();
                     $message = $errors[0] ?? $e->getMessage();
                     if ($message == 'Too many attempts') {
@@ -380,7 +386,7 @@ class OrderController extends Controller
                 try {
                     $this->redx($order);
                     $booked++;
-                } catch (\App\Redx\Exceptions\RedxException $e) {
+                } catch (RedxException $e) {
                     $errors = collect($e->errors)->values()->flatten()->toArray();
                     $message = $errors[0] ?? $e->getMessage();
                     if ($message == 'Too many attempts') {
@@ -411,7 +417,7 @@ class OrderController extends Controller
     /**
      * Calculate the collection amount (COD/amount_to_collect/cash_collection_amount) for an order.
      *
-     * @param  \App\Models\Order  $order
+     * @param  Order  $order
      */
     private function calculateOrderCollectionAmount($order): float
     {
@@ -487,7 +493,7 @@ class OrderController extends Controller
             // "item_description"    => $this->getProductsDetails($order->id), // product details
         ];
 
-        $data = \App\Pathao\Facade\Pathao::order()->create($data);
+        $data = Pathao::order()->create($data);
 
         $order->update([
             'status' => 'SHIPPING',
@@ -524,7 +530,7 @@ class OrderController extends Controller
             'parcel_details_json' => [],
         ];
 
-        $data = \App\Redx\Facade\Redx::order()->create($data);
+        $data = Redx::order()->create($data);
 
         $order->update([
             'status' => 'SHIPPING',
@@ -682,7 +688,7 @@ class OrderController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Admin\Order  $order
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Order $order)
     {

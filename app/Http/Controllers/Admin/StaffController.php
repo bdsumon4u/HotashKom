@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
@@ -12,7 +13,7 @@ class StaffController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
@@ -30,7 +31,7 @@ class StaffController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -42,7 +43,7 @@ class StaffController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -79,8 +80,8 @@ class StaffController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Admin  $admin
-     * @return \Illuminate\Http\Response
+     * @param  Admin  $admin
+     * @return Response
      */
     public function edit(Admin $staff)
     {
@@ -99,8 +100,8 @@ class StaffController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Models\Admin  $admin
-     * @return \Illuminate\Http\Response
+     * @param  Admin  $admin
+     * @return Response
      */
     public function update(Request $request, Admin $staff)
     {

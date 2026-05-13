@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
 class ResellerController extends Controller
@@ -12,7 +13,7 @@ class ResellerController extends Controller
     /**
      * Display a listing of the resellers.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -25,7 +26,7 @@ class ResellerController extends Controller
      * Show the form for editing the specified reseller.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -38,7 +39,7 @@ class ResellerController extends Controller
      * Update the specified reseller in storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, User $reseller)
     {

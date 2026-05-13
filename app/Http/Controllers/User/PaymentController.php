@@ -50,7 +50,7 @@ class PaymentController extends Controller
 
         $coupon = Coupon::findByCode($request->coupon_code);
 
-        if (! $coupon instanceof \App\Models\Coupon || $coupon->coupon_type !== 'subscription') {
+        if (! $coupon instanceof Coupon || $coupon->coupon_type !== 'subscription') {
             return to_route('user.payment.verification')
                 ->with('error', 'Invalid coupon code.');
         }
@@ -105,7 +105,7 @@ class PaymentController extends Controller
                     'amount' => $finalAmount,
                     'original_amount' => $verificationFee,
                     'discount_amount' => $discountAmount,
-                    'coupon_id' => $appliedCoupon instanceof \App\Models\Coupon ? $appliedCoupon->id : null,
+                    'coupon_id' => $appliedCoupon instanceof Coupon ? $appliedCoupon->id : null,
                     'payment_id' => $payment['paymentID'],
                     'merchant_invoice_number' => $payment['merchantInvoiceNumber'],
                 ],

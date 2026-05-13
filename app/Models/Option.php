@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Jobs\CopyResourceToResellers;
+use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Model;
 
 class Option extends Model
@@ -19,7 +21,7 @@ class Option extends Model
 
             // Dispatch job to copy option to reseller databases
             if (isOninda() && $option->wasRecentlyCreated) {
-                dispatch(new \App\Jobs\CopyResourceToResellers($option));
+                dispatch(new CopyResourceToResellers($option));
             }
         });
 
@@ -33,7 +35,7 @@ class Option extends Model
 
             // Dispatch job to remove option from reseller databases
             if (isOninda()) {
-                dispatch(new \App\Jobs\RemoveResourceFromResellers($option->getTable(), $option->id));
+                dispatch(new RemoveResourceFromResellers($option->getTable(), $option->id));
             }
         });
     }

@@ -7,6 +7,7 @@ use App\Http\Requests\SettingRequest;
 use App\Models\Setting;
 use App\Repositories\SettingRepository;
 use App\Traits\ImageUploader;
+use Illuminate\Http\Response;
 
 class SettingController extends Controller
 {
@@ -15,7 +16,7 @@ class SettingController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function __invoke(SettingRequest $request, SettingRepository $settingRepo)
     {

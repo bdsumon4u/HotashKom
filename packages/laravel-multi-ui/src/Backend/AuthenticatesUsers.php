@@ -2,6 +2,8 @@
 
 namespace Hotash\LaravelMultiUi\Backend;
 
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -14,9 +16,9 @@ trait AuthenticatesUsers
     /**
      * Handle a login request to the application.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return RedirectResponse|Response|JsonResponse
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function login(Request $request)
     {
@@ -84,7 +86,7 @@ trait AuthenticatesUsers
      *
      * @return void
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     protected function validateLogin(Request $request)
     {
@@ -119,7 +121,7 @@ trait AuthenticatesUsers
     /**
      * Send the response after the user was authenticated.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     protected function sendLoginResponse(Request $request)
     {
@@ -152,7 +154,7 @@ trait AuthenticatesUsers
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     protected function sendFailedLoginResponse(Request $request)
     {

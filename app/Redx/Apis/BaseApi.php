@@ -14,7 +14,7 @@ class BaseApi
      */
     private $baseUrl;
 
-    private readonly \GuzzleHttp\Client $request;
+    private readonly Client $request;
 
     /**
      * @var array

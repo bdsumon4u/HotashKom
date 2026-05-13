@@ -8,6 +8,7 @@ use Bavix\Wallet\Interfaces\Confirmable;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\CanConfirm;
 use Bavix\Wallet\Traits\HasWallet;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
@@ -146,9 +147,9 @@ class User extends Authenticatable implements Confirmable, Wallet
     /**
      * Get the full URL for the user's logo.
      */
-    protected function logoUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function logoUrl(): Attribute
     {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::make(get: fn (): ?string => $this->logo ? asset('storage/'.$this->logo) : null);
+        return Attribute::make(get: fn (): ?string => $this->logo ? asset('storage/'.$this->logo) : null);
     }
 
     /**

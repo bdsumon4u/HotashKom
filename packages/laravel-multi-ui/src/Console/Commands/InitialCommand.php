@@ -45,7 +45,7 @@ class InitialCommand extends Command
      *
      * @return void
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function handle()
     {

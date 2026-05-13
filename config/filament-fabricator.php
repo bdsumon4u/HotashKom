@@ -1,5 +1,8 @@
 <?php
 
+use App\Filament\Resources\LandingResource;
+use App\Models\Landing;
+
 // config for Z3d0X/FilamentFabricator
 return [
     'routing' => [
@@ -27,9 +30,9 @@ return [
         'web',
     ],
 
-    'page-model' => \App\Models\Landing::class,
+    'page-model' => Landing::class,
 
-    'page-resource' => \App\Filament\Resources\LandingResource::class,
+    'page-resource' => LandingResource::class,
 
     'enable-view-page' => false,
 

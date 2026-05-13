@@ -13,7 +13,7 @@ trait RegistersUsers
     /**
      * Handle a registration request for the application.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function register(Request $request)
     {
