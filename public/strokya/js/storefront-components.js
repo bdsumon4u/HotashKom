@@ -201,7 +201,7 @@ runWhenJQueryReady(function($) {
                     if (window.Livewire) {
                         window.Livewire.dispatch('notify', {
                             message: errorMessage,
-                            type: 'error'
+                            type: 'danger'
                         });
                     } else if (window.$) {
                         window.$.notify(errorMessage, {

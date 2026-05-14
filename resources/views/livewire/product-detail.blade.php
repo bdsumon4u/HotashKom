@@ -44,7 +44,9 @@
             <div>Product Code: <strong>{{ $selectedVar->sku }}</strong></div>
             <div>Availability:
                 <strong>
-                    @if (!$selectedVar->should_track)
+                    @if(!$selectedVar->is_active)
+                        <span class="text-danger">Inactive</span>
+                    @elseif (!$selectedVar->should_track)
                         <span class="text-success">In Stock</span>
                     @else
                         <span
@@ -238,7 +240,7 @@
                                 </p>
                             @endif
                             <div class="mt-2">
-                                <p class="mr-2 mb-0 text-secondary d-inline-block">Categories:</p>
+                                <p class="mb-0 mr-2 text-secondary d-inline-block">Categories:</p>
                                 @foreach ($product->categories as $category)
                                     <a href="{{ route('categories.products', $category) }}"
                                         class="badge badge-primary" wire:navigate.hover>{{ $category->name }}</a>

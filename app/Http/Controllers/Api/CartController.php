@@ -18,6 +18,13 @@ class CartController extends Controller
         ]);
 
         $product = Product::findOrFail($request->product_id);
+        if (!$product->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product is inactive and cannot be added to cart.',
+            ], 400);
+        }
+
         $quantity = $request->quantity ?? 1;
         $instance = $request->instance ?? 'default';
 

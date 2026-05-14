@@ -15,6 +15,11 @@ trait HasCart
             cart()->destroy();
         }
 
+        if (!$product->is_active) {
+            $this->dispatch('notify', ['message' => 'Product is inactive and cannot be added to cart', 'type' => 'danger']);
+            return;
+        }
+
         $fraudQuantity = setting('fraud')->max_qty_per_product ?? 3;
         $maxQuantity = $product->should_track ? min($product->stock_count, $fraudQuantity) : $fraudQuantity;
         $quantity = min($quantity, $maxQuantity);
