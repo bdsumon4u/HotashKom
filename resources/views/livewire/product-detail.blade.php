@@ -44,7 +44,7 @@
             <div>Product Code: <strong>{{ $selectedVar->sku }}</strong></div>
             <div>Availability:
                 <strong>
-                    @if(!$selectedVar->is_active)
+                    @if(!$selectedVar->is_active || !$product->is_active)
                         <span class="text-danger">Inactive</span>
                     @elseif (!$selectedVar->should_track)
                         <span class="text-success">In Stock</span>

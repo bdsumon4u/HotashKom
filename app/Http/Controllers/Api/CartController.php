@@ -17,8 +17,8 @@ class CartController extends Controller
             'instance' => ['string', 'in:default,kart,landing'],
         ]);
 
-        $product = Product::findOrFail($request->product_id);
-        if (!$product->is_active) {
+        $product = Product::with('parent')->findOrFail($request->product_id);
+        if (!$product->is_active || !$product->parent?->is_active) {
             return response()->json([
                 'success' => false,
                 'message' => 'Product is inactive and cannot be added to cart.',
