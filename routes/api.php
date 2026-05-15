@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\ResellerController;
 use App\Http\Controllers\Api\ResellerOrderController;
+use App\Http\Controllers\Api\StorefrontController;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Support\Facades\Route;
 
@@ -61,4 +62,15 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
     Route::post('resellers/{id}/toggle-verify', [ResellerController::class, 'toggleVerify'])->name('resellers.toggle-verify');
     Route::post('reseller/orders/place', [ResellerOrderController::class, 'placeOrder'])
         ->name('api.reseller.orders.place');
+
+    // Storefront API (for Stylon Next.js frontend)
+    Route::prefix('storefront')->name('storefront.')->group(function (): void {
+        Route::get('settings', [StorefrontController::class, 'settings'])->name('settings');
+        Route::get('slides', [StorefrontController::class, 'slides'])->name('slides');
+        Route::get('categories', [StorefrontController::class, 'categories'])->name('categories');
+        Route::get('products', [StorefrontController::class, 'products'])->name('products');
+        Route::get('products/{slug}', [StorefrontController::class, 'product'])->name('product');
+        Route::get('products/{slug}/related', [StorefrontController::class, 'relatedProducts'])->name('product.related');
+        Route::post('checkout', [StorefrontController::class, 'checkout'])->name('checkout');
+    });
 });
