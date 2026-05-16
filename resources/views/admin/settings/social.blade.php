@@ -39,4 +39,13 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <label class="mb-1">Facebook Group Link</label>
+            <div class="form-group">
+                <x-input type="url" name="social[facebook_group][link]" :value="$social->facebook_group->link ?? ''" />
+            </div>
+        </div>
+    </div>
 </div>

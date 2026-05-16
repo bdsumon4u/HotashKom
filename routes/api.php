@@ -68,9 +68,14 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
         Route::get('settings', [StorefrontController::class, 'settings'])->name('settings');
         Route::get('slides', [StorefrontController::class, 'slides'])->name('slides');
         Route::get('categories', [StorefrontController::class, 'categories'])->name('categories');
+        Route::get('categories/nested', [StorefrontController::class, 'categoriesNested'])->name('categories.nested');
         Route::get('products', [StorefrontController::class, 'products'])->name('products');
         Route::get('products/{slug}', [StorefrontController::class, 'product'])->name('product');
         Route::get('products/{slug}/related', [StorefrontController::class, 'relatedProducts'])->name('product.related');
+        Route::get('products/{product:slug}/reviews', [StorefrontController::class, 'reviews'])->name('product.reviews');
+        Route::post('products/{product:slug}/reviews', [StorefrontController::class, 'submitReview'])->name('product.reviews.store');
         Route::post('checkout', [StorefrontController::class, 'checkout'])->name('checkout');
+        Route::get('pages/{slug}', [StorefrontController::class, 'page'])->name('page');
+        Route::get('menus', [StorefrontController::class, 'menus'])->name('menus');
     });
 });

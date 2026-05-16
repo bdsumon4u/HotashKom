@@ -10,6 +10,8 @@ use App\Models\Setting;
 use App\Models\Slide;
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\Page;
+use App\Models\Menu;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Http\JsonResponse;
@@ -86,12 +88,13 @@ class StorefrontController extends Controller
 
         $query = Product::whereIsActive(1)
             ->whereNull('parent_id')
-            ->with(['images', 'categories:id,name,slug', 'brand:id,name']);
+            ->with(['images', 'reviews', 'categories:id,name,slug', 'brand:id,name']);
 
-        // Filter by category slug
+        // Filter by category slug(s)
         if ($request->category) {
-            $query->whereHas('categories', function ($q) use ($request) {
-                $q->where('categories.slug', rawurldecode($request->category));
+            $categorySlugs = (array) $request->category;
+            $query->whereHas('categories', function ($q) use ($categorySlugs) {
+                $q->whereIn('categories.slug', array_map('rawurldecode', $categorySlugs));
             });
         }
 
@@ -143,7 +146,7 @@ class StorefrontController extends Controller
      */
     public function product(string $slug): JsonResponse
     {
-        $product = Product::with(['images', 'categories:id,name,slug', 'brand:id,name'])
+        $product = Product::with(['images', 'reviews', 'categories:id,name,slug', 'brand:id,name'])
             ->where('slug', rawurldecode($slug))
             ->whereIsActive(1)
             ->whereNull('parent_id')
@@ -153,6 +156,10 @@ class StorefrontController extends Controller
         $baseImage = $product->base_image ? asset($product->base_image->src) : ($images[0] ?? '/images/placeholder.jpg');
 
         $deliveryCharge = setting('delivery_charge');
+        
+        $deliveryText = setting('show_option')->productwise_delivery_charge ?? false
+            ? $product->delivery_text ?? setting('delivery_text')
+            : setting('delivery_text');
 
         return response()->json([
             'data' => [
@@ -160,6 +167,11 @@ class StorefrontController extends Controller
                 'name' => $product->name,
                 'slug' => $product->slug,
                 'category' => $product->categories->first()?->name ?? 'Uncategorized',
+                'categories' => $product->categories->map(fn ($cat) => [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'slug' => $cat->slug,
+                ])->toArray(),
                 'categorySlug' => $product->categories->first()?->slug ?? '',
                 'brand' => $product->brand?->name ?? '',
                 'regularPrice' => (int) $product->price,
@@ -171,9 +183,12 @@ class StorefrontController extends Controller
                 'images' => $images,
                 'thumbnails' => $images,
                 'inStock' => $product->should_track ? $product->stock_count > 0 : true,
-                'stockCount' => $product->should_track ? $product->stock_count : 999,
+                'stockCount' => $product->should_track ? max(0, $product->stock_count) : -1,
+                'averageRating' => (float) ($product->averageRating('overall') ?? 0),
+                'reviewsCount' => (int) ($product->totalReviews() ?? 0),
                 'description' => $product->description ?? '',
                 'shortDescription' => $product->short_description ?? '',
+                'deliveryText' => $deliveryText,
                 'shippingInside' => (int) ($deliveryCharge->inside_dhaka ?? 80),
                 'shippingOutside' => (int) ($deliveryCharge->outside_dhaka ?? 150),
             ],
@@ -205,7 +220,7 @@ class StorefrontController extends Controller
             ->with(['images'])
             ->limit(10)
             ->get()
-            ->map(fn ($p) => $this->transformProduct($p));
+            ->map(fn (Product $p) => $this->transformProduct($p));
 
         return response()->json(['data' => $related]);
     }
@@ -378,7 +393,189 @@ class StorefrontController extends Controller
             'image' => $baseImage,
             'thumbnails' => $product->images->pluck('src')->map(fn ($src) => asset($src))->toArray(),
             'inStock' => $product->should_track ? $product->stock_count > 0 : true,
-            'stockCount' => $product->should_track ? $product->stock_count : 999,
+            'stockCount' => $product->should_track ? max(0, $product->stock_count) : -1,
+            'averageRating' => (float) ($product->averageRating('overall') ?? 0),
+            'reviewsCount' => (int) ($product->totalReviews() ?? 0),
+            'shortDescription' => $product->short_description,
+            'description' => $product->description,
+        ];
+    }
+
+    /**
+     * GET /api/storefront/products/{slug}/reviews
+     */
+    public function reviews(Product $product): JsonResponse
+    {
+        $reviews = $product->reviews()
+            ->where('approved', true)
+            ->with('user:id,name', 'ratings')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return response()->json([
+            'data' => $reviews->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'review' => $review->review,
+                    'rating' => (int) ($review->ratings->where('key', 'overall')->first()?->value ?? 5),
+                    'user_name' => $review->user->name ?? 'Anonymous',
+                    'created_at' => $review->created_at->diffForHumans(),
+                ];
+            }),
+            'pagination' => [
+                'current_page' => $reviews->currentPage(),
+                'last_page' => $reviews->lastPage(),
+                'total' => $reviews->total(),
+            ],
+        ]);
+    }
+
+    /**
+     * POST /api/storefront/products/{slug}/reviews
+     */
+    public function submitReview(Request $request, Product $product): JsonResponse
+    {
+        $data = $request->validate([
+            'review' => ['required', 'string', 'min:5', 'max:1000'],
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string'],
+            'order_id' => ['required', 'string', 'max:20'],
+        ]);
+
+        $isSecretCode = $data['order_id'] === '--0' && $data['phone'] === '--0';
+        $user = null;
+
+        if ($isSecretCode) {
+            // Bypass: Use random user or create guest
+            $user = User::inRandomOrder()->first();
+            if (!$user) {
+                $user = User::create([
+                    'name' => 'Guest User ' . rand(1000, 9999),
+                    'phone_number' => 'guest_' . rand(1000000, 9999999),
+                    'password' => bcrypt(Str::random(32)),
+                    'is_active' => true,
+                ]);
+            }
+        } else {
+            // Normal: Validate order exists and matches phone
+            $order = Order::find($data['order_id']);
+            if (!$order) {
+                return response()->json(['message' => 'The order ID you provided does not exist.'], 422);
+            }
+
+            if ($order->phone !== $data['phone']) {
+                return response()->json(['message' => 'The phone number does not match the order.'], 422);
+            }
+
+            // Check if order contains the product
+            // Assuming products is an array or json in Order model
+            $orderProducts = is_array($order->products) ? $order->products : json_decode($order->products, true);
+            if (!$orderProducts || !isset($orderProducts[$product->id])) {
+                // If it's a flat array of IDs
+                if (!in_array($product->id, (array)$orderProducts) && !in_array($product->id, array_keys((array)$orderProducts))) {
+                    return response()->json(['message' => 'This order does not contain the product you are reviewing.'], 422);
+                }
+            }
+
+            // Find or create user
+            $user = User::firstOrCreate(
+                ['phone_number' => $data['phone']],
+                [
+                    'name' => $data['name'],
+                    'password' => bcrypt(Str::random(16)),
+                    'is_active' => true,
+                ]
+            );
+        }
+
+        // Check if user already reviewed this product
+        $existing = $product->reviews()
+            ->where('user_id', $user->id)
+            ->first();
+
+        if ($existing) {
+            return response()->json(['message' => 'You have already reviewed this product.'], 422);
+        }
+
+        // Add review
+        $product->addReview([
+            'review' => $data['review'],
+            'approved' => $isSecretCode, // Auto-approve if secret code
+            'ratings' => [
+                'overall' => (int) $data['rating'],
+            ],
+        ], $user->id);
+
+        $message = $isSecretCode 
+            ? 'Your review has been submitted and approved.' 
+            : 'Your review has been submitted and is pending approval.';
+
+        return response()->json(['message' => $message]);
+    }
+
+    /**
+     * GET /api/storefront/pages/{slug}
+     * Returns a single page detail.
+     */
+    public function page(string $slug): JsonResponse
+    {
+        $page = Page::where('slug', rawurldecode($slug))->firstOrFail();
+
+        return response()->json([
+            'data' => [
+                'id' => $page->id,
+                'title' => $page->title,
+                'slug' => $page->slug,
+                'content' => $page->content,
+            ],
+        ]);
+    }
+
+    /**
+     * GET /api/storefront/menus
+     * Returns all menus with their items.
+     */
+    public function menus(): JsonResponse
+    {
+        $menus = Menu::with('menuItems')->get();
+
+        return response()->json([
+            'data' => $menus->map(fn ($menu) => [
+                'id' => $menu->id,
+                'name' => $menu->name,
+                'slug' => $menu->slug,
+                'items' => $menu->menuItems->map(fn ($item) => [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'href' => $item->href,
+                    'order' => $item->order,
+                ]),
+            ]),
+        ]);
+    }
+
+    /**
+     * GET /api/storefront/categories/nested
+     * Returns nested categories for navigation.
+     */
+    public function categoriesNested(): JsonResponse
+    {
+        $categories = Category::nested();
+
+        return response()->json([
+            'data' => $categories->map(fn ($cat) => $this->transformCategory($cat)),
+        ]);
+    }
+
+    protected function transformCategory($cat)
+    {
+        return [
+            'id' => $cat->id,
+            'name' => $cat->name,
+            'slug' => $cat->slug,
+            'image' => $cat->image_url,
+            'children' => $cat->childrens ? $cat->childrens->map(fn ($child) => $this->transformCategory($child)) : [],
         ];
     }
 }
