@@ -15,7 +15,7 @@ trait HasCart
             cart()->destroy();
         }
 
-        if (!($product->parent ?? $product)->is_active || !$product->is_active) {
+        if (!($product->parent ?? $product)->is_active) {
             $this->dispatch('notify', ['message' => 'Product is inactive and cannot be added to cart', 'type' => 'danger']);
             return;
         }
