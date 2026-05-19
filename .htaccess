@@ -1,15 +1,3 @@
-<IfModule mod_headers.c>
-    # Apply CORS headers only to API requests
-    RewriteCond %{REQUEST_URI} ^/api/ [NC]
-    Header set Access-Control-Allow-Origin "*"
-    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    Header set Access-Control-Max-Age "86400"
-
-    # Allow credentials (optional)
-    # Header set Access-Control-Allow-Credentials "true"
-</IfModule>
-
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews
@@ -19,20 +7,6 @@
     </FilesMatch>
 
     RewriteEngine On
-
-    # If the request is for the API or a specific resource, apply CORS headers
-    RewriteCond %{REQUEST_URI} ^/api/ [NC]
-    Header set Access-Control-Allow-Origin "*"
-    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-    Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    Header set Access-Control-Max-Age "86400"
-
-    # Allow credentials if required (optional)
-    # Header set Access-Control-Allow-Credentials "true"
-
-    # Handle OPTIONS preflight request
-    RewriteCond %{REQUEST_METHOD} OPTIONS
-
 
     RewriteCond %{HTTP_HOST} !^www\. [NC]
     RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
