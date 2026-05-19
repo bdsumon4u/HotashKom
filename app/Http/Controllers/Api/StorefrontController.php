@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Admin;
 use App\Models\Page;
 use App\Models\Menu;
+use App\Models\HomeSection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Http\JsonResponse;
@@ -565,6 +566,49 @@ class StorefrontController extends Controller
 
         return response()->json([
             'data' => $categories->map(fn ($cat) => $this->transformCategory($cat)),
+        ]);
+    }
+
+    /**
+     * GET /api/storefront/home-sections
+     * Returns home sections definitions (without products).
+     */
+    public function homeSections(Request $request): JsonResponse
+    {
+        $sections = HomeSection::orderBy('order')->get();
+
+        $data = $sections->map(function ($section) {
+            return [
+                'id' => $section->id,
+                'title' => $section->title,
+                'type' => $section->type,
+            ];
+        });
+
+        return response()->json([
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * GET /api/storefront/home-sections/{section}/products
+     * Returns products for a specific home section.
+     */
+    public function homeSectionProducts(Request $request, HomeSection $section): JsonResponse
+    {
+        $products = $section->products(15); // Pass 15 for pagination
+
+        $data = $products->getCollection()->map(fn ($p) => $this->transformProduct($p));
+
+        return response()->json([
+            'data' => $data,
+            'pagination' => [
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'per_page' => $products->perPage(),
+                'total' => $products->total(),
+                'has_more' => $products->hasMorePages(),
+            ],
         ]);
     }
 

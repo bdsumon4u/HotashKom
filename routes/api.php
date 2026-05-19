@@ -77,5 +77,7 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
         Route::post('checkout', [StorefrontController::class, 'checkout'])->name('checkout');
         Route::get('pages/{slug}', [StorefrontController::class, 'page'])->name('page');
         Route::get('menus', [StorefrontController::class, 'menus'])->name('menus');
+        Route::get('home-sections', [StorefrontController::class, 'homeSections'])->name('home-sections');
+        Route::get('home-sections/{section}/products', [StorefrontController::class, 'homeSectionProducts'])->name('home-sections.products');
     });
 });
