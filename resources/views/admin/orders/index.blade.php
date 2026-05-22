@@ -2,21 +2,23 @@
 @section('title', 'Orders')
 
 @push('css')
-    <link rel="stylesheet" type="text/css" href="{{asset('assets/css/animate.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('assets/css/daterange-picker.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/animate.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/daterange-picker.css') }}">
     <style>
         .daterangepicker {
             border: 2px solid #d7d7d7 !important;
         }
     </style>
-    <link rel="stylesheet" type="text/css" href="{{asset('assets/css/datatables.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/datatables.css') }}">
     <style>
         .dt-buttons.btn-group {
             margin: .25rem 1rem 1rem 1rem;
         }
+
         .dt-buttons.btn-group .btn {
             font-size: 12px;
         }
+
         th:focus {
             outline: none;
         }
@@ -40,76 +42,84 @@
                         <div class="px-3 row justify-content-between align-items-center">
                             <div>All Orders</div>
                             <div>
-                                <a href="{{route('admin.orders.create')}}" class="btn btn-sm btn-primary">New Order</a>
-                                <a href="{{ route('admin.orders.pathao-csv') }}" class="ml-1 btn btn-sm btn-primary">Pathao CSV</a>
+                                <a href="{{ route('admin.orders.create') }}" class="btn btn-sm btn-primary">New Order</a>
+                                <a href="{{ route('admin.orders.pathao-csv') }}" class="ml-1 btn btn-sm btn-primary">Pathao
+                                    CSV</a>
                             </div>
                         </div>
                         <div class="row d-none" style="row-gap: .25rem;">
                             <div class="col-auto pr-0 d-flex align-items-center" check-count></div>
-                            @unless(false && in_array(request('status'), ['CONFIRMED', 'PACKAGING']))
-                            <div class="col-auto px-1">
-                                <select name="status" id="status" onchange="changeStatus()" class="text-white form-control form-control-sm bg-primary">
-                                    <option value="">Change Status</option>
-                                    @foreach(config('app.orders', []) as $status)
-                                        @php $show = false @endphp
-                                        @switch($status)
-                                            @case('WAITING')
-                                                @php $show = in_array(request('status'), ['PENDING', 'CANCELLED']) @endphp
+                            @unless (false && in_array(request('status'), ['CONFIRMED', 'PACKAGING']))
+                                <div class="col-auto px-1">
+                                    <select name="status" id="status" onchange="changeStatus()"
+                                        class="text-white form-control form-control-sm bg-primary">
+                                        <option value="">Change Status</option>
+                                        @foreach (config('app.orders', []) as $status)
+                                            @php $show = false @endphp
+                                            @switch($status)
+                                                @case('WAITING')
+                                                    @php $show = in_array(request('status'), ['PENDING', 'CANCELLED']) @endphp
                                                 @break
 
-                                            @case('CONFIRMED')
-                                                @php $show = in_array(request('status'), ['PENDING', 'WAITING', 'CANCELLED']) @endphp
+                                                @case('CONFIRMED')
+                                                    @php $show = in_array(request('status'), ['PENDING', 'WAITING', 'CANCELLED']) @endphp
                                                 @break
 
-                                            @case('CANCELLED')
-                                                @php $show = in_array(request('status'), ['PENDING', 'WAITING']) @endphp
+                                                @case('CANCELLED')
+                                                    @php $show = in_array(request('status'), ['PENDING', 'WAITING']) @endphp
                                                 @break
 
-                                            @case('DELIVERED')
-                                            @case('RETURNED')
-                                            @case('LOST')
-                                                @php $show = in_array(request('status'), ['SHIPPING']) @endphp
+                                                @case('DELIVERED')
+                                                @case('RETURNED')
+
+                                                @case('LOST')
+                                                    @php $show = in_array(request('status'), ['SHIPPING']) @endphp
                                                 @break
 
-                                            @default
-
-                                        @endswitch
-                                        @if($show || true)
-                                        <option value="{{ $status }}">{{ $status }}</option>
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </div>
+                                                @default
+                                            @endswitch
+                                            @if ($show || true)
+                                                <option value="{{ $status }}">{{ $status }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
                             @endunless
-                            @unless(request('status') == 'SHIPPING')
-                            <div class="col-auto px-1">
-                                <select name="courier" id="courier" onchange="changeCourier()" class="text-white form-control form-control-sm bg-primary">
-                                    <option value="">Change Courier</option>
-                                    @foreach(couriers() as $provider)
-                                    <option value="{{ $provider }}">{{ $provider }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            @unless (request('status') == 'SHIPPING')
+                                <div class="col-auto px-1">
+                                    <select name="courier" id="courier" onchange="changeCourier()"
+                                        class="text-white form-control form-control-sm bg-primary">
+                                        <option value="">Change Courier</option>
+                                        @foreach (couriers() as $provider)
+                                            <option value="{{ $provider }}">{{ $provider }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             @endunless
-                            @if(!auth()->user()->is('salesman'))
-                            <div class="col-auto px-1">
-                                <select name="staff" id="staff" onchange="changeStaff()" class="text-white form-control form-control-sm bg-primary">
-                                    <option value="">Change Staff</option>
-                                    @foreach(\App\Models\Admin::where('role_id', \App\Models\Admin::SALESMAN)->get() as $staff)
-                                    <option value="{{ $staff->id }}">{{ $staff->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            @if (!auth()->user()->is('salesman'))
+                                <div class="col-auto px-1">
+                                    <select name="staff" id="staff" onchange="changeStaff()"
+                                        class="text-white form-control form-control-sm bg-primary">
+                                        <option value="">Change Staff</option>
+                                        @foreach (\App\Models\Admin::where('role_id', \App\Models\Admin::SALESMAN)->get() as $staff)
+                                            <option value="{{ $staff->id }}">{{ $staff->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             @endif
                             <div class="col-auto pl-0 ml-auto">
-                                @if(request('status') == 'CONFIRMED')
-                                    <button onclick="printSticker()" id="sticker" class="ml-1 btn btn-sm btn-primary">Print Sticker</button>
-                                    <button onclick="printInvoice()" id="invoice" class="ml-1 btn btn-sm btn-primary">Print Invoice</button>
-                                    @if(isReseller())
-                                    <button onclick="forwardToOninda()" id="forward-to-oninda" class="ml-1 btn btn-sm btn-primary">Forward to Wholesaler</button>
+                                @if (request('status') == 'CONFIRMED')
+                                    <button onclick="printSticker()" id="sticker"
+                                        class="ml-1 btn btn-sm btn-primary">Print Sticker</button>
+                                    <button onclick="printInvoice()" id="invoice"
+                                        class="ml-1 btn btn-sm btn-primary">Print Invoice</button>
+                                    @if (isReseller())
+                                        <button onclick="forwardToOninda()" id="forward-to-oninda"
+                                            class="ml-1 btn btn-sm btn-primary">Forward to Wholesaler</button>
                                     @endif
                                 @elseif(request('status') == 'PACKAGING')
-                                    <button onclick="courier()" id="courier" class="ml-1 btn btn-sm btn-primary">Send to Courier</button>
+                                    <button onclick="courier()" id="courier" class="ml-1 btn btn-sm btn-primary">Send to
+                                        Courier</button>
                                 @endif
                             </div>
                         </div>
@@ -118,28 +128,29 @@
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
                                 <thead>
-                                <tr>
-                                    @if($bulk = true || request('status') && !in_array(request('status'), ['DELIVERED', 'RETURNED', 'LOST']))
-                                    <th style="max-width: 5%">
-                                        <input type="checkbox" class="form-control" name="check_all" style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">
-                                    </th>
-                                    @endif
-                                    <th width="80">ID</th>
-                                    @if(isOninda() || isReseller())
-                                    <th width="80">Source</th>
-                                    @endif
-                                    <th style="min-width: 150px; max-width: 250px;">Customer</th>
-                                    <th style="min-width: 250px; max-width: 350px;">Products</th>
-                                    <th width="10">Amount</th>
-                                    <th>Status</th>
-                                    <th>Courier</th>
-                                    <th>Staff</th>
-                                    <th style="white-space: nowrap; min-width: 125px;">Order Date</th>
-                                    <th style="white-space: nowrap; min-width: 125px;">Last Update</th>
-                                    @if(auth()->user()->is('admin'))
-                                    <th width="10">Action</th>
-                                    @endif
-                                </tr>
+                                    <tr>
+                                        @if ($bulk = true || (request('status') && !in_array(request('status'), ['DELIVERED', 'RETURNED', 'LOST'])))
+                                            <th style="max-width: 5%">
+                                                <input type="checkbox" class="form-control" name="check_all"
+                                                    style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">
+                                            </th>
+                                        @endif
+                                        <th width="80">ID</th>
+                                        @if (isOninda() || isReseller())
+                                            <th width="80">Source</th>
+                                        @endif
+                                        <th style="min-width: 150px; max-width: 250px;">Customer</th>
+                                        <th style="min-width: 250px; max-width: 350px;">Products</th>
+                                        <th width="10">Amount</th>
+                                        <th>Status</th>
+                                        <th>Courier</th>
+                                        <th>Staff</th>
+                                        <th style="white-space: nowrap; min-width: 125px;">Order Date</th>
+                                        <th style="white-space: nowrap; min-width: 125px;">Last Update</th>
+                                        @if (auth()->user()->is('admin'))
+                                            <th width="10">Action</th>
+                                        @endif
+                                    </tr>
                                 </thead>
                             </table>
                         </div>
@@ -149,7 +160,8 @@
         </div>
     </div>
 
-    <div class="modal fade" id="orderAdminNotesModal" tabindex="-1" role="dialog" aria-labelledby="orderAdminNotesModalLabel" aria-hidden="true">
+    <div class="modal fade" id="orderAdminNotesModal" tabindex="-1" role="dialog"
+        aria-labelledby="orderAdminNotesModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-scrollable" role="document">
             <div class="modal-content rounded-0">
                 <div class="p-3 modal-header">
@@ -167,10 +179,10 @@
 @endsection
 
 @push('js')
-    <script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}" defer></script>
-    <script src="{{asset('assets/js/datatable/datatable-extension/dataTables.buttons.min.js')}}" defer></script>
-    <script src="{{asset('assets/js/datatable/datatable-extension/buttons.bootstrap4.min.js')}}" defer></script>
-    <script src="{{asset('assets/js/product-list-custom.js')}}" defer></script>
+    <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}" defer></script>
+    <script src="{{ asset('assets/js/datatable/datatable-extension/dataTables.buttons.min.js') }}" defer></script>
+    <script src="{{ asset('assets/js/datatable/datatable-extension/buttons.bootstrap4.min.js') }}" defer></script>
+    <script src="{{ asset('assets/js/product-list-custom.js') }}" defer></script>
 @endpush
 
 @php($parameters = array_merge(request()->query(), request('status') && auth()->user()->is('salesman') ? ['staff_id' => auth()->id()] : []))
@@ -178,9 +190,10 @@
 @push('scripts')
     <script data-push-script>
         var checklist = new Set();
+
         function updateBulkMenu() {
             $('[name="check_all"]').prop('checked', true);
-            $(document).find('[name="order_id[]"]:not([disabled])').each(function () {
+            $(document).find('[name="order_id[]"]:not([disabled])').each(function() {
                 if (checklist.has($(this).val())) {
                     $(this).prop('checked', true);
                 } else {
@@ -198,13 +211,13 @@
                 $('.card-header > .row:first-child').removeClass('d-none');
             }
         }
-        $('[name="check_all"]').on('change', function () {
+        $('[name="check_all"]').on('change', function() {
             if ($(this).prop('checked')) {
-                $(document).find('[name="order_id[]"]:not([disabled])').each(function () {
+                $(document).find('[name="order_id[]"]:not([disabled])').each(function() {
                     checklist.add($(this).val());
                 });
             } else {
-                $(document).find('[name="order_id[]"]:not([disabled])').each(function () {
+                $(document).find('[name="order_id[]"]:not([disabled])').each(function() {
                     checklist.delete($(this).val());
                 });
             }
@@ -236,137 +249,193 @@
             }
 
             table = $('.datatable').DataTable({
-            search: [
-                {
+                search: [{
                     bRegex: true,
                     bSmart: false,
-                },
-            ],
-            // aoColumns: [{ "bSortable": false }, null, null, { "sType": "numeric" }, { "sType": "date" }, null, { "bSortable": false}],
-            dom: 'lBftip',
-            buttons: [
-@foreach(config('app.orders', []) as $status)
-                {
-                    text: '{{ $status }}',
-                    className: "px-1 py-1 {{ request('status') == $status ? 'btn-secondary' : '' }}",
-                    action: function ( e, dt, node, config ) {
-                        window.location = '{!! request()->fullUrlWithQuery(['status' => $status]) !!}';
-                    }
-                },
-@endforeach
-                {
-                    text: 'All',
-                    className: "px-1 py-1 {{ request('status') == '' ? 'btn-secondary' : '' }}",
-                    action: function ( e, dt, node, config ) {
-                        window.location = '{!! request()->fullUrlWithQuery(['status' => '']) !!}';
-                    }
-                },
-            ],
-            processing: true,
-            serverSide: true,
-            ajax: "{!! route('api.orders', $parameters) !!}",
-            columns: [
-                @if($bulk)
-                { data: 'checkbox', name: 'checkbox', sortable: false, searchable: false},
-                @endif
-                { data: 'id', name: 'id' },
-                @if(isOninda() || isReseller())
-                { data: 'source_id', name: 'source_id', sortable: true, searchable: true },
-                @endif
-                { data: 'customer', name: 'customer', sortable: false },
-                { data: 'products', name: 'products', sortable: false },
-                { data: 'amount', name: 'amount', sortable: false },
-                { data: 'status', name: 'status', sortable: false },
-                { data: 'courier', name: 'courier', sortable: false },
-                { data: 'staff', name: 'admin.name', sortable: false },
-                { data: 'created_at', name: 'created_at' },
-                { data: 'updated_at', name: 'updated_at' },
-                @if(auth()->user()->is('admin'))
-                { data: 'actions', searchable: false, orderable: false },
-                @endif
-            ],
-            initComplete: function (settings, json) {
-                window.ordersTotal = json.recordsTotal;
-                var tr = $(this.api().table().header()).children('tr').clone();
-                tr.find('th').each(function (i, item) {
-                    $(this).removeClass('sorting').addClass('p-1');
-                });
-                tr.appendTo($(this.api().table().header()));
-                this.api().columns().every(function (i) {
-                    var th = $(this.header()).parents('thead').find('tr').eq(1).find('th').eq(i);
-                    $(th).empty();
-
-                    var forbidden = [0];
-                    @if(isOninda()||isReseller())
-                        forbidden.push(5);
-                        var dateTimeColumn = 9;
-                        forbidden.push(10);
-                        @if(auth()->user()->is('admin'))
-                            forbidden.push(11);
-                        @endif
-                    @else
-                        forbidden.push(4);
-                        var dateTimeColumn = 8;
-                        forbidden.push(9);
-                        @if(auth()->user()->is('admin'))
-                            forbidden.push(10);
-                        @endif
-                    @endif
-
-                    if ($.inArray(i, forbidden) === -1) {
-                        var column = this;
-                        var input = document.createElement("input");
-                        input.classList.add('form-control', 'border-primary');
-                        if (i === dateTimeColumn) {
-                            $(input).appendTo($(th)).on('apply.daterangepicker', function (ev, picker) {
-                                column.search(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD')).draw();
-                            }).daterangepicker({
-                                startDate: window._start,
-                                endDate: window._end,
-                                ranges: {
-                                    'Today': [moment(), moment()],
-                                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-                                },
-                            });
-
-                            // clear the input when _start and _end are empty
-                            if (!window._start && !window._end) {
-                                $(input).val('');
+                }, ],
+                // aoColumns: [{ "bSortable": false }, null, null, { "sType": "numeric" }, { "sType": "date" }, null, { "bSortable": false}],
+                dom: 'lBftip',
+                buttons: [
+                    @foreach (config('app.orders', []) as $status)
+                        {
+                            text: '{{ $status }}',
+                            className: "px-1 py-1 {{ request('status') == $status ? 'btn-secondary' : '' }}",
+                            action: function(e, dt, node, config) {
+                                window.location = '{!! request()->fullUrlWithQuery(['status' => $status]) !!}';
                             }
-                        } else {
-                            $(input).appendTo($(th))
-                                .on('change', function () {
-                                    if (i) {
-                                        column.search($(this).val(), false, false, true).draw();
-                                    } else {
-                                        column.search('^'+ (this.value.length ? this.value : '.*') +'$', true, false).draw();
-                                    }
-                                });
+                        },
+                    @endforeach {
+                        text: 'All',
+                        className: "px-1 py-1 {{ request('status') == '' ? 'btn-secondary' : '' }}",
+                        action: function(e, dt, node, config) {
+                            window.location = '{!! request()->fullUrlWithQuery(['status' => '']) !!}';
                         }
-                    }
-                });
-            },
-            drawCallback: function () {
-                updateBulkMenu();
-                $(document).on('change', '[name="order_id[]"]', function () {
-                    if ($(this).prop('checked')) {
-                        checklist.add($(this).val());
-                    } else {
-                        checklist.delete($(this).val());
-                    }
+                    },
+                ],
+                processing: true,
+                serverSide: true,
+                ajax: "{!! route('api.orders', $parameters) !!}",
+                columns: [
+                    @if ($bulk)
+                        {
+                            data: 'checkbox',
+                            name: 'checkbox',
+                            sortable: false,
+                            searchable: false
+                        },
+                    @endif {
+                        data: 'id',
+                        name: 'id'
+                    },
+                    @if (isOninda() || isReseller())
+                        {
+                            data: 'source_id',
+                            name: 'source_id',
+                            sortable: true,
+                            searchable: true
+                        },
+                    @endif {
+                        data: 'customer',
+                        name: 'customer',
+                        sortable: false
+                    },
+                    {
+                        data: 'products',
+                        name: 'products',
+                        sortable: false
+                    },
+                    {
+                        data: 'amount',
+                        name: 'amount',
+                        sortable: false
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        sortable: false
+                    },
+                    {
+                        data: 'courier',
+                        name: 'courier',
+                        sortable: false
+                    },
+                    {
+                        data: 'staff',
+                        name: 'admin.name',
+                        sortable: false
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at'
+                    },
+                    {
+                        data: 'updated_at',
+                        name: 'updated_at'
+                    },
+                    @if (auth()->user()->is('admin'))
+                        {
+                            data: 'actions',
+                            searchable: false,
+                            orderable: false
+                        },
+                    @endif
+                ],
+                initComplete: function(settings, json) {
+                    window.ordersTotal = json.recordsTotal;
+                    var tr = $(this.api().table().header()).children('tr').clone();
+                    tr.find('th').each(function(i, item) {
+                        $(this).removeClass('sorting').addClass('p-1');
+                    });
+                    tr.appendTo($(this.api().table().header()));
+                    this.api().columns().every(function(i) {
+                        var th = $(this.header()).parents('thead').find('tr').eq(1).find('th').eq(i);
+                        $(th).empty();
+
+                        var forbidden = [0];
+                        @if (isOninda() || isReseller())
+                            forbidden.push(5);
+                            var dateTimeColumn = 9;
+                            forbidden.push(10);
+                            @if (auth()->user()->is('admin'))
+                                forbidden.push(11);
+                            @endif
+                        @else
+                            forbidden.push(4);
+                            var dateTimeColumn = 8;
+                            forbidden.push(9);
+                            @if (auth()->user()->is('admin'))
+                                forbidden.push(10);
+                            @endif
+                        @endif
+
+                        if ($.inArray(i, forbidden) === -1) {
+                            var column = this;
+                            var input = document.createElement("input");
+                            input.classList.add('form-control', 'border-primary');
+                            if (i === dateTimeColumn) {
+                                $(input).appendTo($(th)).on('apply.daterangepicker', function(ev,
+                                    picker) {
+                                    column.search(picker.startDate.format('YYYY-MM-DD') +
+                                        ' - ' + picker.endDate.format('YYYY-MM-DD')).draw();
+                                }).daterangepicker({
+                                    startDate: window._start,
+                                    endDate: window._end,
+                                    ranges: {
+                                        'Today': [moment(), moment()],
+                                        'Yesterday': [moment().subtract(1, 'days'), moment()
+                                            .subtract(1, 'days')
+                                        ],
+                                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                                        'Last 30 Days': [moment().subtract(29, 'days'),
+                                        moment()],
+                                        'This Month': [moment().startOf('month'), moment()
+                                            .endOf('month')
+                                        ],
+                                        'Last Month': [moment().subtract(1, 'month').startOf(
+                                                'month'), moment().subtract(1, 'month')
+                                            .endOf('month')
+                                        ]
+                                    },
+                                });
+
+                                // clear the input when _start and _end are empty
+                                if (!window._start && !window._end) {
+                                    $(input).val('');
+                                }
+                            } else {
+                                $(input).appendTo($(th))
+                                    .on('change', function() {
+                                        if (i) {
+                                            column.search($(this).val(), false, false, true).draw();
+                                        } else {
+                                            column.search('^' + (this.value.length ? this.value :
+                                                '.*') + '$', true, false).draw();
+                                        }
+                                    });
+                            }
+                        }
+                    });
+                },
+                drawCallback: function() {
                     updateBulkMenu();
-                });
-            },
-            order: [
-                // [1, 'desc']
-            ],
-            pageLength: 50,
-            lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
-        });
+                    $(document).on('change', '[name="order_id[]"]', function() {
+                        if ($(this).prop('checked')) {
+                            checklist.add($(this).val());
+                        } else {
+                            checklist.delete($(this).val());
+                        }
+                        updateBulkMenu();
+                    });
+                },
+                order: [
+                    // [1, 'desc']
+                ],
+                pageLength: 50,
+                lengthMenu: [
+                    [10, 25, 50, 100, 250, 500],
+                    [10, 25, 50, 100, 250, 500]
+                ],
+            });
         }
 
         // Start initialization - wrap in jQuery ready to ensure DOM is ready
@@ -393,14 +462,14 @@
                     order_id: order_id,
                     status: status,
                 },
-                success: function (response) {
+                success: function(response) {
                     checklist.clear();
                     updateBulkMenu();
                     table.draw();
 
                     $.notify('Status updated successfully', 'success');
                 },
-                complete: function () {
+                complete: function() {
                     $('[name="status"]').prop('disabled', false);
                     $('[name="status"]').val('');
                 }
@@ -426,14 +495,14 @@
                     order_id: order_id,
                     courier: courier,
                 },
-                success: function (response) {
+                success: function(response) {
                     // checklist.clear();
                     // updateBulkMenu();
                     table.draw();
 
                     $.notify('Courier updated successfully', 'success');
                 },
-                complete: function () {
+                complete: function() {
                     $('[name="courier"]').prop('disabled', false);
                     $('[name="courier"]').val('');
                 }
@@ -459,49 +528,55 @@
                     order_id: order_id,
                     admin_id: staff,
                 },
-                success: function (response) {
+                success: function(response) {
                     checklist.clear();
                     updateBulkMenu();
                     table.draw();
 
                     $.notify('Staff updated successfully', 'success');
                 },
-                complete: function () {
+                complete: function() {
                     $('[name="staff"]').prop('disabled', false);
                     $('[name="staff"]').val('');
                 },
-                error: function (response) {
-                    $.notify(response?.responseJSON?.message || 'Staff update failed.', {type: 'danger'});
+                error: function(response) {
+                    $.notify(response?.responseJSON?.message || 'Staff update failed.', {
+                        type: 'danger'
+                    });
                 },
             });
         }
 
         // Single interval guard to avoid duplicate refresh timers
         if (!window.__ordersTableRefreshInterval) {
-            window.__ordersTableRefreshInterval = setInterval(function () {
+            window.__ordersTableRefreshInterval = setInterval(function() {
                 if (typeof $.fn.DataTable !== 'undefined' && $.fn.dataTable.isDataTable('.datatable') && table) {
-                    table.ajax.reload(function (res) {
+                    table.ajax.reload(function(res) {
                         if (res.recordsTotal > window.ordersTotal) {
                             window.ordersTotal = res.recordsTotal;
                             $.notify('New orders found', 'success');
                         }
                     }, false);
                 }
-            }, 60*1000);
+            }, 60 * 1000);
         }
 
         function printInvoice() {
-            window.open('{{ route('admin.orders.invoices') }}?order_id=' + $('[name="order_id[]"]:checked').map(function () {
+            window.open('{{ route('admin.orders.invoices') }}?order_id=' + $('[name="order_id[]"]:checked').map(
+        function() {
                 return $(this).val();
             }).get().join(','), '_blank');
         }
+
         function printSticker() {
-            window.open('{{ route('admin.orders.stickers') }}?order_id=' + $('[name="order_id[]"]:checked').map(function () {
+            window.open('{{ route('admin.orders.stickers') }}?order_id=' + $('[name="order_id[]"]:checked').map(
+        function() {
                 return $(this).val();
             }).get().join(','), '_blank');
         }
+
         function courier() {
-            window.open('{{ route('admin.orders.booking') }}?order_id=' + $('[name="order_id[]"]:checked').map(function () {
+            window.open('{{ route('admin.orders.booking') }}?order_id=' + $('[name="order_id[]"]:checked').map(function() {
                 return $(this).val();
             }).get().join(','), '_self');
         }
@@ -518,19 +593,20 @@
                     _token: '{{ csrf_token() }}',
                     order_id: Array.from(checklist),
                 },
-                success: function (response) {
+                success: function(response) {
                     checklist.clear();
                     updateBulkMenu();
                     table.draw();
                     $.notify('Orders are being forwarded to the the Wholesaler', 'success');
                 },
-                error: function (response) {
-                    $.notify(response?.responseJSON?.message || 'Failed to forward orders to the Wholesaler', 'danger');
+                error: function(response) {
+                    $.notify(response?.responseJSON?.message || 'Failed to forward orders to the Wholesaler',
+                        'danger');
                 }
             });
         }
 
-        $(document).on('click', '.js-order-notes-modal', function () {
+        $(document).on('click', '.js-order-notes-modal', function() {
             var orderId = $(this).data('order-id');
             var $modal = $('#orderAdminNotesModal');
             var $body = $('#orderAdminNotesModalBody');
@@ -539,8 +615,9 @@
             $modal.modal('show');
 
             $.get({
-                url: '{{ route('api.orders.admin-notes', ['order' => '__ORDER__']) }}'.replace('__ORDER__', orderId),
-                success: function (response) {
+                url: '{{ route('api.orders.admin-notes', ['order' => '__ORDER__']) }}'.replace('__ORDER__',
+                    orderId),
+                success: function(response) {
                     if (response.html && response.html.trim() !== '') {
                         $body.html(response.html);
                         return;
@@ -548,7 +625,7 @@
 
                     $body.html('<div class="text-muted">No admin notes found.</div>');
                 },
-                error: function () {
+                error: function() {
                     $body.html('<div class="text-danger">Failed to load admin notes.</div>');
                 },
             });
@@ -558,4 +635,3 @@
     <script src="{{ asset('assets/js/datepicker/daterange-picker/moment.min.js') }}"></script>
     <script src="{{ asset('assets/js/datepicker/daterange-picker/daterangepicker.js') }}"></script>
 @endpush
-
