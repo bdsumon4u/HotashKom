@@ -431,9 +431,21 @@ class OrderController extends Controller
 
     private function steadFast($order_ids): int
     {
-        if (! (($SteadFast = setting('SteadFast'))->enabled ?? false)) {
+        $SteadFast = setting('SteadFast');
+        if (! ($SteadFast->enabled ?? false)) {
             return 0;
         }
+
+        // Validate credentials exist
+        if (empty($SteadFast->key) || empty($SteadFast->secret)) {
+            Log::error('SteadFast credentials not configured', [
+                'has_key' => ! empty($SteadFast->key),
+                'has_secret' => ! empty($SteadFast->secret),
+            ]);
+
+            return 0;
+        }
+
         $orders = Order::whereIn('id', $order_ids)->where('data->courier', 'SteadFast')->get()->map(fn ($order): array => [
             'invoice' => (setting('show_option')->invoice_prefix ?? '').$order->id,
             'recipient_name' => $order->name ?? 'N/A',
@@ -441,19 +453,50 @@ class OrderController extends Controller
             'recipient_phone' => $order->phone ?? '',
             'cod_amount' => $this->calculateOrderCollectionAmount($order),
             'note' => '', // $order->note,
-        ])->toJson();
+        ])->toArray();
 
+        // Send request body as raw JSON to match API expectations
         $response = Http::withHeaders([
             'Api-Key' => $SteadFast->key,
             'Secret-Key' => $SteadFast->secret,
             'Content-Type' => 'application/json',
-        ])->post($this->base_url.'/create_order/bulk-order', [
-            'data' => $orders,
-        ]);
+        ])->post($this->base_url.'/create_order/bulk-order', json_encode([
+            'data' => json_encode($orders),
+        ]));
 
-        $data = json_decode($response->getBody()->getContents(), true);
+        $bodyContent = $response->getBody()->getContents();
+        $data = json_decode($bodyContent, true);
+
+        if ($response->failed()) {
+            Log::error('SteadFast API Error', [
+                'status' => $response->status(),
+                'headers' => $response->headers(),
+                'body' => $bodyContent,
+                'decoded' => $data,
+                'request_headers' => [
+                    'Api-Key' => $SteadFast->key ? 'set' : 'missing',
+                    'Secret-Key' => $SteadFast->secret ? 'set' : 'missing',
+                ],
+            ]);
+
+            return 0;
+        }
+
+        if (empty($data['data'])) {
+            Log::warning('SteadFast API - Empty response data', [
+                'response' => $data,
+            ]);
+
+            return 0;
+        }
 
         foreach ($data['data'] ?? [] as $item) {
+            if ($item['status'] !== 'success') {
+                Log::warning('SteadFast order failed', ['item' => $item]);
+
+                continue;
+            }
+
             $invoiceId = (int) preg_replace('/\D/', '', (string) $item['invoice']);
             if (! $order = Order::find($invoiceId)) {
                 continue;
