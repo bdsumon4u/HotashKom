@@ -134,7 +134,8 @@
                                     <th>Status</th>
                                     <th>Courier</th>
                                     <th>Staff</th>
-                                    <th style="white-space: nowrap; min-width: 125px;">Date and Time</th>
+                                    <th style="white-space: nowrap; min-width: 125px;">Order Date</th>
+                                    <th style="white-space: nowrap; min-width: 125px;">Last Update</th>
                                     @if(auth()->user()->is('admin'))
                                     <th width="10">Action</th>
                                     @endif
@@ -279,6 +280,7 @@
                 { data: 'courier', name: 'courier', sortable: false },
                 { data: 'staff', name: 'admin.name', sortable: false },
                 { data: 'created_at', name: 'created_at' },
+                { data: 'updated_at', name: 'updated_at' },
                 @if(auth()->user()->is('admin'))
                 { data: 'actions', searchable: false, orderable: false },
                 @endif
@@ -298,14 +300,16 @@
                     @if(isOninda()||isReseller())
                         forbidden.push(5);
                         var dateTimeColumn = 9;
+                        forbidden.push(10);
                         @if(auth()->user()->is('admin'))
-                            forbidden.push(10);
+                            forbidden.push(11);
                         @endif
                     @else
                         forbidden.push(4);
                         var dateTimeColumn = 8;
+                        forbidden.push(9);
                         @if(auth()->user()->is('admin'))
-                            forbidden.push(9);
+                            forbidden.push(10);
                         @endif
                     @endif
 

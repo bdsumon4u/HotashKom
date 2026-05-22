@@ -124,6 +124,7 @@ class OrderController extends Controller
                 return '';
             })
             ->editColumn('created_at', fn ($row): string => "<div class='text-nowrap'>".$row->created_at->format('d-M-Y').'<br>'.$row->created_at->format('h:i A').'</div>')
+            ->editColumn('updated_at', fn ($row): string => "<div class='text-nowrap'>".$row->updated_at->format('d-M-Y').'<br>'.$row->updated_at->format('h:i A').'</div>')
             ->addColumn('amount', fn ($row): int => $row->condition)
             ->editColumn('status', function ($row) {
                 $return = '<select data-id="'.$row->id.'" onchange="changeStatus" class="status-column form-control-sm">';
@@ -284,7 +285,7 @@ class OrderController extends Controller
 
                 return $actions;
             })
-            ->rawColumns(['checkbox', 'id', 'source_id', 'customer', 'products', 'status', 'courier', 'staff', 'created_at', 'actions']);
+            ->rawColumns(['checkbox', 'id', 'source_id', 'customer', 'products', 'status', 'courier', 'staff', 'created_at', 'updated_at', 'actions']);
 
         return $dt->make(true);
     }
