@@ -141,7 +141,7 @@
         <div class="container">
             <div class="product product--layout--standard" data-layout="standard">
                 <div class="product__content">
-                    <div class="xzoom-container d-flex flex-column">
+                    <div class="xzoom-container d-flex @unless(config('app.vertical_image_gallery')) flex-column @endunless">
                         <div class="original">
                             <img class="xzoom" id="xzoom-default" src="{{ asset($product->base_image->src) }}"
                                 xoriginal="{{ asset($product->base_image->src) }}" />
@@ -154,7 +154,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="mt-2 xzoom-thumbs d-flex">
+                        <div class="mt-2 xzoom-thumbs d-flex @if(config('app.vertical_image_gallery')) flex-column @endif">
                             <a href="{{ asset($product->base_image->src) }}"><img
                                     data-detail="{{ route('products.show', $product) }}"
                                     class="xzoom-gallery product-base__image" width="80"

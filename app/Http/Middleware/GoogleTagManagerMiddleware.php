@@ -26,7 +26,9 @@ class GoogleTagManagerMiddleware
         }
 
         if (! $request->is('checkout') && ! $request->is('save-checkout-progress')) {
-            Cart::instance('kart')->destroy();
+            if (config('app.order_now_is_onetime')) {
+                Cart::instance('kart')->destroy();
+            }
             Cart::instance('landing')->destroy();
             session(['kart' => 'default']);
         }

@@ -18,6 +18,10 @@ return [
 
     'coupon' => env('APP_COUPON', env('APP_ONINDA', false) && env('APP_RESELL', true)),
 
+    'vertical_image_gallery' => env('VERTICAL_IMAGE_GALLERY', false),
+
+    'order_now_is_onetime' => env('ORDER_NOW_IS_ONETIME', true),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
