@@ -460,9 +460,9 @@ class OrderController extends Controller
             'Api-Key' => $SteadFast->key,
             'Secret-Key' => $SteadFast->secret,
             'Content-Type' => 'application/json',
-        ])->post($this->base_url.'/create_order/bulk-order', json_encode([
+        ])->post($this->base_url.'/create_order/bulk-order', [
             'data' => json_encode($orders),
-        ]));
+        ]);
 
         $bodyContent = $response->getBody()->getContents();
         $data = json_decode($bodyContent, true);
