@@ -110,7 +110,7 @@ class EditOrder extends Component
 
         $report = cacheMemo()->remember(
             'courier:'.($this->order->phone ?? ''),
-            now()->addDay(),
+            now()->addWeek(),
             function () {
                 try {
                     $nextToken = function () {
