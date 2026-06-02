@@ -10,6 +10,12 @@ trait HasCart
 {
     public function addToKart(Product $product, int $quantity = 1, string $instance = 'default', $retailPrice = null)
     {
+        $redirectToCheckout = false;
+        if ($instance == 'kart' && ! config('app.order_now_is_onetime')) {
+            $redirectToCheckout = true;
+            $instance = 'default';
+        }
+
         session(['kart' => $instance]);
         if ($instance === 'landing') {
             cart()->destroy();
@@ -69,7 +75,7 @@ trait HasCart
         $this->dispatch('cartUpdated');
         $this->dispatch('notify', ['message' => 'Product added to cart']);
 
-        if ($instance !== 'default' && $instance !== 'landing') {
+        if ($redirectToCheckout || ($instance !== 'default' && $instance !== 'landing')) {
             return to_route('checkout');
         }
     }

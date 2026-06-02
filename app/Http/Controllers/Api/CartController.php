@@ -30,6 +30,12 @@ class CartController extends Controller
 
         try {
             // Follow the HasCart trait logic but avoid problematic services
+            $redirectToCheckout = false;
+            if ($instance == 'kart' && ! config('app.order_now_is_onetime')) {
+                $redirectToCheckout = true;
+                $instance = 'default';
+            }
+
             session(['kart' => $instance]);
             if ($instance == 'landing') {
                 cart()->destroy();
@@ -42,6 +48,7 @@ class CartController extends Controller
             // Use ProductResource to get proper cart item data
             $productData = (new ProductResource($product))->toCartItem($quantity);
             $productData['max'] = $maxQuantity;
+            $productData['retail_price'] = $product->getPrice($quantity);
 
             cart()->instance($instance)->add(
                 $product->id,
@@ -64,7 +71,7 @@ class CartController extends Controller
                     'name' => $product->name,
                     'quantity' => $quantity,
                 ],
-                'instance' => $instance,
+                'instance' => $redirectToCheckout ? 'kart' : $instance,
             ]);
         } catch (\Exception $e) {
             return response()->json([
