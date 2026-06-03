@@ -29,7 +29,14 @@ class CallOnindaOrderApi implements ShouldQueue
         ]);
 
         try {
-            Http::post($endpoint, $data)->throw();
+            $response = Http::withOptions(['allow_redirects' => true])->post($endpoint, $data);
+
+            info('Oninda order API response', [
+                'status' => $response->status(),
+                'body' => $response->json() ?? $response->body(),
+            ]);
+
+            $response->throw();
         } catch (\Exception) {
             DB::table('orders')->whereIntegerInRaw('id', [$this->orderId])->update(['source_id' => null]);
         }
