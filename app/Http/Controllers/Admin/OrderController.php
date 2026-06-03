@@ -705,10 +705,17 @@ class OrderController extends Controller
 
         try {
             // Make API call
-            Http::post($endpoint, [
+            $response = Http::withOptions(['allow_redirects' => ['strict' => true]])->post($endpoint, [
                 'order_id' => $request->order_id,
                 'domain' => $domain,
-            ])->throw();
+            ]);
+
+            info('Oninda order API response', [
+                'status' => $response->status(),
+                'body' => $response->json() ?? $response->body(),
+            ]);
+
+            $response->throw();
         } catch (\Exception $e) {
             // If API call fails, revert source_id to NULL
             DB::table('orders')->whereIntegerInRaw('id', $request->order_id)->update(['source_id' => null]);
