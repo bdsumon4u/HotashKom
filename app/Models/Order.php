@@ -466,7 +466,7 @@ class Order extends Model
         $exception = false;
         $cityList = cacheMemo()->remember('pathao_cities', now()->addDay(), function () use (&$exception) {
             try {
-                return Pathao::area()->city()->data;
+                return Pathao::area()->city()->data ?? [];
             } catch (\Exception $e) {
                 $exception = true;
                 // Log the error for debugging
@@ -504,7 +504,7 @@ class Order extends Model
 
             $areaList = cacheMemo()->remember('pathao_areas:'.$cityId, now()->addDay(), function () use (&$exception, &$cityId) {
                 try {
-                    return Pathao::area()->zone($cityId)->data;
+                    return Pathao::area()->zone($cityId)->data ?? [];
                 } catch (\Exception $e) {
                     $exception = true;
                     // Log the error for debugging
@@ -536,7 +536,7 @@ class Order extends Model
         $exception = false;
         $areaList = cacheMemo()->remember('redx_areas', now()->addDay(), function () use (&$exception) {
             try {
-                return Redx::area()->list()->areas;
+                return Redx::area()->list()->areas ?? [];
             } catch (\Exception) {
                 $exception = true;
 
