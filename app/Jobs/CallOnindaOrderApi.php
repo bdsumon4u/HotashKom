@@ -29,7 +29,7 @@ class CallOnindaOrderApi implements ShouldQueue
         ]);
 
         try {
-            $response = Http::withOptions(['allow_redirects' => true])->post($endpoint, $data);
+            $response = Http::withOptions(['allow_redirects' => ['strict' => true]])->post($endpoint, $data);
 
             info('Oninda order API response', [
                 'status' => $response->status(),
