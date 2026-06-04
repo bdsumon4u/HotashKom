@@ -11,9 +11,6 @@ use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -90,76 +87,10 @@ class EditOrder extends Component
 
     public $options = [];
 
-    public bool $activitiesLoaded = false;
-
-    public Collection $activities;
-
     public Collection $orderNotes;
 
     #[Validate('nullable|string|max:5000')]
     public string $adminNote = '';
-
-    public bool $courierReportLoaded = false;
-
-    public function getCourierReportProperty()
-    {
-        $expires = config('services.courier_report.expires');
-        if (! $expires || Date::parse($expires)->isPast()) {
-            return 'API Expired';
-        }
-
-        $report = cacheMemo()->remember(
-            'courier:'.($this->order->phone ?? ''),
-            now()->addWeek(),
-            function () {
-                try {
-                    $nextToken = function () {
-                        $cacheKey = 'bdcourier:token:rotating';
-                        $apiKeys = Cache::pull($cacheKey, explode('|', config('services.courier_report.key')));
-                        $ignoredKeys = Cache::get($cacheKey.':ignored', []);
-                        $effectiveKeys = array_diff($apiKeys, $ignoredKeys);
-                        if (empty($effectiveKeys)) {
-                            // If all keys are ignored, reset the ignored list and use all keys again
-                            Cache::forget($cacheKey.':ignored');
-                            $effectiveKeys = $apiKeys;
-                        }
-                        $current = array_shift($effectiveKeys);
-                        array_push($effectiveKeys, $current);
-                        Cache::put($cacheKey, $effectiveKeys, now()->addDay());
-
-                        return $current;
-                    };
-
-                    $token = $nextToken();
-                    $response = Http::retry(3, 100)
-                        ->withToken($token)
-                        // ->post('https://courierrank.com/api/dokanai/' . $this->order->phone)
-                        ->post(config('services.courier_report.url'), [
-                            'phone' => $this->order->phone ?? '',
-                        ]);
-
-                    if ($response->status() === 429) {
-                        $ignoredCacheKey = 'bdcourier:token:rotating:ignored';
-                        $ignoredKeys = Cache::get($ignoredCacheKey, []);
-                        if (! in_array($token, $ignoredKeys)) {
-                            $ignoredKeys[] = $token;
-                        }
-                        Cache::put($ignoredCacheKey, $ignoredKeys, now()->endOfDay());
-                    }
-
-                    return $response->json();
-                } catch (\Exception $e) {
-                    return $e->getMessage();
-                }
-            },
-        );
-
-        if (is_string($report)) {
-            cacheMemo()->forget('courier:'.($this->order->phone ?? ''));
-        }
-
-        return $report;
-    }
 
     protected function prepareForValidation($attributes): array
     {
@@ -174,7 +105,6 @@ class EditOrder extends Component
     {
         $this->order = $order;
         $this->fill($this->order->only($this->attrs));
-        $this->activities = collect();
         $this->orderNotes = collect();
 
         if ($this->order->exists) {
@@ -485,25 +415,6 @@ class EditOrder extends Component
         );
     }
 
-    public function loadActivities(): void
-    {
-        if ($this->activitiesLoaded) {
-            return;
-        }
-
-        $this->activities = cacheMemo()->remember(
-            'order_activities:'.$this->order->id,
-            now()->addMinutes(2),
-            fn () => $this->order
-                ->activities()
-                ->with('causer')
-                ->latest()
-                ->get()
-        );
-
-        $this->activitiesLoaded = true;
-    }
-
     public function loadOrderNotes(): void
     {
         if (! $this->order->exists) {
@@ -541,11 +452,6 @@ class EditOrder extends Component
         $this->loadOrderNotes();
 
         session()->flash('success', 'Admin note added successfully.');
-    }
-
-    public function loadCourierReport(): void
-    {
-        $this->courierReportLoaded = true;
     }
 
     public function render()
@@ -586,6 +492,8 @@ class EditOrder extends Component
         return view('livewire.edit-order', [
             'products' => $products,
             'selectedProductParents' => $selectedProductParents,
+            'pathaoCities' => collect($this->order->pathaoCityList()),
+            'pathaoAreas' => collect($this->order->pathaoAreaList($this->city_id)),
         ]);
     }
 }
