@@ -9,12 +9,16 @@
                 <div class="col-md-8">
                     <div class="card">
                         @if (request()->is('thank-you'))
+                            @if (config('app.thank_you_img'))
+                                <img width="100%" src="{{ asset(config('app.thank_you_img')) }}" alt="Thank You">
+                            @else
                             <div class="card-header">
                                 <div class="d-flex justify-content-center">
                                     <img width="100" height="100" src="{{ asset('tik-mark.png') }}" alt="Tick Mark">
                                 </div>
                                 <h4 class="text-center text-success">আপনার অর্ডারটি সাবমিট করা হয়েছে; ধন্যবাদ।</h4>
                             </div>
+                            @endif
                         @endif
                         <div class="order-header">
                             <h5 class="order-header__title">Order #{{ $order->id }}</h5>

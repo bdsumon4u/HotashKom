@@ -69,6 +69,8 @@ return [
 
     'round_robin_order_receiving' => env('ROUND_ROBIN_ORDER_RECEIVING', false),
 
+    'thank_you_img' => env('APP_THANK_YOU_IMG', null),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
