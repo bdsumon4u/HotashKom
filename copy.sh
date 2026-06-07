@@ -231,7 +231,7 @@ fi
 # RUN LARAVEL COMMANDS
 ####################################
 # Reset storage target and migrate to real public/storage directory
-rm -rf public/storage storage/app/pathao*
+rm -rf storage/app/pathao*
 
 ./php artisan key:generate --force
 ./php artisan migrate --force
