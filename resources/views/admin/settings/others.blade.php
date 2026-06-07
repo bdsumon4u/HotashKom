@@ -235,6 +235,12 @@
                         :checked="!!($show_option->show_others_orders ?? false)" />
                     <label for="show-others-orders" class="my-1">Show Other's Orders</label>
                 </div>
+                <div class="checkbox checkbox-secondary">
+                    <input type="hidden" name="show_option[email]" value="0">
+                    <x-checkbox id="show-email" name="show_option[email]" value="1"
+                        :checked="!!($show_option->email ?? false)" />
+                    <label for="show-email" class="my-1">Email Field</label>
+                </div>
             </div>
         </div>
     </div>

@@ -33,6 +33,8 @@ class Checkout extends Component
 
     public $phone = '';
 
+    public $email = '';
+
     public $shipping = '';
 
     public $address = '';
@@ -391,6 +393,7 @@ class Checkout extends Component
             if ($user->phone_number) {
                 $this->phone = Str::after($user->phone_number, '+880');
             }
+            $this->email = $user->email ?? '';
             $this->address = $user->address ?? '';
             $this->note = $user->note ?? '';
             $this->retailDiscount = $user->discount ?? 0;
@@ -398,6 +401,7 @@ class Checkout extends Component
             $this->name = Cookie::get('name', '');
             $this->shipping = Cookie::get('shipping', $shipping ?? '');
             $this->phone = Cookie::get('phone', '');
+            $this->email = Cookie::get('email', '');
             $this->address = Cookie::get('address', '');
             $this->note = Cookie::get('note', '');
             $this->retailDiscount = Cookie::get('retail_discount', 0);
@@ -429,6 +433,7 @@ class Checkout extends Component
         $validationRules = [
             'name' => 'required',
             'phone' => $hidePrefix ? 'required|regex:/^\+8801\d{9}$/' : 'required|regex:/^1\d{9}$/',
+            'email' => 'nullable|email',
             'address' => 'required',
             'note' => 'nullable',
             'shipping' => 'required',
@@ -655,6 +660,7 @@ class Checkout extends Component
         return [
             'name' => $this->name,
             'phone' => $this->phone,
+            'email' => $this->email,
             'shipping' => $this->shipping,
             'address' => $this->address,
             'note' => $this->note,

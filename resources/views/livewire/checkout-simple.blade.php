@@ -52,7 +52,18 @@
                     </div>
                     <x-error field="phone" />
                 </div>
-
+                @if (setting('show_option')->email ?? false)
+                    <div class="simple-form-group">
+                        <label class="simple-label">
+                            আপনার ইমেইল
+                        </label>
+                        <x-input type="email"
+                            name="email"
+                            wire:model="email"
+                            place-holder="আপনার ইমেইল ঠিকানা লিখুন" />
+                        <x-error field="email" />
+                    </div>
+                @endif
                 <div class="simple-form-group">
                     <label class="simple-label">
                         আপনার ঠিকানা<span class="text-danger">*</span>

@@ -25,6 +25,7 @@ class LivewireCheckoutController extends Controller
         $data = $request->validate([
             'name' => ['required'],
             'phone' => $hidePrefix ? 'required|regex:/^\+8801\d{9}$/' : 'required|regex:/^1\d{9}$/',
+            'email' => ['nullable', 'email'],
             'address' => ['required'],
             'note' => ['nullable'],
             'shipping' => ['required'],
@@ -61,6 +62,7 @@ class LivewireCheckoutController extends Controller
 
         $livewire->name = $request->input('name');
         $livewire->phone = $request->input('phone');
+        $livewire->email = $request->input('email');
         $livewire->address = $request->input('address');
         $livewire->note = $request->input('note');
         $livewire->shipping = $request->input('shipping');
