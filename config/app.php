@@ -61,6 +61,7 @@ return [
         'PAID_RETURN',
         'LOST',
         'CANCELLED',
+        'EXCHANGED',
     ],
 
     'increment' => ['PENDING', 'WAITING', 'RETURNED', 'CANCELLED', 'PAID_RETURN'],

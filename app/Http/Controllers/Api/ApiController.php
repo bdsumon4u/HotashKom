@@ -484,6 +484,8 @@ class ApiController extends Controller
             // TODO: add to stock
         } elseif ($request->event == 'order.paid-return') {
             $order->status = 'PAID_RETURN';
+        } elseif ($request->event == 'order.exchanged') {
+            $order->status = 'EXCHANGED';
         }
 
         $order->update([
