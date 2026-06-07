@@ -68,7 +68,7 @@ class HomeSection extends Model
 
         // Optimize: Select only essential fields for better performance
         $query = Product::select([
-            'id', 'name', 'slug', 'price', 'selling_price',
+            'id', 'name', 'slug', 'price', 'selling_price', 'suggested_price',
             'should_track', 'stock_count', 'is_active', 'parent_id', 'updated_at',
         ])
             ->whereIsActive(1)
