@@ -21,6 +21,7 @@ class PageController extends Controller
                 'event' => 'page_view',
                 'page_type' => 'page',
                 'content' => $page->toArray(),
+                'customer' => customer_info(),
             ]);
         }
 

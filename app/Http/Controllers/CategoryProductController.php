@@ -50,6 +50,7 @@ class CategoryProductController extends Controller
                         'quantity' => 1,
                     ])->toArray(),
                 ],
+                'customer' => customer_info(),
             ]);
         }
 

@@ -5,6 +5,7 @@ use App\Http\Middleware\ShortKodeMiddleware;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\HomeSection;
+use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
@@ -273,6 +274,30 @@ if (! function_exists('theMoney')) {
 
         return $currency.'&nbsp;<span>'.number_format($amount, $decimals).'</span>';
     }
+}
+
+function customer_info(?Order $order = null)
+{
+    $order = $order ?? new Order([
+        'name' => 'Guest User',
+        'email' => '',
+        'address' => '',
+        'phone' => '',
+        'user_id' => 0,
+    ]);
+    return [
+        'name' => $order->name,
+        'email' => $order->email,
+        'address' => $order->address,
+        'country' => 'Bangladesh',
+        'state' => 'N/A',
+        'city' => 'N/A',
+        'postal_code' => 'N/A',
+        'phone' => $order->phone,
+        'user_id' => $order->user_id,
+        'first_name' => explode(' ', $order->name, 2)[0] ?? '',
+        'last_name' => explode(' ', $order->name, 2)[1] ?? '',
+    ];
 }
 
 function bytesToHuman($bytes)

@@ -52,19 +52,7 @@ class OrderTrackController extends Controller
                         'quantity' => $product->quantity,
                     ], (array) $order->products)),
                 ],
-                'customer' => [
-                    'name' => $order->name,
-                    'email' => $order->email,
-                    'address' => $order->address,
-                    'country' => 'Bangladesh',
-                    'state' => 'N/A',
-                    'city' => 'N/A',
-                    'postal_code' => 'N/A',
-                    'phone' => $order->phone,
-                    'user_id' => $order->user_id,
-                    'first_name' => explode(' ', $order->name, 2)[0] ?? '',
-                    'last_name' => explode(' ', $order->name, 2)[1] ?? '',
-                ],
+                'customer' => customer_info($order),
             ]);
         }
 

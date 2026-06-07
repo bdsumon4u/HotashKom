@@ -27,11 +27,13 @@ class ProductController extends Controller
                 GoogleTagManagerFacade::set([
                     'event' => 'search',
                     'search_term' => $request->search,
+                    'customer' => customer_info(),
                 ]);
             } else {
                 GoogleTagManagerFacade::set([
                     'event' => 'page_view',
                     'page_type' => 'shop',
+                    'customer' => customer_info(),
                 ]);
             }
         }
@@ -134,6 +136,7 @@ class ProductController extends Controller
                         ],
                     ],
                 ],
+                'customer' => customer_info(),
             ]);
         }
 

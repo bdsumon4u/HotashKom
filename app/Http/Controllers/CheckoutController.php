@@ -30,6 +30,7 @@ class CheckoutController extends Controller
                             'quantity' => $product->qty,
                         ])->values(),
                     ],
+                    'customer' => customer_info(),
                 ]);
             }
 

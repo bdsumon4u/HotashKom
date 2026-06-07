@@ -69,6 +69,7 @@ trait HasCart
                         ],
                     ],
                 ],
+                'customer' => customer_info(),
             ]);
         }
 

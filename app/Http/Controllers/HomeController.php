@@ -21,6 +21,7 @@ class HomeController extends Controller
             GoogleTagManagerFacade::set([
                 'event' => 'page_view',
                 'page_type' => 'home',
+                'customer' => customer_info(),
             ]);
         }
 
