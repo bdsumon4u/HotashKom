@@ -178,6 +178,7 @@ class ApiController extends Controller
                 'var_name' => $product->var_name ?? $product->name,
                 'average_rating' => $averageRating,
                 'total_reviews' => $totalReviews,
+                'retail_price' => $product->retailPrice(),
             ];
         });
 
@@ -274,6 +275,7 @@ class ApiController extends Controller
 
         $collection->transform(function ($product) {
             $product->base_image_url = cdn($product->base_image?->src) ?? '/images/placeholder.jpg';
+            $product->setAttribute('retail_price', $product->retailPrice());
 
             // Calculate rating and review count from loaded relationships (avoid N+1)
             $approvedReviews = $product->reviews ?? collect();

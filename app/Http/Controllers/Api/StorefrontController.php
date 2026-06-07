@@ -3,20 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Category;
+use App\Models\HomeSection;
+use App\Models\Menu;
 use App\Models\Order;
+use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Slide;
 use App\Models\User;
-use App\Models\Admin;
-use App\Models\Page;
-use App\Models\Menu;
-use App\Models\HomeSection;
-use Illuminate\Support\Str;
-use Illuminate\Support\Arr;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class StorefrontController extends Controller
 {
@@ -104,7 +103,7 @@ class StorefrontController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('sku', 'like', "%{$searchTerm}%");
+                    ->orWhere('sku', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -157,7 +156,7 @@ class StorefrontController extends Controller
         $baseImage = $product->base_image ? asset($product->base_image->src) : ($images[0] ?? '/images/placeholder.jpg');
 
         $deliveryCharge = setting('delivery_charge');
-        
+
         $deliveryText = setting('show_option')->productwise_delivery_charge ?? false
             ? $product->delivery_text ?? setting('delivery_text')
             : setting('delivery_text');
@@ -213,7 +212,7 @@ class StorefrontController extends Controller
         $related = Product::whereIsActive(1)
             ->whereNull('parent_id')
             ->where('id', '!=', $product->id)
-            ->when(!empty($categoryIds), function ($q) use ($categoryIds) {
+            ->when(! empty($categoryIds), function ($q) use ($categoryIds) {
                 $q->whereHas('categories', function ($cq) use ($categoryIds) {
                     $cq->whereIn('categories.id', $categoryIds);
                 });
@@ -253,7 +252,9 @@ class StorefrontController extends Controller
         $subtotal = 0;
         foreach ($data['items'] as $item) {
             $product = Product::find($item['id']);
-            if (!$product) continue;
+            if (! $product) {
+                continue;
+            }
 
             $price = $product->selling_price;
             $total = $price * $item['quantity'];
@@ -282,9 +283,9 @@ class StorefrontController extends Controller
         // Format phone
         $phone = $data['phone'];
         if (Str::startsWith($phone, '01')) {
-            $phone = '+88' . $phone;
+            $phone = '+88'.$phone;
         } elseif (Str::startsWith($phone, '8801')) {
-            $phone = '+' . $phone;
+            $phone = '+'.$phone;
         }
 
         // Get or Create User
@@ -318,7 +319,7 @@ class StorefrontController extends Controller
 
         $isFraud = $oldOrders->whereIn('status', ['CANCELLED', 'RETURNED', 'PAID_RETURN'])->count() > 0;
         $isRepeat = $oldOrders->count() > 0;
-        
+
         $purchaseCost = 0;
         foreach ($orderProducts as $productItem) {
             $purchaseCost += $productItem->purchase_price * $productItem->quantity;
@@ -356,10 +357,10 @@ class StorefrontController extends Controller
                 'coupon_code' => null,
                 'purchase_cost' => $purchaseCost,
                 'city_name' => 'N/A',
-                'area_name' => 'N/A'
+                'area_name' => 'N/A',
             ],
         ]);
-        
+
         if ($admin) {
             $admin->update(['last_order_received_at' => now()]);
         }
@@ -399,6 +400,7 @@ class StorefrontController extends Controller
             'reviewsCount' => (int) ($product->totalReviews() ?? 0),
             'shortDescription' => $product->short_description,
             'description' => $product->description,
+            'retail_price' => $product->retailPrice(),
         ];
     }
 
@@ -450,10 +452,10 @@ class StorefrontController extends Controller
         if ($isSecretCode) {
             // Bypass: Use random user or create guest
             $user = User::inRandomOrder()->first();
-            if (!$user) {
+            if (! $user) {
                 $user = User::create([
-                    'name' => 'Guest User ' . rand(1000, 9999),
-                    'phone_number' => 'guest_' . rand(1000000, 9999999),
+                    'name' => 'Guest User '.rand(1000, 9999),
+                    'phone_number' => 'guest_'.rand(1000000, 9999999),
                     'password' => bcrypt(Str::random(32)),
                     'is_active' => true,
                 ]);
@@ -461,7 +463,7 @@ class StorefrontController extends Controller
         } else {
             // Normal: Validate order exists and matches phone
             $order = Order::find($data['order_id']);
-            if (!$order) {
+            if (! $order) {
                 return response()->json(['message' => 'The order ID you provided does not exist.'], 422);
             }
 
@@ -472,9 +474,9 @@ class StorefrontController extends Controller
             // Check if order contains the product
             // Assuming products is an array or json in Order model
             $orderProducts = is_array($order->products) ? $order->products : json_decode($order->products, true);
-            if (!$orderProducts || !isset($orderProducts[$product->id])) {
+            if (! $orderProducts || ! isset($orderProducts[$product->id])) {
                 // If it's a flat array of IDs
-                if (!in_array($product->id, (array)$orderProducts) && !in_array($product->id, array_keys((array)$orderProducts))) {
+                if (! in_array($product->id, (array) $orderProducts) && ! in_array($product->id, array_keys((array) $orderProducts))) {
                     return response()->json(['message' => 'This order does not contain the product you are reviewing.'], 422);
                 }
             }
@@ -508,8 +510,8 @@ class StorefrontController extends Controller
             ],
         ], $user->id);
 
-        $message = $isSecretCode 
-            ? 'Your review has been submitted and approved.' 
+        $message = $isSecretCode
+            ? 'Your review has been submitted and approved.'
             : 'Your review has been submitted and is pending approval.';
 
         return response()->json(['message' => $message]);

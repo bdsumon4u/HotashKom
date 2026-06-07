@@ -65,6 +65,7 @@
                             'discount_text' => setting('discount_text') ?? '',
                         ]) }}"
                         data-is-oninda="{{ isOninda() ? 'true' : 'false' }}"
+                        data-app-resell="{{ (app()->bound('app.resell') ? app('app.resell') : config('app.resell')) ? 'true' : 'false' }}"
                         data-guest-can-see-price="{{ (bool) (setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}"
                         data-user-guest="{{ auth('user')->guest() ? 'true' : 'false' }}"
                         data-user-verified="{{ auth('user')->check() && auth('user')->user()->is_verified ? 'true' : 'false' }}">
@@ -255,17 +256,49 @@
                 const userIsGuest = this.getUserIsGuest();
                 const userIsVerified = this.getUserIsVerified();
                 const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !userIsVerified);
+                const appResell = this.getAppResell();
 
                 let priceHTML = '';
-                if (shouldHidePrice) {
-                    priceHTML = `<span class="product-card__new-price text-danger">${
-                             userIsGuest ? 'Login to see price' : 'Verify account to see price'
-                         }</span>`;
-                } else if (hasDiscount) {
-                    priceHTML =
-                        `<span class="product-card__new-price">Tk. ${productSellingPrice}</span><span class="product-card__old-price">Tk. ${productPrice}</span>`;
+                if (isOninda && appResell) {
+                    const retailPrice = product.retail_price || Math.round(productSellingPrice * 1.4);
+                    const retailPriceHTML = `<div class="product-card__retail-price" style="margin-bottom: 2px;">
+                        <span style="color: #6b7280; font-weight: 500;">Retail price:</span>
+                        <span style="font-weight: 700; color: #111827;">Tk. ${retailPrice}</span>
+                    </div>`;
+                    let wholesalePriceHTML = '';
+
+                    if (userIsGuest) {
+                        wholesalePriceHTML = `<div class="product-card__wholesale-price">
+                            <span style="color: #6b7280; font-weight: 500;">Wholesale price:</span>
+                            <a href="{{ Route::has('auth.login') ? route('auth.login') : route('user.login') }}" style="color: #2563eb; font-weight: 700; text-decoration: none; border-bottom: 1px dashed #2563eb; padding-bottom: 1px;">Login</a>
+                        </div>`;
+                    } else if (shouldHidePrice) {
+                        wholesalePriceHTML = `<div class="product-card__wholesale-price">
+                            <span class="product-card__new-price text-danger" style="font-weight: 700; font-size: 12px;">Verify account to see price</span>
+                        </div>`;
+                    } else if (hasDiscount) {
+                        wholesalePriceHTML = `<div class="product-card__wholesale-price">
+                            <span class="product-card__new-price" style="font-weight: 700;">Tk. ${productSellingPrice}</span>
+                            <span class="product-card__old-price" style="margin-left: 4px;">Tk. ${productPrice}</span>
+                        </div>`;
+                    } else {
+                        wholesalePriceHTML = `<div class="product-card__wholesale-price">
+                            <span style="font-weight: 700; color: #111827;">Tk. ${productPrice}</span>
+                        </div>`;
+                    }
+
+                    priceHTML = `${retailPriceHTML}${wholesalePriceHTML}`;
                 } else {
-                    priceHTML = `Tk. ${productPrice}`;
+                    if (shouldHidePrice) {
+                        priceHTML = `<span class="product-card__new-price text-danger">${
+                                 userIsGuest ? 'Login to see price' : 'Verify account to see price'
+                             }</span>`;
+                    } else if (hasDiscount) {
+                        priceHTML =
+                            `<span class="product-card__new-price">Tk. ${productSellingPrice}</span><span class="product-card__old-price">Tk. ${productPrice}</span>`;
+                    } else {
+                        priceHTML = `Tk. ${productPrice}`;
+                    }
                 }
 
                 return `
@@ -292,9 +325,9 @@
                                          `<span class="text-${(product.stock_count || 0) ? 'success' : 'danger'}">${product.stock_count || 0} In Stock</span>`
                                      }
                                  </div>
-                                 <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}">
+                                  <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}" ${isOninda && appResell ? 'style="font-size: 13px; font-weight: normal; line-height: 1.5; margin-top: 4px;"' : ''}>
                                      ${priceHTML}
-                                 </div>
+                                  </div>
                                  ${buttonsHTML}
                              </div>
                          </div>
@@ -325,6 +358,12 @@
                 // Get isOninda value from the component's data attributes
                 const container = document.querySelector(`#products-container-${this.sectionId}`);
                 return container && container.dataset.isOninda === 'true';
+            },
+
+            getAppResell() {
+                // Get appResell value from the component's data attributes
+                const container = document.querySelector(`#products-container-${this.sectionId}`);
+                return container && container.dataset.appResell === 'true';
             },
 
             getGuestCanSeePrice() {

@@ -87,16 +87,38 @@
                 !$guest_can_see_price &&
                 (auth('user')->guest() || (auth('user')->check() && !auth('user')->user()->is_verified));
         @endphp
-        <div class="product-card__prices {{ $product->selling_price == $product->price ? '' : 'has-special' }}">
-            @if ($should_hide_price)
-                <span class="product-card__new-price text-danger">
-                    {{ auth('user')->guest() ? 'Login to see price' : 'Verify account to see price' }}
-                </span>
-            @elseif ($product->selling_price == $product->price)
-                {!! $product->price ? theMoney($product->price) : 'Contact for price' !!}
+        <div class="product-card__prices {{ $product->selling_price == $product->price ? '' : 'has-special' }}" style="font-size: 13px; font-weight: normal; line-height: 1.5; margin-top: 4px;">
+            @if (isOninda() && (app()->bound('app.resell') ? app('app.resell') : config('app.resell')))
+                <div class="product-card__retail-price" style="margin-bottom: 2px;">
+                    <span style="color: #6b7280; font-weight: 500;">Retail price:</span>
+                    <span style="font-weight: 700; color: #111827;">{!! theMoney($product->retailPrice()) !!}</span>
+                </div>
+                <div class="product-card__wholesale-price">
+                    @if (auth('user')->guest())
+                        <span style="color: #6b7280; font-weight: 500;">Wholesale price:</span>
+                        <a href="{{ Route::has('auth.login') ? route('auth.login') : route('user.login') }}" style="color: #2563eb; font-weight: 700; text-decoration: none; border-bottom: 1px dashed #2563eb; padding-bottom: 1px;">Login</a>
+                    @elseif ($should_hide_price)
+                        <span class="product-card__new-price text-danger" style="font-weight: 700; font-size: 12px;">
+                            Verify account to see price
+                        </span>
+                    @elseif ($product->selling_price == $product->price)
+                        <span style="font-weight: 700; color: #111827;">{!! $product->price ? theMoney($product->price) : 'Contact for price' !!}</span>
+                    @else
+                        <span class="product-card__new-price" style="font-weight: 700;">{!! theMoney($product->selling_price) !!}</span>
+                        <span class="product-card__old-price" style="margin-left: 4px;">{!! theMoney($product->price) !!}</span>
+                    @endif
+                </div>
             @else
-                <span class="product-card__new-price">{!! theMoney($product->selling_price) !!}</span>
-                <span class="product-card__old-price">{!! theMoney($product->price) !!}</span>
+                @if ($should_hide_price)
+                    <span class="product-card__new-price text-danger">
+                        {{ auth('user')->guest() ? 'Login to see price' : 'Verify account to see price' }}
+                    </span>
+                @elseif ($product->selling_price == $product->price)
+                    {!! $product->price ? theMoney($product->price) : 'Contact for price' !!}
+                @else
+                    <span class="product-card__new-price">{!! theMoney($product->selling_price) !!}</span>
+                    <span class="product-card__old-price">{!! theMoney($product->price) !!}</span>
+                @endif
             @endif
         </div>
         @if (!isOninda())
