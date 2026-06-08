@@ -497,4 +497,72 @@ class ApiController extends Controller
         return response()->json(['message' => 'Webhook processed'], 202)
             ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
     }
+
+    public function steadfastWebhook(Request $request)
+    {
+        info('steadfast headers:', $request->headers->all());
+        info('steadfast webhook:', $request->all());
+        $SteadFast = setting('SteadFast');
+        if ($request->header('Authorization') !== $SteadFast->api_key) {
+            info('steadfast webhook failed');
+
+            return response()->json(['message' => 'Webhook failed'], 401);
+        }
+
+        if ($request->notification_type != 'delivery_status') {
+            info('not delivery_status');
+
+            return response()->json(['message' => 'Webhook processed'], 202);
+        }
+
+        info('pathao webhook consignment id: '.$request->invoice_id);
+
+        if (! $order = Order::find(preg_replace('/\D/', '', $request->invoice_id))/* ->orWhere('data->consignment_id', $request->consignment_id)->first() */) {
+            info('order not found');
+
+            return response()->json(['message' => 'Webhook processed'], 202);
+        }
+
+        // $courier = $request->only([
+        //     'consignment_id',
+        //     'order_status',
+        //     'reason',
+        //     'invoice_id',
+        //     'payment_status',
+        //     'collected_amount',
+        // ]);
+        // $order->forceFill(['courier' => ['booking' => 'Pathao'] + $courier]);
+
+        info('event: '.$request->delivery_status);
+        if (in_array($request->delivery_status, ['pending'])) {
+            $order->fill([
+                'status' => 'SHIPPING',
+                'shipped_at' => now(),
+                'data' => [
+                    'consignment_id' => $request->consignment_id,
+                ],
+            ]);
+        } elseif ($request->delivery_status == 'cancelled') {
+            $order->status = 'CANCELLED';
+        } elseif ($request->delivery_status == 'delivered') {
+            $order->status = 'DELIVERED';
+        } elseif ($request->delivery_status == 'partial_delivered') {
+            $order->status = 'PARTIAL_DELIVERY';
+        } elseif ($request->delivery_status == 'paid') {
+
+        } elseif ($request->delivery_status == 'returned') {
+            $order->status = 'RETURNED';
+            // TODO: add to stock
+        } elseif ($request->delivery_status == 'paid_returned') {
+            $order->status = 'PAID_RETURN';
+        } elseif ($request->delivery_status == 'exchanged') {
+            $order->status = 'EXCHANGED';
+        }
+
+        $order->update([
+            'status_at' => now(),
+        ]);
+
+        return response()->json(['message' => 'Webhook processed'], 202);
+    }
 }

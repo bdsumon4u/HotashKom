@@ -54,6 +54,7 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
     Route::get('settings', [ApiController::class, 'settings']);
     Route::get('pending-count/{admin}', [ApiController::class, 'pendingCount']);
     Route::post('pathao-webhook', [ApiController::class, 'pathaoWebhook']);
+    Route::post('steadfast-webhook', [ApiController::class, 'steadfastWebhook']);
     Route::post('checkout', LivewireCheckoutController::class);
     Route::get('orders/{order}', [ApiController::class, 'order']);
     Route::get('resellers', ResellerController::class)->name('resellers');
