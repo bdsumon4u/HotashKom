@@ -269,8 +269,8 @@ class Product extends Model
 
             // Case A: already stored as ['quantity' => [...], 'price' => [...]]
             if (isset($data['quantity']) && isset($data['price']) && is_array($data['quantity']) && is_array($data['price'])) {
-                $quantities = array_map(fn($q) => is_numeric($q) ? (int) $q : $q, $data['quantity']);
-                $prices = array_map(fn($p) => is_null($p) ? null : (string) $p, $data['price']);
+                $quantities = array_map(fn ($q) => is_numeric($q) ? (int) $q : $q, $data['quantity']);
+                $prices = array_map(fn ($p) => is_null($p) ? null : (string) $p, $data['price']);
 
                 return [
                     'quantity' => $quantities,
@@ -279,17 +279,17 @@ class Product extends Model
             }
 
             // Case B: stored as map of quantity => price, e.g. {"500":"125","1000":"120"}
-            if (!empty($data)) {
+            if (! empty($data)) {
                 // normalize pairs and sort by numeric quantity
                 $pairs = [];
                 foreach ($data as $q => $p) {
                     $qty = is_numeric($q) ? (int) $q : $q;
                     $pairs[] = ['q' => $qty, 'p' => is_null($p) ? null : (string) $p];
                 }
-                usort($pairs, fn($a, $b) => (int)$a['q'] <=> (int)$b['q']);
+                usort($pairs, fn ($a, $b) => (int) $a['q'] <=> (int) $b['q']);
 
-                $quantities = array_map(fn($x) => $x['q'], $pairs);
-                $prices = array_map(fn($x) => $x['p'], $pairs);
+                $quantities = array_map(fn ($x) => $x['q'], $pairs);
+                $prices = array_map(fn ($x) => $x['p'], $pairs);
 
                 return [
                     'quantity' => $quantities,

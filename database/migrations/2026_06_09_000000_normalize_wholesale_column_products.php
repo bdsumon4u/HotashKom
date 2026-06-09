@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -16,7 +15,7 @@ return new class extends Migration
             foreach ($products as $product) {
                 $raw = $product->wholesale;
 
-                if (is_null($raw) || $raw === '' ) {
+                if (is_null($raw) || $raw === '') {
                     continue;
                 }
 
@@ -33,7 +32,9 @@ return new class extends Migration
                 // Case A: {'quantity': [...], 'price': [...]} -> convert
                 if (isset($decoded['quantity']) && isset($decoded['price']) && is_array($decoded['quantity']) && is_array($decoded['price'])) {
                     foreach ($decoded['quantity'] as $i => $q) {
-                        if (!isset($decoded['price'][$i])) continue;
+                        if (! isset($decoded['price'][$i])) {
+                            continue;
+                        }
                         $qty = is_numeric($q) ? (int) $q : $q;
                         $normalized[$qty] = (string) $decoded['price'][$i];
                     }
@@ -44,7 +45,10 @@ return new class extends Migration
                     // ensure all keys/values are scalar
                     $allScalar = true;
                     foreach ($decoded as $k => $v) {
-                        if (!is_scalar($k) || (!is_scalar($v) && !is_null($v))) { $allScalar = false; break; }
+                        if (! is_scalar($k) || (! is_scalar($v) && ! is_null($v))) {
+                            $allScalar = false;
+                            break;
+                        }
                     }
                     if ($allScalar) {
                         foreach ($decoded as $k => $v) {
@@ -54,7 +58,7 @@ return new class extends Migration
                     }
                 }
 
-                if (!empty($normalized)) {
+                if (! empty($normalized)) {
                     ksort($normalized);
                     DB::table('products')->where('id', $product->id)->update(['wholesale' => json_encode($normalized)]);
                 }

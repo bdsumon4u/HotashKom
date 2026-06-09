@@ -44,7 +44,7 @@
             <div>Product Code: <strong>{{ $selectedVar->sku }}</strong></div>
             <div>Availability:
                 <strong>
-                    @if(!$product->is_active)
+                    @if (!$product->is_active)
                         <span class="text-danger">Inactive</span>
                     @elseif (!$selectedVar->should_track)
                         <span class="text-success">In Stock</span>
@@ -203,7 +203,7 @@
                     $phone = strlen($phone) == 11 ? '88' . $phone : $phone;
                     $messenger = $company->messenger ?? '';
                     $whatsappMessage = rawurlencode(
-                        "Hello\r\nI am interested in ordering \"{$product->name}\".\r\n\r\n" . url()->current()
+                        "Hello\r\nI am interested in ordering \"{$product->name}\".\r\n\r\n" . url()->current(),
                     );
                     $whatsappLink = "https://api.whatsapp.com/send?phone={$phone}&text={$whatsappMessage}";
                 @endphp
@@ -214,9 +214,8 @@
                             <i class="mr-2 fab fa-facebook-messenger"></i> Messenger
                         </a>
                     @endif
-                    <a href="{{ $whatsappLink }}"
-                        rel="noopener" class="ml-1 btn btn-success d-flex align-items-center whatsapp-link"
-                        style="min-width: 140px;"
+                    <a href="{{ $whatsappLink }}" rel="noopener"
+                        class="ml-1 btn btn-success d-flex align-items-center whatsapp-link" style="min-width: 140px;"
                         data-whatsapp-url="{{ $whatsappLink }}"
                         onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
                         <i class="mr-2 fab fa-whatsapp"></i> WhatsApp
