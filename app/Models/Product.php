@@ -260,15 +260,44 @@ class Product extends Model
     protected function wholesale(): Attribute
     {
         return Attribute::make(get: function ($value) {
-            $data = json_decode((string) $value, true) ?? [];
+            $raw = json_decode((string) $value, true);
+            $data = is_array($raw) ? $raw : [];
+
             if (empty($data) && $this->parent_id) {
                 return $this->parent->wholesale;
             }
 
-            return [
-                'quantity' => array_keys($data),
-                'price' => array_values($data),
-            ];
+            // Case A: already stored as ['quantity' => [...], 'price' => [...]]
+            if (isset($data['quantity']) && isset($data['price']) && is_array($data['quantity']) && is_array($data['price'])) {
+                $quantities = array_map(fn($q) => is_numeric($q) ? (int) $q : $q, $data['quantity']);
+                $prices = array_map(fn($p) => is_null($p) ? null : (string) $p, $data['price']);
+
+                return [
+                    'quantity' => $quantities,
+                    'price' => $prices,
+                ];
+            }
+
+            // Case B: stored as map of quantity => price, e.g. {"500":"125","1000":"120"}
+            if (!empty($data)) {
+                // normalize pairs and sort by numeric quantity
+                $pairs = [];
+                foreach ($data as $q => $p) {
+                    $qty = is_numeric($q) ? (int) $q : $q;
+                    $pairs[] = ['q' => $qty, 'p' => is_null($p) ? null : (string) $p];
+                }
+                usort($pairs, fn($a, $b) => (int)$a['q'] <=> (int)$b['q']);
+
+                $quantities = array_map(fn($x) => $x['q'], $pairs);
+                $prices = array_map(fn($x) => $x['p'], $pairs);
+
+                return [
+                    'quantity' => $quantities,
+                    'price' => $prices,
+                ];
+            }
+
+            return ['quantity' => [], 'price' => []];
         }, set: function ($value) {
             $data = [];
             foreach (($value['quantity'] ?? []) as $key => $quantity) {

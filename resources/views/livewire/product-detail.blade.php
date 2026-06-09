@@ -266,7 +266,13 @@
                         </tr>
                     </tbody>
                 </table>
-                @if ($selectedVar->wholesale['quantity'])
+                @php
+                    $wholesale = $selectedVar->wholesale ?? ['quantity' => [], 'price' => []];
+                    $quantities = is_array($wholesale['quantity'] ?? null) ? $wholesale['quantity'] : [];
+                    $prices = is_array($wholesale['price'] ?? null) ? $wholesale['price'] : [];
+                @endphp
+
+                @if (!empty($quantities) && !empty($prices))
                     <div class="mt-3">
                         <table class="table table-sm table-bordered">
                             <thead>
@@ -279,10 +285,10 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($selectedVar->wholesale['price'] as $price)
+                                @foreach ($quantities as $i => $qty)
                                     <tr>
-                                        <td>{{ $selectedVar->wholesale['quantity'][$loop->index] }}</td>
-                                        <td>{!! theMoney($price) !!}</td>
+                                        <td>{{ $qty }}</td>
+                                        <td>{!! theMoney($prices[$i] ?? null) !!}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
