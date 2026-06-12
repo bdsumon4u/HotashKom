@@ -82,18 +82,21 @@ echo "SSH_KEY: $SSH_KEY"
 echo "KEY_CONTENT: $(cat $SSH_KEY)"
 
 SSH_OPTS="-T -i $SSH_KEY \
--o ControlMaster=auto \
--o ControlPersist=10m \
--o ControlPath=~/.ssh/cm-%r@%h:%p \
+-o StrictHostKeyChecking=no \
+-o UserKnownHostsFile=/dev/null \
 -o LogLevel=ERROR \
 -o Compression=yes"
 
 ssh-keyscan -H "$ssh_host" >> ~/.ssh/known_hosts 2>/dev/null || true
 
 # Transfer SSH Private Key to target
-echo "🔑 Setting up SSH key on target..."
-scp $SSH_OPTS "$SSH_KEY" "$TARGET:.ssh/"
-ssh $SSH_OPTS "$TARGET" "chmod 600 .ssh/$KEY_NAME"
+echo "🔑 Installing SSH key on target..."
+
+base64 "$SSH_KEY" | ssh $SSH_OPTS "$TARGET" "
+    mkdir -p ~/.ssh &&
+    base64 -d > ~/.ssh/$KEY_NAME &&
+    chmod 600 ~/.ssh/$KEY_NAME
+"
 
 ####################################
 # CLEAR SOURCE CACHE BEFORE COPYING
@@ -127,7 +130,6 @@ tar \
     mkdir -p storage/logs
     mkdir -p storage/debugbar
     mkdir -p bootstrap/cache
-
 "
 
 ####################################
