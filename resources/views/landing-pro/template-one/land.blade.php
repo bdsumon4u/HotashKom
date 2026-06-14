@@ -517,7 +517,7 @@
 
                 get showAddressError() {
                     const shouldValidate = this.checkout.touched.address || this.checkout.submitted;
-                    return shouldValidate && this.checkout.address.length < 10;
+                    return shouldValidate && this.checkout.address.length < 5;
                 },
 
                 get isCheckoutValid() {
