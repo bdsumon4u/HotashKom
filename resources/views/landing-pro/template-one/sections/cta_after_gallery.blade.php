@@ -3,10 +3,14 @@
         <div class="max-w-5xl p-3 mx-2 text-white bg-green-800 rounded-md md:p-6">
             <div class="flex flex-col items-center justify-between gap-5 md:flex-row">
                 <div class="text-center md:text-left">
+                    @php
+                        $galleryTitle = data_get($sections, 'cta_after_gallery.title') ?: 'ছবি দেখলেন, এখন অর্ডার করুন';
+                        $gallerySubtitle = data_get($sections, 'cta_after_gallery.subtitle') ?: 'স্টক সীমিত, অফার শেষ হওয়ার আগে অর্ডার করুন';
+                    @endphp
                     <p class="text-lg font-black md:text-2xl">
-                        {{ data_get($sections, 'cta_after_gallery.title', 'ছবি দেখলেন, এখন অর্ডার করুন') }}</p>
-                    @if (filled(data_get($sections, 'cta_after_gallery.subtitle')))
-                        <div class="mt-1 text-sm text-green-100 md:text-base">{!! data_get($sections, 'cta_after_gallery.subtitle') !!}</div>
+                        {{ $galleryTitle }}</p>
+                    @if (filled($gallerySubtitle))
+                        <div class="mt-1 text-sm text-green-100 md:text-base">{!! $gallerySubtitle !!}</div>
                     @endif
                 </div>
                 <div class="flex flex-wrap items-center justify-center gap-2">
