@@ -470,6 +470,11 @@
                                             value="{{ old('section_settings.cta_after_size_guide.title', data_get($sectionSettings, 'cta_after_size_guide.title')) }}"
                                             class="form-control" placeholder="Size matched? Place your order now.">
                                     </div>
+                                    <div class="mb-3 col-md-12">
+                                        <label>CTA Subtitle</label>
+                                        <textarea name="section_settings[cta_after_size_guide][subtitle]" rows="2" class="form-control"
+                                            placeholder="Supporting text for the size guide CTA.">{{ old('section_settings.cta_after_size_guide.subtitle', data_get($sectionSettings, 'cta_after_size_guide.subtitle')) }}</textarea>
+                                    </div>
                                 @endif
 
                                 @if ($key === 'faq')
@@ -497,6 +502,11 @@
                                         <input type="text" name="section_settings[cta_after_faq][title]"
                                             value="{{ old('section_settings.cta_after_faq.title', data_get($sectionSettings, 'cta_after_faq.title')) }}"
                                             class="form-control" placeholder="No more questions. Place your order now.">
+                                    </div>
+                                    <div class="mb-3 col-md-12">
+                                        <label>CTA Subtitle</label>
+                                        <textarea name="section_settings[cta_after_faq][subtitle]" rows="2" class="form-control"
+                                            placeholder="Supporting text for the FAQ CTA.">{{ old('section_settings.cta_after_faq.subtitle', data_get($sectionSettings, 'cta_after_faq.subtitle')) }}</textarea>
                                     </div>
                                 @endif
 

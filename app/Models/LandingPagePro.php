@@ -129,6 +129,7 @@ class LandingPagePro extends Model
             ],
             'cta_after_size_guide' => [
                 'title' => 'সাইজ মিলেছে? এখন অর্ডার করুন',
+                'subtitle' => '',
             ],
             'faq' => [
                 'title' => 'সাধারণ জিজ্ঞাসা',
@@ -141,6 +142,7 @@ class LandingPagePro extends Model
             ],
             'cta_after_faq' => [
                 'title' => 'আর প্রশ্ন নয়, অর্ডার দিন',
+                'subtitle' => '',
             ],
             'order_form' => [
                 'title' => 'পণ্য ও পরিমাণ নির্বাচন করুন',
@@ -164,9 +166,19 @@ class LandingPagePro extends Model
         ];
     }
 
+    public static function ctaSectionKeys(): array
+    {
+        return [
+            'cta_after_gallery',
+            'cta_after_video',
+            'cta_after_size_guide',
+            'cta_after_faq',
+        ];
+    }
+
     public static function defaultSectionSettings(): array
     {
-        $settings = collect(array_keys(static::sectionLabels()))
+        $settings = collect(array_merge(array_keys(static::sectionLabels()), static::ctaSectionKeys()))
             ->mapWithKeys(fn (string $section): array => [$section => ['enabled' => true]])
             ->all();
 

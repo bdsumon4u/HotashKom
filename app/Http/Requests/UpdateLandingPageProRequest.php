@@ -58,10 +58,12 @@ class UpdateLandingPageProRequest extends FormRequest
     {
         $defaults = LandingPagePro::defaultSectionSettings();
         $sectionKeys = array_keys(LandingPagePro::sectionLabels());
+        $ctaKeys = LandingPagePro::ctaSectionKeys();
+        $allKeys = array_merge($sectionKeys, $ctaKeys);
         $reorderableSectionKeys = array_keys(LandingPagePro::reorderableSectionLabels());
         $normalized = [];
 
-        foreach ($sectionKeys as $section) {
+        foreach ($allKeys as $section) {
             $config = $defaults[$section] ?? ['enabled' => true];
             $current = $raw[$section] ?? [];
             $normalized[$section] = is_array($current) ? $current : [];

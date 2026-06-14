@@ -285,6 +285,7 @@ function customer_info(?Order $order = null)
         'phone' => '',
         'user_id' => 0,
     ]);
+
     return [
         'name' => $order->name,
         'email' => $order->email,
