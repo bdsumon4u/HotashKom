@@ -112,7 +112,8 @@
             .card-header,
             .alert,
             .order-details-section,
-            .print-edit-buttons {
+            .print-edit-buttons,
+            .no-print {
                 display: none !important;
             }
             /* Hide sidebar elements that might overlap */
@@ -384,6 +385,12 @@
                                 Print Invoice
                             </button>
                         </div>
+
+                        @if (config('services.courier_report.url') && config('services.courier_report.key'))
+                            <div class="mt-4 no-print">
+                                <livewire:reseller.courier-report :order="$order" wire:key="reseller-order-courier-report-{{ $order->id }}" />
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
