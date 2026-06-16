@@ -22,6 +22,8 @@ return [
 
     'order_now_is_onetime' => env('ORDER_NOW_IS_ONETIME', true),
 
+    'only_admin_can_return_or_deliver' => env('ONLY_ADMIN_CAN_RETURN_OR_DELIVER', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

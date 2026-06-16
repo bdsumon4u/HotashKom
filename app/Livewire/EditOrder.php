@@ -327,6 +327,10 @@ class EditOrder extends Component
     {
         $this->validate();
 
+        if (isOninda() && config('app.resell') && config('app.only_admin_can_return_or_deliver') && in_array($this->status, ['RETURNED', 'DELIVERED']) && ! auth('admin')->user()?->is('admin')) {
+            return session()->flash('error', "You don't have permission to change status to {$this->status}.");
+        }
+
         if (empty($this->selectedProducts)) {
             return session()->flash('error', 'Please add products to the order.');
         }

@@ -606,6 +606,12 @@ class OrderController extends Controller
             'order_id' => ['required', 'array'],
         ]);
 
+        if (isOninda() && config('app.resell') && config('app.only_admin_can_return_or_deliver') && in_array($request->status, ['RETURNED', 'DELIVERED'])) {
+            if (! request()->user()->is('admin')) {
+                return back()->withDanger('You don\'t have permission to change status to '.$request->status.'.');
+            }
+        }
+
         $data['status'] = $request->status;
         $data['status_at'] = now()->toDateTimeString();
         if ($request->status == 'SHIPPING') {

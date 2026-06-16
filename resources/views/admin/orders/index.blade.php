@@ -78,7 +78,10 @@
 
                                                 @default
                                             @endswitch
-                                            @if ($show || true)
+                                            @php
+                                                $adminOnly = isOninda() && config('app.resell') && config('app.only_admin_can_return_or_deliver') && in_array($status, ['RETURNED', 'DELIVERED']) && !auth()->user()->is('admin');
+                                            @endphp
+                                            @if (($show || true) && !$adminOnly)
                                                 <option value="{{ $status }}">{{ $status }}</option>
                                             @endif
                                         @endforeach

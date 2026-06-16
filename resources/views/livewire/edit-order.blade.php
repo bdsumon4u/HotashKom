@@ -357,12 +357,15 @@
                             <td>
                                 <select wire:model="status" id="status" class="form-control" @disabled($order->status === 'RETURNED' || isReseller() && !is_null($order->source_id))>
                                     @foreach (config('app.orders', []) as $stat)
+                                        @php
+                                            $adminOnly = isOninda() && config('app.resell') && config('app.only_admin_can_return_or_deliver') && in_array($stat, ['RETURNED', 'DELIVERED']) && !auth('admin')->user()?->is('admin');
+                                        @endphp
                                         @if($order->status === 'DELIVERED')
-                                            <option value="{{ $stat }}" {{ $stat === 'RETURNED' ? '' : 'disabled' }}>{{ $stat }}</option>
+                                            <option value="{{ $stat }}" {{ $stat === 'RETURNED' || $adminOnly ? '' : 'disabled' }}>{{ $stat }}</option>
                                         @elseif($order->status === 'SHIPPING')
-                                            <option value="{{ $stat }}">{{ $stat }}</option>
+                                            <option value="{{ $stat }}" {{ $adminOnly ? 'disabled' : '' }}>{{ $stat }}</option>
                                         @else
-                                            <option value="{{ $stat }}" {{ $stat === 'RETURNED' ? 'disabled' : '' }}>{{ $stat }}</option>
+                                            <option value="{{ $stat }}" {{ $stat === 'RETURNED' || $adminOnly ? 'disabled' : '' }}>{{ $stat }}</option>
                                         @endif
                                     @endforeach
                                 </select>
