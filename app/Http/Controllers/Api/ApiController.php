@@ -503,7 +503,7 @@ class ApiController extends Controller
         info('steadfast headers:', $request->headers->all());
         info('steadfast webhook:', $request->all());
         $SteadFast = setting('SteadFast');
-        if ($request->header('Authorization') !== $SteadFast->api_key) {
+        if ($request->header('Authorization') !== $SteadFast->key) {
             info('steadfast webhook failed');
 
             return response()->json(['message' => 'Webhook failed'], 401);
