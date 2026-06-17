@@ -88,7 +88,7 @@ class StorefrontController extends Controller
 
         $query = Product::whereIsActive(1)
             ->whereNull('parent_id')
-            ->with(['images', 'reviews', 'categories:id,name,slug', 'brand:id,name']);
+            ->with(['images', 'reviews.ratings', 'categories:id,name,slug', 'brand:id,name']);
 
         // Filter by category slug(s)
         if ($request->category) {
@@ -146,7 +146,14 @@ class StorefrontController extends Controller
      */
     public function product(string $slug): JsonResponse
     {
-        $product = Product::with(['images', 'reviews', 'categories:id,name,slug', 'brand:id,name'])
+        $product = Product::with([
+            'images',
+            'reviews.ratings',
+            'categories:id,name,slug',
+            'brand:id,name',
+            'variations.images',
+            'variations.options.attribute',
+        ])
             ->where('slug', rawurldecode($slug))
             ->whereIsActive(1)
             ->whereNull('parent_id')
@@ -160,6 +167,47 @@ class StorefrontController extends Controller
         $deliveryText = setting('show_option')->productwise_delivery_charge ?? false
             ? $product->delivery_text ?? setting('delivery_text')
             : setting('delivery_text');
+
+        $ratingData = $this->getProductRatingData($product);
+
+        // Build attributes and variations payload (used by the frontend variation picker)
+        $optionGroup = $product->variations->pluck('options')->flatten()->unique('id')->groupBy('attribute_id');
+        $attributes = $optionGroup->keys()->map(function ($attrId) use ($optionGroup) {
+            $attr = $optionGroup->get($attrId)->first()->attribute;
+            return [
+                'id' => $attr->id,
+                'name' => $attr->name,
+                'options' => $optionGroup->get($attrId)->map(fn ($opt) => [
+                    'id' => $opt->id,
+                    'name' => $opt->name,
+                    'value' => $opt->value,
+                ])->values(),
+            ];
+        })->values();
+
+        $variations = $product->variations->map(function ($variation) {
+            $variationImages = $variation->images->isNotEmpty()
+                ? $variation->images->pluck('src')->map(fn ($src) => asset($src))->toArray()
+                : ($variation->parent?->images->pluck('src')->map(fn ($src) => asset($src))->toArray() ?? []);
+
+            $baseImage = $variation->images->first()
+                ? asset($variation->images->first()->src)
+                : (isset($variationImages[0]) ? $variationImages[0] : null);
+
+            return [
+                'id' => (string) $variation->id,
+                'name' => $variation->name,
+                'sku' => $variation->sku,
+                'slug' => $variation->slug,
+                'image' => $baseImage,
+                'images' => $variationImages,
+                'regularPrice' => (int) $variation->price,
+                'salePrice' => (int) $variation->selling_price,
+                'inStock' => $variation->should_track ? $variation->stock_count > 0 : true,
+                'stockCount' => $variation->should_track ? max(0, $variation->stock_count) : -1,
+                'optionIds' => $variation->options->pluck('id')->map(fn ($id) => (int) $id)->toArray(),
+            ];
+        })->values();
 
         return response()->json([
             'data' => [
@@ -184,13 +232,16 @@ class StorefrontController extends Controller
                 'thumbnails' => $images,
                 'inStock' => $product->should_track ? $product->stock_count > 0 : true,
                 'stockCount' => $product->should_track ? max(0, $product->stock_count) : -1,
-                'averageRating' => (float) ($product->averageRating('overall') ?? 0),
-                'reviewsCount' => (int) ($product->totalReviews() ?? 0),
+                'averageRating' => $ratingData['averageRating'],
+                'reviewsCount' => $ratingData['reviewsCount'],
                 'description' => $product->description ?? '',
                 'shortDescription' => $product->short_description ?? '',
                 'deliveryText' => $deliveryText,
                 'shippingInside' => (int) ($deliveryCharge->inside_dhaka ?? 80),
                 'shippingOutside' => (int) ($deliveryCharge->outside_dhaka ?? 150),
+                'attributes' => $attributes,
+                'variations' => $variations,
+                'hasVariations' => $product->variations->isNotEmpty(),
             ],
         ]);
     }
@@ -217,7 +268,7 @@ class StorefrontController extends Controller
                     $cq->whereIn('categories.id', $categoryIds);
                 });
             })
-            ->with(['images'])
+            ->with(['images', 'reviews.ratings'])
             ->limit(10)
             ->get()
             ->map(fn (Product $p) => $this->transformProduct($p));
@@ -240,6 +291,7 @@ class StorefrontController extends Controller
             'items' => ['required', 'array', 'min:1'],
             'items.*.id' => ['required'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.variation_id' => ['nullable'],
         ]);
 
         $deliveryCharge = setting('delivery_charge');
@@ -247,12 +299,17 @@ class StorefrontController extends Controller
             ? (float) ($deliveryCharge->inside_dhaka ?? 80)
             : (float) ($deliveryCharge->outside_dhaka ?? 150);
 
-        // Build products JSON
+        // Build products JSON. Prefer the requested variation when supplied so the
+        // ordered line item matches what the customer picked in the UI.
         $orderProducts = [];
         $subtotal = 0;
         foreach ($data['items'] as $item) {
-            $product = Product::find($item['id']);
-            if (! $product) {
+            $variationId = $item['variation_id'] ?? null;
+            $product = $variationId ? Product::find($variationId) : null;
+            if (!$product) {
+                $product = Product::find($item['id']);
+            }
+            if (!$product) {
                 continue;
             }
 
@@ -380,6 +437,7 @@ class StorefrontController extends Controller
     private function transformProduct(Product $product): array
     {
         $baseImage = $product->base_image ? asset($product->base_image->src) : '/images/placeholder.jpg';
+        $ratingData = $this->getProductRatingData($product);
 
         return [
             'id' => (string) $product->id,
@@ -396,8 +454,8 @@ class StorefrontController extends Controller
             'thumbnails' => $product->images->pluck('src')->map(fn ($src) => asset($src))->toArray(),
             'inStock' => $product->should_track ? $product->stock_count > 0 : true,
             'stockCount' => $product->should_track ? max(0, $product->stock_count) : -1,
-            'averageRating' => (float) ($product->averageRating('overall') ?? 0),
-            'reviewsCount' => (int) ($product->totalReviews() ?? 0),
+            'averageRating' => $ratingData['averageRating'],
+            'reviewsCount' => $ratingData['reviewsCount'],
             'shortDescription' => $product->short_description,
             'description' => $product->description,
             'retail_price' => $product->retailPrice(),
@@ -622,6 +680,27 @@ class StorefrontController extends Controller
             'slug' => $cat->slug,
             'image' => $cat->image_url,
             'children' => $cat->childrens ? $cat->childrens->map(fn ($child) => $this->transformCategory($child)) : [],
+        ];
+    }
+
+    /**
+     * Compute product reviews count and average rating from in-memory collection.
+     */
+    private function getProductRatingData(Product $product): array
+    {
+        $reviews = $product->reviews ?? collect();
+        $reviewsCount = $reviews->count();
+        $averageRating = 0.0;
+
+        if ($reviewsCount > 0) {
+            $reviews->loadMissing('ratings');
+            $ratings = $reviews->flatMap->ratings->where('key', 'overall');
+            $averageRating = $ratings->count() > 0 ? (float) $ratings->avg('value') : 0.0;
+        }
+
+        return [
+            'averageRating' => (float) $averageRating,
+            'reviewsCount' => (int) $reviewsCount,
         ];
     }
 }
