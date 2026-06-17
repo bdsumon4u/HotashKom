@@ -504,7 +504,10 @@ class ApiController extends Controller
         info('steadfast webhook:', $request->all());
         $SteadFast = setting('SteadFast');
         if ($request->header('Authorization') !== 'Bearer ' . $SteadFast->key) {
-            info('steadfast webhook failed');
+            info('steadfast webhook failed', [
+                'header' => $request->header('Authorization'),
+                'expected' => 'Bearer ' . $SteadFast->key,
+            ]);
 
             return response()->json(['message' => 'Webhook failed'], 401);
         }
@@ -515,7 +518,7 @@ class ApiController extends Controller
             return response()->json(['message' => 'Webhook processed'], 202);
         }
 
-        info('pathao webhook consignment id: '.$request->invoice_id);
+        info('steadfast webhook consignment id: '.$request->invoice_id);
 
         if (! $order = Order::find(preg_replace('/\D/', '', $request->invoice_id))/* ->orWhere('data->consignment_id', $request->consignment_id)->first() */) {
             info('order not found');
