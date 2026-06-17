@@ -521,7 +521,7 @@ class ApiController extends Controller
         $invoice = (int) preg_replace('/\D/', '', $request->invoice);
         info('steadfast webhook invoice id: '.$invoice);
 
-        if (! $order = Order::where('id', $invoice)->orWhere('consignment_id', $request->consignment_id)->first()) {
+        if (! $order = Order::where('id', $invoice)->first()) {
             info('order not found');
 
             return response()->json(['message' => 'Webhook processed'], 202);
