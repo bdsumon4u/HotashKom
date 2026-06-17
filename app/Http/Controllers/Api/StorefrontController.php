@@ -319,7 +319,7 @@ class StorefrontController extends Controller
 
             $orderProducts[$product->id] = (object) [
                 'id' => $product->id,
-                'name' => $product->name,
+                'name' => $product->varName, // "Parent Name [Variation Name]" for variations, else product name
                 'slug' => $product->slug,
                 'image' => $product->base_image?->src ?? '',
                 'price' => $price,
