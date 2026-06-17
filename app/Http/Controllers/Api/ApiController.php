@@ -521,7 +521,7 @@ class ApiController extends Controller
         $invoice = (int) preg_replace('/\D/', '', $request->invoice);
         info('steadfast webhook invoice id: '.$invoice);
 
-        if (! $order = Order::find($invoice)) {
+        if (! $order = Order::where('id', $invoice)->orWhere('consignment_id', $request->consignment_id)->first()) {
             info('order not found');
 
             return response()->json(['message' => 'Webhook processed'], 202);
@@ -537,8 +537,8 @@ class ApiController extends Controller
         // ]);
         // $order->forceFill(['courier' => ['booking' => 'Pathao'] + $courier]);
 
-        info('event: '.$request->delivery_status);
-        if (in_array($request->delivery_status, ['pending'])) {
+        info('event: '.$request->status);
+        if (in_array($request->status, ['pending'])) {
             $order->fill([
                 'status' => 'SHIPPING',
                 'shipped_at' => now(),
@@ -546,20 +546,20 @@ class ApiController extends Controller
                     'consignment_id' => $request->consignment_id,
                 ],
             ]);
-        } elseif ($request->delivery_status == 'cancelled') {
+        } elseif ($request->status == 'cancelled') {
             $order->status = 'CANCELLED';
-        } elseif ($request->delivery_status == 'delivered') {
+        } elseif ($request->status == 'delivered') {
             $order->status = 'DELIVERED';
-        } elseif ($request->delivery_status == 'partial_delivered') {
+        } elseif ($request->status == 'partial_delivered') {
             $order->status = 'PARTIAL_DELIVERY';
-        } elseif ($request->delivery_status == 'paid') {
+        } elseif ($request->status == 'paid') {
 
-        } elseif ($request->delivery_status == 'returned') {
+        } elseif ($request->status == 'returned') {
             $order->status = 'RETURNED';
             // TODO: add to stock
-        } elseif ($request->delivery_status == 'paid_returned') {
+        } elseif ($request->status == 'paid_returned') {
             $order->status = 'PAID_RETURN';
-        } elseif ($request->delivery_status == 'exchanged') {
+        } elseif ($request->status == 'exchanged') {
             $order->status = 'EXCHANGED';
         }
 
