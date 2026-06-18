@@ -101,7 +101,7 @@ class HomeController extends Controller
 
         $inactiveProductsQuery = Product::whereIsActive(0)->whereNull('parent_id');
         $inactiveProductsCount = (clone $inactiveProductsQuery)->count();
-        $inactiveProducts = $inactiveProductsCount > 20
+        $inactiveProducts = $inactiveProductsCount > 15
             ? $inactiveProductsQuery->get()
             : cacheMemo()->remember('admin_inactive_products', now()->addMinutes(5), fn () => $inactiveProductsQuery->get());
 
