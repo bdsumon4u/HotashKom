@@ -325,7 +325,9 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @php($retail += (float) $amount)
+                            @php
+                                $retail += (float) $amount;
+                            @endphp
                             @endforeach
                         </tbody>
                     </table>
