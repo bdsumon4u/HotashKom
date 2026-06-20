@@ -303,11 +303,18 @@ class StorefrontController extends Controller
         // ordered line item matches what the customer picked in the UI.
         $orderProducts = [];
         $subtotal = 0;
+
+        $variationIds = collect($data['items'])->pluck('variation_id')->filter()->unique()->toArray();
+        $productIds = collect($data['items'])->pluck('id')->filter()->unique()->toArray();
+
+        $variations = empty($variationIds) ? collect() : Product::with(['parent.categories'])->whereIn('id', $variationIds)->get()->keyBy('id');
+        $products = empty($productIds) ? collect() : Product::with(['categories'])->whereIn('id', $productIds)->get()->keyBy('id');
+
         foreach ($data['items'] as $item) {
             $variationId = $item['variation_id'] ?? null;
-            $product = $variationId ? Product::find($variationId) : null;
+            $product = $variationId ? $variations->get($variationId) : null;
             if (!$product) {
-                $product = Product::find($item['id']);
+                $product = $products->get($item['id']);
             }
             if (!$product) {
                 continue;

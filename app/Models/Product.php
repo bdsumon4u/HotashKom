@@ -155,7 +155,13 @@ class Product extends Model
                 return $this->name;
             }
 
-            return $this->parent->name.' ['.$this->name.']';
+            $parentName = $this->parent?->name;
+            if (!$parentName) {
+                $parent = Product::withoutGlobalScopes()->find($this->parent_id);
+                $parentName = $parent?->name;
+            }
+
+            return $parentName ? $parentName.' ['.$this->name.']' : $this->name;
         });
     }
 
