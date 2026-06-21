@@ -2,8 +2,10 @@
 
 namespace App\Http\CacheProfiles;
 
+use DateTime;
 use Illuminate\Http\Request;
 use Spatie\ResponseCache\CacheProfiles\BaseCacheProfile;
+use Symfony\Component\HttpFoundation\Response;
 
 class StorefrontCacheProfile extends BaseCacheProfile
 {
@@ -17,30 +19,38 @@ class StorefrontCacheProfile extends BaseCacheProfile
     }
 
     /**
+     * Determine if the response should be cached based on its status code.
+     * Only successful responses should be cached.
+     */
+    public function shouldCacheResponse(Response $response): bool
+    {
+        return $response->isSuccessful();
+    }
+
+    /**
      * Return the time in seconds the given request should be cached.
      */
     public function cacheLifetime(Request $request): int
     {
-        // Cache product detail for 5 minutes (300 seconds)
-        // Cache listings for 2 minutes (120 seconds)
+        // Cache product detail for 10 minutes
         if (str_contains($request->path(), 'products/') && ! str_contains($request->path(), 'related')) {
             return 600;
         }
 
+        // Cache related products and reviews for 10 minutes
         if (str_contains($request->path(), 'related') || str_contains($request->path(), 'reviews')) {
             return 600;
         }
 
-        // Default: cache other storefront endpoints for 2 minutes
+        // Default: cache other storefront endpoints for 5 minutes
         return 300;
     }
 
     /**
-     * Determine if the cache should be used for the given request.
-     * This prevents caching when the user is logged in (for admin actions).
+     * Override cacheRequestUntil to use our dynamic cacheLifetime per-request.
      */
-    public function shouldUseCache(Request $request): bool
+    public function cacheRequestUntil(Request $request): DateTime
     {
-        return ! $request->user();
+        return now()->addSeconds($this->cacheLifetime($request));
     }
 }
