@@ -25,7 +25,7 @@ class StorefrontController extends Controller
      */
     public function settings(): JsonResponse
     {
-        $keys = ['company', 'logo', 'social', 'delivery_charge', 'free_delivery', 'scroll_text', 'call_for_order'];
+        $keys = ['company', 'logo', 'social', 'delivery_charge', 'free_delivery', 'scroll_text', 'call_for_order', 'gtm_id', 'pixel_ids'];
         $settings = Setting::whereIn('name', $keys)->get(['name', 'value'])->pluck('value', 'name');
 
         return response()->json([
@@ -174,6 +174,7 @@ class StorefrontController extends Controller
         $optionGroup = $product->variations->pluck('options')->flatten()->unique('id')->groupBy('attribute_id');
         $attributes = $optionGroup->keys()->map(function ($attrId) use ($optionGroup) {
             $attr = $optionGroup->get($attrId)->first()->attribute;
+
             return [
                 'id' => $attr->id,
                 'name' => $attr->name,
@@ -313,10 +314,10 @@ class StorefrontController extends Controller
         foreach ($data['items'] as $item) {
             $variationId = $item['variation_id'] ?? null;
             $product = $variationId ? $variations->get($variationId) : null;
-            if (!$product) {
+            if (! $product) {
                 $product = $products->get($item['id']);
             }
-            if (!$product) {
+            if (! $product) {
                 continue;
             }
 
