@@ -65,7 +65,7 @@ Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): v
         ->name('api.reseller.orders.place');
 
     // Storefront API (for Stylon Next.js frontend)
-    Route::prefix('storefront')->name('storefront.')->group(function (): void {
+    Route::prefix('storefront')->name('storefront.')->middleware('response.cache')->group(function (): void {
         Route::get('settings', [StorefrontController::class, 'settings'])->name('settings');
         Route::get('slides', [StorefrontController::class, 'slides'])->name('slides');
         Route::get('categories', [StorefrontController::class, 'categories'])->name('categories');
