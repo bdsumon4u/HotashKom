@@ -199,6 +199,21 @@ final class ResellerController extends Controller
                         }
                     }
 
+                    $courierName = $order->data['courier'] ?? 'Other';
+                    $courierHtml = '<div>'.$courierName.'</div>';
+                    if ($courierName === 'Pathao') {
+                        $courierHtml .= '<div style="white-space: nowrap;">City: '.($order->data['city_name'] ?? '<strong class="text-danger">N/A</strong>').'</div>';
+                        $courierHtml .= '<div style="white-space: nowrap;">Area: '.($order->data['area_name'] ?? '<strong class="text-danger">N/A</strong>').'</div>';
+                        $courierHtml .= '<div style="white-space: nowrap;">Weight: '.($order->data['weight'] ?? '0.5').' kg</div>';
+                    } elseif ($courierName === 'Redx') {
+                        $courierHtml .= '<div style="white-space: nowrap;">Area: '.($order->data['area_name'] ?? '<strong class="text-danger">N/A</strong>').'</div>';
+                        $courierHtml .= '<div style="white-space: nowrap;">Weight: '.($order->data['weight'] ?? '500').' gm</div>';
+                    }
+
+                    if ($consignmentId) {
+                        $courierHtml .= '<div style="white-space: nowrap;">C.ID: <a href="'.$trackingUrl.'" target="_blank">'.$consignmentId.'</a></div>';
+                    }
+
                     return [
                         'id' => $order->id,
                         'created_at' => $order->created_at->format('d-M-Y h:i A'),
@@ -207,6 +222,7 @@ final class ResellerController extends Controller
                         'consignment_id' => $consignmentId,
                         'tracking_url' => $trackingUrl,
                         'status' => $order->status,
+                        'courier' => $courierHtml,
                         'subtotal' => theMoney($subtotal),
                         'total' => theMoney($total),
                         'actions' => $order->id, // Pass order ID for actions column
