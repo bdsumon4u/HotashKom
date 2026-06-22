@@ -10,7 +10,6 @@ use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\ResellerController;
 use App\Http\Controllers\Api\ResellerOrderController;
 use App\Http\Controllers\Api\StorefrontController;
-use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['as' => 'api.', 'middleware' => HandleCors::class], function (): void {
+Route::group(['as' => 'api.'], function (): void {
     Route::get('products', ProductController::class)->name('products');
     Route::get('images', [ImageController::class, 'index'])->name('images.index');
     Route::get('images/single', [ImageController::class, 'single'])->name('images.single');

@@ -6,6 +6,7 @@ use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Spatie\ResponseCache\Middlewares\CacheResponse;
@@ -26,6 +27,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             EnsureSpaResponse::class,
+        ]);
+
+        // Apply CORS to ALL API routes so cross-origin requests from the
+        // Next.js frontend are not blocked by the browser. CORS is configured
+        // in config/cors.php (paths: ['*'], allowed_origins: ['*']).
+        $middleware->api(prepend: [
+            HandleCors::class,
         ]);
 
         $middleware->alias([
