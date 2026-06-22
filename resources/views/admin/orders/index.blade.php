@@ -406,14 +406,20 @@
                                     $(input).val('');
                                 }
                             } else {
+                                var delayTimer;
                                 $(input).appendTo($(th))
-                                    .on('change', function() {
-                                        if (i) {
-                                            column.search($(this).val(), false, false, true).draw();
-                                        } else {
-                                            column.search('^' + (this.value.length ? this.value :
-                                                '.*') + '$', true, false).draw();
-                                        }
+                                    .on('keyup paste', function() {
+                                        var self = this;
+                                        clearTimeout(delayTimer);
+                                        delayTimer = setTimeout(function() {
+                                            var val = self.value;
+                                            if (i) {
+                                                column.search(val, false, false, true).draw();
+                                            } else {
+                                                column.search('^' + (val.length ? val :
+                                                    '.*') + '$', true, false).draw();
+                                            }
+                                        }, 350);
                                     });
                             }
                         }
