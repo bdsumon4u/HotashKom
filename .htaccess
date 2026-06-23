@@ -3,7 +3,7 @@
         Options -MultiViews
     </IfModule>
 
-    <FilesMatch "\.(eot|otf|ttf|woff|woff2)$">
+    <FilesMatch "\.(eot|otf|ttf|woff|woff2|jpg|jpeg|png|gif|webp|svg|ico)$">
         Header always set Access-Control-Allow-Origin "*"
     </FilesMatch>
 

@@ -62,8 +62,8 @@
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
 
-    # Enable CORS for fonts
-    <FilesMatch "\.(eot|otf|ttf|woff|woff2)$">
+    # Enable CORS for fonts and images
+    <FilesMatch "\.(eot|otf|ttf|woff|woff2|jpg|jpeg|png|gif|webp|svg|ico)$">
         Header set Access-Control-Allow-Origin "*"
     </FilesMatch>
 </IfModule>
