@@ -1020,6 +1020,31 @@
         </a>
     @endif
     {{-- WhatsApp handlers moved to external file: strokya/js/whatsapp-handlers.js --}}
+    @if (config('app.unregister_sw'))
+        <script data-navigate-once>
+            (async () => {\
+                try {
+                    // Unregister all service workers
+                    if ('serviceWorker' in navigator) {
+                        const registrations = await navigator.serviceWorker.getRegistrations();
+                        for (const registration of registrations) {
+                            await registration.unregister();
+                        }
+                    }
+
+                    // Delete all Cache Storage caches
+                    if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        for (const cacheName of cacheNames) {
+                            await caches.delete(cacheName);
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Service worker unregistration failed:', error);
+                }
+            })();
+        </script>
+    @endif
     {{-- Facebook events moved to external file: strokya/js/facebook-events.js --}}
     {{-- xzoom click handler moved to: strokya/js/product-gallery.js --}}
 </body>
