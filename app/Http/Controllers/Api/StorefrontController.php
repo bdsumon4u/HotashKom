@@ -711,4 +711,114 @@ class StorefrontController extends Controller
             'reviewsCount' => (int) $reviewsCount,
         ];
     }
+
+    /**
+     * POST /api/storefront/save-checkout-progress
+     * Saves partial checkout progress from the frontend.
+     */
+    public function saveCheckoutProgress(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['nullable', 'string', 'max:255'],
+            'phone' => ['required', 'string'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'note' => ['nullable', 'string', 'max:1000'],
+            'items' => ['required', 'array'],
+            'items.*.id' => ['required'],
+            'items.*.quantity' => ['required', 'integer', 'min:1'],
+            'items.*.variation_id' => ['nullable'],
+        ]);
+
+        $phone = $data['phone'];
+        if (Str::startsWith($phone, '01')) {
+            $phone = '+88'.$phone;
+        } elseif (Str::startsWith($phone, '1')) {
+            $phone = '+880'.$phone;
+        }
+
+        if (strlen($phone) != 14) {
+            return response()->json(['message' => 'Invalid phone number.'], 422);
+        }
+
+        $items = $data['items'];
+        $cartContent = collect();
+
+        if (!empty($items)) {
+            $variationIds = collect($items)->pluck('variation_id')->filter()->unique()->toArray();
+            $productIds = collect($items)->pluck('id')->filter()->unique()->toArray();
+
+            $variations = empty($variationIds) ? collect() : Product::with(['parent.categories', 'base_image', 'images'])->whereIn('id', $variationIds)->get()->keyBy('id');
+            $products = empty($productIds) ? collect() : Product::with(['categories', 'base_image', 'images'])->whereIn('id', $productIds)->get()->keyBy('id');
+
+            foreach ($items as $item) {
+                $variationId = $item['variation_id'] ?? null;
+                $product = $variationId ? $variations->get($variationId) : null;
+                if (! $product) {
+                    $product = $products->get($item['id']);
+                }
+                if (! $product) {
+                    continue;
+                }
+
+                $price = $product->selling_price;
+                $slug = $product->slug;
+                
+                // Base image resolution
+                $imageSrc = '';
+                if ($product->base_image) {
+                    $imageSrc = $product->base_image->src;
+                } elseif ($product->parent && $product->parent->base_image) {
+                    $imageSrc = $product->parent->base_image->src;
+                } elseif ($product->images->isNotEmpty()) {
+                    $imageSrc = $product->images->first()->src;
+                } elseif ($product->parent && $product->parent->images->isNotEmpty()) {
+                    $imageSrc = $product->parent->images->first()->src;
+                }
+
+                // Construct a stdClass to match Azmolla/Shoppingcart CartItem fields
+                $cartItem = new \stdClass();
+                $cartItem->id = $product->id;
+                $cartItem->name = $product->varName; // Uses Parent [Variation] name
+                $cartItem->qty = $item['quantity'];
+                $cartItem->price = $price;
+                
+                $options = new \stdClass();
+                $options->slug = $slug;
+                $options->image = $imageSrc;
+                $cartItem->options = $options;
+
+                $cartContent->put($product->id, $cartItem);
+            }
+        }
+
+        if ($cartContent->isEmpty()) {
+            return response()->json(['message' => 'Cart is empty.'], 400);
+        }
+
+        $identifier = 'api_' . str_replace('+', '', $phone);
+        $instance = 'default';
+
+        \Illuminate\Support\Facades\DB::table('shopping_cart')->updateOrInsert(
+            [
+                'identifier' => $identifier,
+                'instance' => $instance,
+            ],
+            [
+                'name' => $data['name'] ?? '',
+                'phone' => $phone,
+                'address' => $data['address'] ?? null,
+                'content' => serialize($cartContent),
+                'updated_at' => now(),
+            ]
+        );
+
+        // Clean up any other carts with the same phone number to avoid duplicates
+        \Illuminate\Support\Facades\DB::table('shopping_cart')
+            ->where('phone', $phone)
+            ->where('instance', $instance)
+            ->where('identifier', '!=', $identifier)
+            ->delete();
+
+        return response()->json(['message' => 'Progress saved successfully.']);
+    }
 }

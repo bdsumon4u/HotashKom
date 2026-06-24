@@ -75,7 +75,7 @@ Route::group(['as' => 'api.'], function (): void {
         Route::get('products/{product:slug}/reviews', [StorefrontController::class, 'reviews'])->name('product.reviews');
         Route::post('products/{product:slug}/reviews', [StorefrontController::class, 'submitReview'])->name('product.reviews.store');
         Route::post('checkout', [StorefrontController::class, 'checkout'])->name('checkout');
-        Route::post('save-checkout-progress', [\App\Http\Controllers\ApiController::class, 'saveCheckoutProgress'])->name('save-checkout-progress');
+        Route::post('save-checkout-progress', [StorefrontController::class, 'saveCheckoutProgress'])->name('save-checkout-progress');
         Route::get('pages/{slug}', [StorefrontController::class, 'page'])->name('page');
         Route::get('menus', [StorefrontController::class, 'menus'])->name('menus');
         Route::get('home-sections', [StorefrontController::class, 'homeSections'])->name('home-sections');
