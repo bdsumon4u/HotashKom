@@ -747,8 +747,12 @@ class StorefrontController extends Controller
             $variationIds = collect($items)->pluck('variation_id')->filter()->unique()->toArray();
             $productIds = collect($items)->pluck('id')->filter()->unique()->toArray();
 
-            $variations = empty($variationIds) ? collect() : Product::with(['parent.categories', 'base_image', 'images'])->whereIn('id', $variationIds)->get()->keyBy('id');
-            $products = empty($productIds) ? collect() : Product::with(['categories', 'base_image', 'images'])->whereIn('id', $productIds)->get()->keyBy('id');
+            $variations = empty($variationIds) ? collect() : Product::with(['parent.categories', 'images' => function ($query) {
+                $query->wherePivot('img_type', 'base')->limit(1);
+            }])->whereIn('id', $variationIds)->get()->keyBy('id');
+            $products = empty($productIds) ? collect() : Product::with(['categories', 'images' => function ($query) {
+                $query->wherePivot('img_type', 'base')->limit(1);
+            }])->whereIn('id', $productIds)->get()->keyBy('id');
 
             foreach ($items as $item) {
                 $variationId = $item['variation_id'] ?? null;
