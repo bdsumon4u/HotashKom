@@ -72,17 +72,8 @@
                             }
                         },
                     }" class="pr-md-1 col-lg-3 col-md-4 w-100 position-relative">
-                        <div x-show="!loaded" class="p-3 mb-4 bg-white rounded border filter-sidebar placeholder-glow"
-                            style="min-height: 420px;">
-                            <div class="mb-3 d-flex justify-content-between align-items-center">
-                                <div class="placeholder w-50" style="height: 24px;"></div>
-                                <div class="rounded-circle placeholder" style="width: 24px; height: 24px;"></div>
-                            </div>
-                            <div class="mb-2 placeholder w-75" style="height: 18px;"></div>
-                            <div class="mb-2 placeholder w-100" style="height: 18px;"></div>
-                            <div class="mb-2 w-60 placeholder" style="height: 18px;"></div>
-                            <div class="mb-2 w-80 placeholder" style="height: 18px;"></div>
-                            <div class="mb-2 placeholder w-50" style="height: 18px;"></div>
+                        <div x-show="!loaded" class="p-3 mb-4 bg-white rounded border filter-sidebar placeholder-glow">
+                        
                         </div>
 
                         <div :class="{ 'invisible': !loaded }">
