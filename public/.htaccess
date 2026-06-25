@@ -66,6 +66,12 @@
     <FilesMatch "\.(eot|otf|ttf|woff|woff2|jpg|jpeg|png|gif|webp|svg|ico)$">
         Header set Access-Control-Allow-Origin "*"
     </FilesMatch>
+
+    # Unset duplicate/malformed reporting headers to resolve browser console warnings
+    Header always unset Report-To
+    Header always unset Reporting-Endpoints
+    Header unset Report-To
+    Header unset Reporting-Endpoints
 </IfModule>
 
 # Compression

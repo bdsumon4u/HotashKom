@@ -27,6 +27,14 @@
     RewriteRule ^ public/index.php [L]
 </IfModule>
 
+<IfModule mod_headers.c>
+    # Unset duplicate/malformed reporting headers to resolve browser console warnings
+    Header always unset Report-To
+    Header always unset Reporting-Endpoints
+    Header unset Report-To
+    Header unset Reporting-Endpoints
+</IfModule>
+
 # BEGIN cPanel-generated php ini directives
 <IfModule php_module>
     php_flag display_errors On
