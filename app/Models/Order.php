@@ -255,6 +255,16 @@ class Order extends Model
         );
     }
 
+    protected function isFreeDelivery(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => (bool) ($this->data['isFreeDelivery'] ?? false),
+            set: fn (bool $value): array => [
+                'data' => json_encode(array_merge($this->data ?? [], ['isFreeDelivery' => $value])),
+            ],
+        );
+    }
+
     protected function barcode(): Attribute
     {
         $pad = str_pad($this->id, 10, '0', STR_PAD_LEFT);
