@@ -9,7 +9,8 @@
 
     RewriteEngine On
 
-    # Force WWW
+    # Force WWW except for API routes
+    RewriteCond %{REQUEST_URI} !^/api/ [NC]
     RewriteCond %{HTTP_HOST} !^www\. [NC]
     RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
 

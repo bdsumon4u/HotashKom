@@ -29,12 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             EnsureSpaResponse::class,
         ]);
 
-        // Apply CORS to ALL API routes so cross-origin requests from the
-        // Next.js frontend are not blocked by the browser. CORS is configured
-        // in config/cors.php (paths: ['*'], allowed_origins: ['*']).
-        $middleware->api(prepend: [
-            HandleCors::class,
-        ]);
+
 
         $middleware->alias([
             'auth' => Authenticate::class,

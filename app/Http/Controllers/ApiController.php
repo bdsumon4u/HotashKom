@@ -19,7 +19,15 @@ class ApiController extends Controller
 
     public function saveCheckoutProgress(Request $request): void
     {
-        foreach ($data = $request->json()->all() as $field => $value) {
+        $data = $request->json()->all();
+        if (empty($data) && !empty($request->getContent())) {
+            $decoded = json_decode($request->getContent(), true);
+            if (is_array($decoded)) {
+                $data = $decoded;
+            }
+        }
+
+        foreach ($data as $field => $value) {
             longCookie($field, $value);
         }
 

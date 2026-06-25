@@ -718,6 +718,13 @@ class StorefrontController extends Controller
      */
     public function saveCheckoutProgress(Request $request): JsonResponse
     {
+        if (empty($request->all()) && !empty($request->getContent())) {
+            $json = json_decode($request->getContent(), true);
+            if (is_array($json)) {
+                $request->merge($json);
+            }
+        }
+
         $data = $request->validate([
             'name' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'string'],
