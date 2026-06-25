@@ -43,11 +43,12 @@ class OrderController extends Controller
         $hasSearch = ! empty($request->input('search.value'));
 
         // Check if any column has a search value
-        $columns = ['id', 'customer']; // id and customer columns
-        foreach ($columns as $column) {
-            if (! empty($column['search']['value'] ?? '')) {
-                $hasSearch = true;
-                break;
+        if (is_array($request->input('columns'))) {
+            foreach ($request->input('columns') as $column) {
+                if (! empty($column['search']['value'] ?? '')) {
+                    $hasSearch = true;
+                    break;
+                }
             }
         }
 
@@ -85,7 +86,15 @@ class OrderController extends Controller
 
         if (isOninda()) {
             $orders->leftJoin('users', 'orders.user_id', '=', 'users.id')
-                ->select('orders.*', 'users.domain', 'users.shop_name', 'users.order_prefix');
+                ->select([
+                    'orders.*',
+                    'users.domain',
+                    'users.shop_name',
+                    'users.order_prefix',
+                    'users.name as reseller_name',
+                    'users.phone_number as reseller_phone',
+                    'users.email as reseller_email',
+                ]);
         }
 
         $salesmans = Admin::where('role_id', Admin::SALESMAN)->get(['id', 'name'])->pluck('name', 'id');
@@ -136,6 +145,22 @@ class OrderController extends Controller
                 return $return.'</select>';
             })
             ->addColumn('checkbox', fn ($row): string => '<input type="checkbox" class="form-control" name="order_id[]" value="'.$row->id.'" '.$this->isDisabled($row).' style="min-height: 20px;min-width: 20px;max-height: 20px;max-width: 20px;">')
+            ->editColumn('reseller', function ($row): string {
+                if ($row->user_id && $row->reseller_name) {
+                    $resellerPhone = $row->reseller_phone ? without88($row->reseller_phone) : '';
+                    $phoneHtml = $resellerPhone ? "<div style='white-space:nowrap;'><i class='mr-1 fa fa-phone'></i><a href='tel:{$row->reseller_phone}'>{$resellerPhone}</a></div>" : '';
+                    $shopHtml = $row->shop_name ? "<div style='white-space:nowrap;'><i class='mr-1 fa fa-shopping-bag'></i>".e($row->shop_name).'</div>' : '';
+
+                    return "
+                        <div>
+                            <div style='white-space:nowrap;'><i class='mr-1 fa fa-user'></i>".e($row->reseller_name)."</div>
+                            {$shopHtml}
+                            {$phoneHtml}
+                        </div>";
+                }
+
+                return '';
+            })
             ->editColumn('customer', function ($row): string {
                 $customerNote = $row->note
                     ? "<div class='text-danger'><i class='mr-1 fa fa-sticky-note-o'></i>".e($row->note).'</div>'
@@ -219,6 +244,13 @@ class OrderController extends Controller
 
                 return $return.'<div style="white-space: nowrap; display: none;">Tracking Code: <a href="https://www.steadfast.com.bd/?tracking_code=" target="_blank"></a></div>';
             })
+            ->filterColumn('reseller', function ($query, $keyword): void {
+                $query->where(function ($q) use ($keyword): void {
+                    $q->where('users.name', 'like', '%'.$keyword.'%')
+                        ->orWhere('users.shop_name', 'like', '%'.$keyword.'%')
+                        ->orWhere('users.phone_number', 'like', '%'.$keyword.'%');
+                });
+            })
             ->filterColumn('customer', function ($query, $keyword): void {
                 $query->where(function ($q) use ($keyword): void {
                     $q->where('orders.name', 'like', '%'.$keyword.'%')
@@ -280,12 +312,16 @@ class OrderController extends Controller
                 $actions = '<div class="btn-group">';
                 // if (isOninda() || ! $order->source_id) { // allow for every platform
                 $actions .= '<a href="'.route('admin.orders.destroy', $order).'" data-action="delete" class="btn btn-sm btn-danger">Delete</a>';
-                // }
                 $actions .= '</div>';
 
                 return $actions;
-            })
-            ->rawColumns(['checkbox', 'id', 'source_id', 'customer', 'products', 'status', 'courier', 'staff', 'created_at', 'updated_at', 'actions']);
+            });
+        $rawColumns = ['checkbox', 'id', 'source_id', 'customer', 'products', 'status', 'courier', 'staff', 'created_at', 'updated_at', 'actions'];
+        if (isOninda() && config('app.resell')) {
+            $rawColumns[] = 'reseller';
+        }
+
+        $dt = $dt->rawColumns($rawColumns);
 
         return $dt->make(true);
     }

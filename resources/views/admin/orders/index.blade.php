@@ -142,6 +142,9 @@
                                         @if (isOninda() || isReseller())
                                             <th width="80">Source</th>
                                         @endif
+                                        @if (isOninda() && config('app.resell'))
+                                            <th style="min-width: 150px; max-width: 250px;">Reseller</th>
+                                        @endif
                                         <th style="min-width: 150px; max-width: 250px;">Customer</th>
                                         <th style="min-width: 250px; max-width: 350px;">Products</th>
                                         <th width="10">Amount</th>
@@ -297,6 +300,13 @@
                             sortable: true,
                             searchable: true
                         },
+                    @endif
+                    @if (isOninda() && config('app.resell'))
+                        {
+                            data: 'reseller',
+                            name: 'reseller',
+                            sortable: false
+                        },
                     @endif {
                         data: 'customer',
                         name: 'customer',
@@ -355,7 +365,14 @@
                         $(th).empty();
 
                         var forbidden = [0];
-                        @if (isOninda() || isReseller())
+                        @if (isOninda() && config('app.resell'))
+                            forbidden.push(6);
+                            var dateTimeColumn = 10;
+                            forbidden.push(11);
+                            @if (auth()->user()->is('admin'))
+                                forbidden.push(12);
+                            @endif
+                        @elseif (isOninda() || isReseller())
                             forbidden.push(5);
                             var dateTimeColumn = 9;
                             forbidden.push(10);
