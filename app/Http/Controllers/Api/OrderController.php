@@ -242,7 +242,7 @@ class OrderController extends Controller
                     $return .= '<a href="'.route('admin.orders.booking', ['order_id' => $row->id]).'" class="btn btn-sm btn-primary">Submit</a>';
                 }
 
-                return $return.'<div style="white-space: nowrap; display: none;">Tracking Code: <a href="https://www.steadfast.com.bd/?tracking_code=" target="_blank"></a></div>';
+                return $return.'<div style="white-space: nowrap; display: none;">Tracking Code: <a href="https://www.steadfast.com.bd/?tracking_code=" target="_blank"></a></div>' . ($row->tracking_message ? '<div>'.$row->tracking_message.'</div>' : '');
             })
             ->filterColumn('reseller', function ($query, $keyword): void {
                 $query->where(function ($q) use ($keyword): void {

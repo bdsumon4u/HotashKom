@@ -512,17 +512,27 @@ class ApiController extends Controller
             return response()->json(['message' => 'Webhook failed'], 401);
         }
 
-        if ($request->notification_type != 'delivery_status') {
-            info('not delivery_status');
-
-            return response()->json(['message' => 'Webhook processed'], 202);
-        }
-
         $invoice = (int) preg_replace('/\D/', '', $request->invoice);
         info('steadfast webhook invoice id: '.$invoice);
 
         if (! $order = Order::where('id', $invoice)->first()) {
             info('order not found');
+
+            return response()->json(['message' => 'Webhook processed'], 202);
+        }
+
+        if ($request->notification_type == 'tracking_update') {
+            info('tracking update webhook');
+
+            $order->update([
+                'tracking_message' => $request->tracking_message,
+            ]);
+
+            return response()->json(['message' => 'Webhook processed'], 202);
+        }
+
+        if ($request->notification_type != 'delivery_status') {
+            info('not delivery_status');
 
             return response()->json(['message' => 'Webhook processed'], 202);
         }

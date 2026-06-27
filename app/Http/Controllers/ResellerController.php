@@ -214,6 +214,10 @@ final class ResellerController extends Controller
                         $courierHtml .= '<div style="white-space: nowrap;">C.ID: <a href="'.$trackingUrl.'" target="_blank">'.$consignmentId.'</a></div>';
                     }
 
+                    if (isset($order->data['tracking_message'])) {
+                        $courierHtml .= '<div>'.$order->data['tracking_message'].'</div>';
+                    }
+
                     return [
                         'id' => $order->id,
                         'created_at' => $order->created_at->format('d-M-Y h:i A'),
