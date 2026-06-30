@@ -235,7 +235,7 @@ class StorefrontController extends Controller
                 'stockCount' => $product->should_track ? max(0, $product->stock_count) : -1,
                 'averageRating' => $ratingData['averageRating'],
                 'reviewsCount' => $ratingData['reviewsCount'],
-                'description' => $product->description ?? '',
+                'description' => str_replace('../../../storage', url('/storage'), $product->description ?? ''),
                 'shortDescription' => $product->short_description ?? '',
                 'deliveryText' => $deliveryText,
                 'shippingInside' => (int) ($deliveryCharge->inside_dhaka ?? 80),
@@ -465,7 +465,7 @@ class StorefrontController extends Controller
             'averageRating' => $ratingData['averageRating'],
             'reviewsCount' => $ratingData['reviewsCount'],
             'shortDescription' => $product->short_description,
-            'description' => $product->description,
+            'description' => str_replace('../../../storage', url('/storage'), $product->description ?? ''),
             'retail_price' => $product->retailPrice(),
         ];
     }
