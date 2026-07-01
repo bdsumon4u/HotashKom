@@ -4,7 +4,7 @@
         <div class="mobile-header__panel">
             <div class="container">
                 <div class="mobile-header__body">
-                    <button class="mobile-header__menu-button">
+                    <button class="mobile-header__menu-button" aria-label="Open menu">
                         <svg width="18px" height="14px" viewBox="0 0 18 14"><path d="M0 8V6h18v2H0zm0-8h18v2H0V0zm14 14H0v-2h14v2z"/></svg>
                     </button>
                     <a class="mobile-header__logo" href="{{ url('/') }}" wire:navigate.hover>

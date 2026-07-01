@@ -14,14 +14,27 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const observer = new MutationObserver(function (mutations) {
-            document.querySelectorAll('.owl-prev[role="presentation"], .owl-next[role="presentation"]').forEach(function (el) {
-                el.removeAttribute('role');
+        var slideshowContainer = document.querySelector('.block-slideshow .owl-carousel');
+        if (slideshowContainer) {
+            var observer = new MutationObserver(function () {
+                slideshowContainer.querySelectorAll('.owl-prev[role="presentation"], .owl-next[role="presentation"]').forEach(function (el) {
+                    el.removeAttribute('role');
+                });
+                var prev = slideshowContainer.querySelector('.owl-prev');
+                var next = slideshowContainer.querySelector('.owl-next');
+                if (prev && !prev.getAttribute('aria-label')) {
+                    prev.setAttribute('aria-label', 'Previous slide');
+                }
+                if (next && !next.getAttribute('aria-label')) {
+                    next.setAttribute('aria-label', 'Next slide');
+                }
+                slideshowContainer.querySelectorAll('.owl-dot').forEach(function (dot, index) {
+                    if (!dot.getAttribute('aria-label')) {
+                        dot.setAttribute('aria-label', 'Go to slide ' + (index + 1));
+                    }
+                });
             });
-        });
-        const container = document.querySelector('.block-slideshow .owl-carousel');
-        if (container) {
-            observer.observe(container, {childList: true, subtree: true});
+            observer.observe(slideshowContainer, {childList: true, subtree: true});
         }
     });
 </script>
