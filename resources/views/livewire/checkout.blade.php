@@ -250,9 +250,7 @@
                             <span class="input-check__body">
                                 <input class="input-check__input" type="checkbox" id="checkout-terms-mobile" checked>
                                 <span class="input-check__box"></span>
-                                <svg class="input-check__icon" width="9px" height="7px">
-                                    <use xlink:href="{{ asset('strokya/images/sprite.svg#check-9x7') }}"></use>
-                                </svg>
+                                <svg class="input-check__icon" width="9px" height="7px" viewBox="0 0 9 7"><path d="M9.002 1.396L3.461 7.002-.002 3.498l1.385-1.402 2.078 2.103L7.617-.006l1.385 1.402z"/></svg>
                             </span>
                         </span>
                         <label class="form-check-label" for="checkout-terms-mobile">I agree to the <span
@@ -376,9 +374,7 @@
                                     <input class="input-check__input" type="checkbox" id="checkout-terms-desktop"
                                         checked>
                                     <span class="input-check__box"></span>
-                                    <svg class="input-check__icon" width="9px" height="7px">
-                                        <use xlink:href="{{ asset('strokya/images/sprite.svg#check-9x7') }}"></use>
-                                    </svg>
+                                    <svg class="input-check__icon" width="9px" height="7px" viewBox="0 0 9 7"><path d="M9.002 1.396L3.461 7.002-.002 3.498l1.385-1.402 2.078 2.103L7.617-.006l1.385 1.402z"/></svg>
                                 </span>
                             </span>
                             <label class="form-check-label" for="checkout-terms-desktop">I agree to the <span

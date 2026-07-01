@@ -245,14 +245,15 @@
         </div>
     </div>
     <div class="row">
+        @php
+            $serviceIcons = config('services.service_icons', []);
+        @endphp
         @foreach (config('services.services', []) as $num => $icon)
             <div class="col-md-6">
                 <div class="input-group">
                     <div class="mr-1 input-group-prepend">
                         <span class="input-group-text">
-                            <svg width="24px" height="24px">
-                                <use xlink:href="{{ asset($icon) }}"></use>
-                            </svg>
+                            {!! str_replace('<svg ', '<svg width="24px" height="24px" ', $serviceIcons[$num] ?? '') !!}
                         </span>
                     </div>
                     <div class="" style="flex: 1;">

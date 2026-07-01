@@ -20,7 +20,6 @@
             'jquery' => asset('strokya/vendor/jquery-3.3.1/jquery.min.js'),
             'bootstrap' => asset('strokya/vendor/bootstrap-4.2.1/js/bootstrap.bundle.min.js'),
             'owl' => asset('strokya/vendor/owl-carousel-2.3.4/owl.carousel.min.js'),
-            'svg4everybody' => asset('strokya/vendor/svg4everybody-2.1.9/svg4everybody.min.js'),
         ],
     ])
     {{-- Preload critical CSS --}}
@@ -893,9 +892,7 @@
             <div class="mobilemenu__header">
                 <div class="mobilemenu__title">Menu</div>
                 <button type="button" class="mobilemenu__close">
-                    <svg width="20px" height="20px">
-                        <use xlink:href="{{ asset('strokya/images/sprite.svg#cross-20') }}"></use>
-                    </svg>
+                    <svg width="20px" height="20px" viewBox="0 0 20 20"><path d="M17.71 17.71a.99.99 0 0 1-1.4 0L10 11.4l-6.31 6.31a.99.99 0 1 1-1.4-1.4L8.6 10 2.29 3.69a.99.99 0 1 1 1.4-1.4L10 8.6l6.31-6.31a.99.99 0 1 1 1.4 1.4L11.4 10l6.31 6.31a.99.99 0 0 1 0 1.4z"/></svg>
                 </button>
             </div>
             <div class="mobilemenu__content">

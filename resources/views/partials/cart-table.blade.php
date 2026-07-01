@@ -50,9 +50,7 @@
                     <td class="cart-table__column cart-table__column--remove">
                         <button type="button" class="btn btn-light btn-sm btn-svg-icon"
                             wire:click="remove('{{ $product->rowId }}')">
-                            <svg width="12px" height="12px">
-                                <use xlink:href="{{ asset('strokya/images/sprite.svg#cross-12') }}"></use>
-                            </svg>
+                            <svg width="12px" height="12px" viewBox="0 0 12 12"><path d="M10.8 10.8c-.4.4-1 .4-1.4 0L6 7.4l-3.4 3.4c-.4.4-1 .4-1.4 0-.4-.4-.4-1 0-1.4L4.6 6 1.2 2.6c-.4-.4-.4-1 0-1.4.4-.4 1-.4 1.4 0L6 4.6l3.4-3.4c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4L7.4 6l3.4 3.4c.4.4.4 1 0 1.4z"/></svg>
                         </button>
                     </td>
                 </tr>

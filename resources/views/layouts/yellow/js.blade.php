@@ -111,33 +111,3 @@
 <script src="https://cdn.jsdelivr.net/autocomplete.js/0/autocomplete.min.js"></script>
 <script src="{{ asset('strokya/js/algolia.js') }}"></script>
 <script src="{{ asset('strokya/vendor/jquery.bootstrap-growl.min.js') }}"></script> --}}
-{{-- SVG4Everybody can be deferred - SVG fallbacks are not critical for initial render --}}
-<script src="{{ cdnAsset('svg4everybody', 'strokya/vendor/svg4everybody-2.1.9/svg4everybody.min.js') }}" defer
-    onerror="this.onerror=null;this.src='{{ asset('strokya/vendor/svg4everybody-2.1.9/svg4everybody.min.js') }}';">
-</script>
-<script defer>
-    // Wait for svg4everybody to load
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof svg4everybody !== 'undefined') {
-                svg4everybody();
-            } else {
-                window.addEventListener('load', function() {
-                    if (typeof svg4everybody !== 'undefined') {
-                        svg4everybody();
-                    }
-                });
-            }
-        });
-    } else {
-        if (typeof svg4everybody !== 'undefined') {
-            svg4everybody();
-        } else {
-            window.addEventListener('load', function() {
-                if (typeof svg4everybody !== 'undefined') {
-                    svg4everybody();
-                }
-            });
-        }
-    }
-</script>

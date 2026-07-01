@@ -56,14 +56,6 @@ return [
                 'unpkg' => 'https://unpkg.com/owl.carousel@2.3.4/dist/owl.carousel.min.js',
             ],
         ],
-        'svg4everybody' => [
-            'version' => '2.1.11',
-            'js' => [
-                'jsdelivr' => 'https://cdn.jsdelivr.net/npm/svg4everybody@2.1.11/dist/svg4everybody.min.js',
-                'cdnjs' => 'https://cdnjs.cloudflare.com/ajax/libs/svg4everybody/2.1.11/svg4everybody.min.js',
-                'unpkg' => 'https://unpkg.com/svg4everybody@2.1.11/dist/svg4everybody.min.js',
-            ],
-        ],
         'jquery-3.5.1' => [
             'version' => '3.5.1',
             'js' => [

@@ -210,12 +210,13 @@
                                 </div>
                             @endif
                             <div class="block-features__list flex-column d-none d-md-block">
+                                @php
+                                    $serviceIcons = config('services.service_icons', []);
+                                @endphp
                                 @foreach (config('services.services', []) as $num => $icon)
                                     <div class="block-features__item">
                                         <div class="block-features__icon">
-                                            <svg width="48px" height="48px">
-                                                <use xlink:href="{{ asset($icon) }}"></use>
-                                            </svg>
+                                            {!! str_replace('<svg ', '<svg width="48px" height="48px" ', $serviceIcons[$num] ?? '') !!}
                                         </div>
                                         <div class="block-features__content">
                                             <div class="block-features__title">{{ $services->$num->title }}</div>

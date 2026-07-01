@@ -18,9 +18,7 @@
                 </div>
                 <button type="button" class="dropcart__product-remove btn btn-light btn-sm btn-svg-icon"
                     wire:click="remove('{{ $product->rowId }}')">
-                    <svg width="10px" height="10px">
-                        <use xlink:href="{{ asset('strokya/images/sprite.svg#cross-10') }}"></use>
-                    </svg>
+                    <svg width="10px" height="10px" viewBox="0 0 10 10"><path d="M8.8 8.8c-.4.4-1 .4-1.4 0L5 6.4 2.6 8.8c-.4.4-1 .4-1.4 0-.4-.4-.4-1 0-1.4L3.6 5 1.2 2.6c-.4-.4-.4-1 0-1.4.4-.4 1-.4 1.4 0L5 3.6l2.4-2.4c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4L6.4 5l2.4 2.4c.4.4.4 1 0 1.4z"/></svg>
                 </button>
             </div>
         @empty
