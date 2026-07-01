@@ -35,14 +35,14 @@
                     </div>
                     <div class="mobile-header__indicators">
                         <div class="indicator indicator--mobile-search indicator--mobile d-sm-none">
-                            <button class="indicator__button">
+                            <button class="indicator__button" aria-label="Search">
                                 <span class="indicator__area">
                                     <svg width="20px" height="20px" viewBox="0 0 20 20"><path d="M19.2 17.8s-.2.5-.5.8c-.4.4-.9.6-.9.6s-.9.7-2.8-1.6c-1.1-1.4-2.2-2.8-3.1-3.9-1 .8-2.4 1.3-3.9 1.3-3.9 0-7-3.1-7-7s3.1-7 7-7 7 3.1 7 7c0 1.5-.5 2.9-1.3 4 1.1.8 2.5 2 4 3.1 2.3 1.7 1.5 2.7 1.5 2.7zM8 3C5.2 3 3 5.2 3 8s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z"/></svg>
                                 </span>
                             </button>
                         </div>
                         <div class="indicator indicator--trigger--click">
-                            <a href="#" class="indicator__button">
+                            <a href="#" class="indicator__button" aria-label="Shopping cart">
                                 <span class="indicator__area">
                                     <svg width="20" height="20">
                                         <circle cx="7" cy="17" r="2"></circle>
