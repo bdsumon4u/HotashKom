@@ -1,6 +1,5 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(function() {
+    runWhenJQueryReady(function($) {
         // Desktop search
         var $desktopInput = $("input[name='search']").filter(function() {
             return $(this).closest('.site-header__search').length > 0;
