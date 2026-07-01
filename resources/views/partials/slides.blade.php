@@ -11,6 +11,22 @@
     @endif
 @endpush
 
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const observer = new MutationObserver(function (mutations) {
+            document.querySelectorAll('.owl-prev[role="presentation"], .owl-next[role="presentation"]').forEach(function (el) {
+                el.removeAttribute('role');
+            });
+        });
+        const container = document.querySelector('.block-slideshow .owl-carousel');
+        if (container) {
+            observer.observe(container, {childList: true, subtree: true});
+        }
+    });
+</script>
+@endpush
+
 @push('styles')
 <style>
     @if(!(setting('show_option')->category_dropdown ?? false))
