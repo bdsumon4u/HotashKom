@@ -161,6 +161,7 @@
                                 </div>
                                 <div class="block-slideshow__slide-image block-slideshow__slide-image--mobile" style="position: relative; overflow: hidden;">
                                     <img src="{{ $mobileImageUrl }}" alt="{{ $slide->title ?? 'Slide' }}"
+                                         fetchpriority="high"
                                          loading="eager"
                                          style="width: 100%; height: 100%; object-fit: {{ $objectFit }}; position: absolute; top: 0; left: 0;">
                                 </div>
