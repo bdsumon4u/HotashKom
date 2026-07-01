@@ -920,7 +920,9 @@
                 @endif
                 <x-alert-box class="mt-2 row" />
             </div>
-            @yield('content')
+            <main>
+                @yield('content')
+            </main>
         </div>
         <!-- site__body / end -->
         <!-- site__footer -->
