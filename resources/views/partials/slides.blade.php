@@ -135,6 +135,9 @@
             padding-left: 27px;
         }
     }
+    .block-slideshow .owl-carousel .owl-dot {
+        width: 24px !important;
+    }
 </style>
 @endpush
 <div class="block block-slideshow block-slideshow--layout--with-departments">
