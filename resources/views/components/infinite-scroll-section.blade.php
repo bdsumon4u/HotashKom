@@ -303,6 +303,7 @@
 
                 return `
                          <div class="product-card" data-id="${productId}" data-max="${product.should_track ? (product.stock_count || 0) : -1}">
+                             ${product.free_delivery ? '<div class="product-card__ribbon"><span class="badge badge--free-delivery">Free Delivery</span></div>' : ''}
                              <div class="product-card__badges-list">
                                 ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
                                 ${discountText ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}

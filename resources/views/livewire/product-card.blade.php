@@ -1,5 +1,10 @@
 <div class="product-card" data-id="{{ $product->id }}"
     data-max="{{ $product->should_track ? $product->stock_count : -1 }}">
+    @if ($is_free_delivery)
+        <div class="product-card__ribbon">
+            <span class="badge badge--free-delivery">Free Delivery</span>
+        </div>
+    @endif
     @php
         $in_stock = !$product->should_track || $product->stock_count > 0;
     @endphp

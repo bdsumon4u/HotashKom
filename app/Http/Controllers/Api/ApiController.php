@@ -273,9 +273,12 @@ class ApiController extends Controller
             ? $products->getCollection()
             : $products;
 
-        $collection->transform(function ($product) {
+        $freeDelivery = setting('free_delivery');
+
+        $collection->transform(function ($product) use ($freeDelivery) {
             $product->base_image_url = cdn($product->base_image?->src) ?? '/images/placeholder.jpg';
             $product->setAttribute('retail_price', $product->retailPrice());
+            $product->setAttribute('free_delivery', $this->isFreeDeliveryProduct($product, $freeDelivery));
 
             // Calculate rating and review count from loaded relationships (avoid N+1)
             $approvedReviews = $product->reviews ?? collect();
@@ -292,6 +295,21 @@ class ApiController extends Controller
 
             return $product;
         });
+    }
+
+    protected function isFreeDeliveryProduct(Product $product, mixed $freeDelivery): bool
+    {
+        if (! ($freeDelivery->enabled ?? false)) {
+            return false;
+        }
+
+        if ($freeDelivery->for_all ?? false) {
+            return true;
+        }
+
+        $products = (array) ($freeDelivery->products ?? []);
+
+        return array_key_exists($product->id, $products);
     }
 
     private function deliveryText($product, $freeDelivery)
@@ -503,10 +521,10 @@ class ApiController extends Controller
         info('steadfast headers:', $request->headers->all());
         info('steadfast webhook:', $request->all());
         $SteadFast = setting('SteadFast');
-        if ($request->header('Authorization') !== 'Bearer ' . $SteadFast->key) {
+        if ($request->header('Authorization') !== 'Bearer '.$SteadFast->key) {
             info('steadfast webhook failed', [
                 'header' => $request->header('Authorization'),
-                'expected' => 'Bearer ' . $SteadFast->key,
+                'expected' => 'Bearer '.$SteadFast->key,
             ]);
 
             return response()->json(['message' => 'Webhook failed'], 401);

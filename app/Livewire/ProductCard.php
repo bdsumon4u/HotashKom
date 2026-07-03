@@ -32,6 +32,27 @@ class ProductCard extends Component
 
     public function render()
     {
-        return view('livewire.product-card');
+        $freeDelivery = setting('free_delivery');
+        $isFreeDelivery = $this->isFreeDeliveryProduct($this->product, $freeDelivery);
+
+        return view('livewire.product-card', [
+            'free_delivery' => $freeDelivery,
+            'is_free_delivery' => $isFreeDelivery,
+        ]);
+    }
+
+    protected function isFreeDeliveryProduct(Product $product, mixed $freeDelivery): bool
+    {
+        if (! ($freeDelivery->enabled ?? false)) {
+            return false;
+        }
+
+        if ($freeDelivery->for_all ?? false) {
+            return true;
+        }
+
+        $products = (array) ($freeDelivery->products ?? []);
+
+        return array_key_exists($product->id, $products);
     }
 }

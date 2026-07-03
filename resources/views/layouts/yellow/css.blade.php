@@ -29,4 +29,23 @@
         transform: translate3d(-2px, -2px, 0);
         box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
     }
+
+    .product-card__ribbon {
+        position: absolute;
+        top: 1px;
+        right: 3px;
+        z-index: 2;
+    }
+
+    .badge--free-delivery {
+        display: inline-block;
+        background-color: #059669;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 3px;
+        line-height: 1.3;
+        white-space: nowrap;
+    }
 </style>
