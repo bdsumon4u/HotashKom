@@ -164,9 +164,9 @@
                             </div>
                             <div class="product-card__info">
                                 <div class="product-card__name">
-                                    <h5 style="overflow: hidden;text-overflow:ellipsis; font-size: 16px; font-weight: 700;">
+                                    <h4 style="overflow: hidden;text-overflow:ellipsis; font-size: 16px; font-weight: 700;">
                                         <a href="{{ route('brands.products', $brand) }}" wire:navigate.hover title="{{$brand->name}}">{{ $brand->name }}</a>
-                                    </h5>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
@@ -212,9 +212,9 @@
                             </div>
                             <div class="product-card__info">
                                 <div class="product-card__name">
-                                    <h5 style="overflow: hidden;text-overflow:ellipsis; font-size: 16px; font-weight: 700;">
+                                    <h4 style="overflow: hidden;text-overflow:ellipsis; font-size: 16px; font-weight: 700;">
                                         <a href="{{ route('categories.products', $category) }}" wire:navigate.hover title="{{$category->name}}">{{ $category->name }}</a>
-                                    </h5>
+                                    </h4>
                                 </div>
                             </div>
                         </div>
