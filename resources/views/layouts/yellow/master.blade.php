@@ -987,6 +987,7 @@
         <div class="widget-connect widget-connect-right">
             @if ($messenger)
                 <a class="widget-connect__button widget-connect__button-telemessenger button-slide-out"
+                    aria-label="Messenger Link"
                     style="background: white; color: blue;" href="{{ $messenger }}" data-toggle="tooltip"
                     data-placement="left" title="" target="_blank" data-original-title="Messenger">
                     <i class="fab fa-facebook-messenger"></i>
@@ -997,6 +998,7 @@
                     style="background: white; color: green;" href="https://wa.me/{{ $phone }}"
                     data-toggle="tooltip" data-placement="left" title="" data-original-title="WhatsApp"
                     data-whatsapp-url="https://wa.me/{{ $phone }}"
+                    aria-label="Whatsapp Link"
                     onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
                     <i class="fab fa-whatsapp"></i>
                 </a>
@@ -1007,6 +1009,7 @@
         </div>
     @elseif ($phone)
         <a href="https://api.whatsapp.com/send?phone={{ $phone }}"
+            aria-label="Whatsapp Link"
             style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;cursor:pointer;"
             data-whatsapp-url="https://api.whatsapp.com/send?phone={{ $phone }}"
             onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
@@ -1014,6 +1017,7 @@
         </a>
     @elseif (strlen($messenger) > 13)
         <a href="{{ $messenger }}" target="_blank"
+            aria-label="Messenger Link"
             style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#0084ff;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;">
             <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
         </a>
