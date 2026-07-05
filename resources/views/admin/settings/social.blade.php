@@ -9,7 +9,7 @@
         <div class="col-md-6">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-facebook"></i></span>
+                    <span class="input-group-text"><i class="fab fa-facebook"></i></span>
                 </div>
                 <x-input type="url" name="social[facebook][link]" :value="$social->facebook->link ?? ''" />
             </div>
@@ -17,7 +17,7 @@
         <div class="col-md-6">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-twitter"></i></span>
+                    <span class="input-group-text"><i class="fab fa-twitter"></i></span>
                 </div>
                 <x-input type="url" name="social[twitter][link]" :value="$social->twitter->link ?? ''" />
             </div>
@@ -25,7 +25,7 @@
         <div class="col-md-6">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-instagram"></i></span>
+                    <span class="input-group-text"><i class="fab fa-instagram"></i></span>
                 </div>
                 <x-input type="url" name="social[instagram][link]" :value="$social->instagram->link ?? ''" />
             </div>
@@ -33,9 +33,25 @@
         <div class="col-md-6">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-youtube"></i></span>
+                    <span class="input-group-text"><i class="fab fa-youtube"></i></span>
                 </div>
                 <x-input type="url" name="social[youtube][link]" :value="$social->youtube->link ?? ''" />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fab fa-pinterest"></i></span>
+                </div>
+                <x-input type="url" name="social[pinterest][link]" :value="$social->pinterest->link ?? ''" />
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
+                </div>
+                <x-input type="url" name="social[linkedin][link]" :value="$social->linkedin->link ?? ''" />
             </div>
         </div>
     </div>

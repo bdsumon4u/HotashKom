@@ -76,6 +76,8 @@ return [
 
     'thank_you_img' => env('APP_THANK_YOU_IMG', null),
 
+    'footer_view' => env('APP_FOOTER_VIEW', 'partials.footer-default'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

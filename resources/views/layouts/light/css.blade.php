@@ -1,5 +1,5 @@
 @php
-    $fontawesomeCss = cdnAsset('fontawesome.css', 'assets/css/fontawesome.css');
+    $fontawesomeCss = cdnAsset('fontawesome.css', 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css');
     $cdnProvider = config('cdn.provider', 'jsdelivr');
     $fontAwesomeVersion = config('cdn.assets.fontawesome.version', '6.5.1');
 

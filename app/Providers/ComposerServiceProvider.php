@@ -38,7 +38,7 @@ class ComposerServiceProvider extends ServiceProvider
         $menus = [
             'topbar-menu' => 'topbar',
             'header-menu' => 'header.menu.*',
-            'quick-links' => 'footer',
+            'quick-links' => 'footer-*',
         ];
 
         foreach ($menus as $slug => $view) {

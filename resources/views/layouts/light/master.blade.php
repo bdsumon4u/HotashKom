@@ -11,7 +11,7 @@
 
     @php
         $jqueryJs = cdnAsset('jquery-3.5.1', 'assets/js/jquery-3.5.1.min.js');
-        $fontawesomeCss = cdnAsset('fontawesome.css', 'assets/css/fontawesome.css');
+        $fontawesomeCss = cdnAsset('fontawesome.css', 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css');
     @endphp
 
     @include('layouts.partials.cdn-fallback', [
