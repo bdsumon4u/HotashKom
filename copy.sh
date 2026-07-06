@@ -109,17 +109,23 @@ echo "🧹 Clearing source cache..."
 ####################################
 echo "📦 Copying files..."
 
-tar \
-  --exclude=storage/framework/sessions \
-  --exclude=storage/framework/views \
-  --exclude=storage/framework/cache \
-  --exclude=storage/framework/testing \
-  --exclude=storage/logs \
-  --exclude=storage/debugbar \
-  --exclude=storage/app/pathao* \
-  --exclude=storage/app/mpdf \
-  --exclude=bootstrap/cache \
-  -czf - . \
+# Build exclude list: skip public/storage only if it's a symlink (typical Laravel setup)
+EXCLUDES=(
+  --exclude=storage/framework/sessions
+  --exclude=storage/framework/views
+  --exclude=storage/framework/cache
+  --exclude=storage/framework/testing
+  --exclude=storage/logs
+  --exclude=storage/debugbar
+  --exclude=storage/app/pathao*
+  --exclude=storage/app/mpdf
+  --exclude=bootstrap/cache
+)
+if [[ -L public/storage ]]; then
+  EXCLUDES+=(--exclude=public/storage)
+fi
+
+tar "${EXCLUDES[@]}" -czf - . \
 | ssh $SSH_OPTS "$TARGET" "
     mkdir -p '$target_root_dir'
     cd '$target_root_dir'
