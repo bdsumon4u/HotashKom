@@ -210,14 +210,15 @@
                 <div class="gap-2 my-2 d-flex justify-content-center">
                     @if (strlen($messenger) > 13)
                         <a href="{{ $messenger }}" target="_blank" rel="noopener"
+                            data-contact-type="messenger"
                             class="mr-1 btn btn-primary d-flex align-items-center" style="min-width: 140px;">
                             <i class="mr-2 fab fa-facebook-messenger"></i> Messenger
                         </a>
                     @endif
                     <a href="{{ $whatsappLink }}" rel="noopener"
+                        data-contact-type="whatsapp"
                         class="ml-1 btn btn-success d-flex align-items-center whatsapp-link" style="min-width: 140px;"
-                        data-whatsapp-url="{{ $whatsappLink }}"
-                        onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
+                        data-whatsapp-url="{{ $whatsappLink }}">
                         <i class="mr-2 fab fa-whatsapp"></i> WhatsApp
                     </a>
                 </div>

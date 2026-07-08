@@ -398,3 +398,28 @@
     </div>
     @endif
 </div>
+
+@script
+<script>
+    (function () {
+        function getCookie(name) {
+            var match = document.cookie.match(new RegExp('(^|;\\s*)' + name + '=([^;]*)'));
+            return match ? decodeURIComponent(match[2]) : '';
+        }
+
+        function buildFbc() {
+            var params = new URLSearchParams(window.location.search);
+            var fbclid = params.get('fbclid');
+            return fbclid ? 'fb.1.' + Date.now() + '.' + fbclid : '';
+        }
+
+        var fbp = getCookie('_fbp');
+        var fbc = getCookie('_fbc') || buildFbc();
+        var url = window.location.href;
+
+        if (fbp) { $wire.set('fbp', fbp); }
+        if (fbc) { $wire.set('fbc', fbc); }
+        $wire.set('eventSourceUrl', url);
+    })();
+</script>
+@endscript

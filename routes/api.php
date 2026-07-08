@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AddToCartTrackingController;
 use App\Http\Controllers\Api\ApiController;
+use App\Http\Controllers\Api\ContactTrackingController;
+use App\Http\Controllers\Api\ViewContentTrackingController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\LivewireCheckoutController;
 use App\Http\Controllers\Api\MenuItemSortController;
@@ -56,6 +59,9 @@ Route::group(['as' => 'api.'], function (): void {
     Route::post('steadfast-webhook', [ApiController::class, 'steadfastWebhook']);
     Route::post('checkout', LivewireCheckoutController::class);
     Route::get('orders/{order}', [ApiController::class, 'order']);
+    Route::post('track-contact', ContactTrackingController::class)->name('track-contact');
+    Route::post('track-add-to-cart', AddToCartTrackingController::class)->name('track-add-to-cart');
+    Route::post('track-view-content', ViewContentTrackingController::class)->name('track-view-content');
     Route::get('resellers', ResellerController::class)->name('resellers');
     Route::put('resellers/{id}', [ResellerController::class, 'update'])->name('resellers.update');
     Route::delete('resellers/{id}', [ResellerController::class, 'destroy'])->name('resellers.destroy');

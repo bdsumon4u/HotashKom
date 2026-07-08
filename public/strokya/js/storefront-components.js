@@ -150,6 +150,9 @@ runWhenJQueryReady(function($) {
     window.handleAddToCart = function(button) {
         const productId = button.getAttribute('data-product-id');
         const action = button.getAttribute('data-action') || 'add';
+        // Read product metadata from button's closest card if available
+        const card = button.closest('[data-id]');
+        const cardProductId = card ? card.getAttribute('data-id') : productId;
 
         button.disabled = true;
         const originalText = button.innerHTML;
@@ -178,6 +181,52 @@ runWhenJQueryReady(function($) {
                     if (cartCountElement && data.cart_count) {
                         cartCountElement.textContent = data.cart_count;
                     }
+
+                    // ── Facebook Pixel + GTM AddToCart tracking ──────────────
+                    const product = data.product || {};
+                    const eventId = 'atc_' + (product.id || productId) + '_' + Date.now();
+                    const eventData = {
+                        currency: 'BDT',
+                        value: parseFloat(data.cart_total) || 0,
+                        content_ids: [String(product.id || productId)],
+                        content_name: product.name || '',
+                        quantity: product.quantity || 1,
+                        content_type: 'product',
+                    };
+
+                    // Push to dataLayer for GTM
+                    window.dataLayer = window.dataLayer || [];
+                    window.dataLayer.push({
+                        event: 'meta_AddToCart',
+                        meta_event_name: 'AddToCart',
+                        meta_event_id: eventId,
+                        meta_event_data: eventData,
+                        ecommerce: {
+                            currency: 'BDT',
+                            value: eventData.value,
+                            items: [{ item_id: String(product.id || productId), item_name: product.name || '', quantity: product.quantity || 1 }],
+                        },
+                    });
+
+                    // Browser-side fbq
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'AddToCart', eventData, { eventID: eventId });
+                    }
+
+                    // Server-side CAPI via sendBeacon (survives immediate navigations)
+                    const getCookie = (name) => {
+                        const match = document.cookie.match(new RegExp('(^|;\\s*)' + name + '=([^;]*)'));
+                        return match ? decodeURIComponent(match[2]) : null;
+                    };
+                    const capiPayload = JSON.stringify({
+                        product_id: product.id || productId,
+                        value: eventData.value,
+                        fbp: getCookie('_fbp'),
+                        fbc: getCookie('_fbc'),
+                        _token: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    });
+                    navigator.sendBeacon('/api/track-add-to-cart', new Blob([capiPayload], { type: 'application/json' }));
+                    // ─────────────────────────────────────────────────────────
 
                     if (window.Livewire) {
                         window.Livewire.dispatch('cartUpdated');

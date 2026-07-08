@@ -69,6 +69,12 @@ class Checkout extends Component
      */
     public bool $retailDeliveryFeeManuallySet = false;
 
+    public string $fbp = '';
+
+    public string $fbc = '';
+
+    public string $eventSourceUrl = '';
+
     protected $facebookService;
 
     public function boot(FacebookPixelService $facebookService): void
@@ -528,6 +534,23 @@ class Checkout extends Component
                 $orderData['courier'] = 'Pathao';
             }
 
+            // Capture browser tracking signals at order time
+            $fbp = $this->fbp;
+            $fbc = $this->fbc;
+
+            // Auto-build fbc from fbclid URL param if cookie was absent
+            if (empty($fbc) && request()->has('fbclid')) {
+                $fbc = 'fb.1.'.now()->getTimestampMs().'.'.request()->query('fbclid');
+            }
+
+            $orderTracking = [
+                'fbp' => $fbp,
+                'fbc' => $fbc,
+                'ip' => request()->ip(),
+                'ua' => request()->userAgent(),
+                'event_source_url' => $this->eventSourceUrl ?: url()->current(),
+            ];
+
             $data += [
                 'source_id' => config('app.instant_order_forwarding') ? 0 : null,
                 'admin_id' => $admin->id ?? Admin::query()->inRandomOrder()->first()->id,
@@ -536,6 +559,7 @@ class Checkout extends Component
                 'status_at' => now()->toDateTimeString(),
                 // Additional Data
                 'data' => $orderData,
+                'tracking' => $orderTracking,
             ];
 
             $order = Order::create($data);
@@ -565,15 +589,33 @@ class Checkout extends Component
             });
 
             if (config('meta-pixel.meta_pixel')) {
-                $this->facebookService->trackPurchase([
+                $orderPayload = [
                     'id' => $order->id,
                     'total' => $order->data['subtotal'],
-                ], $data['products'], [
+                ];
+                $userDataArr = [
                     'name' => $user->name,
                     'email' => $user->email,
                     'phone' => $user->phone_number,
                     'external_id' => $user->id,
-                ], $this);
+                ];
+                $orderTrackingData = $order->tracking ?? [];
+
+                // Generate persistent event ID for Lead/Purchase to be reused on thank you page
+                $eventName = config('meta-pixel.advanced_tracking') ? 'Lead' : 'Purchase';
+                $eventId = 'ch_'.strtolower($eventName).'_'.$order->id.'_'.time();
+                $orderTrackingData['event_id'] = $eventId;
+
+                // Save updated tracking data back to order
+                $order->update(['tracking' => $orderTrackingData]);
+
+                if (config('meta-pixel.advanced_tracking')) {
+                    // Advanced tracking: fire Lead at checkout, Purchase on order confirmation
+                    $this->facebookService->trackLead($orderPayload, $data['products'], $userDataArr, $this, $orderTrackingData);
+                } else {
+                    // Standard tracking: fire Purchase immediately at checkout
+                    $this->facebookService->trackPurchase($orderPayload, $data['products'], $userDataArr, $this, $orderTrackingData);
+                }
             }
 
             return $order;

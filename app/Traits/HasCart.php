@@ -45,7 +45,7 @@ trait HasCart
 
         storeOrUpdateCart();
 
-        if (config('meta-pixel.meta_pixel')) {
+        if (config('meta-pixel.meta_pixel') && isset($this->facebookService)) {
             $this->facebookService->trackAddToCart([
                 'id' => $this->product->id,
                 'name' => $this->product->name,

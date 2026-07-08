@@ -1,6 +1,14 @@
 @if ($metaPixel->isEnabled())
+    @php
+        $rawPixelConfig = config('meta-pixel.meta_pixel');
+        $metaPixelIds = collect(explode('|', $rawPixelConfig))
+            ->map(fn($p) => explode(':', $p)[0])
+            ->filter()
+            ->unique()
+            ->values();
+    @endphp
     <!-- Meta Pixel Code -->
-    <script>
+    <script data-navigate-once>
         ! function(f, b, e, v, n, t, s) {
             if (f.fbq) return;
             n = f.fbq = function() {
@@ -19,34 +27,25 @@
             s.parentNode.insertBefore(t, s)
         }(window, document, 'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-        @if (false)
-            @if ($user = $metaPixel->getUser())
-                @if ($userIdAsString)
-                    fbq('init', '{{ $metaPixel->pixelId() }}', {
-                        em: '{{ $user['em'] }}',
-                        external_id: '{{ $user['external_id'] }}'
-                    });
-                @else
-                    fbq('init', '{{ $metaPixel->pixelId() }}', {
-                        em: '{{ $user['em'] }}',
-                        external_id: {{ $user['external_id'] }}
-                    });
-                @endif
-            @else
-                fbq('init', '{{ $metaPixel->pixelId() }}');
-            @endif
-        @else
-            @foreach (explode(' ', $metaPixel->pixelId()) as $id)
-                @if ($id)
-                    fbq('init', '{{ $id }}');
-                @endif
-            @endforeach
-        @endif
+        @foreach ($metaPixelIds as $id)
+            fbq('init', '{{ $id }}');
+        @endforeach
+        
         fbq('track', 'PageView');
+        console.log('pageview');
+
+        document.addEventListener('livewire:navigated', function () {
+            if (typeof fbq === 'function') {
+                fbq('track', 'PageView');
+                console.log('navigated');
+            }
+        });
     </script>
     <noscript>
-        <img height="1" width="1" style="display:none"
-            src="https://www.facebook.com/tr?id={{ $metaPixel->pixelId() }}&ev=PageView&noscript=1" />
+        @foreach ($metaPixelIds as $id)
+            <img height="1" width="1" style="display:none"
+                src="https://www.facebook.com/tr?id={{ $id }}&ev=PageView&noscript=1" />
+        @endforeach
     </noscript>
     <!-- End Meta Pixel Code -->
 @endif

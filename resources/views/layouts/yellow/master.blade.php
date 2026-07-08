@@ -217,8 +217,6 @@
         @endphp
     @endif
 
-    {{-- Load Meta Pixel immediately (not deferred) so Facebook can detect it during setup --}}
-    {{-- Use data-navigate-once so it doesn't reload during SPA navigation --}}
     <x-metapixel-head />
     @include('layouts.yellow.css')
     <!-- js -->
@@ -879,6 +877,24 @@
         @endphp
     @endif
     <x-metapixel-body />
+    {{-- Render any server-flashed dataLayer events (e.g. ViewContent from ProductController) --}}
+    @if(session('datalayer_events'))
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            @foreach(session('datalayer_events') as $dlEvent)
+                window.dataLayer.push({{ Js::from($dlEvent) }});
+            @endforeach
+        </script>
+    @endif
+    {{-- Expose tracking config and CSRF token to JavaScript --}}
+    <script data-navigate-once>
+        window._csrfToken = '{{ csrf_token() }}';
+        window.trackingConfig = {
+            pixelEnabled: {{ config('meta-pixel.meta_pixel') ? 'true' : 'false' }},
+            advancedTracking: {{ config('meta-pixel.advanced_tracking') ? 'true' : 'false' }},
+        };
+        window.dataLayer = window.dataLayer || [];
+    </script>
     <!-- quickview-modal -->
     <div id="quickview-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
@@ -989,7 +1005,8 @@
                 <a class="widget-connect__button widget-connect__button-telemessenger button-slide-out"
                     aria-label="Messenger Link"
                     style="background: white; color: blue;" href="{{ $messenger }}" data-toggle="tooltip"
-                    data-placement="left" title="" target="_blank" data-original-title="Messenger">
+                    data-placement="left" title="" target="_blank" data-original-title="Messenger"
+                    data-contact-type="messenger">
                     <i class="fab fa-facebook-messenger"></i>
                 </a>
             @endif
@@ -999,7 +1016,7 @@
                     data-toggle="tooltip" data-placement="left" title="" data-original-title="WhatsApp"
                     data-whatsapp-url="https://wa.me/{{ $phone }}"
                     aria-label="Whatsapp Link"
-                    onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
+                    data-contact-type="whatsapp">
                     <i class="fab fa-whatsapp"></i>
                 </a>
             @endif
@@ -1012,12 +1029,13 @@
             aria-label="Whatsapp Link"
             style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;cursor:pointer;"
             data-whatsapp-url="https://api.whatsapp.com/send?phone={{ $phone }}"
-            onclick="window.location.href=this.getAttribute('data-whatsapp-url')||this.href;return false;">
+            data-contact-type="whatsapp">
             <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>
         </a>
     @elseif (strlen($messenger) > 13)
         <a href="{{ $messenger }}" target="_blank"
             aria-label="Messenger Link"
+            data-contact-type="messenger"
             style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#0084ff;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;">
             <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
         </a>

@@ -335,6 +335,78 @@
         </div>
     </div>
     <!-- .block-products-carousel / end -->
+
+    @if(config('meta-pixel.meta_pixel'))
+        <script>
+            (function() {
+                const productData = {
+                    id: {{ $product->id }},
+                    name: @json($product->name),
+                    price: {{ $product->selling_price }},
+                    url: @json(route('products.show', $product->slug))
+                };
+                const eventId = 'vc_' + productData.id + '_' + Date.now();
+                const eventData = {
+                    currency: 'BDT',
+                    value: productData.price,
+                    content_ids: [String(productData.id)],
+                    content_name: productData.name,
+                    content_type: 'product',
+                    quantity: 1
+                };
+
+                // 1. Push to dataLayer for GTM
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                    event: 'meta_ViewContent',
+                    meta_event_name: 'ViewContent',
+                    meta_event_id: eventId,
+                    meta_event_data: eventData,
+                    ecommerce: {
+                        currency: 'BDT',
+                        value: productData.price,
+                        items: [{
+                            item_id: String(productData.id),
+                            item_name: productData.name,
+                            price: productData.price,
+                            quantity: 1
+                        }]
+                    }
+                });
+
+                // 2. Fire browser fbq
+                if (typeof fbq === 'function') {
+                    fbq('track', 'ViewContent', eventData, { eventID: eventId });
+                }
+
+                // 3. Fire server CAPI via API call
+                const getCookie = (name) => {
+                    const match = document.cookie.match(new RegExp('(^|;\\s*)' + name + '=([^;]*)'));
+                    return match ? decodeURIComponent(match[2]) : null;
+                };
+                const payload = JSON.stringify({
+                    product_id: productData.id,
+                    value: productData.price,
+                    fbp: getCookie('_fbp'),
+                    fbc: getCookie('_fbc'),
+                    event_id: eventId
+                });
+
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon('/api/track-view-content', new Blob([payload], { type: 'application/json' }));
+                } else {
+                    fetch('/api/track-view-content', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        },
+                        body: payload
+                    });
+                }
+            })();
+        </script>
+    @endif
 @endsection
 
 @push('scripts')

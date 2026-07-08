@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Product;
 use FacebookAds\Object\ServerSide\Content;
 use FacebookAds\Object\ServerSide\CustomData;
 use FacebookAds\Object\ServerSide\DeliveryCategory;
@@ -13,7 +14,22 @@ use Livewire\Component;
 class FacebookPixelService
 {
     /**
-     * Generate a unique event ID
+     * Standard Meta Pixel events (use fbq('track', ...))
+     *
+     * @var array<string>
+     */
+    protected array $standardEvents = [
+        'AddPaymentInfo', 'AddToCart', 'AddToWishlist', 'CompleteRegistration',
+        'Contact', 'CustomizeProduct', 'Donate', 'FindLocation', 'InitiateCheckout',
+        'Lead', 'Purchase', 'Schedule', 'Search', 'StartTrial', 'SubmitApplication',
+        'Subscribe', 'ViewContent',
+    ];
+
+    /**
+     * Generate a unique, deterministic event ID for deduplication.
+     *
+     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>  $customData
      */
     protected function generateEventId(string $eventName, array $userData, array $customData): string
     {
@@ -28,132 +44,310 @@ class FacebookPixelService
     }
 
     /**
-     * Create server-side custom data object
+     * Build server-side CustomData from a flat array.
+     *
+     * @param  array<string, mixed>  $customData
      */
     protected function createServerCustomData(array $customData): CustomData
     {
-        $customDataObj = new CustomData;
+        $obj = new CustomData;
 
         if (isset($customData['currency'])) {
-            $customDataObj->setCurrency($customData['currency']);
+            $obj->setCurrency($customData['currency']);
         }
+
         if (isset($customData['value'])) {
-            $customDataObj->setValue($customData['value']);
+            $obj->setValue($customData['value']);
         }
-        $customDataObj->setContentIds($customData['content_ids']);
-        if (isset($customData['content_ids'])) {
+
+        $obj->setContentIds($customData['content_ids'] ?? []);
+
+        if (! empty($customData['content_ids'])) {
             $contents = [];
             foreach ($customData['content_ids'] as $id) {
                 $content = new Content;
                 $content->setProductId($id);
-                $content->setTitle($customData['content_name']);
+                $content->setTitle($customData['content_name'] ?? '');
                 $content->setQuantity($customData['quantity'] ?? 1);
-                $content->setItemPrice($customData['value']);
+                $content->setItemPrice($customData['value'] ?? 0);
                 $content->setDeliveryCategory(DeliveryCategory::HOME_DELIVERY);
                 $contents[] = $content;
             }
-            $customDataObj->setContents($contents);
+            $obj->setContents($contents);
         }
+
         if (isset($customData['content_name'])) {
-            $customDataObj->setContentName($customData['content_name']);
+            $obj->setContentName($customData['content_name']);
         }
 
-        return $customDataObj;
-    }
-
-    protected function createServerUserData(array $userData)
-    {
-        /** @var UserData $userDataObj */
-        $userDataObj = MetaPixel::userData();
-        if (isset($userData['name'])) {
-            $nameParts = explode(' ', trim($userData['name']));
-            $lastName = '';
-
-            $firstName = $nameParts[0];
-            if (count($nameParts) === 2) {
-                $lastName = $nameParts[1];
-            } elseif (count($nameParts) > 2) {
-                $firstName .= ' '.$nameParts[1];
-                $lastName = implode(' ', array_slice($nameParts, 2));
-            }
-            $userDataObj->setFirstName($firstName);
-            $userDataObj->setLastName($lastName);
+        if (isset($customData['content_type'])) {
+            $obj->setContentType($customData['content_type']);
         }
 
-        if (isset($userData['email'])) {
-            $userDataObj->setEmail($userData['email']);
-        }
-        if (isset($userData['phone'])) {
-            $userDataObj->setPhone($userData['phone']);
-        }
-        if (isset($userData['external_id'])) {
-            $userDataObj->setExternalId($userData['external_id']);
+        if (isset($customData['num_items'])) {
+            $obj->setNumItems($customData['num_items']);
         }
 
-        return $userDataObj;
+        if (isset($customData['order_id'])) {
+            $obj->setOrderId((string) $customData['order_id']);
+        }
+
+        return $obj;
     }
 
     /**
-     * Track an event with both client and server-side tracking
+     * Build server-side UserData from a flat array.
+     * Accepts browser signals: fbp, fbc, client_ip_address, client_user_agent, event_source_url.
+     *
+     * @param  array<string, mixed>  $userData
      */
-    public function trackEvent(string $eventName, array $customData = [], array $userData = [], ?Component $component = null): void
+    protected function createServerUserData(array $userData): UserData
+    {
+        /** @var UserData $obj */
+        $obj = MetaPixel::userData();
+
+        if (isset($userData['name'])) {
+            $parts = explode(' ', trim((string) $userData['name']));
+            $firstName = $parts[0];
+            $lastName = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
+            $obj->setFirstName($firstName);
+            if ($lastName !== '') {
+                $obj->setLastName($lastName);
+            }
+        }
+
+        if (isset($userData['email'])) {
+            $obj->setEmail($userData['email']);
+        }
+
+        if (isset($userData['phone'])) {
+            $obj->setPhone($userData['phone']);
+        }
+
+        if (isset($userData['external_id'])) {
+            $obj->setExternalId((string) $userData['external_id']);
+        }
+
+        // Browser tracking signals
+        if (! empty($userData['fbp'])) {
+            $obj->setFbp($userData['fbp']);
+        }
+
+        if (! empty($userData['fbc'])) {
+            $obj->setFbc($userData['fbc']);
+        }
+
+        if (! empty($userData['client_ip_address'])) {
+            $obj->setClientIpAddress($userData['client_ip_address']);
+        }
+
+        if (! empty($userData['client_user_agent'])) {
+            $obj->setClientUserAgent($userData['client_user_agent']);
+        }
+
+        return $obj;
+    }
+
+    /**
+     * Whether this is a standard Meta Pixel event.
+     */
+    protected function isStandardEvent(string $eventName): bool
+    {
+        return in_array($eventName, $this->standardEvents, true);
+    }
+
+    /**
+     * Send a single pixel event to all configured pixels via the Conversions API.
+     *
+     * @param  array<string, mixed>  $customData
+     * @param  array<string, mixed>  $userData
+     */
+    protected function sendToConversionsApi(string $eventName, string $eventId, array $customData, array $userData, ?string $eventSourceUrl = null): void
+    {
+        $serverCustomData = $this->createServerCustomData($customData);
+        $serverUserData = $this->createServerUserData($userData);
+
+        foreach (explode('|', (string) config('meta-pixel.meta_pixel')) as $pixel) {
+            $parts = explode(':', $pixel);
+            if (count($parts) < 2) {
+                continue;
+            }
+            [$id, $token, $test] = array_pad($parts, 3, null);
+            MetaPixel::setPixelId($id);
+            MetaPixel::setToken($token);
+            if ($test) {
+                MetaPixel::setTestEventCode($test);
+            }
+
+            // eventSourceUrl is passed as 5th arg to send() — not a setter method
+            MetaPixel::send($eventName, $eventId, $serverCustomData, $serverUserData, $eventSourceUrl);
+        }
+    }
+
+    /**
+     * Core tracking method — dispatches client-side Livewire event and queues server-side CAPI call.
+     * Pass $tracking array (fbp, fbc, ip, ua, event_source_url) for enriched CAPI matching.
+     *
+     * @param  array<string, mixed>  $customData
+     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>  $tracking  Browser signals: fbp, fbc, ip, ua, event_source_url
+     */
+    public function trackEvent(string $eventName, array $customData = [], array $userData = [], ?Component $component = null, array $tracking = []): void
     {
         try {
-            // Generate event ID
-            $eventId = $this->generateEventId($eventName, $userData, $customData);
+            $eventId = $tracking['event_id'] ?? $this->generateEventId($eventName, $userData, $customData);
 
-            // Client-side tracking
-            // MetaPixel::flashEvent($eventName, $customData, $eventId);
+            // Merge browser signals into userData for CAPI
+            $mergedUserData = array_merge($userData, array_filter([
+                'fbp' => $tracking['fbp'] ?? null,
+                'fbc' => $tracking['fbc'] ?? null,
+                'client_ip_address' => $tracking['ip'] ?? $tracking['client_ip_address'] ?? null,
+                'client_user_agent' => $tracking['ua'] ?? $tracking['client_user_agent'] ?? null,
+            ]));
 
-            // If component is provided, dispatch event to browser
+            $eventSourceUrl = $tracking['event_source_url'] ?? null;
+
+            // Client-side: dispatch Livewire browser event (fbq + dataLayer)
             if ($component instanceof Component) {
-                info('dispatching event to browser', [
-                    'eventName' => $eventName,
-                    'customData' => $customData,
-                    'eventId' => $eventId,
-                ]);
                 $component->dispatch('facebookEvent', [
                     'eventName' => $eventName,
                     'customData' => $customData,
                     'eventId' => $eventId,
+                    'isStandard' => $this->isStandardEvent($eventName),
+                    'tracking' => array_filter([
+                        'fbp' => $tracking['fbp'] ?? null,
+                        'fbc' => $tracking['fbc'] ?? null,
+                    ]),
                 ]);
             }
 
-            defer(function () use ($eventName, $eventId, $customData, $userData): void {
-                // info('dispatching event to server', [
-                //     'eventName' => $eventName,
-                //     'customData' => $customData,
-                //     'eventId' => $eventId,
-                // ]);
-                // Server-side tracking
-                $serverCustomData = $this->createServerCustomData($customData);
-                $serverUserData = $this->createServerUserData($userData);
-
-                foreach (explode('|', (string) config('meta-pixel.meta_pixel')) as $pixel) {
-                    [$id, $token, $test] = explode(':', $pixel);
-                    MetaPixel::setPixelId($id);
-                    MetaPixel::setToken($token);
-                    MetaPixel::setTestEventCode($test);
-                    MetaPixel::send($eventName, $eventId, $serverCustomData, $serverUserData);
-                }
+            // Server-side: Conversions API (deferred)
+            defer(function () use ($eventName, $eventId, $customData, $mergedUserData, $eventSourceUrl): void {
+                $this->sendToConversionsApi($eventName, $eventId, $customData, $mergedUserData, $eventSourceUrl);
             });
-
-            // Log for debugging
-            // Log::info('Facebook Event Tracked', [
-            //     'event_name' => $eventName,
-            //     'event_id' => $eventId,
-            //     'custom_data' => $customData,
-            //     'user_data' => $userData,
-            // ]);
         } catch (\Exception $e) {
             Log::error('Facebook Pixel Error: '.$e->getMessage());
         }
     }
 
     /**
-     * Track AddToCart event
+     * Track ViewContent event.
+     *
+     * @param  array<string, mixed>  $tracking  Browser signals for CAPI match quality
      */
-    public function trackAddToCart(array $product, ?Component $component = null): void
+    public function trackViewContent(Product $product, ?string $eventId = null, array $tracking = []): void
+    {
+        try {
+            $eventId = $eventId ?: $this->generateEventId('ViewContent', [], [
+                'content_ids' => [$product->id],
+                'value' => $product->selling_price,
+            ]);
+
+            $customData = [
+                'currency' => 'BDT',
+                'value' => $product->selling_price,
+                'content_ids' => [$product->id],
+                'content_name' => $product->name,
+                'content_type' => 'product',
+                'quantity' => 1,
+            ];
+
+            // Merge browser signals into userData for CAPI
+            $mergedUserData = array_filter([
+                'fbp' => $tracking['fbp'] ?? null,
+                'fbc' => $tracking['fbc'] ?? null,
+                'client_ip_address' => $tracking['ip'] ?? $tracking['client_ip_address'] ?? request()->ip(),
+                'client_user_agent' => $tracking['ua'] ?? $tracking['client_user_agent'] ?? request()->userAgent(),
+            ]);
+
+            $eventSourceUrl = $tracking['event_source_url'] ?? request()->header('Referer') ?: url()->current();
+
+            // Server-side: Conversions API (deferred)
+            defer(function () use ($eventId, $customData, $mergedUserData, $eventSourceUrl): void {
+                $this->sendToConversionsApi('ViewContent', $eventId, $customData, $mergedUserData, $eventSourceUrl);
+            });
+        } catch (\Exception $e) {
+            Log::error('Facebook Pixel Error: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Track InitiateCheckout event when the checkout page loads (non-Livewire controller context).
+     *
+     * @return array<string, mixed>
+     */
+    public function trackInitiateCheckout(): array
+    {
+        try {
+            $cartItems = cart()->content();
+            $cartTotal = cart()->subTotal();
+            $contentIds = $cartItems->pluck('id')->values()->all();
+
+            $eventId = $this->generateEventId('InitiateCheckout', [], [
+                'content_ids' => $contentIds,
+                'value' => $cartTotal,
+            ]);
+
+            $customData = [
+                'currency' => 'BDT',
+                'value' => $cartTotal,
+                'content_ids' => array_map('strval', $contentIds),
+                'num_items' => $cartItems->sum('qty'),
+                'content_type' => 'product',
+            ];
+
+            // Handled browser-side via checkout.blade.php script to support SPA wire:navigate transitions
+
+            $dataLayerItems = $cartItems->map(fn ($item): array => [
+                'item_id' => (string) $item->id,
+                'item_name' => $item->name,
+                'price' => $item->price,
+                'quantity' => $item->qty,
+            ])->values()->all();
+
+            session()->flash('datalayer_events', array_merge(
+                session('datalayer_events', []),
+                [[
+                    'event' => 'meta_InitiateCheckout',
+                    'meta_event_name' => 'InitiateCheckout',
+                    'meta_event_id' => $eventId,
+                    'meta_event_data' => $customData,
+                    'ecommerce' => [
+                        'currency' => 'BDT',
+                        'value' => $cartTotal,
+                        'items' => $dataLayerItems,
+                    ],
+                ]]
+            ));
+
+            $userData = [
+                'client_ip_address' => request()->ip(),
+                'client_user_agent' => request()->userAgent(),
+            ];
+
+            defer(function () use ($eventId, $customData, $userData): void {
+                $this->sendToConversionsApi('InitiateCheckout', $eventId, $customData, $userData, url()->current());
+            });
+
+            return [
+                'event_id' => $eventId,
+                'custom_data' => $customData,
+                'dataLayerItems' => $dataLayerItems,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Facebook Pixel Error: '.$e->getMessage());
+
+            return [];
+        }
+    }
+
+    /**
+     * Track AddToCart event.
+     *
+     * @param  array<string, mixed>  $product
+     * @param  array<string, mixed>  $tracking  Browser signals for CAPI match quality
+     */
+    public function trackAddToCart(array $product, ?Component $component = null, array $tracking = []): void
     {
         $this->trackEvent('AddToCart', [
             'currency' => 'BDT',
@@ -162,22 +356,121 @@ class FacebookPixelService
             'content_name' => $product['name'],
             'quantity' => 1,
             'page_url' => $product['page_url'],
-        ], [], $component);
+        ], [], $component, $tracking);
     }
 
     /**
-     * Track Purchase event
+     * Track Lead event — used at checkout when advanced_tracking is enabled.
+     *
+     * @param  array<string, mixed>  $order
+     * @param  array<mixed>  $products
+     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>  $tracking  Browser signals stored on the order
      */
-    public function trackPurchase(array $order, array $products, array $userData, ?Component $component = null): void
+    public function trackLead(array $order, array $products, array $userData, ?Component $component = null, array $tracking = []): void
+    {
+        $this->trackEvent('Lead', [
+            'currency' => 'BDT',
+            'value' => $order['total'],
+            'content_ids' => array_column($products, 'id'),
+            'content_name' => 'Lead',
+            'order_id' => $order['id'],
+            'quantity' => array_sum(array_column($products, 'quantity')),
+        ], $userData, $component, $tracking);
+    }
+
+    /**
+     * Track Purchase event.
+     *
+     * @param  array<string, mixed>  $order
+     * @param  array<mixed>  $products
+     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>  $tracking  Browser signals stored on the order
+     */
+    public function trackPurchase(array $order, array $products, array $userData, ?Component $component = null, array $tracking = []): void
     {
         $this->trackEvent('Purchase', [
             'currency' => 'BDT',
             'value' => $order['total'],
             'content_ids' => array_column($products, 'id'),
             'content_name' => 'Purchase',
-            'transaction_id' => $order['id'],
+            'order_id' => $order['id'],
             'quantity' => array_sum(array_column($products, 'quantity')),
-            'page_url' => route('thank-you'),
-        ], $userData, $component);
+        ], $userData, $component, $tracking);
+    }
+
+    /**
+     * Track Contact event (WhatsApp / Messenger / tel click).
+     *
+     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>  $tracking
+     */
+    public function trackContact(string $contactType, string $contactUrl, array $userData = [], ?Component $component = null, array $tracking = []): void
+    {
+        $this->trackEvent('Contact', [
+            'content_name' => $contactType,
+            'content_ids' => [],
+            'page_url' => $contactUrl,
+        ], $userData, $component, $tracking);
+    }
+
+    /**
+     * Track custom OrderCancelled event.
+     *
+     * @param  array<string, mixed>  $order
+     * @param  array<mixed>  $products
+     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>  $tracking
+     */
+    public function trackOrderCancelled(array $order, array $products, array $userData = [], ?Component $component = null, array $tracking = []): void
+    {
+        $this->trackEvent('OrderCancelled', [
+            'currency' => 'BDT',
+            'value' => $order['total'],
+            'content_ids' => array_column($products, 'id'),
+            'content_name' => 'OrderCancelled',
+            'order_id' => $order['id'],
+            'quantity' => array_sum(array_column($products, 'quantity')),
+        ], $userData, $component, $tracking);
+    }
+
+    /**
+     * Track custom OrderReturned event.
+     *
+     * @param  array<string, mixed>  $order
+     * @param  array<mixed>  $products
+     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>  $tracking
+     */
+    public function trackOrderReturned(array $order, array $products, array $userData = [], ?Component $component = null, array $tracking = []): void
+    {
+        $this->trackEvent('OrderReturned', [
+            'currency' => 'BDT',
+            'value' => $order['total'],
+            'content_ids' => array_column($products, 'id'),
+            'content_name' => 'OrderReturned',
+            'order_id' => $order['id'],
+            'quantity' => array_sum(array_column($products, 'quantity')),
+        ], $userData, $component, $tracking);
+    }
+
+    /**
+     * Track custom OrderDelivered event.
+     *
+     * @param  array<string, mixed>  $order
+     * @param  array<mixed>  $products
+     * @param  array<string, mixed>  $userData
+     * @param  array<string, mixed>  $tracking
+     */
+    public function trackOrderDelivered(array $order, array $products, array $userData = [], ?Component $component = null, array $tracking = []): void
+    {
+        $this->trackEvent('OrderDelivered', [
+            'currency' => 'BDT',
+            'value' => $order['total'],
+            'content_ids' => array_column($products, 'id'),
+            'content_name' => 'OrderDelivered',
+            'order_id' => $order['id'],
+            'quantity' => array_sum(array_column($products, 'quantity')),
+        ], $userData, $component, $tracking);
     }
 }

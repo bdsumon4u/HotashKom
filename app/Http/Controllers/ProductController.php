@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ProductResource;
 use App\Models\HomeSection;
 use App\Models\Product;
+use App\Services\FacebookPixelService;
 use App\Traits\HasProductFilters;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,6 +15,8 @@ use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 class ProductController extends Controller
 {
     use HasProductFilters;
+
+    public function __construct(protected FacebookPixelService $facebookPixelService) {}
 
     /**
      * Display a listing of the resource.

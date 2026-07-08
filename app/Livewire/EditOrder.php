@@ -9,6 +9,7 @@ use App\Models\OrderNote;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
+use App\Services\FacebookPixelService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -17,6 +18,13 @@ use Livewire\Component;
 
 class EditOrder extends Component
 {
+    protected FacebookPixelService $facebookService;
+
+    public function boot(FacebookPixelService $facebookService): void
+    {
+        $this->facebookService = $facebookService;
+    }
+
     private array $attrs = [
         'name', 'phone', 'email', 'address', 'note', 'status',
     ];
@@ -347,9 +355,12 @@ class EditOrder extends Component
             ->fill(['products' => $this->selectedProducts]);
 
         if ($this->order->exists) {
+            $statusChanged = $this->order->status != $this->status;
+            $newStatus = $this->status;
             $confirming = false;
-            if ($this->order->status != $this->status) {
-                $confirming = $this->status === 'CONFIRMED';
+
+            if ($statusChanged) {
+                $confirming = $newStatus === 'CONFIRMED';
                 $this->order->forceFill([
                     'status_at' => now()->toDateTimeString(),
                 ]);
@@ -363,6 +374,34 @@ class EditOrder extends Component
 
             if ($confirming && ($user = $this->order->user)) {
                 $user->notify(new OrderConfirmed($this->order));
+            }
+
+            // Fire pixel events when status changes and pixel is configured
+            if ($statusChanged && config('meta-pixel.meta_pixel') && config('meta-pixel.advanced_tracking')) {
+                $products = collect($this->order->products)->values()->all();
+                $orderArr = [
+                    'id' => $this->order->id,
+                    'total' => $this->order->data['subtotal'] ?? 0,
+                ];
+                $userData = [];
+                $orderTracking = $this->order->tracking ?? [];
+
+                if ($user = $this->order->user) {
+                    $userData = [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'phone' => $user->phone_number,
+                        'external_id' => $user->id,
+                    ];
+                }
+
+                if ($newStatus === 'CONFIRMED') {
+                    $this->facebookService->trackPurchase($orderArr, $products, $userData, null, $orderTracking);
+                } elseif ($newStatus === 'CANCELLED') {
+                    $this->facebookService->trackOrderCancelled($orderArr, $products, $userData, null, $orderTracking);
+                } elseif (in_array($newStatus, ['RETURNED', 'PAID_RETURN'])) {
+                    $this->facebookService->trackOrderReturned($orderArr, $products, $userData, null, $orderTracking);
+                }
             }
 
             session()->flash('success', 'Order updated successfully.');

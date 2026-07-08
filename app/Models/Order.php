@@ -6,6 +6,7 @@ use App\Jobs\SyncOrderStatusWithReseller;
 use App\Jobs\SyncProductStockWithResellers;
 use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
+use App\Services\FacebookPixelService;
 use Fuse\Fuse;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -13,8 +14,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class Order extends Model
 {
@@ -25,7 +28,7 @@ class Order extends Model
     const MANUAL = 1;
 
     protected $fillable = [
-        'admin_id', 'user_id', 'type', 'name', 'phone', 'email', 'address', 'status', 'status_at', 'shipped_at', 'products', 'note', 'data', 'source_id',
+        'admin_id', 'user_id', 'type', 'name', 'phone', 'email', 'address', 'status', 'status_at', 'shipped_at', 'products', 'note', 'data', 'tracking', 'source_id',
     ];
 
     protected $attributes = [
@@ -111,6 +114,99 @@ class Order extends Model
         static::updated(function (Order $order): void {
             // Clear EditOrder component caches
             cacheMemo()->forget('order_activities:'.$order->id);
+
+            $status = Arr::get($order->getChanges(), 'status');
+
+            if ($status) {
+                try {
+                    // Fire CAPI + flash GTM dataLayer on order status change
+                    $facebookPixelService = app(FacebookPixelService::class);
+
+                    $facebookProducts = [];
+                    foreach ($order->products as $product) {
+                        $p = (array) $product;
+                        $price = (float) (isOninda() && config('app.resell') ? $p['retail_price'] ?? $p['price'] : $p['price']);
+                        $facebookProducts[] = [
+                            'id' => $p['id'],
+                            'name' => $p['name'],
+                            'price' => $price,
+                            'quantity' => (int) $p['quantity'],
+                        ];
+                    }
+
+                    $retail = 0;
+                    foreach ($facebookProducts as $p) {
+                        $retail = $retail + ($p['price'] * $p['quantity']);
+                    }
+                    $shippingCost = (float) (isOninda() && config('app.resell') ? $order->data['retail_delivery_fee'] ?? ($order->data['shipping_cost'] ?? 0) : $order->data['shipping_cost'] ?? 0);
+                    $discount = (float) (isOninda() && config('app.resell') ? $order->data['retail_discount'] ?? 0 : $order->data['discount'] ?? 0);
+                    $advanced = (float) ($order->data['advanced'] ?? 0);
+                    $couponDiscount = (float) ($order->data['coupon_discount'] ?? 0);
+
+                    $orderTotal = $retail + $shippingCost - $discount - $advanced - $couponDiscount;
+
+                    $orderPayload = [
+                        'id' => $order->id,
+                        'total' => $orderTotal,
+                    ];
+
+                    $tracking = $order->tracking ?: [];
+                    $eventId = 'ord_'.strtolower($status).'_'.$order->id.'_'.time();
+                    $tracking['event_id'] = $eventId;
+
+                    $userData = [
+                        'em' => $order->email ? strtolower($order->email) : null,
+                        'ph' => $order->phone ? preg_replace('/[^\d]/', '', $order->phone) : null,
+                        'fn' => $order->name ? strtolower($order->name) : null,
+                        'client_ip_address' => $tracking['ip'] ?? request()->ip(),
+                        'client_user_agent' => $tracking['ua'] ?? request()->userAgent(),
+                    ];
+
+                    $tracked = false;
+                    $dlEventName = '';
+
+                    if ($status === 'CONFIRMED' && config('meta-pixel.advanced_tracking')) {
+                        $facebookPixelService->trackPurchase($orderPayload, $facebookProducts, $userData, null, $tracking);
+                        $dlEventName = 'Purchase';
+                        $tracked = true;
+                    } elseif ($status === 'DELIVERED') {
+                        $facebookPixelService->trackOrderDelivered($orderPayload, $facebookProducts, $userData, null, $tracking);
+                        $dlEventName = 'OrderDelivered';
+                        $tracked = true;
+                    } elseif ($status === 'CANCELLED') {
+                        $facebookPixelService->trackOrderCancelled($orderPayload, $facebookProducts, $userData, null, $tracking);
+                        $dlEventName = 'OrderCancelled';
+                        $tracked = true;
+                    } elseif ($status === 'RETURNED' || $status === 'PAID_RETURN') {
+                        $facebookPixelService->trackOrderReturned($orderPayload, $facebookProducts, $userData, null, $tracking);
+                        $dlEventName = 'OrderReturned';
+                        $tracked = true;
+                    }
+
+                    if ($tracked && GoogleTagManagerFacade::isEnabled()) {
+                        $dlEvent = [
+                            'event' => 'meta_'.$dlEventName,
+                            'meta_event_name' => $dlEventName,
+                            'meta_event_id' => $eventId,
+                            'ecommerce' => [
+                                'transaction_id' => (string) $order->id,
+                                'value' => $orderTotal,
+                                'currency' => 'BDT',
+                                'items' => array_map(fn ($p) => [
+                                    'item_id' => (string) $p['id'],
+                                    'item_name' => $p['name'],
+                                    'price' => $p['price'],
+                                    'quantity' => $p['quantity'],
+                                ], $facebookProducts),
+                            ],
+                            'customer' => customer_info(),
+                        ];
+                        session()->flash('datalayer_events', array_merge(session('datalayer_events', []), [$dlEvent]));
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Order status tracking error: '.$e->getMessage());
+                }
+            }
 
             if (! isOninda()) {
                 return;
@@ -252,6 +348,16 @@ class Order extends Model
         return Attribute::make(
             fn ($data): mixed => json_decode((string) $data, true),
             fn ($data) => $this->attributes['data'] = json_encode(array_merge($this->data, $data)),
+        );
+    }
+
+    protected function tracking(): Attribute
+    {
+        return Attribute::make(
+            fn ($tracking): array => $tracking ? json_decode((string) $tracking, true) : [],
+            fn ($tracking) => $this->attributes['tracking'] = json_encode(
+                array_merge($this->tracking ?? [], is_array($tracking) ? $tracking : [])
+            ),
         );
     }
 
@@ -569,6 +675,7 @@ class Order extends Model
             'admin_id' => 'integer',
             'products' => 'array',
             'data' => 'array',
+            'tracking' => 'array',
             'status_at' => 'datetime',
             'shipped_at' => 'datetime',
         ];

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutRequest;
+use App\Services\FacebookPixelService;
 use Illuminate\Http\Response;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class CheckoutController extends Controller
 {
+    public function __construct(protected FacebookPixelService $facebookPixelService) {}
+
     /**
      * Handle the incoming request.
      *
@@ -34,7 +37,12 @@ class CheckoutController extends Controller
                 ]);
             }
 
-            return view('checkout');
+            $trackingDetails = null;
+            if (config('meta-pixel.meta_pixel')) {
+                $trackingDetails = $this->facebookPixelService->trackInitiateCheckout();
+            }
+
+            return view('checkout', compact('trackingDetails'));
         }
     }
 }

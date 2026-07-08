@@ -55,7 +55,8 @@
                     </svg>
                     &nbsp;
                     <a style="font-family: monospace;" class="topbar-link"
-                        href="tel:{{ $company->phone ?? '' }}">{{ $company->phone ?? '' }}</a>
+                        href="tel:{{ $company->phone ?? '' }}"
+                        data-contact-type="tel">{{ $company->phone ?? '' }}</a>
                 </div>
             @endif
             @foreach ($menuItems as $item)

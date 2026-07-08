@@ -4,6 +4,12 @@ return [
     'meta_pixel' => env('META_PIXEL', ''),
 
     /*
+     * Enable advanced tracking: fire Lead at checkout, Purchase on confirm,
+     * and custom events for cancelled/returned orders.
+     */
+    'advanced_tracking' => env('ADVANCED_TRACKING', false),
+
+    /*
      * The Meta pixel id, should be a code that looks something like "1202417153106158".
      */
     'pixel_id' => env('META_PIXEL_ID', ''),

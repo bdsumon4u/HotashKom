@@ -253,6 +253,42 @@
             </x-form>
         </div>
     </div>
+    @if (!empty($trackingDetails) && config('meta-pixel.meta_pixel'))
+        @php
+            $jsItems = array_map(fn($p) => [
+                'item_id' => $p['item_id'],
+                'item_name' => $p['item_name'],
+                'price' => $p['price'],
+                'quantity' => $p['quantity']
+            ], $trackingDetails['dataLayerItems']);
+        @endphp
+        <script>
+            (function() {
+                var eventName = 'InitiateCheckout';
+                var eventId = @json($trackingDetails['event_id']);
+                var eventData = @json($trackingDetails['custom_data']);
+
+                // 1. Push to dataLayer (standard and custom events)
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                    event: 'meta_' + eventName,
+                    meta_event_name: eventName,
+                    meta_event_id: eventId,
+                    meta_event_data: eventData,
+                    ecommerce: {
+                        currency: 'BDT',
+                        value: eventData.value,
+                        items: @json($jsItems)
+                    }
+                });
+
+                // 2. Fire browser fbq with identical event ID
+                if (typeof fbq === 'function') {
+                    fbq('track', eventName, eventData, { eventID: eventId });
+                }
+            })();
+        </script>
+    @endif
 @endsection
 
 @push('scripts')

@@ -43,7 +43,8 @@
                                 networks</div>
                             <ul class="footer-newsletter__social-links">
                                 <li class="footer-newsletter__social-link footer-newsletter__social-link--phone">
-                                    <a href="tel:{{$company->phone}}" target="_blank" class="bg-primary" aria-label="Call us">
+                                    <a href="tel:{{$company->phone}}" target="_blank" class="bg-primary" aria-label="Call us"
+                                        data-contact-type="tel">
                                         <i class="fas fa-phone"></i>
                                     </a>
                                 </li>
