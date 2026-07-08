@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BrandProductController;
 use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\CheckoutController;
@@ -137,6 +138,9 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
         Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
         Route::get('/categories/{category:slug}/products', CategoryProductController::class)->name('categories.products');
         Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
+
+        Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
+        Route::get('/blogs/{blog:slug}', [BlogController::class, 'show'])->name('blogs.show');
 
         pageRoutes();
     });

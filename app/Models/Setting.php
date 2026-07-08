@@ -23,7 +23,35 @@ class Setting extends Model
 
     public static function array()
     {
-        return cacheMemo()->rememberForever('settings', fn () => self::all()->flatMap(fn ($setting): array => [$setting->name => $setting->value])->toArray());
+        return cacheMemo()->rememberForever('settings', function () {
+            $settings = self::all()->flatMap(fn ($setting): array => [$setting->name => $setting->value])->toArray();
+
+            if (empty($settings['company'])) {
+                $settings['company'] = (object) [
+                    'name' => 'HotashKom',
+                    'phone' => '01700000000',
+                    'whatsapp' => '01700000000',
+                    'email' => 'info@hotashkom.test',
+                    'address' => 'Dhaka, Bangladesh',
+                    'messenger' => '',
+                ];
+            }
+
+            if (empty($settings['logo'])) {
+                $settings['logo'] = (object) [
+                    'desktop' => '',
+                    'favicon' => '',
+                ];
+            }
+
+            if (empty($settings['show_option'])) {
+                $settings['show_option'] = (object) [
+                    'customer_login' => false,
+                ];
+            }
+
+            return $settings;
+        });
     }
 
     protected function value(): Attribute

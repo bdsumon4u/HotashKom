@@ -988,13 +988,15 @@
     {{-- Storefront components moved to external file: strokya/js/storefront-components.js --}}
     @stack('scripts')
     @php
-        function phone88($phone)
-        {
-            $phone = preg_replace('/[^\d]/', '', $phone);
-            if (strlen($phone) == 11) {
-                $phone = '88' . $phone;
+        if (! function_exists('phone88')) {
+            function phone88($phone)
+            {
+                $phone = preg_replace('/[^\d]/', '', $phone);
+                if (strlen($phone) == 11) {
+                    $phone = '88' . $phone;
+                }
+                return $phone;
             }
-            return $phone;
         }
         $messenger = $company->messenger ?? '';
         $phone = phone88($company->whatsapp ?? '');

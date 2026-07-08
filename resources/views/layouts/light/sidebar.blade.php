@@ -175,6 +175,14 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/blogs*') ? 'active' : '' }}"
+                            href="{{ route('admin.blogs.index') }}">
+                            <i data-feather="book-open"> </i>
+                            <span>Blogs</span>
+                        </a>
+                    </li>
+
                     <li class="sidebar-title">
                         <h6>Reports</h6>
                     </li>

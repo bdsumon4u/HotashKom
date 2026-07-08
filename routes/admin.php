@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ApiController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\AttributeOptionController;
 use App\Http\Controllers\Admin\Auth\ChangePasswordController;
+use App\Http\Controllers\Admin\BlogController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CartController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -136,6 +137,7 @@ Route::group(['as' => 'admin.'], function (): void {
             'reports' => ReportController::class,
             'home-sections' => HomeSectionController::class,
             'pages' => PageController::class,
+            'blogs' => BlogController::class,
             'menus' => MenuController::class,
             'menu-items' => MenuItemController::class,
             'category-menus' => CategoryMenuController::class,
