@@ -81,14 +81,14 @@ return [
     'slides' => [
         'object_fit' => env('SLIDES_OBJECT_FIT', 'cover'),
         'mobile' => [
-            'width' => 360,
-            'height' => 180,
+            'width' => env('SLIDES_MOBILE_WIDTH', 360),
+            'height' => env('SLIDES_MOBILE_HEIGHT', 180),
             'resize' => env('SLIDES_MOBILE_RESIZE', true),
             'method' => env('SLIDES_MOBILE_METHOD', 'resize'),
         ],
         'desktop' => [
-            'width' => 840,
-            'height' => 395,
+            'width' => env('SLIDES_DESKTOP_WIDTH', 1125),
+            'height' => env('SLIDES_DESKTOP_HEIGHT', 395),
             'resize' => env('SLIDES_DESKTOP_RESIZE', true),
             'method' => env('SLIDES_DESKTOP_METHOD', 'resize'),
         ],
