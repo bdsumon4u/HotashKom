@@ -87,7 +87,7 @@ return [
             'method' => env('SLIDES_MOBILE_METHOD', 'resize'),
         ],
         'desktop' => [
-            'width' => 1125,
+            'width' => 840,
             'height' => 395,
             'resize' => env('SLIDES_DESKTOP_RESIZE', true),
             'method' => env('SLIDES_DESKTOP_METHOD', 'resize'),
