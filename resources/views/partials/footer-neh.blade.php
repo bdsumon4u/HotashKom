@@ -61,7 +61,7 @@
     }
 
     .rankmet-footer-col-1 {
-        flex: 1 1 300px;
+        flex: 1 1 0px;
         max-width: 320px;
     }
 
