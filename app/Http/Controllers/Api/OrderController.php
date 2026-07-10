@@ -45,6 +45,9 @@ class OrderController extends Controller
         // Check if any column has a search value
         if (is_array($request->input('columns'))) {
             foreach ($request->input('columns') as $column) {
+                if ($column['name'] === 'products') {
+                    continue;
+                }
                 if (! empty($column['search']['value'] ?? '')) {
                     $hasSearch = true;
                     break;
