@@ -1046,7 +1046,7 @@
     {{-- WhatsApp handlers moved to external file: strokya/js/whatsapp-handlers.js --}}
     @if (config('app.unregister_sw'))
         <script data-navigate-once>
-            (async () => {\
+            (async () => {
                 try {
                     // Unregister all service workers
                     if ('serviceWorker' in navigator) {
@@ -1075,8 +1075,12 @@
     <script>
         (function() {
             if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelId) {
-                var userData = {{ Js::from(app(App\Services\FacebookPixelService::class)->getNormalizedUserData()) }};
-                fbq('init', window.trackingConfig.pixelId, userData);
+                if (window.hasInitializedMetaPixel) {
+                    var userData = {{ Js::from(app(App\Services\FacebookPixelService::class)->getNormalizedUserData()) }};
+                    fbq('init', window.trackingConfig.pixelId, userData);
+                } else {
+                    window.hasInitializedMetaPixel = true;
+                }
             }
         })();
     </script>
