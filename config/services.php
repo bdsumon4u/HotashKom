@@ -84,13 +84,13 @@ return [
             'width' => env('SLIDES_MOBILE_WIDTH', 360),
             'height' => env('SLIDES_MOBILE_HEIGHT', 180),
             'resize' => env('SLIDES_MOBILE_RESIZE', true),
-            'method' => env('SLIDES_MOBILE_METHOD', 'resize'),
+            'method' => env('SLIDES_MOBILE_METHOD', 'coverDown'),
         ],
         'desktop' => [
-            'width' => env('SLIDES_DESKTOP_WIDTH', 1125),
+            'width' => env('SLIDES_DESKTOP_WIDTH', 1125), // SLIDES_DESKTOP_WIDTH=840
             'height' => env('SLIDES_DESKTOP_HEIGHT', 395),
             'resize' => env('SLIDES_DESKTOP_RESIZE', true),
-            'method' => env('SLIDES_DESKTOP_METHOD', 'resize'),
+            'method' => env('SLIDES_DESKTOP_METHOD', 'coverDown'),
         ],
     ],
 
