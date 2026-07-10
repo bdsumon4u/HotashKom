@@ -6,17 +6,15 @@
 
     $createSectionDefaults ??= \App\Models\LandingPagePro::getCreateSectionDefaults();
 
-    if ($isCreateForm) {
-        $sectionSettings = array_replace_recursive($createSectionDefaults, $sectionSettings);
-    }
+    $sectionSettings = array_replace_recursive($createSectionDefaults, $sectionSettings);
 
     $defaultFormTitle = $isCreateForm ? 'Hotash Clothing | Premium Exported Trousers' : $landingPagePro->title;
     $defaultFormSlug = $isCreateForm ? '' : $landingPagePro->slug;
     $defaultSeoTitle = $isCreateForm
-        ? 'Hotash Clothing | Premium Exported Trousers'
+        ? ''
         : data_get($landingPagePro->seo, 'title');
     $defaultSeoDescription = $isCreateForm
-        ? 'আমাদের প্রতিটি পণ্য এক্সপোর্ট কোয়ালিটি সম্পন্ন। Premium Trousers for Premium Customers.'
+        ? ''
         : data_get($landingPagePro->seo, 'description');
 
     $itemsInitial = collect(
@@ -96,7 +94,6 @@
     $sectionOrderLabels = $sectionOrderLabels ?? \App\Models\LandingPagePro::reorderableSectionLabels();
     $richTextSections ??= \App\Models\LandingPagePro::getRichTextSections();
     $sectionsWithoutSubtitle ??= \App\Models\LandingPagePro::getSectionsWithoutSubtitle();
-    $accordionSectionKeys = array_keys($sections);
     $reorderableSectionKeys = array_keys($sectionOrderLabels);
     $sectionOrderInitial = collect(old('section_settings.section_order', data_get($sectionSettings, 'section_order', [])))
         ->map(fn($section) => (string) $section)
@@ -111,6 +108,24 @@
         ->unique()
         ->values()
         ->all();
+
+    // Reorder $sections according to the saved order
+    $sortedSections = [];
+    if (isset($sections['announcement_bar'])) {
+        $sortedSections['announcement_bar'] = $sections['announcement_bar'];
+    }
+    foreach ($sectionOrderInitial as $key) {
+        if (isset($sections[$key])) {
+            $sortedSections[$key] = $sections[$key];
+        }
+    }
+    if (isset($sections['footer'])) {
+        $sortedSections['footer'] = $sections['footer'];
+    }
+    $sections = $sortedSections;
+
+    $accordionSectionKeys = array_keys($sections);
+
     $sectionOpenInitial = collect($accordionSectionKeys)
         ->mapWithKeys(fn($key) => [$key => (bool) data_get($sectionSettings, $key . '.enabled', true)])
         ->all();

@@ -86,7 +86,7 @@ class LandingPagePro extends Model
     {
         return [
             'announcement_bar' => [
-                'title' => 'Limited Time Offer! Free Shipping on Orders Over 3 Pieces.',
+                'title' => 'সীমিত সময়ের অফার! ৩ পিসের বেশি অর্ডারে ফ্রি শিপিং।',
             ],
             'hero' => [
                 'title' => 'Original Exported Guess Trouser',
@@ -141,7 +141,7 @@ class LandingPagePro extends Model
                 ]),
             ],
             'cta_after_faq' => [
-                'title' => 'আর প্রশ্ন নয়, অর্ডার দিন',
+                'title' => 'আর প্রশ্ন নয়, অর্ডার দিন',
                 'subtitle' => '',
             ],
             'order_form' => [
@@ -162,6 +162,10 @@ class LandingPagePro extends Model
             'final_cta' => [
                 'title' => 'রিভিউ দেখলেন, এবার অর্ডার কনফার্ম করুন',
                 'subtitle' => 'আপনার পছন্দের কালার ও সাইজ বেছে এখনই অর্ডার দিন',
+            ],
+            'footer' => [
+                'title' => 'Hotash CLOTHING',
+                'subtitle' => 'আমাদের প্রতিটি পণ্য এক্সপোর্ট কোয়ালিটি সম্পন্ন। Premium Trousers for Premium Customers.',
             ],
         ];
     }

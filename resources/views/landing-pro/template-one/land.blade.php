@@ -5,10 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ data_get($landingPagePro->seo, 'title', $landingPagePro->title) }}</title>
-    @if (filled(data_get($landingPagePro->seo, 'description')))
-        <meta name="description" content="{{ data_get($landingPagePro->seo, 'description') }}">
-    @endif
+    <title>{{ data_get($landingPagePro->seo, 'title') ?: $landingPagePro->title }}</title>
+    <meta name="description" content="{{ data_get($landingPagePro->seo, 'description') ?: 'আমাদের প্রতিটি পণ্য এক্সপোর্ট কোয়ালিটি সম্পন্ন। Premium Trousers for Premium Customers.' }}">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
