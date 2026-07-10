@@ -2,6 +2,7 @@
 
 namespace Hotash\FacebookPixel;
 
+use App\Services\FacebookPixelService;
 use Exception;
 use FacebookAds\Api;
 use FacebookAds\Logger\CurlLogger;
@@ -12,7 +13,6 @@ use FacebookAds\Object\ServerSide\EventRequest;
 use FacebookAds\Object\ServerSide\EventResponse;
 use FacebookAds\Object\ServerSide\UserData;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\URL;
@@ -234,11 +234,8 @@ class MetaPixel
      */
     public function getUser(): ?array
     {
-        if ($this->isAdvancedMatchingEnabled() && Auth::check()) {
-            return [
-                'em' => strtolower(Auth::user()->email),
-                'external_id' => Auth::user()->id,
-            ];
+        if ($this->isAdvancedMatchingEnabled()) {
+            return app(FacebookPixelService::class)->getNormalizedUserData();
         }
 
         return null;

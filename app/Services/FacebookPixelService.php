@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\Order;
 use App\Models\Product;
 use FacebookAds\Object\ServerSide\Content;
 use FacebookAds\Object\ServerSide\CustomData;
 use FacebookAds\Object\ServerSide\DeliveryCategory;
 use FacebookAds\Object\ServerSide\UserData;
 use Hotash\FacebookPixel\Facades\MetaPixel;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
@@ -96,36 +98,156 @@ class FacebookPixelService
     }
 
     /**
+     * Get normalized user matching data from array and cookies/session.
+     *
+     * @param  array<string, mixed>  $userData
+     * @return array<string, mixed>
+     */
+    public function getNormalizedUserData(array $userData = [], ?string $eventName = null): array
+    {
+        $email = $userData['email'] ?? $userData['em'] ?? null;
+        $phone = $userData['phone'] ?? $userData['ph'] ?? null;
+        $name = $userData['name'] ?? null;
+        $firstName = $userData['first_name'] ?? $userData['fn'] ?? null;
+        $lastName = $userData['last_name'] ?? $userData['ln'] ?? $userData['surname'] ?? null;
+        $city = $userData['city'] ?? $userData['ct'] ?? null;
+        $country = $userData['country'] ?? $userData['cn'] ?? null;
+
+        // Fetch from cookies as fallback if not present
+        if (empty($email)) {
+            $email = Cookie::get('email');
+        }
+        if (empty($phone)) {
+            $phone = Cookie::get('phone');
+        }
+        if (empty($name)) {
+            $name = Cookie::get('name');
+        }
+
+        // Default country fallback to bd
+        if (empty($country)) {
+            $country = 'bd';
+        }
+
+        // Handle shipping area for city if empty
+        if (empty($city)) {
+            $shippingArea = Cookie::get('shipping');
+            if ($shippingArea) {
+                $city = $shippingArea;
+            }
+        }
+
+        // Format phone
+        if ($phone) {
+            $phone = preg_replace('/[^\d]/', '', (string) $phone);
+            if (strlen($phone) === 11 && str_starts_with($phone, '01')) {
+                $phone = '88'.$phone;
+            }
+        }
+
+        // Format email
+        if ($email) {
+            $email = strtolower(trim((string) $email));
+        }
+
+        // Format names
+        if ($name && empty($firstName)) {
+            $parts = explode(' ', trim((string) $name));
+            $firstName = $parts[0];
+            $lastName = $lastName ?: (count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '');
+        }
+
+        if ($firstName) {
+            $firstName = strtolower(trim((string) $firstName));
+        }
+        if ($lastName) {
+            $lastName = strtolower(trim((string) $lastName));
+        }
+
+        // Format city
+        if ($city) {
+            $city = str_replace(' ', '', strtolower(trim((string) $city)));
+        }
+
+        if ($country) {
+            $country = strtolower(trim((string) $country));
+        }
+
+        // Filter parameters based on event name logic
+        $richEvents = ['Lead', 'Purchase', 'OrderCancelled', 'OrderReturned', 'OrderDelivered'];
+        $isRich = $eventName && in_array($eventName, $richEvents, true);
+
+        $result = [
+            'em' => $email,
+            'ph' => $phone,
+        ];
+
+        if ($isRich) {
+            $result['fn'] = $firstName;
+            $result['ln'] = $lastName;
+            $result['ct'] = $city;
+            $result['cn'] = $country;
+        }
+
+        return array_filter($result);
+    }
+
+    /**
+     * Enrich the user data using the order model from database.
+     */
+    protected function enrichUserDataForOrder(int|string $orderId, array &$userData): void
+    {
+        $order = Order::find($orderId);
+        if ($order) {
+            $userData['email'] = $userData['email'] ?? $order->email;
+            $userData['phone'] = $userData['phone'] ?? $order->phone;
+            if (empty($userData['name']) && empty($userData['first_name']) && empty($userData['fn'])) {
+                $userData['name'] = $order->name;
+            }
+            if (empty($userData['city']) && empty($userData['ct'])) {
+                $userData['city'] = $order->data['shipping_area'] ?? null;
+            }
+            if (empty($userData['country']) && empty($userData['cn'])) {
+                $userData['country'] = 'bd';
+            }
+        }
+    }
+
+    /**
      * Build server-side UserData from a flat array.
      * Accepts browser signals: fbp, fbc, client_ip_address, client_user_agent, event_source_url.
      *
      * @param  array<string, mixed>  $userData
      */
-    protected function createServerUserData(array $userData): UserData
+    protected function createServerUserData(array $userData, ?string $eventName = null): UserData
     {
         /** @var UserData $obj */
         $obj = MetaPixel::userData();
 
-        if (isset($userData['name'])) {
-            $parts = explode(' ', trim((string) $userData['name']));
-            $firstName = $parts[0];
-            $lastName = count($parts) > 1 ? implode(' ', array_slice($parts, 1)) : '';
-            $obj->setFirstName($firstName);
-            if ($lastName !== '') {
-                $obj->setLastName($lastName);
-            }
+        $normalized = $this->getNormalizedUserData($userData, $eventName);
+
+        if (isset($normalized['em'])) {
+            $obj->setEmail($normalized['em']);
         }
 
-        if (isset($userData['email'])) {
-            $obj->setEmail($userData['email']);
+        if (isset($normalized['ph'])) {
+            $obj->setPhone($normalized['ph']);
         }
 
-        if (isset($userData['phone'])) {
-            $obj->setPhone($userData['phone']);
+        if (isset($normalized['fn'])) {
+            $obj->setFirstName($normalized['fn']);
         }
 
-        if (isset($userData['external_id'])) {
-            $obj->setExternalId((string) $userData['external_id']);
+        if (isset($normalized['ln'])) {
+            $obj->setLastName($normalized['ln']);
+        }
+
+        if (isset($normalized['ct'])) {
+            $obj->setCity($normalized['ct']);
+        }
+
+        if (isset($normalized['cn'])) {
+            $obj->setCountry($normalized['cn']);
         }
 
         // Browser tracking signals
@@ -165,7 +287,7 @@ class FacebookPixelService
     protected function sendToConversionsApi(string $eventName, string $eventId, array $customData, array $userData, ?string $eventSourceUrl = null): void
     {
         $serverCustomData = $this->createServerCustomData($customData);
-        $serverUserData = $this->createServerUserData($userData);
+        $serverUserData = $this->createServerUserData($userData, $eventName);
 
         foreach (explode('|', (string) config('meta-pixel.meta_pixel')) as $pixel) {
             $parts = explode(':', $pixel);
@@ -207,6 +329,8 @@ class FacebookPixelService
 
             $eventSourceUrl = $tracking['event_source_url'] ?? null;
 
+            $normalizedUser = $this->getNormalizedUserData($userData, $eventName);
+
             // Client-side: dispatch Livewire browser event (fbq + dataLayer)
             if ($component instanceof Component) {
                 $component->dispatch('facebookEvent', [
@@ -214,6 +338,7 @@ class FacebookPixelService
                     'customData' => $customData,
                     'eventId' => $eventId,
                     'isStandard' => $this->isStandardEvent($eventName),
+                    'userData' => $normalizedUser,
                     'tracking' => array_filter([
                         'fbp' => $tracking['fbp'] ?? null,
                         'fbc' => $tracking['fbc'] ?? null,
@@ -369,6 +494,7 @@ class FacebookPixelService
      */
     public function trackLead(array $order, array $products, array $userData, ?Component $component = null, array $tracking = []): void
     {
+        $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('Lead', [
             'currency' => 'BDT',
             'value' => $order['total'],
@@ -389,6 +515,7 @@ class FacebookPixelService
      */
     public function trackPurchase(array $order, array $products, array $userData, ?Component $component = null, array $tracking = []): void
     {
+        $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('Purchase', [
             'currency' => 'BDT',
             'value' => $order['total'],
@@ -424,6 +551,7 @@ class FacebookPixelService
      */
     public function trackOrderCancelled(array $order, array $products, array $userData = [], ?Component $component = null, array $tracking = []): void
     {
+        $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('OrderCancelled', [
             'currency' => 'BDT',
             'value' => $order['total'],
@@ -444,6 +572,7 @@ class FacebookPixelService
      */
     public function trackOrderReturned(array $order, array $products, array $userData = [], ?Component $component = null, array $tracking = []): void
     {
+        $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('OrderReturned', [
             'currency' => 'BDT',
             'value' => $order['total'],
@@ -464,6 +593,7 @@ class FacebookPixelService
      */
     public function trackOrderDelivered(array $order, array $products, array $userData = [], ?Component $component = null, array $tracking = []): void
     {
+        $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('OrderDelivered', [
             'currency' => 'BDT',
             'value' => $order['total'],

@@ -13,10 +13,16 @@ document.addEventListener('facebookEvent', function (event) {
     var eventId = detail.eventId;
     var isStandard = detail.isStandard !== false;
     var tracking = detail.tracking || {};
+    var userData = detail.userData || {};
 
     // Read fbp/fbc from cookies if not already sent from server
     var fbp = tracking.fbp || getCookie('_fbp') || '';
     var fbc = tracking.fbc || getCookie('_fbc') || buildFbcFromUrl() || '';
+
+    // Re-initialize fbq matching parameters dynamically if updated matching data is received
+    if (Object.keys(userData).length > 0 && typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelId) {
+        fbq('init', window.trackingConfig.pixelId, userData);
+    }
 
     // 1. Push to dataLayer for GTM (includes user signals for GA4/Google Ads)
     window.dataLayer = window.dataLayer || [];
@@ -61,6 +67,31 @@ document.addEventListener('facebookEvent', function (event) {
             fbc: fbc,
         });
     }
+});
+
+// ─── Centralized PageView Tracking ──────────────────────────────────────────
+
+var hasTrackedInitial = false;
+
+function trackPageView() {
+    if (typeof fbq === 'function') {
+        fbq('track', 'PageView');
+    }
+}
+
+// Track PageView on Livewire 3 SPA transitions
+document.addEventListener('livewire:navigated', function () {
+    trackPageView();
+    hasTrackedInitial = true;
+});
+
+// Fallback for non-Livewire pages or if livewire:navigated didn't fire
+document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(function () {
+        if (!hasTrackedInitial) {
+            trackPageView();
+        }
+    }, 100);
 });
 
 // ─── Cookie / FBC helpers ───────────────────────────────────────────────────

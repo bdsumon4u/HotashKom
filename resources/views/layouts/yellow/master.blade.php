@@ -890,6 +890,7 @@
     <script data-navigate-once>
         window._csrfToken = '{{ csrf_token() }}';
         window.trackingConfig = {
+            pixelId: '{{ setting('pixel_ids', '') }}',
             pixelEnabled: {{ config('meta-pixel.meta_pixel') ? 'true' : 'false' }},
             advancedTracking: {{ config('meta-pixel.advanced_tracking') ? 'true' : 'false' }},
         };
@@ -1070,6 +1071,15 @@
     @endif
     {{-- Facebook events moved to external file: strokya/js/facebook-events.js --}}
     {{-- xzoom click handler moved to: strokya/js/product-gallery.js --}}
+    {{-- Re-initialize Meta Pixel with latest decrypted user data matching params on every page load & SPA transition --}}
+    <script>
+        (function() {
+            if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelId) {
+                var userData = {{ Js::from(app(App\Services\FacebookPixelService::class)->getNormalizedUserData()) }};
+                fbq('init', window.trackingConfig.pixelId, userData);
+            }
+        })();
+    </script>
 </body>
 
 </html>
