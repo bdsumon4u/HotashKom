@@ -1075,10 +1075,11 @@
     <script>
         (function() {
             if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelId) {
-                if (window.hasInitializedMetaPixel) {
-                    var userData = {{ Js::from(app(App\Services\FacebookPixelService::class)->getNormalizedUserData()) }};
+                var userData = {{ Js::from(app(App\Services\FacebookPixelService::class)->getNormalizedUserData()) }};
+                var isInitialized = window.hasInitializedMetaPixel || (typeof fbq.instance === 'object' && fbq.instance.pixels && fbq.instance.pixels.hasOwnProperty(window.trackingConfig.pixelId));
+                
+                if (!isInitialized || Object.keys(userData).length > 0) {
                     fbq('init', window.trackingConfig.pixelId, userData);
-                } else {
                     window.hasInitializedMetaPixel = true;
                 }
             }

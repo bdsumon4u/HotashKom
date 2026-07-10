@@ -27,19 +27,15 @@
             s.parentNode.insertBefore(t, s)
         }(window, document, 'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-        @foreach ($metaPixelIds as $id)
-            fbq('init', '{{ $id }}');
-        @endforeach
-        
-        fbq('track', 'PageView');
-        console.log('pageview');
-
-        document.addEventListener('livewire:navigated', function () {
-            if (typeof fbq === 'function') {
-                fbq('track', 'PageView');
-                console.log('navigated');
-            }
-        });
+        @if($user = $metaPixel->getUser())
+            @foreach ($metaPixelIds as $id)
+                fbq('init', '{{ $id }}', {{ Js::from($user) }});
+            @endforeach
+        @else
+            @foreach ($metaPixelIds as $id)
+                fbq('init', '{{ $id }}');
+            @endforeach
+        @endif
     </script>
     <noscript>
         @foreach ($metaPixelIds as $id)
