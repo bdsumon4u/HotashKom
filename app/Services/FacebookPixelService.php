@@ -271,6 +271,26 @@ class FacebookPixelService
     }
 
     /**
+     * Get a list of unique pixel IDs from setting('pixel_ids') for browser-side pixel tracking.
+     * Parses space, comma, and newline separators.
+     *
+     * @return array<int, string>
+     */
+    public function getPixelIds(): array
+    {
+        $rawSetting = setting('pixel_ids', '');
+        if (empty($rawSetting)) {
+            return [];
+        }
+        $ids = preg_split('/[\s\r\n,]+/', (string) $rawSetting);
+        if (! $ids) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(array_map('trim', $ids))));
+    }
+
+    /**
      * Whether this is a standard Meta Pixel event.
      */
     protected function isStandardEvent(string $eventName): bool
@@ -299,6 +319,8 @@ class FacebookPixelService
             MetaPixel::setToken($token);
             if ($test) {
                 MetaPixel::setTestEventCode($test);
+            } else {
+                MetaPixel::setTestEventCode(null);
             }
 
             // eventSourceUrl is passed as 5th arg to send() — not a setter method

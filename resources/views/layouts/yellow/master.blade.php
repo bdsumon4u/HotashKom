@@ -890,8 +890,8 @@
     <script data-navigate-once>
         window._csrfToken = '{{ csrf_token() }}';
         window.trackingConfig = {
-            pixelId: '{{ setting('pixel_ids', '') }}',
-            pixelEnabled: {{ config('meta-pixel.meta_pixel') ? 'true' : 'false' }},
+            pixelIds: {{ Js::from(app(App\Services\FacebookPixelService::class)->getPixelIds()) }},
+            pixelEnabled: {{ (config('meta-pixel.meta_pixel') || setting('pixel_ids')) ? 'true' : 'false' }},
             advancedTracking: {{ config('meta-pixel.advanced_tracking') ? 'true' : 'false' }},
         };
         window.dataLayer = window.dataLayer || [];
@@ -1074,14 +1074,18 @@
     {{-- Re-initialize Meta Pixel with latest decrypted user data matching params on every page load & SPA transition --}}
     <script>
         (function() {
-            if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelId) {
+            if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelIds && window.trackingConfig.pixelIds.length > 0) {
                 var userData = {{ Js::from(app(App\Services\FacebookPixelService::class)->getNormalizedUserData()) }};
-                var isInitialized = window.hasInitializedMetaPixel || (typeof fbq.instance === 'object' && fbq.instance.pixels && fbq.instance.pixels.hasOwnProperty(window.trackingConfig.pixelId));
+                var initializedPixels = window.initializedMetaPixels || {};
                 
-                if (!isInitialized || Object.keys(userData).length > 0) {
-                    fbq('init', window.trackingConfig.pixelId, userData);
-                    window.hasInitializedMetaPixel = true;
-                }
+                window.trackingConfig.pixelIds.forEach(function(pixelId) {
+                    var isInitialized = initializedPixels[pixelId] || (typeof fbq.instance === 'object' && fbq.instance.pixels && fbq.instance.pixels.hasOwnProperty(pixelId));
+                    if (!isInitialized || Object.keys(userData).length > 0) {
+                        fbq('init', pixelId, userData);
+                        initializedPixels[pixelId] = true;
+                    }
+                });
+                window.initializedMetaPixels = initializedPixels;
             }
         })();
     </script>

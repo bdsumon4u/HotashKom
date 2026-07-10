@@ -33,11 +33,13 @@ document.addEventListener('facebookEvent', function (event) {
 
     // Re-initialize fbq matching parameters dynamically if updated matching data is received
     if (Object.keys(userData).length > 0) {
-        if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelId) {
-            console.log('[Meta Pixel] Re-initializing fbq for pixel:', window.trackingConfig.pixelId, 'with new userData:', userData);
-            fbq('init', window.trackingConfig.pixelId, userData);
+        if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelIds && window.trackingConfig.pixelIds.length > 0) {
+            window.trackingConfig.pixelIds.forEach(function (pixelId) {
+                console.log('[Meta Pixel] Re-initializing fbq for pixel:', pixelId, 'with new userData:', userData);
+                fbq('init', pixelId, userData);
+            });
         } else {
-            console.warn('[Meta Pixel] Attempted to re-initialize fbq with userData but fbq or window.trackingConfig.pixelId is missing', {
+            console.warn('[Meta Pixel] Attempted to re-initialize fbq with userData but fbq or window.trackingConfig.pixelIds is missing', {
                 fbqExists: typeof fbq === 'function',
                 pixelConfig: window.trackingConfig
             });
