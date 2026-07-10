@@ -957,7 +957,7 @@
     <script src="{{ versionedAsset('strokya/js/product-gallery.js') }}" defer></script>
     <script src="{{ versionedAsset('strokya/js/storefront-components.js') }}" defer></script>
     <script src="{{ versionedAsset('strokya/js/whatsapp-handlers.js') }}" defer></script>
-    <script src="{{ versionedAsset('strokya/js/facebook-events.js') }}" defer></script>
+    <script src="{{ versionedAsset('strokya/js/facebook-events.js') }}" defer data-navigate-once></script>
     {{-- All JavaScript has been moved to external files for better caching --}}
     {{-- See: strokya/js/product-gallery.js, notify-handler.js, storefront-components.js, etc. --}}
     <style>

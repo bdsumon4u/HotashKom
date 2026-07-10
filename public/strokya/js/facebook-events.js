@@ -2,8 +2,14 @@
 // Listens for Livewire-dispatched 'facebookEvent' browser events and:
 //   1. Pushes the event to window.dataLayer (for GTM) — includes fbp/fbc for remarketing
 //   2. Fires the appropriate fbq() call (standard 'track' vs custom 'trackCustom')
-document.addEventListener('facebookEvent', function (event) {
-    console.log('[Meta Pixel] facebookEvent listener triggered', event.detail);
+
+if (window.hasInitializedFacebookEvents) {
+    console.log('[Meta Pixel] facebook-events.js already initialized, skipping duplicate execution');
+} else {
+    window.hasInitializedFacebookEvents = true;
+
+    document.addEventListener('facebookEvent', function (event) {
+        console.log('[Meta Pixel] facebookEvent listener triggered', event.detail);
 
     if (!event.detail || event.detail.length === 0) {
         console.warn('[Meta Pixel] facebookEvent triggered but event.detail is missing or empty');
@@ -148,4 +154,5 @@ function buildFbcFromUrl() {
     var fbcValue = 'fb.1.' + Date.now() + '.' + fbclid;
     console.log('[Meta Pixel FBC Builder] Constructed FBC from URL:', fbcValue);
     return fbcValue;
+}
 }
