@@ -2,13 +2,13 @@
     <div class="container">
         @if($title ?? null)
             <div class="block-header">
-                <h3 class="block-header__title" style="padding: 0.375rem 1rem;">
+                <h1 class="block-header__title" style="padding: 0.375rem 1rem;">
                     @isset($section)
                         <a href="{{ route('home-sections.products', $section) }}">{{ $title }}</a>
                     @else
                         {{ $title }}
                     @endisset
-                </h3>
+                </h1>
                 <div class="block-header__divider"></div>
                 @isset($section)
                     <a href="{{ route('products.index', ['filter_section' => $section->id]) }}" class="ml-3 btn btn-sm btn-all">

@@ -42,10 +42,10 @@
             <div class="container">
                 @if ($section->title ?? null)
                     <div class="block-header">
-                        <h3 class="block-header__title" style="padding: 0.375rem 1rem;">
+                        <h1 class="block-header__title" style="padding: 0.375rem 1rem;">
                             <a href="{{ route('home-sections.products', $section) }}"
                                 wire:navigate.hover>{{ $section->title }}</a>
-                        </h3>
+                        </h1>
                         <div class="block-header__divider"></div>
                         <a href="{{ route('products.index', ['filter_section' => $section->id]) }}"
                             class="ml-3 btn btn-sm btn-all" wire:navigate.hover>
