@@ -14,7 +14,7 @@
 
     .rankmet-footer-watermark {
         position: absolute;
-        bottom: -50px;
+        bottom: -25px;
         left: 0;
         right: 0;
         width: 100%;
@@ -196,13 +196,9 @@
     }
 
     .rankmet-footer-bottom {
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        padding-top: 30px;
-        padding-bottom: 20px;
         text-align: center;
         display: flex;
-        flex-direction: column;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
         gap: 15px;
     }
@@ -258,7 +254,7 @@
         }
 
         .rankmet-footer-watermark {
-            bottom: -50px;
+            bottom: -25px;
         }
 
         .rankmet-footer-socials {
@@ -385,6 +381,9 @@
 
         <!-- Bottom: Dynamic Credit & Checkout Bar -->
         <div class="rankmet-footer-bottom">
+            <div class="rankmet-footer-copyright">
+                &copy; {{ date('Y') }} {{ $company->name ?? '' }}. All Rights Reserved.
+            </div>
             @if(isset($company->dev_name) && $company->dev_name != '#' && isset($company->dev_link) && $company->dev_link != '#')
                 <div class="rankmet-footer-credit">
                     Developed By <a href="{{ $company->dev_link }}" target="_blank" style="color: #FF6600; text-decoration: none;">{{ $company->dev_name }}</a>
@@ -392,10 +391,6 @@
             @else
                 <img src="{{ asset('payments.png') }}" alt="Payment methods" class="rankmet-footer-checkout-img" style="height: 44px; width: auto;">
             @endif
-
-            <div class="rankmet-footer-copyright">
-                &copy; {{ date('Y') }} {{ $company->name ?? '' }}. All Rights Reserved.
-            </div>
         </div>
     </div>
 </footer>
