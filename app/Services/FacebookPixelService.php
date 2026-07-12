@@ -247,7 +247,7 @@ class FacebookPixelService
         }
 
         if (isset($normalized['cn'])) {
-            $obj->setCountry($normalized['cn']);
+            $obj->setCountryCode($normalized['cn']);
         }
 
         // Browser tracking signals

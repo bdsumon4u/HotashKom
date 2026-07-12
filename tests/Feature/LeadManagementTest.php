@@ -9,6 +9,7 @@ it('stores a lead submission', function () {
     $response = $this->from($formUrl)->post(route('leads.store'), [
         'name' => 'Test Lead',
         'shop_name' => 'Test Shop',
+        'district' => 'Dhaka',
         'email' => 'lead@example.com',
         'phone' => '01551234567',
         'message' => 'Please reach out to me.',
