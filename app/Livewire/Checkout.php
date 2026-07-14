@@ -709,6 +709,10 @@ class Checkout extends Component
 
     protected function fillFromCookie(): bool
     {
+        if (isOninda() && config('app.resell')) {
+            return false;
+        }
+
         return true;
     }
 

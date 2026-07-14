@@ -455,6 +455,10 @@ if (! function_exists('versionedAsset')) {
 
 function longCookie($field, $value)
 {
+    if (isOninda() && config('app.resell')) {
+        return;
+    }
+
     if ($value) {
         Cookie::queue(Cookie::make($field, $value, 10 * 365 * 24 * 60)); // 10 years
     }
@@ -473,6 +477,10 @@ function cart($id = null): CartInstance|CartItem|null
 
 function storeOrUpdateCart($phone = null, $name = '', $address = null)
 {
+    if (isOninda() && config('app.resell')) {
+        return;
+    }
+
     if (! $phone = $phone ?? Cookie::get('phone', '')) {
         return;
     }
@@ -567,6 +575,10 @@ function storeOrUpdateCart($phone = null, $name = '', $address = null)
 
 function deleteOrUpdateCart()
 {
+    if (isOninda() && config('app.resell')) {
+        return;
+    }
+
     $phone = Cookie::get('phone', '');
     $content = cart()->content()->mapWithKeys(fn ($item) => [$item->options->parent_id => $item]);
 
