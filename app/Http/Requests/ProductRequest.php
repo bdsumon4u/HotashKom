@@ -54,6 +54,7 @@ class ProductRequest extends FormRequest
             'desc_img_pos' => 'required_if:desc_img,1',
             'shipping_inside' => 'nullable|integer',
             'shipping_outside' => 'nullable|integer',
+            'packaging_charge' => 'nullable|integer|min:0',
             'delivery_text' => 'nullable',
         ];
 

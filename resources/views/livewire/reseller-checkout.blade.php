@@ -161,7 +161,7 @@
                                 @if (config('app.resell'))
                                     <tr>
                                         <th style="white-space:nowrap;">Packaging Charge</th>
-                                        <td>{!! theMoney(25) !!}</td>
+                                        <td>{!! theMoney($packagingCharge) !!}</td>
                                     </tr>
                                 @endif
                                 <tr>
@@ -193,7 +193,7 @@
                         <tfoot class="checkout__totals-footer">
                             <tr>
                                 <th>Buying</th>
-                                <td>{!! theMoney(cart()->total() + (isOninda() && config('app.resell') ? 25 : 0)) !!}</td>
+                                <td>{!! theMoney(cart()->total() + (isOninda() && config('app.resell') ? $packagingCharge : 0)) !!}</td>
                             </tr>
                             @if (isOninda())
                                 <tr>
@@ -250,7 +250,7 @@
                                 @if (config('app.resell'))
                                     <tr>
                                         <th style="white-space:nowrap;font-size:14px;">Packaging Charge</th>
-                                        <td>{!! theMoney(25) !!}</td>
+                                        <td>{!! theMoney($packagingCharge) !!}</td>
                                     </tr>
                                 @endif
                                 <tr>
@@ -283,7 +283,7 @@
                             <tr>
                                 <th style="white-space:nowrap;font-size:18px;">Buying Total</th>
                                 <td style="font-size:14px;">
-                                    <span>{!! theMoney(cart()->total() + (isOninda() && config('app.resell') ? 25 : 0)) !!}</span>
+                                    <span>{!! theMoney(cart()->total() + (isOninda() && config('app.resell') ? $packagingCharge : 0)) !!}</span>
                                 </td>
                             </tr>
                             @if (isOninda())

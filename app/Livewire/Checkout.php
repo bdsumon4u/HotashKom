@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Notifications\User\AccountCreated;
 use App\Notifications\User\OrderPlaced;
 use App\Services\FacebookPixelService;
+use App\Traits\ResolvesPackagingCharge;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
@@ -25,6 +26,8 @@ use function Illuminate\Support\defer;
 
 class Checkout extends Component
 {
+    use ResolvesPackagingCharge;
+
     public ?Order $order = null;
 
     public $isFreeDelivery = false;
@@ -297,8 +300,7 @@ class Checkout extends Component
                 ) ?? $deliveryAreas->first();
                 $isInside = ($area === data_get($insideAreaSetting, 'name'));
 
-                $outsideAreaSetting = $deliveryAreas->first(fn ($a) => 
-                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'outside') || 
+                $outsideAreaSetting = $deliveryAreas->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'outside') ||
                     Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'বাহির')
                 );
                 $isOutside = $outsideAreaSetting && ($area === data_get($outsideAreaSetting, 'name'));
@@ -544,6 +546,7 @@ class Checkout extends Component
                 'coupon_code' => $this->applied_coupon?->code,
                 'subtotal' => cart()->subtotal(),
                 'purchase_cost' => cart()->content()->sum(fn ($item): int|float => ($item->options->purchase_price ?: $item->options->price) * $item->qty),
+                'packaging_charge' => $this->resolvePackagingCharge($data['products']),
             ];
 
             // Add city and area data if Pathao is enabled and user_selects_city_area is checked
@@ -690,6 +693,8 @@ class Checkout extends Component
             ? 'livewire.checkout-simple'
             : 'livewire.checkout';
 
+        $cartProductIds = cart()->content()->pluck('id')->filter()->unique()->values()->toArray();
+
         return view($view, [
             'user' => optional(auth('user')->user()),
             'pathaoCities' => collect($tempOrder->pathaoCityList()),
@@ -698,6 +703,7 @@ class Checkout extends Component
             'advanced' => $this->advanced,
             'retailDeliveryFee' => $this->retailDeliveryFee,
             'retailDiscount' => $this->retailDiscount,
+            'packagingCharge' => $this->resolvePackagingCharge(array_flip($cartProductIds)),
         ]);
     }
 

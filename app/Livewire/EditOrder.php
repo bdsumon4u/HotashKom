@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
 use App\Services\FacebookPixelService;
+use App\Traits\ResolvesPackagingCharge;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -18,6 +19,8 @@ use Livewire\Component;
 
 class EditOrder extends Component
 {
+    use ResolvesPackagingCharge;
+
     protected FacebookPixelService $facebookService;
 
     public function boot(FacebookPixelService $facebookService): void
@@ -126,7 +129,7 @@ class EditOrder extends Component
         $this->retail_delivery_fee = (int) ($this->order->data['retail_delivery_fee'] ?? 0);
         $this->shipping_cost = (int) ($this->order->data['shipping_cost'] ?? 0);
         $this->subtotal = (int) ($this->order->data['subtotal'] ?? 0);
-        $this->packaging_charge = (int) ($this->order->data['packaging_charge'] ?? 25);
+        $this->packaging_charge = (int) ($this->order->data['packaging_charge'] ?? config('app.packaging_charge', 25));
         $this->weight = (float) ($this->order->data['weight'] ?? 0.5);
 
         // Handle string properties
@@ -313,7 +316,7 @@ class EditOrder extends Component
         $this->subtotal = $this->order->getSubtotal($this->selectedProducts);
         $this->shipping_cost = $shippingCost;
 
-        if (isOninda() && config('app.resell') && !is_null($this->order?->user)) {
+        if (isOninda() && config('app.resell') && ! is_null($this->order?->user)) {
             // Reseller order on resell site: use reseller's custom rate (falls back to admin rate)
             $this->retail_delivery_fee = $this->order->user->getShippingCost($value);
         } else {
@@ -321,6 +324,11 @@ class EditOrder extends Component
             $this->retail_delivery_fee = $shippingCost;
         }
         $this->updatedRetailDeliveryFee($this->retail_delivery_fee);
+
+        if (isOninda() && config('app.resell')) {
+            $this->packaging_charge = $this->resolvePackagingCharge($this->selectedProducts);
+            $this->updatedPackagingCharge($this->packaging_charge);
+        }
     }
 
     public function updatedRetailDeliveryFee($value): void

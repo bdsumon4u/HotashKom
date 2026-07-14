@@ -149,16 +149,11 @@ return new class extends Migration
      */
     private function indexExists(string $table, string $index): bool
     {
-        $connection = Schema::getConnection();
-        $database = $connection->getDatabaseName();
-        $tableName = $connection->getTablePrefix().$table;
+        if (! Schema::hasTable($table)) {
+            return false;
+        }
 
-        $result = $connection->select(
-            'SELECT COUNT(*) as count FROM information_schema.statistics 
-             WHERE table_schema = ? AND table_name = ? AND index_name = ?',
-            [$database, $tableName, $index]
-        );
-
-        return (int) $result[0]->count > 0;
+        return collect(Schema::getIndexes($table))
+            ->contains(fn ($i) => $i['name'] === $index);
     }
 };

@@ -231,7 +231,7 @@ class Order extends Model
             $retailDiscount = (float) ($order->data['retail_discount'] ?? 0);
             $subtotal = (float) ($order->data['subtotal'] ?? 0);
             $discount = (float) ($order->data['discount'] ?? 0);
-            $packagingCharge = (float) ($order->data['packaging_charge'] ?? 25); // Packaging charge
+            $packagingCharge = (float) ($order->data['packaging_charge'] ?? config('app.packaging_charge', 25)); // Packaging charge
 
             $calculateCommission = (fn (): float =>
                 // Commission = (retail + retail_delivery_fee) - advanced - retail_discount - (subtotal + shipping_cost - discount) - packaging_charge

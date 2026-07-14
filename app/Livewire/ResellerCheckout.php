@@ -27,6 +27,8 @@ class ResellerCheckout extends Checkout
             - (float) $this->advanced
             - (float) $this->retailDiscount;
 
+        $cartProductIds = $cartItems->pluck('id')->filter()->unique()->values()->toArray();
+
         return view('livewire.reseller-checkout', [
             'user' => optional(auth('user')->user()),
             'pathaoCities' => collect($tempOrder->pathaoCityList()),
@@ -37,6 +39,7 @@ class ResellerCheckout extends Checkout
             'retailDiscount' => $this->retailDiscount,
             'sellingSubtotal' => $sellingSubtotal,
             'sellingTotal' => $sellingTotal,
+            'packagingCharge' => $this->resolvePackagingCharge(array_flip($cartProductIds)),
         ]);
     }
 

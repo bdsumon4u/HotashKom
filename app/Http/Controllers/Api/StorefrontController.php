@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Slide;
 use App\Models\User;
+use App\Traits\ResolvesPackagingCharge;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,8 @@ use Illuminate\Validation\Rule;
 
 class StorefrontController extends Controller
 {
+    use ResolvesPackagingCharge;
+
     /**
      * GET /api/storefront/settings
      * Returns site settings needed by the frontend (company info, delivery charges, etc.)
@@ -415,7 +418,7 @@ class StorefrontController extends Controller
                 'city_id' => '',
                 'area_id' => '',
                 'weight' => 0.5,
-                'packaging_charge' => 25,
+                'packaging_charge' => $this->resolvePackagingCharge(array_keys($orderProducts)),
                 'is_fraud' => $isFraud,
                 'is_repeat' => $isRepeat,
                 'shipping_area' => $data['shipping'],

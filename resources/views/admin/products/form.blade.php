@@ -169,6 +169,16 @@
                             <x-error field="shipping_outside" />
                         </div>
                     </div>
+                    @if(isOninda() && config('app.resell'))
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="packaging_charge">Packaging Charge</label>
+                            <x-input name="packaging_charge" :value="$product->packaging_charge" placeholder="{{ config('app.packaging_charge', 25) }}" />
+                            <x-error field="packaging_charge" />
+                            <small class="form-text text-muted">Leave blank to use default ({{ config('app.packaging_charge', 25) }} ৳). Reseller's order packaging charge = max across all ordered products.</small>
+                        </div>
+                    </div>
+                    @endif
                     <div class="col-sm-12">
                         <h4><small class="mb-1 border-bottom">Delivery and Return Policy</small></h4>
                     </div>

@@ -24,6 +24,8 @@ return [
 
     'only_admin_can_return_or_deliver' => env('ONLY_ADMIN_CAN_RETURN_OR_DELIVER', false),
 
+    'packaging_charge' => env('PACKAGING_CHARGE', 25),
+
     'unregister_sw' => env('UNREGISTER_SW', false),
 
     /*
