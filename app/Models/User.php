@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable implements Confirmable, Wallet
 {
@@ -29,7 +30,7 @@ class User extends Authenticatable implements Confirmable, Wallet
         'name', 'shop_name', 'email', 'phone_number', 'bkash_number', 'address',
         'website', 'order_prefix', 'domain', 'is_active', 'password', 'is_verified',
         'db_name', 'db_username', 'db_password', 'logo',
-        'inside_dhaka_shipping', 'outside_dhaka_shipping',
+        'inside_dhaka_shipping', 'outside_dhaka_shipping', 'delivery_areas',
     ];
 
     /**
@@ -157,11 +158,39 @@ class User extends Authenticatable implements Confirmable, Wallet
      */
     public function getShippingCost(string $shippingArea): int
     {
-        return match ($shippingArea) {
-            'Inside Dhaka' => (int) ($this->inside_dhaka_shipping ?? 0),
-            'Outside Dhaka' => (int) ($this->outside_dhaka_shipping ?? 0),
-            default => 0,
-        };
+        // 1. Check reseller's custom dynamic delivery areas list first
+        if (is_array($this->delivery_areas)) {
+            $matchedArea = collect($this->delivery_areas)->first(fn ($a) => data_get($a, 'name') === $shippingArea);
+            if ($matchedArea && data_get($matchedArea, 'cost') !== null && data_get($matchedArea, 'cost') !== '') {
+                return (int) data_get($matchedArea, 'cost');
+            }
+        }
+
+        // 2. Backward compatibility fallback
+        $insideAreaSetting = collect(setting('delivery_areas') ?? [])->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'inside') ||
+            Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা শহর') ||
+            Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা সিটি')
+        ) ?? collect(setting('delivery_areas') ?? [])->first();
+
+        $isInside = ($shippingArea === data_get($insideAreaSetting, 'name'));
+
+        if ($isInside) {
+            return (int) ($this->inside_dhaka_shipping ?? 0);
+        }
+
+        $outsideAreaSetting = collect(setting('delivery_areas') ?? [])->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'outside') ||
+            Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'বাহির')
+        );
+        $isOutside = $outsideAreaSetting && ($shippingArea === data_get($outsideAreaSetting, 'name'));
+
+        if ($isOutside) {
+            return (int) ($this->outside_dhaka_shipping ?? 0);
+        }
+
+        // 3. Fallback to admin's setting cost
+        $adminAreaSetting = collect(setting('delivery_areas') ?? [])->first(fn ($a) => data_get($a, 'name') === $shippingArea);
+
+        return (int) data_get($adminAreaSetting, 'cost', 0);
     }
 
     /**
@@ -169,6 +198,10 @@ class User extends Authenticatable implements Confirmable, Wallet
      */
     public function hasCustomShippingCosts(): bool
     {
+        if (is_array($this->delivery_areas) && count($this->delivery_areas) > 0) {
+            return true;
+        }
+
         return ($this->inside_dhaka_shipping > 0) || ($this->outside_dhaka_shipping > 0);
     }
 
@@ -182,6 +215,7 @@ class User extends Authenticatable implements Confirmable, Wallet
             'is_active' => 'boolean',
             'inside_dhaka_shipping' => 'integer',
             'outside_dhaka_shipping' => 'integer',
+            'delivery_areas' => 'array',
         ];
     }
 

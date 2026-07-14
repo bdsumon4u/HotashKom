@@ -359,49 +359,29 @@ $selectedOptionIds = $selectedProduct->options->pluck('id')->toArray();
                                                                 for="billing_address_1"
                                                                 class="">Shipping&nbsp;<abbr class="required"
                                                                     title="required">*</abbr></label>
-                                                            <div class="woocommerce-input-wrapper">
-
-
-                                                                <ul id="shipping_method"
-                                                                    style="border: 1px solid var( --wcf-field-border-color ); display: flex; column-gap: 1rem; padding: .5rem;"
-                                                                    class="woocommerce-shipping-methods">
-                                                                    <li style="white-space: nowrap; margin: 0;">
-                                                                        <input type="radio"
-                                                                            wire:model.live="shipping"
-                                                                            name="shipping_method[0]" data-index="0"
-                                                                            id="shipping_method_0_flat_rate1"
-                                                                            value="Inside Dhaka"
-                                                                            class="shipping_method"
-                                                                            checked='checked' /><label
-                                                                            for="shipping_method_0_flat_rate1">ঢাকা শহর
-                                                                            <strong
-                                                                                class="woocommerce-Price-amount amount"><bdi>
-                                                                                    @if (!(setting('show_option')->productwise_delivery_charge ?? false))
-                                                                                        <strong
-                                                                                            class="woocommerce-Price-currencySymbol">&#2547;</strong>
-                                                                                        {{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->inside_dhaka }}
-                                                                                    @endif
-                                                                                </bdi>
-                                                                            </strong></label>
-                                                                    </li>
-                                                                    <li style="white-space: nowrap; margin: 0;">
-                                                                        <input type="radio"
-                                                                            wire:model.live="shipping"
-                                                                            name="shipping_method[0]" data-index="0"
-                                                                            id="shipping_method_0_flat_rate2"
-                                                                            value="Outside Dhaka"
-                                                                            class="shipping_method" /><label
-                                                                            for="shipping_method_0_flat_rate2">ঢাকার
-                                                                            বাইরে <strong
-                                                                                class="woocommerce-Price-amount amount"><bdi>
-                                                                                    @if (!(setting('show_option')->productwise_delivery_charge ?? false))
-                                                                                        <strong
-                                                                                            class="woocommerce-Price-currencySymbol">&#2547;</strong>
-                                                                                        {{ $isFreeDelivery ? 'FREE' : setting('delivery_charge')->outside_dhaka }}
-                                                                                    @endif
-                                                                                </bdi></strong></label>
-                                                                    </li>
-                                                                </ul>
+                                                                 <ul id="shipping_method"
+                                                                     style="border: 1px solid var( --wcf-field-border-color ); display: flex; column-gap: 1rem; padding: .5rem;"
+                                                                     class="woocommerce-shipping-methods">
+                                                                     @foreach (setting('delivery_areas') ?? [] as $index => $area)
+                                                                         <li style="white-space: nowrap; margin: 0;">
+                                                                             <input type="radio"
+                                                                                 wire:model.live="shipping"
+                                                                                 name="shipping_method[0]" data-index="0"
+                                                                                 id="shipping_method_0_flat_rate_{{ $index }}"
+                                                                                 value="{{ data_get($area, 'name') }}"
+                                                                                 class="shipping_method" /><label
+                                                                                 for="shipping_method_0_flat_rate_{{ $index }}">
+                                                                                 {{ data_get($area, 'name') }}
+                                                                                 <strong class="woocommerce-Price-amount amount"><bdi>
+                                                                                     @if (!(setting('show_option')->productwise_delivery_charge ?? false))
+                                                                                         <strong class="woocommerce-Price-currencySymbol">&#2547;</strong>
+                                                                                         {{ $isFreeDelivery ? 'FREE' : $this->shippingCost(data_get($area, 'name')) }}
+                                                                                     @endif
+                                                                                 </bdi></strong>
+                                                                             </label>
+                                                                         </li>
+                                                                     @endforeach
+                                                                 </ul>
 
                                                                 <div class="wcf-field-required-error">
                                                                     {{ $errors->first('address') }}</div>

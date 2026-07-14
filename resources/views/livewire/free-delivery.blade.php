@@ -24,33 +24,56 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div x-show="!free || !all" class="py-2 row borderr">
-                @php
-                    $default_area = setting('default_area');
-                @endphp
-                <div class="col-md-6 pr-md-1">
-                    <label for="products_page-rows" class="d-flex justify-content-between" style="font-size: 90%">
-                        <div>Inside Dhaka</div>
-                        <div>
-                            <input type="hidden" name="default_area[inside]" value="0">
-                            <input type="checkbox" name="default_area[inside]" id="delivery-inside" @if($default_area->inside ?? false) checked @endif>
-                            <label class="mb-0 ml-1" for="delivery-inside">Default</label>
-                        </div>
-                    </label>
-                    <x-input name="delivery_charge[inside_dhaka]" id="delivery_charge-inside_dhaka" :value="$delivery_charge['inside_dhaka'] ?? config('services.shipping')['Inside Dhaka']" />
-                    <x-error field="delivery_charge.inside_dhaka" />
+            <div x-show="!free || !all" class="py-2 row borderr" x-data="{ 
+                areas: @js($delivery_areas ?: []),
+                addArea() {
+                    this.areas.push({ name: '', cost: '', is_default: false });
+                    this.$nextTick(() => {
+                        this.ensureOneDefault();
+                    });
+                },
+                removeArea(index) {
+                    const wasDefault = this.areas[index].is_default;
+                    this.areas.splice(index, 1);
+                    if (wasDefault && this.areas.length > 0) {
+                        this.setDefault(0);
+                    }
+                },
+                setDefault(index) {
+                    this.areas.forEach((area, i) => {
+                        area.is_default = (i === index);
+                    });
+                },
+                ensureOneDefault() {
+                    if (this.areas.length > 0 && !this.areas.some(a => a.is_default)) {
+                        this.setDefault(0);
+                    }
+                }
+            }" x-init="ensureOneDefault()">
+                <div class="col-12 mb-2 d-flex justify-content-between align-items-center">
+                    <label class="font-weight-bold mb-0">Delivery Areas & Charges</label>
+                    <button type="button" @click="addArea()" class="btn btn-primary btn-sm px-2 py-1">Add Area</button>
                 </div>
-                <div class="col-md-6 pl-md-1">
-                    <label for="products_page-cols" class="d-flex justify-content-between" style="font-size: 90%">
-                        <div>Outside Dhaka</div>
-                        <div>
-                            <input type="hidden" name="default_area[outside]" value="0">
-                            <input type="checkbox" name="default_area[outside]" id="delivery-outside" @if($default_area->outside ?? false) checked @endif>
-                            <label class="mb-0 ml-1" for="delivery-outside">Default</label>
+                <div class="col-12">
+                    <template x-for="(area, index) in areas" :key="index">
+                        <div class="form-row align-items-center mb-2">
+                            <div class="col-5">
+                                <input type="text" :name="'delivery_areas[' + index + '][name]'" x-model="area.name" class="form-control form-control-sm" placeholder="Area Name" required>
+                            </div>
+                            <div class="col-4">
+                                <input type="number" :name="'delivery_areas[' + index + '][cost]'" x-model="area.cost" class="form-control form-control-sm" placeholder="Charge" required min="0">
+                            </div>
+                            <div class="col-2 text-center">
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" :id="'default_area_' + index" name="default_delivery_area" :value="index" :checked="area.is_default" @change="setDefault(index)" class="custom-control-input">
+                                    <label class="custom-control-label small" :for="'default_area_' + index">Default</label>
+                                </div>
+                            </div>
+                            <div class="col-1 text-right">
+                                <button type="button" @click="removeArea(index)" class="btn btn-danger btn-sm p-1 px-2">&times;</button>
+                            </div>
                         </div>
-                    </label>
-                    <x-input name="delivery_charge[outside_dhaka]" id="delivery_charge-outside_dhaka" :value="$delivery_charge['outside_dhaka'] ?? config('services.shipping')['Outside Dhaka']" />
-                    <x-error field="delivery_charge.outside_dhaka" />
+                    </template>
                 </div>
             </div>
             <div x-show="free && all" class="py-2 row borderr">

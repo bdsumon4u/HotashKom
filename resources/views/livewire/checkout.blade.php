@@ -62,27 +62,20 @@
                     <div class="m-0 form-group col-md-3">
                         <label class="d-block"><label>ডেলিভারি এরিয়া: <span class="text-danger">*</span></label>
                     </div>
-                    <div class="form-group col-md-9">
+                     <div class="form-group col-md-9">
                         <div class="form-control @error('shipping') is-invalid @enderror h-auto">
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" wire:model.live="shipping"
-                                    @change="$wire.updateField('shipping', $event.target.value)"
-                                    class="custom-control-input" id="inside-dhaka" name="shipping" value="Inside Dhaka">
-                                <label class="custom-control-label" for="inside-dhaka">ঢাকা শহর
-                                    @if(cart()->subTotal()) ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Inside Dhaka') }}
-                                    টাকা) @endif
-                                </label>
-                            </div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" wire:model.live="shipping"
-                                    @change="$wire.updateField('shipping', $event.target.value)"
-                                    class="custom-control-input" id="outside-dhaka" name="shipping"
-                                    value="Outside Dhaka">
-                                <label class="custom-control-label" for="outside-dhaka">ঢাকার বাইরে
-                                    @if(cart()->subTotal()) ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Outside Dhaka') }}
-                                    টাকা) @endif
-                                </label>
-                            </div>
+                            @foreach (setting('delivery_areas') ?? [] as $index => $area)
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" wire:model.live="shipping"
+                                        @change="$wire.updateField('shipping', $event.target.value)"
+                                        class="custom-control-input" id="shipping-area-{{ $index }}" name="shipping" value="{{ data_get($area, 'name') }}">
+                                    <label class="custom-control-label" for="shipping-area-{{ $index }}">
+                                        {{ data_get($area, 'name') }}
+                                        @if(cart()->subTotal()) ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost(data_get($area, 'name')) }}
+                                        টাকা) @endif
+                                    </label>
+                                </div>
+                            @endforeach
                         </div>
                         <x-error field="shipping" />
                     </div>

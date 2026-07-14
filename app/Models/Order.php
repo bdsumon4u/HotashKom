@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
@@ -505,20 +506,59 @@ class Order extends Model
         $this->isFreeDelivery = false;
         $shipping_cost = 0;
         if ($shipping_area) {
+            $deliveryAreas = collect(setting('delivery_areas') ?? []);
+            $areaSetting = $deliveryAreas->first(fn ($a) => data_get($a, 'name') === $shipping_area);
+            $areaCost = (int) data_get($areaSetting, 'cost', 0);
+
             if (setting('show_option')->productwise_delivery_charge ?? false) {
-                $shipping_cost = $products->sum(function ($item) use ($shipping_area) {
-                    $item = (array) $item;
-                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? ($item['quantity'] ?? 1) : 1;
+                $insideAreaSetting = $deliveryAreas->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'inside') ||
+                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা শহর') ||
+                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা সিটি')
+                ) ?? $deliveryAreas->first();
+                $isInside = ($shipping_area === data_get($insideAreaSetting, 'name'));
 
-                    return ($item[$shipping_area === 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
-                }) ?: setting('delivery_charge')->{$shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+                $outsideAreaSetting = $deliveryAreas->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'outside') ||
+                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'বাহির')
+                );
+                $isOutside = $outsideAreaSetting && ($shipping_area === data_get($outsideAreaSetting, 'name'));
+
+                if ($isInside) {
+                    if (setting('show_option')->quantitywise_delivery_charge ?? false) {
+                        $shipping_cost = $products->sum(function ($item) {
+                            $item = (array) $item;
+                            $factor = $item['quantity'] ?? 1;
+
+                            return ($item['shipping_inside'] ?? 0) * $factor;
+                        });
+                    } else {
+                        $shipping_cost = $products->max(function ($item) {
+                            $item = (array) $item;
+
+                            return $item['shipping_inside'] ?? 0;
+                        });
+                    }
+                    $shipping_cost = $shipping_cost ?: $areaCost;
+                } elseif ($isOutside) {
+                    if (setting('show_option')->quantitywise_delivery_charge ?? false) {
+                        $shipping_cost = $products->sum(function ($item) {
+                            $item = (array) $item;
+                            $factor = $item['quantity'] ?? 1;
+
+                            return ($item['shipping_outside'] ?? 0) * $factor;
+                        });
+                    } else {
+                        $shipping_cost = $products->max(function ($item) {
+                            $item = (array) $item;
+
+                            return $item['shipping_outside'] ?? 0;
+                        });
+                    }
+                    $shipping_cost = $shipping_cost ?: $areaCost;
+                } else {
+                    $shipping_cost = $areaCost;
+                }
             } else {
-                $shipping_cost = $products->max(function ($item) use ($shipping_area) {
-                    $item = (array) $item;
-                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? ($item['quantity'] ?? 1) : 1;
-
-                    return ($item[$shipping_area === 'Inside Dhaka' ? 'shipping_inside' : 'shipping_outside'] ?? 0) * $factor;
-                }) ?: setting('delivery_charge')->{$shipping_area === 'Inside Dhaka' ? 'inside_dhaka' : 'outside_dhaka'} ?? 0;
+                $shipping_cost = $areaCost;
             }
         }
 

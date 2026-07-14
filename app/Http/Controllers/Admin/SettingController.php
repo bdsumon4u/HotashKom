@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Repositories\SettingRepository;
 use App\Traits\ImageUploader;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 class SettingController extends Controller
 {
@@ -26,6 +27,34 @@ class SettingController extends Controller
         }
 
         $data = $request->validated();
+
+        if ($request->get('tab') === 'delivery') {
+            $defaultIndex = (int) ($data['default_delivery_area'] ?? 0);
+            $deliveryAreas = $data['delivery_areas'] ?? [];
+            foreach ($deliveryAreas as $index => &$area) {
+                $area['is_default'] = ($index === $defaultIndex);
+            }
+            unset($data['default_delivery_area']);
+            $data['delivery_areas'] = $deliveryAreas;
+
+            // Reconstruct delivery_charge and default_area for backwards compatibility
+            $insideArea = collect($deliveryAreas)->first(fn ($a) => Str::contains(Str::lower($a['name'] ?? ''), 'inside') || Str::contains(Str::lower($a['name'] ?? ''), 'ঢাকা শহর') || Str::contains(Str::lower($a['name'] ?? ''), 'ঢাকা সিটি'));
+            $insideArea ??= $deliveryAreas[0] ?? null;
+
+            $outsideArea = collect($deliveryAreas)->first(fn ($a) => Str::contains(Str::lower($a['name'] ?? ''), 'outside') || Str::contains(Str::lower($a['name'] ?? ''), 'বাহির'));
+            $outsideArea ??= collect($deliveryAreas)->first(fn ($a) => ! $insideArea || ($a['name'] !== ($insideArea['name'] ?? '')));
+            $outsideArea ??= $deliveryAreas[1] ?? $deliveryAreas[0] ?? null;
+
+            $data['delivery_charge'] = [
+                'inside_dhaka' => (int) ($insideArea['cost'] ?? 60),
+                'outside_dhaka' => (int) ($outsideArea['cost'] ?? 120),
+            ];
+
+            $data['default_area'] = [
+                'inside' => (bool) ($insideArea['is_default'] ?? false),
+                'outside' => (bool) ($outsideArea['is_default'] ?? false),
+            ];
+        }
 
         if (isset($data['logo'])) {
             foreach ($data['logo'] as $type => $file) {

@@ -39,7 +39,7 @@
 
                         <form method="POST" action="{{ route('reseller.profile.update') }}" enctype="multipart/form-data">
                             @csrf
-                            @php($user = auth()->user())
+                            @php $user = auth()->user(); @endphp
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -167,43 +167,56 @@
                                             <h6 class="mb-0">Shipping Cost Settings</h6>
                                         </div>
                                         <div class="p-4 shadow-sm card-body rounded-0">
-                                            <div class="form-group">
-                                                <label for="inside_dhaka_shipping">Inside Dhaka Shipping Cost</label>
-                                                <div class="input-group">
-                                                                                                    <input type="text" class="form-control @error('inside_dhaka_shipping') is-invalid @enderror"
-                                                       name="inside_dhaka_shipping" id="inside_dhaka_shipping"
-                                                       placeholder="0" min="0" step="1"
-                                                       value="{{ old('inside_dhaka_shipping', $user->inside_dhaka_shipping ?? 0) }}">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text">TK</span>
-                                                    </div>
-                                                </div>
-                                                @error('inside_dhaka_shipping')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                                <small class="form-text text-muted">Shipping cost for orders within Dhaka city</small>
-                                            </div>
+                                            @foreach (setting('delivery_areas') ?? [] as $index => $adminArea)
+                                                @php
+                                                    $adminAreaName = data_get($adminArea, 'name');
+                                                    $resellerAreaSetting = collect($user->delivery_areas ?? [])->first(fn($a) => data_get($a, 'name') === $adminAreaName);
+                                                    $currentCost = data_get($resellerAreaSetting, 'cost');
+                                                    
+                                                    if ($currentCost === null || $currentCost === '') {
+                                                        $insideAreaSetting = collect(setting('delivery_areas') ?? [])->first(fn ($a) => 
+                                                            \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower(data_get($a, 'name') ?? ''), 'inside') || 
+                                                            \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা শহর') || 
+                                                            \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা সিটি')
+                                                        ) ?? collect(setting('delivery_areas') ?? [])->first();
 
-                                            <div class="form-group">
-                                                <label for="outside_dhaka_shipping">Outside Dhaka Shipping Cost</label>
-                                                <div class="input-group">
-                                                                                                    <input type="text" class="form-control @error('outside_dhaka_shipping') is-invalid @enderror"
-                                                       name="outside_dhaka_shipping" id="outside_dhaka_shipping"
-                                                       placeholder="0" min="0" step="1"
-                                                       value="{{ old('outside_dhaka_shipping', $user->outside_dhaka_shipping ?? 0) }}">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text">TK</span>
+                                                        $isInside = ($adminAreaName === data_get($insideAreaSetting, 'name'));
+                                                        if ($isInside) {
+                                                            $currentCost = $user->inside_dhaka_shipping ?? data_get($adminArea, 'cost', 0);
+                                                        } else {
+                                                            $outsideAreaSetting = collect(setting('delivery_areas') ?? [])->first(fn ($a) => 
+                                                                \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower(data_get($a, 'name') ?? ''), 'outside') || 
+                                                                \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower(data_get($a, 'name') ?? ''), 'বাহির')
+                                                            );
+                                                            $isOutside = $outsideAreaSetting && ($adminAreaName === data_get($outsideAreaSetting, 'name'));
+                                                            if ($isOutside) {
+                                                                $currentCost = $user->outside_dhaka_shipping ?? data_get($adminArea, 'cost', 0);
+                                                            } else {
+                                                                $currentCost = data_get($adminArea, 'cost', 0);
+                                                            }
+                                                        }
+                                                    }
+                                                @endphp
+                                                <div class="form-group">
+                                                    <label for="reseller_area_{{ $index }}">{{ $adminAreaName }} Shipping Cost</label>
+                                                    <div class="input-group">
+                                                        <input type="hidden" name="reseller_delivery_areas[{{ $index }}][name]" value="{{ $adminAreaName }}">
+                                                        <input type="text" class="form-control @error("reseller_delivery_areas.{$index}.cost") is-invalid @enderror"
+                                                            name="reseller_delivery_areas[{{ $index }}][cost]" id="reseller_area_{{ $index }}"
+                                                            placeholder="0" min="0" step="1"
+                                                            value="{{ old("reseller_delivery_areas.{$index}.cost", $currentCost) }}">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">TK</span>
+                                                        </div>
                                                     </div>
+                                                    @error("reseller_delivery_areas.{$index}.cost")
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $message }}</strong>
+                                                        </span>
+                                                    @enderror
+                                                    <small class="form-text text-muted">Set custom shipping cost for {{ $adminAreaName }}</small>
                                                 </div>
-                                                @error('outside_dhaka_shipping')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                                <small class="form-text text-muted">Shipping cost for orders outside Dhaka city</small>
-                                            </div>
+                                            @endforeach
                                         </div>
                                     </div>
                                 </div>

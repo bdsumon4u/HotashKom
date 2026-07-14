@@ -15,7 +15,9 @@ use App\Models\Slide;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class StorefrontController extends Controller
 {
@@ -283,22 +285,22 @@ class StorefrontController extends Controller
      */
     public function checkout(Request $request): JsonResponse
     {
+        $deliveryAreas = collect(setting('delivery_areas') ?? [])->pluck('name')->toArray();
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string'],
             'address' => ['required', 'string', 'max:500'],
             'note' => ['nullable', 'string', 'max:1000'],
-            'shipping' => ['required', 'in:Inside Dhaka,Outside Dhaka'],
+            'shipping' => ['required', Rule::in($deliveryAreas)],
             'items' => ['required', 'array', 'min:1'],
             'items.*.id' => ['required'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.variation_id' => ['nullable'],
         ]);
 
-        $deliveryCharge = setting('delivery_charge');
-        $shippingCost = $data['shipping'] === 'Inside Dhaka'
-            ? (float) ($deliveryCharge->inside_dhaka ?? 80)
-            : (float) ($deliveryCharge->outside_dhaka ?? 150);
+        $areaSetting = collect(setting('delivery_areas') ?? [])->firstWhere('name', $data['shipping']);
+        $shippingCost = (float) ($areaSetting['cost'] ?? 0);
 
         // Build products JSON. Prefer the requested variation when supplied so the
         // ordered line item matches what the customer picked in the UI.
@@ -718,7 +720,7 @@ class StorefrontController extends Controller
      */
     public function saveCheckoutProgress(Request $request): JsonResponse
     {
-        if (empty($request->all()) && !empty($request->getContent())) {
+        if (empty($request->all()) && ! empty($request->getContent())) {
             $json = json_decode($request->getContent(), true);
             if (is_array($json)) {
                 $request->merge($json);
@@ -750,7 +752,7 @@ class StorefrontController extends Controller
         $items = $data['items'];
         $cartContent = collect();
 
-        if (!empty($items)) {
+        if (! empty($items)) {
             $variationIds = collect($items)->pluck('variation_id')->filter()->unique()->toArray();
             $productIds = collect($items)->pluck('id')->filter()->unique()->toArray();
 
@@ -773,7 +775,7 @@ class StorefrontController extends Controller
 
                 $price = $product->selling_price;
                 $slug = $product->slug;
-                
+
                 // Base image resolution
                 $imageSrc = '';
                 if ($product->base_image) {
@@ -787,13 +789,13 @@ class StorefrontController extends Controller
                 }
 
                 // Construct a stdClass to match Azmolla/Shoppingcart CartItem fields
-                $cartItem = new \stdClass();
+                $cartItem = new \stdClass;
                 $cartItem->id = $product->id;
                 $cartItem->name = $product->varName; // Uses Parent [Variation] name
                 $cartItem->qty = $item['quantity'];
                 $cartItem->price = $price;
-                
-                $options = new \stdClass();
+
+                $options = new \stdClass;
                 $options->slug = $slug;
                 $options->image = $imageSrc;
                 $cartItem->options = $options;
@@ -806,10 +808,10 @@ class StorefrontController extends Controller
             return response()->json(['message' => 'Cart is empty.'], 400);
         }
 
-        $identifier = 'api_' . str_replace('+', '', $phone);
+        $identifier = 'api_'.str_replace('+', '', $phone);
         $instance = 'default';
 
-        \Illuminate\Support\Facades\DB::table('shopping_cart')->updateOrInsert(
+        DB::table('shopping_cart')->updateOrInsert(
             [
                 'identifier' => $identifier,
                 'instance' => $instance,
@@ -824,7 +826,7 @@ class StorefrontController extends Controller
         );
 
         // Clean up any other carts with the same phone number to avoid duplicates
-        \Illuminate\Support\Facades\DB::table('shopping_cart')
+        DB::table('shopping_cart')
             ->where('phone', $phone)
             ->where('instance', $instance)
             ->where('identifier', '!=', $identifier)

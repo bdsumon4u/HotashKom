@@ -79,36 +79,23 @@
                         ডেলিভারি এরিয়া<span class="text-danger">*</span>
                     </label>
                     <div class="simple-shipping-options">
-                        <label class="simple-shipping-option">
-                            <input type="radio"
-                                wire:model.live="shipping"
-                                @change="$wire.updateField('shipping', $event.target.value)"
-                                name="shipping"
-                                value="Inside Dhaka">
-                            <span class="simple-shipping-content">
-                                <span class="simple-shipping-title">
-                                    ঢাকার ভিতরে
-                                    @if (cart()->subTotal())
-                                        ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Inside Dhaka').' Tk' }})
-                                    @endif
+                        @foreach (setting('delivery_areas') ?? [] as $index => $area)
+                            <label class="simple-shipping-option">
+                                <input type="radio"
+                                    wire:model.live="shipping"
+                                    @change="$wire.updateField('shipping', $event.target.value)"
+                                    name="shipping"
+                                    value="{{ data_get($area, 'name') }}">
+                                <span class="simple-shipping-content">
+                                    <span class="simple-shipping-title">
+                                        {{ data_get($area, 'name') }}
+                                        @if (cart()->subTotal())
+                                            ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost(data_get($area, 'name')).' Tk' }})
+                                        @endif
+                                    </span>
                                 </span>
-                            </span>
-                        </label>
-                        <label class="simple-shipping-option">
-                            <input type="radio"
-                                wire:model.live="shipping"
-                                @change="$wire.updateField('shipping', $event.target.value)"
-                                name="shipping"
-                                value="Outside Dhaka">
-                            <span class="simple-shipping-content">
-                                <span class="simple-shipping-title">
-                                    ঢাকার বাহিরে
-                                    @if (cart()->subTotal())
-                                        ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost('Outside Dhaka').' Tk' }})
-                                    @endif
-                                </span>
-                            </span>
-                        </label>
+                            </label>
+                        @endforeach
                     </div>
                     <x-error field="shipping" />
                 </div>

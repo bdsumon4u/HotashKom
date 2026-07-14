@@ -47,11 +47,12 @@ class SettingRequest extends FormRequest
 
         if ($this->get('tab') == 'delivery') {
             return [
-                'delivery_charge.inside_dhaka' => 'sometimes|integer',
-                'delivery_charge.outside_dhaka' => 'sometimes|integer',
+                'delivery_areas' => 'required|array|min:1',
+                'delivery_areas.*.name' => 'required|string|max:255',
+                'delivery_areas.*.cost' => 'required|integer|min:0',
+                'default_delivery_area' => 'required|integer',
                 'delivery_text' => 'sometimes',
                 'free_delivery' => 'sometimes',
-                'default_area' => 'required|array',
                 'show_option' => 'required|array',
             ];
         }

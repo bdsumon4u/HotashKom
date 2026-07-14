@@ -35,18 +35,13 @@
                 <div class="form-group">
                     <label class="d-block">Delivery Charge City <span class="text-danger">*</span></label>
                     <div class="form-control h-auto @error('shipping_area') is-invalid @enderror">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="inside-dhaka" name="shipping"
-                                wire:model.live="shipping_area" value="Inside Dhaka" @disabled(isReseller() && !is_null($order->source_id))>
-                            <label class="custom-control-label" for="inside-dhaka">Inside
-                                Dhaka</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="outside-dhaka" name="shipping"
-                                wire:model.live="shipping_area" value="Outside Dhaka" @disabled(isReseller() && !is_null($order->source_id))>
-                            <label class="custom-control-label" for="outside-dhaka">Outside
-                                Dhaka</label>
-                        </div>
+                        @foreach (setting('delivery_areas') ?? [] as $index => $area)
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" id="shipping-area-{{ $index }}" name="shipping"
+                                    wire:model.live="shipping_area" value="{{ data_get($area, 'name') }}" @disabled(isReseller() && !is_null($order->source_id))>
+                                <label class="custom-control-label" for="shipping-area-{{ $index }}">{{ data_get($area, 'name') }}</label>
+                            </div>
+                        @endforeach
                     </div>
                     <x-error field="shipping_area" />
                 </div>
@@ -413,11 +408,21 @@
                         </tr>
                         @endif
                         <tr>
-                            <th style="font-size:14px;white-space:nowrap;vertical-align:middle;">Our Delivery Charge</th>
+                            <th style="font-size:12px;white-space:nowrap;vertical-align:middle;">Our Delivery Charge</th>
                             <td class="shipping">
-                                <input class="shipping form-control" style="height: auto; padding: 2px 8px;"
-                                    type="text" wire:model.live.debounce.500ms="{{ (!isOninda() || config('app.resell')) ? 'shipping_cost' : 'retail_delivery_fee' }}"
-                                    class="form-control" @disabled(isReseller() && !is_null($order->source_id))>
+                                @if (!isOninda() || config('app.resell'))
+                                    <input class="shipping form-control" style="height: auto; padding: 2px 8px;"
+                                        type="text"
+                                        wire:key="shipping-cost-input-{{ $shipping_area }}"
+                                        wire:model.live.debounce.500ms="shipping_cost"
+                                        @disabled(isReseller() && !is_null($order->source_id))>
+                                @else
+                                    <input class="shipping form-control" style="height: auto; padding: 2px 8px;"
+                                        type="text"
+                                        wire:key="retail-delivery-input-{{ $shipping_area }}"
+                                        wire:model.live.debounce.500ms="retail_delivery_fee"
+                                        @disabled(isReseller() && !is_null($order->source_id))>
+                                @endif
                             </td>
                         </tr>
                     </tbody>

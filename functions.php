@@ -256,11 +256,7 @@ if (! function_exists('pageRoutes')) {
 if (! function_exists('setting')) {
     function setting($name, $default = null)
     {
-        return cacheMemo()->rememberForever('settings:'.$name, function () use ($name, $default) {
-            $setting = Setting::whereName($name)->first();
-
-            return $setting?->value ?? $default;
-        });
+        return Setting::array()[$name] ?? $default;
     }
 }
 

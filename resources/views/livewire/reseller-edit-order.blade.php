@@ -28,18 +28,13 @@
                 <div class="form-group">
                     <label class="d-block">Delivery Charge City <span class="text-danger">*</span></label>
                     <div class="form-control h-auto @error('shipping_area') is-invalid @enderror">
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="inside-dhaka" name="shipping"
-                                wire:model.live="shipping_area" value="Inside Dhaka">
-                            <label class="custom-control-label" for="inside-dhaka">Inside
-                                Dhaka</label>
-                        </div>
-                        <div class="custom-control custom-radio custom-control-inline">
-                            <input type="radio" class="custom-control-input" id="outside-dhaka" name="shipping"
-                                wire:model.live="shipping_area" value="Outside Dhaka">
-                            <label class="custom-control-label" for="outside-dhaka">Outside
-                                Dhaka</label>
-                        </div>
+                        @foreach (setting('delivery_areas') ?? [] as $index => $area)
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" id="shipping-area-{{ $index }}" name="shipping"
+                                    wire:model.live="shipping_area" value="{{ data_get($area, 'name') }}">
+                                <label class="custom-control-label" for="shipping-area-{{ $index }}">{{ data_get($area, 'name') }}</label>
+                            </div>
+                        @endforeach
                     </div>
                     <x-error field="shipping_area" />
                 </div>

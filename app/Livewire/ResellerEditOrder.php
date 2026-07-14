@@ -184,7 +184,7 @@ class ResellerEditOrder extends Component
         /** @var User $reseller */
         $reseller = auth('user')->user();
         $subtotal = $this->order->getSubtotal($this->selectedProducts);
-        $this->shipping_cost = $this->order->getShippingCost($this->selectedProducts, $this->subtotal, $value);
+        $this->shipping_cost = $this->order->getShippingCost($this->selectedProducts, $subtotal, $value);
         $this->fill([
             'subtotal' => $subtotal,
             'shipping_cost' => $this->shipping_cost,

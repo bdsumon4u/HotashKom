@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-        <livewire:free-delivery :free-delivery="$free_delivery ?? null" :delivery-charge="$delivery_charge" />
+        <livewire:free-delivery :free-delivery="$free_delivery ?? null" :delivery-charge="$delivery_charge" :delivery-areas="$delivery_areas ?? []" />
         <div class="col-md-12">
             <div class="form-group">
                 <label for="delivery-text">Delivery Text</label>

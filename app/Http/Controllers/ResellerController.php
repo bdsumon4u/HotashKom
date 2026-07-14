@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 final class ResellerController extends Controller
 {
@@ -99,12 +100,14 @@ final class ResellerController extends Controller
 
     private function processCheckout(Request $request, $user)
     {
+        $deliveryAreas = collect(setting('delivery_areas') ?? [])->pluck('name')->toArray();
+
         // Validate the request
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'regex:/^1\d{9}$/'],
             'address' => ['required', 'string'],
-            'shipping' => ['required', 'in:Inside Dhaka,Outside Dhaka'],
+            'shipping' => ['required', Rule::in($deliveryAreas)],
             'note' => ['nullable', 'string'],
         ]);
 
@@ -343,15 +346,38 @@ final class ResellerController extends Controller
             'address' => ['nullable', 'string', 'max:500'],
             'domain' => 'nullable|string|max:255|unique:users,domain,'.$user->id,
             'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            'inside_dhaka_shipping' => ['nullable', 'integer', 'min:0', 'max:999999'],
-            'outside_dhaka_shipping' => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'reseller_delivery_areas' => ['nullable', 'array'],
+            'reseller_delivery_areas.*.name' => ['required', 'string'],
+            'reseller_delivery_areas.*.cost' => ['required', 'integer', 'min:0', 'max:999999'],
         ]);
 
         $user->fill($request->only([
             'name', 'shop_name', 'email', 'phone_number',
             'bkash_number', 'address', 'domain',
-            'inside_dhaka_shipping', 'outside_dhaka_shipping',
         ]));
+
+        $resellerAreas = $request->input('reseller_delivery_areas', []);
+        $formattedAreas = [];
+        foreach ($resellerAreas as $area) {
+            $formattedAreas[] = [
+                'name' => data_get($area, 'name'),
+                'cost' => $area['cost'] !== null && $area['cost'] !== '' ? (int) $area['cost'] : 0,
+            ];
+        }
+        $user->delivery_areas = $formattedAreas;
+
+        // Reconstruct inside_dhaka_shipping and outside_dhaka_shipping for backwards compatibility
+        $insideAreaSetting = collect($formattedAreas)->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'inside') ||
+            Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা শহর') ||
+            Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা সিটি')
+        ) ?? collect($formattedAreas)->first();
+
+        $outsideAreaSetting = collect($formattedAreas)->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'outside') ||
+            Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'বাহির')
+        );
+
+        $user->inside_dhaka_shipping = $insideAreaSetting ? (int) data_get($insideAreaSetting, 'cost', 0) : 0;
+        $user->outside_dhaka_shipping = $outsideAreaSetting ? (int) data_get($outsideAreaSetting, 'cost', 0) : ($formattedAreas[1] ?? $insideAreaSetting ? (int) data_get($formattedAreas[1] ?? $insideAreaSetting, 'cost', 0) : 0);
 
         if ($request->hasFile('logo')) {
             // Delete old logo if exists

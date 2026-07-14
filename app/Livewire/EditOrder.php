@@ -308,21 +308,26 @@ class EditOrder extends Component
 
     public function updatedShippingArea($value): void
     {
-        $this->fill([
-            'subtotal' => $subtotal = $this->order->getSubtotal($this->selectedProducts),
-            'shipping_cost' => $this->order->getShippingCost($this->selectedProducts, $subtotal, $value),
-        ]);
-        if (! isOninda() || ! config('app.resell')) {
-            $this->fill(['retail_delivery_fee' => $this->shipping_cost]);
-            $this->updatedRetailDeliveryFee($this->shipping_cost);
+        $shippingCost = $this->order->getShippingCost($this->selectedProducts, $this->order->getSubtotal($this->selectedProducts), $value);
+
+        $this->subtotal = $this->order->getSubtotal($this->selectedProducts);
+        $this->shipping_cost = $shippingCost;
+
+        if (isOninda() && config('app.resell') && !is_null($this->order?->user)) {
+            // Reseller order on resell site: use reseller's custom rate (falls back to admin rate)
+            $this->retail_delivery_fee = $this->order->user->getShippingCost($value);
+        } else {
+            // Non-reseller order: mirror admin delivery cost
+            $this->retail_delivery_fee = $shippingCost;
         }
+        $this->updatedRetailDeliveryFee($this->retail_delivery_fee);
     }
 
     public function updatedRetailDeliveryFee($value): void
     {
         $this->order->fill(['data' => array_merge($this->order->data, ['retail_delivery_fee' => $value])]);
         if (isOninda() && ! config('app.resell')) {
-            $this->fill(['shipping_cost' => $value]);
+            $this->shipping_cost = $value;
         }
     }
 
@@ -344,7 +349,7 @@ class EditOrder extends Component
         }
 
         if (isOninda() && ! config('app.resell')) {
-            $this->fill(['retail_discount' => $this->discount]);
+            $this->retail_discount = $this->discount;
         }
 
         $this->order

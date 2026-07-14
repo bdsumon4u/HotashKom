@@ -287,24 +287,49 @@ class Checkout extends Component
         $area ??= $this->shipping;
         $shipping_cost = 0;
         if ($area) {
+            $deliveryAreas = collect(setting('delivery_areas') ?? []);
+            $areaSetting = $deliveryAreas->first(fn ($a) => data_get($a, 'name') === $area);
+            $areaCost = (int) data_get($areaSetting, 'cost', 0);
             if (setting('show_option')->productwise_delivery_charge ?? false) {
-                $shipping_cost = cart()->content()->sum(function ($item) use ($area) {
-                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
-                    if ($area == 'Inside Dhaka') {
-                        return $item->options->shipping_inside * $factor;
+                $insideAreaSetting = $deliveryAreas->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'inside') ||
+                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা শহর') ||
+                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা সিটি')
+                ) ?? $deliveryAreas->first();
+                $isInside = ($area === data_get($insideAreaSetting, 'name'));
+
+                $outsideAreaSetting = $deliveryAreas->first(fn ($a) => 
+                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'outside') || 
+                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'বাহির')
+                );
+                $isOutside = $outsideAreaSetting && ($area === data_get($outsideAreaSetting, 'name'));
+
+                if ($isInside) {
+                    if (setting('show_option')->quantitywise_delivery_charge ?? false) {
+                        $shipping_cost = cart()->content()->sum(function ($item) {
+                            return ($item->options->shipping_inside ?? 0) * $item->qty;
+                        });
                     } else {
-                        return $item->options->shipping_outside * $factor;
+                        $shipping_cost = cart()->content()->max(function ($item) {
+                            return $item->options->shipping_inside ?? 0;
+                        });
                     }
-                });
+                    $shipping_cost = $shipping_cost ?: $areaCost;
+                } elseif ($isOutside) {
+                    if (setting('show_option')->quantitywise_delivery_charge ?? false) {
+                        $shipping_cost = cart()->content()->sum(function ($item) {
+                            return ($item->options->shipping_outside ?? 0) * $item->qty;
+                        });
+                    } else {
+                        $shipping_cost = cart()->content()->max(function ($item) {
+                            return $item->options->shipping_outside ?? 0;
+                        });
+                    }
+                    $shipping_cost = $shipping_cost ?: $areaCost;
+                } else {
+                    $shipping_cost = $areaCost;
+                }
             } else {
-                $shipping_cost = cart()->content()->max(function ($item) use ($area) {
-                    $factor = (setting('show_option')->quantitywise_delivery_charge ?? false) ? $item->qty : 1;
-                    if ($area == 'Inside Dhaka') {
-                        return $item->options->shipping_inside * $factor;
-                    } else {
-                        return $item->options->shipping_outside * $factor;
-                    }
-                });
+                $shipping_cost = $areaCost;
             }
         }
 
@@ -380,15 +405,9 @@ class Checkout extends Component
         //     $this->phone = '+880';
         // }
 
-        $default_area = setting('default_area');
-        if ($default_area->inside ?? false) {
-            $shipping = 'Inside Dhaka';
-            if (! $this->retailDeliveryFeeManuallySet) {
-                $this->retailDeliveryFee = $this->shippingCost($shipping);
-            }
-        }
-        if ($default_area->outside ?? false) {
-            $shipping = 'Outside Dhaka';
+        $defaultArea = collect(setting('delivery_areas') ?? [])->first(fn ($a) => (bool) data_get($a, 'is_default'));
+        if ($defaultArea) {
+            $shipping = data_get($defaultArea, 'name');
             if (! $this->retailDeliveryFeeManuallySet) {
                 $this->retailDeliveryFee = $this->shippingCost($shipping);
             }

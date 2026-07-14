@@ -11,6 +11,8 @@ class FreeDelivery extends Component
 
     public array $delivery_charge;
 
+    public array $delivery_areas = [];
+
     public int $free_delivery;
 
     public int $free_for_all;
@@ -21,7 +23,7 @@ class FreeDelivery extends Component
 
     public $search;
 
-    public function mount($freeDelivery, $deliveryCharge): void
+    public function mount($freeDelivery, $deliveryCharge, $deliveryAreas = []): void
     {
         $freeDelivery = optional($freeDelivery);
         $this->free_delivery = (int) ($freeDelivery->enabled ?? false) && ($freeDelivery->enabled != 'false');
@@ -34,6 +36,7 @@ class FreeDelivery extends Component
             $this->addProduct($product, $products[$product->id], true);
         });
         $this->delivery_charge = json_decode(json_encode($deliveryCharge), true);
+        $this->delivery_areas = json_decode(json_encode($deliveryAreas), true) ?: [];
     }
 
     public function addProduct(Product $product, $quantity = 1, $silent = false)
