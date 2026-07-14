@@ -118,7 +118,7 @@ class Order extends Model
 
             $status = Arr::get($order->getChanges(), 'status');
 
-            if ($status) {
+            if (config('meta-pixel.advanced_tracking') && $status) {
                 try {
                     // Fire CAPI + flash GTM dataLayer on order status change
                     $facebookPixelService = app(FacebookPixelService::class);
@@ -212,8 +212,6 @@ class Order extends Model
             if (! isOninda()) {
                 return;
             }
-
-            $status = Arr::get($order->getChanges(), 'status');
 
             // Dispatch job to sync status with resellers
             if ($status) {
