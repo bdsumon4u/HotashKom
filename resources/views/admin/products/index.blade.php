@@ -76,7 +76,7 @@
             <div class="p-3 card-body">
                <div class="table-responsive product-table">
                   @php $isAdmin = auth('admin')->check() && auth('admin')->user()->is('admin'); @endphp
-                  <table class="display" id="product-table" data-url="{{ route('api.products', ['admin_id' => auth('admin')->id()]) }}">
+                  <table class="display" id="product-table" data-url="{{ route('api.products', ['admin_id' => auth('admin')->id(), 'only' => request('only')]) }}">
                      <thead>
                         <tr>
                            <th width="100">Image</th>

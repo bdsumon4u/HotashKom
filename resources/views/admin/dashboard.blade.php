@@ -87,21 +87,21 @@
                     <div class="col-xl-4 box-col-4 col-lg-4 col-md-4">
                         <div class="rounded-sm card o-hidden">
                             <div class="p-3 card-body">
-                                <div class="ecommerce-widgets media">
+                                <a href="{{ route('admin.products.index') }}" class="ecommerce-widgets media">
                                     <div class="media-body">
                                         <p class="mb-2 f-w-500 font-roboto">Total Products</p>
                                         <h4 class="mb-0 f-w-500 f-26"><span class="counter">{{ $productsCount }}</span></h4>
                                     </div>
                                     <div class="ecommerce-box light-bg-primary"><i class="fa fa-heart"
                                             aria-hidden="true"></i></div>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
                     <div class="col-xl-4 box-col-4 col-lg-4 col-md-4">
                         <div class="rounded-sm card o-hidden">
                             <div class="p-3 card-body">
-                                <div class="ecommerce-widgets media">
+                                <a href="{{ route('admin.products.index', ['only' => 'inactive']) }}" class="ecommerce-widgets media">
                                     <div class="media-body">
                                         <p class="mb-2 f-w-500 font-roboto">Inactive Products</p>
                                         <h4 class="mb-0 f-w-500 f-26"><span
@@ -109,14 +109,14 @@
                                     </div>
                                     <div class="ecommerce-box light-bg-primary"><i class="fa fa-heart"
                                             aria-hidden="true"></i></div>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
                     <div class="col-xl-4 box-col-4 col-lg-4 col-md-4">
                         <div class="rounded-sm card o-hidden">
                             <div class="p-3 card-body">
-                                <div class="ecommerce-widgets media">
+                                <a href="{{ route('admin.products.index', ['only' => 'low-stock']) }}" class="ecommerce-widgets media">
                                     <div class="media-body">
                                         <p class="mb-2 f-w-500 font-roboto">Low Stock</p>
                                         <h4 class="mb-0 f-w-500 f-26"><span
@@ -124,7 +124,7 @@
                                     </div>
                                     <div class="ecommerce-box light-bg-primary"><i class="fa fa-heart"
                                             aria-hidden="true"></i></div>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
