@@ -295,33 +295,74 @@ final class ResellerController extends Controller
     {
         if ($request->ajax()) {
             $user = Auth::guard('user')->user();
-            $transactions = $user->wallet->transactions()->latest()->paginate(50);
 
-            return response()->json([
-                'draw' => $request->draw,
-                'recordsTotal' => $transactions->total(),
-                'recordsFiltered' => $transactions->total(),
-                'data' => $transactions->map(fn ($transaction, $index): array => [
-                    'DT_RowIndex' => $index + 1,
+            $page = (int) ($request->input('start', 0) / max((int) $request->input('length', 50), 1)) + 1;
+            $perPage = (int) $request->input('length', 50);
+            $transactions = $user->wallet->transactions()->latest()->paginate($perPage, ['*'], 'page', $page);
+
+            // Shared cache: order_id → Order. Each unique order loaded once per page.
+            $ordersCache = [];
+            $loadOrder = function (int $orderId) use (&$ordersCache): ?Order {
+                if (! array_key_exists($orderId, $ordersCache)) {
+                    $ordersCache[$orderId] = Order::find($orderId);
+                }
+
+                return $ordersCache[$orderId];
+            };
+
+            $startIndex = ($transactions->currentPage() - 1) * $transactions->perPage();
+
+            $data = $transactions->values()->map(function ($transaction, $index) use ($loadOrder, $startIndex): array {
+                $meta = $transaction->meta;
+                $orderId = $meta['order_id'] ?? null;
+                $order = $orderId ? $loadOrder((int) $orderId) : null;
+
+                if (isset($meta['trx_id']) && isset($meta['admin_id'])) {
+                    $metaHtml = '<span class="text-muted">Trx ID: '.e($meta['trx_id']).' by staff #'.e($meta['admin_id']).'</span>';
+                } else {
+                    $title = $meta['reason'] ?? 'N/A';
+                    $metaHtml = $orderId
+                        ? '<a target="_blank" href="'.route('reseller.orders.show', $orderId).'">'.e($title).'</a>'
+                        : e($title);
+                }
+
+                $subtotalHtml = '-';
+                $deliveryHtml = '-';
+
+                if ($order) {
+                    $sellSubtotalVal = collect((array) $order->products)->sum(
+                        fn ($p) => (float) ($p->retail_price ?? $p->price ?? 0) * (int) ($p->quantity ?? 0)
+                    );
+                    $buySubtotal = number_format((int) ($order->data['subtotal'] ?? 0));
+                    $sellSubtotal = number_format((int) $sellSubtotalVal);
+                    $subtotalHtml = '<small class="text-muted">Buy</small> '.$buySubtotal.'<br><small class="text-muted">Sell</small> '.$sellSubtotal;
+
+                    $buyDelivery = number_format((int) ($order->data['shipping_cost'] ?? 0));
+                    $sellDelivery = number_format((int) ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0));
+                    $deliveryHtml = '<small class="text-muted">Buy</small> '.$buyDelivery.'<br><small class="text-muted">Sell</small> '.$sellDelivery;
+                }
+
+                return [
+                    'DT_RowIndex' => $startIndex + $index + 1,
                     'type' => $transaction->type === 'deposit'
                         ? '<span class="badge badge-success">Deposit</span>'
                         : '<span class="badge badge-danger">Withdraw</span>',
                     'amount' => number_format((float) $transaction->amount, 2).' tk',
                     'created_at' => $transaction->created_at->format('d-M-Y H:i'),
                     'status' => $transaction->confirmed ? 'COMPLETED' : 'PENDING',
-                    'meta' => (function ($meta) {
-                        if (isset($meta['trx_id']) && isset($meta['admin_id'])) {
-                            return '<span class="text-muted">Trx ID: '.e($meta['trx_id']).' by staff #'.e($meta['admin_id']).'</span>';
-                        }
+                    'meta' => $metaHtml,
+                    'subtotal' => $subtotalHtml,
+                    'delivery_charge' => $deliveryHtml,
+                    'advanced' => $order ? number_format((int) ($order->data['advanced'] ?? 0)) : '-',
+                    'packaging_charge' => $order ? number_format((int) ($order->data['packaging_charge'] ?? 0)) : '-',
+                ];
+            });
 
-                        $title = $meta['reason'] ?? 'N/A';
-                        if ($id = $meta['order_id'] ?? false) {
-                            return '<a target="_blank" href="'.route('reseller.orders.show', $id).'">'.e($title).'</a>';
-                        }
-
-                        return e($title);
-                    })($transaction->meta),
-                ]),
+            return response()->json([
+                'draw' => $request->draw,
+                'recordsTotal' => $transactions->total(),
+                'recordsFiltered' => $transactions->total(),
+                'data' => $data,
             ]);
         }
 
