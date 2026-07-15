@@ -104,7 +104,7 @@
         font-size: 19px;
         font-weight: 600;
         line-height: 1.2632em;
-        color: #FF6600;
+        color: #00BF63;
         margin-top: 0;
         margin-bottom: 25px;
         text-transform: none;
@@ -176,19 +176,45 @@
     }
 
     .rankmet-footer-email-box {
-        margin-bottom: 20px;
+        margin-bottom: 12px;
     }
 
     .rankmet-footer-email {
         font-family: 'DM Sans', sans-serif;
         font-size: 16px;
-        color: #FF6600;
+        color: #00BF63;
         text-decoration: none;
         transition: color 0.3s ease;
     }
 
     .rankmet-footer-email:hover {
         color: #FFFFFF;
+    }
+
+    .rankmet-footer-phone-box {
+        margin-bottom: 12px;
+    }
+
+    .rankmet-footer-phone {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 16px;
+        color: #B7B7B7;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .rankmet-footer-phone:hover {
+        color: #FFFFFF;
+    }
+
+    .rankmet-footer-address-box {
+        margin-bottom: 20px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 16px;
+        color: #B7B7B7;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
     }
 
     .rankmet-footer-policies li {
@@ -271,7 +297,7 @@
 </style>
 
 <footer class="rankmet-footer">
-    <div class="rankmet-footer-watermark">
+    <div class="rankmet-footer-watermark d-none">
         @if(isset($logo->desktop) && $logo->desktop)
             <img src="{{ asset($logo->desktop) }}" alt="">
         @elseif(isset($logo->mobile) && $logo->mobile)
@@ -367,14 +393,27 @@
 
                 @if(isset($company->email) && $company->email)
                     <div class="rankmet-footer-email-box">
-                        <a href="mailto:{{ $company->email }}" class="rankmet-footer-email">{{ $company->email }}</a>
+                        <a href="mailto:{{ $company->email }}" class="rankmet-footer-email"><i class="fa fa-envelope mr-2" style="color: #00BF63;"></i>{{ $company->email }}</a>
+                    </div>
+                @endif
+
+                @if(isset($company->phone) && $company->phone)
+                    <div class="rankmet-footer-phone-box">
+                        <a href="tel:{{ $company->phone }}" class="rankmet-footer-phone"><i class="fa fa-phone-alt mr-2" style="color: #00BF63;"></i>{{ $company->phone }}</a>
+                    </div>
+                @endif
+
+                @if(isset($company->address) && $company->address)
+                    <div class="rankmet-footer-address-box">
+                        <i class="fa fa-map-marker-alt" style="color: #00BF63; margin-top: 4px;"></i>
+                        <span>{{ $company->address }}</span>
                     </div>
                 @endif
 
                 <ul class="rankmet-footer-list rankmet-footer-policies">
-                    <li><a href="{{ url('privacy-policy') }}">Privacy Policy</a></li>
+                    <!-- <li><a href="{{ url('privacy-policy') }}">Privacy Policy</a></li>
                     <li><a href="{{ url('refund-policy') }}">Refund Policy</a></li>
-                    <li><a href="{{ url('terms-of-services') }}">Terms of Services</a></li>
+                    <li><a href="{{ url('terms-of-services') }}">Terms of Services</a></li> -->
                 </ul>
             </div>
         </div>

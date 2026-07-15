@@ -595,6 +595,7 @@
         .widget-connect__button-activator {
             margin: auto;
             border-radius: 50%;
+            background: #ff0000;
             box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
             background-position: center center;
             background-repeat: no-repeat;
@@ -1027,7 +1028,7 @@
                     <i class="fab fa-whatsapp"></i>
                 </a>
             @endif
-            <div class="widget-connect__button-activator" style="background-color: #ff0000;">
+            <div class="widget-connect__button-activator">
                 <div class="widget-connect__button-activator-icon"></div>
             </div>
         </div>

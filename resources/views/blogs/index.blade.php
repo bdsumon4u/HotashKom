@@ -84,7 +84,7 @@
                     text-decoration: none;
                 }
                 .blog-card__title a:hover {
-                    color: #ffd333; /* Primary brand yellow color or hover shade */
+                    color: #00BF63; /* Primary brand yellow color or hover shade */
                 }
                 .blog-card__excerpt {
                     font-size: 0.9rem;
@@ -104,7 +104,7 @@
                     transition: gap 0.2s ease, color 0.2s ease;
                 }
                 .blog-card__link:hover {
-                    color: #ffd333;
+                    color: #00BF63;
                     gap: 0.5rem;
                 }
                 .blogs-pagination .pagination {
