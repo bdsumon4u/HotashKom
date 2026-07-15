@@ -218,7 +218,7 @@ class Order extends Model
                 dispatch(new SyncOrderStatusWithReseller($order->id));
             }
 
-            if (! in_array($status, ['DELIVERED', 'RETURNED'])) {
+            if (! in_array($status, ['DELIVERED', 'RETURNED', 'PAID_RETURN'])) {
                 return;
             }
 

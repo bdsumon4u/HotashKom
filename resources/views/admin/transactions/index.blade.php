@@ -72,6 +72,7 @@
                                     <th>Delivery</th>
                                     <th>Advanced</th>
                                     <th>Packaging</th>
+                                    <th>Total</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -250,6 +251,12 @@
                         {
                             data: 'packaging_charge',
                             name: 'packaging_charge',
+                            orderable: false,
+                            searchable: false
+                        },
+                        {
+                            data: 'total',
+                            name: 'total',
                             orderable: false,
                             searchable: false
                         },

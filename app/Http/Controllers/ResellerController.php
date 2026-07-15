@@ -328,18 +328,34 @@ final class ResellerController extends Controller
 
                 $subtotalHtml = '-';
                 $deliveryHtml = '-';
+                $advancedHtml = '-';
+                $packagingHtml = '-';
+                $totalHtml = '-';
 
                 if ($order) {
                     $sellSubtotalVal = collect((array) $order->products)->sum(
                         fn ($p) => (float) ($p->retail_price ?? $p->price ?? 0) * (int) ($p->quantity ?? 0)
                     );
-                    $buySubtotal = number_format((int) ($order->data['subtotal'] ?? 0));
-                    $sellSubtotal = number_format((int) $sellSubtotalVal);
-                    $subtotalHtml = '<small class="text-muted">Buy</small> '.$buySubtotal.'<br><small class="text-muted">Sell</small> '.$sellSubtotal;
+                    $buySubtotalVal = (int) ($order->data['subtotal'] ?? 0);
+                    $buyDeliveryVal = (int) ($order->data['shipping_cost'] ?? 0);
+                    $sellDeliveryVal = (int) ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0);
+                    $advancedVal = (int) ($order->data['advanced'] ?? 0);
+                    $packagingVal = (int) ($order->data['packaging_charge'] ?? 0);
 
-                    $buyDelivery = number_format((int) ($order->data['shipping_cost'] ?? 0));
-                    $sellDelivery = number_format((int) ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0));
-                    $deliveryHtml = '<small class="text-muted">Buy</small> '.$buyDelivery.'<br><small class="text-muted">Sell</small> '.$sellDelivery;
+                    $buySubtotal = number_format($buySubtotalVal);
+                    $sellSubtotal = number_format((int) $sellSubtotalVal);
+                    $subtotalHtml = '<span style="white-space:nowrap"><small class="text-muted">Buy</small> '.$buySubtotal.'</span><br><span style="white-space:nowrap"><small class="text-muted">Sell</small> '.$sellSubtotal.'</span>';
+
+                    $buyDelivery = number_format($buyDeliveryVal);
+                    $sellDelivery = number_format($sellDeliveryVal);
+                    $deliveryHtml = '<span style="white-space:nowrap"><small class="text-muted">Buy</small> '.$buyDelivery.'</span><br><span style="white-space:nowrap"><small class="text-muted">Sell</small> '.$sellDelivery.'</span>';
+
+                    $advancedHtml = '-<br>'.number_format($advancedVal);
+                    $packagingHtml = number_format($packagingVal).'<br>-';
+
+                    $buyTotal = number_format($buySubtotalVal + $buyDeliveryVal + $packagingVal);
+                    $sellTotal = number_format((int) $sellSubtotalVal + $sellDeliveryVal - $advancedVal);
+                    $totalHtml = '<span style="white-space:nowrap"><small class="text-muted">Buy</small> '.$buyTotal.'</span><br><span style="white-space:nowrap"><small class="text-muted">Sell</small> '.$sellTotal.'</span>';
                 }
 
                 return [
@@ -353,8 +369,9 @@ final class ResellerController extends Controller
                     'meta' => $metaHtml,
                     'subtotal' => $subtotalHtml,
                     'delivery_charge' => $deliveryHtml,
-                    'advanced' => $order ? number_format((int) ($order->data['advanced'] ?? 0)) : '-',
-                    'packaging_charge' => $order ? number_format((int) ($order->data['packaging_charge'] ?? 0)) : '-',
+                    'advanced' => $advancedHtml,
+                    'packaging_charge' => $packagingHtml,
+                    'total' => $totalHtml,
                 ];
             });
 

@@ -65,7 +65,7 @@ class TransactionController extends Controller
                         fn ($p) => (float) ($p->retail_price ?? $p->price ?? 0) * (int) ($p->quantity ?? 0)
                     ));
 
-                    return '<small class="text-muted">Buy</small> '.$buy.'<br><small class="text-muted">Sell</small> '.$sell;
+                    return '<span style="white-space:nowrap"><small class="text-muted">Buy</small> '.$buy.'</span><br><span style="white-space:nowrap"><small class="text-muted">Sell</small> '.$sell.'</span>';
                 })
                 ->addColumn('delivery_charge', function ($row) use ($loadOrder) {
                     $orderId = $row->meta['order_id'] ?? null;
@@ -79,7 +79,7 @@ class TransactionController extends Controller
                     $buy = number_format((int) ($order->data['shipping_cost'] ?? 0));
                     $sell = number_format((int) ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0));
 
-                    return '<small class="text-muted">Buy</small> '.$buy.'<br><small class="text-muted">Sell</small> '.$sell;
+                    return '<span style="white-space:nowrap"><small class="text-muted">Buy</small> '.$buy.'</span><br><span style="white-space:nowrap"><small class="text-muted">Sell</small> '.$sell.'</span>';
                 })
                 ->addColumn('advanced', function ($row) use ($loadOrder) {
                     $orderId = $row->meta['order_id'] ?? null;
@@ -87,8 +87,12 @@ class TransactionController extends Controller
                         return '-';
                     }
                     $order = $loadOrder((int) $orderId);
+                    if (! $order) {
+                        return '-';
+                    }
+                    $amount = number_format((int) ($order->data['advanced'] ?? 0));
 
-                    return $order ? number_format((int) ($order->data['advanced'] ?? 0)) : '-';
+                    return '-<br>'.$amount;
                 })
                 ->addColumn('packaging_charge', function ($row) use ($loadOrder) {
                     $orderId = $row->meta['order_id'] ?? null;
@@ -96,8 +100,35 @@ class TransactionController extends Controller
                         return '-';
                     }
                     $order = $loadOrder((int) $orderId);
+                    if (! $order) {
+                        return '-';
+                    }
+                    $amount = number_format((int) ($order->data['packaging_charge'] ?? 0));
 
-                    return $order ? number_format((int) ($order->data['packaging_charge'] ?? 0)) : '-';
+                    return $amount.'<br>-';
+                })
+                ->addColumn('total', function ($row) use ($loadOrder) {
+                    $orderId = $row->meta['order_id'] ?? null;
+                    if (! $orderId) {
+                        return '-';
+                    }
+                    $order = $loadOrder((int) $orderId);
+                    if (! $order) {
+                        return '-';
+                    }
+                    $buySubtotal = (int) ($order->data['subtotal'] ?? 0);
+                    $buyDelivery = (int) ($order->data['shipping_cost'] ?? 0);
+                    $packaging = (int) ($order->data['packaging_charge'] ?? 0);
+                    $sellSubtotal = (int) collect((array) $order->products)->sum(
+                        fn ($p) => (float) ($p->retail_price ?? $p->price ?? 0) * (int) ($p->quantity ?? 0)
+                    );
+                    $sellDelivery = (int) ($order->data['retail_delivery_fee'] ?? $order->data['shipping_cost'] ?? 0);
+                    $advanced = (int) ($order->data['advanced'] ?? 0);
+
+                    $buyTotal = number_format($buySubtotal + $buyDelivery + $packaging);
+                    $sellTotal = number_format($sellSubtotal + $sellDelivery - $advanced);
+
+                    return '<span style="white-space:nowrap"><small class="text-muted">Buy</small> '.$buyTotal.'</span><br><span style="white-space:nowrap"><small class="text-muted">Sell</small> '.$sellTotal.'</span>';
                 })
                 ->addColumn('status', function ($row) {
                     if ($row->confirmed) {
@@ -106,7 +137,7 @@ class TransactionController extends Controller
                         return '<span class="badge badge-warning">Pending</span>';
                     }
                 })
-                ->rawColumns(['type', 'meta', 'status', 'subtotal', 'delivery_charge'])
+                ->rawColumns(['type', 'meta', 'status', 'subtotal', 'delivery_charge', 'advanced', 'packaging_charge', 'total'])
                 ->make(true);
         }
 
