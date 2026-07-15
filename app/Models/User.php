@@ -175,7 +175,7 @@ class User extends Authenticatable implements Confirmable, Wallet
         $isInside = ($shippingArea === data_get($insideAreaSetting, 'name'));
 
         if ($isInside) {
-            return (int) ($this->inside_dhaka_shipping ?? 0);
+            return (int) ($this->inside_dhaka_shipping ?: data_get($insideAreaSetting, 'cost', 0));
         }
 
         $outsideAreaSetting = collect(setting('delivery_areas') ?? [])->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'outside') ||
@@ -184,7 +184,7 @@ class User extends Authenticatable implements Confirmable, Wallet
         $isOutside = $outsideAreaSetting && ($shippingArea === data_get($outsideAreaSetting, 'name'));
 
         if ($isOutside) {
-            return (int) ($this->outside_dhaka_shipping ?? 0);
+            return (int) ($this->outside_dhaka_shipping ?: data_get($outsideAreaSetting, 'cost', 0));
         }
 
         // 3. Fallback to admin's setting cost
