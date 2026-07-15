@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Admin;
+use App\Models\Blog;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\Setting;
@@ -99,4 +100,82 @@ it('renders fallback product SEO on product detail page', function () {
 
     $response->assertStatus(200);
     $response->assertSee('Aesthetic Product');
+});
+
+it('renders fallback blog SEO on blog detail page', function () {
+    $this->withoutExceptionHandling();
+
+    $blog = Blog::create([
+        'title' => 'Important Health Blog',
+        'slug' => 'important-health-blog',
+        'content' => 'This is a premium and detailed blog post about healthy eating habits.',
+        'image' => 'uploads/blog.jpg',
+    ]);
+
+    $response = $this->get(route('blogs.show', $blog));
+
+    $response->assertStatus(200);
+    $response->assertSee('Important Health Blog');
+});
+
+it('allows admin to create a blog with custom SEO', function () {
+    $this->withoutExceptionHandling();
+    $admin = Admin::factory()->create();
+
+    $payload = [
+        'title' => 'Advanced Tech Blog',
+        'slug' => 'advanced-tech-blog',
+        'content' => 'Testing blog creation with SEO properties.',
+        'seo' => [
+            'title' => 'Tech Blog SEO Title',
+            'description' => 'Tech Blog SEO Description',
+            'image' => 'https://example.com/tech.jpg',
+        ],
+    ];
+
+    $response = $this
+        ->actingAs($admin, 'admin')
+        ->post(route('admin.blogs.store'), $payload);
+
+    $response->assertRedirect(route('admin.blogs.index'));
+
+    $blog = Blog::where('slug', 'advanced-tech-blog')->first();
+    expect($blog)->not->toBeNull();
+    expect($blog->seo->title)->toBe('Tech Blog SEO Title');
+    expect($blog->seo->description)->toBe('Tech Blog SEO Description');
+    expect($blog->seo->image)->toBe('https://example.com/tech.jpg');
+});
+
+it('allows admin to update a blog with custom SEO', function () {
+    $this->withoutExceptionHandling();
+    $admin = Admin::factory()->create();
+
+    $blog = Blog::create([
+        'title' => 'Older Blog',
+        'slug' => 'older-blog',
+        'content' => 'Some older content.',
+    ]);
+
+    $payload = [
+        'title' => 'Updated Older Blog',
+        'slug' => 'older-blog',
+        'content' => 'Some updated older content.',
+        'seo' => [
+            'title' => 'Updated SEO Title',
+            'description' => 'Updated SEO Description',
+            'image' => 'https://example.com/updated.jpg',
+        ],
+    ];
+
+    $response = $this
+        ->actingAs($admin, 'admin')
+        ->patch(route('admin.blogs.update', $blog), $payload);
+
+    $response->assertRedirect(route('admin.blogs.index'));
+
+    $blog->refresh();
+    expect($blog->title)->toBe('Updated Older Blog');
+    expect($blog->seo->title)->toBe('Updated SEO Title');
+    expect($blog->seo->description)->toBe('Updated SEO Description');
+    expect($blog->seo->image)->toBe('https://example.com/updated.jpg');
 });

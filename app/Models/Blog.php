@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use RalphJSmit\Laravel\SEO\Support\HasSEO;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class Blog extends Model
 {
+    use HasSEO;
+
     protected $fillable = [
         'title',
         'slug',
@@ -39,5 +43,30 @@ class Blog extends Model
 
         // For other fields (like 'id'), use the value as-is
         return $this->where($field, $value)->first();
+    }
+
+    /**
+     * Get dynamic SEO data fallback.
+     */
+    public function getDynamicSEOData(): SEOData
+    {
+        $title = $this->seo?->title ?: $this->title;
+
+        $description = $this->seo?->description;
+        if (! $description && $this->content) {
+            $description = strip_tags($this->content);
+            $description = (string) str($description)->limit(160);
+        }
+
+        $image = $this->seo?->image;
+        if (! $image && $this->image) {
+            $image = asset($this->image);
+        }
+
+        return new SEOData(
+            title: $title,
+            description: $description,
+            image: $image,
+        );
     }
 }

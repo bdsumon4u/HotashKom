@@ -53,6 +53,33 @@
                             </div>
                         </div>
                         <div class="col-sm-12">
+                            <h4 class="mt-4 border-bottom pb-2">SEO Settings</h4>
+                            <div class="form-group">
+                                <label for="seo_title">SEO Title</label>
+                                <input type="text" name="seo[title]" value="{{ old('seo.title', $blog->seo?->title ?? '') }}" id="seo_title" class="form-control @error('seo.title') is-invalid @enderror" placeholder="Leave empty to use blog title">
+                                @error('seo.title')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                <small class="form-text text-muted">Recommended: 50-60 characters. If empty, blog title will be used.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="seo_description">SEO Description</label>
+                                <textarea name="seo[description]" id="seo_description" rows="3" class="form-control @error('seo.description') is-invalid @enderror" placeholder="Leave empty to use content summary">{{ old('seo.description', $blog->seo?->description ?? '') }}</textarea>
+                                @error('seo.description')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                <small class="form-text text-muted">Recommended: 150-160 characters. If empty, content summary will be used.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="seo_image">SEO Image (Open Graph)</label>
+                                <input type="text" name="seo[image]" value="{{ old('seo.image', $blog->seo?->image ?? '') }}" id="seo_image" class="form-control @error('seo.image') is-invalid @enderror" placeholder="Full URL to image">
+                                @error('seo.image')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                <small class="form-text text-muted">Optional: Full URL to an image for social media sharing. If empty, blog featured image will be used.</small>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
                             <div class="form-group mb-0">
                                 <button type="submit" class="btn btn-success">Save</button>
                             </div>

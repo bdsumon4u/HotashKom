@@ -52,6 +52,9 @@ class BlogController extends Controller
             'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:blogs'],
             'content' => ['required'],
             'image' => ['nullable', 'image', 'max:2048'],
+            'seo.title' => ['nullable', 'string', 'max:255'],
+            'seo.description' => ['nullable', 'string', 'max:500'],
+            'seo.image' => ['nullable', 'url', 'max:500'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
@@ -66,7 +69,13 @@ class BlogController extends Controller
             ]);
         }
 
-        Blog::create($data);
+        $blog = Blog::create($data);
+
+        $seoData = $request->input('seo', []);
+        $seoData = array_filter($seoData, fn ($value): bool => ! empty($value));
+        if (! empty($seoData)) {
+            $blog->seo()->updateOrCreate([], $seoData);
+        }
 
         return to_route('admin.blogs.index')->withSuccess('Blog Created.');
     }
@@ -97,6 +106,9 @@ class BlogController extends Controller
             'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:blogs,slug,'.$blog->id],
             'content' => ['required'],
             'image' => ['nullable', 'image', 'max:2048'],
+            'seo.title' => ['nullable', 'string', 'max:255'],
+            'seo.description' => ['nullable', 'string', 'max:500'],
+            'seo.image' => ['nullable', 'url', 'max:500'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
@@ -112,6 +124,14 @@ class BlogController extends Controller
         }
 
         $blog->update($data);
+
+        $seoData = $request->input('seo', []);
+        $seoData = array_filter($seoData, fn ($value): bool => ! empty($value));
+        if (! empty($seoData)) {
+            $blog->seo()->updateOrCreate([], $seoData);
+        } elseif ($request->has('seo')) {
+            $blog->seo?->delete();
+        }
 
         return to_route('admin.blogs.index')->withSuccess('Blog Updated.');
     }

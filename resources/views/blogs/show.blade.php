@@ -1,5 +1,9 @@
 @extends('layouts.yellow.master')
 
+@section('seo_tags')
+    {!! seo()->for($blog) !!}
+@endsection
+
 @section('title', $blog->title)
 
 @section('content')
