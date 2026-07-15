@@ -52,6 +52,8 @@ class ComposerServiceProvider extends ServiceProvider
         });
 
         $settingsPages = [
+            'index',
+            'products.index',
             'partials.header.*',
             'partials.footer',
             'products.show',

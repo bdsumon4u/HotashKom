@@ -18,6 +18,7 @@ class Setting extends Model
     {
         static::saved(function ($setting): void {
             cacheMemo()->put('settings:'.$setting->name, $setting->value);
+            cacheMemo()->forget('settings');
             Cache::forget('settings');
         });
     }

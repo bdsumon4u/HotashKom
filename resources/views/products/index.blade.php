@@ -1,14 +1,17 @@
 @extends('layouts.yellow.master')
-
-@push('head')
-    @if (isset($category) && $category instanceof \Illuminate\Database\Eloquent\Model)
+@if (isset($category) && $category instanceof \Illuminate\Database\Eloquent\Model)
+    @section('seo_tags')
         {!! seo()->for($category) !!}
-    @elseif(isset($brand) && $brand instanceof \Illuminate\Database\Eloquent\Model)
+    @endsection
+@elseif(isset($brand) && $brand instanceof \Illuminate\Database\Eloquent\Model)
+    @section('seo_tags')
         {!! seo()->for($brand) !!}
-    @elseif(isset($section) && $section instanceof \Illuminate\Database\Eloquent\Model)
+    @endsection
+@elseif(isset($section) && $section instanceof \Illuminate\Database\Eloquent\Model)
+    @section('seo_tags')
         {!! seo()->for($section) !!}
-    @endif
-@endpush
+    @endsection
+@endif
 
 @section('title', 'Products')
 

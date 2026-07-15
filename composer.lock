@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cf07e5a4e5e69ebe7c2639e7362dbe7c",
+    "content-hash": "7cb7006059ca0f4328794427807c0ec5",
     "packages": [
         {
             "name": "amidesfahani/filament-tinyeditor",
@@ -128,77 +128,6 @@
                 "source": "https://github.com/AnourValar/eloquent-serialize/tree/1.3.7"
             },
             "time": "2026-03-27T16:21:06+00:00"
-        },
-        {
-            "name": "artesaos/seotools",
-            "version": "v1.4.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/artesaos/seotools.git",
-                "reference": "c92d09f0ad4491181863850a3ab2e1534361409b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/artesaos/seotools/zipball/c92d09f0ad4491181863850a3ab2e1534361409b",
-                "reference": "c92d09f0ad4491181863850a3ab2e1534361409b",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "illuminate/config": "^10.0 || ^11.0 || ^12.0 || ^13.0",
-                "illuminate/support": "^10.0 || ^11.0 || ^12.0 || ^13.0",
-                "php": "^8.1"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^8.0 || ^9.0 || ^10.0 || ^11.0",
-                "phpunit/phpunit": "^9.0 || ^10.0 || ^11.5.3"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "SEO": "Artesaos\\SEOTools\\Facades\\SEOTools",
-                        "JsonLd": "Artesaos\\SEOTools\\Facades\\JsonLd",
-                        "SEOMeta": "Artesaos\\SEOTools\\Facades\\SEOMeta",
-                        "Twitter": "Artesaos\\SEOTools\\Facades\\TwitterCard",
-                        "OpenGraph": "Artesaos\\SEOTools\\Facades\\OpenGraph"
-                    },
-                    "providers": [
-                        "Artesaos\\SEOTools\\Providers\\SEOToolsServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Artesaos\\SEOTools\\": "src/SEOTools/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Vinicius",
-                    "email": "luiz.vinicius73@gmail.com"
-                }
-            ],
-            "description": "SEO Tools for Laravel and Lumen",
-            "keywords": [
-                "JSON-LD",
-                "laravel",
-                "lumen",
-                "metatags",
-                "opengraph",
-                "seo",
-                "seotools",
-                "webmaster"
-            ],
-            "support": {
-                "issues": "https://github.com/artesaos/seotools/issues",
-                "source": "https://github.com/artesaos/seotools"
-            },
-            "time": "2026-03-28T12:37:33+00:00"
         },
         {
             "name": "awcodes/filament-tiptap-editor",

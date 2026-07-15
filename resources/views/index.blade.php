@@ -1,6 +1,21 @@
 @extends('layouts.yellow.master')
 
+@section('seo_tags')
+    @if (!empty($company->seo_title))
+        <title>{{ $company->seo_title }}</title>
+        @if (!empty($company->meta_description))
+            <meta name="description" content="{{ $company->meta_description }}">
+        @endif
+    @endif
+@endsection
+
 @section('title', 'Home')
+
+@push('head')
+    @if (empty($company->seo_title) && !empty($company->meta_description))
+        <meta name="description" content="{{ $company->meta_description }}">
+    @endif
+@endpush
 
 @push('head')
   {{-- Preconnect to unpkg.com for AOS.js to reduce latency --}}
@@ -130,6 +145,15 @@
         <x-reseller-verification-alert />
     </div>
 </div>
+@endif
+
+<!-- Home Page Heading (e.g: Trusted Online Shopping in Bangladesh) -->
+@if (!empty($company->home_heading))
+    <div class="block my-4">
+        <div class="container">
+            <h1 class="text-center home-page-heading" style="font-size: 2rem; font-weight: 700; color: #3d464d; margin: 1.5rem 0;">{{ $company->home_heading }}</h1>
+        </div>
+    </div>
 @endif
 
 @if(($show_option = setting('show_option'))->brand_carousel ?? false)

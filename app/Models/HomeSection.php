@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class HomeSection extends Model
 {
@@ -131,5 +132,21 @@ class HomeSection extends Model
             'items' => 'array',
             'data' => 'object',
         ];
+    }
+
+    /**
+     * Get dynamic SEO data fallback.
+     */
+    public function getDynamicSEOData(): SEOData
+    {
+        $title = $this->seo?->title ?: $this->title;
+        $description = $this->seo?->description;
+        $image = $this->seo?->image;
+
+        return new SEOData(
+            title: $title,
+            description: $description,
+            image: $image,
+        );
     }
 }

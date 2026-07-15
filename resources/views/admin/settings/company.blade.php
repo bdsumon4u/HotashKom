@@ -112,6 +112,31 @@
                 <x-error field="company[gmap_ecode]" />
             </div>
         </div>
+
+        <div class="col-sm-12">
+            <h4><small class="mb-1 border-bottom">SEO & Homepage Settings</small></h4>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="company-home_heading">Home Page Heading</label>
+                <x-input name="company[home_heading]" id="company-home_heading" :value="$company->home_heading ?? ''" placeholder="e.g. Trusted Online Shopping in Bangladesh" />
+                <x-error field="company.home_heading" />
+            </div>
+            <div class="form-group">
+                <label for="company-seo_title">SEO Title</label>
+                <x-input name="company[seo_title]" id="company-seo_title" :value="$company->seo_title ?? ''" placeholder="Leave empty to use default homepage title" />
+                <x-error field="company.seo_title" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="company-meta_description">Meta Description</label>
+                <x-textarea rows=5 name="company[meta_description]" id="company-meta_description" placeholder="Short description of the homepage (recommended: 150-160 characters)">{{ $company->meta_description ?? '' }}</x-textarea>
+                <x-error field="company.meta_description" />
+            </div>
+        </div>
         <div class="col-md-6 d-none">
             <div class="form-group">
                 <label for="dev-name">Dev Name</label>

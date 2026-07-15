@@ -1,9 +1,9 @@
 @extends('layouts.yellow.master')
 @php $services = setting('services') @endphp
 
-@push('head')
+@section('seo_tags')
     {!! seo()->for($product) !!}
-@endpush
+@endsection
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('strokya/vendor/xzoom/xzoom.css') }}">

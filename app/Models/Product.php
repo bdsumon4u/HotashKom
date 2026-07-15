@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Laravel\Scout\Searchable;
 use Nicolaslopezj\Searchable\SearchableTrait;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
+use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class Product extends Model
 {
@@ -459,5 +460,33 @@ class Product extends Model
     public function reviews(): MorphMany
     {
         return $this->morphMany(Review::class, 'reviewable');
+    }
+
+    /**
+     * Get dynamic SEO data fallback.
+     */
+    public function getDynamicSEOData(): SEOData
+    {
+        $title = $this->seo?->title ?: $this->name;
+
+        $description = $this->seo?->description;
+        if (! $description) {
+            $description = $this->short_description ?: $this->description;
+            if ($description) {
+                $description = strip_tags($description);
+                $description = (string) str($description)->limit(160);
+            }
+        }
+
+        $image = $this->seo?->image;
+        if (! $image && $this->base_image) {
+            $image = $this->base_image->src;
+        }
+
+        return new SEOData(
+            title: $title,
+            description: $description,
+            image: $image,
+        );
     }
 }

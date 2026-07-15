@@ -40,6 +40,9 @@ class SettingRequest extends FormRequest
                 'company.gmap_ecode' => ['nullable'],
                 'company.dev_name' => ['nullable'],
                 'company.dev_link' => ['nullable'],
+                'company.home_heading' => ['nullable', 'string', 'max:255'],
+                'company.seo_title' => ['nullable', 'string', 'max:255'],
+                'company.meta_description' => ['nullable', 'string', 'max:500'],
                 'call_for_order' => ['required'],
                 'social' => ['required', 'array'],
             ];
