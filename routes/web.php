@@ -195,11 +195,12 @@ Route::get('/db-status', function () {
 
     return response()->json([
         'connections' => [
-            'current' => $status->get('Threads_connected')?->Value,
-            'max_ever' => $status->get('Max_used_connections')?->Value,
-            'limit' => $variables->get('max_connections')?->Value,
-            'aborted_connects' => $status->get('Aborted_connects')?->Value,  // refused: max_connections hit
-            'aborted_clients' => $status->get('Aborted_clients')?->Value,   // dropped: client died mid-connection
+            'your_website_current' => count($processes), // How many connections your site has right now
+            'server_total_current' => $status->get('Threads_connected')?->Value, // Total connections on the entire shared server
+            'server_limit' => $variables->get('max_connections')?->Value, // Max connections allowed on the server
+            'server_max_ever' => $status->get('Max_used_connections')?->Value, // Max connections ever used simultaneously on the server
+            'aborted_connects' => $status->get('Aborted_connects')?->Value,  // Refused connections server-wide (max_connections hit)
+            'aborted_clients' => $status->get('Aborted_clients')?->Value,   // Dropped connections server-wide
         ],
         'timeouts' => [
             'wait_timeout' => $variables->get('wait_timeout')?->Value,
@@ -210,11 +211,10 @@ Route::get('/db-status', function () {
             'total_connections_ever' => $status->get('Connections')?->Value,
             'global_queries' => $status->get('Queries')?->Value,
             'slow_queries' => $status->get('Slow_queries')?->Value,
-            'threads_running' => $status->get('Threads_running')?->Value,   // actively executing (not sleeping)
-            'threads_cached' => $status->get('Threads_cached')?->Value,    // waiting to be reused
+            'threads_running' => $status->get('Threads_running')?->Value,   // Actively executing (not sleeping) server-wide
+            'threads_cached' => $status->get('Threads_cached')?->Value,    // Waiting to be reused server-wide
         ],
         // Only shows YOUR own connections if you lack PROCESS privilege on shared hosting.
-        // On cPanel shared hosting this will typically only show 1 row (this request itself).
         'your_process_list' => $processes,
         'checked_at' => now()->toDateTimeString(),
     ], 200, [], JSON_PRETTY_PRINT);
