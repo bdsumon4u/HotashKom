@@ -59,6 +59,12 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // Set session-level idle timeouts without needing root access.
+                // MySQL will reclaim this connection after 60 seconds of inactivity
+                // instead of the server default (often 8 hours on shared hosting).
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'SET SESSION wait_timeout=60, interactive_timeout=60',
+                // Fail fast if the MySQL server is unreachable.
+                PDO::ATTR_TIMEOUT => 5,
             ]) : [],
         ],
 

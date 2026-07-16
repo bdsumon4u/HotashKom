@@ -16,6 +16,10 @@ use App\Pathao\Apis\StoreApi;
 use App\Pathao\Manage\Manage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
@@ -76,6 +80,18 @@ class AppServiceProvider extends ServiceProvider
             Slide::class,
         ])->each(static function (string $model): void {
             $model::observe(ResponseCacheObserver::class);
+        });
+
+        // Release the MySQL connection between queue jobs so workers do not
+        // hold idle connections open while waiting for the next job.
+        Event::listen(JobProcessed::class, static function (): void {
+            DB::disconnect();
+        });
+
+        // Reconnect cleanly before the next job starts in case the connection
+        // was dropped by MySQL's wait_timeout during the idle period.
+        Event::listen(JobProcessing::class, static function (): void {
+            DB::reconnect();
         });
     }
 }

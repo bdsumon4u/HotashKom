@@ -20,6 +20,7 @@ use App\Http\Middleware\EnsureResellerIsVerified;
 use App\Http\Middleware\GoogleTagManagerMiddleware;
 use Hotash\FacebookPixel\MetaPixelMiddleware;
 use Hotash\LaravelMultiUi\Facades\MultiUi;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 
@@ -176,3 +177,45 @@ Route::get('/cache-clear', [ApiController::class, 'clearCache'])->name('clear.ca
 // Feed routes
 Route::get('/feed/catalog', [FeedController::class, 'catalog'])->name('feed.catalog');
 Route::get('/feed/catalog-simple', [FeedController::class, 'catalogSimple'])->name('feed.catalog.simple');
+
+// Secure MySQL connection diagnostics — access via /db-status?key=YOUR_DEBUG_KEY
+Route::get('/db-status', function () {
+    $secret = config('app.debug_key');
+    if (! $secret || request('key') !== $secret) {
+        abort(403);
+    }
+
+    $status = collect(DB::select('SHOW GLOBAL STATUS'))
+        ->keyBy('Variable_name');
+
+    $variables = collect(DB::select('SHOW VARIABLES'))
+        ->keyBy('Variable_name');
+
+    $processes = DB::select('SHOW PROCESSLIST');
+
+    return response()->json([
+        'connections' => [
+            'current' => $status->get('Threads_connected')?->Value,
+            'max_ever' => $status->get('Max_used_connections')?->Value,
+            'limit' => $variables->get('max_connections')?->Value,
+            'aborted_connects' => $status->get('Aborted_connects')?->Value,  // refused: max_connections hit
+            'aborted_clients' => $status->get('Aborted_clients')?->Value,   // dropped: client died mid-connection
+        ],
+        'timeouts' => [
+            'wait_timeout' => $variables->get('wait_timeout')?->Value,
+            'interactive_timeout' => $variables->get('interactive_timeout')?->Value,
+            'connect_timeout' => $variables->get('connect_timeout')?->Value,
+        ],
+        'traffic' => [
+            'total_connections_ever' => $status->get('Connections')?->Value,
+            'global_queries' => $status->get('Queries')?->Value,
+            'slow_queries' => $status->get('Slow_queries')?->Value,
+            'threads_running' => $status->get('Threads_running')?->Value,   // actively executing (not sleeping)
+            'threads_cached' => $status->get('Threads_cached')?->Value,    // waiting to be reused
+        ],
+        // Only shows YOUR own connections if you lack PROCESS privilege on shared hosting.
+        // On cPanel shared hosting this will typically only show 1 row (this request itself).
+        'your_process_list' => $processes,
+        'checked_at' => now()->toDateTimeString(),
+    ], 200, [], JSON_PRETTY_PRINT);
+});

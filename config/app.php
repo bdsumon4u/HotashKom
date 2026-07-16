@@ -105,6 +105,7 @@ return [
     */
 
     'debug' => (bool) env('APP_DEBUG', false),
+    'debug_key' => env('APP_DEBUG_KEY'),
 
     /*
     |--------------------------------------------------------------------------
