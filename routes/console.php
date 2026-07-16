@@ -10,10 +10,9 @@ Artisan::command('inspire', function (): void {
 })->purpose('Display an inspiring quote')->hourly();
 
 // Schedule queue worker to run every minute
-Schedule::command('queue:work --timeout=90 --tries=3 --sleep=1 --max-jobs=100 --max-time=300 --daemon --stop-when-empty')
+Schedule::command('queue:work --timeout=90 --tries=3 --sleep=1 --stop-when-empty')
     ->everyMinute()
-    ->withoutOverlapping()
-    ->runInBackground();
+    ->withoutOverlapping();
 
 // Cleanup duplicate relationships command
 Artisan::command('resellers:cleanup-duplicates {--product-id= : Clean up duplicates for a specific product ID}', function (): void {

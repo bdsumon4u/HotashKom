@@ -44,27 +44,30 @@ class LogDatabaseUsage
         return $next($request);
     }
 
-    /**
-     * Log after the response has been sent to the client.
-     */
     public function terminate(Request $request, Response $response): void
     {
-        if ($this->queryCount < self::QUERY_THRESHOLD) {
-            return;
+        try {
+            if ($this->queryCount < self::QUERY_THRESHOLD) {
+                return;
+            }
+
+            $context = [
+                'method' => $request->method(),
+                'url' => $request->fullUrl(),
+                'queries' => $this->queryCount,
+                'total_ms' => round($this->totalMs, 2),
+                'status' => $response->getStatusCode(),
+            ];
+
+            if (! empty($this->slowQueries)) {
+                $context['slow_queries'] = $this->slowQueries;
+            }
+
+            Log::channel('db_usage')->warning("Heavy DB usage: {$this->queryCount} queries on {$request->method()} {$request->path()}", $context);
+        } finally {
+            // Explicitly close the database connection to free up connection slots
+            // for concurrent requests immediately after the response is sent.
+            DB::disconnect();
         }
-
-        $context = [
-            'method' => $request->method(),
-            'url' => $request->fullUrl(),
-            'queries' => $this->queryCount,
-            'total_ms' => round($this->totalMs, 2),
-            'status' => $response->getStatusCode(),
-        ];
-
-        if (! empty($this->slowQueries)) {
-            $context['slow_queries'] = $this->slowQueries;
-        }
-
-        Log::channel('db_usage')->warning("Heavy DB usage: {$this->queryCount} queries on {$request->method()} {$request->path()}", $context);
     }
 }
