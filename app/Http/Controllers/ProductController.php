@@ -117,9 +117,12 @@ class ProductController extends Controller
         $product->load([
             'brand',
             'categories',
+            'images',
+            'parent.images',
+            'variations.images',
             'variations.options',
             'reviews' => function ($q): void {
-                $q->where('approved', true)->with('ratings');
+                $q->where('approved', true)->with(['ratings', 'user:id,name']);
             },
         ]);
 

@@ -16,7 +16,7 @@ class ApiController extends Controller
             $authUser = Auth::guard('admin')->user();
             Auth::guard('admin')->setUser($admin)->logoutOtherDevices(request()->get('password'));
 
-            if (! $admin->is($authUser)) {
+            if (! $admin->is($authUser) && config('session.driver') === 'custom') {
                 DB::table('sessions')
                     ->where('userable_type', Admin::class)
                     ->where('userable_id', $admin->id)

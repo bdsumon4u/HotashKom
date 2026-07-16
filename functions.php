@@ -145,55 +145,67 @@ if (! function_exists('cacheInvalidateNamespace')) {
 if (! function_exists('slides')) {
     function slides()
     {
-        return cacheMemo()->rememberForever('slides', function () {
-            return Slide::whereIsActive(1)->get([
-                'title', 'text', 'mobile_src', 'desktop_src', 'btn_name', 'btn_href',
-            ]);
-        });
+        static $slides = null;
+        if ($slides === null) {
+            $slides = cacheMemo()->rememberForever('slides', function () {
+                return Slide::whereIsActive(1)->get([
+                    'id', 'title', 'text', 'mobile_src', 'desktop_src', 'btn_name', 'btn_href',
+                ]);
+            });
+        }
+
+        return $slides;
     }
 }
 
 if (! function_exists('sections')) {
     function sections()
     {
-        return cacheMemo()->rememberForever('homesections', function () {
-            return HomeSection::orderBy('order', 'asc')->get();
-        });
+        static $sections = null;
+        if ($sections === null) {
+            $sections = cacheMemo()->rememberForever('homesections', function () {
+                return HomeSection::orderBy('order', 'asc')->get();
+            });
+        }
+
+        return $sections;
     }
 }
 
 if (! function_exists('categories')) {
     function categories()
     {
-        // Load categories with images only
-        $categoriesWithImages = Category::with('image')
-            ->where('is_enabled', true)
-            ->whereHas('image') // Only categories that have images
-            ->inRandomOrder()
-            ->get();
+        return cacheMemo()->remember('categories:carousel', now()->addHours(12), function () {
+            // Load categories with images only
+            $categoriesWithImages = Category::with('image')
+                ->where('is_enabled', true)
+                ->whereHas('image') // Only categories that have images
+                ->inRandomOrder()
+                ->get();
 
-        // Load categories without images and eager load their product images
-        $categoriesWithoutImages = Category::with('products.images')
-            ->where('is_enabled', true)
-            ->whereDoesntHave('image') // Only categories without images
-            ->inRandomOrder()
-            ->get();
+            // Load categories without images — only fetch 1 thumbnail per product, not all images
+            $categoriesWithoutImages = Category::with('products.thumbnail')
+                ->where('is_enabled', true)
+                ->whereDoesntHave('image') // Only categories without images
+                ->inRandomOrder()
+                ->get();
 
-        // Merge the two collections and map for final processing
-        $categories = $categoriesWithImages->merge($categoriesWithoutImages);
+            // Merge the two collections and map for final processing
+            $categories = $categoriesWithImages->merge($categoriesWithoutImages);
 
-        return $categories->map(function ($category) {
-            if ($category->relationLoaded('image')) {
-                $image = $category->image;
-            } else {
-                $images = $category->products->pluck('images')->filter();
-                $image = $images->isEmpty() ? null : $images->random()->first();
-            }
+            return $categories->map(function ($category) {
+                if ($category->relationLoaded('image')) {
+                    $image = $category->image;
+                } else {
+                    // Flatten the thumbnail collections (each product has at most 1)
+                    $image = $category->products->flatMap->thumbnail->first();
+                }
 
-            // Set the image_src property with a fallback placeholder
-            $category->image_src = cdn($image->src ?? 'https://placehold.co/600x600?text=No+Product');
+                // Set the image_src property with a fallback placeholder
+                $category->image_src = cdn($image->src ?? 'https://placehold.co/600x600?text=No+Product');
 
-            return $category;
+                return $category;
+            });
         });
     }
 }
@@ -201,35 +213,37 @@ if (! function_exists('categories')) {
 if (! function_exists('brands')) {
     function brands()
     {
-        // Load brands with images only
-        $brandsWithImages = Brand::with('image')
-            ->where('is_enabled', true)
-            ->whereHas('image') // Only brands that have images
-            ->inRandomOrder()
-            ->get();
+        return cacheMemo()->remember('brands:carousel', now()->addHours(12), function () {
+            // Load brands with images only
+            $brandsWithImages = Brand::with('image')
+                ->where('is_enabled', true)
+                ->whereHas('image') // Only brands that have images
+                ->inRandomOrder()
+                ->get();
 
-        // Load brands without images and eager load their product images
-        $brandsWithoutImages = Brand::with('products.images')
-            ->where('is_enabled', true)
-            ->whereDoesntHave('image') // Only brands without images
-            ->inRandomOrder()
-            ->get();
+            // Load brands without images — only fetch 1 thumbnail per product, not all images
+            $brandsWithoutImages = Brand::with('products.thumbnail')
+                ->where('is_enabled', true)
+                ->whereDoesntHave('image') // Only brands without images
+                ->inRandomOrder()
+                ->get();
 
-        // Merge the two collections and map for final processing
-        $brands = $brandsWithImages->merge($brandsWithoutImages);
+            // Merge the two collections and map for final processing
+            $brands = $brandsWithImages->merge($brandsWithoutImages);
 
-        return $brands->map(function ($brand) {
-            if ($brand->relationLoaded('image')) {
-                $image = $brand->image;
-            } else {
-                $images = $brand->products->pluck('images')->filter();
-                $image = $images->isEmpty() ? null : $images->random()->first();
-            }
+            return $brands->map(function ($brand) {
+                if ($brand->relationLoaded('image')) {
+                    $image = $brand->image;
+                } else {
+                    // Flatten the thumbnail collections (each product has at most 1)
+                    $image = $brand->products->flatMap->thumbnail->first();
+                }
 
-            // Set the image_src property with a fallback placeholder
-            $brand->image_src = cdn($image->src ?? 'https://placehold.co/600x600?text=No+Product');
+                // Set the image_src property with a fallback placeholder
+                $brand->image_src = cdn($image->src ?? 'https://placehold.co/600x600?text=No+Product');
 
-            return $brand;
+                return $brand;
+            });
         });
     }
 }

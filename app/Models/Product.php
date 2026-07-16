@@ -25,7 +25,7 @@ class Product extends Model
     use Searchable;
     // use SearchableTrait;
 
-    protected $with = ['images'];
+    protected $with = ['thumbnail'];
 
     protected $fillable = [
         'brand_id', 'name', 'slug', 'description', 'short_description', 'price', 'average_purchase_price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
@@ -134,6 +134,7 @@ class Product extends Model
         // Clear API-related caches
         cacheInvalidateNamespace('api_sections');
         cacheInvalidateNamespace('product_filters');
+        cacheInvalidateNamespace('section_products');
 
         // Clear admin dashboard caches
         cacheMemo()->forget('admin_products_count');
@@ -241,6 +242,20 @@ class Product extends Model
             ->withPivot(['img_type', 'order'])
             ->orderBy('order')
             ->withTimestamps();
+    }
+
+    /**
+     * Only the single base/thumbnail image — used on listing cards.
+     * Keeps memory and query payload small on all product listing pages.
+     */
+    public function thumbnail()
+    {
+        return $this->belongsToMany(Image::class)
+            ->withPivot(['img_type', 'order'])
+            ->wherePivot('img_type', 'base')
+            ->orderBy('order')
+            ->withTimestamps()
+            ->limit(1);
     }
 
     public function parent()
@@ -361,9 +376,15 @@ class Product extends Model
     protected function baseImage(): Attribute
     {
         return Attribute::make(get: function () {
-            $images = $this->images ?? collect();
+            // Use pre-loaded thumbnail relation if available (listing pages)
+            if ($this->relationLoaded('thumbnail') && $this->thumbnail->isNotEmpty()) {
+                return $this->thumbnail->first();
+            }
+
+            // Fall back to filtering from fully-loaded images (product detail page)
+            $images = $this->relationLoaded('images') ? $this->images : collect();
             if ($images->isEmpty()) {
-                $images = $this->parent->images ?? collect();
+                $images = $this->parent?->relationLoaded('images') ? ($this->parent->images ?? collect()) : collect();
             }
 
             return $images->first(fn (Image $image): bool => $image->pivot->img_type == 'base');
@@ -373,9 +394,10 @@ class Product extends Model
     protected function additionalImages(): Attribute
     {
         return Attribute::make(get: function () {
-            $images = $this->images ?? collect();
+            // Only available when full images relation is loaded (e.g. product detail page)
+            $images = $this->relationLoaded('images') ? $this->images : collect();
             if ($images->isEmpty()) {
-                $images = $this->parent->images ?? collect();
+                $images = $this->parent?->relationLoaded('images') ? ($this->parent->images ?? collect()) : collect();
             }
 
             return $images->filter(fn (Image $image): bool => $image->pivot->img_type == 'additional');

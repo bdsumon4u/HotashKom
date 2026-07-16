@@ -1,13 +1,30 @@
 @php
-    $averageRating = $product->averageRating('overall');
-    $totalReviews = $product->totalReviews();
-    $reviews = $product
-        ->reviews()
-        ->where('approved', true)
-        ->with('user:id,name', 'ratings')
-        ->orderBy('created_at', 'desc')
-        ->take($perPage = 10)
-        ->get();
+    // Calculate average rating and total reviews using the pre-loaded collection
+    $approvedReviews = $product->relationLoaded('reviews')
+        ? $product->reviews->where('approved', true)
+        : $product->reviews()->where('approved', true)->with('ratings')->get();
+
+    $overallRatings = $approvedReviews->flatMap(function ($review) {
+        return $review->relationLoaded('ratings')
+            ? $review->ratings->where('key', 'overall')
+            : $review->ratings()->where('key', 'overall')->get();
+    });
+
+    $averageRating = $overallRatings->count() > 0 ? $overallRatings->avg('value') : 0;
+    $totalReviews = $approvedReviews->count();
+
+    // Sort and limit reviews in memory to avoid extra database query
+    if ($product->relationLoaded('reviews')) {
+        $reviews = $approvedReviews->sortByDesc('created_at')->take(10);
+    } else {
+        $reviews = $product->reviews()
+            ->where('approved', true)
+            ->with('user:id,name', 'ratings')
+            ->orderBy('created_at', 'desc')
+            ->take($perPage = 10)
+            ->get();
+    }
+    $perPage = 10;
 @endphp
 
 <div class="reviews-section">

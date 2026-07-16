@@ -52,6 +52,9 @@ class Category extends Model
      */
     private static function clearCategoryCaches($category): void
     {
+        // Clear carousel cache
+        cacheMemo()->forget('categories:carousel');
+
         // Clear nested categories cache (all variations)
         cacheMemo()->forget('categories:nested:');
         cacheMemo()->forget('categories:nested:0');
@@ -115,10 +118,10 @@ class Category extends Model
         $count && $query->take($count);
 
         if ($count) {
-            return $query->get();
+            return cacheMemo()->rememberForever('categories:nested:'.$count, fn () => $query->get());
         }
 
-        return cacheMemo()->rememberForever('categories:nested:'.$enabledOnly, fn () => $query->get());
+        return cacheMemo()->rememberForever('categories:nested:'.($enabledOnly ? 'enabled' : 'all'), fn () => $query->get());
     }
 
     public function products()

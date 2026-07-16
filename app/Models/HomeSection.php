@@ -49,6 +49,7 @@ class HomeSection extends Model
 
         // Clear related namespaced caches
         cacheInvalidateNamespace('product_filters');
+        cacheInvalidateNamespace('section_products');
     }
 
     public function categories()
@@ -58,72 +59,115 @@ class HomeSection extends Model
 
     public function products($paginate = 0, $category = null)
     {
-        $ids = $this->items ?? [];
-        $rows = $this->data->rows ?? 3;
-        $cols = $this->data->cols ?? 5;
-        $sorted = setting('show_option')->product_sort ?? 'random';
+        if ($paginate || $category) {
+            $ids = $this->items ?? [];
+            $rows = $this->data->rows ?? 3;
+            $cols = $this->data->cols ?? 5;
+            $sorted = setting('show_option')->product_sort ?? 'random';
 
-        if ($this->type == 'carousel-grid') {
-            $rows *= $cols;
-        }
-
-        // Optimize: Select only essential fields for better performance
-        $query = Product::select([
-            'id', 'name', 'slug', 'price', 'selling_price', 'suggested_price',
-            'should_track', 'stock_count', 'is_active', 'parent_id', 'updated_at',
-        ])
-            ->whereIsActive(1)
-            ->whereNull('parent_id');
-
-        if ($category) {
-            $query->whereHas('categories', function ($query) use ($category): void {
-                $query->where('categories.id', $category);
-            });
-        } elseif (($this->data->source ?? false) == 'specific') {
-            // Eager load categories to avoid N+1 queries
-            $categoryIds = $this->categories()->pluck('categories.id')->toArray();
-            $query->whereHas('categories', function ($query) use ($categoryIds): void {
-                $query->whereIn('categories.id', $categoryIds);
-            })
-                ->orWhereIn('id', $ids);
-        }
-
-        $query->when(! $paginate, function ($query) use ($rows, $cols): void {
-            $query->take($rows * $cols);
-        });
-
-        // Optimize: Use more efficient ordering
-        $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
-
-        if ($ids) {
-            if ($sorted == 'random') {
-                $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');
-            } elseif ($sorted == 'updated_at') {
-                $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
-            } elseif ($sorted == 'selling_price') {
-                $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE selling_price END');
+            if ($this->type == 'carousel-grid') {
+                $rows *= $cols;
             }
-        } else {
-            if ($sorted == 'random') {
-                $query->inRandomOrder();
-            } elseif ($sorted == 'updated_at') {
-                $query->latest('updated_at');
-            } elseif ($sorted == 'selling_price') {
-                $query->orderBy('selling_price');
-            }
-        }
 
-        return $paginate
-            ? $query->with([
+            $query = Product::select([
+                'id', 'name', 'slug', 'price', 'selling_price', 'suggested_price',
+                'should_track', 'stock_count', 'is_active', 'parent_id', 'updated_at',
+            ])
+                ->whereIsActive(1)
+                ->whereNull('parent_id');
+
+            if ($category) {
+                $query->whereHas('categories', function ($query) use ($category): void {
+                    $query->where('categories.id', $category);
+                });
+            } elseif (($this->data->source ?? false) == 'specific') {
+                $categoryIds = $this->categories()->pluck('categories.id')->toArray();
+                $query->whereHas('categories', function ($query) use ($categoryIds): void {
+                    $query->whereIn('categories.id', $categoryIds);
+                })
+                    ->orWhereIn('id', $ids);
+            }
+
+            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+
+            if ($ids) {
+                if ($sorted == 'random') {
+                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');
+                } elseif ($sorted == 'updated_at') {
+                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
+                } elseif ($sorted == 'selling_price') {
+                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE selling_price END');
+                }
+            } else {
+                if ($sorted == 'random') {
+                    $query->inRandomOrder();
+                } elseif ($sorted == 'updated_at') {
+                    $query->latest('updated_at');
+                } elseif ($sorted == 'selling_price') {
+                    $query->orderBy('selling_price');
+                }
+            }
+
+            return $query->with([
                 'reviews' => function ($q): void {
                     $q->where('approved', true)->with('ratings');
                 },
-            ])->paginate($paginate)
-            : $query->with([
+            ])->paginate($paginate);
+        }
+
+        return cacheRememberNamespaced('section_products', 'section:'.$this->id, now()->addHours(2), function () {
+            $ids = $this->items ?? [];
+            $rows = $this->data->rows ?? 3;
+            $cols = $this->data->cols ?? 5;
+            $sorted = setting('show_option')->product_sort ?? 'random';
+
+            if ($this->type == 'carousel-grid') {
+                $rows *= $cols;
+            }
+
+            $query = Product::select([
+                'id', 'name', 'slug', 'price', 'selling_price', 'suggested_price',
+                'should_track', 'stock_count', 'is_active', 'parent_id', 'updated_at',
+            ])
+                ->whereIsActive(1)
+                ->whereNull('parent_id');
+
+            if (($this->data->source ?? false) == 'specific') {
+                $categoryIds = $this->categories()->pluck('categories.id')->toArray();
+                $query->whereHas('categories', function ($query) use ($categoryIds): void {
+                    $query->whereIn('categories.id', $categoryIds);
+                })
+                    ->orWhereIn('id', $ids);
+            }
+
+            $query->take($rows * $cols);
+
+            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+
+            if ($ids) {
+                if ($sorted == 'random') {
+                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');
+                } elseif ($sorted == 'updated_at') {
+                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
+                } elseif ($sorted == 'selling_price') {
+                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE selling_price END');
+                }
+            } else {
+                if ($sorted == 'random') {
+                    $query->inRandomOrder();
+                } elseif ($sorted == 'updated_at') {
+                    $query->latest('updated_at');
+                } elseif ($sorted == 'selling_price') {
+                    $query->orderBy('selling_price');
+                }
+            }
+
+            return $query->with([
                 'reviews' => function ($q): void {
                     $q->where('approved', true)->with('ratings');
                 },
             ])->get();
+        });
     }
 
     protected function casts(): array

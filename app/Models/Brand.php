@@ -53,6 +53,9 @@ class Brand extends Model
      */
     private static function clearBrandCaches(): void
     {
+        // Clear carousel cache
+        cacheMemo()->forget('brands:carousel');
+
         // Clear brands cache
         cacheMemo()->forget('brands');
 

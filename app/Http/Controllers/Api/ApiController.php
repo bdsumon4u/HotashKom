@@ -432,9 +432,9 @@ class ApiController extends Controller
             'delivery_text', 'products_page', 'delivery_charge',
         ]));
 
-        // return cacheMemo()->remember('settings:'.implode(';', $keys), now()->addMinute(), function () use ($keys) {
-        return Setting::whereIn('name', $keys)->get(['name', 'value'])->pluck('value', 'name');
-        // });
+        $settingsArray = Setting::array();
+
+        return collect($settingsArray)->only($keys)->toArray();
     }
 
     public function pendingCount(Admin $admin): JsonResponse

@@ -11,7 +11,6 @@ use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
-use App\Models\Slide;
 use App\Models\User;
 use App\Traits\ResolvesPackagingCharge;
 use Illuminate\Http\JsonResponse;
@@ -31,7 +30,8 @@ class StorefrontController extends Controller
     public function settings(): JsonResponse
     {
         $keys = ['company', 'logo', 'social', 'delivery_charge', 'free_delivery', 'scroll_text', 'call_for_order', 'gtm_id', 'pixel_ids'];
-        $settings = Setting::whereIn('name', $keys)->get(['name', 'value'])->pluck('value', 'name');
+        $settingsArray = Setting::array();
+        $settings = collect($settingsArray)->only($keys)->toArray();
 
         return response()->json([
             'data' => $settings,
@@ -44,7 +44,7 @@ class StorefrontController extends Controller
      */
     public function slides(): JsonResponse
     {
-        $slides = Slide::whereIsActive(1)->get()->map(fn ($slide) => [
+        $slides = slides()->map(fn ($slide) => [
             'id' => $slide->id,
             'title' => $slide->title,
             'text' => $slide->text,

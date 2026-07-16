@@ -90,10 +90,13 @@ class StaffController extends Controller
 
         return $this->view([
             'admin' => $staff,
-            'logins' => DB::table('sessions')
-                ->where('userable_type', Admin::class)
-                ->where('userable_id', $staff->id)
-                ->get(),
+            // Active session list requires the custom database session driver.
+            'logins' => config('session.driver') === 'custom'
+                ? DB::table('sessions')
+                    ->where('userable_type', Admin::class)
+                    ->where('userable_id', $staff->id)
+                    ->get()
+                : collect(),
         ]);
     }
 

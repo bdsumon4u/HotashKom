@@ -100,6 +100,9 @@ class ProductDetail extends Component
         } else {
             $this->selectedVar = $this->product;
             $this->showBrandCategory = true;
+            if (! $this->selectedVar->relationLoaded('options')) {
+                $this->selectedVar->load('options');
+            }
         }
         $this->options = $this->selectedVar->options->pluck('id', 'attribute_id')->toArray();
         $this->maxQuantity = $this->selectedVar->should_track ? min($this->selectedVar->stock_count, $maxPerProduct) : $maxPerProduct;

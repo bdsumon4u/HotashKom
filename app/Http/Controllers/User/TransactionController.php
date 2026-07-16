@@ -20,17 +20,26 @@ class TransactionController extends Controller
         if ($request->ajax()) {
             $query = auth('user')->user()->wallet->transactions();
 
-            // Shared cache: order_id → Order. Each unique order loaded once, reused across all columns.
-            $ordersCache = [];
-            $loadOrder = function (int $orderId) use (&$ordersCache): ?Order {
-                if (! array_key_exists($orderId, $ordersCache)) {
-                    $ordersCache[$orderId] = Order::find($orderId);
-                }
+            $dataTable = DataTables::of($query);
 
-                return $ordersCache[$orderId];
+            // Force prepare and fetch only the paginated results for this request
+            $transactions = $dataTable->prepareQuery()->results();
+
+            // Pre-load orders for the current page transactions in 1 query
+            $orderIds = [];
+            foreach ($transactions as $transaction) {
+                $orderId = $transaction->meta['order_id'] ?? null;
+                if ($orderId) {
+                    $orderIds[] = (int) $orderId;
+                }
+            }
+            $orders = Order::whereIn('id', array_unique($orderIds))->get()->keyBy('id');
+
+            $loadOrder = function (int $orderId) use ($orders): ?Order {
+                return $orders->get($orderId);
             };
 
-            return DataTables::of($query)
+            return $dataTable
                 ->addIndexColumn()
                 ->editColumn('type', fn ($row): string => $row->type === 'deposit' ?
                     '<span class="badge badge-success">Deposit</span>' :

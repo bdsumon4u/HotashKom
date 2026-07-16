@@ -82,6 +82,12 @@ class HomeController extends Controller
         }
 
         $staffs = cacheMemo()->remember('admin_staffs_online_offline', now()->addMinutes(1), function () {
+            // Online/offline tracking requires the custom database session driver.
+            // When SESSION_DRIVER is set to 'file', this feature is disabled.
+            if (config('session.driver') !== 'custom') {
+                return ['online' => collect(), 'offline' => collect()];
+            }
+
             $query = DB::table('admins')
                 ->select('admins.id', 'admins.name', 'admins.email', 'admins.role_id', 'admins.is_active', DB::raw('MAX(sessions.last_activity) as last_activity'))
                 ->leftJoin('sessions', 'sessions.userable_id', '=', 'admins.id')

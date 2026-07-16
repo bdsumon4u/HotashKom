@@ -300,14 +300,18 @@ final class ResellerController extends Controller
             $perPage = (int) $request->input('length', 50);
             $transactions = $user->wallet->transactions()->latest()->paginate($perPage, ['*'], 'page', $page);
 
-            // Shared cache: order_id → Order. Each unique order loaded once per page.
-            $ordersCache = [];
-            $loadOrder = function (int $orderId) use (&$ordersCache): ?Order {
-                if (! array_key_exists($orderId, $ordersCache)) {
-                    $ordersCache[$orderId] = Order::find($orderId);
+            // Pre-load orders for the current page transactions in 1 query
+            $orderIds = [];
+            foreach ($transactions as $transaction) {
+                $orderId = $transaction->meta['order_id'] ?? null;
+                if ($orderId) {
+                    $orderIds[] = (int) $orderId;
                 }
+            }
+            $orders = Order::whereIn('id', array_unique($orderIds))->get()->keyBy('id');
 
-                return $ordersCache[$orderId];
+            $loadOrder = function (int $orderId) use ($orders): ?Order {
+                return $orders->get($orderId);
             };
 
             $startIndex = ($transactions->currentPage() - 1) * $transactions->perPage();

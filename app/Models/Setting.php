@@ -13,6 +13,8 @@ class Setting extends Model
         'name', 'value',
     ];
 
+    protected static ?array $settingsArray = null;
+
     #[\Override]
     public static function booted(): void
     {
@@ -20,12 +22,23 @@ class Setting extends Model
             cacheMemo()->put('settings:'.$setting->name, $setting->value);
             cacheMemo()->forget('settings');
             Cache::forget('settings');
+            self::$settingsArray = null;
+        });
+
+        static::deleted(function (): void {
+            cacheMemo()->forget('settings');
+            Cache::forget('settings');
+            self::$settingsArray = null;
         });
     }
 
     public static function array()
     {
-        return cacheMemo()->rememberForever('settings', function () {
+        if (self::$settingsArray !== null) {
+            return self::$settingsArray;
+        }
+
+        return self::$settingsArray = cacheMemo()->rememberForever('settings', function () {
             $settings = self::all()->flatMap(fn ($setting): array => [$setting->name => $setting->value])->toArray();
 
             if (empty($settings['company'])) {

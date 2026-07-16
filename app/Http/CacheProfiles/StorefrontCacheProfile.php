@@ -11,11 +11,36 @@ class StorefrontCacheProfile extends BaseCacheProfile
 {
     /**
      * Determine if the response cache middleware should be enabled for the given request.
+     * Cache all GET requests to storefront web routes and API storefront endpoints.
+     * Skip caching for authenticated users so their session data is never shared.
      */
     public function shouldCacheRequest(Request $request): bool
     {
-        // Only cache GET requests to storefront routes
-        return $request->is('api/storefront/*') && $request->isMethod('GET');
+        if (! $request->isMethod('GET')) {
+            return false;
+        }
+
+        // Never cache requests for authenticated users
+        if (auth()->check()) {
+            return false;
+        }
+
+        // Cache API storefront endpoints
+        if ($request->is('api/storefront/*')) {
+            return true;
+        }
+
+        // Cache key customer-facing web pages for guests only
+        return $request->is('/')
+            || $request->is('products/*')
+            || $request->is('shop')
+            || $request->is('category/*')
+            || $request->is('categories/*')
+            || $request->is('brand/*')
+            || $request->is('brands/*')
+            || $request->is('blogs')
+            || $request->is('blogs/*')
+            || $request->is('sections/*');
     }
 
     /**
@@ -32,17 +57,23 @@ class StorefrontCacheProfile extends BaseCacheProfile
      */
     public function cacheLifetime(Request $request): int
     {
-        // Cache product detail for 10 minutes
-        if (str_contains($request->path(), 'products/') && ! str_contains($request->path(), 'related')) {
-            return 600;
+        // Cache homepage and section listing pages for 30 minutes
+        if ($request->is('/') || $request->is('sections/*')) {
+            return 1800;
         }
 
-        // Cache related products and reviews for 10 minutes
-        if (str_contains($request->path(), 'related') || str_contains($request->path(), 'reviews')) {
-            return 600;
+        // Cache product detail for 15 minutes
+        if ($request->is('products/*')) {
+            return 900;
         }
 
-        // Default: cache other storefront endpoints for 5 minutes
+        // Cache category/brand listing pages for 20 minutes
+        if ($request->is('category/*') || $request->is('categories/*')
+            || $request->is('brand/*') || $request->is('brands/*')) {
+            return 1200;
+        }
+
+        // Default: 5 minutes for API and other storefront endpoints
         return 300;
     }
 
