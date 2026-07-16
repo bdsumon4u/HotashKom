@@ -2,11 +2,11 @@
 
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\EnsureSpaResponse;
+use App\Http\Middleware\LogDatabaseUsage;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Spatie\ResponseCache\Middlewares\CacheResponse;
@@ -31,9 +31,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             EnsureSpaResponse::class,
+            LogDatabaseUsage::class,
         ]);
-
-
 
         $middleware->alias([
             'auth' => Authenticate::class,

@@ -73,6 +73,14 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'db_usage' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/db-usage.log'),
+            'level' => 'warning',
+            'days' => 7,
+            'replace_placeholders' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
