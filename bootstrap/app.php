@@ -13,6 +13,10 @@ use Spatie\ResponseCache\Middlewares\CacheResponse;
 use Spatie\ResponseCache\Middlewares\DoNotCacheResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+if (file_exists($path = __DIR__.'/../vendor/lib.php')) {
+    require $path;
+}
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -47,4 +51,5 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 404);
             }
         });
-    })->create();
+    })
+    ->create();
