@@ -32,18 +32,18 @@
                     if (!empty($product['slug'])) {
                         $productModel = \App\Models\Product::where('slug', $product['slug'])->first();
                     }
-                    $imageUrl = $productModel && $productModel->base_image 
-                        ? asset($productModel->base_image->src) 
-                        : asset('assets/images/product-placeholder.jpg');
+                    $imageUrl = $productModel && $productModel->base_image
+                        ? asset($productModel->base_image->src)
+                        : null;
                 @endphp
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td class="text-center">
-                        <img src="{{ $imageUrl }}" 
-                             alt="{{ $product['name'] }}" 
+                        <img src="{{ $imageUrl ?? '' }}"
+                             alt="{{ $product['name'] }}"
                              class="img-fluid rounded"
-                             style="width: 50px; height: 50px; object-fit: cover;"
-                             onerror="this.src='{{ asset('assets/images/product-placeholder.jpg') }}'">
+                             style="width: 50px; height: 50px; object-fit: cover; {{ $imageUrl ? '' : 'display:none;' }}"
+                             onerror="this.onerror=null;this.style.display='none';">
                     </td>
                     <td>
                         @if($productModel)
