@@ -107,22 +107,22 @@ class HomeController extends Controller
 
         $inactiveProductsQuery = Product::whereIsActive(0)->whereNull('parent_id');
         $inactiveProductsCount = (clone $inactiveProductsQuery)->count();
-        $inactiveProducts = $inactiveProductsCount > 15
-            ? $inactiveProductsQuery->get()
-            : cacheMemo()->remember('admin_inactive_products', now()->addMinutes(5), fn () => $inactiveProductsQuery->get());
+        // $inactiveProducts = $inactiveProductsCount > 15
+        //     ? $inactiveProductsQuery->get()
+        //     : cacheMemo()->remember('admin_inactive_products', now()->addMinutes(5), fn () => $inactiveProductsQuery->get());
 
         $lowStockProductsQuery = Product::whereShouldTrack(1)->where('stock_count', '<', 10)->whereNull('parent_id');
         $lowStockProductsCount = (clone $lowStockProductsQuery)->count();
-        $lowStockProducts = $lowStockProductsCount > 20
-            ? $lowStockProductsQuery->get()
-            : cacheMemo()->remember('admin_low_stock_products', now()->addMinutes(5), fn () => $lowStockProductsQuery->get());
+        // $lowStockProducts = $lowStockProductsCount > 20
+        //     ? $lowStockProductsQuery->get()
+        //     : cacheMemo()->remember('admin_low_stock_products', now()->addMinutes(5), fn () => $lowStockProductsQuery->get());
 
         // Get total pending withdrawal amount
-        $pendingWithdrawalAmount = cacheMemo()->remember('pending_withdrawal_amount', 300, fn (): float|int => abs(Transaction::where('type', 'withdraw')
+        $pendingWithdrawalAmount = isOninda() && config('app.resell') ? cacheMemo()->remember('pending_withdrawal_amount', 300, fn (): float|int => abs(Transaction::where('type', 'withdraw')
             ->where('confirmed', false)
-            ->sum('amount')));
+            ->sum('amount'))) : 0;
 
-        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProducts', 'lowStockProducts', 'start', 'end', 'pendingWithdrawalAmount'));
+        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'start', 'end', 'pendingWithdrawalAmount'));
     }
 
     /**

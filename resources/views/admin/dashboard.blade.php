@@ -196,6 +196,7 @@
                 </div>
             </div>
             <div class="col-xl-4 xl-50 box-col-12">
+                @isset($inactiveProducts)
                 <div class="rounded-sm card">
                     <div class="p-4 card-header card-no-border">
                         <h5>Inactive Products</h5>
@@ -239,6 +240,7 @@
                         </div>
                     </div>
                 </div>
+                @endisset
                 <div class="rounded-sm card">
                     <div class="p-3 card-header">
                         <h5>Staffs</h5>
@@ -280,6 +282,7 @@
                 </div>
             </div>
             <div class="col-xl-4 xl-50 box-xl-12">
+                @isset($lowStockProducts)
                 <div class="rounded-sm card">
                     <div class="p-4 card-header card-no-border">
                         <h5>Low Stock</h5>
@@ -315,6 +318,7 @@
                         </div>
                     </div>
                 </div>
+                @endisset
                 @if(isOninda() && config('app.resell'))
                 <div class="rounded-sm card">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center">
