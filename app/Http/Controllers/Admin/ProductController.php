@@ -81,7 +81,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
-        $product->load(['variations' => fn ($query) => $query->with('parent', 'options')]);
+        $product->load(['images', 'variations' => fn ($query) => $query->with('parent', 'options')]);
 
         return $this->view(compact('product'), '', [
             'categories' => Category::nested(),
