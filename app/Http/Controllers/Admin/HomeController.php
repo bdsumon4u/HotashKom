@@ -122,7 +122,7 @@ class HomeController extends Controller
             ->where('confirmed', false)
             ->sum('amount'))) : 0;
 
-        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'start', 'end', 'pendingWithdrawalAmount'));
+        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProductsCount', 'lowStockProductsCount', 'start', 'end', 'pendingWithdrawalAmount'));
     }
 
     /**

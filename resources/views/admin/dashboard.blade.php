@@ -105,7 +105,7 @@
                                     <div class="media-body">
                                         <p class="mb-2 f-w-500 font-roboto">Inactive Products</p>
                                         <h4 class="mb-0 f-w-500 f-26"><span
-                                                class="counter">{{ $inactiveProducts->count() }}</span></h4>
+                                                class="counter">{{ $inactiveProductsCount }}</span></h4>
                                     </div>
                                     <div class="ecommerce-box light-bg-primary"><i class="fa fa-heart"
                                             aria-hidden="true"></i></div>
@@ -120,7 +120,7 @@
                                     <div class="media-body">
                                         <p class="mb-2 f-w-500 font-roboto">Low Stock</p>
                                         <h4 class="mb-0 f-w-500 f-26"><span
-                                                class="counter">{{ $lowStockProducts->count() }}</span></h4>
+                                                class="counter">{{ $lowStockProductsCount }}</span></h4>
                                     </div>
                                     <div class="ecommerce-box light-bg-primary"><i class="fa fa-heart"
                                             aria-hidden="true"></i></div>
