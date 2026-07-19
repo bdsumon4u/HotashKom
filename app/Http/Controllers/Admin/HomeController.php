@@ -122,7 +122,163 @@ class HomeController extends Controller
             ->where('confirmed', false)
             ->sum('amount'))) : 0;
 
-        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProductsCount', 'lowStockProductsCount', 'start', 'end', 'pendingWithdrawalAmount'));
+        $serverInfo = $this->getServerInfo();
+
+        return view('admin.dashboard', compact('staffs', 'products', 'productInOrders', 'productsCount', 'orders', 'amounts', 'inactiveProductsCount', 'lowStockProductsCount', 'start', 'end', 'pendingWithdrawalAmount', 'serverInfo'));
+    }
+
+    /**
+     * Get server information.
+     */
+    private function getServerInfo(): array
+    {
+        $info = [
+            'os' => PHP_OS_FAMILY.' ('.PHP_OS.')',
+            'php_version' => PHP_VERSION,
+            'ip' => request()->server('SERVER_ADDR') ?? gethostbyname(gethostname()) ?? 'Unknown',
+            'server_software' => request()->server('SERVER_SOFTWARE') ?? 'Unknown',
+            'cpu_model' => 'Unknown',
+            'cpu_cores' => 'Unknown',
+            'ram_total' => 'Unknown',
+            'ram_free' => 'Unknown',
+            'ram_used' => 'Unknown',
+            'ram_percentage' => 0,
+            'disk_total' => 'Unknown',
+            'disk_free' => 'Unknown',
+            'disk_used' => 'Unknown',
+            'disk_percentage' => 0,
+            'db_version' => 'Unknown',
+        ];
+
+        // CPU & RAM details
+        try {
+            if (PHP_OS_FAMILY === 'Linux') {
+                // Read /proc/cpuinfo
+                if (@is_readable('/proc/cpuinfo')) {
+                    $cpuinfo = @file_get_contents('/proc/cpuinfo');
+                    if ($cpuinfo) {
+                        $cores = substr_count($cpuinfo, 'processor');
+                        if ($cores > 0) {
+                            $info['cpu_cores'] = $cores;
+                        }
+                        if (preg_match('/model name\s+:\s+(.+)$/m', $cpuinfo, $matches)) {
+                            $info['cpu_model'] = trim($matches[1]);
+                        }
+                    }
+                }
+
+                // Read /proc/meminfo
+                if (@is_readable('/proc/meminfo')) {
+                    $lines = @file('/proc/meminfo');
+                    if ($lines) {
+                        $totalRam = 0;
+                        $freeRam = 0;
+                        foreach ($lines as $line) {
+                            if (preg_match('/^MemTotal:\s+(\d+)\s+kB/i', $line, $matches)) {
+                                $totalRam = (int) $matches[1] * 1024;
+                            }
+                            if (preg_match('/^MemAvailable:\s+(\d+)\s+kB/i', $line, $matches)) {
+                                $freeRam = (int) $matches[1] * 1024;
+                            } elseif (preg_match('/^MemFree:\s+(\d+)\s+kB/i', $line, $matches)) {
+                                if ($freeRam === 0) {
+                                    $freeRam = (int) $matches[1] * 1024;
+                                }
+                            }
+                        }
+                        if ($totalRam > 0) {
+                            $usedRam = $totalRam - $freeRam;
+                            $info['ram_total'] = $this->formatBytes($totalRam);
+                            $info['ram_free'] = $this->formatBytes($freeRam);
+                            $info['ram_used'] = $this->formatBytes($usedRam);
+                            $info['ram_percentage'] = round(($usedRam / $totalRam) * 100, 1);
+                        }
+                    }
+                }
+            } elseif (PHP_OS_FAMILY === 'Darwin') {
+                // macOS helper commands if shell_exec is allowed
+                if (function_exists('shell_exec')) {
+                    $cpuModel = @shell_exec('sysctl -n machdep.cpu.brand_string');
+                    $cpuCores = @shell_exec('sysctl -n hw.ncpu');
+                    $totalRam = @shell_exec('sysctl -n hw.memsize');
+
+                    if ($cpuModel) {
+                        $info['cpu_model'] = trim($cpuModel);
+                    }
+                    if ($cpuCores) {
+                        $info['cpu_cores'] = trim($cpuCores);
+                    }
+                    if ($totalRam) {
+                        $totalRamBytes = (int) trim($totalRam);
+                        $info['ram_total'] = $this->formatBytes($totalRamBytes);
+
+                        // Try parsing vm_stat for free memory
+                        $vmStat = @shell_exec('vm_stat');
+                        if ($vmStat) {
+                            $pageSize = 4096;
+                            if (preg_match('/page size of (\d+) bytes/', $vmStat, $pageMatches)) {
+                                $pageSize = (int) $pageMatches[1];
+                            }
+                            if (preg_match('/Pages free:\s+(\d+)/', $vmStat, $freeMatches) &&
+                                preg_match('/Pages inactive:\s+(\d+)/', $vmStat, $inactiveMatches)) {
+                                $freePages = (int) $freeMatches[1] + (int) $inactiveMatches[1];
+                                $freeRamBytes = $freePages * $pageSize;
+                                $usedRamBytes = $totalRamBytes - $freeRamBytes;
+                                $info['ram_free'] = $this->formatBytes($freeRamBytes);
+                                $info['ram_used'] = $this->formatBytes($usedRamBytes);
+                                $info['ram_percentage'] = round(($usedRamBytes / $totalRamBytes) * 100, 1);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // Ignore system parsing exceptions to prevent crash
+        }
+
+        // Disk Usage
+        try {
+            $diskPath = '/';
+            if (PHP_OS_FAMILY === 'Windows') {
+                $diskPath = 'C:';
+            }
+            $totalDisk = @disk_total_space($diskPath);
+            $freeDisk = @disk_free_space($diskPath);
+            if ($totalDisk !== false && $freeDisk !== false) {
+                $usedDisk = $totalDisk - $freeDisk;
+                $info['disk_total'] = $this->formatBytes($totalDisk);
+                $info['disk_free'] = $this->formatBytes($freeDisk);
+                $info['disk_used'] = $this->formatBytes($usedDisk);
+                $info['disk_percentage'] = round(($usedDisk / $totalDisk) * 100, 1);
+            }
+        } catch (\Throwable $e) {
+            // Ignore disk usage exception
+        }
+
+        // Database Version
+        try {
+            $dbVersion = DB::select('select version() as version');
+            if (! empty($dbVersion) && isset($dbVersion[0]->version)) {
+                $info['db_version'] = $dbVersion[0]->version;
+            }
+        } catch (\Throwable $e) {
+            // Ignore DB exception
+        }
+
+        return $info;
+    }
+
+    /**
+     * Format bytes into readable format
+     */
+    private function formatBytes(int $bytes, int $precision = 2): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+
+        return round($bytes, $precision).' '.$units[$pow];
     }
 
     /**
