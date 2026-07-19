@@ -36,6 +36,19 @@
             display: none !important;
         }
 
+        body {
+            visibility: hidden;
+        }
+    </style>
+    <noscript>
+        <style>
+            body {
+                visibility: visible !important;
+            }
+        </style>
+    </noscript>
+    <style>
+
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -945,6 +958,14 @@
                     return this.products.filter(p => p.selected).reduce((sum, p) => sum + (p.price * p.qty), 0);
                 }
             }
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.body.style.visibility = 'visible';
+        });
+        if (document.readyState === "interactive" || document.readyState === "complete") {
+            document.body.style.visibility = 'visible';
         }
     </script>
 </body>

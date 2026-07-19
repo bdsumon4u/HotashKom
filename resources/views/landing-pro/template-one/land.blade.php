@@ -16,6 +16,19 @@
             display: none !important;
         }
 
+        body {
+            visibility: hidden;
+        }
+    </style>
+    <noscript>
+        <style>
+            body {
+                visibility: visible !important;
+            }
+        </style>
+    </noscript>
+    <style>
+
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -38,6 +51,7 @@
             scroll-snap-align: start;
         }
     </style>
+    <x-metapixel-head />
 </head>
 
 @php
@@ -619,6 +633,15 @@
                     }
                 },
             };
+        }
+    </script>
+    <x-metapixel-body />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.body.style.visibility = 'visible';
+        });
+        if (document.readyState === "interactive" || document.readyState === "complete") {
+            document.body.style.visibility = 'visible';
         }
     </script>
 </body>
