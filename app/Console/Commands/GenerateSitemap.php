@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Blog;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Page;
@@ -212,5 +213,29 @@ class GenerateSitemap extends Command
             });
 
         $flushCurrent();
+    }
+
+    private function generateBlogSitemaps(string $publicSitemapsDir, SitemapIndex $index)
+    {
+        if (! Schema::hasTable((new Blog)->getTable())) {
+            return;
+        }
+
+        $sitemap = Sitemap::create();
+
+        Blog::query()
+            ->orderBy('id')
+            ->get(['id', 'slug', 'updated_at'])
+            ->each(function ($blog) use ($sitemap): void {
+                $sitemap->add(
+                    Url::create(url('/'.$blog->slug))
+                        ->setLastModificationDate($blog->updated_at)
+                        ->setPriority(0.5)
+                );
+            });
+
+        $filename = 'blogs.xml';
+        $sitemap->writeToFile($publicSitemapsDir.DIRECTORY_SEPARATOR.$filename);
+        $index->add(url('sitemaps/'.$filename));
     }
 }
