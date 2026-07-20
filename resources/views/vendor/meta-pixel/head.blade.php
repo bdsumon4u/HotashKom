@@ -8,7 +8,7 @@
             ->values();
     @endphp
     <!-- Meta Pixel Code -->
-    <script data-navigate-once>
+    <script>
         ! function(f, b, e, v, n, t, s) {
             if (f.fbq) return;
             n = f.fbq = function() {
