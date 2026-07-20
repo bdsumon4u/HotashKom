@@ -63,6 +63,7 @@ class GenerateSitemap extends Command
         $this->generateBrandSitemap($publicSitemapsDir, $index);
         $this->generatePageSitemap($publicSitemapsDir, $index);
         $this->generateProductSitemaps($publicSitemapsDir, $index, $productTagsPerSitemap);
+        $this->generateBlogSitemaps($publicSitemapsDir, $index);
 
         $index->writeToFile($publicSitemapIndexPath);
 
