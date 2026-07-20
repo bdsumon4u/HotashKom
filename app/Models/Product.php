@@ -381,10 +381,19 @@ class Product extends Model
                 return $this->thumbnail->first();
             }
 
+            // If we are a variation and have no thumbnail, fall back to parent's thumbnail
+            if ($this->parent_id) {
+                $parent = $this->relationLoaded('parent') ? $this->parent : $this->parent()->first();
+                if ($parent && $parent->relationLoaded('thumbnail') && $parent->thumbnail->isNotEmpty()) {
+                    return $parent->thumbnail->first();
+                }
+            }
+
             // Fall back to filtering from fully-loaded images (product detail page)
             $images = $this->relationLoaded('images') ? $this->images : collect();
             if ($images->isEmpty()) {
-                $images = $this->parent?->relationLoaded('images') ? ($this->parent->images ?? collect()) : collect();
+                $parent = $this->relationLoaded('parent') ? $this->parent : ($this->parent_id ? $this->parent()->first() : null);
+                $images = $parent?->relationLoaded('images') ? ($parent->images ?? collect()) : collect();
             }
 
             return $images->first(fn (Image $image): bool => $image->pivot->img_type == 'base');

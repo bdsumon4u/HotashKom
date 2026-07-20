@@ -143,7 +143,7 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-start">
-                                            <img src="{{ asset(optional($selectedVar->base_image)->src) }}"
+                                            <img src="{{ cdn(optional($selectedVar->base_image)->src) }}"
                                                 width="80" height="80" alt=""
                                                 class="mr-1 rounded" style="object-fit: cover;">
                                             <div class="flex-grow-1">
@@ -228,7 +228,7 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-start">
-                                                <img src="{{ asset($product['image'] ?? 'assets/images/no-image.png') }}"
+                                                <img src="{{ cdn($product['image'] ?? null) }}"
                                                     width="60" height="60" alt="{{ $product['name'] }}"
                                                     class="mr-1 rounded" style="object-fit: cover;">
                                                 <div class="flex-grow-1">

@@ -174,7 +174,7 @@
                                 @endphp
                                 <tr>
                                     <td>
-                                        <img src="{{ asset(optional($selectedVar->base_image)->src) }}"
+                                        <img src="{{ cdn(optional($selectedVar->base_image)->src) }}"
                                             width="100" height="100" alt="">
                                     </td>
                                     <td>
@@ -252,7 +252,7 @@
                                 @endphp
                                 <tr>
                                     <td>
-                                        <img src="{{ asset($product['image']) }}" width="100" height="100"
+                                        <img src="{{ cdn($product['image'] ?? null) }}" width="100" height="100"
                                             alt="">
                                     </td>
                                     <td>
