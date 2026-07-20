@@ -61,34 +61,40 @@ class ProductVariationController extends Controller
 
                     $baseSku = $product->sku.'('.implode('-', $items).')';
                     $sku = $baseSku;
-                    $counter = 1;
-                    while (true) {
-                        $existing = Product::where('sku', $sku)->first();
-                        if (! $existing) {
-                            break;
+
+                    $existingSkuProduct = Product::where('sku', $sku)->first();
+                    if ($existingSkuProduct) {
+                        if ($existingSkuProduct->parent_id == $product->id) {
+                            return;
                         }
-                        if ($existing->parent_id && ! $existing->parent()->exists()) {
-                            $existing->delete();
-                            break;
+                        if ($existingSkuProduct->parent_id && ! $existingSkuProduct->parent()->exists()) {
+                            $existingSkuProduct->delete();
+                        } else {
+                            $counter = 1;
+                            while (Product::where('sku', $baseSku.'-'.$counter)->exists()) {
+                                $counter++;
+                            }
+                            $sku = $baseSku.'-'.$counter;
                         }
-                        $sku = $baseSku.'-'.$counter;
-                        $counter++;
                     }
 
                     $baseSlug = $product->slug.'('.implode('-', $items).')';
                     $slug = $baseSlug;
-                    $counter = 1;
-                    while (true) {
-                        $existing = Product::where('slug', $slug)->first();
-                        if (! $existing) {
-                            break;
+
+                    $existingSlugProduct = Product::where('slug', $slug)->first();
+                    if ($existingSlugProduct) {
+                        if ($existingSlugProduct->parent_id == $product->id) {
+                            return;
                         }
-                        if ($existing->parent_id && ! $existing->parent()->exists()) {
-                            $existing->delete();
-                            break;
+                        if ($existingSlugProduct->parent_id && ! $existingSlugProduct->parent()->exists()) {
+                            $existingSlugProduct->delete();
+                        } else {
+                            $counter = 1;
+                            while (Product::where('slug', $baseSlug.'-'.$counter)->exists()) {
+                                $counter++;
+                            }
+                            $slug = $baseSlug.'-'.$counter;
                         }
-                        $slug = $baseSlug.'-'.$counter;
-                        $counter++;
                     }
 
                     // Create new variation
