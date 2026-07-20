@@ -15,6 +15,8 @@
                     </button>
 
                     <div x-ref="reviewTrack"
+                        @touchstart="handleTouchStart($event)"
+                        @touchend="handleTouchEnd($event, 'review')"
                         class="flex gap-3 overflow-x-hidden md:gap-4 snap-x no-scrollbar scroll-smooth">
                         @foreach ($reviews as $review)
                             <div class="p-4 bg-white border rounded-md shadow-sm review-item snap-start md:p-6">

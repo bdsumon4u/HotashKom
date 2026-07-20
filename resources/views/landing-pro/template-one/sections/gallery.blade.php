@@ -15,6 +15,8 @@
                     </button>
 
                     <div x-ref="galleryTrack"
+                        @touchstart="handleTouchStart($event)"
+                        @touchend="handleTouchEnd($event, 'gallery')"
                         class="flex gap-3 pb-6 overflow-x-hidden md:gap-4 snap-x no-scrollbar scroll-smooth">
                         @foreach ($galleryImages as $index => $image)
                             <div

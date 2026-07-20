@@ -282,6 +282,12 @@
                 },
                 galleryIndex: 0,
                 reviewIndex: 0,
+                touchStartX: 0,
+                touchStartY: 0,
+                touchEndX: 0,
+                touchEndY: 0,
+                galleryInterval: null,
+                reviewInterval: null,
                 checkout: {
                     name: '',
                     phone: '',
@@ -305,6 +311,12 @@
                         this.initCarouselWidths();
                         this.goToReview(0);
                         this.goToGallery(0);
+                        if (this.$refs.galleryTrack) {
+                            this.startGalleryAutoSlide();
+                        }
+                        if (this.$refs.reviewTrack) {
+                            this.startReviewAutoSlide();
+                        }
                         window.addEventListener('resize', () => this.initCarouselWidths());
                     });
                 },
@@ -539,36 +551,127 @@
 
                 nextReview() {
                     const total = {{ count($reviews) }};
+                    if (total === 0) {
+                        return;
+                    }
                     this.reviewIndex = (this.reviewIndex + 1) % total;
                     this.scrollToIndex(this.$refs.reviewTrack, this.reviewIndex);
+                    if (this.$refs.reviewTrack) {
+                        this.startReviewAutoSlide();
+                    }
                 },
 
                 prevReview() {
                     const total = {{ count($reviews) }};
+                    if (total === 0) {
+                        return;
+                    }
                     this.reviewIndex = (this.reviewIndex - 1 + total) % total;
                     this.scrollToIndex(this.$refs.reviewTrack, this.reviewIndex);
+                    if (this.$refs.reviewTrack) {
+                        this.startReviewAutoSlide();
+                    }
                 },
 
                 nextGallery() {
                     const total = {{ count($galleryImages) }};
+                    if (total === 0) {
+                        return;
+                    }
                     this.galleryIndex = (this.galleryIndex + 1) % total;
                     this.scrollToIndex(this.$refs.galleryTrack, this.galleryIndex);
+                    if (this.$refs.galleryTrack) {
+                        this.startGalleryAutoSlide();
+                    }
                 },
 
                 prevGallery() {
                     const total = {{ count($galleryImages) }};
+                    if (total === 0) {
+                        return;
+                    }
                     this.galleryIndex = (this.galleryIndex - 1 + total) % total;
                     this.scrollToIndex(this.$refs.galleryTrack, this.galleryIndex);
+                    if (this.$refs.galleryTrack) {
+                        this.startGalleryAutoSlide();
+                    }
                 },
 
                 goToGallery(index) {
                     this.galleryIndex = index;
                     this.scrollToIndex(this.$refs.galleryTrack, this.galleryIndex);
+                    if (this.$refs.galleryTrack) {
+                        this.startGalleryAutoSlide();
+                    }
                 },
 
                 goToReview(index) {
                     this.reviewIndex = index;
                     this.scrollToIndex(this.$refs.reviewTrack, this.reviewIndex);
+                    if (this.$refs.reviewTrack) {
+                        this.startReviewAutoSlide();
+                    }
+                },
+
+                handleTouchStart(e) {
+                    this.touchStartX = e.touches[0].clientX;
+                    this.touchStartY = e.touches[0].clientY;
+                },
+
+                handleTouchEnd(e, type) {
+                    this.touchEndX = e.changedTouches[0].clientX;
+                    this.touchEndY = e.changedTouches[0].clientY;
+                    this.handleSwipe(type);
+                },
+
+                handleSwipe(type) {
+                    const threshold = 50; // minimum distance for swipe
+                    const diffX = this.touchStartX - this.touchEndX;
+                    const diffY = this.touchStartY - this.touchEndY;
+                    
+                    if (Math.abs(diffX) > threshold && Math.abs(diffX) > Math.abs(diffY)) {
+                        if (diffX > 0) {
+                            if (type === 'gallery') {
+                                this.nextGallery();
+                            } else if (type === 'review') {
+                                this.nextReview();
+                            }
+                        } else {
+                            if (type === 'gallery') {
+                                this.prevGallery();
+                            } else if (type === 'review') {
+                                this.prevReview();
+                            }
+                        }
+                    }
+                },
+
+                startGalleryAutoSlide() {
+                    this.stopGalleryAutoSlide();
+                    this.galleryInterval = setInterval(() => {
+                        this.nextGallery();
+                    }, 3000);
+                },
+
+                stopGalleryAutoSlide() {
+                    if (this.galleryInterval) {
+                        clearInterval(this.galleryInterval);
+                        this.galleryInterval = null;
+                    }
+                },
+
+                startReviewAutoSlide() {
+                    this.stopReviewAutoSlide();
+                    this.reviewInterval = setInterval(() => {
+                        this.nextReview();
+                    }, 3000);
+                },
+
+                stopReviewAutoSlide() {
+                    if (this.reviewInterval) {
+                        clearInterval(this.reviewInterval);
+                        this.reviewInterval = null;
+                    }
                 },
 
                 scrollToIndex(track, index, behavior = 'smooth') {
