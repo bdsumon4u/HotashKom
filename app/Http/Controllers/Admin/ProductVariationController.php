@@ -58,8 +58,38 @@ class ProductVariationController extends Controller
 
                 $variations->each(function ($items, $i) use ($product, $options, $newVariations): void {
                     $name = $options->filter(fn ($item): bool => in_array($item->id, $items))->pluck('name')->join('-');
-                    $sku = $product->sku.'('.implode('-', $items).')';
-                    $slug = $product->slug.'('.implode('-', $items).')';
+
+                    $baseSku = $product->sku.'('.implode('-', $items).')';
+                    $sku = $baseSku;
+                    $counter = 1;
+                    while (true) {
+                        $existing = Product::where('sku', $sku)->first();
+                        if (! $existing) {
+                            break;
+                        }
+                        if ($existing->parent_id && ! $existing->parent()->exists()) {
+                            $existing->delete();
+                            break;
+                        }
+                        $sku = $baseSku.'-'.$counter;
+                        $counter++;
+                    }
+
+                    $baseSlug = $product->slug.'('.implode('-', $items).')';
+                    $slug = $baseSlug;
+                    $counter = 1;
+                    while (true) {
+                        $existing = Product::where('slug', $slug)->first();
+                        if (! $existing) {
+                            break;
+                        }
+                        if ($existing->parent_id && ! $existing->parent()->exists()) {
+                            $existing->delete();
+                            break;
+                        }
+                        $slug = $baseSlug.'-'.$counter;
+                        $counter++;
+                    }
 
                     // Create new variation
                     $variation = $product->replicate();
