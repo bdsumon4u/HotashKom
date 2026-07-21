@@ -82,7 +82,6 @@
                 }
 
                 window.trackingConfig.pixelIds.forEach(function(pixelId) {
-                    console.log(pixelId);
                     var isInitialized = isPixelInitialized(pixelId);
                     if (!isInitialized || hasUserData) {
                         if (hasUserData) {
@@ -94,6 +93,7 @@
                     }
                 });
                 window.initializedMetaPixels = initializedPixels;
+                fbq('track', 'PageView');
             }
         })();
     </script>
