@@ -52,6 +52,50 @@
         }
     </style>
     <x-metapixel-head />
+    <script>
+        window._csrfToken = '{{ csrf_token() }}';
+        window.trackingConfig = {
+            pixelIds: {{ Js::from(app(App\Services\FacebookPixelService::class)->getPixelIds()) }},
+            pixelEnabled: {{ (config('meta-pixel.meta_pixel') || setting('pixel_ids')) ? 'true' : 'false' }},
+            advancedTracking: {{ config('meta-pixel.advanced_tracking') ? 'true' : 'false' }},
+        };
+        window.dataLayer = window.dataLayer || [];
+
+        (function() {
+            if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelIds && window.trackingConfig.pixelIds.length > 0) {
+                var userData = {{ Js::from(app(App\Services\FacebookPixelService::class)->getNormalizedUserData()) }};
+                var hasUserData = userData && (Array.isArray(userData) ? userData.length > 0 : Object.keys(userData).length > 0);
+                var initializedPixels = window.initializedMetaPixels || {};
+                
+                function isPixelInitialized(pixelId) {
+                    if (initializedPixels[pixelId]) return true;
+                    if (typeof fbq.instance === 'object' && fbq.instance.pixels && fbq.instance.pixels.hasOwnProperty(pixelId)) return true;
+                    if (Array.isArray(fbq.queue)) {
+                        for (var i = 0; i < fbq.queue.length; i++) {
+                            var item = fbq.queue[i];
+                            if (Array.isArray(item) && item[0] === 'init' && item[1] === pixelId) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+
+                window.trackingConfig.pixelIds.forEach(function(pixelId) {
+                    var isInitialized = isPixelInitialized(pixelId);
+                    if (!isInitialized || hasUserData) {
+                        if (hasUserData) {
+                            fbq('init', pixelId, userData);
+                        } else {
+                            fbq('init', pixelId);
+                        }
+                        initializedPixels[pixelId] = true;
+                    }
+                });
+                window.initializedMetaPixels = initializedPixels;
+            }
+        })();
+    </script>
 </head>
 
 @php
