@@ -89,6 +89,13 @@
                             <livewire:section-product />
                         </div>
                         <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="content">Content</label>
+                                <x-textarea editor name="content" id="content" rows="5">{{ old('content') }}</x-textarea>
+                                <x-error field="content" />
+                            </div>
+                        </div>
+                        <div class="col-md-12">
                             <hr>
                             <h6 class="mb-2">SEO Settings <small class="text-muted">(Optional)</small></h6>
                             <div class="row">
@@ -132,6 +139,7 @@
 @endsection
 
 @push('js')
+<script src="{{ asset('js/tinymce.js') }}" defer></script>
 <script src="{{asset('assets/js/select2/select2.full.min.js')}}" defer></script>
 <script src="{{asset('assets/js/select2/select2-custom.js')}}" defer></script>
 @endpush

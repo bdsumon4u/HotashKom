@@ -154,6 +154,25 @@
                                 {!! $products->appends(request()->query())->links() !!}
                             </div>
                         @endif
+
+                        @php
+                            $descriptionContent = null;
+                            if (isset($category) && $category instanceof \Illuminate\Database\Eloquent\Model && !empty($category->content)) {
+                                $descriptionContent = $category->content;
+                            } elseif (isset($brand) && $brand instanceof \Illuminate\Database\Eloquent\Model && !empty($brand->content)) {
+                                $descriptionContent = $brand->content;
+                            } elseif (isset($section) && $section instanceof \Illuminate\Database\Eloquent\Model && !empty($section->content)) {
+                                $descriptionContent = $section->content;
+                            }
+                        @endphp
+
+                        @if ($descriptionContent)
+                            <div class="card mt-4 category-brand-content-section border-0 shadow-sm">
+                                <div class="card-body p-4 text-justify">
+                                    {!! $descriptionContent !!}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

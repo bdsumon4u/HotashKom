@@ -228,6 +228,13 @@
                                                             :selected="request('active_id', 0)" />
                                                     </div>
                                                     <div class="form-group">
+                                                        <label for="create-content">Content</label>
+                                                        <x-textarea editor name="content" id="create-content" rows="5">{{ old('content') }}</x-textarea>
+                                                        @error('content')
+                                                            <span class="invalid-feedback d-block">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="form-group">
                                                         <!-- Button to Open the Modal -->
                                                         <label for="base_image" class="mb-0 d-block">
                                                             <strong>Category Image</strong>
@@ -331,6 +338,13 @@
                                                             <x-category-dropdown :categories="$categories" name="parent_id"
                                                                 placeholder="Select parent" id="edit-parent-id"
                                                                 :selected="$active->parent->id ?? 0" :disabled="$active->id" />
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-content">Content</label>
+                                                            <x-textarea editor name="content" id="edit-content" rows="5">{{ old('content', $active->content) }}</x-textarea>
+                                                            @error('content')
+                                                                <span class="invalid-feedback d-block">{{ $message }}</span>
+                                                            @enderror
                                                         </div>
                                                         <div class="form-group">
                                                             <!-- Button to Open the Modal -->
@@ -465,6 +479,10 @@
     </div>
     @include('admin.images.single-picker', ['selected' => old('base_image', 0)])
 @endsection
+
+@push('js')
+    <script src="{{ asset('js/tinymce.js') }}" defer></script>
+@endpush
 
 @push('scripts')
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>

@@ -11,7 +11,7 @@ class HomeSection extends Model
     use HasSEO;
 
     protected $fillable = [
-        'title', 'type', 'items', 'order', 'data',
+        'title', 'type', 'items', 'order', 'data', 'content',
     ];
 
     protected $with = ['categories'];

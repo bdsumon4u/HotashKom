@@ -59,6 +59,7 @@ class HomeSectionRequest extends FormRequest
             'type' => 'required',
             'items' => 'nullable|array',
             'categories' => 'nullable|array',
+            'content' => 'nullable|string',
         ];
 
         // Only require rows/cols for product sections (not content or banner)

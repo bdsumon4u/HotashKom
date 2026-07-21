@@ -51,6 +51,7 @@ class BrandController extends Controller
             'seo.title' => ['nullable', 'string', 'max:255'],
             'seo.description' => ['nullable', 'string', 'max:500'],
             'seo.image' => ['nullable', 'url', 'max:500'],
+            'content' => ['nullable', 'string'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
@@ -87,6 +88,7 @@ class BrandController extends Controller
             'seo.title' => ['nullable', 'string', 'max:255'],
             'seo.description' => ['nullable', 'string', 'max:500'],
             'seo.image' => ['nullable', 'url', 'max:500'],
+            'content' => ['nullable', 'string'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);

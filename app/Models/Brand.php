@@ -15,7 +15,7 @@ class Brand extends Model
     use HasSEO;
 
     protected $fillable = [
-        'image_id', 'name', 'slug', 'is_enabled',
+        'image_id', 'name', 'slug', 'is_enabled', 'content',
     ];
 
     #[\Override]

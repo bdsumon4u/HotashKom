@@ -127,6 +127,13 @@
                                                         @enderror
                                                     </div>
                                                     <div class="form-group">
+                                                        <label for="create-content">Content</label>
+                                                        <x-textarea editor name="content" id="create-content" rows="5">{{ old('content') }}</x-textarea>
+                                                        @error('content')
+                                                            <span class="invalid-feedback d-block">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="form-group">
                                                         <!-- Button to Open the Modal -->
                                                         <label for="base_image" class="mb-0 d-block">
                                                             <strong>Brand Image</strong>
@@ -215,6 +222,13 @@
                                                                 class="form-control @error('slug') is-invalid @enderror">
                                                             @error('slug')
                                                                 <span class="invalid-feedback">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="edit-content">Content</label>
+                                                            <x-textarea editor name="content" id="edit-content" rows="5">{{ old('content', $active->content) }}</x-textarea>
+                                                            @error('content')
+                                                                <span class="invalid-feedback d-block">{{ $message }}</span>
                                                             @enderror
                                                         </div>
                                                         <div class="form-group">
@@ -332,6 +346,10 @@
     </div>
     @include('admin.images.single-picker', ['selected' => old('base_image', 0)])
 @endsection
+
+@push('js')
+    <script src="{{ asset('js/tinymce.js') }}" defer></script>
+@endpush
 
 @push('scripts')
     <script>

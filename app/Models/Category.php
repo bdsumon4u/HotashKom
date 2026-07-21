@@ -13,7 +13,7 @@ class Category extends Model
     use HasSEO;
 
     protected $fillable = [
-        'parent_id', 'image_id', 'name', 'slug', 'order', 'is_enabled',
+        'parent_id', 'image_id', 'name', 'slug', 'order', 'is_enabled', 'content',
     ];
 
     #[\Override]
