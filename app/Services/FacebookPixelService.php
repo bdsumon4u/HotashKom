@@ -368,6 +368,14 @@ class FacebookPixelService
                 ]);
             }
 
+            // Register event with MetaPixel facade for Blade component rendering (<x-metapixel-body />)
+            if ($this->isStandardEvent($eventName)) {
+                MetaPixel::track($eventName, $customData, $eventId);
+                MetaPixel::flashEvent($eventName, $customData, $eventId);
+            } else {
+                MetaPixel::trackCustom($eventName, $customData, $eventId);
+            }
+
             // Server-side: Conversions API (deferred)
             defer(function () use ($eventName, $eventId, $customData, $mergedUserData, $eventSourceUrl): void {
                 $this->sendToConversionsApi($eventName, $eventId, $customData, $mergedUserData, $eventSourceUrl);
