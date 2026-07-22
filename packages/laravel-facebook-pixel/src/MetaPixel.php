@@ -137,21 +137,29 @@ class MetaPixel
 
     public function userData(): UserData
     {
+        $userData = clone $this->userData;
+
         if ($user = $this->getUser()) {
-            return $this->userData
-                ->setEmail($user['em'])
-                ->setExternalId($user['external_id'])
-                ->setClientIpAddress(Request::ip())
-                ->setClientUserAgent(Request::userAgent())
-                // ->setFbc(Request::get('fbclid') ?? Arr::get($_COOKIE, '_fbc'))
-                ->setFbc(Arr::get($_COOKIE, '_fbc'))
-                ->setFbp(Arr::get($_COOKIE, '_fbp'));
+            if (! empty($user['em'])) {
+                $userData->setEmail($user['em']);
+            }
+            if (! empty($user['ph'])) {
+                $userData->setPhone($user['ph']);
+            }
+            if (! empty($user['fn'])) {
+                $userData->setFirstName($user['fn']);
+            }
+            if (! empty($user['ln'])) {
+                $userData->setLastName($user['ln']);
+            }
+            if (! empty($user['external_id'])) {
+                $userData->setExternalId($user['external_id']);
+            }
         }
 
-        return $this->userData
+        return $userData
             ->setClientIpAddress(Request::ip())
             ->setClientUserAgent(Request::userAgent())
-            // ->setFbc(Request::get('fbclid') ?? Arr::get($_COOKIE, '_fbc'))
             ->setFbc(Arr::get($_COOKIE, '_fbc'))
             ->setFbp(Arr::get($_COOKIE, '_fbp'));
     }
