@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\OrderPlaced;
+use App\Services\FacebookPixelService;
 use App\Services\LandingPageProTemplateRegistry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

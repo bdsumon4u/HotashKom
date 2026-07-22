@@ -12,6 +12,7 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\FacebookPixelService;
 use App\Traits\ResolvesPackagingCharge;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
