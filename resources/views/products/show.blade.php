@@ -336,7 +336,7 @@
     </div>
     <!-- .block-products-carousel / end -->
 
-    @if(config('meta-pixel.meta_pixel'))
+    @if(config('meta-pixel.meta_pixel') || setting('pixel_ids'))
         <script>
             (function() {
                 const productData = {

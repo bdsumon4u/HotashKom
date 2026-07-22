@@ -278,16 +278,29 @@ class FacebookPixelService
      */
     public function getPixelIds(): array
     {
+        $ids = [];
+
+        // 1. Get IDs from database setting('pixel_ids')
         $rawSetting = setting('pixel_ids', '');
-        if (empty($rawSetting)) {
-            return [];
-        }
-        $ids = preg_split('/[\s\r\n,]+/', (string) $rawSetting);
-        if (! $ids) {
-            return [];
+        if (! empty($rawSetting)) {
+            $parsed = preg_split('/[\s\r\n,]+/', (string) $rawSetting);
+            if ($parsed) {
+                $ids = array_merge($ids, array_filter(array_map('trim', $parsed)));
+            }
         }
 
-        return array_values(array_unique(array_filter(array_map('trim', $ids))));
+        // 2. Also extract IDs from config('meta-pixel.meta_pixel')
+        $rawConfig = config('meta-pixel.meta_pixel');
+        if (! empty($rawConfig)) {
+            foreach (explode('|', (string) $rawConfig) as $pixelStr) {
+                $parts = explode(':', trim($pixelStr));
+                if (! empty($parts[0])) {
+                    $ids[] = trim($parts[0]);
+                }
+            }
+        }
+
+        return array_values(array_unique(array_filter($ids)));
     }
 
     /**
@@ -309,9 +322,21 @@ class FacebookPixelService
         $serverCustomData = $this->createServerCustomData($customData);
         $serverUserData = $this->createServerUserData($userData, $eventName);
 
-        foreach (explode('|', (string) config('meta-pixel.meta_pixel')) as $pixel) {
+        $pixels = array_filter(array_map('trim', explode('|', (string) config('meta-pixel.meta_pixel'))));
+        if (empty($pixels)) {
+            $token = config('meta-pixel.token');
+            if ($token) {
+                $testCode = config('meta-pixel.test_event_code');
+                foreach ($this->getPixelIds() as $id) {
+                    $pixels[] = implode(':', array_filter([$id, $token, $testCode]));
+                }
+            }
+        }
+
+        foreach ($pixels as $pixel) {
             $parts = explode(':', $pixel);
-            if (count($parts) < 2) {
+            if (count($parts) < 2 || empty($parts[0]) || empty($parts[1])) {
+                // Must have both ID and Token to execute server-side Conversions API call
                 continue;
             }
             [$id, $token, $test] = array_pad($parts, 3, null);

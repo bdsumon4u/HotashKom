@@ -45,12 +45,13 @@ trait HasCart
 
         storeOrUpdateCart();
 
-        if (config('meta-pixel.meta_pixel') && isset($this->facebookService)) {
+        if (config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
+            $this->facebookService ??= app(FacebookPixelService::class);
             $this->facebookService->trackAddToCart([
-                'id' => $this->product->id,
-                'name' => $this->product->name,
-                'price' => $this->product->selling_price,
-                'page_url' => route('products.show', $this->product->slug),
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->selling_price,
+                'page_url' => route('products.show', $product->slug),
             ], $this);
         }
 
