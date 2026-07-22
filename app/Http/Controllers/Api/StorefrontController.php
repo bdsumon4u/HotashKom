@@ -431,8 +431,40 @@ class StorefrontController extends Controller
             ],
         ]);
 
-        if ($admin) {
-            $admin->update(['last_order_received_at' => now()]);
+        if (config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
+            $facebookProducts = [];
+            foreach ($orderProducts as $productItem) {
+                $facebookProducts[] = [
+                    'id' => (string) ($productItem->id ?? ''),
+                    'name' => $productItem->name ?? '',
+                    'price' => (float) ($productItem->price ?? 0),
+                    'quantity' => (int) ($productItem->quantity ?? 1),
+                ];
+            }
+
+            $orderPayload = [
+                'id' => $order->id,
+                'total' => (float) $subtotal,
+            ];
+
+            $userDataArr = [
+                'name' => $order->name,
+                'email' => $order->email ?? '',
+                'phone' => $order->phone,
+                'external_id' => $order->user_id,
+            ];
+
+            $orderTrackingData = [];
+            $eventName = config('meta-pixel.advanced_tracking') ? 'Lead' : 'Purchase';
+            $orderTrackingData['event_id'] = 'ch_'.strtolower($eventName).'_'.$order->id.'_'.time();
+            $order->update(['tracking' => $orderTrackingData]);
+
+            $facebookService = app(FacebookPixelService::class);
+            if (config('meta-pixel.advanced_tracking')) {
+                $facebookService->trackLead($orderPayload, $facebookProducts, $userDataArr, null, $orderTrackingData);
+            } else {
+                $facebookService->trackPurchase($orderPayload, $facebookProducts, $userDataArr, null, $orderTrackingData);
+            }
         }
 
         return response()->json([

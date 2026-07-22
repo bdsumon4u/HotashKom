@@ -469,6 +469,44 @@ class LandingPageProController extends Controller
             ], 422);
         }
 
+        if (config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
+            $facebookProducts = [];
+            foreach ($productsPayload as $item) {
+                $facebookProducts[] = [
+                    'id' => (string) ($item['id'] ?? ''),
+                    'name' => $item['name'] ?? '',
+                    'price' => (float) ($item['price'] ?? 0),
+                    'quantity' => (int) ($item['quantity'] ?? 1),
+                ];
+            }
+
+            $orderPayload = [
+                'id' => $order->id,
+                'total' => (float) ($order->data['subtotal'] ?? 0),
+            ];
+
+            $userDataArr = [
+                'name' => $order->name,
+                'email' => $order->email ?? '',
+                'phone' => $order->phone,
+                'external_id' => $order->user_id,
+            ];
+
+            $orderTrackingData = $order->tracking ?? [];
+            $eventName = config('meta-pixel.advanced_tracking') ? 'Lead' : 'Purchase';
+            $orderTrackingData['event_id'] = 'ch_'.strtolower($eventName).'_'.$order->id.'_'.time();
+
+            $order->update(['tracking' => $orderTrackingData]);
+
+            $facebookService = app(FacebookPixelService::class);
+
+            if (config('meta-pixel.advanced_tracking')) {
+                $facebookService->trackLead($orderPayload, $facebookProducts, $userDataArr, null, $orderTrackingData);
+            } else {
+                $facebookService->trackPurchase($orderPayload, $facebookProducts, $userDataArr, null, $orderTrackingData);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'redirect_url' => route('thank-you', ['order' => $order->id]),
