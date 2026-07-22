@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Services\FacebookPixelService;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 trait HasCart
