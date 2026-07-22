@@ -154,7 +154,7 @@
             <!-- Description -->
             @if($description ?? false)
                 <div class="youtube-header-description">
-                    {!! $description !!}
+                    {!! fix_youtube_embeds($description) !!}
                 </div>
             @endif
 

@@ -710,3 +710,40 @@ function without88(string $phone): string
 {
     return str_replace('+88', '', $phone);
 }
+
+if (! function_exists('fix_youtube_embeds')) {
+    function fix_youtube_embeds(?string $html): string
+    {
+        if (empty($html) || ! str_contains($html, 'iframe')) {
+            return (string) $html;
+        }
+
+        return preg_replace_callback('/<iframe\s+([^>]*src=["\'][^"\']*(?:youtube\.com|youtube-nocookie\.com|youtu\.be)[^"\']*["\'][^>]*)>/i', function ($matches) {
+            $attributes = $matches[1];
+
+            if (preg_match('/allow=["\']([^"\']*)["\']/i', $attributes, $allowMatch)) {
+                $allowVal = $allowMatch[1];
+                if (! str_contains($allowVal, 'autoplay')) {
+                    $newAllow = 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; '.$allowVal.'"';
+                    $attributes = preg_replace('/allow=["\'][^"\']*["\']/i', $newAllow, $attributes);
+                }
+            } else {
+                $attributes .= ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"';
+            }
+
+            if (! preg_match('/referrerpolicy=/i', $attributes)) {
+                $attributes .= ' referrerpolicy="strict-origin-when-cross-origin"';
+            }
+
+            if (! preg_match('/allowfullscreen/i', $attributes)) {
+                $attributes .= ' allowfullscreen';
+            }
+
+            if (! preg_match('/style=/i', $attributes)) {
+                $attributes .= ' style="width: 100%; aspect-ratio: 16/9; max-width: 100%; border: 0;"';
+            }
+
+            return '<iframe '.$attributes.'>';
+        }, $html);
+    }
+}

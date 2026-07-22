@@ -250,7 +250,7 @@
                                 </div>
                             @endif
 
-                            {!! $product->description !!}
+                            {!! fix_youtube_embeds($product->description) !!}
 
                             @if ($product->desc_img && $product->desc_img_pos == 'after_content')
                                 <div class="text-center">

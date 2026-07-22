@@ -67,7 +67,7 @@
                 <div class="elementor-element elementor-element-61b505b elementor-element-1a4b772 elementor-align-left elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
                     data-id="1a4b772" data-element_type="widget" data-widget_type="icon-list.default">
                     <div class="elementor-widget-container">
-                        {!! $description !!}
+                        {!! fix_youtube_embeds($description) !!}
                     </div>
                 </div>
             </div>
