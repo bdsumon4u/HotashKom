@@ -351,6 +351,14 @@ class FacebookPixelService
 
             $eventSourceUrl = $tracking['event_source_url'] ?? null;
 
+            // Ensure valid Meta Pixel format for value and currency
+            if (isset($customData['value'])) {
+                $customData['value'] = (float) $customData['value'];
+                if (empty($customData['currency'])) {
+                    $customData['currency'] = 'BDT';
+                }
+            }
+
             $normalizedUser = $this->getNormalizedUserData($userData, $eventName);
 
             // Client-side: dispatch Livewire browser event (fbq + dataLayer)
