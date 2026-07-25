@@ -281,7 +281,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-sm card">
+                <div class="rounded-sm card d-none">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center">
                         <h5>Server Information</h5>
                         <span class="badge badge-primary">{{ $serverInfo['os'] }}</span>
