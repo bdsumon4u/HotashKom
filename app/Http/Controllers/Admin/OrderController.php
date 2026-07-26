@@ -12,6 +12,7 @@ use App\Pathao\Exceptions\PathaoException;
 use App\Pathao\Facade\Pathao;
 use App\Redx\Exceptions\RedxException;
 use App\Redx\Facade\Redx;
+use App\Services\ProductReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -156,25 +157,18 @@ class OrderController extends Controller
             $amounts[$status] = $data->total_amount ?? 0;
         }
 
-        $productInOrders[] = [];
+        $statuses = $request->status ? [$request->status] : [];
 
-        $products = $orderQ
-            ->when($request->status, fn ($q) => $q->where('status', $request->status))->get()
-            ->flatMap(function ($order) use (&$productInOrders) {
-                $products = json_decode(json_encode($order->products, JSON_UNESCAPED_UNICODE), true);
+        $productsData = (new ProductReportService)->generateProductsReport(
+            $_start,
+            $_end,
+            $statuses,
+            request('date_type', 'status_at'),
+            request('staff_id')
+        );
 
-                foreach ($products as $product) {
-                    $productInOrders[$product['name']][$order->id] = 1 + ($productInOrders[$product['name']][$order->id] ?? 0);
-                }
-
-                return $products;
-            })
-            ->groupBy('id')->map(fn ($item): array => [
-                'name' => $item->random()['name'],
-                'slug' => $item->random()['slug'],
-                'quantity' => $item->sum('quantity'),
-                'total' => $item->sum('total'),
-            ])->sortByDesc('quantity')->all();
+        $products = $productsData['products'];
+        $productInOrders = $productsData['productInOrders'];
 
         return view('admin.orders.filter', [
             'start' => $start,

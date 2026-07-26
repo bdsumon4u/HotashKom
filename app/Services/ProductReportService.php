@@ -38,7 +38,7 @@ final readonly class ProductReportService
         $productInOrders = [];
 
         $products = (clone $orderQuery)->get()
-            ->whereIn('status', $statuses)
+            ->when(! empty($statuses), fn ($collection) => $collection->whereIn('status', $statuses))
             ->flatMap(function ($order) use (&$productInOrders) {
                 $products = json_decode(json_encode($order->products, JSON_UNESCAPED_UNICODE), true);
 
@@ -51,6 +51,7 @@ final readonly class ProductReportService
             })
             ->groupBy('name') // Group by name instead of id to avoid duplicates
             ->mapWithKeys(fn ($item, $name): array => [$name => [
+                'id' => $item->first()['id'] ?? null,
                 'name' => $name,
                 'slug' => $item->first()['slug'] ?? '',
                 'quantity' => (int) $item->sum('quantity'),
@@ -66,7 +67,7 @@ final readonly class ProductReportService
                     // Otherwise use wholesale amounts (original behavior)
                     return $product['total'];
                 }),
-                'purchase_cost' => (float) $item->sum(fn ($product): int|float => ((isset($product['purchase_price']) && $product['purchase_price']) ? $product['purchase_price'] : $product['price']) * $product['quantity']),
+                'purchase_cost' => (float) $item->sum(fn ($product): int|float => ((isset($product['purchase_price']) && $product['purchase_price']) ? $product['purchase_price'] : ($product['price'] ?? 0)) * $product['quantity']),
             ]])
             ->sortByDesc('quantity')
             ->all();
