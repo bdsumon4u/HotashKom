@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CopyProductToResellers;
 use App\Jobs\RemoveProductVariationsFromResellers;
 use App\Models\Option;
 use App\Models\Product;
@@ -45,77 +46,81 @@ class ProductVariationController extends Controller
         $attributes = collect($request->get('attributes'));
         $options = Option::find($attributes->flatten());
 
-        DB::transaction(function () use ($attributes, $product, $options): void {
-            try {
-                // Delete all existing variations first
-                $product->variations()->delete();
+        DB::beginTransaction();
 
-                // Delete variations from reseller databases
-                dispatch(new RemoveProductVariationsFromResellers($product->id));
+        try {
+            // Delete all existing variations first
+            $product->variations()->delete();
 
-                $variations = collect($attributes->first())->crossJoin(...$attributes->splice(1));
-                $newVariations = collect();
+            $variations = collect($attributes->first())->crossJoin(...$attributes->splice(1));
+            $newVariations = collect();
 
-                $variations->each(function ($items, $i) use ($product, $options, $newVariations): void {
-                    $name = $options->filter(fn ($item): bool => in_array($item->id, $items))->pluck('name')->join('-');
+            $variations->each(function ($items, $i) use ($product, $options, $newVariations): void {
+                $name = $options->filter(fn ($item): bool => in_array($item->id, $items))->pluck('name')->join('-');
 
-                    $baseSku = $product->sku.'('.implode('-', $items).')';
-                    $sku = $baseSku;
+                $baseSku = $product->sku.'('.implode('-', $items).')';
+                $sku = $baseSku;
 
-                    $existingSkuProduct = Product::where('sku', $sku)->first();
-                    if ($existingSkuProduct) {
-                        if ($existingSkuProduct->parent_id == $product->id) {
-                            return;
-                        }
-                        if ($existingSkuProduct->parent_id && ! $existingSkuProduct->parent()->exists()) {
-                            $existingSkuProduct->delete();
-                        } else {
-                            $counter = 1;
-                            while (Product::where('sku', $baseSku.'-'.$counter)->exists()) {
-                                $counter++;
-                            }
-                            $sku = $baseSku.'-'.$counter;
-                        }
+                $existingSkuProduct = Product::where('sku', $sku)->first();
+                if ($existingSkuProduct) {
+                    if ($existingSkuProduct->parent_id == $product->id) {
+                        return;
                     }
-
-                    $baseSlug = $product->slug.'('.implode('-', $items).')';
-                    $slug = $baseSlug;
-
-                    $existingSlugProduct = Product::where('slug', $slug)->first();
-                    if ($existingSlugProduct) {
-                        if ($existingSlugProduct->parent_id == $product->id) {
-                            return;
+                    if ($existingSkuProduct->parent_id && ! $existingSkuProduct->parent()->exists()) {
+                        $existingSkuProduct->delete();
+                    } else {
+                        $counter = 1;
+                        while (Product::where('sku', $baseSku.'-'.$counter)->exists()) {
+                            $counter++;
                         }
-                        if ($existingSlugProduct->parent_id && ! $existingSlugProduct->parent()->exists()) {
-                            $existingSlugProduct->delete();
-                        } else {
-                            $counter = 1;
-                            while (Product::where('slug', $baseSlug.'-'.$counter)->exists()) {
-                                $counter++;
-                            }
-                            $slug = $baseSlug.'-'.$counter;
-                        }
+                        $sku = $baseSku.'-'.$counter;
                     }
+                }
 
-                    // Create new variation
-                    $variation = $product->replicate();
-                    $variation->forceFill([
-                        'name' => $name,
-                        'sku' => $sku,
-                        'slug' => $slug,
-                        'parent_id' => $product->id,
-                    ]);
-                    $variation->save();
+                $baseSlug = $product->slug.'('.implode('-', $items).')';
+                $slug = $baseSlug;
 
-                    // Sync options
-                    $variation->options()->sync($items);
-                    $newVariations->push($variation);
-                });
+                $existingSlugProduct = Product::where('slug', $slug)->first();
+                if ($existingSlugProduct) {
+                    if ($existingSlugProduct->parent_id == $product->id) {
+                        return;
+                    }
+                    if ($existingSlugProduct->parent_id && ! $existingSlugProduct->parent()->exists()) {
+                        $existingSlugProduct->delete();
+                    } else {
+                        $counter = 1;
+                        while (Product::where('slug', $baseSlug.'-'.$counter)->exists()) {
+                            $counter++;
+                        }
+                        $slug = $baseSlug.'-'.$counter;
+                    }
+                }
 
-            } catch (\Exception $e) {
-                throw $e;
-            }
-        });
+                // Create new variation
+                $variation = $product->replicate();
+                $variation->forceFill([
+                    'name' => $name,
+                    'sku' => $sku,
+                    'slug' => $slug,
+                    'parent_id' => $product->id,
+                ]);
+                $variation->save();
+
+                // Sync options
+                $variation->options()->sync($items);
+                $newVariations->push($variation);
+            });
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            throw $e;
+        }
+
+        // Dispatch reseller jobs after successful DB commit
+        dispatch(new RemoveProductVariationsFromResellers($product->id));
+        dispatch(new CopyProductToResellers($product));
 
         return back()->withSuccess('Check your variations.');
     }
