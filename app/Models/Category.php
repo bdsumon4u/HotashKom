@@ -57,10 +57,10 @@ class Category extends Model
 
         // Clear nested categories cache (all variations)
         cacheMemo()->forget('categories:nested:');
-        cacheMemo()->forget('categories:nested:0');
-        cacheMemo()->forget('categories:nested:1');
+        cacheMemo()->forget('categories:nested:enabled');
+        cacheMemo()->forget('categories:nested:all');
         // Clear all possible nested cache variations
-        for ($i = 0; $i <= 10; $i++) {
+        for ($i = 0; $i <= 15; $i++) {
             cacheMemo()->forget("categories:nested:{$i}");
         }
 
@@ -79,7 +79,7 @@ class Category extends Model
             cacheMemo()->forget('api_category:'.$category->slug);
         }
         // Clear all possible nested API category cache variations
-        for ($i = 0; $i <= 10; $i++) {
+        for ($i = 0; $i <= 15; $i++) {
             cacheMemo()->forget("api_categories:nested:{$i}");
         }
 
