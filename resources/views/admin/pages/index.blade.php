@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="card-body p-3">
-                <div class="table-responive">
+                <div class="table-responsive">
                     <table class="table table-bordered table-striped table-hover datatable" style="width: 100%;">
                         <thead>
                             <tr>
