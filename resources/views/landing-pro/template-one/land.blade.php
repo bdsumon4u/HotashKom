@@ -138,9 +138,39 @@
     }
 
     $showAnnouncementBar = data_get($sections, 'announcement_bar.enabled', true);
-    $deliveryCharge = setting('delivery_charge');
-    $insideDhakaDeliveryCharge = (int) data_get($deliveryCharge, 'inside_dhaka', 0);
-    $outsideDhakaDeliveryCharge = (int) data_get($deliveryCharge, 'outside_dhaka', 0);
+    $rawDeliveryAreas = setting('delivery_areas');
+    $deliveryAreas = collect($rawDeliveryAreas ?? [])
+        ->map(function ($area): array {
+            return [
+                'name' => (string) data_get($area, 'name', ''),
+                'cost' => (int) data_get($area, 'cost', 0),
+                'is_default' => (bool) data_get($area, 'is_default', false),
+            ];
+        })
+        ->filter(fn(array $area): bool => filled($area['name']))
+        ->values();
+
+    if ($deliveryAreas->isEmpty()) {
+        $deliveryCharge = setting('delivery_charge');
+        $deliveryAreas = collect([
+            [
+                'name' => 'Inside Dhaka',
+                'cost' => (int) data_get($deliveryCharge, 'inside_dhaka', 70),
+                'is_default' => true,
+            ],
+            [
+                'name' => 'Outside Dhaka',
+                'cost' => (int) data_get($deliveryCharge, 'outside_dhaka', 120),
+                'is_default' => false,
+            ],
+        ]);
+    }
+
+    $defaultDeliveryArea = $deliveryAreas->firstWhere('is_default', true)['name']
+        ?? ($deliveryAreas->first()['name'] ?? '');
+
+    $insideDhakaDeliveryCharge = (int) ($deliveryAreas->firstWhere('name', 'Inside Dhaka')['cost'] ?? data_get(setting('delivery_charge'), 'inside_dhaka', 70));
+    $outsideDhakaDeliveryCharge = (int) ($deliveryAreas->firstWhere('name', 'Outside Dhaka')['cost'] ?? data_get(setting('delivery_charge'), 'outside_dhaka', 120));
 
     $parseLines = function (?string $value): array {
         return collect(preg_split('/\r\n|\r|\n/', (string) $value))
@@ -351,11 +381,12 @@
                 touchEndY: 0,
                 galleryInterval: null,
                 reviewInterval: null,
+                deliveryAreas: @json($deliveryAreas),
                 checkout: {
                     name: '',
                     phone: '',
                     address: '',
-                    deliveryArea: '',
+                    deliveryArea: @json($defaultDeliveryArea),
                     touched: {
                         name: false,
                         phone: false,
@@ -617,9 +648,22 @@
                     return this.selectedItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
                 },
 
+                get currentDeliveryAreaSetting() {
+                    if (!Array.isArray(this.deliveryAreas)) {
+                        return null;
+                    }
+
+                    return this.deliveryAreas.find((a) => a.name === this.checkout.deliveryArea) || this.deliveryAreas[0] || null;
+                },
+
                 get deliveryCharge() {
                     if (this.hasFreeDeliveryItem) {
                         return 0;
+                    }
+
+                    const currentArea = this.currentDeliveryAreaSetting;
+                    if (currentArea) {
+                        return Number(currentArea.cost || 0);
                     }
 
                     return this.checkout.deliveryArea === 'outside' ? this.outsideDhakaDeliveryCharge : this

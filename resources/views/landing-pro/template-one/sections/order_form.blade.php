@@ -111,31 +111,22 @@
                             <div class="p-3 bg-white rounded-md border lg:col-span-2">
                                 <p class="mb-2 text-xs font-bold tracking-wide text-gray-700 uppercase">ডেলিভারি এরিয়া
                                 </p>
-                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                    <label
-                                        class="flex justify-between items-center p-2 rounded-lg border cursor-pointer"
-                                        :class="checkout.deliveryArea === 'inside' ? 'border-green-500 bg-green-50' :
-                                            'border-gray-200'">
-                                        <div class="flex gap-2 items-center">
-                                            <input type="radio" value="inside" x-model="checkout.deliveryArea"
-                                                class="accent-green-600">
-                                            <span class="text-sm font-semibold text-gray-800">Inside Dhaka</span>
-                                        </div>
-                                        <span class="text-sm font-black text-green-700"
-                                            x-text="hasFreeDeliveryItem ? 'FREE' : `${insideDhakaDeliveryCharge}৳`"></span>
-                                    </label>
-                                    <label
-                                        class="flex justify-between items-center p-2 rounded-lg border cursor-pointer"
-                                        :class="checkout.deliveryArea === 'outside' ? 'border-green-500 bg-green-50' :
-                                            'border-gray-200'">
-                                        <div class="flex gap-2 items-center">
-                                            <input type="radio" value="outside" x-model="checkout.deliveryArea"
-                                                class="accent-green-600">
-                                            <span class="text-sm font-semibold text-gray-800">Outside Dhaka</span>
-                                        </div>
-                                        <span class="text-sm font-black text-green-700"
-                                            x-text="hasFreeDeliveryItem ? 'FREE' : `${outsideDhakaDeliveryCharge}৳`"></span>
-                                    </label>
+                                <div class="grid gap-2"
+                                    :class="deliveryAreas.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'">
+                                    <template x-for="area in deliveryAreas" :key="area.name">
+                                        <label
+                                            class="flex justify-between items-center p-2 rounded-lg border cursor-pointer transition"
+                                            :class="checkout.deliveryArea === area.name ? 'border-green-500 bg-green-50' :
+                                                'border-gray-200 bg-white'">
+                                            <div class="flex gap-2 items-center">
+                                                <input type="radio" :value="area.name" x-model="checkout.deliveryArea"
+                                                    class="accent-green-600">
+                                                <span class="text-sm font-semibold text-gray-800" x-text="area.name"></span>
+                                            </div>
+                                            <span class="text-sm font-black text-green-700"
+                                                x-text="hasFreeDeliveryItem ? 'FREE' : `${area.cost}৳`"></span>
+                                        </label>
+                                    </template>
                                 </div>
                             </div>
 

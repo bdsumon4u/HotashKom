@@ -298,7 +298,7 @@ class LandingPageProController extends Controller
             'name' => ['required', 'string'],
             'phone' => ['required', 'string'],
             'address' => ['required', 'string'],
-            'delivery_area' => ['required', 'in:inside,outside'],
+            'delivery_area' => ['required', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.landing_product_id' => ['required', 'integer'],
             'items.*.product_id' => ['required', 'exists:products,id'],
@@ -316,7 +316,14 @@ class LandingPageProController extends Controller
             ], 422);
         }
 
-        $shippingArea = $validated['delivery_area'] === 'outside' ? 'Outside Dhaka' : 'Inside Dhaka';
+        $rawDeliveryArea = (string) $validated['delivery_area'];
+        if ($rawDeliveryArea === 'inside') {
+            $shippingArea = 'Inside Dhaka';
+        } elseif ($rawDeliveryArea === 'outside') {
+            $shippingArea = 'Outside Dhaka';
+        } else {
+            $shippingArea = $rawDeliveryArea;
+        }
 
         $fraud = setting('fraud');
 
