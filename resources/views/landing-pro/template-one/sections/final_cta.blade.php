@@ -12,11 +12,24 @@
             @endif
             <div class="flex flex-wrap justify-center gap-3 mt-6">
                 <a href="#order"
-                    class="px-8 py-3 text-sm font-black uppercase transition bg-red-600 rounded-md hover:bg-red-700">এখনই
-                    অর্ডার করুন</a>
-                <a href="#order"
-                    class="px-8 py-3 text-sm font-black text-green-900 uppercase transition bg-green-300 rounded-md hover:bg-green-200">অর্ডার
-                    লিস্ট দেখুন</a>
+                    class="inline-flex items-center justify-center px-6 py-3 text-sm md:text-base font-black text-white uppercase transition bg-red-600 rounded-md shadow hover:bg-red-700">
+                    <i class="mr-2 fas fa-shopping-cart"></i>
+                    এখনই অর্ডার করুন
+                </a>
+                @if ($callUrl !== '#order')
+                    <a href="{{ $callUrl }}"
+                        class="inline-flex items-center justify-center px-6 py-3 text-sm md:text-base font-black text-gray-900 uppercase transition bg-white rounded-md shadow hover:bg-gray-100">
+                        <i class="mr-2 fas fa-phone-alt"></i>
+                        কল করুন
+                    </a>
+                @endif
+                @if ($whatsappUrl !== '#order')
+                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer"
+                        class="inline-flex items-center justify-center px-6 py-3 text-sm md:text-base font-black text-white uppercase transition bg-[#25D366] rounded-md shadow hover:bg-[#20ba5a]">
+                        <i class="mr-2 fab fa-whatsapp text-lg"></i>
+                        হোয়াটসঅ্যাপ
+                    </a>
+                @endif
             </div>
         </div>
     </section>

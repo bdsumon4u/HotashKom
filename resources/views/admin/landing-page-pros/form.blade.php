@@ -1,6 +1,7 @@
 @php
     use App\Models\Image;
 
+    $company = setting('company');
     $sectionSettings = old('section_settings', $landingPagePro->mergedSectionSettings());
     $isCreateForm = !$landingPagePro->exists;
 
@@ -218,6 +219,29 @@
                         onclick="window.open('/lp/' + document.getElementById('slug').value, '_blank')">VISIT</button>
                 </div>
                 <x-error field="slug" />
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3 form-group">
+                        <label for="phone">Call Phone Number</label>
+                        <input type="text" name="section_settings[phone]" id="phone"
+                            value="{{ old('section_settings.phone', data_get($sectionSettings, 'phone')) }}"
+                            class="form-control"
+                            placeholder="e.g. 01700000000">
+                        <small class="form-text text-muted">Leave blank to use default fallback: {{ $company->phone ?? 'N/A' }}</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3 form-group">
+                        <label for="whatsapp">WhatsApp Number</label>
+                        <input type="text" name="section_settings[whatsapp]" id="whatsapp"
+                            value="{{ old('section_settings.whatsapp', data_get($sectionSettings, 'whatsapp')) }}"
+                            class="form-control"
+                            placeholder="e.g. 01700000000">
+                        <small class="form-text text-muted">Leave blank to use default fallback: {{ $company->whatsapp ?? ($company->phone ?? 'N/A') }}</small>
+                    </div>
+                </div>
             </div>
 
             <div class="row">
@@ -461,9 +485,9 @@
 
                                 @if ($key === 'size_guide')
                                     <div class="mb-3 col-md-12">
-                                        <label>Size Guide Rows (format: SIZE|WAIST|LENGTH, one per line)</label>
+                                        <label>Size Guide Rows (format: SIZE|WAIST (কোমর)|LENGTH (লম্বা), one per line)</label>
                                         <textarea name="section_settings[size_guide][rows_text]" rows="4" class="form-control"
-                                            placeholder="M|28-30|38&#10;L|30-32|39">{{ old('section_settings.size_guide.rows_text', data_get($sectionSettings, 'size_guide.rows_text')) }}</textarea>
+                                            placeholder="SIZE|WAIST (কোমর)|LENGTH (লম্বা)&#10;M|28-30|38&#10;L|30-32|39">{{ old('section_settings.size_guide.rows_text', data_get($sectionSettings, 'size_guide.rows_text')) }}</textarea>
                                     </div>
 
                                     <div class="mb-2 col-md-12">
@@ -671,15 +695,22 @@
                 initSelect2() {
                     runWhenJQueryReady(() => {
                         this.$nextTick(() => {
+                            const self = this;
                             const $selects = $('.js-product-select');
                             $selects.each(function() {
-                                if ($(this).hasClass('select2-hidden-accessible')) {
+                                const $el = $(this);
+                                if ($el.hasClass('select2-hidden-accessible')) {
                                     return;
                                 }
 
-                                $(this).select2({
+                                $el.select2({
                                     placeholder: 'Search product',
                                     allowClear: true,
+                                }).on('change', function() {
+                                    const index = $selects.index(this);
+                                    if (index !== -1 && self.items[index]) {
+                                        self.items[index].product_id = $el.val() ? Number($el.val()) : null;
+                                    }
                                 });
                             });
                         });

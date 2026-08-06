@@ -138,12 +138,11 @@ class LandingPageProController extends Controller
     {
         return Product::query()
             ->whereNull('parent_id')
-            ->where('is_active', true)
             ->orderBy('name')
-            ->get(['id', 'name', 'sku'])
+            ->get(['id', 'name', 'sku', 'is_active'])
             ->map(fn (Product $product): array => [
                 'id' => $product->id,
-                'label' => $product->name,
+                'label' => $product->name.($product->is_active ? '' : ' (Inactive)'),
             ])
             ->values();
     }

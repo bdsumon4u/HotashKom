@@ -15,10 +15,27 @@
                     </div>
                 </template>
             </div>
-            <a href="#order"
-                class="inline-block px-10 py-3 text-lg font-black text-white transition bg-red-600 rounded-md shadow-xl md:mt-8 hover:bg-red-700">
-                অর্ডার করতে চাই
-            </a>
+            <div class="flex flex-wrap items-center justify-center gap-3 my-4 md:mt-8">
+                <a href="#order"
+                    class="inline-flex items-center justify-center px-6 py-3 text-base md:text-lg font-black text-white transition bg-red-600 rounded-md shadow-xl hover:bg-red-700">
+                    <i class="mr-2 fas fa-shopping-cart"></i>
+                    অর্ডার করতে চাই
+                </a>
+                @if ($callUrl !== '#order')
+                    <a href="{{ $callUrl }}"
+                        class="inline-flex items-center justify-center px-6 py-3 text-base md:text-lg font-black text-green-900 transition bg-white rounded-md shadow-xl hover:bg-green-50">
+                        <i class="mr-2 fas fa-phone-alt"></i>
+                        কল করুন
+                    </a>
+                @endif
+                @if ($whatsappUrl !== '#order')
+                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer"
+                        class="inline-flex items-center justify-center px-6 py-3 text-base md:text-lg font-black text-white transition bg-[#25D366] rounded-md shadow-xl hover:bg-[#20ba5a]">
+                        <i class="mr-2 fab fa-whatsapp text-xl"></i>
+                        হোয়াটসঅ্যাপ
+                    </a>
+                @endif
+            </div>
         </div>
     </section>
 @endif

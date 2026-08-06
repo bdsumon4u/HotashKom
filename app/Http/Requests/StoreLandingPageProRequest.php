@@ -37,6 +37,9 @@ class StoreLandingPageProRequest extends FormRequest
             'seo.title' => ['nullable', 'string', 'max:255'],
             'seo.description' => ['nullable', 'string', 'max:500'],
             'section_settings' => ['nullable', 'array'],
+            'section_settings.*' => ['nullable'],
+            'section_settings.phone' => ['nullable', 'string', 'max:50'],
+            'section_settings.whatsapp' => ['nullable', 'string', 'max:50'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.product_id' => ['required', Rule::exists('products', 'id')->whereNull('parent_id'), 'distinct'],
             'items.*.free_delivery' => ['nullable', 'boolean'],
@@ -83,6 +86,9 @@ class StoreLandingPageProRequest extends FormRequest
             ->concat($missingKeys)
             ->values()
             ->all();
+
+        $normalized['phone'] = filled(data_get($raw, 'phone')) ? trim((string) data_get($raw, 'phone')) : null;
+        $normalized['whatsapp'] = filled(data_get($raw, 'whatsapp')) ? trim((string) data_get($raw, 'whatsapp')) : null;
 
         return array_replace_recursive($defaults, $normalized);
     }

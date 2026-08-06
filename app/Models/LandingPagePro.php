@@ -187,6 +187,8 @@ class LandingPagePro extends Model
             ->all();
 
         $settings['section_order'] = array_keys(static::reorderableSectionLabels());
+        $settings['phone'] = null;
+        $settings['whatsapp'] = null;
 
         return $settings;
     }

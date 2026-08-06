@@ -6,15 +6,21 @@
                     {{ data_get($sections, 'size_guide.title', 'সাইজ গাইড (Size Chart)') }}</h3>
                 <div class="overflow-hidden border-2 border-gray-100 rounded-md">
                     <table class="w-full text-center bg-white">
-                        <thead class="text-white bg-green-800">
-                            <tr>
-                                <th class="p-4">SIZE</th>
-                                <th class="p-4">WAIST (কোমর)</th>
-                                <th class="p-4">LENGTH (লেন্থ)</th>
-                            </tr>
-                        </thead>
+                        @php
+                            $headerRow = $sizeRows[0] ?? null;
+                            $bodyRows = array_slice($sizeRows, 1);
+                        @endphp
+                        @if ($headerRow)
+                            <thead class="text-white bg-green-800">
+                                <tr>
+                                    <th class="p-4">{{ $headerRow['size'] }}</th>
+                                    <th class="p-4">{{ $headerRow['waist'] }}</th>
+                                    <th class="p-4">{{ $headerRow['length'] }}</th>
+                                </tr>
+                            </thead>
+                        @endif
                         <tbody class="text-gray-800 divide-y">
-                            @foreach ($sizeRows as $row)
+                            @foreach ($bodyRows as $row)
                                 <tr>
                                     <td class="p-4 bg-gray-50">{{ $row['size'] }}</td>
                                     <td class="p-4">{{ $row['waist'] }}</td>

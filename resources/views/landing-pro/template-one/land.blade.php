@@ -112,8 +112,18 @@
         return $normalized;
     };
 
-    $normalizedCallPhone = $normalizePhone($company->phone ?? '');
-    $normalizedWhatsappPhone = $normalizePhone($company->whatsapp ?? '');
+    $rawCallPhone = data_get($sections, 'phone');
+    if (blank($rawCallPhone)) {
+        $rawCallPhone = $company->phone ?? '';
+    }
+
+    $rawWhatsappPhone = data_get($sections, 'whatsapp');
+    if (blank($rawWhatsappPhone)) {
+        $rawWhatsappPhone = $company->whatsapp ?? ($company->phone ?? '');
+    }
+
+    $normalizedCallPhone = $normalizePhone($rawCallPhone);
+    $normalizedWhatsappPhone = $normalizePhone($rawWhatsappPhone);
     $social = setting('social');
 
     $callUrl = $normalizedCallPhone ? 'tel:+' . $normalizedCallPhone : '#order';
@@ -190,6 +200,7 @@
 
     if (empty($sizeRows)) {
         $sizeRows = [
+            ['size' => 'SIZE', 'waist' => 'WAIST (কোমর)', 'length' => 'LENGTH (লেন্থ)'],
             ['size' => 'M', 'waist' => '28-30', 'length' => '38'],
             ['size' => 'L', 'waist' => '30-32', 'length' => '39'],
             ['size' => 'XL', 'waist' => '32-34', 'length' => '40'],
@@ -277,6 +288,13 @@
                 ->all();
         })
         ->values()
+        ->map(function (array $product, int $index): array {
+            if ($index === 0) {
+                $product['selected'] = true;
+            }
+
+            return $product;
+        })
         ->all();
 
     $videoUrl = data_get($sections, 'video.url', 'https://www.youtube.com/embed/dQw4w9WgXcQ');
@@ -309,7 +327,7 @@
 
     @foreach ($configuredSectionOrder as $sectionKey)
         @includeIf('landing-pro.template-one.sections.' . $sectionKey)
-        @if (isset($ctaSectionMap[$sectionKey]))
+        @if (isset($ctaSectionMap[$sectionKey]) && data_get($sections, $sectionKey . '.enabled', true))
             @includeIf('landing-pro.template-one.sections.' . $ctaSectionMap[$sectionKey])
         @endif
     @endforeach
@@ -351,6 +369,9 @@
 
                 init() {
                     this.startTimer(new Date().getTime() + 86400000);
+                    if (this.products.length > 0 && !this.products.some((p) => p.selected)) {
+                        this.products[0].selected = true;
+                    }
                     this.products.forEach((_, index) => this.selectVariantByAttributes(index));
                     this.$nextTick(() => {
                         this.initCarouselWidths();
@@ -792,6 +813,31 @@
             document.body.style.visibility = 'visible';
         }
     </script>
+
+    <!-- Floating Action Buttons (Call & WhatsApp) -->
+    <div class="fixed bottom-4 right-4 z-50 flex flex-col gap-3 md:bottom-6 md:right-6">
+        @if ($whatsappUrl !== '#order')
+            <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer"
+                class="group relative flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-2xl transition-all duration-300 hover:scale-110 hover:bg-[#20ba5a] active:scale-95 md:h-14 md:w-14"
+                title="WhatsApp-এ কথা বলুন" aria-label="WhatsApp">
+                <i class="fab fa-whatsapp text-2xl md:text-3xl"></i>
+                <span class="absolute right-16 hidden whitespace-nowrap rounded-md bg-gray-900 px-3 py-1.5 text-xs font-bold text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 md:block">
+                    WhatsApp-এ কথা বলুন
+                </span>
+            </a>
+        @endif
+
+        @if ($callUrl !== '#order')
+            <a href="{{ $callUrl }}"
+                class="group relative flex h-12 w-12 items-center justify-center rounded-full bg-green-700 text-white shadow-2xl transition-all duration-300 hover:scale-110 hover:bg-green-800 active:scale-95 md:h-14 md:w-14"
+                title="সরাসরি কল করুন" aria-label="Call">
+                <i class="fas fa-phone-alt text-xl md:text-2xl"></i>
+                <span class="absolute right-16 hidden whitespace-nowrap rounded-md bg-gray-900 px-3 py-1.5 text-xs font-bold text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100 md:block">
+                    সরাসরি কল করুন
+                </span>
+            </a>
+        @endif
+    </div>
 </body>
 
 </html>
