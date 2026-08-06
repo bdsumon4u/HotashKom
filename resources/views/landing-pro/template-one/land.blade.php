@@ -138,39 +138,11 @@
     }
 
     $showAnnouncementBar = data_get($sections, 'announcement_bar.enabled', true);
-    $rawDeliveryAreas = setting('delivery_areas');
-    $deliveryAreas = collect($rawDeliveryAreas ?? [])
-        ->map(function ($area): array {
-            return [
-                'name' => (string) data_get($area, 'name', ''),
-                'cost' => (int) data_get($area, 'cost', 0),
-                'is_default' => (bool) data_get($area, 'is_default', false),
-            ];
-        })
-        ->filter(fn(array $area): bool => filled($area['name']))
-        ->values();
-
-    if ($deliveryAreas->isEmpty()) {
-        $deliveryCharge = setting('delivery_charge');
-        $deliveryAreas = collect([
-            [
-                'name' => 'Inside Dhaka',
-                'cost' => (int) data_get($deliveryCharge, 'inside_dhaka', 70),
-                'is_default' => true,
-            ],
-            [
-                'name' => 'Outside Dhaka',
-                'cost' => (int) data_get($deliveryCharge, 'outside_dhaka', 120),
-                'is_default' => false,
-            ],
-        ]);
-    }
-
-    $defaultDeliveryArea = $deliveryAreas->firstWhere('is_default', true)['name']
-        ?? ($deliveryAreas->first()['name'] ?? '');
-
-    $insideDhakaDeliveryCharge = (int) ($deliveryAreas->firstWhere('name', 'Inside Dhaka')['cost'] ?? data_get(setting('delivery_charge'), 'inside_dhaka', 70));
-    $outsideDhakaDeliveryCharge = (int) ($deliveryAreas->firstWhere('name', 'Outside Dhaka')['cost'] ?? data_get(setting('delivery_charge'), 'outside_dhaka', 120));
+    $deliveryAreaService = app(\App\Services\DeliveryAreaService::class);
+    $deliveryAreas = $deliveryAreaService->getDeliveryAreas();
+    $defaultDeliveryArea = $deliveryAreaService->getDefaultAreaName();
+    $insideDhakaDeliveryCharge = (int) ($deliveryAreas->firstWhere('name', 'Inside Dhaka')['cost'] ?? 70);
+    $outsideDhakaDeliveryCharge = (int) ($deliveryAreas->firstWhere('name', 'Outside Dhaka')['cost'] ?? 120);
 
     $parseLines = function (?string $value): array {
         return collect(preg_split('/\r\n|\r|\n/', (string) $value))

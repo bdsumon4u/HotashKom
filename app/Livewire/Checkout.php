@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\AccountCreated;
 use App\Notifications\User\OrderPlaced;
+use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
 use App\Traits\ResolvesPackagingCharge;
 use Illuminate\Support\Arr;
@@ -286,84 +287,17 @@ class Checkout extends Component
             return 0;
         }
 
-        $this->isFreeDelivery = false;
         $area ??= $this->shipping;
-        $shipping_cost = 0;
-        if ($area) {
-            $deliveryAreas = collect(setting('delivery_areas') ?? []);
-            $areaSetting = $deliveryAreas->first(fn ($a) => data_get($a, 'name') === $area);
-            $areaCost = (int) data_get($areaSetting, 'cost', 0);
-            if (setting('show_option')->productwise_delivery_charge ?? false) {
-                $insideAreaSetting = $deliveryAreas->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'inside') ||
-                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা শহর') ||
-                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা সিটি')
-                ) ?? $deliveryAreas->first();
-                $isInside = ($area === data_get($insideAreaSetting, 'name'));
+        $isFree = false;
+        $shippingCost = app(DeliveryAreaService::class)->calculateShippingCost(
+            $area,
+            cart()->content(),
+            (float) cart()->subTotal(),
+            $isFree
+        );
+        $this->isFreeDelivery = $isFree;
 
-                $outsideAreaSetting = $deliveryAreas->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'outside') ||
-                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'বাহির')
-                );
-                $isOutside = $outsideAreaSetting && ($area === data_get($outsideAreaSetting, 'name'));
-
-                if ($isInside) {
-                    if (setting('show_option')->quantitywise_delivery_charge ?? false) {
-                        $shipping_cost = cart()->content()->sum(function ($item) {
-                            return ($item->options->shipping_inside ?? 0) * $item->qty;
-                        });
-                    } else {
-                        $shipping_cost = cart()->content()->max(function ($item) {
-                            return $item->options->shipping_inside ?? 0;
-                        });
-                    }
-                    $shipping_cost = $shipping_cost ?: $areaCost;
-                } elseif ($isOutside) {
-                    if (setting('show_option')->quantitywise_delivery_charge ?? false) {
-                        $shipping_cost = cart()->content()->sum(function ($item) {
-                            return ($item->options->shipping_outside ?? 0) * $item->qty;
-                        });
-                    } else {
-                        $shipping_cost = cart()->content()->max(function ($item) {
-                            return $item->options->shipping_outside ?? 0;
-                        });
-                    }
-                    $shipping_cost = $shipping_cost ?: $areaCost;
-                } else {
-                    $shipping_cost = $areaCost;
-                }
-            } else {
-                $shipping_cost = $areaCost;
-            }
-        }
-
-        $freeDelivery = setting('free_delivery');
-
-        if (! ((bool) ($freeDelivery->enabled ?? false)) || ($freeDelivery->enabled ?? false) == 'false') {
-            return $shipping_cost;
-        }
-
-        if ($freeDelivery->for_all ?? false) {
-            if (cart()->subTotal() < $freeDelivery->min_amount) {
-                return $shipping_cost;
-            }
-            $quantity = cart()->content()->sum(fn ($product) => $product->qty);
-            if ($quantity < $freeDelivery->min_quantity) {
-                return $shipping_cost;
-            }
-
-            $this->isFreeDelivery = true;
-
-            return 0;
-        }
-
-        foreach ((array) ($freeDelivery->products ?? []) as $id => $qty) {
-            if (cart()->content()->where('options.parent_id', $id)->where('qty', '>=', $qty)->count()) {
-                $this->isFreeDelivery = true;
-
-                return 0;
-            }
-        }
-
-        return $shipping_cost;
+        return $shippingCost;
     }
 
     public function updatedShipping(): void

@@ -249,20 +249,28 @@
                     </div>
                 </div>
             @endif
+            @php
+                $areaColumns = app(\App\Services\DeliveryAreaService::class)->getProductDeliveryCharges($selectedVar);
+                $columnCount = $areaColumns->count();
+                $colWidth = $columnCount > 0 ? floor(100 / $columnCount) : 100;
+            @endphp
+
             <table class="table table-sm table-bordered">
                 <thead>
                     <tr>
-                        <th colspan="2" class="text-center">Delivery Charge</th>
+                        <th colspan="{{ $columnCount }}" class="text-center">Delivery Charge</th>
                     </tr>
                     <tr>
-                        <th width="50%">Inside Dhaka</th>
-                        <th width="50%">Outside Dhaka</th>
+                        @foreach ($areaColumns as $col)
+                            <th width="{{ $colWidth }}%">{{ $col['name'] }}</th>
+                        @endforeach
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{!! theMoney($selectedVar->shipping_inside) !!}</td>
-                        <td>{!! theMoney($selectedVar->shipping_outside) !!}</td>
+                        @foreach ($areaColumns as $col)
+                            <td>{!! theMoney($col['cost']) !!}</td>
+                        @endforeach
                     </tr>
                 </tbody>
             </table>

@@ -6,6 +6,7 @@ use App\Jobs\SyncOrderStatusWithReseller;
 use App\Jobs\SyncProductStockWithResellers;
 use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
+use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
 use Fuse\Fuse;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -15,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
@@ -501,98 +501,16 @@ class Order extends Model
             return 0;
         }
 
-        $this->isFreeDelivery = false;
-        $shipping_cost = 0;
-        if ($shipping_area) {
-            $deliveryAreas = collect(setting('delivery_areas') ?? []);
-            $areaSetting = $deliveryAreas->first(fn ($a) => data_get($a, 'name') === $shipping_area);
-            $areaCost = (int) data_get($areaSetting, 'cost', 0);
+        $isFree = false;
+        $shippingCost = app(DeliveryAreaService::class)->calculateShippingCost(
+            $shipping_area,
+            $products,
+            $subtotal,
+            $isFree
+        );
+        $this->isFreeDelivery = $isFree;
 
-            if (setting('show_option')->productwise_delivery_charge ?? false) {
-                $insideAreaSetting = $deliveryAreas->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'inside') ||
-                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা শহর') ||
-                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'ঢাকা সিটি')
-                ) ?? $deliveryAreas->first();
-                $isInside = ($shipping_area === data_get($insideAreaSetting, 'name'));
-
-                $outsideAreaSetting = $deliveryAreas->first(fn ($a) => Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'outside') ||
-                    Str::contains(Str::lower(data_get($a, 'name') ?? ''), 'বাহির')
-                );
-                $isOutside = $outsideAreaSetting && ($shipping_area === data_get($outsideAreaSetting, 'name'));
-
-                if ($isInside) {
-                    if (setting('show_option')->quantitywise_delivery_charge ?? false) {
-                        $shipping_cost = $products->sum(function ($item) {
-                            $item = (array) $item;
-                            $factor = $item['quantity'] ?? 1;
-
-                            return ($item['shipping_inside'] ?? 0) * $factor;
-                        });
-                    } else {
-                        $shipping_cost = $products->max(function ($item) {
-                            $item = (array) $item;
-
-                            return $item['shipping_inside'] ?? 0;
-                        });
-                    }
-                    $shipping_cost = $shipping_cost ?: $areaCost;
-                } elseif ($isOutside) {
-                    if (setting('show_option')->quantitywise_delivery_charge ?? false) {
-                        $shipping_cost = $products->sum(function ($item) {
-                            $item = (array) $item;
-                            $factor = $item['quantity'] ?? 1;
-
-                            return ($item['shipping_outside'] ?? 0) * $factor;
-                        });
-                    } else {
-                        $shipping_cost = $products->max(function ($item) {
-                            $item = (array) $item;
-
-                            return $item['shipping_outside'] ?? 0;
-                        });
-                    }
-                    $shipping_cost = $shipping_cost ?: $areaCost;
-                } else {
-                    $shipping_cost = $areaCost;
-                }
-            } else {
-                $shipping_cost = $areaCost;
-            }
-        }
-
-        $freeDelivery = setting('free_delivery');
-
-        if (! ($freeDelivery->enabled ?? false) || ($freeDelivery->enabled ?? false) == 'false') {
-            return $shipping_cost;
-        }
-
-        if ($freeDelivery->for_all ?? false) {
-            if ($subtotal < $freeDelivery->min_amount) {
-                return $shipping_cost;
-            }
-            $quantity = $products->sum(function ($product) {
-                $product = (array) $product;
-
-                return $product['quantity'] ?? 0;
-            });
-            if ($quantity < $freeDelivery->min_quantity) {
-                return $shipping_cost;
-            }
-
-            $this->isFreeDelivery = true;
-
-            return 0;
-        }
-
-        foreach ((array) ($freeDelivery->products ?? []) as $id => $qty) {
-            if ($products->where('parent_id', $id)->where('quantity', '>=', $qty)->count()) {
-                $this->isFreeDelivery = true;
-
-                return 0;
-            }
-        }
-
-        return $shipping_cost;
+        return $shippingCost;
     }
 
     public function getActivitylogOptions(): LogOptions
