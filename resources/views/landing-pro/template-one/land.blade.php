@@ -368,7 +368,7 @@
                 products: @json($productsPayload),
 
                 init() {
-                    this.startTimer(new Date().getTime() + 86400000);
+                    this.startTimer();
                     if (this.products.length > 0 && !this.products.some((p) => p.selected)) {
                         this.products[0].selected = true;
                     }
@@ -423,17 +423,52 @@
                     }
                 },
 
-                startTimer(expiry) {
-                    setInterval(() => {
-                        const diff = expiry - new Date().getTime();
-                        if (diff < 0) {
-                            return;
+                startTimer() {
+                    const ONE_HOUR_MS = 60 * 60 * 1000;
+                    const storageKey = 'lp_timer_target_{{ $landingPagePro->slug }}';
+
+                    const getValidTargetExpiry = () => {
+                        const now = Date.now();
+                        let saved = null;
+                        try {
+                            saved = localStorage.getItem(storageKey);
+                        } catch (e) {
+                            // localStorage disabled or restricted fallback
+                        }
+                        let targetExpiry = saved ? parseInt(saved, 10) : 0;
+                        let remaining = targetExpiry - now;
+
+                        if (!targetExpiry || isNaN(targetExpiry) || remaining < ONE_HOUR_MS) {
+                            const randomDurationMs = Math.floor((3600 + Math.random() * 10800) * 1000);
+                            targetExpiry = now + randomDurationMs;
+                            try {
+                                localStorage.setItem(storageKey, targetExpiry.toString());
+                            } catch (e) {
+                                // ignore
+                            }
                         }
 
-                        this.timer.hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
-                        this.timer.minutes = String(Math.floor((diff / 1000 / 60) % 60)).padStart(2, '0');
+                        return targetExpiry;
+                    };
+
+                    let targetExpiry = getValidTargetExpiry();
+
+                    const updateDisplay = () => {
+                        const now = Date.now();
+                        let diff = targetExpiry - now;
+
+                        if (diff < ONE_HOUR_MS) {
+                            targetExpiry = getValidTargetExpiry();
+                            diff = targetExpiry - now;
+                        }
+
+                        this.timer.hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+                        this.timer.minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
                         this.timer.seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-                    }, 1000);
+                    };
+
+                    updateDisplay();
+                    setInterval(updateDisplay, 1000);
                 },
 
                 increment(index) {
