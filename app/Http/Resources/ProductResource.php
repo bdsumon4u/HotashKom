@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\DeliveryAreaService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Arr;
@@ -62,6 +63,7 @@ class ProductResource extends JsonResource
             'total' => $price * $quantity,
             'shipping_inside' => $this->resource->shipping_inside,
             'shipping_outside' => $this->resource->shipping_outside,
+            'delivery_areas' => app(DeliveryAreaService::class)->getProductDeliveryCharges($this->resource)->toArray(),
         ];
     }
 }

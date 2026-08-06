@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\DeliveryAreaService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProductRequest extends FormRequest
@@ -21,6 +22,22 @@ class ProductRequest extends FormRequest
 
         if (! $this->price) {
             $this->merge(['price' => $this->get('selling_price')]);
+        }
+
+        if ($this->has('delivery_charges') && is_array($this->delivery_charges)) {
+            $deliveryAreaService = app(DeliveryAreaService::class);
+            $insideArea = $deliveryAreaService->getInsideArea();
+            $outsideArea = $deliveryAreaService->getOutsideArea();
+
+            $insideVal = $insideArea ? data_get($this->delivery_charges, $insideArea['name']) : null;
+            $outsideVal = $outsideArea ? data_get($this->delivery_charges, $outsideArea['name']) : null;
+
+            if (! is_null($insideVal) && $insideVal !== '') {
+                $this->merge(['shipping_inside' => (int) $insideVal]);
+            }
+            if (! is_null($outsideVal) && $outsideVal !== '') {
+                $this->merge(['shipping_outside' => (int) $outsideVal]);
+            }
         }
     }
 
@@ -54,6 +71,8 @@ class ProductRequest extends FormRequest
             'desc_img_pos' => 'required_if:desc_img,1',
             'shipping_inside' => 'nullable|integer',
             'shipping_outside' => 'nullable|integer',
+            'delivery_charges' => 'nullable|array',
+            'delivery_charges.*' => 'nullable|integer|min:0',
             'packaging_charge' => 'nullable|integer|min:0',
             'delivery_text' => 'nullable',
         ];

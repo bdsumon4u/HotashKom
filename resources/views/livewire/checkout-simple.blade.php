@@ -79,7 +79,7 @@
                         ডেলিভারি এরিয়া<span class="text-danger">*</span>
                     </label>
                     <div class="simple-shipping-options">
-                        @foreach (setting('delivery_areas') ?? [] as $index => $area)
+                        @foreach (app(\App\Services\DeliveryAreaService::class)->getDeliveryAreas() as $index => $area)
                             <label class="simple-shipping-option">
                                 <input type="radio"
                                     wire:model.live="shipping"

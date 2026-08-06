@@ -155,20 +155,35 @@
                     <div class="col-sm-12">
                         <h4><small class="mb-1 border-bottom">Delivery Charge</small></h4>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="shipping_inside">Inside Dhaka</label>
-                            <x-input name="shipping_inside" :value="$product->shipping_inside" />
-                            <x-error field="shipping_inside" />
+                    @php
+                        $deliveryAreaService = app(\App\Services\DeliveryAreaService::class);
+                        $deliveryAreas = $deliveryAreaService->getDeliveryAreas();
+                        $insideArea = $deliveryAreaService->getInsideArea($deliveryAreas);
+                        $outsideArea = $deliveryAreaService->getOutsideArea($deliveryAreas);
+                    @endphp
+                    @foreach ($deliveryAreas as $area)
+                        @php
+                            $areaName = $area['name'];
+                            $isInside = $insideArea && $areaName === $insideArea['name'];
+                            $isOutside = $outsideArea && $areaName === $outsideArea['name'];
+
+                            $savedCharge = data_get($product->delivery_charges, $areaName);
+                            if (is_null($savedCharge) || $savedCharge === '') {
+                                if ($isInside) {
+                                    $savedCharge = $product->shipping_inside;
+                                } elseif ($isOutside) {
+                                    $savedCharge = $product->shipping_outside;
+                                }
+                            }
+                        @endphp
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="delivery_charge_{{ \Illuminate\Support\Str::slug($areaName) }}">{{ $areaName }}</label>
+                                <x-input name="delivery_charges[{{ $areaName }}]" :value="$savedCharge" placeholder="{{ $area['cost'] }}" />
+                                <x-error field="delivery_charges.{{ $areaName }}" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="shipping_outside">Outside Dhaka</label>
-                            <x-input name="shipping_outside" :value="$product->shipping_outside" />
-                            <x-error field="shipping_outside" />
-                        </div>
-                    </div>
+                    @endforeach
                     @if(isOninda() && config('app.resell'))
                     <div class="col-md-12">
                         <div class="form-group">

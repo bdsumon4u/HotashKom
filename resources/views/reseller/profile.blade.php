@@ -167,7 +167,7 @@
                                             <h6 class="mb-0">Shipping Cost Settings</h6>
                                         </div>
                                         <div class="p-4 shadow-sm card-body rounded-0">
-                                            @foreach (setting('delivery_areas') ?? [] as $index => $adminArea)
+                                            @foreach (app(\App\Services\DeliveryAreaService::class)->getDeliveryAreas() as $index => $adminArea)
                                                 @php
                                                     $adminAreaName = data_get($adminArea, 'name');
                                                     $resellerAreaSetting = collect($user->delivery_areas ?? [])->first(fn($a) => data_get($a, 'name') === $adminAreaName);

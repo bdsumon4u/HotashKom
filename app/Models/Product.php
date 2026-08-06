@@ -29,7 +29,7 @@ class Product extends Model
 
     protected $fillable = [
         'brand_id', 'name', 'slug', 'description', 'short_description', 'price', 'average_purchase_price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
-        'source_id', 'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'hot_sale', 'new_arrival', 'shipping_inside', 'shipping_outside', 'delivery_text',
+        'source_id', 'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'hot_sale', 'new_arrival', 'shipping_inside', 'shipping_outside', 'delivery_charges', 'delivery_text',
         'packaging_charge',
     ];
 
@@ -482,6 +482,7 @@ class Product extends Model
             'hot_sale' => 'boolean',
             'new_arrival' => 'boolean',
             'should_track' => 'boolean',
+            'delivery_charges' => 'array',
         ];
     }
 

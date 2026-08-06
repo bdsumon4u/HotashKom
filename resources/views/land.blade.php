@@ -1,3 +1,8 @@
+@php
+    $deliveryAreaService = app(\App\Services\DeliveryAreaService::class);
+    $deliveryAreas = $deliveryAreaService->getDeliveryAreas();
+    $defaultDeliveryArea = $deliveryAreaService->getDefaultAreaName();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -432,29 +437,21 @@
                             <div class="p-3 bg-white border border-gray-200 rounded-xl">
                                 <p class="mb-2 text-xs font-bold tracking-wide text-gray-700 uppercase">ডেলিভারি এরিয়া
                                 </p>
-                                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                    <label
-                                        class="flex items-center justify-between p-2.5 border rounded-lg cursor-pointer"
-                                        :class="checkout.deliveryArea === 'inside' ? 'border-green-500 bg-green-50' :
-                                            'border-gray-200 bg-white'">
-                                        <div class="flex items-center gap-2">
-                                            <input type="radio" name="delivery_area" value="inside"
-                                                x-model="checkout.deliveryArea" class="accent-green-600">
-                                            <span class="text-sm font-semibold text-gray-800">Inside Dhaka</span>
-                                        </div>
-                                        <span class="text-sm font-black text-green-700">70৳</span>
-                                    </label>
-                                    <label
-                                        class="flex items-center justify-between p-2.5 border rounded-lg cursor-pointer"
-                                        :class="checkout.deliveryArea === 'outside' ? 'border-green-500 bg-green-50' :
-                                            'border-gray-200 bg-white'">
-                                        <div class="flex items-center gap-2">
-                                            <input type="radio" name="delivery_area" value="outside"
-                                                x-model="checkout.deliveryArea" class="accent-green-600">
-                                            <span class="text-sm font-semibold text-gray-800">Outside Dhaka</span>
-                                        </div>
-                                        <span class="text-sm font-black text-green-700">130৳</span>
-                                    </label>
+                                <div class="grid gap-2"
+                                    :class="deliveryAreas.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'">
+                                    <template x-for="area in deliveryAreas" :key="area.name">
+                                        <label
+                                            class="flex items-center justify-between p-2.5 border rounded-lg cursor-pointer transition"
+                                            :class="checkout.deliveryArea === area.name ? 'border-green-500 bg-green-50' :
+                                                'border-gray-200 bg-white'">
+                                            <div class="flex items-center gap-2">
+                                                <input type="radio" name="delivery_area" :value="area.name"
+                                                    x-model="checkout.deliveryArea" class="accent-green-600">
+                                                <span class="text-sm font-semibold text-gray-800" x-text="area.name"></span>
+                                            </div>
+                                            <span class="text-sm font-black text-green-700" x-text="`${area.cost}৳`"></span>
+                                        </label>
+                                    </template>
                                 </div>
                             </div>
 
@@ -607,11 +604,12 @@
                 reviewIndex: 0,
 
                 // Checkout Form State
+                deliveryAreas: @json($deliveryAreas),
                 checkout: {
                     name: '',
                     phone: '',
                     address: '',
-                    deliveryArea: 'inside',
+                    deliveryArea: @json($defaultDeliveryArea),
                     touched: {
                         name: false,
                         phone: false,
@@ -927,7 +925,8 @@
                 },
 
                 get deliveryCharge() {
-                    return this.checkout.deliveryArea === 'outside' ? 130 : 70;
+                    const currentArea = this.deliveryAreas.find(a => a.name === this.checkout.deliveryArea);
+                    return currentArea ? Number(currentArea.cost) : 0;
                 },
 
                 get grandTotal() {

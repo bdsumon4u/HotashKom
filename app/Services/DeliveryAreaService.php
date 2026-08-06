@@ -85,10 +85,15 @@ class DeliveryAreaService
             $cost = $area['cost'];
 
             if ($isProductWise && $product) {
-                if ($insideArea && $area['name'] === $insideArea['name']) {
-                    $cost = (int) ($product->shipping_inside ?: $area['cost']);
-                } elseif ($outsideArea && $area['name'] === $outsideArea['name']) {
-                    $cost = (int) ($product->shipping_outside ?: $area['cost']);
+                $areaName = $area['name'];
+                $customCharges = $product->delivery_charges ?? [];
+
+                if (is_array($customCharges) && array_key_exists($areaName, $customCharges) && ! is_null($customCharges[$areaName]) && $customCharges[$areaName] !== '') {
+                    $cost = (int) $customCharges[$areaName];
+                } elseif ($insideArea && $areaName === $insideArea['name'] && ! is_null($product->shipping_inside)) {
+                    $cost = (int) $product->shipping_inside;
+                } elseif ($outsideArea && $areaName === $outsideArea['name'] && ! is_null($product->shipping_outside)) {
+                    $cost = (int) $product->shipping_outside;
                 }
             }
 
@@ -134,52 +139,42 @@ class DeliveryAreaService
             $insideArea = $this->getInsideArea($areas);
             $outsideArea = $this->getOutsideArea($areas);
 
-            $isInside = ($normalizedAreaName === data_get($insideArea, 'name'));
-            $isOutside = $outsideArea && ($normalizedAreaName === data_get($outsideArea, 'name'));
+            $resolveItemFee = function ($item) use ($normalizedAreaName, $insideArea, $outsideArea): int {
+                $itemArray = is_array($item) ? $item : (array) $item;
+                $options = data_get($item, 'options');
+                $deliveryCharges = data_get($options, 'delivery_charges') ?? data_get($itemArray, 'delivery_charges', []);
 
-            if ($isInside) {
-                if ($isQuantityWise) {
-                    $shippingCost = $itemsCollection->sum(function ($item): int|float {
-                        $itemArray = is_array($item) ? $item : (array) $item;
-                        $options = data_get($item, 'options');
-
-                        $insideFee = (int) (data_get($options, 'shipping_inside') ?? data_get($itemArray, 'shipping_inside', 0));
-                        $qty = (int) (data_get($item, 'qty') ?? data_get($itemArray, 'quantity', 1));
-
-                        return $insideFee * $qty;
-                    });
-                } else {
-                    $shippingCost = $itemsCollection->max(function ($item): int|float {
-                        $itemArray = is_array($item) ? $item : (array) $item;
-                        $options = data_get($item, 'options');
-
-                        return (int) (data_get($options, 'shipping_inside') ?? data_get($itemArray, 'shipping_inside', 0));
-                    });
+                if (is_array($deliveryCharges) && array_key_exists($normalizedAreaName, $deliveryCharges) && ! is_null($deliveryCharges[$normalizedAreaName]) && $deliveryCharges[$normalizedAreaName] !== '') {
+                    return (int) $deliveryCharges[$normalizedAreaName];
                 }
-                $shippingCost = $shippingCost ?: $areaCost;
-            } elseif ($isOutside) {
-                if ($isQuantityWise) {
-                    $shippingCost = $itemsCollection->sum(function ($item): int|float {
-                        $itemArray = is_array($item) ? $item : (array) $item;
-                        $options = data_get($item, 'options');
 
-                        $outsideFee = (int) (data_get($options, 'shipping_outside') ?? data_get($itemArray, 'shipping_outside', 0));
-                        $qty = (int) (data_get($item, 'qty') ?? data_get($itemArray, 'quantity', 1));
+                $isInside = ($insideArea && $normalizedAreaName === $insideArea['name']);
+                $isOutside = ($outsideArea && $normalizedAreaName === $outsideArea['name']);
 
-                        return $outsideFee * $qty;
-                    });
-                } else {
-                    $shippingCost = $itemsCollection->max(function ($item): int|float {
-                        $itemArray = is_array($item) ? $item : (array) $item;
-                        $options = data_get($item, 'options');
-
-                        return (int) (data_get($options, 'shipping_outside') ?? data_get($itemArray, 'shipping_outside', 0));
-                    });
+                if ($isInside) {
+                    return (int) (data_get($options, 'shipping_inside') ?? data_get($itemArray, 'shipping_inside', 0));
                 }
-                $shippingCost = $shippingCost ?: $areaCost;
+
+                if ($isOutside) {
+                    return (int) (data_get($options, 'shipping_outside') ?? data_get($itemArray, 'shipping_outside', 0));
+                }
+
+                return 0;
+            };
+
+            if ($isQuantityWise) {
+                $shippingCost = $itemsCollection->sum(function ($item) use ($resolveItemFee): int|float {
+                    $qty = (int) (data_get($item, 'qty') ?? data_get($item, 'quantity', 1));
+
+                    return $resolveItemFee($item) * $qty;
+                });
             } else {
-                $shippingCost = $areaCost;
+                $shippingCost = $itemsCollection->max(function ($item) use ($resolveItemFee): int|float {
+                    return $resolveItemFee($item);
+                });
             }
+
+            $shippingCost = $shippingCost ?: $areaCost;
         } else {
             $shippingCost = $areaCost;
         }

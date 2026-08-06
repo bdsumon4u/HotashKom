@@ -35,7 +35,7 @@
                 <div class="form-group">
                     <label class="d-block">Delivery Charge City <span class="text-danger">*</span></label>
                     <div class="form-control h-auto @error('shipping_area') is-invalid @enderror">
-                        @foreach (setting('delivery_areas') ?? [] as $index => $area)
+                        @foreach (app(\App\Services\DeliveryAreaService::class)->getDeliveryAreas() as $index => $area)
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" class="custom-control-input" id="shipping-area-{{ $index }}" name="shipping"
                                     wire:model.live="shipping_area" value="{{ data_get($area, 'name') }}" @disabled(isReseller() && !is_null($order->source_id))>

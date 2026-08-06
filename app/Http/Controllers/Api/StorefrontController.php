@@ -12,6 +12,7 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
 use App\Traits\ResolvesPackagingCharge;
 use Illuminate\Http\JsonResponse;
@@ -244,8 +245,9 @@ class StorefrontController extends Controller
                 'description' => str_replace('../../../storage', url('/storage'), $product->description ?? ''),
                 'shortDescription' => $product->short_description ?? '',
                 'deliveryText' => $deliveryText,
-                'shippingInside' => (int) ($deliveryCharge->inside_dhaka ?? 80),
-                'shippingOutside' => (int) ($deliveryCharge->outside_dhaka ?? 150),
+                'deliveryAreas' => app(DeliveryAreaService::class)->getProductDeliveryCharges($product)->toArray(),
+                'shippingInside' => (int) (data_get(app(DeliveryAreaService::class)->getInsideArea(), 'cost') ?? 70),
+                'shippingOutside' => (int) (data_get(app(DeliveryAreaService::class)->getOutsideArea(), 'cost') ?? 120),
                 'attributes' => $attributes,
                 'variations' => $variations,
                 'hasVariations' => $product->variations->isNotEmpty(),

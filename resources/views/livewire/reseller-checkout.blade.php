@@ -57,7 +57,7 @@
                         </div>
                         <div class="form-group col-md-9">
                             <div class="form-control @error('shipping') is-invalid @enderror h-auto">
-                                @foreach (setting('delivery_areas') ?? [] as $index => $area)
+                                @foreach (app(\App\Services\DeliveryAreaService::class)->getDeliveryAreas() as $index => $area)
                                     <div class="custom-control custom-radio custom-control-inline">
                                         <input type="radio" wire:model.live="shipping"
                                             @change="$wire.updateField('shipping', $event.target.value)"
