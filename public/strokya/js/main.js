@@ -62,6 +62,9 @@
         });
 
         $(document).on('click', function (event) {
+            if ($(event.target).closest('.xzoom-container, .xzoom-thumbs, .zoom-control, .xzoom-preview, .xzoom-lens, .xzoom-source, .xzoom-loading, .xzoom-caption').length) {
+                return;
+            }
             $('.indicator')
                 .not($(event.target).closest('.indicator'))
                 .removeClass('indicator--opened');
