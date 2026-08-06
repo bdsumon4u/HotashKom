@@ -477,7 +477,7 @@ class LandingPageProController extends Controller
             ], 422);
         }
 
-        if (config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
+        if (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
             $facebookProducts = [];
             foreach ($productsPayload as $item) {
                 $facebookProducts[] = [

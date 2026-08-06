@@ -20,7 +20,7 @@ class AddToCartTrackingController extends Controller
      */
     public function __invoke(Request $request): JsonResponse
     {
-        if (! config('meta-pixel.meta_pixel') && ! setting('pixel_ids')) {
+        if (! setting('meta_pixel') && ! config('meta-pixel.meta_pixel') && ! setting('pixel_ids')) {
             return response()->json(['success' => true]);
         }
 

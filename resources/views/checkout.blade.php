@@ -253,7 +253,7 @@
             </x-form>
         </div>
     </div>
-    @if (!empty($trackingDetails) && (config('meta-pixel.meta_pixel') || setting('pixel_ids')))
+    @if (!empty($trackingDetails) && (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')))
         @php
             $jsItems = array_map(fn($p) => [
                 'item_id' => $p['item_id'],

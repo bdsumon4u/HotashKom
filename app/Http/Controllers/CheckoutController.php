@@ -38,7 +38,7 @@ class CheckoutController extends Controller
             }
 
             $trackingDetails = null;
-            if (config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
+            if (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
                 $trackingDetails = $this->facebookPixelService->trackInitiateCheckout();
             }
 

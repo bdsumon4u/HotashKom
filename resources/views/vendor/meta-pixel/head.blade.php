@@ -1,8 +1,8 @@
-@if ($metaPixel->isEnabled() || !empty(setting('pixel_ids')))
+@if ($metaPixel->isEnabled() || !empty(setting('pixel_ids')) || !empty(setting('meta_pixel')))
     @php
         $dbPixelIds = preg_split('/[\s\r\n,]+/', (string) setting('pixel_ids', '')) ?: [];
-        $rawPixelConfig = config('meta-pixel.meta_pixel');
-        $configPixelIds = collect(explode('|', (string) $rawPixelConfig))
+        $rawPixelConfig = setting('meta_pixel') ?: config('meta-pixel.meta_pixel');
+        $configPixelIds = collect(preg_split('/[\r\n|]+/', (string) $rawPixelConfig))
             ->map(fn($p) => explode(':', trim($p))[0])
             ->filter()
             ->all();

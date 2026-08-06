@@ -56,7 +56,7 @@
         window._csrfToken = '{{ csrf_token() }}';
         window.trackingConfig = {
             pixelIds: {{ Js::from(app(App\Services\FacebookPixelService::class)->getPixelIds()) }},
-            pixelEnabled: {{ (config('meta-pixel.meta_pixel') || setting('pixel_ids')) ? 'true' : 'false' }},
+            pixelEnabled: {{ (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')) ? 'true' : 'false' }},
             advancedTracking: {{ config('meta-pixel.advanced_tracking') ? 'true' : 'false' }},
         };
         window.dataLayer = window.dataLayer || [];

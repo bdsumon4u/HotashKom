@@ -34,6 +34,7 @@ class StorefrontController extends Controller
         $keys = ['company', 'logo', 'social', 'delivery_charge', 'free_delivery', 'scroll_text', 'call_for_order', 'gtm_id', 'pixel_ids'];
         $settingsArray = Setting::array();
         $settings = collect($settingsArray)->only($keys)->toArray();
+        $settings['pixel_ids'] = implode(' ', app(FacebookPixelService::class)->getPixelIds());
 
         return response()->json([
             'data' => $settings,
@@ -434,7 +435,7 @@ class StorefrontController extends Controller
             ],
         ]);
 
-        if (config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
+        if (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
             $facebookProducts = [];
             foreach ($orderProducts as $productItem) {
                 $facebookProducts[] = [

@@ -46,7 +46,7 @@ trait HasCart
 
         storeOrUpdateCart();
 
-        if (config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
+        if (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
             $this->facebookService ??= app(FacebookPixelService::class);
             $this->facebookService->trackAddToCart([
                 'id' => $product->id,

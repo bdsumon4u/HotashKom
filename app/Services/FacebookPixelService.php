@@ -272,6 +272,16 @@ class FacebookPixelService
 
     /**
      * Get a list of unique pixel IDs from setting('pixel_ids') for browser-side pixel tracking.
+    /**
+     * Get Meta Pixel CAPI configuration string from settings with fallback to env config.
+     */
+    public function getMetaPixelConfig(): string
+    {
+        return (string) (setting('meta_pixel') ?: config('meta-pixel.meta_pixel', ''));
+    }
+
+    /**
+     * Get a list of unique pixel IDs from setting('pixel_ids') for browser-side pixel tracking.
      * Parses space, comma, and newline separators.
      *
      * @return array<int, string>
@@ -289,13 +299,16 @@ class FacebookPixelService
             }
         }
 
-        // 2. Also extract IDs from config('meta-pixel.meta_pixel')
-        $rawConfig = config('meta-pixel.meta_pixel');
+        // 2. Also extract IDs from getMetaPixelConfig()
+        $rawConfig = $this->getMetaPixelConfig();
         if (! empty($rawConfig)) {
-            foreach (explode('|', (string) $rawConfig) as $pixelStr) {
-                $parts = explode(':', trim($pixelStr));
-                if (! empty($parts[0])) {
-                    $ids[] = trim($parts[0]);
+            $pixelStrings = preg_split('/[\r\n|]+/', $rawConfig);
+            if ($pixelStrings) {
+                foreach ($pixelStrings as $pixelStr) {
+                    $parts = explode(':', trim($pixelStr));
+                    if (! empty($parts[0])) {
+                        $ids[] = trim($parts[0]);
+                    }
                 }
             }
         }
@@ -319,10 +332,12 @@ class FacebookPixelService
      */
     protected function sendToConversionsApi(string $eventName, string $eventId, array $customData, array $userData, ?string $eventSourceUrl = null): void
     {
+        info('send to conversions api');
         $serverCustomData = $this->createServerCustomData($customData);
         $serverUserData = $this->createServerUserData($userData, $eventName);
 
-        $pixels = array_filter(array_map('trim', explode('|', (string) config('meta-pixel.meta_pixel'))));
+        $rawMetaPixel = $this->getMetaPixelConfig();
+        $pixels = array_filter(array_map('trim', preg_split('/[\r\n|]+/', $rawMetaPixel) ?: []));
         if (empty($pixels)) {
             $token = config('meta-pixel.token');
             if ($token) {

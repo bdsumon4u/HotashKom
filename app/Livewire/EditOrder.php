@@ -390,7 +390,7 @@ class EditOrder extends Component
             }
 
             // Fire pixel events when status changes and pixel is configured
-            if ($statusChanged && config('meta-pixel.meta_pixel') && config('meta-pixel.advanced_tracking')) {
+            if ($statusChanged && (setting('meta_pixel') || config('meta-pixel.meta_pixel')) && config('meta-pixel.advanced_tracking')) {
                 $products = collect($this->order->products)->values()->all();
                 $orderArr = [
                     'id' => $this->order->id,

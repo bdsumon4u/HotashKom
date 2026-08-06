@@ -544,7 +544,7 @@ class Checkout extends Component
                 Cache::increment('fraud:daily:'.$order->phone);
             });
 
-            if (config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
+            if (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
                 $orderPayload = [
                     'id' => $order->id,
                     'total' => $order->data['subtotal'],

@@ -64,6 +64,7 @@ class SettingRequest extends FormRequest
             return [
                 'gtm_id' => 'sometimes',
                 'pixel_ids' => 'sometimes',
+                'meta_pixel' => 'sometimes',
                 'scripts' => 'sometimes',
             ];
         }
