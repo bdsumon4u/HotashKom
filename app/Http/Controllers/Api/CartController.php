@@ -30,12 +30,6 @@ class CartController extends Controller
 
         try {
             // Follow the HasCart trait logic but avoid problematic services
-            $redirectToCheckout = false;
-            if ($instance == 'kart' && ! config('app.order_now_is_onetime')) {
-                $redirectToCheckout = true;
-                $instance = 'default';
-            }
-
             session(['kart' => $instance]);
             if ($instance == 'landing') {
                 cart()->destroy();
@@ -71,7 +65,7 @@ class CartController extends Controller
                     'name' => $product->name,
                     'quantity' => $quantity,
                 ],
-                'instance' => $redirectToCheckout ? 'kart' : $instance,
+                'instance' => $instance,
             ]);
         } catch (\Exception $e) {
             return response()->json([

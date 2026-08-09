@@ -20,8 +20,6 @@ return [
 
     'vertical_image_gallery' => env('VERTICAL_IMAGE_GALLERY', false),
 
-    'order_now_is_onetime' => env('ORDER_NOW_IS_ONETIME', true),
-
     'only_admin_can_return_or_deliver' => env('ONLY_ADMIN_CAN_RETURN_OR_DELIVER', false),
 
     'packaging_charge' => env('PACKAGING_CHARGE', 25),

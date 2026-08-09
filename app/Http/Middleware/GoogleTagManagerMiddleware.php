@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Azmolla\Shoppingcart\Facades\Cart;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class GoogleTagManagerMiddleware
@@ -26,10 +27,14 @@ class GoogleTagManagerMiddleware
         }
 
         if (! $request->is('checkout') && ! $request->is('save-checkout-progress')) {
-            if (config('app.order_now_is_onetime')) {
-                Cart::instance('kart')->destroy();
-            }
+            Cart::instance('kart')->destroy();
             Cart::instance('landing')->destroy();
+
+            DB::table('shopping_cart')
+                ->where('identifier', session()->getId())
+                ->whereIn('instance', ['kart', 'landing'])
+                ->delete();
+
             session(['kart' => 'default']);
         }
 
