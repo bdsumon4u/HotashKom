@@ -28,30 +28,28 @@
                 areas: @js($delivery_areas ?: []),
                 addArea() {
                     this.areas.push({ name: '', cost: '', is_default: false });
-                    this.$nextTick(() => {
-                        this.ensureOneDefault();
-                    });
                 },
                 removeArea(index) {
                     const wasDefault = this.areas[index].is_default;
                     this.areas.splice(index, 1);
                     if (wasDefault && this.areas.length > 0) {
-                        this.setDefault(0);
+                        this.setDefault(-1);
                     }
                 },
                 setDefault(index) {
                     this.areas.forEach((area, i) => {
                         area.is_default = (i === index);
                     });
-                },
-                ensureOneDefault() {
-                    if (this.areas.length > 0 && !this.areas.some(a => a.is_default)) {
-                        this.setDefault(0);
-                    }
                 }
-            }" x-init="ensureOneDefault()">
+            }">
                 <div class="col-12 mb-2 d-flex justify-content-between align-items-center">
-                    <label class="font-weight-bold mb-0">Delivery Areas & Charges</label>
+                    <div class="d-flex align-items-center">
+                        <label class="font-weight-bold mb-0">Delivery Areas & Charges</label>
+                        <div class="custom-control custom-radio custom-control-inline mb-0 ml-3">
+                            <input type="radio" id="default_area_none" name="default_delivery_area" value="-1" :checked="!areas.some(a => a.is_default)" @change="setDefault(-1)" class="custom-control-input">
+                            <label class="custom-control-label small font-weight-bold" for="default_area_none">No Default</label>
+                        </div>
+                    </div>
                     <button type="button" @click="addArea()" class="btn btn-primary btn-sm px-2 py-1">Add Area</button>
                 </div>
                 <div class="col-12">

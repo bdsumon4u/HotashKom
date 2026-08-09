@@ -358,6 +358,7 @@ class Checkout extends Component
             $this->address = $user->address ?? '';
             $this->note = $user->note ?? '';
             $this->retailDiscount = $user->discount ?? 0;
+            $this->shipping = Cookie::get('shipping', $shipping ?? '');
         } elseif ($this->fillFromCookie()) {
             $this->name = Cookie::get('name', '');
             $this->shipping = Cookie::get('shipping', $shipping ?? '');

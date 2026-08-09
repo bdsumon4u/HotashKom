@@ -29,10 +29,10 @@ class SettingController extends Controller
         $data = $request->validated();
 
         if ($request->get('tab') === 'delivery') {
-            $defaultIndex = (int) ($data['default_delivery_area'] ?? 0);
+            $defaultIndex = isset($data['default_delivery_area']) ? (int) $data['default_delivery_area'] : -1;
             $deliveryAreas = $data['delivery_areas'] ?? [];
             foreach ($deliveryAreas as $index => &$area) {
-                $area['is_default'] = ($index === $defaultIndex);
+                $area['is_default'] = ($defaultIndex >= 0 && $index === $defaultIndex);
             }
             unset($data['default_delivery_area']);
             $data['delivery_areas'] = $deliveryAreas;

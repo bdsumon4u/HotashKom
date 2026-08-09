@@ -45,8 +45,7 @@ class DeliveryAreaService
     {
         $areas = $this->getDeliveryAreas();
 
-        return $areas->firstWhere('is_default', true)['name']
-            ?? ($areas->first()['name'] ?? '');
+        return $areas->firstWhere('is_default', true)['name'] ?? '';
     }
 
     public function getInsideArea(?Collection $areas = null): ?array
