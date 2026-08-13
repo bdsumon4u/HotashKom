@@ -179,6 +179,7 @@ class ApiController extends Controller
                 'average_rating' => $averageRating,
                 'total_reviews' => $totalReviews,
                 'retail_price' => $product->retailPrice(),
+                'variations_count' => $product->variations_count,
             ];
         });
 
@@ -251,7 +252,11 @@ class ApiController extends Controller
 
     private function loadProductRelationships($products): void
     {
-        $products->load([
+        $collection = $products instanceof LengthAwarePaginator
+            ? $products->getCollection()
+            : $products;
+
+        $collection->load([
             'images' => function ($query): void {
                 $query->select('images.id', 'images.path')
                     ->withPivot(['img_type', 'order'])
@@ -265,6 +270,8 @@ class ApiController extends Controller
                     ->with('ratings');
             },
         ]);
+
+        $collection->loadCount('variations');
     }
 
     private function addBaseImageUrls($products): void

@@ -32,7 +32,7 @@ class BrandProductController extends Controller
             'reviews' => function ($q): void {
                 $q->where('approved', true)->with('ratings');
             },
-        ])->paginate($per_page)->appends(request()->query());
+        ])->withCount('variations')->paginate($per_page)->appends(request()->query());
 
         // Get filter data
         $filterData = $this->getProductFilterData();

@@ -223,6 +223,8 @@
                 const isOninda = this.getIsOninda();
                 const guestCanSeePrice = this.getGuestCanSeePrice();
 
+                const hasVariations = (product.variations_count !== undefined ? product.variations_count : (product.variations ? product.variations.length : 0)) > 1;
+
                 // Generate buttons HTML
                 let buttonsHTML = '';
                 if (!isOninda) {
@@ -231,25 +233,47 @@
                     const buttonType = showOption.product_grid_button || 'add_to_cart';
 
                     if (buttonType === 'add_to_cart') {
-                        buttonsHTML = `
-                                 <div class="product-card__buttons">
-                                     <button class="btn btn-primary product-card__addtocart" type="button" ${disabledAttr}
-                                             data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
-                                         ${showOption.add_to_cart_icon || ''}
-                                         <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
-                                     </button>
-                                 </div>
-                             `;
+                        if (hasVariations) {
+                            buttonsHTML = `
+                                     <div class="product-card__buttons">
+                                         <a class="btn btn-primary product-card__addtocart" href="${productUrl}" wire:navigate.hover style="text-decoration: none;">
+                                             ${showOption.add_to_cart_icon || ''}
+                                             <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
+                                         </a>
+                                     </div>
+                                 `;
+                        } else {
+                            buttonsHTML = `
+                                     <div class="product-card__buttons">
+                                         <button class="btn btn-primary product-card__addtocart" type="button" ${disabledAttr}
+                                                 data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
+                                             ${showOption.add_to_cart_icon || ''}
+                                             <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
+                                         </button>
+                                     </div>
+                                 `;
+                        }
                     } else if (buttonType === 'order_now') {
-                        buttonsHTML = `
-                                 <div class="product-card__buttons">
-                                     <button class="btn btn-primary product-card__ordernow order-now-drift" type="button" ${disabledAttr}
-                                             data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
-                                         ${showOption.order_now_icon || ''}
-                                         <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
-                                     </button>
-                                 </div>
-                             `;
+                        if (hasVariations) {
+                            buttonsHTML = `
+                                     <div class="product-card__buttons">
+                                         <a class="btn btn-primary product-card__ordernow order-now-drift" href="${productUrl}" wire:navigate.hover style="text-decoration: none;">
+                                             ${showOption.order_now_icon || ''}
+                                             <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
+                                         </a>
+                                     </div>
+                                 `;
+                        } else {
+                            buttonsHTML = `
+                                     <div class="product-card__buttons">
+                                         <button class="btn btn-primary product-card__ordernow order-now-drift" type="button" ${disabledAttr}
+                                                 data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
+                                             ${showOption.order_now_icon || ''}
+                                             <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
+                                         </button>
+                                     </div>
+                                 `;
+                        }
                     }
                 }
 

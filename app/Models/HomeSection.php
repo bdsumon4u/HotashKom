@@ -112,7 +112,7 @@ class HomeSection extends Model
                 'reviews' => function ($q): void {
                     $q->where('approved', true)->with('ratings');
                 },
-            ])->paginate($paginate);
+            ])->withCount('variations')->paginate($paginate);
         }
 
         return cacheRememberNamespaced('section_products', 'section:'.$this->id, now()->addHours(2), function () {
@@ -166,7 +166,7 @@ class HomeSection extends Model
                 'reviews' => function ($q): void {
                     $q->where('approved', true)->with('ratings');
                 },
-            ])->get();
+            ])->withCount('variations')->get();
         });
     }
 

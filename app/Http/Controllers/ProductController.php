@@ -83,12 +83,14 @@ class ProductController extends Controller
                     $q->where('approved', true)->with('ratings');
                 },
             ]);
+            $products->getCollection()->loadCount('variations');
         } else {
             $products->loadMissing([
                 'reviews' => function ($q): void {
                     $q->where('approved', true)->with('ratings');
                 },
             ]);
+            $products->loadCount('variations');
         }
 
         $products = $products

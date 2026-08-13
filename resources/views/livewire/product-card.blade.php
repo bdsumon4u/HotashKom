@@ -129,19 +129,34 @@
         @if (!isOninda())
             <div class="product-card__buttons">
                 @php($available = !$product->should_track || $product->stock_count > 0)
+                @php($has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1)
                 @if (($show_option->product_grid_button ?? false) == 'add_to_cart')
-                    <button wire:click="addToCart" class="btn btn-primary product-card__addtocart" type="button"
-                        {{ $available ? '' : 'disabled' }}>
-                        {!! $show_option->add_to_cart_icon ?? null !!}
-                        <span class="ml-1">{{ $show_option->add_to_cart_text ?? '' }}</span>
-                    </button>
+                    @if ($has_variations)
+                        <a href="{{ route('products.show', $product) }}" wire:navigate.hover class="btn btn-primary product-card__addtocart" style="text-decoration: none;">
+                            {!! $show_option->add_to_cart_icon ?? null !!}
+                            <span class="ml-1">{{ $show_option->add_to_cart_text ?? '' }}</span>
+                        </a>
+                    @else
+                        <button wire:click="addToCart" class="btn btn-primary product-card__addtocart" type="button"
+                            {{ $available ? '' : 'disabled' }}>
+                            {!! $show_option->add_to_cart_icon ?? null !!}
+                            <span class="ml-1">{{ $show_option->add_to_cart_text ?? '' }}</span>
+                        </button>
+                    @endif
                 @endif
                 @if (($show_option->product_grid_button ?? false) == 'order_now')
-                    <button wire:click="addToCart('kart')" class="btn btn-primary product-card__ordernow" type="button"
-                        {{ $available ? '' : 'disabled' }}>
-                        {!! $show_option->order_now_icon ?? null !!}
-                        <span class="ml-1">{{ $show_option->order_now_text ?? '' }}</span>
-                    </button>
+                    @if ($has_variations)
+                        <a href="{{ route('products.show', $product) }}" wire:navigate.hover class="btn btn-primary product-card__ordernow" style="text-decoration: none;">
+                            {!! $show_option->order_now_icon ?? null !!}
+                            <span class="ml-1">{{ $show_option->order_now_text ?? '' }}</span>
+                        </a>
+                    @else
+                        <button wire:click="addToCart('kart')" class="btn btn-primary product-card__ordernow" type="button"
+                            {{ $available ? '' : 'disabled' }}>
+                            {!! $show_option->order_now_icon ?? null !!}
+                            <span class="ml-1">{{ $show_option->order_now_text ?? '' }}</span>
+                        </button>
+                    @endif
                 @endif
             </div>
         @endif
