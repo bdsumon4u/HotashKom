@@ -204,7 +204,7 @@ class OrderController extends Controller
                     } else {
                         $imageHtml = '';
                     }
-                    $products .= "<li style='margin-bottom: 12px;'><div style='display: flex; align-items: center; margin-bottom: 4px;'>{$product->quantity} x {$imageHtml}</div><div><a class='text-underline' href='".route('products.show', $product->slug)."' target='_blank'>{$product->name}</a></div></li>";
+                    $products .= "<li style='margin-bottom: 12px;'><div style='display: flex; align-items: center; margin-bottom: 4px;'>".($product->quantity??1)." x {$imageHtml}</div><div><a class='text-underline' href='".route('products.show', $product->slug)."' target='_blank'>{$product->name}</a></div></li>";
                 }
 
                 return $products.'</ul>';

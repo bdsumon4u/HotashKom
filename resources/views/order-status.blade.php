@@ -12,11 +12,13 @@
                             @if (config('app.thank_you_img'))
                                 <img width="100%" src="{{ asset(config('app.thank_you_img')) }}" alt="Thank You">
                             @else
-                            <div class="card-header">
-                                <div class="d-flex justify-content-center">
-                                    <img width="100" height="100" src="{{ asset('tik-mark.png') }}" alt="Tick Mark">
+                            <div class="card-header text-center">
+                                <h2 class="font-weight-bold mb-3" style="color: #10a2ba; font-size: 2rem;">আপনার অর্ডারটি সফলভাবে সম্পন্ন হয়েছে।</h2>
+                                <h4 class="font-weight-bold mb-3" style="color: #dc3545;">আমাদের কল সেন্টার থেকে ফোন করে আপনার অর্ডারটি কনফার্ম করা হবে</h4>
+                                <p class="font-weight-bold mb-4" style="color: #dc3545; font-size: 0.95rem; line-height: 1.6;">অর্ডার প্লেস করার জন্য অসংখ্য ধন্যবাদ। কিছু সময়ের মধ্যেই আমাদের একজন কল সেন্টার প্রতিনিধি আপনাকে কল করবে উনার সাথে বিস্তারিত কথা বলে জেনে বুঝে অর্ডার কনফার্ম করবেন।।</p>
+                                <div class="d-flex justify-content-center mb-3">
+                                    <span style="font-size: 4rem; display: block; line-height: 1;">🎉</span>
                                 </div>
-                                <h4 class="text-center text-success">আপনার অর্ডারটি সাবমিট করা হয়েছে; ধন্যবাদ।</h4>
                             </div>
                             @endif
                         @endif
