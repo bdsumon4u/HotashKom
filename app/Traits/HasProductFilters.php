@@ -91,6 +91,8 @@ trait HasProductFilters
             }
         } elseif ($sorted == 'updated_at') {
             $query->latest('updated_at');
+        } elseif ($sorted == 'created_at') {
+            $query->latest('created_at');
         } elseif ($sorted == 'selling_price') {
             $query->orderBy('selling_price');
         }

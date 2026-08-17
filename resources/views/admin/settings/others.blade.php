@@ -149,6 +149,7 @@
                 <select name="show_option[product_sort]" id="product-sort" class="form-control">
                     <option value="random" @if ($sorted == 'random') selected @endif>Random</option>
                     <option value="updated_at" @if ($sorted == 'updated_at') selected @endif>Last Update</option>
+                    <option value="created_at" @if ($sorted == 'created_at') selected @endif>Newly Added</option>
                     <option value="selling_price" @if ($sorted == 'selling_price') selected @endif>Cheap Price
                     </option>
                 </select>

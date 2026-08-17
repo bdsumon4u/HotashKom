@@ -95,6 +95,8 @@ class HomeSection extends Model
                     $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');
                 } elseif ($sorted == 'updated_at') {
                     $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
+                } elseif ($sorted == 'created_at') {
+                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE created_at END DESC');
                 } elseif ($sorted == 'selling_price') {
                     $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE selling_price END');
                 }
@@ -103,6 +105,8 @@ class HomeSection extends Model
                     $query->inRandomOrder();
                 } elseif ($sorted == 'updated_at') {
                     $query->latest('updated_at');
+                } elseif ($sorted == 'created_at') {
+                    $query->latest('created_at');
                 } elseif ($sorted == 'selling_price') {
                     $query->orderBy('selling_price');
                 }
@@ -149,6 +153,8 @@ class HomeSection extends Model
                     $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');
                 } elseif ($sorted == 'updated_at') {
                     $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
+                } elseif ($sorted == 'created_at') {
+                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE created_at END DESC');
                 } elseif ($sorted == 'selling_price') {
                     $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE selling_price END');
                 }
@@ -157,6 +163,8 @@ class HomeSection extends Model
                     $query->inRandomOrder();
                 } elseif ($sorted == 'updated_at') {
                     $query->latest('updated_at');
+                } elseif ($sorted == 'created_at') {
+                    $query->latest('created_at');
                 } elseif ($sorted == 'selling_price') {
                     $query->orderBy('selling_price');
                 }
