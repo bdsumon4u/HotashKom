@@ -289,11 +289,11 @@
                                                 Unit Price: {{ $product['price'] }} (buy); {{ $product['retail_price'] ?? $product['price'] }} (sell)
                                             </div>
                                             <div class="text-nowrap">
-                                                Total Price: {{ $product['price'] * $product['quantity'] }} (buy); {{ $amount = ($product['retail_price'] ?? $product['price']) * $product['quantity'] }} (sell)
+                                                Total Price: {{ (int)($product['price'] ?? 0) * (int)($product['quantity'] ?? 0) }} (buy); {{ $amount = ((int)($product['retail_price'] ?? 0) ?? (int)($product['price'] ?? 0)) * (int)($product['quantity'] ?? 0) }} (sell)
                                             </div>
                                             @else
                                             <div class="text-nowrap">
-                                                Total Price: {{ $amount = ($product[isOninda() ? 'retail_price' : 'price'] ?? $product['price']) * $product['quantity'] }}
+                                                Total Price: {{ $amount = ((int)($product[isOninda() ? 'retail_price' : 'price'] ?? 0) ?? (int)($product['price'] ?? 0)) * (int)($product['quantity'] ?? 0) }}
                                             </div>
                                             @endif
                                         </div>
