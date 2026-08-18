@@ -286,7 +286,7 @@
                                         <div class="mt-2 d-flex flex-column">
                                             @if(isOninda() && config('app.resell'))
                                             <div class="text-nowrap">
-                                                Unit Price: {{ $product['price'] }} (buy); {{ $product['retail_price'] ?? $product['price'] }} (sell)
+                                                Unit Price: {{ (int)($product['price'] ?? 0) }} (buy); {{ (int)($product['retail_price'] ?? $product['price'] ?? 0) }} (sell)
                                             </div>
                                             <div class="text-nowrap">
                                                 Total Price: {{ (int)($product['price'] ?? 0) * (int)($product['quantity'] ?? 0) }} (buy); {{ $amount = ((int)($product['retail_price'] ?? 0) ?? (int)($product['price'] ?? 0)) * (int)($product['quantity'] ?? 0) }} (sell)
