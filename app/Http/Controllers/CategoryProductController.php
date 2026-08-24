@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Product;
 use App\Traits\HasProductFilters;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -20,7 +21,15 @@ class CategoryProductController extends Controller
     public function __invoke(Request $request, Category $category)
     {
         $per_page = $request->get('per_page', 50);
-        $query = $category->products()->whereIsActive(1)->whereNull('parent_id');
+        $categoryIds = $category->parent_id
+            ? [$category->id]
+            : $category->childrens()->pluck('id')->prepend($category->id)->all();
+
+        $query = Product::whereIsActive(1)
+            ->whereNull('parent_id')
+            ->whereHas('categories', function ($categoryQuery) use ($categoryIds): void {
+                $categoryQuery->whereIn('categories.id', $categoryIds);
+            });
 
         // Apply filters
         $this->applyProductFilters($query, $request);
@@ -35,6 +44,15 @@ class CategoryProductController extends Controller
                 $q->where('approved', true)->with('ratings');
             },
         ])->withCount('variations')->paginate($per_page)->appends(request()->query());
+
+        // Return 404 when a requested pagination page has no valid results.
+        // Page 1 remains valid even when the result set is empty.
+        if (
+            $products->currentPage() > 1
+            && $products->currentPage() > $products->lastPage()
+        ) {
+            abort(404);
+        }
 
         if (GoogleTagManagerFacade::isEnabled()) {
             GoogleTagManagerFacade::set([

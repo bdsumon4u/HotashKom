@@ -1,307 +1,33 @@
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
-
-    .rankmet-footer {
-        position: relative;
-        background-color: #1B1919;
-        padding-top: 70px;
-        padding-bottom: 20px;
-        font-family: 'DM Sans', sans-serif;
-        color: #FFFFFF;
-        overflow: hidden;
-        z-index: 1;
-    }
-
-    .rankmet-footer-watermark {
-        position: absolute;
-        bottom: -25px;
-        left: 0;
-        right: 0;
-        width: 100%;
-        z-index: -1;
-        pointer-events: none;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .rankmet-footer-watermark img {
-        max-height: 250px;
-        width: auto;
-        opacity: 0.05;
-        transition: opacity 0.3s ease;
-    }
-
-    .rankmet-footer:hover .rankmet-footer-watermark img {
-        opacity: 0.15;
-    }
-
-    .rankmet-footer-container {
-        max-width: 1320px;
-        margin: 0 auto;
-        padding: 0 30px;
-        position: relative;
-        z-index: 2;
-    }
-
-    .rankmet-footer-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        flex-wrap: wrap;
-        gap: 30px;
-        padding-bottom: 50px;
-    }
-
-    .rankmet-footer-col {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .rankmet-footer-col-1 {
-        flex: 1 1 0px;
-        max-width: 320px;
-    }
-
-    .rankmet-footer-col-2 {
-        flex: 1 1 150px;
-        max-width: 200px;
-    }
-
-    .rankmet-footer-col-3 {
-        flex: 1 1 250px;
-        max-width: 320px;
-    }
-
-    .rankmet-footer-col-4 {
-        flex: 1 1 220px;
-        max-width: 280px;
-    }
-
-    .rankmet-footer-logo {
-        display: inline-block;
-        margin-bottom: 25px;
-        text-decoration: none;
-    }
-
-    .rankmet-footer-logo img {
-        max-height: 50px;
-        width: auto;
-    }
-
-    .rankmet-footer-desc {
-        font-size: 17px;
-        line-height: 1.625em;
-        letter-spacing: -0.2px;
-        color: #F6F4F1;
-        margin: 0;
-    }
-
-    .rankmet-footer-title {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 19px;
-        font-weight: 600;
-        line-height: 1.2632em;
-        color: #00BF63;
-        margin-top: 0;
-        margin-bottom: 25px;
-        text-transform: none;
-        letter-spacing: 0;
-    }
-
-    .rankmet-footer-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .rankmet-footer-list li {
-        margin-bottom: 12px;
-        line-height: 1.5;
-    }
-
-    .rankmet-footer-list li:last-child {
-        margin-bottom: 0;
-    }
-
-    .rankmet-footer-list a {
-        color: #FFFFFF;
-        font-size: 16px;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .rankmet-footer-list a:hover {
-        color: #FF6600;
-    }
-
-    .rankmet-footer-socials {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 25px;
-    }
-
-    .rankmet-footer-socials a {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 1px solid #414141;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #FFFFFF;
-        text-decoration: none;
-        transition: all 0.3s ease;
-    }
-
-    .rankmet-footer-socials a svg,
-    .rankmet-footer-socials a i {
-        width: 16px;
-        height: 16px;
-        font-size: 16px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        fill: currentColor;
-        transition: fill 0.3s ease;
-    }
-
-    .rankmet-footer-socials a:hover {
-        background-color: #FF6600;
-        border-color: #FF6600;
-        color: #FFFFFF;
-    }
-
-    .rankmet-footer-email-box {
-        margin-bottom: 12px;
-    }
-
-    .rankmet-footer-email {
-        font-family: 'DM Sans', sans-serif;
-        font-size: 16px;
-        color: #00BF63;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .rankmet-footer-email:hover {
-        color: #FFFFFF;
-    }
-
-    .rankmet-footer-phone-box {
-        margin-bottom: 12px;
-    }
-
-    .rankmet-footer-phone {
-        font-family: 'DM Sans', sans-serif;
-        font-size: 16px;
-        color: #B7B7B7;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .rankmet-footer-phone:hover {
-        color: #FFFFFF;
-    }
-
-    .rankmet-footer-address-box {
-        margin-bottom: 20px;
-        font-family: 'DM Sans', sans-serif;
-        font-size: 16px;
-        color: #B7B7B7;
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
-    }
-
-    .rankmet-footer-policies li {
-        margin-bottom: 8px;
-    }
-
-    .rankmet-footer-bottom {
-        text-align: center;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .rankmet-footer-checkout-img {
-        max-width: 100%;
-        height: auto;
-        max-height: 44px;
-    }
-
-    .rankmet-footer-copyright {
-        font-size: 14px;
-        color: #B7B7B7;
-    }
-
-    .rankmet-footer-credit {
-        font-size: 14px;
-        color: #B7B7B7;
-    }
-
-    .rankmet-footer-credit a:hover {
-        color: #FFFFFF !important;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 1024px) {
-        .rankmet-footer {
-            padding-top: 50px;
-            padding-left: 30px;
-            padding-right: 30px;
-        }
-
-        .rankmet-footer-row {
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 40px;
-            padding-bottom: 40px;
-        }
-
-        .rankmet-footer-col {
-            align-items: center;
-            width: 100%;
-            max-width: 100% !important;
-        }
-
-        .rankmet-footer-title {
-            margin-bottom: 15px;
-        }
-
-        .rankmet-footer-bottom {
-            padding-top: 20px;
-        }
-
-        .rankmet-footer-watermark {
-            bottom: -25px;
-        }
-
-        .rankmet-footer-socials {
-            justify-content: center;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .rankmet-footer {
-            padding-left: 20px;
-            padding-right: 20px;
-        }
-    }
-</style>
-
 <footer class="rankmet-footer">
+    @php
+        $desktopLogo = (isset($logo->desktop) && $logo->desktop) ? asset($logo->desktop) : null;
+        $mobileLogo = (isset($logo->mobile) && $logo->mobile) ? asset($logo->mobile) : $desktopLogo;
+        $hasPerfLogo = file_exists(public_path('performance/images/hk-logo-320.webp'));
+        $perfLogo320 = asset('performance/images/hk-logo-320.webp');
+        $perfLogo640 = asset('performance/images/hk-logo-640.webp');
+        $siteBrand = $company->name ?? config('app.name');
+    @endphp
     <div class="rankmet-footer-watermark d-none">
-        @if(isset($logo->desktop) && $logo->desktop)
-            <img src="{{ asset($logo->desktop) }}" alt="">
-        @elseif(isset($logo->mobile) && $logo->mobile)
-            <img src="{{ asset($logo->mobile) }}" alt="">
+        @if($hasPerfLogo)
+            <img
+                src="{{ $perfLogo320 }}"
+                srcset="{{ $perfLogo320 }} 320w, {{ $perfLogo640 }} 640w"
+                sizes="255px"
+                alt="{{ $siteBrand }}"
+                width="320"
+                height="81"
+                loading="lazy"
+                decoding="async"
+            >
+        @elseif($desktopLogo || $mobileLogo)
+            <img
+                src="{{ $desktopLogo ?: $mobileLogo }}"
+                alt="{{ $siteBrand }}"
+                width="320"
+                height="81"
+                loading="lazy"
+                decoding="async"
+            >
         @endif
     </div>
 
@@ -310,12 +36,28 @@
             <!-- Column 1: Logo & Description -->
             <div class="rankmet-footer-col rankmet-footer-col-1">
                 <a href="{{ url('/') }}" class="rankmet-footer-logo">
-                    @if(isset($logo->desktop) && $logo->desktop)
-                        <img src="{{ asset($logo->desktop) }}" alt="{{ $company->name ?? '' }}">
-                    @elseif(isset($logo->mobile) && $logo->mobile)
-                        <img src="{{ asset($logo->mobile) }}" alt="{{ $company->name ?? '' }}">
+                    @if($hasPerfLogo)
+                        <img
+                            src="{{ $perfLogo320 }}"
+                            srcset="{{ $perfLogo320 }} 320w, {{ $perfLogo640 }} 640w"
+                            sizes="255px"
+                            alt="{{ $siteBrand }}"
+                            width="320"
+                            height="81"
+                            loading="lazy"
+                            decoding="async"
+                        >
+                    @elseif($desktopLogo || $mobileLogo)
+                        <img
+                            src="{{ $desktopLogo ?: $mobileLogo }}"
+                            alt="{{ $siteBrand }}"
+                            width="320"
+                            height="81"
+                            loading="lazy"
+                            decoding="async"
+                        >
                     @else
-                        <h5 class="text-white m-0 font-weight-bold" style="font-family: 'Plus Jakarta Sans', sans-serif;">{{ $company->name ?? '' }}</h5>
+                        <h5 class="m-0 font-weight-bold text-white" style="font-family: 'Plus Jakarta Sans', sans-serif;">{{ $siteBrand }}</h5>
                     @endif
                 </a>
                 <p class="rankmet-footer-desc">
@@ -330,12 +72,29 @@
                     <ul class="rankmet-footer-list">
                         @foreach($menuItems as $item)
                             @php
-                                $rawHref = $item->href;
+                                $rawHref = (string) $item->href;
+                                $footerItemName = (string) $item->name;
+
+                                // FOOTER TRACK ORDER TO BLOGS START
+                                $footerItemPath = parse_url(
+                                    $rawHref,
+                                    PHP_URL_PATH
+                                );
+
+                                $footerItemPath = is_string($footerItemPath)
+                                    ? trim($footerItemPath, '/')
+                                    : trim($rawHref, '/');
+
+                                if ($footerItemPath === 'track-order') {
+                                    $rawHref = '/blogs';
+                                    $footerItemName = 'Blogs';
+                                }
+                                // FOOTER TRACK ORDER TO BLOGS END
                                 $isExternal = \Illuminate\Support\Str::startsWith($rawHref, ['http://', 'https://', 'mailto:', 'tel:', '#']);
                                 $href = $isExternal ? $rawHref : url($rawHref);
                             @endphp
                             <li>
-                                <a href="{{ $href }}" @unless($isExternal) wire:navigate.hover @endunless>{{ $item->name }}</a>
+                                <a href="{{ $href }}" @unless($isExternal) @endunless>{{ $footerItemName }}</a>
                             </li>
                         @endforeach
                     </ul>
@@ -349,7 +108,7 @@
                     <ul class="rankmet-footer-list">
                         @foreach($categories->shuffle()->take(6) as $category)
                             <li>
-                                <a href="{{ route('categories.products', $category) }}">{{ $category->name }}</a>
+                                <a href="{{ route('category.show', $category) }}">{{ $category->name }}</a>
                             </li>
                         @endforeach
                     </ul>
@@ -393,19 +152,19 @@
 
                 @if(isset($company->email) && $company->email)
                     <div class="rankmet-footer-email-box">
-                        <a href="mailto:{{ $company->email }}" class="rankmet-footer-email"><i class="fa fa-envelope mr-2" style="color: #00BF63;"></i>{{ $company->email }}</a>
+                        <!--email_off--><a href="mailto:{{ $company->email }}" class="rankmet-footer-email"><i class="fa fa-envelope mr-2" style="color: var(--brand);"></i>{{ $company->email }}</a><!--/email_off-->
                     </div>
                 @endif
 
                 @if(isset($company->phone) && $company->phone)
                     <div class="rankmet-footer-phone-box">
-                        <a href="tel:{{ $company->phone }}" class="rankmet-footer-phone"><i class="fa fa-phone-alt mr-2" style="color: #00BF63;"></i>{{ $company->phone }}</a>
+                        <a href="tel:{{ $company->phone }}" class="rankmet-footer-phone"><i class="fa fa-phone-alt mr-2" style="color: var(--brand);"></i>{{ $company->phone }}</a>
                     </div>
                 @endif
 
                 @if(isset($company->address) && $company->address)
                     <div class="rankmet-footer-address-box">
-                        <i class="fa fa-map-marker-alt" style="color: #00BF63; margin-top: 4px;"></i>
+                        <i class="fa fa-map-marker-alt" style="color: var(--brand); margin-top: 4px;"></i>
                         <span>{{ $company->address }}</span>
                     </div>
                 @endif
@@ -421,15 +180,9 @@
         <!-- Bottom: Dynamic Credit & Checkout Bar -->
         <div class="rankmet-footer-bottom">
             <div class="rankmet-footer-copyright">
-                &copy; {{ date('Y') }} {{ $company->name ?? '' }}. All Rights Reserved.
+                &copy; {{ date('Y') }} {{ $company->name ?? '' }}. All Rights Reserved. | Trade Licence: 55271728022600104
             </div>
-            @if(isset($company->dev_name) && $company->dev_name != '#' && isset($company->dev_link) && $company->dev_link != '#')
-                <div class="rankmet-footer-credit">
-                    Developed By <a href="{{ $company->dev_link }}" target="_blank" style="color: #FF6600; text-decoration: none;">{{ $company->dev_name }}</a>
-                </div>
-            @else
-                <img src="{{ asset('payments.png') }}" alt="Payment methods" class="rankmet-footer-checkout-img" style="height: 44px; width: auto;">
-            @endif
+            <div class="rankmet-footer-credit"><i class="fa fa-truck mr-2" style="color: var(--brand);"></i>সারা বাংলাদেশে Cash on Delivery</div>
         </div>
     </div>
 </footer>

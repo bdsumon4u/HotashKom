@@ -2,6 +2,12 @@
 
 @section('title', 'Checkout')
 
+@section('seo_tags')
+    <title>Secure Checkout | {{ $company->name ?? config('app.name') }}</title>
+    <meta name="description" content="Complete your {{ $company->name ?? config('app.name') }} order securely with cash on delivery available across Bangladesh.">
+    <meta name="robots" content="noindex, follow">
+@endsection
+
 @push('styles')
 <style>
     .form-group {
@@ -242,12 +248,97 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+/* NEHMART_PREMIUM_CHECKOUT_LEGACY */
+.checkout:not(.checkout--simple) {
+    padding: 24px 0 38px;
+    background: radial-gradient(circle at top right, rgba(29,191,115,.10), transparent 34%), linear-gradient(180deg,#f7fcf9,#fff 65%);
+}
+.checkout-page-heading { max-width:1140px; margin:0 auto 18px; padding:0 15px; }
+.checkout-page-heading h1 { margin:0; color:#173c2a; font-size:clamp(24px,3vw,32px); font-weight:800; letter-spacing:-.45px; }
+.checkout-page-heading h1::after { display:block; width:54px; height:4px; margin-top:9px; border-radius:99px; background:#1dbf73; content:""; }
+
+.checkout:not(.checkout--simple) .card {
+    overflow:hidden; border:1px solid #dcebe3; border-radius:14px; background:#fff;
+    box-shadow:0 10px 28px rgba(22,58,39,.08);
+}
+.checkout:not(.checkout--simple) .card-body { padding:24px; }
+.checkout:not(.checkout--simple) .form-row { padding:11px 0; border-bottom:1px solid #edf3ef; }
+.checkout:not(.checkout--simple) .form-row:last-child { border-bottom:0; }
+.checkout:not(.checkout--simple) .form-row label { margin-bottom:7px; color:#294536; font-size:14px; font-weight:700; }
+
+.checkout:not(.checkout--simple) .form-control,
+.checkout:not(.checkout--simple) textarea,
+.checkout:not(.checkout--simple) select {
+    min-height:44px; border:1px solid #cfe2d7; border-radius:9px; box-shadow:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
+}
+.checkout:not(.checkout--simple) textarea.form-control,
+.checkout:not(.checkout--simple) textarea { min-height:100px; }
+.checkout:not(.checkout--simple) .form-control:focus,
+.checkout:not(.checkout--simple) textarea:focus,
+.checkout:not(.checkout--simple) select:focus {
+    border-color:#1dbf73; box-shadow:0 0 0 3px rgba(29,191,115,.14);
+}
+.checkout:not(.checkout--simple) .input-group-text { border-color:#cfe2d7; background:#eefaf3; color:#087c43; font-weight:800; }
+.checkout:not(.checkout--simple) .form-control.h-auto { padding:13px 14px; border-radius:10px; background:#f8fdf9; }
+.checkout:not(.checkout--simple) .custom-control { margin:5px 18px 5px 0; }
+.checkout:not(.checkout--simple) .custom-control-label { color:#294536; font-weight:600; cursor:pointer; }
+.checkout:not(.checkout--simple) .custom-control-input:checked ~ .custom-control-label::before { border-color:#1dbf73; background-color:#1dbf73; }
+
+.checkout:not(.checkout--simple) .text-center.border.text-danger {
+    margin-bottom:18px !important; padding:12px 16px !important; border:1px solid #bdebd1 !important;
+    border-radius:10px; background:#effbf4; color:#087c43 !important; font-size:15px !important; font-weight:600; line-height:1.5;
+}
+.checkout:not(.checkout--simple) .card-title { margin-bottom:17px; color:#173c2a; font-size:20px; font-weight:800; }
+.checkout:not(.checkout--simple) .checkout__totals { width:100%; margin-top:8px; margin-bottom:18px; }
+.checkout:not(.checkout--simple) .checkout__totals th,
+.checkout:not(.checkout--simple) .checkout__totals td {
+    padding:9px 0; border-bottom:1px solid #edf3ef; color:#4b5f52; font-size:14px;
+}
+.checkout:not(.checkout--simple) .checkout__totals td { text-align:right; color:#173c2a; font-weight:700; }
+.checkout:not(.checkout--simple) .checkout__totals-footer th,
+.checkout:not(.checkout--simple) .checkout__totals-footer td {
+    padding-top:14px; border-bottom:0; color:#087c43; font-size:18px !important; font-weight:800;
+}
+
+.checkout:not(.checkout--simple) .btn-outline-primary { border-color:#1dbf73; background:#fff; color:#087c43; font-weight:700; }
+.checkout:not(.checkout--simple) .btn-outline-primary:hover { border-color:#1dbf73; background:#1dbf73; color:#fff; }
+.checkout:not(.checkout--simple) .checkout__agree { margin:18px 0 14px; padding:12px; border-radius:9px; background:#f5fbf7; color:#405c4b; font-size:13px; }
+.checkout:not(.checkout--simple) .btn-primary.btn-xl {
+    min-height:54px; border:0; border-radius:10px; background:linear-gradient(135deg,#1dbf73,#0ca95d);
+    box-shadow:0 9px 18px rgba(29,191,115,.24); color:#fff; font-size:17px; font-weight:800;
+    transition:transform .2s ease, box-shadow .2s ease;
+}
+.checkout:not(.checkout--simple) .btn-primary.btn-xl:hover { transform:translateY(-1px); box-shadow:0 13px 24px rgba(29,191,115,.31); }
+.checkout:not(.checkout--simple) .btn-primary.btn-xl:disabled { transform:none; opacity:.7; box-shadow:none; }
+
+@media (min-width:768px) {
+    .checkout:not(.checkout--simple) .col-md-4 > .card { position:sticky; top:18px; }
+}
+@media (max-width:767.98px) {
+    .checkout:not(.checkout--simple) { padding:16px 0 26px; }
+    .checkout-page-heading { margin-bottom:14px; }
+    .checkout-page-heading h1 { font-size:24px; }
+    .checkout:not(.checkout--simple) .card { border-radius:11px; }
+    .checkout:not(.checkout--simple) .card-body { padding:16px; }
+    .checkout:not(.checkout--simple) .form-row { padding:8px 0; }
+    .checkout:not(.checkout--simple) .text-center.border.text-danger { padding:10px 12px !important; font-size:14px !important; }
+    .checkout:not(.checkout--simple) .btn-primary.btn-xl { min-height:50px; font-size:16px; }
+}
+</style>
+@endpush
 @section('content')
     @php
         $checkoutTemplate = setting('show_option')->checkout_template ?? config('app.checkout_template', 'legacy');
     @endphp
     <div class="block mt-1 checkout {{ $checkoutTemplate === 'simple' ? 'checkout--simple' : '' }}">
         <div class="{{ $checkoutTemplate === 'simple' ? 'container-fluid px-lg-5' : 'container' }}">
+            <header class="checkout-page-heading">
+                <h1>Complete Your Order</h1>
+            </header>
+
             <x-form checkoutform :action="route('checkout')" method="POST">
                 <livewire:checkout />
             </x-form>

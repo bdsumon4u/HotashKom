@@ -9,7 +9,7 @@
                 <ul class="departments__links">
                     @foreach($categories as $category)
                         <li class="departments__item @if($category->childrens->isNotEmpty()) departments__item--menu @endif">
-                            <a href="{{ route('categories.products', $category) }}" wire:navigate.hover>{{ $category->name }}
+                            <a href="{{ route('category.show', $category) }}" wire:navigate.hover>{{ $category->name }}
                                 @if ($category->childrens->isNotEmpty())
                                     <svg class="departments__link-arrow" width="6px" height="9px" viewBox="0 0 6 9"><path d="M.4 8.8c-.4-.4-.5-1-.1-1.4l3-2.9-3-2.9C-.1 1.2-.1.5.4.2c.4-.3.9-.3 1.3.1L6 4.5 1.6 8.7c-.3.4-.9.4-1.2.1z"/></svg>
                                 @endif
@@ -20,7 +20,7 @@
                                     <ul class="menu menu--layout--classic">
                                         @foreach ($category->childrens as $category)
                                             <li>
-                                                <a href="{{ route('categories.products', $category) }}" wire:navigate.hover>{{ $category->name }}
+                                                <a href="{{ route('category.show', $category) }}" wire:navigate.hover>{{ $category->name }}
                                                     @if ($category->childrens->isNotEmpty())
                                                         <svg class="menu__arrow" width="6px" height="9px" viewBox="0 0 6 9"><path d="M.4 8.8c-.4-.4-.5-1-.1-1.4l3-2.9-3-2.9C-.1 1.2-.1.5.4.2c.4-.3.9-.3 1.3.1L6 4.5 1.6 8.7c-.3.4-.9.4-1.2.1z"/></svg>
                                                     @endif
@@ -30,7 +30,7 @@
                                                         <!-- .menu -->
                                                         <ul class="menu menu--layout--classic">
                                                             @foreach($category->childrens as $category)
-                                                                <li><a href="{{ route('categories.products', $category) }}" wire:navigate.hover>{{ $category->name }}</a></li>
+                                                                <li><a href="{{ route('category.show', $category) }}" wire:navigate.hover>{{ $category->name }}</a></li>
                                                             @endforeach
                                                         </ul>
                                                         <!-- .menu / end -->

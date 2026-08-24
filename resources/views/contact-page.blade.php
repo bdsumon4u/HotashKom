@@ -42,7 +42,7 @@
                         </div>
                         <div class="part-txt">
                             <div>{{ $company->contact_name ?? '' }}</div>
-                            <a class="text-dark" href="mailto:{{$company->email}}">{{$company->email}}</a>
+                            <!--email_off--><a class="text-dark" href="mailto:{{$company->email}}">{{$company->email}}</a><!--/email_off-->
                             <br>
                             <a class="text-dark" href="tel:{{$company->phone}}">{{$company->phone}}</a>
                         </div>

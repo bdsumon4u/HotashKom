@@ -1,5 +1,6 @@
 @extends('layouts.yellow.master')
 @section('title', 'Page Not Found')
+@section('is_error_page', '1')
 
 @section('content')
 <div class="block">

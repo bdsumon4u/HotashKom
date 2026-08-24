@@ -151,7 +151,7 @@
                         <input type="checkbox" checked class="mr-2">
                         <span>
                             I agree with the
-                            <a href="javascript:void(0);" class="simple-terms-link">Terms and Conditions</a>
+                            <button type="button" class="terms-new-tab text-info" aria-label="Open Terms and Conditions in a new tab" style="padding:0;border:0;background:transparent;text-decoration:underline;cursor:pointer;font:inherit;" onclick="event.preventDefault(); event.stopPropagation(); var termsWindow=window.open(`{{ url('/terms-and-conditions') }}`, `_blank`); if(termsWindow){termsWindow.opener=null;} return false;">terms and conditions</button>
                         </span>
                     </label>
                 </div>

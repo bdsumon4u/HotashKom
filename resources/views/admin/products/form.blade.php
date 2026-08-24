@@ -162,25 +162,11 @@
                         $outsideArea = $deliveryAreaService->getOutsideArea($deliveryAreas);
                     @endphp
                     @foreach ($deliveryAreas as $area)
-                        @php
-                            $areaName = $area['name'];
-                            $isInside = $insideArea && $areaName === $insideArea['name'];
-                            $isOutside = $outsideArea && $areaName === $outsideArea['name'];
-
-                            $savedCharge = data_get($product->delivery_charges, $areaName);
-                            if (is_null($savedCharge) || $savedCharge === '') {
-                                if ($isInside) {
-                                    $savedCharge = $product->shipping_inside;
-                                } elseif ($isOutside) {
-                                    $savedCharge = $product->shipping_outside;
-                                }
-                            }
-                        @endphp
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label for="delivery_charge_{{ \Illuminate\Support\Str::slug($areaName) }}">{{ $areaName }}</label>
-                                <x-input name="delivery_charges[{{ $areaName }}]" :value="$savedCharge" placeholder="{{ $area['cost'] }}" />
-                                <x-error field="delivery_charges.{{ $areaName }}" />
+                                <label for="delivery_charge_{{ \Illuminate\Support\Str::slug($area['name']) }}">{{ $area['name'] }}</label>
+                                <x-input name="delivery_charges[{{ $area['name'] }}]" :value="$product->delivery_charges[$area['name']] ?? null" placeholder="{{ $area['cost'] }}" />
+                                <x-error field="delivery_charges.{{ $area['name'] }}" />
                             </div>
                         </div>
                     @endforeach

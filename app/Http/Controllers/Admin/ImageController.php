@@ -58,11 +58,18 @@ class ImageController extends Controller
     public function update(Request $request, Image $image)
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
-        $request->validate([
-            'filename' => ['required', 'string'],
+        $data = $request->validate([
+            'filename' => ['sometimes', 'required', 'string', 'max:255'],
+            'alt_text' => ['sometimes', 'nullable', 'string', 'max:255'],
         ]);
 
-        $image->update($request->only('filename'));
+        if (array_key_exists('alt_text', $data)) {
+            $data['alt_text'] = filled($data['alt_text'])
+                ? trim($data['alt_text'])
+                : null;
+        }
+
+        $image->update($data);
 
         return request()->expectsJson()
             ? response()->json(['success' => 'Image Has Been Updated.'])

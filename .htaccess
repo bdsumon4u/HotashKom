@@ -9,12 +9,39 @@
 
     RewriteEngine On
 
-    # Force WWW except for API routes, /public/, /storage/, etc.
-    RewriteCond %{REQUEST_URI} !^/api/ [NC]
-    RewriteCond %{REQUEST_URI} !^/public/ [NC]
-    RewriteCond %{REQUEST_URI} !^/storage/ [NC]
-    RewriteCond %{HTTP_HOST} !^www\. [NC]
-    RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
+    # BEGIN CANONICAL_REDIRECTS
+
+    # Legacy category/brand page=1 directly to preferred clean URL
+    RewriteCond %{QUERY_STRING} ^page=1$ [NC]
+    RewriteRule ^categories/([^/]+)/products/?$ /category/$1 [R=301,L,NE,QSD]
+
+    RewriteCond %{QUERY_STRING} ^page=1$ [NC]
+    RewriteRule ^brands/([^/]+)/products/?$ /brand/$1 [R=301,L,NE,QSD]
+
+    # Remove the duplicate page=1 parameter
+    RewriteCond %{QUERY_STRING} ^page=1$ [NC]
+    RewriteRule ^(shop|blogs|categories|brands)/?$ /$1 [R=301,L,NE,QSD]
+
+    RewriteCond %{QUERY_STRING} ^page=1$ [NC]
+    RewriteRule ^(category|brand)/([^/]+)/?$ /$1/$2 [R=301,L,NE,QSD]
+
+    # Redirect legacy category and brand URLs while preserving other queries
+    RewriteRule ^categories/([^/]+)/products/?$ /category/$1 [R=301,L,NE]
+
+    RewriteRule ^brands/([^/]+)/products/?$ /brand/$1 [R=301,L,NE]
+
+    # Redirect deprecated singular product URL to preferred plural URL
+    RewriteRule ^product/([^/]+)/?$ /products/$1 [R=301,L,NE]
+
+    # END CANONICAL_REDIRECTS
+
+    # Redirect only the duplicate first blog page
+    RewriteCond %{QUERY_STRING} ^page=1$
+    RewriteRule ^blogs/?$ /blogs [R=301,L,NE,QSD]
+    # Force HTTPS (exclude local development domains)
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1|.*\.test)$ [NC]
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
 
     # Laravel public folder handling
     RewriteCond %{REQUEST_FILENAME} -d [OR]
@@ -36,6 +63,98 @@
     Header unset Report-To
     Header unset Reporting-Endpoints
 </IfModule>
+
+# Long browser cache for versioned and timestamped image files
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/avif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(avif|webp|jpg|jpeg|png|gif|svg|ico)$">
+        Header always set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>
+
+# BEGIN SEO NOINDEX HEADERS
+<IfModule mod_setenvif.c>
+    # Admin and admin authentication URLs
+    SetEnvIf Request_URI "^/admin([/-]|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/getpass(/|$)" app_seo_noindex=1
+
+    # API and cart endpoints
+    SetEnvIf Request_URI "^/api(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/cart(/|$)" app_seo_noindex=1
+
+    # Checkout and order utility pages
+    SetEnvIf Request_URI "^/checkout(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/orders(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/thank-you(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/track-order(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/save-checkout-progress(/|$)" app_seo_noindex=1
+
+    # Customer authentication and account pages
+    SetEnvIf Request_URI "^/login(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/register(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/profile(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/user-password(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/password(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/forgot-password(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/reset-password(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/email/verify(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/verify-email(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/resend-otp(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/user-logout(/|$)" app_seo_noindex=1
+
+    # Private reseller pages
+    SetEnvIf Request_URI "^/reseller/(checkout|dashboard|orders|profile)(/|$)" app_seo_noindex=1
+    # Lead form and machine-readable product feeds
+    SetEnvIf Request_URI "^/lead-form(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/feed(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/google-merchant-feed\.xml$" app_seo_noindex=1
+</IfModule>
+
+<IfModule mod_headers.c>
+    # FINAL INDEX CONTROL
+
+    # Filament/private management interfaces
+    SetEnvIf Request_URI "^/landing(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/filament(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/pulse(/|$)" app_seo_noindex=1
+
+    # Product review AJAX/data endpoint
+    SetEnvIf Request_URI "^/products/[^/]+/reviews(/|$)" app_seo_noindex=1
+
+    # Homepage product-section collection URLs are crawlable but not search landing pages
+    SetEnvIf Request_URI "^/sections/[^/]+/products(/|$)" app_seo_noindex=1
+
+    # All reseller/private account pages
+    SetEnvIf Request_URI "^/reseller(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/transactions(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/payment(/|$)" app_seo_noindex=1
+
+    # Payment callbacks/status pages
+    SetEnvIf Request_URI "^/bkash(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/maintenance-payment(/|$)" app_seo_noindex=1
+
+    # Password/reset utility routes
+    SetEnvIf Request_URI "^/reset-pass(/|$)" app_seo_noindex=1
+
+    # Diagnostics and maintenance operations
+    SetEnvIf Request_URI "^/db-status(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/storage-link(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/scout-(flush|import)(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/link-optimize(/|$)" app_seo_noindex=1
+    SetEnvIf Request_URI "^/cache-clear(/|$)" app_seo_noindex=1
+    Header always set X-Robots-Tag "noindex, noarchive" env=app_seo_noindex
+</IfModule>
+# END SEO NOINDEX HEADERS
 
 # BEGIN cPanel-generated php ini directives
 <IfModule php_module>
@@ -80,3 +199,9 @@
     AddHandler application/x-httpd-alt-php84 .php .php8 .phtml
     AddHandler application/x-httpd-alt-php84___lsphp .php .php8 .phtml
 </IfModule>
+
+# HSTS_START
+<IfModule mod_headers.c>
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+# HSTS_END

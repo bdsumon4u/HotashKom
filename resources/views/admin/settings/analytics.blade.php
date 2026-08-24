@@ -38,4 +38,24 @@
             </div>
         </div>
     </div>
+    <hr>
+    <h6 class="mb-3">Google Merchant &amp; Customer Reviews</h6>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="gcr_merchant_id">Google Customer Reviews Merchant ID</label>
+                <x-input name="gcr_merchant_id" id="gcr_merchant_id" :value="$gcr_merchant_id ?? null" placeholder="e.g. 5825413307" />
+                <x-error field="gcr_merchant_id" />
+                <small class="form-text text-muted">Numeric ID from Google Merchant Center. Leave blank to disable the reviews widget.</small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="google_merchant_id_prefix">Google Merchant Feed Item ID Prefix</label>
+                <x-input name="google_merchant_id_prefix" id="google_merchant_id_prefix" :value="$google_merchant_id_prefix ?? 'hk-'" placeholder="e.g. hk-" />
+                <x-error field="google_merchant_id_prefix" />
+                <small class="form-text text-muted">Prefix prepended to product IDs in Google Merchant XML feed (e.g. <code>hk-</code>).</small>
+            </div>
+        </div>
+    </div>
 </div>

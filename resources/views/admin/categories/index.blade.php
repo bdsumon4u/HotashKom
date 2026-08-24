@@ -299,6 +299,44 @@
                                                         <small class="form-text text-muted">Recommended: 1200x630px. If
                                                             empty, category image will be used.</small>
                                                     </div>
+                                                    <details class="p-2 mb-3 border rounded">
+                                                        <summary class="font-weight-bold text-secondary" style="cursor: pointer;">Premium Category Configuration <small class="text-muted">(Optional)</small></summary>
+                                                        <div class="mt-2">
+                                                            <h6 class="mb-2 text-muted">Category Header &amp; Subcategories</h6>
+                                                            <div class="form-group">
+                                                                <label for="create-premium-eyebrow">Eyebrow Text</label>
+                                                                <input type="text" name="premium_header_config[eyebrow]" value="{{ old('premium_header_config.eyebrow') }}" id="create-premium-eyebrow" class="form-control" placeholder="Leave empty to use category name">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="create-premium-help-title">Help Card Title</label>
+                                                                <input type="text" name="premium_header_config[help_title]" value="{{ old('premium_header_config.help_title') }}" id="create-premium-help-title" class="form-control" placeholder="Leave empty to use SEO/category title">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="create-premium-help-text">Help Card Text</label>
+                                                                <textarea name="premium_header_config[help_text]" id="create-premium-help-text" rows="2" class="form-control" placeholder="Leave empty to use SEO description">{{ old('premium_header_config.help_text') }}</textarea>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="create-premium-section-title">Subcategories Section Title</label>
+                                                                <input type="text" name="premium_header_config[section_title]" value="{{ old('premium_header_config.section_title') }}" id="create-premium-section-title" class="form-control" placeholder="Leave empty to use {Category Name}-এর বিভাগগুলো">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="create-premium-section-text">Subcategories Section Text</label>
+                                                                <textarea name="premium_header_config[section_text]" id="create-premium-section-text" rows="2" class="form-control" placeholder="Optional intro paragraph under subcategories title">{{ old('premium_header_config.section_text') }}</textarea>
+                                                            </div>
+
+                                                            <hr>
+                                                            <h6 class="mb-2 text-muted">Premium Buying Guides (Blog Cards)</h6>
+                                                            <div class="form-group">
+                                                                <label for="create-premium-guide-title">Guides Section Title</label>
+                                                                <input type="text" name="premium_guide_title" value="{{ old('premium_guide_title') }}" id="create-premium-guide-title" class="form-control" placeholder="Leave empty to use {Category Name} কেনার আগে আরও জানুন">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="create-premium-guide-patterns">Blog Match Patterns (Keywords / Slugs)</label>
+                                                                <textarea name="premium_guide_patterns" id="create-premium-guide-patterns" rows="2" class="form-control" placeholder="Comma or newline separated (e.g. camera, wifi-camera, security-camera)">{{ old('premium_guide_patterns') }}</textarea>
+                                                                <small class="form-text text-muted">Leave empty to hide guides section for this category.</small>
+                                                            </div>
+                                                        </div>
+                                                    </details>
                                                     <button type="submit"
                                                         class="ml-auto btn btn-sm btn-success d-block"><i
                                                             class="fa fa-check"></i> Create</button>
@@ -412,6 +450,49 @@
                                                             <small class="form-text text-muted">Recommended: 1200x630px. If
                                                                 empty, category image will be used.</small>
                                                         </div>
+                                                        @php
+                                                            $headerConfig = old('premium_header_config', $active->premium_header_config ?? []);
+                                                            $guideConfig = $active->premium_guide_config ?? [];
+                                                            $guidePatterns = is_array($guideConfig['patterns'] ?? null) ? implode("\n", $guideConfig['patterns']) : '';
+                                                        @endphp
+                                                        <details class="p-2 mb-3 border rounded">
+                                                            <summary class="font-weight-bold text-secondary" style="cursor: pointer;">Premium Category Configuration <small class="text-muted">(Optional)</small></summary>
+                                                            <div class="mt-2">
+                                                                <h6 class="mb-2 text-muted">Category Header &amp; Subcategories</h6>
+                                                                <div class="form-group">
+                                                                    <label for="edit-premium-eyebrow">Eyebrow Text</label>
+                                                                    <input type="text" name="premium_header_config[eyebrow]" value="{{ old('premium_header_config.eyebrow', $headerConfig['eyebrow'] ?? '') }}" id="edit-premium-eyebrow" class="form-control" placeholder="Leave empty to use category name">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="edit-premium-help-title">Help Card Title</label>
+                                                                    <input type="text" name="premium_header_config[help_title]" value="{{ old('premium_header_config.help_title', $headerConfig['help_title'] ?? '') }}" id="edit-premium-help-title" class="form-control" placeholder="Leave empty to use SEO/category title">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="edit-premium-help-text">Help Card Text</label>
+                                                                    <textarea name="premium_header_config[help_text]" id="edit-premium-help-text" rows="2" class="form-control" placeholder="Leave empty to use SEO description">{{ old('premium_header_config.help_text', $headerConfig['help_text'] ?? '') }}</textarea>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="edit-premium-section-title">Subcategories Section Title</label>
+                                                                    <input type="text" name="premium_header_config[section_title]" value="{{ old('premium_header_config.section_title', $headerConfig['section_title'] ?? '') }}" id="edit-premium-section-title" class="form-control" placeholder="Leave empty to use {Category Name}-এর বিভাগগুলো">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="edit-premium-section-text">Subcategories Section Text</label>
+                                                                    <textarea name="premium_header_config[section_text]" id="edit-premium-section-text" rows="2" class="form-control" placeholder="Optional intro paragraph under subcategories title">{{ old('premium_header_config.section_text', $headerConfig['section_text'] ?? '') }}</textarea>
+                                                                </div>
+
+                                                                <hr>
+                                                                <h6 class="mb-2 text-muted">Premium Buying Guides (Blog Cards)</h6>
+                                                                <div class="form-group">
+                                                                    <label for="edit-premium-guide-title">Guides Section Title</label>
+                                                                    <input type="text" name="premium_guide_title" value="{{ old('premium_guide_title', $guideConfig['title'] ?? '') }}" id="edit-premium-guide-title" class="form-control" placeholder="Leave empty to use {Category Name} কেনার আগে আরও জানুন">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="edit-premium-guide-patterns">Blog Match Patterns (Keywords / Slugs)</label>
+                                                                    <textarea name="premium_guide_patterns" id="edit-premium-guide-patterns" rows="2" class="form-control" placeholder="Comma or newline separated (e.g. camera, wifi-camera, security-camera)">{{ old('premium_guide_patterns', $guidePatterns) }}</textarea>
+                                                                    <small class="form-text text-muted">Leave empty to hide guides section for this category.</small>
+                                                                </div>
+                                                            </div>
+                                                        </details>
                                                         <button type="submit"
                                                             class="ml-auto btn btn-sm btn-success d-block"><i
                                                                 class="fa fa-check"></i> Submit</button>

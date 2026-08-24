@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Blog;
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Page;
 use App\Models\Product;
@@ -60,7 +59,6 @@ class GenerateSitemap extends Command
 
         $this->generateStaticSitemap($publicSitemapsDir, $index);
         $this->generateCategorySitemap($publicSitemapsDir, $index);
-        $this->generateBrandSitemap($publicSitemapsDir, $index);
         $this->generatePageSitemap($publicSitemapsDir, $index);
         $this->generateProductSitemaps($publicSitemapsDir, $index, $productTagsPerSitemap);
         $this->generateBlogSitemaps($publicSitemapsDir, $index);
@@ -74,17 +72,25 @@ class GenerateSitemap extends Command
 
     private function generateStaticSitemap(string $publicSitemapsDir, SitemapIndex $index): void
     {
+        $homeUrl = rtrim(
+            (string) config('app.url'),
+            '/'
+        ).'/';
+
         $sitemap = Sitemap::create()
-            ->add(Url::create(url('/'))->setPriority(1.0))
+            ->add(Url::create($homeUrl)->setPriority(1.0))
             ->add(Url::create(url('/shop'))->setPriority(0.9))
             ->add(Url::create(url('/categories'))->setPriority(0.7))
-            ->add(Url::create(url('/brands'))->setPriority(0.7))
-            ->add(Url::create(url('/lead-form'))->setPriority(0.3))
-            ->add(Url::create(url('/feed/catalog'))->setPriority(0.2))
-            ->add(Url::create(url('/feed/catalog-simple'))->setPriority(0.2));
+            ->add(Url::create(url('/blogs'))->setPriority(0.7));
 
         $filename = 'static.xml';
-        $sitemap->writeToFile($publicSitemapsDir.DIRECTORY_SEPARATOR.$filename);
+
+        $sitemap->writeToFile(
+            $publicSitemapsDir
+                .DIRECTORY_SEPARATOR
+                .$filename
+        );
+
         $index->add(url('sitemaps/'.$filename));
     }
 
@@ -111,33 +117,6 @@ class GenerateSitemap extends Command
             });
 
         $filename = 'categories.xml';
-        $sitemap->writeToFile($publicSitemapsDir.DIRECTORY_SEPARATOR.$filename);
-        $index->add(url('sitemaps/'.$filename));
-    }
-
-    private function generateBrandSitemap(string $publicSitemapsDir, SitemapIndex $index): void
-    {
-        if (! Schema::hasTable((new Brand)->getTable())) {
-            return;
-        }
-
-        $sitemap = Sitemap::create();
-
-        Brand::query()
-            ->where('is_enabled', true)
-            ->select(['id', 'slug', 'updated_at'])
-            ->orderBy('id')
-            ->chunkById(2000, function ($brands) use ($sitemap): void {
-                foreach ($brands as $brand) {
-                    $sitemap->add(
-                        Url::create(url('/brand/'.$brand->slug))
-                            ->setLastModificationDate($brand->updated_at)
-                            ->setPriority(0.6)
-                    );
-                }
-            });
-
-        $filename = 'brands.xml';
         $sitemap->writeToFile($publicSitemapsDir.DIRECTORY_SEPARATOR.$filename);
         $index->add(url('sitemaps/'.$filename));
     }
@@ -229,7 +208,7 @@ class GenerateSitemap extends Command
             ->get(['id', 'slug', 'updated_at'])
             ->each(function ($blog) use ($sitemap): void {
                 $sitemap->add(
-                    Url::create(url('/'.$blog->slug))
+                    Url::create(url('/blogs/'.$blog->slug))
                         ->setLastModificationDate($blog->updated_at)
                         ->setPriority(0.5)
                 );

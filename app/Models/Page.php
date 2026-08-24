@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Page extends Model
 {
     protected $fillable = [
-        'title', 'slug', 'content',
+        'title', 'slug', 'content', 'seo_title', 'meta_description',
     ];
 
     #[\Override]

@@ -82,11 +82,40 @@ class CategoryController extends Controller
             'seo.description' => ['nullable', 'string', 'max:500'],
             'seo.image' => ['nullable', 'url', 'max:500'],
             'content' => ['nullable', 'string'],
+            'premium_header_config' => ['nullable', 'array'],
+            'premium_header_config.eyebrow' => ['nullable', 'string', 'max:255'],
+            'premium_header_config.help_title' => ['nullable', 'string', 'max:255'],
+            'premium_header_config.help_text' => ['nullable', 'string', 'max:1000'],
+            'premium_header_config.section_title' => ['nullable', 'string', 'max:255'],
+            'premium_header_config.section_text' => ['nullable', 'string', 'max:1000'],
+            'premium_guide_title' => ['nullable', 'string', 'max:255'],
+            'premium_guide_patterns' => ['nullable', 'string', 'max:1000'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
 
         $data['image_id'] = Arr::pull($data, 'base_image');
+
+        // Handle premium guide config
+        $patternsText = Arr::pull($data, 'premium_guide_patterns', '');
+        $guideTitle = Arr::pull($data, 'premium_guide_title', '');
+        $patterns = preg_split('/[\r\n,]+/', (string) $patternsText);
+        $patterns = array_values(array_filter(array_map('trim', $patterns ?: [])));
+
+        if (! empty($patterns) || ! empty($guideTitle)) {
+            $data['premium_guide_config'] = [
+                'title' => $guideTitle ?: null,
+                'patterns' => $patterns,
+            ];
+        } else {
+            $data['premium_guide_config'] = null;
+        }
+
+        // Clean premium header config if all empty
+        if (isset($data['premium_header_config']) && is_array($data['premium_header_config'])) {
+            $headerFiltered = array_filter($data['premium_header_config'], fn ($v): bool => filled($v));
+            $data['premium_header_config'] = ! empty($headerFiltered) ? $data['premium_header_config'] : null;
+        }
 
         // Extract SEO data before creating
         $seoData = $request->input('seo', []);
@@ -162,6 +191,14 @@ class CategoryController extends Controller
             'seo.description' => ['nullable', 'string', 'max:500'],
             'seo.image' => ['nullable', 'url', 'max:500'],
             'content' => ['nullable', 'string'],
+            'premium_header_config' => ['nullable', 'array'],
+            'premium_header_config.eyebrow' => ['nullable', 'string', 'max:255'],
+            'premium_header_config.help_title' => ['nullable', 'string', 'max:255'],
+            'premium_header_config.help_text' => ['nullable', 'string', 'max:1000'],
+            'premium_header_config.section_title' => ['nullable', 'string', 'max:255'],
+            'premium_header_config.section_text' => ['nullable', 'string', 'max:1000'],
+            'premium_guide_title' => ['nullable', 'string', 'max:255'],
+            'premium_guide_patterns' => ['nullable', 'string', 'max:1000'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
         ]);
@@ -180,6 +217,29 @@ class CategoryController extends Controller
         }
 
         $data['image_id'] = Arr::pull($data, 'base_image');
+
+        // Handle premium guide config
+        $patternsText = Arr::pull($data, 'premium_guide_patterns', '');
+        $guideTitle = Arr::pull($data, 'premium_guide_title', '');
+        $patterns = preg_split('/[\r\n,]+/', (string) $patternsText);
+        $patterns = array_values(array_filter(array_map('trim', $patterns ?: [])));
+
+        if (! empty($patterns) || ! empty($guideTitle)) {
+            $data['premium_guide_config'] = [
+                'title' => $guideTitle ?: null,
+                'patterns' => $patterns,
+            ];
+        } else {
+            $data['premium_guide_config'] = null;
+        }
+
+        // Clean premium header config if all empty
+        if (isset($data['premium_header_config']) && is_array($data['premium_header_config'])) {
+            $headerFiltered = array_filter($data['premium_header_config'], fn ($v): bool => filled($v));
+            $data['premium_header_config'] = ! empty($headerFiltered) ? $data['premium_header_config'] : null;
+        } else {
+            $data['premium_header_config'] = null;
+        }
 
         // Extract SEO data before updating
         $seoData = $request->input('seo', []);

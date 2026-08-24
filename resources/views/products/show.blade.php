@@ -1,5 +1,11 @@
 @extends('layouts.yellow.master')
-@php $services = setting('services') @endphp
+
+@push('head')
+    @include('schema.product', ['product' => $product])
+@endpush
+@php
+    $services = setting('services');
+@endphp
 
 @section('seo_tags')
     {!! seo()->for($product) !!}
@@ -8,6 +14,9 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('strokya/vendor/xzoom/xzoom.css') }}">
     <link rel="stylesheet" href="{{ asset('strokya/vendor/xZoom-master/example/css/demo.css') }}">
+        @once
+            <link rel="stylesheet" href="{{ asset('css/hk-customer-reviews-premium.css') }}">
+        @endonce
     <style>
         .review-rating-link {
             transition: opacity 0.2s ease;
@@ -143,7 +152,7 @@
                 <div class="product__content">
                     <div class="xzoom-container d-flex @unless(config('app.vertical_image_gallery')) flex-column @endunless">
                         <div class="original">
-                            <img class="xzoom" id="xzoom-default" src="{{ asset($product->base_image->src) }}"
+                            <img class="xzoom" id="xzoom-default" src="{{ asset($product->base_image->src) }}" alt="{{ $product->base_image->alt_text ?: $product->name }}"
                                 xoriginal="{{ asset($product->base_image->src) }}" />
                             <div class="zoom-nav">
                                 <button class="zoom-control left">
@@ -159,6 +168,7 @@
                                     data-detail="{{ route('products.show', $product) }}"
                                     class="xzoom-gallery product-base__image" width="80"
                                     src="{{ asset($product->base_image->src) }}"
+                                    alt="{{ $product->base_image->alt_text ?: $product->name }}"
                                     xpreview="{{ asset($product->base_image->src) }}"></a>
                             @php
                                 // Collect all variant base images
@@ -180,6 +190,7 @@
                                     @if ($hasVariants) class="variant-image-link" data-variant-ids="{{ json_encode($variantIds) }}" @endif>
                                     <img class="xzoom-gallery @if ($hasVariants) variant-image @endif"
                                         width="80" src="{{ asset($image->src) }}"
+                                        alt="{{ $image->alt_text ?: $product->name }}"
                                         @if ($hasVariants) data-variant-ids="{{ json_encode($variantIds) }}" @endif>
                                 </a>
                             @endforeach
@@ -193,16 +204,10 @@
                             @if ($product->variations->isNotEmpty())
                                 <div class="p-3 mt-2 mb-2 border product__footer">
                                     <div class="product__tags tags">
-                                        @if ($product->brand)
-                                            <p class="mb-0 text-secondary">
-                                                Brand: <a href="{{ route('brands.products', $product->brand) }}"
-                                                    class="text-primary badge badge-light"><big>{{ $product->brand->name }}</big></a>
-                                            </p>
-                                        @endif
                                         <div class="mt-2">
                                             <p class="mr-2 mb-0 text-secondary d-inline-block">Categories:</p>
                                             @foreach ($product->categories as $category)
-                                                <a href="{{ route('categories.products', $category) }}"
+                                                <a href="{{ route('category.show', $category) }}"
                                                     class="badge badge-primary">{{ $category->name }}</a>
                                             @endforeach
                                         </div>
@@ -233,29 +238,34 @@
                 </div>
             </div>
             <div id="accordion" class="mt-3">
-                <div class="card">
+                <div class="card nm-product-description-card">
+                    @once
+                        <link rel="stylesheet" href="{{ asset('css/hk-product-description-premium.css') }}">
+                    @endonce
                     <div class="p-0 card-header">
-                        <a class="px-4 card-link" datatoggle="collapse" href="javascript:void(false)">
+                        <a class="px-4 card-link nm-product-description-title" datatoggle="collapse" href="javascript:void(false)">
                             Product Description
                         </a>
                     </div>
                     <div id="collapseOne" class="collapse show" data-parent="#accordion">
-                        <div class="p-2 card-body">
+                        <div class="p-2 card-body nm-product-description-body">
                             @if ($product->desc_img && $product->desc_img_pos == 'before_content')
                                 <div class="text-center">
                                     @foreach ($product->images as $image)
-                                        <img src="{{ asset($image->src) }}" alt="{{ $product->name }}"
+                                        <img src="{{ asset($image->src) }}" alt="{{ $image->alt_text ?: $product->name }}"
                                             class="my-2 border img-fluid">
                                     @endforeach
                                 </div>
                             @endif
 
-                            {!! fix_youtube_embeds($product->description) !!}
+                            <div class="nm-product-description">
+                                {!! fix_youtube_embeds($product->description) !!}
+                            </div>
 
                             @if ($product->desc_img && $product->desc_img_pos == 'after_content')
                                 <div class="text-center">
                                     @foreach ($product->images as $image)
-                                        <img src="{{ asset($image->src) }}" alt="{{ $product->name }}"
+                                        <img src="{{ asset($image->src) }}" alt="{{ $image->alt_text ?: $product->name }}"
                                             class="my-2 border img-fluid">
                                     @endforeach
                                 </div>
@@ -266,18 +276,16 @@
                 <div class="mt-3 card">
                     <div class="p-0 card-header">
                         <a class="px-4 card-link" datatoggle="collapse" href="javascript:void(false)">
-                            Delivery and Return Policy
+                            Delivery & Return Policy
                         </a>
                     </div>
                     <div id="collapseTwo" class="collapse show" data-parent="#accordion">
                         <div class="p-2 card-body">
-                            {!! setting('show_option')->productwise_delivery_charge ?? false
-                                ? $product->delivery_text ?? setting('delivery_text')
-                                : setting('delivery_text') !!}
+                            @include('products.partials.delivery-return-premium', ['product' => $product])
                         </div>
                     </div>
                 </div>
-                <div class="mt-3 card">
+                <div class="mt-3 card nm-customer-reviews-card">
                     <div class="p-0 card-header">
                         <a class="px-4 card-link" data-toggle="collapse" href="javascript:void(false)" aria-expanded="false">
                             Customer Reviews
@@ -299,7 +307,9 @@
         </div>
     </div>
     <!-- .block-products-carousel -->
-    @php($relatedProductsSetting = setting('related_products'))
+    @php
+        $relatedProductsSetting = setting('related_products');
+    @endphp
     <div class="lazy-related-products" x-data="lazyRelatedProducts({{ $product->getKey() }}, {{ $relatedProductsSetting->cols ?? 5 }})" x-init="init()"
         data-show-option="{{ json_encode([
             'product_grid_button' => setting('show_option')->product_grid_button ?? 'add_to_cart',

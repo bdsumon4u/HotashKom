@@ -35,17 +35,18 @@
 </style>
 @endpush
 
-<div class="infinite-scroll-section" x-data="infiniteScroll({{ $section->id }})" x-init="init()" data-section-id="{{ $section->id }}">
+<div class="infinite-scroll-section"
+    x-data="infiniteScroll({{ $section->id }})" data-section-id="{{ $section->id }}">
 
     @if ($section->type == 'pure-grid')
         <div class="block block-products-carousel">
             <div class="container">
                 @if ($section->title ?? null)
                     <div class="block-header">
-                        <h1 class="block-header__title" style="padding: 0.375rem 1rem;">
+                        <h2 class="block-header__title" style="padding: 0.375rem 1rem;">
                             <a href="{{ route('home-sections.products', $section) }}"
                                 wire:navigate.hover>{{ $section->title }}</a>
-                        </h1>
+                        </h2>
                         <div class="block-header__divider"></div>
                         <a href="{{ route('products.index', ['filter_section' => $section->id]) }}"
                             class="ml-3 btn btn-sm btn-all" wire:navigate.hover>
@@ -89,7 +90,8 @@
     @endif
 
     <!-- Loading trigger -->
-    <div class="load-more-trigger" x-show="hasMore" x-ref="loadMoreTrigger" style="height: 20px; margin: 20px 0;">
+    <div class="load-more-trigger" x-show="hasMore" x-ref="loadMoreTrigger" style="margin: 26px 0; text-align: center;">
+        <button type="button" @click="loadProducts()" :disabled="loading" x-show="!loading" style="min-width:190px;min-height:47px;padding:10px 22px;border:0;border-radius:8px;background:var(--brand);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">আরও পণ্য দেখুন</button>
         <div x-show="loading" class="text-center">
             <div class="spinner-border text-primary" role="status">
                 <span class="sr-only">Loading...</span>
@@ -106,34 +108,137 @@
             currentPage: 1,
             hasMore: true,
             loading: false,
-            perPage: 20,
+            perPage: {{ strcasecmp(trim($section->title ?? ''), 'All Products') === 0 ? 100 : 20 }},
             loadedProductIds: new Set(),
+            loadedProductSlugs: new Set(),
+            requestedPages: new Set(),
+            initialized: false,
             observer: null,
 
             init() {
-                // Wait for DOM to be ready
+                if (this.initialized) return;
+
+                this.initialized = true;
+                this.restoreExistingState();
+
                 setTimeout(() => {
-                    this.loadProducts();
-                    this.setupIntersectionObserver();
+                    if (
+                        this.hasMore &&
+                        this.loadedProductIds.size === 0 &&
+                        this.loadedProductSlugs.size === 0
+                    ) {
+                        this.loadProducts();
+                    }
+
+                    // Manual load enabled: products load only after button click.
                 }, 100);
+            },
+
+            getContainer() {
+                return document.querySelector(
+                    `#products-container-${this.sectionId}`
+                );
+            },
+
+            restoreExistingState() {
+                const container = this.getContainer();
+                if (!container) return;
+
+                const savedNextPage = Number(container.dataset.nextPage || 1);
+
+                if (
+                    Number.isInteger(savedNextPage) &&
+                    savedNextPage > 0
+                ) {
+                    this.currentPage = savedNextPage;
+                }
+
+                if (container.dataset.hasMore === 'false') {
+                    this.hasMore = false;
+                }
+
+                container
+                    .querySelectorAll('[data-product-id]')
+                    .forEach((element) => {
+                        const id = element.dataset.productId;
+
+                        if (id) {
+                            this.loadedProductIds.add(String(id));
+                        }
+                    });
+
+                container
+                    .querySelectorAll('a[href*="/products/"]')
+                    .forEach((link) => {
+                        try {
+                            const url = new URL(
+                                link.getAttribute('href'),
+                                window.location.origin
+                            );
+
+                            const marker = '/products/';
+                            const position = url.pathname.indexOf(marker);
+
+                            if (position === -1) return;
+
+                            const slug = decodeURIComponent(
+                                url.pathname
+                                    .slice(position + marker.length)
+                                    .split('/')[0]
+                            );
+
+                            if (slug) {
+                                this.loadedProductSlugs.add(slug);
+                            }
+                        } catch (error) {
+                            // Ignore malformed links.
+                        }
+                    });
+            },
+
+            persistState() {
+                const container = this.getContainer();
+                if (!container) return;
+
+                container.dataset.nextPage = String(this.currentPage);
+                container.dataset.hasMore = this.hasMore ? 'true' : 'false';
             },
 
             async loadProducts() {
                 if (this.loading || !this.hasMore) return;
 
+                const requestedPage = Number(this.currentPage);
+
+                if (
+                    !Number.isInteger(requestedPage) ||
+                    requestedPage < 1 ||
+                    this.requestedPages.has(requestedPage)
+                ) {
+                    return;
+                }
+
+                this.requestedPages.add(requestedPage);
                 this.loading = true;
 
                 try {
                     const response = await fetch(
-                        `/api/sections/${this.sectionId}/products?page=${this.currentPage}&per_page=${this.perPage}`
+                        `/api/sections/${this.sectionId}/products?page=${requestedPage}&per_page=${this.perPage}`
                     );
 
                     if (response.ok) {
                         const data = await response.json();
 
                         if (data.data && Array.isArray(data.data)) {
-                            this.hasMore = data.pagination?.has_more || false;
-                            this.currentPage++;
+                            const responsePage = Number(
+                                data.pagination?.current_page || requestedPage
+                            );
+
+                            this.hasMore = Boolean(
+                                data.pagination?.has_more
+                            );
+
+                            this.currentPage = responsePage + 1;
+                            this.persistState();
                             this.appendProducts(data.data);
 
                             if (!this.hasMore) {
@@ -179,12 +284,41 @@
                 }
 
                 products.forEach((product, index) => {
-                    const productId = product.id || index;
+                    const productId = product.id == null
+                        ? ''
+                        : String(product.id);
 
-                    if (this.loadedProductIds.has(productId)) return;
+                    const productSlug = product.slug == null
+                        ? ''
+                        : String(product.slug);
 
-                    this.loadedProductIds.add(productId);
+                    if (
+                        (productId &&
+                            this.loadedProductIds.has(productId)) ||
+                        (productSlug &&
+                            this.loadedProductSlugs.has(productSlug))
+                    ) {
+                        return;
+                    }
+
+                    if (productId) {
+                        this.loadedProductIds.add(productId);
+                    }
+
+                    if (productSlug) {
+                        this.loadedProductSlugs.add(productSlug);
+                    }
+
                     const element = this.createProductElement(product, index);
+
+                    if (productId) {
+                        element.dataset.productId = productId;
+                    }
+
+                    if (productSlug) {
+                        element.dataset.productSlug = productSlug;
+                    }
+
                     container.appendChild(element);
                 });
             },
@@ -203,7 +337,22 @@
                 const productSlug = product.slug || productId;
                 const productPrice = product.price || 0;
                 const productSellingPrice = product.selling_price || productPrice;
-                const productImage = product.base_image_url || '/images/placeholder.jpg';
+                const productImage320 =
+    product.base_image_url_320 ||
+    product.base_image_url ||
+    '/images/placeholder.jpg';
+
+const productImage480 =
+    product.base_image_url_480 ||
+    productImage320;
+
+const productImageAlt = String(
+    product.base_image_alt || productName
+)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
                 const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                 const inStock = !product.should_track || (product.stock_count || 0) > 0;
                 const hasDiscount = productPrice !== productSellingPrice;
@@ -330,11 +479,20 @@
                              ${product.free_delivery ? '<div class="product-card__ribbon"><span class="badge badge--free-delivery">Free Delivery</span></div>' : ''}
                              <div class="product-card__badges-list">
                                 ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
-                                ${discountText ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                              </div>
                              <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
                                  <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
-                                     <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                                     <img
+    src="${productImage320}"
+    srcset="${productImage320} 320w, ${productImage480} 480w"
+    sizes="(max-width: 575px) 50vw, (max-width: 991px) 33vw, (max-width: 1199px) 25vw, 220px"
+    alt="${productImageAlt}"
+    width="480"
+    height="480"
+    loading="lazy"
+    decoding="async"
+    style="width: 100%; height: 100%; object-fit: cover;"
+>
                                  </a>
                              </div>
                              <div class="product-card__info">
@@ -442,6 +600,11 @@
             },
 
             setupIntersectionObserver() {
+                // Prevent multiple observers after browser Back or Alpine re-init.
+                this.disconnectObserver();
+
+                if (!this.hasMore) return;
+
                 this.observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting && !this.loading && this.hasMore) {

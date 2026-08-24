@@ -90,3 +90,6 @@ Allow: /
  
 User-agent: Yeti
 Allow: /
+
+Sitemap: /sitemap.xml
+

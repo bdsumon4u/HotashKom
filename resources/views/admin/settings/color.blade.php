@@ -17,7 +17,7 @@
     </style>
 @endpush
 <div class="tab-pane active" id="item-color" role="tabpanel">
-    @foreach(['topbar' => 'Top Bar', 'header' => 'Header', 'navbar' => 'Nav Bar', 'search' => 'Search', 'category_menu' => 'Category Menu', 'section' => 'Section', 'badge' => 'Badge', 'footer' => 'Footer', 'primary' => 'Primary Button', 'add_to_cart' => 'AddToCart Button', 'order_now' => 'OrderNow Button'] as $id => $title)
+    @foreach(['brand' => 'Brand Color','topbar' => 'Top Bar', 'header' => 'Header', 'navbar' => 'Nav Bar', 'search' => 'Search', 'category_menu' => 'Category Menu', 'section' => 'Section', 'badge' => 'Badge', 'footer' => 'Footer', 'primary' => 'Primary Button', 'add_to_cart' => 'AddToCart Button', 'order_now' => 'OrderNow Button'] as $id => $title)
     <div class="row border-bottom mb-2">
         <div class="col-sm-12">
             <h4><small class="border-bottom mb-1">{{ $title}}</small></h4>

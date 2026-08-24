@@ -172,8 +172,8 @@ class StorefrontController extends Controller
 
         $deliveryCharge = setting('delivery_charge');
 
-        $deliveryText = setting('show_option')->productwise_delivery_charge ?? false
-            ? $product->delivery_text ?? setting('delivery_text')
+        $deliveryText = filled($product->delivery_text)
+            ? $product->delivery_text
             : setting('delivery_text');
 
         $ratingData = $this->getProductRatingData($product);

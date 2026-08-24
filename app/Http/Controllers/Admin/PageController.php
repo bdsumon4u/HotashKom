@@ -46,6 +46,8 @@ class PageController extends Controller
         $data = $request->validate([
             'title' => ['required'],
             'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:pages'],
+            'seo_title' => ['nullable', 'string', 'max:255'],
+            'meta_description' => ['nullable', 'string', 'max:500'],
             'content' => ['required'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
@@ -79,6 +81,8 @@ class PageController extends Controller
         $data = $request->validate([
             'title' => ['required'],
             'slug' => ['required', 'regex:/^[a-zA-Z0-9-]+$/', 'unique:pages,slug,'.$page->id],
+            'seo_title' => ['nullable', 'string', 'max:255'],
+            'meta_description' => ['nullable', 'string', 'max:500'],
             'content' => ['required'],
         ], [
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',

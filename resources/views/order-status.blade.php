@@ -68,7 +68,9 @@
                                         </tr>
                                     </thead>
                                     <tbody class="card-table__body card-table__body--merge-rows">
-                                        @php($retail = 0)
+                                        @php
+                                            $retail = 0;
+                                        @endphp
                                         @foreach ($order->products as $product)
                                             <tr>
                                                 <td><a
@@ -77,14 +79,18 @@
                                                 <td>{!! theMoney($product->quantity * $product->price) !!}</td>
                                                 @if(isOninda() && config('app.resell'))
                                                 <td>{!! theMoney($amount = $product->quantity * $product->retail_price) !!}</td>
-                                                @php($retail += (float) $amount)
+                                                @php
+                                                    $retail += (float) $amount;
+                                                @endphp
                                                 @endif
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tbody class="card-table__body card-table__body--merge-rows">
-                                        @php($data = $order->data)
-                                        @php($couponDiscount = (float) ($data['coupon_discount'] ?? 0))
+                                        @php
+                                            $data = $order->data;
+                                            $couponDiscount = (float) ($data['coupon_discount'] ?? 0);
+                                        @endphp
                                         <tr>
                                             <th>Subtotal</th>
                                                                                             <td>{!! theMoney((float) ($data['subtotal'] ?? 0)) !!}</td>
@@ -154,5 +160,30 @@
             </div>
         </div>
     </div>
+    {{-- Google Customer Reviews Opt-in Module --}}
+    @php
+        $gcrMerchantId = setting('gcr_merchant_id');
+        $gcrEmail = trim((string) $order->email);
+        $gcrCity = strtolower(trim((string) ($order->data['city_name'] ?? '')));
+        $gcrBusinessDays = in_array($gcrCity, ['dhaka', 'dinajpur'], true) ? 2 : 5;
+        $gcrDeliveryDate = $order->created_at->copy()->addWeekdays($gcrBusinessDays)->format('Y-m-d');
+    @endphp
+
+    @if ($gcrMerchantId && request()->is('thank-you') && $gcrEmail !== '')
+        <script src="https://apis.google.com/js/platform.js?onload=renderOptIn" async defer></script>
+        <script>
+            window.renderOptIn = function () {
+                window.gapi.load('surveyoptin', function () {
+                    window.gapi.surveyoptin.render({
+                        merchant_id: {{ (int) $gcrMerchantId }},
+                        order_id: {!! json_encode((string) $order->id) !!},
+                        email: {!! json_encode($gcrEmail) !!},
+                        delivery_country: 'BD',
+                        estimated_delivery_date: {!! json_encode($gcrDeliveryDate) !!}
+                    });
+                });
+            };
+        </script>
+    @endif
 @endsection
 

@@ -65,6 +65,9 @@ class HomeSection extends Model
             $cols = $this->data->cols ?? 5;
             $sorted = setting('show_option')->product_sort ?? 'random';
 
+            // A fixed seed keeps random-looking pagination stable across requests.
+            $randomSeed = crc32('home-section-'.$this->id) & 0x7FFFFFFF;
+
             if ($this->type == 'carousel-grid') {
                 $rows *= $cols;
             }
@@ -76,23 +79,28 @@ class HomeSection extends Model
                 ->whereIsActive(1)
                 ->whereNull('parent_id');
 
-            if ($category) {
-                $query->whereHas('categories', function ($query) use ($category): void {
-                    $query->where('categories.id', $category);
-                });
-            } elseif (($this->data->source ?? false) == 'specific') {
-                $categoryIds = $this->categories()->pluck('categories.id')->toArray();
+            // Strict category filtering for category-based visual sections.
+            // Products manually pinned in $items can be prioritised, but cannot
+            // bypass the section's selected category/category-child rules.
+            $categoryIds = $category
+                ? [(int) $category]
+                : $this->categories()->pluck('categories.id')->map(
+                    static fn ($id): int => (int) $id
+                )->all();
+
+            if ($categoryIds) {
                 $query->whereHas('categories', function ($query) use ($categoryIds): void {
                     $query->whereIn('categories.id', $categoryIds);
-                })
-                    ->orWhereIn('id', $ids);
+                });
             }
 
             $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
 
             if ($ids) {
                 if ($sorted == 'random') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');
+                    $query->orderByRaw(
+                        'CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND('.$randomSeed.') END'
+                    );
                 } elseif ($sorted == 'updated_at') {
                     $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
                 } elseif ($sorted == 'created_at') {
@@ -102,7 +110,7 @@ class HomeSection extends Model
                 }
             } else {
                 if ($sorted == 'random') {
-                    $query->inRandomOrder();
+                    $query->inRandomOrder($randomSeed);
                 } elseif ($sorted == 'updated_at') {
                     $query->latest('updated_at');
                 } elseif ($sorted == 'created_at') {
@@ -111,6 +119,9 @@ class HomeSection extends Model
                     $query->orderBy('selling_price');
                 }
             }
+
+            // Deterministic tie-breaker prevents records moving between pages.
+            $query->orderBy('products.id');
 
             return $query->with([
                 'reviews' => function ($q): void {
@@ -136,12 +147,17 @@ class HomeSection extends Model
                 ->whereIsActive(1)
                 ->whereNull('parent_id');
 
-            if (($this->data->source ?? false) == 'specific') {
-                $categoryIds = $this->categories()->pluck('categories.id')->toArray();
+            // Strict category filtering for category-based visual sections.
+            // Pinned products remain prioritised only when they belong to one
+            // of the categories selected for this section.
+            $categoryIds = $this->categories()->pluck('categories.id')->map(
+                static fn ($id): int => (int) $id
+            )->all();
+
+            if ($categoryIds) {
                 $query->whereHas('categories', function ($query) use ($categoryIds): void {
                     $query->whereIn('categories.id', $categoryIds);
-                })
-                    ->orWhereIn('id', $ids);
+                });
             }
 
             $query->take($rows * $cols);

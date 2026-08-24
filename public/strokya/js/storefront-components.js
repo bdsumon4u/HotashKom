@@ -410,6 +410,16 @@ runWhenJQueryReady(function($) {
                 this.loading = true;
                 try {
                     const params = new URLSearchParams(window.location.search);
+
+                    // Preserve current category context for infinite scrolling.
+                    const categoryPage = window.location.pathname.match(/^\/category\/([^/?#]+)/);
+                    const categoryProductsPage = window.location.pathname.match(/^\/categories\/([^/?#]+)\/products/);
+                    const categorySlug = categoryPage?.[1] || categoryProductsPage?.[1];
+
+                    if (categorySlug) {
+                        params.set('category', decodeURIComponent(categorySlug));
+                    }
+
                     params.set('page', this.currentPage + 1);
                     params.set('per_page', this.perPage);
                     const shuffleSeed = this.getShuffleSeed();
@@ -585,7 +595,6 @@ runWhenJQueryReady(function($) {
                     <div class="product-card" data-id="${productId}" data-max="${product.should_track ? (product.stock_count || 0) : -1}">
                         <div class="product-card__badges-list">
                             ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
-                            ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                         </div>
                         <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
                             <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">

@@ -49,9 +49,9 @@
                                     </a>
                                 </li>
                                 <li class="footer-newsletter__social-link footer-newsletter__social-link--phone">
-                                    <a href="mailto:{{$company->email}}" target="_blank" class="bg-secondary" aria-label="Email us">
+                                    <!--email_off--><a href="mailto:{{$company->email}}" target="_blank" class="bg-secondary" aria-label="Email us">
                                         <i class="fas fa-envelope"></i>
-                                    </a>
+                                    </a><!--/email_off-->
                                 </li>
                                 @foreach($social ?? [] as $item => $data)
                                 @if(($link = $data->link ?? false) && $link != '#')

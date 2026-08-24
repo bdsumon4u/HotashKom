@@ -69,8 +69,9 @@ class DeliveryAreaService
             $lower = Str::lower($area['name']);
 
             return Str::contains($lower, 'outside') ||
-                Str::contains($lower, 'বাহির');
-        });
+                Str::contains($lower, 'বাহির') ||
+                Str::contains($lower, 'বাইরে');
+        }) ?? $areas->last();
     }
 
     public function getProductDeliveryCharges(?Product $product = null): Collection

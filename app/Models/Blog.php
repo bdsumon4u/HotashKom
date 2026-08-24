@@ -15,7 +15,15 @@ class Blog extends Model
         'slug',
         'content',
         'image',
+        'faqs',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'faqs' => 'array',
+        ];
+    }
 
     #[\Override]
     public function getRouteKeyName()
@@ -34,14 +42,12 @@ class Blog extends Model
     {
         $field ??= $this->getRouteKeyName();
 
-        // Only decode URL-encoded value when the field is 'slug'
         if ($field === 'slug') {
             $decodedValue = rawurldecode((string) $value);
 
             return $this->where($field, $decodedValue)->first();
         }
 
-        // For other fields (like 'id'), use the value as-is
         return $this->where($field, $value)->first();
     }
 

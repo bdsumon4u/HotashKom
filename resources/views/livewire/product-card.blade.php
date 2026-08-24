@@ -12,31 +12,44 @@
         @if (!$in_stock)
             <div class="product-card__badge product-card__badge--sale">Sold</div>
         @endif
-        @if ($product->price != $product->selling_price)
-            @php
-                $percent = round(
-                    (($product->price - $product->selling_price) * 100) / $product->price,
-                    0,
-                    PHP_ROUND_HALF_UP,
-                );
-                $discountText = str_replace('[percent]', $percent, setting('discount_text') ?? '');
-            @endphp
-            @if (! empty(trim($discountText)))
-                <div class="product-card__badge product-card__badge--sale">
-                    {!! $discountText !!}
-                </div>
-            @endif
-        @endif
+
     </div>
     <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
-        <a href="{{ route('products.show', $product) }}" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
-            <img src="{{ cdn(optional($product->base_image)->src) }}" alt="Base Image" loading="lazy"
-                style="width: 100%; height: 100%; object-fit: cover;">
-        </a>
-    </div>
+    <a href="{{ route('products.show', $product) }}"
+       
+        style="display: block; width: 100%; height: 100%;">
+
+        @php
+            $productImageSrc = optional($product->base_image)->src;
+            $productImageAlt = optional($product->base_image)->alt_text
+                ?: $product->name;
+        @endphp
+
+        <img
+            src="{{ cdn($productImageSrc, 320, 320) }}"
+            srcset="
+                {{ cdn($productImageSrc, 320, 320) }} 320w,
+                {{ cdn($productImageSrc, 480, 480) }} 480w
+            "
+            sizes="
+                (max-width: 575px) 50vw,
+                (max-width: 991px) 33vw,
+                (max-width: 1199px) 25vw,
+                220px
+            "
+            alt="{{ $productImageAlt }}"
+            width="480"
+            height="480"
+            loading="lazy"
+            decoding="async"
+            style="width: 100%; height: 100%; object-fit: contain; background: #fff;"
+        >
+    </a>
+</div>        
+
     <div class="product-card__info">
         <div class="product-card__name">
-            <a href="{{ route('products.show', $product) }}" wire:navigate.hover
+            <a href="{{ route('products.show', $product) }}"
                 data-name="{{ $product->var_name }}">{{ $product->name }}</a>
         </div>
         @php
@@ -128,8 +141,10 @@
         </div>
         @if (!isOninda())
             <div class="product-card__buttons">
-                @php($available = !$product->should_track || $product->stock_count > 0)
-                @php($has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1)
+                @php
+                    $available = !$product->should_track || $product->stock_count > 0;
+                    $has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1;
+                @endphp
                 @if (($show_option->product_grid_button ?? false) == 'add_to_cart')
                     @if ($has_variations)
                         <a href="{{ route('products.show', $product) }}" wire:navigate.hover class="btn btn-primary product-card__addtocart" style="text-decoration: none;">

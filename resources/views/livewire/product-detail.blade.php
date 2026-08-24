@@ -232,48 +232,69 @@
             @if ($product->variations->isEmpty() || $showBrandCategory)
                 <div class="p-3 mt-2 mb-2 border product__footer">
                     <div class="product__tags tags">
-                        @if ($product->brand)
-                            <p class="mb-0 text-secondary">
-                                Brand: <a href="{{ route('brands.products', $product->brand) }}"
-                                    class="text-primary badge badge-light"
-                                    wire:navigate.hover><big>{{ $product->brand->name }}</big></a>
-                            </p>
-                        @endif
                         <div class="mt-2">
                             <p class="mb-0 mr-2 text-secondary d-inline-block">Categories:</p>
                             @foreach ($product->categories as $category)
-                                <a href="{{ route('categories.products', $category) }}"
+                                <a href="{{ route('category.show', $category) }}"
                                     class="badge badge-primary" wire:navigate.hover>{{ $category->name }}</a>
                             @endforeach
                         </div>
                     </div>
                 </div>
             @endif
+            @once
+                <link rel="stylesheet" href="{{ asset('css/hk-product-top-premium.css') }}">
+            @endonce
+
             @php
                 $areaColumns = app(\App\Services\DeliveryAreaService::class)->getProductDeliveryCharges($selectedVar);
-                $columnCount = $areaColumns->count();
-                $colWidth = $columnCount > 0 ? floor(100 / $columnCount) : 100;
+                $isTwoColumns = $areaColumns->count() === 2;
             @endphp
 
-            <table class="table table-sm table-bordered">
-                <thead>
-                    <tr>
-                        <th colspan="{{ $columnCount }}" class="text-center">Delivery Charge</th>
-                    </tr>
-                    <tr>
-                        @foreach ($areaColumns as $col)
-                            <th width="{{ $colWidth }}%">{{ $col['name'] }}</th>
-                        @endforeach
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        @foreach ($areaColumns as $col)
-                            <td>{!! theMoney($col['cost']) !!}</td>
-                        @endforeach
-                    </tr>
-                </tbody>
-            </table>
+            @if ($areaColumns->isNotEmpty())
+                <section class="nm-delivery-charge-card" aria-label="Delivery Charge">
+                    <div class="nm-delivery-charge-head">
+                        <div class="nm-delivery-charge-heading">
+                            <span class="nm-delivery-charge-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3 6.5h11v9H3v-9Zm11 3h3.4l2.6 3v3H14v-6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                                    <circle cx="7" cy="17" r="1.7" stroke="currentColor" stroke-width="1.8"/>
+                                    <circle cx="17" cy="17" r="1.7" stroke="currentColor" stroke-width="1.8"/>
+                                </svg>
+                            </span>
+                            <span class="nm-delivery-charge-copy">
+                                <strong class="nm-delivery-charge-title">
+                                    Delivery Charge
+                                </strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="nm-delivery-charge-body">
+                        <div class="nm-delivery-charge-grid {{ $isTwoColumns ? 'nm-delivery-charge-grid--cols-2' : 'nm-delivery-charge-grid--stacked' }}">
+                            @foreach ($areaColumns as $col)
+                                <div class="nm-delivery-charge-item">
+                                    <span class="nm-delivery-area-label">
+                                        {{ $col['name'] }}
+                                    </span>
+                                    <span class="nm-delivery-charge-price">
+                                        {!! theMoney($col['cost']) !!}
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="nm-delivery-charge-trust">
+                            <span class="nm-delivery-charge-check" aria-hidden="true">
+                                ✓
+                            </span>
+                            <span>
+                                সারা বাংলাদেশে Cash on Delivery
+                            </span>
+                        </div>
+                    </div>
+                </section>
+            @endif
             @php
                 $wholesale = $selectedVar->wholesale ?? ['quantity' => [], 'price' => []];
                 $quantities = is_array($wholesale['quantity'] ?? null) ? $wholesale['quantity'] : [];

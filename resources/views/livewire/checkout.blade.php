@@ -46,18 +46,18 @@
                         </div>
                     </div>
                 </div>
-                @if (setting('show_option')->email ?? false)
+                {{-- Email field is always visible for Google Customer Reviews --}}
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
-                        <label>কাস্টমারের ইমেইল:</label>
+                        <label>ইমেইল ঠিকানা <small class="text-muted">(ঐচ্ছিক)</small>:</label>
                     </div>
                     <div class="form-group col-md-9">
                         <x-input type="email" name="email" wire:model="email" place-holder="কাস্টমারের ইমেইল ঠিকানা লিখুন।"
                             placeholder="Type customer's email address here." />
                         <x-error field="email" />
+                        <small class="form-text text-muted">ইমেইল দিলে Google থেকে কেনাকাটার অভিজ্ঞতা জানানোর অনুরোধ আসতে পারে।</small>
                     </div>
                 </div>
-                @endif
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
                         <label class="d-block"><label>ডেলিভারি এরিয়া: <span class="text-danger">*</span></label>
@@ -246,9 +246,7 @@
                                 <svg class="input-check__icon" width="9px" height="7px" viewBox="0 0 9 7"><path d="M9.002 1.396L3.461 7.002-.002 3.498l1.385-1.402 2.078 2.103L7.617-.006l1.385 1.402z"/></svg>
                             </span>
                         </span>
-                        <label class="form-check-label" for="checkout-terms-mobile">I agree to the <span
-                                class="text-info" target="_blank" href="javascript:void(0);">terms and
-                                conditions</span>*</label>
+                        <label class="form-check-label" for="checkout-terms-mobile">I agree to the </label> <button type="button" class="terms-new-tab text-info" aria-label="Open Terms and Conditions in a new tab" style="padding:0;border:0;background:transparent;text-decoration:underline;cursor:pointer;font:inherit;" onclick="event.preventDefault(); event.stopPropagation(); var termsWindow=window.open(`{{ url('/terms-and-conditions') }}`, `_blank`); if(termsWindow){termsWindow.opener=null;} return false;">terms and conditions</button>*
                     </div>
                 </div>
                 <button type="button" wire:click="checkout" wire:loading.attr="disabled"
@@ -370,9 +368,7 @@
                                     <svg class="input-check__icon" width="9px" height="7px" viewBox="0 0 9 7"><path d="M9.002 1.396L3.461 7.002-.002 3.498l1.385-1.402 2.078 2.103L7.617-.006l1.385 1.402z"/></svg>
                                 </span>
                             </span>
-                            <label class="form-check-label" for="checkout-terms-desktop">I agree to the <span
-                                    class="text-info" target="_blank" href="javascript:void(0);">terms and
-                                    conditions</span>*</label>
+                            <label class="form-check-label" for="checkout-terms-desktop">I agree to the </label> <button type="button" class="terms-new-tab text-info" aria-label="Open Terms and Conditions in a new tab" style="padding:0;border:0;background:transparent;text-decoration:underline;cursor:pointer;font:inherit;" onclick="event.preventDefault(); event.stopPropagation(); var termsWindow=window.open(`{{ url('/terms-and-conditions') }}`, `_blank`); if(termsWindow){termsWindow.opener=null;} return false;">terms and conditions</button>*
                         </div>
                     </div>
                     <button type="button" wire:click="checkout" wire:loading.attr="disabled"

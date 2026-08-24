@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\HomeSection;
 use App\Models\Page;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\Slide;
 use App\Observers\ResponseCacheObserver;
 use App\Pathao\Apis\AreaApi;
@@ -78,6 +79,7 @@ class AppServiceProvider extends ServiceProvider
             Page::class,
             Product::class,
             Slide::class,
+            Setting::class,
         ])->each(static function (string $model): void {
             $model::observe(ResponseCacheObserver::class);
         });

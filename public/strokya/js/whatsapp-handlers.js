@@ -208,13 +208,32 @@
         }
     }
 
-    runWhenJQueryReady(function ($) {
-        $('.widget-connect__button-activator-icon')
-            .off('click.widgetConnect')
-            .on('click.widgetConnect', function () {
-                $(this).toggleClass('active');
-                $('.widget-connect').toggleClass('active');
-                $('a.widget-connect__button').toggleClass('button-slide-out button-slide');
+    // Floating Messenger / WhatsApp launcher
+    // Vanilla JS so the launcher works even if jQuery timing changes.
+    document.addEventListener('click', function (e) {
+        var activator = e.target.closest('.widget-connect__button-activator');
+
+        if (!activator) {
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var widget = activator.closest('.widget-connect');
+        var icon = activator.querySelector('.widget-connect__button-activator-icon');
+
+        if (icon) {
+            icon.classList.toggle('active');
+        }
+
+        if (widget) {
+            widget.classList.toggle('active');
+
+            widget.querySelectorAll('a.widget-connect__button').forEach(function (button) {
+                button.classList.toggle('button-slide-out');
+                button.classList.toggle('button-slide');
             });
+        }
     });
 }());

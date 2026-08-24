@@ -80,7 +80,7 @@ class ApiController extends Controller
     public function sectionProducts(Request $request, HomeSection $section)
     {
         $page = $request->get('page', 1);
-        $perPage = min($request->get('per_page', 20), 20);
+        $perPage = max(1, min((int) $request->get('per_page', 20), 100));
 
         $products = $section->products(paginate: $perPage, category: $request->category);
 
@@ -112,6 +112,26 @@ class ApiController extends Controller
         // Use the same logic as ProductController::index
         $query = Product::whereIsActive(1)->whereNull('parent_id');
 
+        // Category-safe infinite-scroll filter.
+        // A category page must never receive generic shop products.
+        $categorySlug = rawurldecode((string) $request->get('category', ''));
+
+        if ($categorySlug !== '') {
+            $category = Category::where('slug', $categorySlug)->first();
+
+            if (! $category) {
+                abort(404);
+            }
+
+            $categoryIds = $category->parent_id
+                ? [$category->id]
+                : $category->childrens()->pluck('id')->prepend($category->id)->all();
+
+            $query->whereHas('categories', function ($categoryQuery) use ($categoryIds): void {
+                $categoryQuery->whereIn('categories.id', $categoryIds);
+            });
+        }
+
         // Apply filters using the trait
         $this->applyProductFilters($query, $request);
 
@@ -123,8 +143,25 @@ class ApiController extends Controller
 
         // Search
         if ($request->search) {
-            $products = Product::search($request->search, function ($q) use ($request): void {
+            $products = Product::search($request->search, function ($q) use ($request, $categorySlug): void {
                 $q->whereIsActive(1)->whereNull('parent_id');
+
+                if ($categorySlug !== '') {
+                    $category = Category::where('slug', $categorySlug)->first();
+
+                    if (! $category) {
+                        abort(404);
+                    }
+
+                    $categoryIds = $category->parent_id
+                        ? [$category->id]
+                        : $category->childrens()->pluck('id')->prepend($category->id)->all();
+
+                    $q->whereHas('categories', function ($categoryQuery) use ($categoryIds): void {
+                        $categoryQuery->whereIn('categories.id', $categoryIds);
+                    });
+                }
+
                 $this->applyProductFilters($q, $request);
                 $this->applyProductSorting($q);
                 // Explicitly select all columns
@@ -283,7 +320,25 @@ class ApiController extends Controller
         $freeDelivery = setting('free_delivery');
 
         $collection->transform(function ($product) use ($freeDelivery) {
-            $product->base_image_url = cdn($product->base_image?->src) ?? '/images/placeholder.jpg';
+            $imageSource = $product->base_image?->src;
+
+            $product->base_image_url = cdn($imageSource)
+                ?? '/images/placeholder.jpg';
+
+            $product->base_image_url_320 = cdn(
+                $imageSource,
+                320,
+                320
+            );
+
+            $product->base_image_url_480 = cdn(
+                $imageSource,
+                480,
+                480
+            );
+
+            $product->base_image_alt = $product->base_image?->alt_text
+                ?: $product->name;
             $product->setAttribute('retail_price', $product->retailPrice());
             $product->setAttribute('free_delivery', $this->isFreeDeliveryProduct($product, $freeDelivery));
 

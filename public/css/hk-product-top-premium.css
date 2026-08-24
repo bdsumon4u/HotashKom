@@ -1,0 +1,668 @@
+/*
+ * HotashKom Product Top Premium
+ * Visual layer only.
+ * No Livewire/cart/pricing/delivery logic.
+ */
+
+/* =====================================================
+   PRODUCT TITLE
+   ===================================================== */
+
+.product--layout--standard .product__name {
+    margin: 0 0 10px;
+    color: #1c2b24;
+    font-size: clamp(27px, 2.4vw, 34px);
+    font-weight: 800;
+    line-height: 1.16;
+    letter-spacing: -.45px;
+}
+
+
+/* =====================================================
+   PRODUCT INFO / META
+   ===================================================== */
+
+.product--layout--standard .product__info {
+    color: #415047;
+}
+
+.product--layout--standard .product__info hr {
+    border-color: #e7eee9;
+}
+
+.product--layout--standard .product__info .text-secondary {
+    color: #67766e !important;
+}
+
+
+/* =====================================================
+   PRICE
+   ===================================================== */
+
+.product--layout--standard .product__prices {
+    margin-top: 8px !important;
+    margin-bottom: 10px !important;
+    padding: 10px 0;
+    color: #25362d;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.35;
+    border-top: 1px solid #edf2ef;
+    border-bottom: 1px solid #edf2ef;
+}
+
+.product--layout--standard
+.product__prices
+.product-card__new-price {
+    margin-left: 4px;
+    color: var(--brand-dark, #15995b) !important;
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -.25px;
+}
+
+.product--layout--standard
+.product__prices
+.product-card__old-price {
+    margin-left: 7px;
+    color: #a16b6b !important;
+    font-size: 15px;
+    font-weight: 500;
+    opacity: .78;
+}
+
+
+/* =====================================================
+   OPTIONS
+   ===================================================== */
+
+.product--layout--standard .product__option-label {
+    color: #34463c;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.product--layout--standard
+.input-radio-label__list label span {
+    border-radius: 7px;
+    transition:
+        border-color .18s ease,
+        background .18s ease,
+        color .18s ease;
+}
+
+
+/* =====================================================
+   QUANTITY
+   ===================================================== */
+
+.product--layout--standard
+.product__sidebar
+.product__actions-item.border-top {
+    margin-top: 8px;
+    padding: 11px 12px !important;
+    background: #f8fbf9;
+    border: 1px solid #e3ece7 !important;
+    border-radius: 10px;
+}
+
+.product--layout--standard
+.product__sidebar
+.product__actions-item.border-top big {
+    color: #34443c;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.product--layout--standard .product__quantity {
+    overflow: hidden;
+    border: 1px solid #d7e3dc;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.product--layout--standard
+.product__quantity
+.input-number__input {
+    height: 38px;
+    color: #24352c;
+    background: #fff;
+    border: 0 !important;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.product--layout--standard
+.product__quantity
+.input-number__add,
+.product--layout--standard
+.product__quantity
+.input-number__sub {
+    background: #f4f8f6;
+}
+
+
+/* =====================================================
+   CTA BUTTONS
+   ===================================================== */
+
+.product--layout--standard .product__buttons {
+    margin-top: 10px;
+}
+
+.product--layout--standard
+.product__buttons.d-lg-inline-flex {
+    gap: 10px !important;
+}
+
+.product--layout--standard
+.product__ordernow,
+.product--layout--standard
+.product__addtocart {
+    min-height: 48px;
+    border-radius: 9px !important;
+    font-size: 15px;
+    font-weight: 800;
+    box-shadow: none !important;
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease,
+        border-color .18s ease;
+}
+
+.product--layout--standard
+.product__ordernow:disabled,
+.product--layout--standard
+.product__addtocart:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* =====================================================
+   CALL SUPPORT
+   ===================================================== */
+
+.product--layout--standard .call-for-order {
+    margin-top: 11px !important;
+    padding: 10px 12px !important;
+    color: #5e6d65;
+    background:
+        linear-gradient(
+            135deg,
+            #fbfdfc,
+            #f5faf7
+        );
+    border: 1px solid #dfe9e3 !important;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.product--layout--standard
+.call-for-order a {
+    text-decoration: none !important;
+}
+
+.product--layout--standard
+.call-for-order a.text-danger {
+    color: var(--brand-dark, #15995b) !important;
+}
+
+.product--layout--standard
+.call-for-order .lead {
+    margin-bottom: 0;
+    color: var(--brand-dark, #15995b);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   MESSENGER / WHATSAPP
+   ===================================================== */
+
+.product--layout--standard
+.call-for-order + div.d-flex {
+    gap: 8px !important;
+    margin-top: 9px !important;
+    margin-bottom: 9px !important;
+}
+
+.product--layout--standard
+.call-for-order + div.d-flex > a {
+    min-width: 0 !important;
+    min-height: 39px;
+    justify-content: center;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: none;
+}
+
+
+/* =====================================================
+   BRAND / CATEGORY
+   ===================================================== */
+
+.product--layout--standard .product__footer {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    padding: 11px 13px !important;
+    background: #fbfdfc;
+    border: 1px solid #e1ebe5 !important;
+    border-radius: 10px;
+}
+
+.product--layout--standard
+.product__footer .product__tags {
+    font-size: 13px;
+}
+
+.product--layout--standard
+.product__footer .badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.product--layout--standard
+.product__footer .badge-light {
+    color: var(--brand-dark, #168c55) !important;
+    background: var(--brand-soft, #eefaf4);
+    border: 1px solid var(--brand-border, #d4efe1);
+}
+
+.product--layout--standard
+.product__footer .badge-primary {
+    color: var(--brand-dark, #168c55) !important;
+    background: var(--brand-soft, #eaf9f1) !important;
+    border: 1px solid var(--brand-border, #ccebd9) !important;
+}
+
+
+/* =====================================================
+   TRUST / SERVICE SIDEBAR
+   ===================================================== */
+
+.product--layout--standard
+.block-features__list {
+    overflow: hidden;
+    padding: 5px 15px;
+    background: #fff;
+    border: 1px solid #e1eae5;
+    border-radius: 14px;
+    box-shadow:
+        0 8px 24px rgba(27, 69, 49, .055);
+}
+
+.product--layout--standard
+.block-features__item {
+    padding: 15px 2px;
+    align-items: flex-start;
+}
+
+.product--layout--standard
+.block-features__icon {
+    flex: 0 0 42px;
+    width: 42px;
+    margin-right: 12px;
+    color: #244e3a;
+}
+
+.product--layout--standard
+.block-features__icon svg {
+    width: 38px !important;
+    height: 38px !important;
+}
+
+.product--layout--standard
+.block-features__title {
+    margin-bottom: 3px;
+    color: #26382f;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.product--layout--standard
+.block-features__subtitle {
+    color: #68776f;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.product--layout--standard
+.block-features__divider {
+    height: 1px;
+    background: #edf2ef;
+}
+
+
+/* =====================================================
+   WHOLE TOP AREA MICRO POLISH
+   ===================================================== */
+
+.product--layout--standard .product__content {
+    align-items: start;
+}
+
+.product--layout--standard .product__info {
+    min-width: 0;
+}
+
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+
+@media (max-width: 991px) {
+
+    .product--layout--standard .product__name {
+        font-size: 27px;
+    }
+
+    .product--layout--standard
+    .product__ordernow,
+    .product--layout--standard
+    .product__addtocart {
+        min-height: 46px;
+        font-size: 14px;
+    }
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 575px) {
+
+    .product--layout--standard .product__name {
+        margin-bottom: 8px;
+        font-size: 23px;
+        line-height: 1.22;
+        letter-spacing: -.2px;
+    }
+
+    .product--layout--standard .product__prices {
+        margin-top: 7px !important;
+        padding: 9px 0;
+        font-size: 15px;
+    }
+
+    .product--layout--standard
+    .product__prices
+    .product-card__new-price {
+        font-size: 22px;
+    }
+
+    .product--layout--standard
+    .product__sidebar
+    .product__actions-item.border-top {
+        padding: 9px 10px !important;
+    }
+
+    .product--layout--standard
+    .product__buttons.d-lg-inline-flex {
+        display: block !important;
+    }
+
+    .product--layout--standard
+    .product__actions-item--ordernow,
+    .product--layout--standard
+    .product__actions-item--addtocart {
+        width: 100%;
+    }
+
+    .product--layout--standard
+    .product__actions-item--addtocart {
+        margin-top: 7px;
+    }
+
+    .product--layout--standard
+    .product__ordernow,
+    .product--layout--standard
+    .product__addtocart {
+        min-height: 46px;
+    }
+
+    .product--layout--standard
+    .call-for-order + div.d-flex {
+        flex-wrap: wrap;
+    }
+
+    .product--layout--standard
+    .call-for-order + div.d-flex > a {
+        flex: 1 1 135px;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .product--layout--standard .product__footer {
+        padding: 10px 11px !important;
+    }
+}
+
+/* =====================================================
+   DELIVERY CHARGE CARD
+   ===================================================== */
+
+.nm-delivery-charge-card {
+    margin: 10px 0 14px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #dfece5;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(25, 76, 52, .07);
+}
+
+.nm-delivery-charge-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 15px;
+    background: linear-gradient(135deg, var(--brand-soft), #ffffff);
+    border-bottom: 1px solid #e1efe7;
+}
+
+.nm-delivery-charge-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.nm-delivery-charge-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    color: var(--brand-dark);
+    background: var(--brand-soft);
+    border-radius: 10px;
+}
+
+.nm-delivery-charge-icon svg {
+    width: 21px;
+    height: 21px;
+}
+
+.nm-delivery-charge-copy {
+    min-width: 0;
+}
+
+.nm-delivery-charge-title {
+    display: block;
+    color: #17261f;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.nm-delivery-charge-subtitle {
+    display: block;
+    margin-top: 2px;
+    color: #738078;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.nm-delivery-charge-badge {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    color: #13814d;
+    background: #e6f9ef;
+    border: 1px solid #caecda;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.nm-delivery-charge-body {
+    padding: 14px;
+}
+
+.nm-delivery-charge-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.nm-delivery-charge-grid--cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.nm-delivery-charge-grid--stacked {
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.nm-delivery-charge-item {
+    min-width: 0;
+    padding: 13px;
+    background: #fbfdfc;
+    border: 1px solid #e1ebe5;
+    border-radius: 11px;
+}
+
+.nm-delivery-charge-grid--stacked .nm-delivery-charge-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+}
+
+.nm-delivery-area-label {
+    display: block;
+    color: #26372e;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.nm-delivery-charge-grid--stacked .nm-delivery-area-label {
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+.nm-delivery-area-note {
+    display: block;
+    margin-top: 2px;
+    color: #7a8780;
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+.nm-delivery-charge-price {
+    display: block;
+    margin-top: 8px;
+    color: var(--brand-dark, #14955a);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.nm-delivery-charge-grid--stacked .nm-delivery-charge-price {
+    margin-top: 0;
+    font-size: 20px;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.nm-delivery-charge-trust {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 11px;
+    padding: 9px 11px;
+    color: #425149;
+    background: #f3faf6;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.nm-delivery-charge-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 19px;
+    width: 19px;
+    height: 19px;
+    color: #fff;
+    background: var(--brand);
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+@media (max-width: 575px) {
+    .nm-delivery-charge-head {
+        padding: 12px;
+    }
+
+    .nm-delivery-charge-badge {
+        display: none;
+    }
+
+    .nm-delivery-charge-body {
+        padding: 12px;
+    }
+
+    .nm-delivery-charge-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px;
+    }
+
+    .nm-delivery-charge-item {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 11px 12px !important;
+    }
+
+    .nm-delivery-area-label {
+        font-size: 12px;
+    }
+
+    .nm-delivery-charge-price {
+        margin-top: 0 !important;
+        text-align: right;
+        font-size: 20px;
+        white-space: nowrap;
+    }
+}

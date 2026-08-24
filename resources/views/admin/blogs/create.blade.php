@@ -51,7 +51,8 @@
                             </div>
                         </div>
                         <div class="col-sm-12">
-                            <h4 class="mt-4 border-bottom pb-2">SEO Settings</h4>
+ @include('admin.blogs.partials.faqs')
+ <h4 class="mt-4 border-bottom pb-2">SEO Settings</h4>
                             <div class="form-group">
                                 <label for="seo_title">SEO Title</label>
                                 <input type="text" name="seo[title]" value="{{ old('seo.title') }}" id="seo_title" class="form-control @error('seo.title') is-invalid @enderror" placeholder="Leave empty to use blog title">
@@ -92,6 +93,12 @@
 
 @push('js')
 <script src="{{ asset('js/tinymce.js') }}" defer></script>
+<script
+    src="{{ asset('js/admin-blog-editor.js') }}"
+    data-blog-inline-image-editor
+    data-upload-url="{{ route('admin.blog-inline-images.store') }}"
+    defer
+></script>
 @endpush
 
 @push('scripts')

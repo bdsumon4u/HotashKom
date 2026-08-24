@@ -360,24 +360,80 @@ function couriers()
 
 function cdn(?string $url, int $w = 150, int $h = 150)
 {
+    $w = max(1, $w);
+    $h = max(1, $h);
+
     if (! $url) {
-        return asset('https://placehold.co/600x600?text=No+Image');
+        return 'https://placehold.co/600x600?text=No+Image';
     }
 
-    if (parse_url($url, PHP_URL_HOST) == 'placehold.co') {
+    if (parse_url($url, PHP_URL_HOST) === 'placehold.co') {
         return $url;
     }
 
     if ($username = config('services.gumlet.username')) {
-        return str_replace(request()->getHost(), $username.'.gumlet.io', $url).'?fit=resize&w='.$w.'&h='.$h;
+        return str_replace(
+            request()->getHost(),
+            $username.'.gumlet.io',
+            $url
+        ).'?fit=resize&w='.$w.'&h='.$h;
     }
 
     if ($username = config('services.cloudinary.username')) {
-        return 'https://res.cloudinary.com/'.$username.'/image/fetch/w_'.$w.',h_'.$h.',c_thumb/f_webp/'.asset($url);
+        return 'https://res.cloudinary.com/'
+            .$username
+            .'/image/fetch/w_'.$w.',h_'.$h.',c_thumb/f_webp/'
+            .asset($url);
     }
 
     if ($username = config('services.imagekit.username')) {
-        return str_replace(request()->getHost(), 'ik.imagekit.io/'.$username, $url).'??tr=w-'.$w.',h-'.$h;
+        return str_replace(
+            request()->getHost(),
+            'ik.imagekit.io/'.$username,
+            $url
+        ).'?tr=w-'.$w.',h-'.$h;
+    }
+
+    $path = parse_url($url, PHP_URL_PATH);
+
+    if (is_string($path)) {
+        $normalizedPath = ltrim(rawurldecode($path), '/');
+
+        if (str_starts_with($normalizedPath, 'storage/')) {
+            $relativePath = substr(
+                $normalizedPath,
+                strlen('storage/')
+            );
+
+            $hasUnsafePath = str_contains($relativePath, '../')
+                || str_contains($relativePath, '..\\');
+
+            $extension = pathinfo(
+                $relativePath,
+                PATHINFO_EXTENSION
+            );
+
+            if (
+                $relativePath !== ''
+                && ! $hasUnsafePath
+                && $extension !== ''
+            ) {
+                $withoutExtension = substr(
+                    $relativePath,
+                    0,
+                    -(strlen($extension) + 1)
+                );
+
+                $optimizedPath = 'optimized-images/'
+                    .$w.'x'.$h.'/'
+                    .$withoutExtension
+                    .'.webp';
+
+                if (is_file(public_path($optimizedPath))) {
+                    return asset($optimizedPath);
+                }
+            }
+        }
     }
 
     return asset($url);

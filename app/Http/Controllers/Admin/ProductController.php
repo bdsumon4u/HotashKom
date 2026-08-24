@@ -11,6 +11,7 @@ use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\IndexNowService;
 use App\Traits\PreventsSourcedResourceDeletion;
 use Illuminate\Http\Response;
 
@@ -62,6 +63,12 @@ class ProductController extends Controller
         // Handle relationships and dispatch copy job
         $this->handleProductRelationships($product, $data);
 
+        if (! $product->parent_id && $product->slug && $product->is_active) {
+            app(IndexNowService::class)->submit(
+                route('products.show', $product)
+            );
+        }
+
         return redirect()->action([static::class, 'edit'], $product)->with('success', 'Product Has Been Created.');
     }
 
@@ -100,6 +107,8 @@ class ProductController extends Controller
         abort_if($request->user()->is('salesman'), 403, 'You don\'t have permission.');
         $data = $request->validationData();
 
+        $oldSlug = (string) $product->slug;
+
         if (! isset($data['wholesale'])) {
             $data['wholesale'] = [];
         }
@@ -134,6 +143,20 @@ class ProductController extends Controller
 
         event(new ProductUpdated($product, $data));
 
+        if (! $product->parent_id && $product->slug) {
+            $indexNowUrls = [
+                route('products.show', $product),
+            ];
+
+            if ($oldSlug !== '' && $oldSlug !== (string) $product->slug) {
+                $indexNowUrls[] = route('products.show', [
+                    'product' => $oldSlug,
+                ]);
+            }
+
+            app(IndexNowService::class)->submit($indexNowUrls);
+        }
+
         return redirect()
             ->action([static::class, 'index'])
             ->with('success', 'Product Has Been Updated. <a href="'.route('products.show', $product).'" target="_blank">View the Product</a> or <a href="'.route('admin.products.edit', $product).'">Edit the Product</a> again.');
@@ -160,6 +183,12 @@ class ProductController extends Controller
             $product->seo?->delete();
         }
 
+        if (! $product->parent_id && $product->slug) {
+            app(IndexNowService::class)->submit(
+                route('products.show', $product)
+            );
+        }
+
         return back()->with('success', 'SEO Settings Have Been Updated.');
     }
 
@@ -176,7 +205,15 @@ class ProductController extends Controller
             return $result;
         }
 
+        $deletedUrl = (! $product->parent_id && $product->slug)
+            ? route('products.show', ['product' => $product->slug])
+            : null;
+
         $product->delete();
+
+        if ($deletedUrl) {
+            app(IndexNowService::class)->submit($deletedUrl);
+        }
 
         return request()->ajax()
             ? true

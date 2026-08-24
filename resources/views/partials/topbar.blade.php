@@ -86,11 +86,13 @@
                 </div>
             @endif
             <div class="topbar__spring"></div>
-            @if ($show_option->track_order ?? false)
-                <div class="topbar__item topbar__item--link">
-                    <a class="topbar-link" href="{{ url('/track-order') }}" wire:navigate.hover>Track Order</a>
-                </div>
-            @endif
+            <div class="topbar__item topbar__item--link">
+                <a class="topbar-link" href="{{ route('track-order') }}" wire:navigate.hover>Track Order</a>
+            </div>
         </div>
     </div>
 </div>
+
+<style id="nm-mobile-ticker-only">
+@media(max-width:767.98px){.topbar,.site-header .topbar{display:block!important;height:32px!important;min-height:32px!important;overflow:hidden!important}.topbar__container,.topbar__row{display:flex!important;height:32px!important;min-height:32px!important;align-items:center!important}.topbar__row>.topbar__item,.topbar__row>.topbar__spring{display:none!important}.topbar__row>.topbar__ticker{display:flex!important;flex:1 1 100%!important;width:100%!important;min-width:0!important;margin:0!important;overflow:hidden!important}}
+</style>

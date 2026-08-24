@@ -21,7 +21,12 @@ class StorefrontCacheProfile extends BaseCacheProfile
         }
 
         // Never cache requests for authenticated users
-        if (auth()->check()) {
+        if (auth()->check() || auth('user')->check() || auth('admin')->check()) {
+            return false;
+        }
+
+        // Guests with an active cart must receive their own dynamic cart data.
+        if ($request->hasSession() && $request->session()->has('kart')) {
             return false;
         }
 

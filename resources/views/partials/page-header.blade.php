@@ -1,3 +1,5 @@
+@if(in_array(request()->path(), ['terms-and-conditions', 'privacy-policy', 'disclaimer', 'return-and-refund-policy', 'shipping-and-delivery-policy'], true) === false)
+{{-- NM PREMIUM LEGAL PAGE HEADER HIDE --}}
 <div class="page-header">
     <div class="container page-header__container">
         <div class="page-header__breadcrumb">
@@ -22,3 +24,5 @@
         @endif
     </div>
 </div>
+
+@endif

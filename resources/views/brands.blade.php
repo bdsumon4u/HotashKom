@@ -19,14 +19,14 @@
                     <div class="products-list__item">
                         <div class="product-card">
                             <div class="product-card__image">
-                                <a href="{{ route('brands.products', $brand) }}">
+                                <a href="{{ route('brand.show', $brand) }}">
                                     <img src="{{ $brand->image_src }}" alt="Product Image">
                                 </a>
                             </div>
                             <div class="product-card__info">
                                 <div class="product-card__name">
                                     <h6>
-                                        <a href="{{ route('brands.products', $brand) }}">{{ $brand->name }}</a>
+                                        <a href="{{ route('brand.show', $brand) }}">{{ $brand->name }}</a>
                                     </h6>
                                 </div>
                             </div>

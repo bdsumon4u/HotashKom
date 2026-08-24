@@ -2,6 +2,12 @@
 
 @section('title', 'Track Order')
 
+@section('seo_tags')
+    <title>Track Your {{ $company->name ?? config('app.name') }} Order</title>
+    <meta name="description" content="Enter your {{ $company->name ?? config('app.name') }} order ID to check the latest order status and delivery progress.">
+    <meta name="robots" content="noindex, follow">
+@endsection
+
 @section('content')
 
 @include('partials.page-header', [

@@ -8,9 +8,9 @@
 
         <form method="GET" action="{{
             $categorySlug
-                ? route('categories.products', $categorySlug)
+                ? route('category.show', $categorySlug)
                 : ($brandSlug
-                    ? route('brands.products', $brandSlug)
+                    ? route('brand.show', $brandSlug)
                     : route('products.index'))
         }}" id="filter-form"
               x-show="mobileOpen || isDesktop"
@@ -102,9 +102,9 @@
                 <button type="submit" class="btn btn-primary">Filter</button>
                 <a href="{{
                     $categorySlug
-                        ? route('categories.products', $categorySlug)
+                        ? route('category.show', $categorySlug)
                         : ($brandSlug
-                            ? route('brands.products', $brandSlug)
+                            ? route('brand.show', $brandSlug)
                             : route('products.index', ($search && $search !== '') ? ['search' => $search] : []))
                 }}" class="btn btn-secondary">Reset</a>
             </div>

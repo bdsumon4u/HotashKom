@@ -6,9 +6,33 @@
         <div class="container site-header__middle">
             <div class="site-header__logo">
                 <a href="{{ url('/') }}" wire:navigate.hover>
-                    <img src="{{ asset($logo->desktop ?? '') }}" alt="Logo"
-                        style="max-width: 100%; max-height: 84px; width: auto; height: auto; display: block;"
-                        width="auto" height="84">
+                    @php
+                        $desktopLogo = (isset($logo->desktop) && $logo->desktop) ? asset($logo->desktop) : null;
+                        $hasPerfLogo = file_exists(public_path('performance/images/hk-logo-320.webp'));
+                        $perfLogo320 = asset('performance/images/hk-logo-320.webp');
+                        $perfLogo640 = asset('performance/images/hk-logo-640.webp');
+                        $siteBrand = $company->name ?? config('app.name');
+                    @endphp
+                    @if($hasPerfLogo)
+                        <img
+                            src="{{ $perfLogo320 }}"
+                            srcset="{{ $perfLogo320 }} 320w, {{ $perfLogo640 }} 640w"
+                            sizes="255px"
+                            alt="{{ $siteBrand }}"
+                            width="320"
+                            height="81"
+                            decoding="async"
+                            style="max-width: 100%; max-height: 84px; width: auto; height: auto; display: block;"
+                        >
+                    @elseif($desktopLogo)
+                        <img
+                            src="{{ $desktopLogo }}"
+                            alt="{{ $siteBrand }}"
+                            style="max-width: 100%; max-height: 84px; width: auto; height: auto; display: block;"
+                        >
+                    @else
+                        <span class="font-weight-bold" style="font-size: 24px;">{{ $siteBrand }}</span>
+                    @endif
                 </a>
             </div>
             <div class="site-header__search">

@@ -13,7 +13,7 @@ class Image extends Model
     protected $appends = ['size_human'];
 
     protected $fillable = [
-        'filename', 'disk', 'path', 'extension', 'mime', 'size',
+        'filename', 'alt_text', 'disk', 'path', 'extension', 'mime', 'size',
     ];
 
     #[\Override]

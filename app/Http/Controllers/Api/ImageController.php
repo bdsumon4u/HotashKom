@@ -56,9 +56,26 @@ class ImageController extends Controller
                         </div>
                     </div>
                 ')
+            ->editColumn('alt_text', fn (Image $image): string => '
+                    <div style="min-width: 240px;">
+                        <textarea
+                            class="form-control form-control-sm image-alt-input"
+                            rows="2"
+                            maxlength="255"
+                            placeholder="Describe this image"
+                        >'.e($image->alt_text ?? '').'</textarea>
+                        <button
+                            type="button"
+                            class="mt-2 btn btn-sm btn-success image-alt-save"
+                            data-url="'.route('admin.images.update', $image).'"
+                        >
+                            <i class="mr-1 fa fa-save"></i> Save Alt Text
+                        </button>
+                    </div>
+                ')
             ->addColumn('action', fn (Image $image): string => '<button class="p-1 select-image d-flex justify-content-center align-items-center text-dark" data-id="'.$image->id.'" data-src="'.cdn($image->src).'">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                 </button>')
-            ->rawColumns(['preview', 'filename', 'action']);
+            ->rawColumns(['preview', 'filename', 'alt_text', 'action']);
     }
 }

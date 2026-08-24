@@ -63,6 +63,7 @@
                                 <th>ID</th>
                                 <th width="100">Preview</th>
                                 <th>Filename</th>
+                                <th>Alt Text</th>
                                 <th>Mime</th>
                                 <th>Size</th>
                                 <th width="10">Action</th>
@@ -93,6 +94,7 @@
                 { data: 'id' },
                 { data: 'preview' },
                 { data: 'filename', name: 'filename' },
+                { data: 'alt_text', name: 'alt_text' },
                 { data: 'mime', name: 'mime' },
                 { data: 'size_human', name: 'size' },
                 { data: 'action' },
@@ -102,6 +104,67 @@
             lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
         });
 
+        $(document)
+            .off('click.imageAlt')
+            .on('click.imageAlt', '.image-alt-save', function (event) {
+                event.preventDefault();
+
+                const button = $(this);
+                const input = button
+                    .closest('div')
+                    .find('.image-alt-input');
+
+                const originalText = button.html();
+
+                button
+                    .prop('disabled', true)
+                    .html('<i class="mr-1 fa fa-spinner fa-spin"></i> Saving');
+
+                $.ajax({
+                    url: button.data('url'),
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json'
+                    },
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        _method: 'PATCH',
+                        alt_text: input.val()
+                    },
+                    success: function () {
+                        button
+                            .removeClass('btn-success')
+                            .addClass('btn-primary')
+                            .html('<i class="mr-1 fa fa-check"></i> Saved');
+
+                        setTimeout(function () {
+                            button
+                                .removeClass('btn-primary')
+                                .addClass('btn-success')
+                                .prop('disabled', false)
+                                .html(originalText);
+                        }, 1200);
+                    },
+                    error: function (xhr) {
+                        const message =
+                            xhr.responseJSON?.message ||
+                            'Alt text could not be saved.';
+
+                        button
+                            .prop('disabled', false)
+                            .html(originalText);
+
+                        if ($.notify) {
+                            $.notify(message, {
+                                type: 'danger',
+                                z_index: 9999
+                            });
+                        } else {
+                            alert(message);
+                        }
+                    }
+                });
+            });
         // Wait for Dropzone to be available (since it's loaded with defer)
         function initDropzone() {
             if (window.Dropzone) {

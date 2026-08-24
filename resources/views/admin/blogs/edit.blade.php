@@ -53,6 +53,7 @@
                             </div>
                         </div>
                         <div class="col-sm-12">
+                            @include('admin.blogs.partials.faqs')
                             <h4 class="mt-4 border-bottom pb-2">SEO Settings</h4>
                             <div class="form-group">
                                 <label for="seo_title">SEO Title</label>
@@ -94,4 +95,10 @@
 
 @push('js')
 <script src="{{ asset('js/tinymce.js') }}" defer></script>
+<script
+    src="{{ asset('js/admin-blog-editor.js') }}"
+    data-blog-inline-image-editor
+    data-upload-url="{{ route('admin.blog-inline-images.store') }}"
+    defer
+></script>
 @endpush

@@ -1,0 +1,348 @@
+
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+    .rankmet-footer {
+        position: relative;
+        background-color: #1B1919;
+        padding-top: 70px;
+        padding-bottom: 20px;
+        font-family: 'DM Sans', sans-serif;
+        color: #FFFFFF;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .rankmet-footer-watermark {
+        position: absolute;
+        bottom: -25px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: -1;
+        pointer-events: none;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .rankmet-footer-watermark img {
+        max-height: 250px;
+        width: auto;
+        opacity: 0.05;
+        transition: opacity 0.3s ease;
+    }
+
+    .rankmet-footer:hover .rankmet-footer-watermark img {
+        opacity: 0.15;
+    }
+
+    .rankmet-footer-container {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0 30px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .rankmet-footer-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 30px;
+        padding-bottom: 50px;
+    }
+
+    .rankmet-footer-col {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .rankmet-footer-col-1 {
+        flex: 1 1 0px;
+        max-width: 320px;
+    }
+
+    .rankmet-footer-col-2 {
+        flex: 1 1 150px;
+        max-width: 200px;
+    }
+
+    .rankmet-footer-col-3 {
+        flex: 1 1 250px;
+        max-width: 320px;
+    }
+
+    .rankmet-footer-col-4 {
+        flex: 1 1 220px;
+        max-width: 280px;
+    }
+
+    .rankmet-footer-logo {
+        display: inline-block;
+        margin-bottom: 25px;
+        text-decoration: none;
+    }
+
+    .rankmet-footer-logo img {
+        max-height: 50px;
+        width: auto;
+    }
+
+    .rankmet-footer-desc {
+        font-size: 17px;
+        line-height: 1.625em;
+        letter-spacing: -0.2px;
+        color: #F6F4F1;
+        margin: 0;
+    }
+
+    .rankmet-footer-title {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 19px;
+        font-weight: 600;
+        line-height: 1.2632em;
+        color: var(--brand);
+        margin-top: 0;
+        margin-bottom: 25px;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .rankmet-footer-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .rankmet-footer-list li {
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .rankmet-footer-list li:last-child {
+        margin-bottom: 0;
+    }
+
+    .rankmet-footer-list a {
+        color: #FFFFFF;
+        font-size: 16px;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .rankmet-footer-list a:hover {
+        color: var(--brand);
+    }
+
+    .rankmet-footer-socials {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+
+    .rankmet-footer-socials a {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid #414141;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #FFFFFF;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .rankmet-footer-socials a svg,
+    .rankmet-footer-socials a i {
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        fill: currentColor;
+        transition: fill 0.3s ease;
+    }
+
+    .rankmet-footer-socials a:hover {
+        background-color: var(--brand);
+        border-color: var(--brand);
+        color: #FFFFFF;
+    }
+
+    .rankmet-footer-email-box {
+        margin-bottom: 12px;
+    }
+
+    .rankmet-footer-email {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 16px;
+        color: var(--brand);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .rankmet-footer-email:hover {
+        color: #FFFFFF;
+    }
+
+    .rankmet-footer-phone-box {
+        margin-bottom: 12px;
+    }
+
+    .rankmet-footer-phone {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 16px;
+        color: #B7B7B7;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .rankmet-footer-phone:hover {
+        color: #FFFFFF;
+    }
+
+    .rankmet-footer-address-box {
+        margin-bottom: 20px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 16px;
+        color: #B7B7B7;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .rankmet-footer-policies li {
+        margin-bottom: 8px;
+    }
+
+    .rankmet-footer-bottom {
+        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .rankmet-footer-checkout-img {
+        max-width: 100%;
+        height: auto;
+        max-height: 44px;
+    }
+
+    .rankmet-footer-copyright {
+        font-size: 14px;
+        color: #B7B7B7;
+    }
+
+    .rankmet-footer-credit {
+        font-size: 14px;
+        color: #B7B7B7;
+    }
+
+    .rankmet-footer-credit a:hover {
+        color: #FFFFFF !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+        .rankmet-footer {
+            padding-top: 50px;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        .rankmet-footer-row {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 40px;
+            padding-bottom: 40px;
+        }
+
+        .rankmet-footer-col {
+            align-items: center;
+            width: 100%;
+            max-width: 100% !important;
+        }
+
+        .rankmet-footer-title {
+            margin-bottom: 15px;
+        }
+
+        .rankmet-footer-bottom {
+            padding-top: 20px;
+        }
+
+        .rankmet-footer-watermark {
+            bottom: -25px;
+        }
+
+        .rankmet-footer-socials {
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .rankmet-footer {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+    }
+    /* Footer bottom alignment */
+    @media (min-width: 1025px) {
+        .rankmet-footer-credit {
+            flex: 0 0 22%;
+            text-align: left;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .rankmet-footer-bottom {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .rankmet-footer-credit {
+            flex: 0 0 auto;
+            width: 100%;
+            text-align: center;
+        }
+    }
+    /* Final footer bottom alignment */
+    @media (min-width: 1025px) {
+        .rankmet-footer-bottom {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 280px;
+            column-gap: 30px;
+            align-items: center;
+            text-align: left;
+        }
+
+        .rankmet-footer-credit {
+            width: 280px;
+            max-width: 280px;
+            text-align: left;
+            justify-self: start;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .rankmet-footer-bottom {
+            display: grid;
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .rankmet-footer-credit {
+            width: 100%;
+            max-width: none;
+            text-align: center;
+            justify-self: stretch;
+        }
+    }

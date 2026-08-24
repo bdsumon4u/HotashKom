@@ -212,7 +212,6 @@
                         <div class="product-card" data-id="${productId}" data-max="${shouldTrack ? (stockCount || 0) : -1}">
                             <div class="product-card__badges-list">
                                 ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
-                                ${discountText ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                             </div>
                             <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
                                 <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">

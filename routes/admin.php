@@ -122,6 +122,8 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::post('reviews/bulk-delete', [ReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
         Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
+        Route::post('blog-inline-images', [BlogController::class, 'uploadInlineImage'])
+            ->name('blog-inline-images.store');
         Route::resources([
             'staffs' => StaffController::class,
             'slides' => SlideController::class,

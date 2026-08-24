@@ -102,7 +102,7 @@
 {{-- <script src="{{ asset('strokya/vendor/nouislider-12.1.0/nouislider.min.js') }}"></script> --}}
 <!-- <script src="{{ asset('strokya/js/number.js') }}"></script> -->
 {{-- Main.js can be deferred - most functionality is not critical for initial render --}}
-<script src="{{ versionedAsset('strokya/js/main.js') }}" defer></script>
+<script src="{{ asset('strokya/js/main.js') . '?v=20260816-040457' }}" defer></script>
 {{-- Bootstrap notify can be deferred - notifications appear after page load --}}
 <script src="{{ versionedAsset('assets/js/notify/bootstrap-notify.min.js') }}" defer></script>
 <!-- Include AlgoliaSearch JS Client and autocomplete.js library -->

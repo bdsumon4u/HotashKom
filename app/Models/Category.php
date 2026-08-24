@@ -14,7 +14,21 @@ class Category extends Model
 
     protected $fillable = [
         'parent_id', 'image_id', 'name', 'slug', 'order', 'is_enabled', 'content',
+        'premium_header_config', 'premium_guide_config',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'premium_header_config' => 'array',
+            'premium_guide_config' => 'array',
+        ];
+    }
 
     #[\Override]
     public static function booted(): void
@@ -173,5 +187,41 @@ class Category extends Model
             description: $description,
             image: $image,
         );
+    }
+
+    /**
+     * @return array{eyebrow: string|null, help_title: string|null, help_text: string|null, section_title: string|null, section_text: string|null}
+     */
+    public function getPremiumHeaderData(): array
+    {
+        $raw = $this->premium_header_config ?? [];
+        $seoTitle = $this->seo?->title ?: $this->name;
+        $seoDesc = $this->seo?->description ?? '';
+
+        return [
+            'eyebrow' => $raw['eyebrow'] ?? $this->name,
+            'help_title' => $raw['help_title'] ?? $seoTitle,
+            'help_text' => $raw['help_text'] ?? $seoDesc,
+            'section_title' => $raw['section_title'] ?? ($this->name ? $this->name.'-এর বিভাগগুলো' : null),
+            'section_text' => $raw['section_text'] ?? null,
+        ];
+    }
+
+    /**
+     * @return array{title: string, patterns: list<string>}|null
+     */
+    public function getPremiumGuideData(): ?array
+    {
+        $raw = $this->premium_guide_config ?? [];
+        $patterns = $raw['patterns'] ?? [];
+
+        if (empty($patterns) || ! is_array($patterns)) {
+            return null;
+        }
+
+        return [
+            'title' => $raw['title'] ?? ($this->name ? $this->name.' কেনার আগে আরও জানুন' : ''),
+            'patterns' => array_values(array_filter($patterns)),
+        ];
     }
 }

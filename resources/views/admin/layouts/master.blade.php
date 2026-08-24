@@ -7,7 +7,27 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $company->name ?? config('app.name', 'Laravel') }}</title>
+    @php
+    $adminSiteName = $company->name ?? config('app.name', 'Laravel');
+    $adminSeoTitle = $adminSiteName;
+
+    if (request()->routeIs('admin.login')) {
+        $adminSeoTitle = $adminSiteName . ' - Admin Login';
+    } elseif (request()->routeIs('admin.password.request')) {
+        $adminSeoTitle = $adminSiteName . ' - Reset Admin Password';
+    }
+@endphp
+
+<title>{{ $adminSeoTitle }}</title>
+
+@if (request()->routeIs(
+    'admin.login',
+    'admin.password.request',
+    'admin.password.reset',
+    'admin.password.confirm'
+))
+    <meta name="robots" content="noindex, nofollow">
+@endif
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>

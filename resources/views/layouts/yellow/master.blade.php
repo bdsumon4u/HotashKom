@@ -2,33 +2,165 @@
 <html lang="en" dir="ltr">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R48TJ5VTDC"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "G-R48TJ5VTDC");
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="format-detection" content="telephone=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @if (trim($__env->yieldContent('seo_tags')))
-        @yield('seo_tags')
-    @else
-        <title>{{ $company->name }} - @yield('title')</title>
-    @endif
-    <link rel="icon" type="image/png" href="{{ asset($logo->favicon) }}">
+@php
+    $renderedSeoTags = trim($__env->yieldContent('seo_tags'));
 
+    $isErrorPage = trim(
+        $__env->yieldContent('is_error_page')
+    ) === '1';
+
+    $canonicalUrl = rtrim(config('app.url'), '/')
+        . '/'
+        . ltrim(request()->path(), '/');
+
+    $pageNumber = max(
+        1,
+        (int) request()->query('page', 1)
+    );
+
+    $isCollectionRoute = request()->routeIs(
+        'products.index',
+        'blogs.index',
+        'category.show',
+        'categories.products',
+        'brand.show',
+        'brands.products',
+        'categories',
+        'brands'
+    );
+
+    $filterQueryKeys = [
+        'filter_section',
+        'filter_category',
+        'filter_option',
+        'search',
+        'shuffle',
+    ];
+
+    $isNonSeoRoute = request()->routeIs(
+        'brands',
+        'brand.show',
+        'brands.products'
+    );
+
+    $shouldNoindex = $isErrorPage
+        || $isNonSeoRoute
+        || collect($filterQueryKeys)
+        ->contains(
+            fn (string $key): bool => request()->has($key)
+        );
+
+    $shouldUsePaginatedCanonical = $isCollectionRoute
+        && $pageNumber > 1
+        && ! $shouldNoindex;
+
+    if ($shouldUsePaginatedCanonical) {
+        $canonicalUrl .= '?page=' . $pageNumber;
+
+        $renderedSeoTags = preg_replace(
+            "/<link\b(?=[^>]*\brel\s*=\s*['\"]canonical['\"])[^>]*>\s*/i",
+            '',
+            $renderedSeoTags
+        ) ?? $renderedSeoTags;
+    }
+
+    if ($shouldNoindex) {
+        $renderedSeoTags = preg_replace(
+            "/<meta\b(?=[^>]*\bname\s*=\s*['\"]robots['\"])[^>]*>\s*/i",
+            '',
+            $renderedSeoTags
+        ) ?? $renderedSeoTags;
+    }
+
+    $hasCanonical = preg_match(
+        "/rel\s*=\s*['\"]canonical['\"]/i",
+        $renderedSeoTags
+    ) === 1;
+
+    $usesGeneratedCanonical = request()->is('products/*')
+        || request()->is('blogs/*')
+        || request()->is('category/*')
+        || request()->is('categories/*')
+        || request()->is('brand/*')
+        || request()->is('brands/*');
+@endphp
+
+@if ($renderedSeoTags)
+    {!! $renderedSeoTags !!}
+@else
+    <title>{{ $company->name }} - @yield('title')</title>
+@endif
+
+@if (
+    ! $isErrorPage
+    && ! $hasCanonical
+    && (
+        ! $usesGeneratedCanonical
+        || $shouldUsePaginatedCanonical
+    )
+)
+    <link rel="canonical" href="{{ $canonicalUrl }}">
+@endif
+
+@if ($shouldNoindex)
+    <meta
+        name="robots"
+        content="noindex, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+@endif
+    <link rel="icon" type="image/png" href="{{ asset($logo->favicon) }}">
+        {{-- Critical page-specific preloads must be discovered early --}}
+    @if(request()->routeIs(
+        'products.index',
+        'blogs.index',
+        'category.show',
+        'categories.products',
+        'brand.show',
+        'brands.products',
+        'categories',
+        'brands'
+    ))
+        @include('schema.collection')
+    @endif
+    @if(in_array(request()->path(), [
+        'about-us',
+        'contact-us',
+        'terms-and-conditions',
+        'privacy-policy',
+        'disclaimer',
+        'return-and-refund-policy',
+        'shipping-and-delivery-policy',
+    ], true))
+        @include('schema.static-page')
+    @endif
+    @stack('head')
     @php
-        $bootstrapCss = cdnAsset('bootstrap.css', 'strokya/vendor/bootstrap-4.2.1/css/bootstrap.min.css');
-        $fontawesomeCss = cdnAsset('fontawesome.css', 'strokya/vendor/fontawesome-5.6.1/css/all.min.css');
-        $jqueryJs = cdnAsset('jquery', 'strokya/vendor/jquery-3.3.1/jquery.min.js');
+        $bootstrapCss = asset('performance/vendor/bootstrap-4.6.2/css/bootstrap.min.css') . '?v=4.6.2';
+        $fontawesomeCss = asset('performance/vendor/fontawesome-6.5.1/css/all.min.css') . '?v=6.5.1';
+        $jqueryJs = asset('performance/vendor/jquery-3.7.1/jquery.min.js') . '?v=3.7.1';
     @endphp
 
     @include('layouts.partials.cdn-fallback', [
         'fallbackAssets' => [
-            'jquery' => asset('strokya/vendor/jquery-3.3.1/jquery.min.js'),
-            'bootstrap' => asset('strokya/vendor/bootstrap-4.2.1/js/bootstrap.bundle.min.js'),
+            'jquery' => asset('performance/vendor/jquery-3.7.1/jquery.min.js') . '?v=3.7.1',
+            'bootstrap' => asset('performance/vendor/bootstrap-4.6.2/js/bootstrap.bundle.min.js') . '?v=4.6.2',
             'owl' => asset('strokya/vendor/owl-carousel-2.3.4/owl.carousel.min.js'),
         ],
     ])
     {{-- Preload critical CSS --}}
     <link rel="preload" href="{{ $bootstrapCss }}" as="style" crossorigin="anonymous">
-    <link rel="preload" href="{{ $fontawesomeCss }}" as="style" crossorigin="anonymous">
     <link rel="preload" href="{{ versionedAsset('strokya/css/style.css') }}" as="style">
 
     {{-- jQuery is loaded synchronously, no need to preload --}}
@@ -101,7 +233,7 @@
         // Polyfill for browsers that don't support preload with onload
         (function() {
             function processPreloadLinks() {
-                var preloadLinks = document.querySelectorAll('link[rel="preload"][as="style"]');
+                var preloadLinks = document.querySelectorAll('link[rel="preload"][as="style"][data-async-css="true"]');
                 preloadLinks.forEach(function(link) {
                     // If onload handler wasn't set or doesn't work, provide fallback
                     if (!link.hasAttribute('data-async-processed')) {
@@ -146,8 +278,8 @@
     </script>
 
     {{-- Global jQuery (needed for SPA navigation) --}}
-    <script src="{{ $jqueryJs }}" data-navigate-once crossorigin="anonymous" referrerpolicy="no-referrer"
-        onerror="window.__loadLocalAsset && window.__loadLocalAsset('jquery')"></script>
+    <script src="{{ $jqueryJs }}" defer data-navigate-once crossorigin="anonymous" referrerpolicy="no-referrer"
+    onerror="window.__loadLocalAsset && window.__loadLocalAsset('jquery')"></script>
     <script data-navigate-once>
         (function() {
             if (window.runWhenJQueryReady) {
@@ -196,7 +328,6 @@
             }
         })();
     </script>
-    </script>
 
     <!-- css -->
     {{-- Google Tag Manager: load once (not deferred) to avoid duplicate injections with SPA navigation --}}
@@ -226,29 +357,24 @@
     <!-- js -->
     <!-- font - fontawesome -->
     @php
-        $cdnProvider = config('cdn.provider', 'jsdelivr');
-        $fontAwesomeVersion = config('cdn.assets.fontawesome.version', '6.5.1');
-
-        // Determine base URL based on CDN provider
-        $fontBaseUrl = match ($cdnProvider) {
-            'jsdelivr' => "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@{$fontAwesomeVersion}/webfonts",
-            'cdnjs' => "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/{$fontAwesomeVersion}/webfonts",
-            'unpkg' => "https://unpkg.com/@fortawesome/fontawesome-free@{$fontAwesomeVersion}/webfonts",
-            default => "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@{$fontAwesomeVersion}/webfonts",
-        };
+        $fontBaseUrl = asset(
+            'performance/vendor/fontawesome-6.5.1/webfonts'
+        );
     @endphp
 
-    {{-- Preload critical Font Awesome fonts for faster rendering --}}
-    @if (config('cdn.enabled', true))
-        <link rel="preload" href="{{ $fontBaseUrl }}/fa-brands-400.woff2" as="font" type="font/woff2"
-            crossorigin="anonymous">
-        <link rel="preload" href="{{ $fontBaseUrl }}/fa-solid-900.woff2" as="font" type="font/woff2"
-            crossorigin="anonymous">
-        <link rel="preload" href="{{ $fontBaseUrl }}/fa-regular-400.woff2" as="font" type="font/woff2"
-            crossorigin="anonymous">
-    @endif
-
+    {{-- Load Font Awesome without blocking the initial page render --}}
+<link
+    rel="preload"
+    href="{{ $fontawesomeCss }}"
+    as="style"
+    data-async-css="true"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    onload="this.onload=null;this.rel='stylesheet'"
+>
+<noscript>
     <link rel="stylesheet" href="{{ $fontawesomeCss }}" crossorigin="anonymous" referrerpolicy="no-referrer">
+</noscript>
 
     <!-- Optimize Font Awesome font loading with font-display: swap -->
     <style>
@@ -855,7 +981,61 @@
             rel="stylesheet">
     </noscript>
     {!! $scripts ?? null !!}
-    @stack('head')
+    
+    <link rel="stylesheet" href="/css/hk-footer.css?v=20260810-224732">
+
+    @if (request()->routeIs('category.show', 'categories.products'))
+        <link rel="stylesheet" href="/css/hk-premium-category.css?v=20260810-232705">
+    @endif
+
+    @php
+        $gcrMerchantId = setting('gcr_merchant_id');
+    @endphp
+    @if ($gcrMerchantId)
+    {{-- Load the non-essential Google Merchant badge after the page becomes interactive. --}}
+    <script data-navigate-once>
+        (function () {
+            if (window.__merchantWidgetScheduled) {
+                return;
+            }
+
+            window.__merchantWidgetScheduled = true;
+
+            function loadMerchantWidget() {
+                if (document.getElementById('merchantWidgetScript')) {
+                    return;
+                }
+
+                var script = document.createElement('script');
+                script.id = 'merchantWidgetScript';
+                script.src = 'https://www.gstatic.com/shopping/merchant/merchantwidget.js';
+                script.async = true;
+
+                script.onload = function () {
+                    if (window.merchantwidget && typeof window.merchantwidget.start === 'function') {
+                        window.merchantwidget.start({
+                            merchant_id: {{ (int) $gcrMerchantId }},
+                            position: 'BOTTOM_RIGHT',
+                            region: 'BD'
+                        });
+                    }
+                };
+
+                document.head.appendChild(script);
+            }
+
+            function scheduleMerchantWidget() {
+                window.setTimeout(loadMerchantWidget, 2500);
+            }
+
+            if (document.readyState === 'complete') {
+                scheduleMerchantWidget();
+            } else {
+                window.addEventListener('load', scheduleMerchantWidget, { once: true });
+            }
+        })();
+    </script>
+    @endif
 </head>
 
 <body class="header-fixed" style="margin: 0; padding: 0;">
@@ -953,13 +1133,14 @@
     </div><!-- site / end -->
     @livewireScripts
     @include('layouts.yellow.js')
-    {{-- Defer xzoom scripts - only needed on product detail pages, not critical for initial render --}}
-    <script src="{{ asset('strokya/vendor/xzoom/xzoom.min.js') }}" defer></script>
-    <script src="{{ asset('strokya/vendor/xZoom-master/example/js/vendor/modernizr.js') }}" defer></script>
-    <script src="{{ asset('strokya/vendor/xZoom-master/example/js/setup.js') }}" defer></script>
-    {{-- External JavaScript files for better caching and performance --}}
+    {{-- Product zoom and related-product scripts are needed only on product detail pages. --}}
+    @if (request()->routeIs('product.show', 'products.show'))
+        <script src="{{ asset('strokya/vendor/xzoom/xzoom.min.js') }}" defer></script>
+        <script src="{{ versionedAsset('strokya/js/product-gallery.js') }}" defer></script>
+    @endif
+
+    {{-- External JavaScript files for shared storefront behaviour. --}}
     <script src="{{ versionedAsset('strokya/js/notify-handler.js') }}" defer></script>
-    <script src="{{ versionedAsset('strokya/js/product-gallery.js') }}" defer></script>
     <script src="{{ versionedAsset('strokya/js/storefront-components.js') }}" defer></script>
     <script src="{{ versionedAsset('strokya/js/whatsapp-handlers.js') }}" defer></script>
     <script src="{{ versionedAsset('strokya/js/facebook-events.js') }}" defer data-navigate-once></script>
@@ -993,61 +1174,7 @@
     </style>
     {{-- Storefront components moved to external file: strokya/js/storefront-components.js --}}
     @stack('scripts')
-    @php
-        if (! function_exists('phone88')) {
-            function phone88($phone)
-            {
-                $phone = preg_replace('/[^\d]/', '', $phone);
-                if (strlen($phone) == 11) {
-                    $phone = '88' . $phone;
-                }
-                return $phone;
-            }
-        }
-        $messenger = $company->messenger ?? '';
-        $phone = phone88($company->whatsapp ?? '');
-    @endphp
-    @if ($phone && strlen($messenger) > 13)
-        <div class="widget-connect widget-connect-right">
-            @if ($messenger)
-                <a class="widget-connect__button widget-connect__button-telemessenger button-slide-out"
-                    aria-label="Messenger Link"
-                    style="background: white; color: blue;" href="{{ $messenger }}" data-toggle="tooltip"
-                    data-placement="left" title="" target="_blank" data-original-title="Messenger"
-                    data-contact-type="messenger">
-                    <i class="fab fa-facebook-messenger"></i>
-                </a>
-            @endif
-            @if ($phone)
-                <a class="widget-connect__button widget-connect__button-whatsapp button-slide-out"
-                    style="background: white; color: green;" href="https://wa.me/{{ $phone }}"
-                    data-toggle="tooltip" data-placement="left" title="" data-original-title="WhatsApp"
-                    data-whatsapp-url="https://wa.me/{{ $phone }}"
-                    aria-label="Whatsapp Link"
-                    data-contact-type="whatsapp">
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-            @endif
-            <div class="widget-connect__button-activator">
-                <div class="widget-connect__button-activator-icon"></div>
-            </div>
-        </div>
-    @elseif ($phone)
-        <a href="https://api.whatsapp.com/send?phone={{ $phone }}"
-            aria-label="Whatsapp Link"
-            style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#25d366;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;cursor:pointer;"
-            data-whatsapp-url="https://api.whatsapp.com/send?phone={{ $phone }}"
-            data-contact-type="whatsapp">
-            <i class="fab fa-whatsapp" style="margin-top: 1rem;"></i>
-        </a>
-    @elseif (strlen($messenger) > 13)
-        <a href="{{ $messenger }}" target="_blank"
-            aria-label="Messenger Link"
-            data-contact-type="messenger"
-            style="position:fixed;width:60px;height:60px;bottom:40px;right:40px;background-color:#0084ff;color:#FFF;border-radius:50px;text-align:center;font-size:30px;box-shadow: 2px 2px 3px #999;z-index:100;">
-            <i class="fab fa-facebook-messenger" style="margin-top: 1rem;"></i>
-        </a>
-    @endif
+
     {{-- WhatsApp handlers moved to external file: strokya/js/whatsapp-handlers.js --}}
     @if (config('app.unregister_sw'))
         <script data-navigate-once>
@@ -1113,6 +1240,7 @@
             }
         })();
     </script>
+
 </body>
 
 </html>

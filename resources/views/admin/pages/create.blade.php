@@ -35,6 +35,43 @@
                         </div>
                         <x-error field="slug" />
                     </div>
+                    <!-- Page SEO Fields -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="seo_title">SEO Title</label>
+                                <x-input
+                                    name="seo_title"
+                                    id="seo_title"
+                                    :value="old('seo_title')"
+                                    maxlength="255"
+                                    placeholder="Enter the SEO title"
+                                />
+                                <small class="form-text text-muted">
+                                    Recommended length: approximately 50–60 characters.
+                                </small>
+                                <x-error field="seo_title" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="meta_description">Meta Description</label>
+                                <x-textarea
+                                    rows="4"
+                                    name="meta_description"
+                                    id="meta_description"
+                                    maxlength="500"
+                                    placeholder="Enter a concise page description"
+                                >{{ old('meta_description') }}</x-textarea>
+                                <small class="form-text text-muted">
+                                    Recommended length: approximately 150–160 characters.
+                                </small>
+                                <x-error field="meta_description" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Page SEO Fields / end -->
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group">

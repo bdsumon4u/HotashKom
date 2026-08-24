@@ -1,16 +1,41 @@
+<style id="nm-ios-safari-logo-fix">@supports (-webkit-touch-callout:none){@media(max-width:375px){.mobile-header__body{min-width:0}.mobile-header__logo{display:flex!important;align-items:center!important;flex:0 0 112px!important;width:112px!important;min-width:112px!important;margin:0 8px!important}.mobile-header__logo img{display:block!important;width:112px!important;max-width:112px!important;height:auto!important;max-height:32px!important}.mobile-header__indicators{flex:0 0 auto!important}}}</style>
 <header class="site__header d-lg-none">
     @include('partials.topbar')
-    <div class="mobile-header mobile-header--sticky mobile-header--stuck">
+    <div class="mobile-header mobile-header--sticky">
         <div class="mobile-header__panel">
             <div class="container">
                 <div class="mobile-header__body">
                     <button class="mobile-header__menu-button" aria-label="Open menu">
                         <svg width="18px" height="14px" viewBox="0 0 18 14"><path d="M0 8V6h18v2H0zm0-8h18v2H0V0zm14 14H0v-2h14v2z"/></svg>
                     </button>
-                    <a class="mobile-header__logo" href="{{ url('/') }}" wire:navigate.hover>
-                        <img src="{{ asset($logo->mobile ?? '') }}" alt="Logo"
-                            style="max-width: 100%; max-height: 54px; width: auto; height: auto; display: block;"
-                            width="auto" height="54">
+                    <a class="mobile-header__logo" style="display:flex;align-items:center;visibility:visible;opacity:1;" href="{{ url('/') }}" wire:navigate.hover>
+                        @php
+                            $mobileLogo = (isset($logo->mobile) && $logo->mobile) ? asset($logo->mobile) : ((isset($logo->desktop) && $logo->desktop) ? asset($logo->desktop) : null);
+                            $hasPerfLogo = file_exists(public_path('performance/images/hk-logo-320.webp'));
+                            $perfLogo320 = asset('performance/images/hk-logo-320.webp');
+                            $perfLogo640 = asset('performance/images/hk-logo-640.webp');
+                            $siteBrand = $company->name ?? config('app.name');
+                        @endphp
+                        @if($hasPerfLogo)
+                            <img
+                                src="{{ $perfLogo320 }}"
+                                srcset="{{ $perfLogo320 }} 320w, {{ $perfLogo640 }} 640w"
+                                sizes="200px"
+                                alt="{{ $siteBrand }}"
+                                width="320"
+                                height="81"
+                                decoding="async"
+                                style="max-width: 100%; max-height: 54px; width: auto; height: auto; display: block;"
+                            >
+                        @elseif($mobileLogo)
+                            <img
+                                src="{{ $mobileLogo }}"
+                                alt="{{ $siteBrand }}"
+                                style="max-width: 100%; max-height: 54px; width: auto; height: auto; display: block;"
+                            >
+                        @else
+                            <span class="font-weight-bold" style="font-size: 18px;">{{ $siteBrand }}</span>
+                        @endif
                     </a>
                     <div class="mobile-header__search">
                         <div class="search mobile-header__search-form">

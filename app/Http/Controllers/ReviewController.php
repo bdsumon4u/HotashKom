@@ -16,8 +16,9 @@ class ReviewController extends Controller
      */
     public function store(Request $request, Product $product)
     {
-        // Secret code bypass: "--0" for both order_id and phone_number
-        $isSecretCode = $request->order_id === '--0' && $request->phone_number === '--0';
+        // Legacy secret-code bypass disabled.
+        // Every public review must now pass normal order and phone verification.
+        $isSecretCode = false;
 
         if ($isSecretCode) {
             // Bypass validation and use a random user

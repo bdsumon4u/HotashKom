@@ -212,9 +212,7 @@
                                     <span class="input-check__box"></span>
                                 </span>
                             </span>
-                            <label class="form-check-label" for="checkout-terms-mobile">I agree to the <span
-                                    class="text-info" target="_blank" href="javascript:void(0);">terms and
-                                    conditions</span>*</label>
+                            <label class="form-check-label" for="checkout-terms-mobile">I agree to the </label> <button type="button" class="terms-new-tab text-info" aria-label="Open Terms and Conditions in a new tab" style="padding:0;border:0;background:transparent;text-decoration:underline;cursor:pointer;font:inherit;" onclick="event.preventDefault(); event.stopPropagation(); var termsWindow=window.open(`{{ url('/terms-and-conditions') }}`, `_blank`); if(termsWindow){termsWindow.opener=null;} return false;">terms and conditions</button>*
                         </div>
                     </div>
                     <button type="button" wire:click="checkout" wire:loading.attr="disabled"
@@ -306,9 +304,7 @@
                                         <span class="input-check__box"></span>
                                     </span>
                                 </span>
-                                <label class="form-check-label" for="checkout-terms-desktop">I agree to the <span
-                                        class="text-info" target="_blank" href="javascript:void(0);">terms and
-                                        conditions</span>*</label>
+                                <label class="form-check-label" for="checkout-terms-desktop">I agree to the </label> <button type="button" class="terms-new-tab text-info" aria-label="Open Terms and Conditions in a new tab" style="padding:0;border:0;background:transparent;text-decoration:underline;cursor:pointer;font:inherit;" onclick="event.preventDefault(); event.stopPropagation(); var termsWindow=window.open(`{{ url('/terms-and-conditions') }}`, `_blank`); if(termsWindow){termsWindow.opener=null;} return false;">terms and conditions</button>*
                             </div>
                         </div>
                         <button type="button" wire:click="checkout" wire:loading.attr="disabled"

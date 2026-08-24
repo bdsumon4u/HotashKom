@@ -6,13 +6,16 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BrandProductController;
 use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\GoogleMerchantFeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HomeSectionProductController;
 use App\Http\Controllers\LandingPageProController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\MaintenancePaymentController;
 use App\Http\Controllers\OrderTrackController;
+use App\Http\Controllers\PinterestCatalogFeedController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ResellerController;
 use App\Http\Controllers\ReviewController;
@@ -119,9 +122,9 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
     Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
     Route::post('/products/{product:slug}/reviews', [ReviewController::class, 'store'])->name('products.reviews.store');
     Route::get('/products/{product:slug}/reviews', [ReviewController::class, 'index'])->name('products.reviews.index');
-    Route::get('/category/{category:slug}', CategoryProductController::class)->name('category.show');
+    Route::get('/category/{category:slug}', CategoryProductController::class)->name('category.show')->middleware('response.cache');
     Route::get('/categories/{category:slug}/products', CategoryProductController::class)->name('categories.products');
-    Route::get('/brand/{brand:slug}', BrandProductController::class)->name('brand.show');
+    Route::get('/brand/{brand:slug}', BrandProductController::class)->name('brand.show')->middleware('response.cache');
     Route::get('/brands/{brand:slug}/products', BrandProductController::class)->name('brands.products');
     Route::get('/lp/{landingPagePro:slug}', [LandingPageProController::class, 'show'])->name('landing-pro.show');
     Route::post('/lp/{landingPagePro:slug}/checkout', [LandingPageProController::class, 'checkout'])->name('landing-pro.checkout');
@@ -168,15 +171,20 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
 
 });
 
-Route::get('/storage-link', [ApiController::class, 'storageLink']);
-Route::get('/scout-flush', [ApiController::class, 'scoutFlush']);
-Route::get('/scout-import', [ApiController::class, 'scoutImport']);
-Route::get('/link-optimize', [ApiController::class, 'linkOptimize']);
-Route::get('/cache-clear', [ApiController::class, 'clearCache'])->name('clear.cache');
+// Operational maintenance routes must never be publicly executable.
+Route::middleware('auth:admin')->group(function (): void {
+    Route::get('/storage-link', [ApiController::class, 'storageLink']);
+    Route::get('/scout-flush', [ApiController::class, 'scoutFlush']);
+    Route::get('/scout-import', [ApiController::class, 'scoutImport']);
+    Route::get('/link-optimize', [ApiController::class, 'linkOptimize']);
+    Route::get('/cache-clear', [ApiController::class, 'clearCache'])->name('clear.cache');
+});
 
 // Feed routes
 Route::get('/feed/catalog', [FeedController::class, 'catalog'])->name('feed.catalog');
 Route::get('/feed/catalog-simple', [FeedController::class, 'catalogSimple'])->name('feed.catalog.simple');
+Route::get('/google-merchant-feed.xml', GoogleMerchantFeedController::class)->name('feed.google-merchant');
+Route::get('/pinterest-catalog-feed.xml', PinterestCatalogFeedController::class)->name('feed.pinterest-catalog');
 
 // Secure MySQL connection diagnostics — access via /db-status?key=YOUR_DEBUG_KEY
 Route::get('/db-status', function () {
@@ -219,3 +227,19 @@ Route::get('/db-status', function () {
         'checked_at' => now()->toDateTimeString(),
     ], 200, [], JSON_PRETTY_PRINT);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Contact Form
+|--------------------------------------------------------------------------
+*/
+
+Route::post(
+    '/contact-us/send',
+    [
+        ContactMessageController::class,
+        'store',
+    ]
+)
+    ->middleware('throttle:5,1')
+    ->name('contact.submit');

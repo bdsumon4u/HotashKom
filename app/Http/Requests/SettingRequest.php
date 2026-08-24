@@ -66,6 +66,8 @@ class SettingRequest extends FormRequest
                 'pixel_ids' => 'sometimes',
                 'meta_pixel' => 'sometimes',
                 'scripts' => 'sometimes',
+                'gcr_merchant_id' => 'sometimes|nullable|digits_between:1,20',
+                'google_merchant_id_prefix' => 'sometimes|nullable|string|max:32',
             ];
         }
 
@@ -93,7 +95,7 @@ class SettingRequest extends FormRequest
 
         if ($this->get('tab') == 'color') {
             $rules = [];
-            foreach (['topbar', 'header', 'search', 'navbar', 'category_menu', 'section', 'badge', 'footer', 'primary', 'add_to_cart', 'order_now'] as $key) {
+            foreach (['brand', 'primary', 'topbar', 'header', 'search', 'navbar', 'category_menu', 'section', 'badge', 'footer', 'add_to_cart', 'order_now'] as $key) {
                 $rules['color.'.$key] = 'required|array';
                 foreach (['background_color', 'background_hover', 'text_color', 'text_hover'] as $color) {
                     $rules['color.'.$key.'.'.$color] = ['required', 'regex:/^#([a-f0-9]{6}|[a-f0-9]{3})$/i'];

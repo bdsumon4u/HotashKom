@@ -52,6 +52,10 @@
     ExpiresByType font/eot "access plus 1 year"
 
     # Default
+    # Frequently updated sitemap, robots.txt and llms.txt files
+ExpiresByType application/xml "access plus 1 hour"
+ExpiresByType text/xml "access plus 1 hour"
+ExpiresByType text/plain "access plus 1 hour"
     ExpiresDefault "access plus 1 month"
 </IfModule>
 
