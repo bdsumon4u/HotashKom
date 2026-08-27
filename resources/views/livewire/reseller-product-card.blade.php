@@ -44,7 +44,7 @@
             <label class="small text-muted">Quantity:</label>
             <div class="input-number product__quantity d-inline-block">
                 <input type="number" class="form-control form-control-sm input-number__input"
-                       wire:model.live="quantity" min="1" max="{{ $maxQuantity }}" readonly>
+                       wire:model.live.debounce.250ms="quantity" min="1" max="{{ $maxQuantity }}" readonly>
                 <div class="input-number__add" wire:click="increment"></div>
                 <div class="input-number__sub" wire:click="decrement"></div>
             </div>
