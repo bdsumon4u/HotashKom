@@ -9,6 +9,7 @@ use FacebookAds\Object\ServerSide\CustomData;
 use FacebookAds\Object\ServerSide\DeliveryCategory;
 use FacebookAds\Object\ServerSide\UserData;
 use Hotash\FacebookPixel\Facades\MetaPixel;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -221,50 +222,57 @@ class FacebookPixelService
      */
     protected function createServerUserData(array $userData, ?string $eventName = null): UserData
     {
-        /** @var UserData $obj */
-        $obj = MetaPixel::userData();
+        $obj = new UserData;
 
         $normalized = $this->getNormalizedUserData($userData, $eventName);
 
-        if (isset($normalized['em'])) {
+        if (! empty($normalized['em'])) {
             $obj->setEmail($normalized['em']);
         }
 
-        if (isset($normalized['ph'])) {
+        if (! empty($normalized['ph'])) {
             $obj->setPhone($normalized['ph']);
         }
 
-        if (isset($normalized['fn'])) {
+        if (! empty($normalized['fn'])) {
             $obj->setFirstName($normalized['fn']);
         }
 
-        if (isset($normalized['ln'])) {
+        if (! empty($normalized['ln'])) {
             $obj->setLastName($normalized['ln']);
         }
 
-        if (isset($normalized['ct'])) {
+        if (! empty($normalized['ct'])) {
             $obj->setCity($normalized['ct']);
         }
 
-        if (isset($normalized['cn'])) {
+        if (! empty($normalized['cn'])) {
             $obj->setCountryCode($normalized['cn']);
         }
 
+        if (! empty($userData['external_id'])) {
+            $obj->setExternalId((string) $userData['external_id']);
+        }
+
         // Browser tracking signals
-        if (! empty($userData['fbp'])) {
-            $obj->setFbp($userData['fbp']);
+        $fbp = $userData['fbp'] ?? Cookie::get('_fbp') ?? Arr::get($_COOKIE, '_fbp');
+        if (! empty($fbp)) {
+            $obj->setFbp((string) $fbp);
         }
 
-        if (! empty($userData['fbc'])) {
-            $obj->setFbc($userData['fbc']);
+        $fbc = $userData['fbc'] ?? Cookie::get('_fbc') ?? Arr::get($_COOKIE, '_fbc');
+        if (! empty($fbc)) {
+            $obj->setFbc((string) $fbc);
         }
 
-        if (! empty($userData['client_ip_address'])) {
-            $obj->setClientIpAddress($userData['client_ip_address']);
+        $clientIp = $userData['client_ip_address'] ?? request()->ip();
+        if (! empty($clientIp)) {
+            $obj->setClientIpAddress((string) $clientIp);
         }
 
-        if (! empty($userData['client_user_agent'])) {
-            $obj->setClientUserAgent($userData['client_user_agent']);
+        $clientUserAgent = $userData['client_user_agent'] ?? request()->userAgent();
+        if (! empty($clientUserAgent)) {
+            $obj->setClientUserAgent((string) $clientUserAgent);
         }
 
         return $obj;
