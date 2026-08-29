@@ -63,6 +63,7 @@ return [
         'PAID',
         'RETURNED',
         'PAID_RETURN',
+        'RETURN_RECEIVED',
         'LOST',
         'CANCELLED',
         'EXCHANGED',

@@ -513,6 +513,8 @@ class ApiController extends Controller
             $order->status = 'PAID_RETURN';
         } elseif ($request->event == 'order.exchanged') {
             $order->status = 'EXCHANGED';
+        } else if ($request->event == 'order.returned-to-merchant') {
+            $order->status = 'RETURN_RECEIVED';
         }
 
         $order->update([
