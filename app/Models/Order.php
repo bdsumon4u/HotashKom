@@ -29,7 +29,7 @@ class Order extends Model
     const MANUAL = 1;
 
     protected $fillable = [
-        'admin_id', 'user_id', 'type', 'name', 'phone', 'email', 'address', 'status', 'status_at', 'shipped_at', 'products', 'note', 'data', 'tracking', 'source_id',
+        'admin_id', 'user_id', 'type', 'name', 'phone', 'email', 'address', 'status', 'status_at', 'shipped_at', 'products', 'note', 'data', 'tracking', 'courier_report', 'source_id',
     ];
 
     protected $attributes = [
@@ -632,6 +632,7 @@ class Order extends Model
             'products' => 'array',
             'data' => 'array',
             'tracking' => 'array',
+            'courier_report' => 'array',
             'status_at' => 'datetime',
             'shipped_at' => 'datetime',
         ];

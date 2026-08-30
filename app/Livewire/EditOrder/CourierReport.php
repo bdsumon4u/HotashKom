@@ -21,9 +21,16 @@ class CourierReport extends Component
         $this->order = $order;
     }
 
-    public function load(): void
+    public function load(bool $force = false): void
     {
-        if ($this->loaded) {
+        if ($this->loaded && ! $force) {
+            return;
+        }
+
+        if (! $force && ! empty($this->order->courier_report)) {
+            $this->report = $this->order->courier_report;
+            $this->loaded = true;
+
             return;
         }
 
@@ -35,18 +42,20 @@ class CourierReport extends Component
             return;
         }
 
-        $report = cacheMemo()->remember(
-            'courier:'.($this->order->phone ?? ''),
-            now()->addWeek(),
-            fn () => $this->fetchCourierReport(),
-        );
+        $report = $this->fetchCourierReport();
 
-        if (is_string($report)) {
-            cacheMemo()->forget('courier:'.($this->order->phone ?? ''));
+        if (is_array($report) && ! isset($report['error']) && ! empty($report)) {
+            $this->order->forceFill(['courier_report' => $report])->saveQuietly();
         }
 
         $this->report = $report;
         $this->loaded = true;
+    }
+
+    public function refreshReport(): void
+    {
+        $this->loaded = false;
+        $this->load(force: true);
     }
 
     /**
@@ -85,6 +94,10 @@ class CourierReport extends Component
                     $ignoredKeys[] = $token;
                 }
                 Cache::put($ignoredCacheKey, $ignoredKeys, now()->endOfDay());
+            }
+
+            if (! $response->successful()) {
+                return $response->body() ?: 'Failed to fetch courier report';
             }
 
             return $response->json();

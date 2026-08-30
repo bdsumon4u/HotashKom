@@ -1,9 +1,12 @@
 <div id="courier-report" class="shadow-sm card rounded-0" wire:init="load">
-    <div class="p-3 card-header">
+    <div class="p-3 card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0 card-title">Courier Report</h5>
+        <button type="button" wire:click="refreshReport" wire:loading.attr="disabled" class="btn btn-sm btn-outline-secondary" title="Refresh Report">
+            <i class="fa fa-refresh" wire:loading.class="fa-spin" wire:target="refreshReport"></i>
+        </button>
     </div>
     <div class="p-0 card-body">
-        <div wire:loading wire:target="load" class="py-4 text-center text-muted">Loading courier report...</div>
+        <div wire:loading wire:target="load, refreshReport" class="py-4 text-center text-muted">Loading courier report...</div>
         @if ($loaded)
             @if (is_string($report))
                 <div class="alert alert-danger">{{ $report }}</div>
@@ -57,7 +60,7 @@
                 </div>
             @endif
         @else
-            <div class="py-4 text-center text-muted" wire:loading.remove wire:target="load">Loading courier report...</div>
+            <div class="py-4 text-center text-muted" wire:loading.remove wire:target="load, refreshReport">Loading courier report...</div>
         @endif
     </div>
 </div>
