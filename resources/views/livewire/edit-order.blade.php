@@ -340,6 +340,7 @@
                 @endif
             </div>
         </div>
+        <livewire:edit-order.activities :order="$order" wire:key="order-activities-{{ $order->id }}" />
     </div>
     <div class="mt-4 col-12 col-lg-6 col-xl-5 mt-lg-0">
         <div class="shadow-sm card rounded-0">
@@ -548,11 +549,85 @@
                 </div>
             </div>
 
-            <livewire:edit-order.activities :order="$order" wire:key="order-activities-{{ $order->id }}" />
-
             @if (config('services.courier_report.url') && config('services.courier_report.key'))
                 <livewire:edit-order.courier-report :order="$order" wire:key="order-courier-report-{{ $order->id }}" />
             @endif
+
+            <div class="shadow-sm card rounded-0">
+                <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 card-title">UTM Tracking</h5>
+                    @if (! empty($order->utm_source))
+                        <span class="badge badge-primary text-uppercase">{{ $order->utm_source }}</span>
+                    @else
+                        <span class="badge badge-secondary">Direct / None</span>
+                    @endif
+                </div>
+                <div class="p-3 card-body">
+                    @php($utm = $order->utm)
+                    @if (! empty($utm))
+                        <table class="table table-sm table-bordered mb-0">
+                            <tbody>
+                                @if (! empty($utm['utm_source']))
+                                    <tr>
+                                        <th width="35%" class="py-1 bg-light">Source</th>
+                                        <td class="py-1 font-weight-bold text-primary">{{ $utm['utm_source'] }}</td>
+                                    </tr>
+                                @endif
+                                @if (! empty($utm['utm_medium']))
+                                    <tr>
+                                        <th class="py-1 bg-light">Medium</th>
+                                        <td class="py-1">{{ $utm['utm_medium'] }}</td>
+                                    </tr>
+                                @endif
+                                @if (! empty($utm['utm_campaign']))
+                                    <tr>
+                                        <th class="py-1 bg-light">Campaign</th>
+                                        <td class="py-1 font-weight-bold">{{ $utm['utm_campaign'] }}</td>
+                                    </tr>
+                                @endif
+                                @if (! empty($utm['utm_content']))
+                                    <tr>
+                                        <th class="py-1 bg-light">Content</th>
+                                        <td class="py-1">{{ $utm['utm_content'] }}</td>
+                                    </tr>
+                                @endif
+                                @if (! empty($utm['utm_term']))
+                                    <tr>
+                                        <th class="py-1 bg-light">Term / Keyword</th>
+                                        <td class="py-1">{{ $utm['utm_term'] }}</td>
+                                    </tr>
+                                @endif
+                                @if (! empty($utm['landing_page']))
+                                    <tr>
+                                        <th class="py-1 bg-light">Landing Page</th>
+                                        <td class="py-1 text-truncate" style="max-width: 200px;" title="{{ $utm['landing_page'] }}">/{{ ltrim($utm['landing_page'], '/') }}</td>
+                                    </tr>
+                                @endif
+                                @if (! empty($utm['fbclid']) || ! empty($utm['gclid']) || ! empty($utm['ttclid']))
+                                    <tr>
+                                        <th class="py-1 bg-light">Click ID</th>
+                                        <td class="py-1">
+                                            @if (! empty($utm['fbclid'])) <span class="badge badge-info">FBCLID</span> @endif
+                                            @if (! empty($utm['gclid'])) <span class="badge badge-success">GCLID</span> @endif
+                                            @if (! empty($utm['ttclid'])) <span class="badge badge-dark">TTCLID</span> @endif
+                                        </td>
+                                    </tr>
+                                @endif
+                                @if (! empty($utm['captured_at']))
+                                    <tr>
+                                        <th class="py-1 bg-light">Attributed At</th>
+                                        <td class="py-1 text-muted">{{ \Illuminate\Support\Carbon::parse($utm['captured_at'])->format('d-M-Y h:i A') }}</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    @else
+                        <div class="text-muted text-center py-2">
+                            <i class="fa fa-info-circle mr-1"></i> No campaign attribution recorded for this order.
+                        </div>
+                    @endif
+                </div>
+            </div>
         @endif
     </div>
 </div>

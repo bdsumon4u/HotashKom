@@ -13,6 +13,7 @@ use App\Notifications\User\AccountCreated;
 use App\Notifications\User\OrderPlaced;
 use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
+use App\Services\UtmTrackingService;
 use App\Traits\ResolvesPackagingCharge;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -500,12 +501,15 @@ class Checkout extends Component
                 $fbc = 'fb.1.'.now()->getTimestampMs().'.'.request()->query('fbclid');
             }
 
+            $utmData = app(UtmTrackingService::class)->getUtmData();
+
             $orderTracking = [
                 'fbp' => $fbp,
                 'fbc' => $fbc,
                 'ip' => request()->ip(),
                 'ua' => request()->userAgent(),
                 'event_source_url' => $this->eventSourceUrl ?: url()->current(),
+                'utm' => ! empty($utmData) ? $utmData : null,
             ];
 
             $data += [

@@ -360,6 +360,26 @@ class Order extends Model
         );
     }
 
+    protected function utm(): Attribute
+    {
+        return Attribute::get(fn (): array => (array) ($this->tracking['utm'] ?? []));
+    }
+
+    protected function utmSource(): Attribute
+    {
+        return Attribute::get(fn (): ?string => $this->tracking['utm']['utm_source'] ?? $this->tracking['utm_source'] ?? null);
+    }
+
+    protected function utmCampaign(): Attribute
+    {
+        return Attribute::get(fn (): ?string => $this->tracking['utm']['utm_campaign'] ?? $this->tracking['utm_campaign'] ?? null);
+    }
+
+    protected function utmMedium(): Attribute
+    {
+        return Attribute::get(fn (): ?string => $this->tracking['utm']['utm_medium'] ?? $this->tracking['utm_medium'] ?? null);
+    }
+
     protected function isFreeDelivery(): Attribute
     {
         return Attribute::make(

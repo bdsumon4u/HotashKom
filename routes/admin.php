@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\ShipmentReportController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TransactionController;
+use App\Http\Controllers\Admin\UtmReportController;
 use App\Http\Middleware\CheckForMaintenanceDue;
 use Hotash\LaravelMultiUi\Facades\MultiUi;
 use Illuminate\Support\Facades\Route;
@@ -73,6 +74,7 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::get('/reports/shipment', [ShipmentReportController::class, 'index'])->name('reports.shipment');
         Route::get('/reports/filter', [OrderController::class, 'filter'])->name('orders.filter');
         Route::get('/reports/customer', [ReportController::class, 'customer'])->name('reports.customer');
+        Route::get('/reports/utm', UtmReportController::class)->name('reports.utm');
         Route::get('/orders/pathao-csv', [OrderController::class, 'csv'])->name('orders.pathao-csv');
         Route::get('/orders/invoices', [OrderController::class, 'invoices'])->name('orders.invoices');
         Route::get('/orders/stickers', [OrderController::class, 'stickers'])->name('orders.stickers');

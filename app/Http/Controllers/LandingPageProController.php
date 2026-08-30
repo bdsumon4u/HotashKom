@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Notifications\User\OrderPlaced;
 use App\Services\FacebookPixelService;
 use App\Services\LandingPageProTemplateRegistry;
+use App\Services\UtmTrackingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -448,6 +449,12 @@ class LandingPageProController extends Controller
                     'purchase_cost' => collect($productsPayload)->sum(
                         fn (array $item): int|float => (($item['purchase_price'] ?? $item['price'] ?? 0) * ($item['quantity'] ?? 0))
                     ),
+                ],
+                'tracking' => [
+                    'ip' => request()->ip(),
+                    'ua' => request()->userAgent(),
+                    'event_source_url' => url()->current(),
+                    'utm' => app(UtmTrackingService::class)->getUtmData() ?: null,
                 ],
             ]);
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\CaptureUtmTracking;
 use App\Http\Middleware\EnsureSpaResponse;
 use App\Http\Middleware\LogDatabaseUsage;
 use App\Http\Middleware\RedirectIfAuthenticated;
@@ -31,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             EnsureSpaResponse::class,
+            CaptureUtmTracking::class,
         ]);
 
         $middleware->append(LogDatabaseUsage::class);

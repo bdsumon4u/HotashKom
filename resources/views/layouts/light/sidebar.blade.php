@@ -235,6 +235,14 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.reports.utm' ? 'active' : '' }}"
+                            href="{{ route('admin.reports.utm') }}">
+                            <i data-feather="trending-up"> </i>
+                            <span>UTM</span>
+                        </a>
+                    </li>
+
                     <li class="sidebar-title">
                         <h6>Users</h6>
                     </li>

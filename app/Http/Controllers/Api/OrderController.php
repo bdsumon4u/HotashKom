@@ -114,7 +114,23 @@ class OrderController extends Controller
                     }
                 },
             ])
-            ->editColumn('id', fn ($row): string => '<a class="px-2 btn btn-light btn-sm text-nowrap" href="'.route('admin.orders.edit', $row->id).'">'.$row->id.'<i class="ml-1 fa fa-eye"></i></a>')
+            ->editColumn('id', function ($row): string {
+                $idHtml = '<a class="px-2 btn btn-light btn-sm text-nowrap" href="'.route('admin.orders.edit', $row->id).'">'.$row->id.'<i class="ml-1 fa fa-eye"></i></a>';
+                if ($source = $row->utm_source) {
+                    $badgeClass = match (strtolower($source)) {
+                        'facebook', 'fb' => 'badge-primary',
+                        'google' => 'badge-danger',
+                        'tiktok' => 'badge-dark',
+                        'instagram' => 'badge-info',
+                        'youtube' => 'badge-danger',
+                        default => 'badge-secondary',
+                    };
+                    $campaign = $row->utm_campaign ? ' title="Campaign: '.e($row->utm_campaign).'"' : '';
+                    $idHtml .= '<div class="mt-1"><span class="badge '.$badgeClass.'"'.$campaign.' style="font-size: 10px;">'.e(strtoupper($source)).'</span></div>';
+                }
+
+                return $idHtml;
+            })
             ->editColumn('source_id', function ($row): string {
                 if (! $row->source_id) {
                     return '';
@@ -204,7 +220,7 @@ class OrderController extends Controller
                     } else {
                         $imageHtml = '';
                     }
-                    $products .= "<li style='margin-bottom: 12px;'><div style='display: flex; align-items: center; margin-bottom: 4px;'>".($product->quantity??1)." x {$imageHtml}</div><div><a class='text-underline' href='".route('products.show', $product->slug)."' target='_blank'>{$product->name}</a></div></li>";
+                    $products .= "<li style='margin-bottom: 12px;'><div style='display: flex; align-items: center; margin-bottom: 4px;'>".($product->quantity ?? 1)." x {$imageHtml}</div><div><a class='text-underline' href='".route('products.show', $product->slug)."' target='_blank'>{$product->name}</a></div></li>";
                 }
 
                 return $products.'</ul>';
@@ -245,7 +261,7 @@ class OrderController extends Controller
                     $return .= '<a href="'.route('admin.orders.booking', ['order_id' => $row->id]).'" class="btn btn-sm btn-primary">Submit</a>';
                 }
 
-                return $return.'<div style="white-space: nowrap; display: none;">Tracking Code: <a href="https://www.steadfast.com.bd/?tracking_code=" target="_blank"></a></div>' . (isset($row->data['tracking_message']) ? '<div>'.$row->data['tracking_message'].'</div>' : '');
+                return $return.'<div style="white-space: nowrap; display: none;">Tracking Code: <a href="https://www.steadfast.com.bd/?tracking_code=" target="_blank"></a></div>'.(isset($row->data['tracking_message']) ? '<div>'.$row->data['tracking_message'].'</div>' : '');
             })
             ->filterColumn('reseller', function ($query, $keyword): void {
                 $query->where(function ($q) use ($keyword): void {
