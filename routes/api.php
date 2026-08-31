@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\AddToCartTrackingController;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Api\ContactTrackingController;
-use App\Http\Controllers\Api\ViewContentTrackingController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\LivewireCheckoutController;
 use App\Http\Controllers\Api\MenuItemSortController;
@@ -13,6 +12,7 @@ use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\ResellerController;
 use App\Http\Controllers\Api\ResellerOrderController;
 use App\Http\Controllers\Api\StorefrontController;
+use App\Http\Controllers\Api\ViewContentTrackingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,6 +57,7 @@ Route::group(['as' => 'api.'], function (): void {
     Route::get('pending-count/{admin}', [ApiController::class, 'pendingCount']);
     Route::post('pathao-webhook', [ApiController::class, 'pathaoWebhook']);
     Route::post('steadfast-webhook', [ApiController::class, 'steadfastWebhook']);
+    Route::post('redx-webhook', [ApiController::class, 'redxWebhook']);
     Route::post('checkout', LivewireCheckoutController::class);
     Route::get('orders/{order}', [ApiController::class, 'order']);
     Route::post('track-contact', ContactTrackingController::class)->name('track-contact');

@@ -513,7 +513,7 @@ class ApiController extends Controller
             $order->status = 'PAID_RETURN';
         } elseif ($request->event == 'order.exchanged') {
             $order->status = 'EXCHANGED';
-        } else if ($request->event == 'order.returned-to-merchant') {
+        } elseif ($request->event == 'order.returned-to-merchant') {
             $order->status = 'RETURN_RECEIVED';
         }
 
@@ -605,5 +605,87 @@ class ApiController extends Controller
         ]);
 
         return response()->json(['message' => 'Webhook processed'], 202);
+    }
+
+    public function redxWebhook(Request $request)
+    {
+        info('redx headers:', $request->headers->all());
+        info('redx webhook:', $request->all());
+
+        // Validate token if configured in redx.access_token and passed in request
+        $expectedToken = config('redx.store_id');
+        if ($expectedToken && $request->has('token')) {
+            $providedToken = trim((string) $request->get('token'));
+
+            if ($providedToken !== $expectedToken) {
+                info('redx webhook token mismatch', [
+                    'provided' => $providedToken,
+                ]);
+
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+        }
+
+        $invoice = (int) preg_replace('/\D/', '', (string) ($request->invoice_number ?? $request->merchant_invoice_id));
+        info('redx webhook invoice id: '.$invoice);
+
+        $order = null;
+        if ($invoice) {
+            $order = Order::find($invoice);
+        }
+
+        if (! $order && $request->tracking_number) {
+            $order = Order::where('data->consignment_id', $request->tracking_number)->first();
+        }
+
+        if (! $order) {
+            info('redx webhook order not found: invoice='.$invoice.', tracking='.$request->tracking_number);
+
+            return response()->json(['message' => 'Order not found'], 202);
+        }
+
+        $status = strtolower((string) $request->status);
+        $deliveryType = strtolower((string) $request->delivery_type);
+
+        info('redx webhook status: '.$status.', delivery_type: '.$deliveryType);
+
+        if (in_array($status, ['ready-for-delivery', 'delivery-in-progress'])) {
+            $orderData = $order->data ?? [];
+            if ($request->tracking_number) {
+                $orderData['consignment_id'] = $request->tracking_number;
+            }
+
+            $order->fill([
+                'status' => 'SHIPPING',
+                'shipped_at' => $order->shipped_at ?? now(),
+                'data' => $orderData,
+            ]);
+        } elseif ($status === 'delivered') {
+            $order->status = 'DELIVERED';
+        } elseif ($status === 'agent-hold') {
+            $order->status = 'COURIER_HOLD';
+        } elseif ($status === 'agent-returning') {
+            $order->status = 'RETURNED';
+        } elseif ($status === 'returned') {
+            $order->status = 'RETURN_RECEIVED';
+        } elseif ($status === 'paid') {
+            $order->status = 'PAID';
+        }
+
+        // Delivery type overrides if applicable
+        if (in_array($deliveryType, ['exchange-delivery', 'exchange-return'])) {
+            $order->status = 'EXCHANGED';
+        } elseif (in_array($deliveryType, ['partial-delivery', 'partial-return'])) {
+            $order->status = 'PARTIAL_DELIVERY';
+        }
+
+        if ($request->message_en || $request->message_bn) {
+            $order->tracking_message = $request->message_en ?: $request->message_bn;
+        }
+
+        $order->status_at = now();
+        $order->save();
+
+        return response()->json(['message' => 'Webhook processed'], 200);
     }
 }
