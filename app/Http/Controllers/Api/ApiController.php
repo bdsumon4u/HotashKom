@@ -499,7 +499,7 @@ class ApiController extends Controller
         } elseif ($request->event == 'order.pickup-cancelled') {
             $order->status = 'CANCELLED';
         } elseif ($request->event == 'order.on-hold') {
-            $order->status = 'WAITING';
+            $order->status = 'COURIER_HOLD';
         } elseif ($request->event == 'order.delivered') {
             $order->status = 'DELIVERED';
         } elseif ($request->event == 'order.partial-delivery') {

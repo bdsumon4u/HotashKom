@@ -35,61 +35,106 @@
 
     <!-- Summary Cards -->
     <div class="row">
-        <div class="col-xl-3 col-md-6">
-            <div class="card o-hidden">
+        <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
+            <div class="card o-hidden h-100 kpi-card">
                 <div class="p-3 card-body">
-                    <div class="d-flex static-top-widget">
-                        <div class="align-self-center">
+                    <div class="d-flex static-top-widget align-items-center">
+                        <div class="align-self-center kpi-icon-wrap kpi-primary">
                             <i data-feather="truck" class="font-primary"></i>
                         </div>
-                        <div class="ml-2 flex-grow-1">
-                            <span class="font-roboto">Total Shipped</span>
-                            <h4 class="font-roboto">{{ $report['total_shipped'] }}</h4>
+                        <div class="ml-3 flex-grow-1">
+                            <span class="font-roboto text-muted" style="font-size: 13px;">Total Shipped</span>
+                            <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['total_shipped'] }}</h4>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card o-hidden">
+        <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
+            <div class="card o-hidden h-100 kpi-card">
                 <div class="p-3 card-body">
-                    <div class="d-flex static-top-widget">
-                        <div class="align-self-center">
+                    <div class="d-flex static-top-widget align-items-center">
+                        <div class="align-self-center kpi-icon-wrap kpi-warning">
                             <i data-feather="clock" class="font-warning"></i>
                         </div>
-                        <div class="ml-2 flex-grow-1">
-                            <span class="font-roboto">Shipping</span>
-                            <h4 class="font-roboto">{{ $report['status_breakdown']['SHIPPING']['count'] ?? 0 }}</h4>
+                        <div class="ml-3 flex-grow-1">
+                            <span class="font-roboto text-muted" style="font-size: 13px;">Shipping</span>
+                            <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['SHIPPING']['count'] ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card o-hidden">
+        <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
+            <div class="card o-hidden h-100 kpi-card">
                 <div class="p-3 card-body">
-                    <div class="d-flex static-top-widget">
-                        <div class="align-self-center">
+                    <div class="d-flex static-top-widget align-items-center">
+                        <div class="align-self-center kpi-icon-wrap kpi-success">
                             <i data-feather="check-circle" class="font-success"></i>
                         </div>
-                        <div class="ml-2 flex-grow-1">
-                            <span class="font-roboto">Delivered</span>
-                            <h4 class="font-roboto">{{ $report['status_breakdown']['DELIVERED']['count'] ?? 0 }}</h4>
+                        <div class="ml-3 flex-grow-1">
+                            <span class="font-roboto text-muted" style="font-size: 13px;">Delivered</span>
+                            <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['DELIVERED']['count'] ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card o-hidden">
+        <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
+            <div class="card o-hidden h-100 kpi-card">
                 <div class="p-3 card-body">
-                    <div class="d-flex static-top-widget">
-                        <div class="align-self-center">
+                    <div class="d-flex static-top-widget align-items-center">
+                        <div class="align-self-center kpi-icon-wrap kpi-danger">
                             <i data-feather="rotate-ccw" class="font-danger"></i>
                         </div>
-                        <div class="ml-2 flex-grow-1">
-                            <span class="font-roboto">Returned</span>
-                            <h4 class="font-roboto">{{ $report['status_breakdown']['RETURNED']['count'] ?? 0 }}</h4>
+                        <div class="ml-3 flex-grow-1">
+                            <span class="font-roboto text-muted" style="font-size: 13px;">Returned</span>
+                            <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['RETURNED']['count'] ?? 0 }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 col-xl-4 col-md-4 col-sm-6">
+            <div class="card o-hidden h-100 kpi-card">
+                <div class="p-3 card-body">
+                    <div class="d-flex static-top-widget align-items-center">
+                        <div class="align-self-center kpi-icon-wrap kpi-info">
+                            <i data-feather="repeat" class="font-info"></i>
+                        </div>
+                        <div class="ml-3 flex-grow-1">
+                            <span class="font-roboto text-muted" style="font-size: 13px;">Paid Return</span>
+                            <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['PAID_RETURN']['count'] ?? 0 }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 col-xl-4 col-md-4 col-sm-6">
+            <div class="card o-hidden h-100 kpi-card">
+                <div class="p-3 card-body">
+                    <div class="d-flex static-top-widget align-items-center">
+                        <div class="align-self-center kpi-icon-wrap kpi-secondary">
+                            <i data-feather="package" class="font-secondary"></i>
+                        </div>
+                        <div class="ml-3 flex-grow-1">
+                            <span class="font-roboto text-muted" style="font-size: 13px;">Return Received</span>
+                            <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['RETURN_RECEIVED']['count'] ?? 0 }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 col-xl-4 col-md-4 col-sm-6">
+            <div class="card o-hidden h-100 kpi-card">
+                <div class="p-3 card-body">
+                    <div class="d-flex static-top-widget align-items-center">
+                        <div class="align-self-center kpi-icon-wrap kpi-dark">
+                            <i data-feather="check-square" class="font-dark"></i>
+                        </div>
+                        <div class="ml-3 flex-grow-1">
+                            <span class="font-roboto text-muted" style="font-size: 13px;">Paid Return Rcv</span>
+                            <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['PAID_RETURN_RCV']['count'] ?? 0 }}</h4>
                         </div>
                     </div>
                 </div>
@@ -119,9 +164,20 @@
                             </thead>
                             <tbody>
                                 @foreach($report['status_breakdown'] as $status => $data)
+                                @php
+                                    $badgeClass = match($status) {
+                                        'DELIVERED' => 'badge-success',
+                                        'SHIPPING' => 'badge-warning',
+                                        'RETURNED' => 'badge-danger',
+                                        'PAID_RETURN' => 'badge-info',
+                                        'RETURN_RECEIVED' => 'badge-secondary',
+                                        'PAID_RETURN_RCV' => 'badge-dark',
+                                        default => 'badge-light',
+                                    };
+                                @endphp
                                 <tr>
                                     <td>
-                                        <span class="badge badge-{{ $status === 'DELIVERED' ? 'success' : ($status === 'SHIPPING' ? 'warning' : ($status === 'RETURNED' ? 'danger' : 'secondary')) }}">
+                                        <span class="badge {{ $badgeClass }}">
                                             {{ $status }}
                                         </span>
                                     </td>
@@ -160,6 +216,9 @@
                                     <th>Delivered</th>
                                     <th>Shipping</th>
                                     <th>Returned</th>
+                                    <th>Paid Return</th>
+                                    <th>Return Rcv</th>
+                                    <th>Paid Return Rcv</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -175,6 +234,9 @@
                                     <td class="text-success">{{ $data['delivered'] }}</td>
                                     <td class="text-warning">{{ $data['shipping'] }}</td>
                                     <td class="text-danger">{{ $data['returned'] }}</td>
+                                    <td class="text-info">{{ $data['paid_return'] ?? 0 }}</td>
+                                    <td class="text-secondary">{{ $data['return_received'] ?? 0 }}</td>
+                                    <td class="text-dark">{{ $data['paid_return_rcv'] ?? 0 }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -205,6 +267,9 @@
                                     <th>Shipping</th>
                                     <th>Delivered</th>
                                     <th>Returned</th>
+                                    <th>Paid Return</th>
+                                    <th>Return Rcv</th>
+                                    <th>Paid Return Rcv</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -225,6 +290,9 @@
                                     <td class="text-warning">{{ $data['shipping'] }}</td>
                                     <td class="text-success">{{ $data['delivered'] }}</td>
                                     <td class="text-danger">{{ $data['returned'] }}</td>
+                                    <td class="text-info">{{ $data['paid_return'] ?? 0 }}</td>
+                                    <td class="text-secondary">{{ $data['return_received'] ?? 0 }}</td>
+                                    <td class="text-dark">{{ $data['paid_return_rcv'] ?? 0 }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -239,25 +307,32 @@
     <div class="row">
         <div class="col-12">
             <div class="shadow-sm rounded-0 card">
-                <div class="p-3 card-header d-flex justify-content-between align-items-center">
-                    <h5>Shipped Products</h5>
-                    <div>
-                        <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => 'ALL'])) }}"
-                           class="btn btn-sm {{ request('product_status', 'ALL') == 'ALL' ? 'btn-primary' : 'btn-outline-primary' }}">
-                            ALL
-                        </a>
-                        <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => 'SHIPPING'])) }}"
-                           class="btn btn-sm {{ request('product_status') == 'SHIPPING' ? 'btn-warning' : 'btn-outline-warning' }}">
-                            SHIPPING
-                        </a>
-                        <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => 'DELIVERED'])) }}"
-                           class="btn btn-sm {{ request('product_status') == 'DELIVERED' ? 'btn-success' : 'btn-outline-success' }}">
-                            DELIVERED
-                        </a>
-                        <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => 'RETURNED'])) }}"
-                           class="btn btn-sm {{ request('product_status') == 'RETURNED' ? 'btn-danger' : 'btn-outline-danger' }}">
-                            RETURNED
-                        </a>
+                <div class="p-3 card-header d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
+                    <h5 class="mb-0">Shipped Products</h5>
+                    <div class="report-status-nav">
+                        @php
+                            $activeStatus = request('product_status', 'ALL');
+                            $filterStatuses = [
+                                'ALL' => ['label' => 'ALL', 'class' => 'status-pill-all', 'count' => $report['total_shipped']],
+                                'SHIPPING' => ['label' => 'Shipping', 'class' => 'status-pill-shipping', 'count' => $report['status_breakdown']['SHIPPING']['count'] ?? 0],
+                                'DELIVERED' => ['label' => 'Delivered', 'class' => 'status-pill-delivered', 'count' => $report['status_breakdown']['DELIVERED']['count'] ?? 0],
+                                'RETURNED' => ['label' => 'Returned', 'class' => 'status-pill-returned', 'count' => $report['status_breakdown']['RETURNED']['count'] ?? 0],
+                                'PAID_RETURN' => ['label' => 'Paid Return', 'class' => 'status-pill-paid-return', 'count' => $report['status_breakdown']['PAID_RETURN']['count'] ?? 0],
+                                'RETURN_RECEIVED' => ['label' => 'Return Received', 'class' => 'status-pill-return-rcv', 'count' => $report['status_breakdown']['RETURN_RECEIVED']['count'] ?? 0],
+                                'PAID_RETURN_RCV' => ['label' => 'Paid Return Rcv', 'class' => 'status-pill-paid-return-rcv', 'count' => $report['status_breakdown']['PAID_RETURN_RCV']['count'] ?? 0],
+                            ];
+                        @endphp
+
+                        @foreach($filterStatuses as $statusKey => $statusConfig)
+                            @php
+                                $isActive = ($activeStatus === $statusKey);
+                            @endphp
+                            <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => $statusKey])) }}"
+                               class="status-pill {{ $statusConfig['class'] }} {{ $isActive ? 'active' : '' }}">
+                                <span class="status-pill-label">{{ $statusConfig['label'] }}</span>
+                                <span class="status-pill-count">{{ $statusConfig['count'] }}</span>
+                            </a>
+                        @endforeach
                     </div>
                 </div>
                 <div class="p-3 card-body">
@@ -285,6 +360,146 @@
     <style>
         .daterangepicker {
             border: 2px solid #d7d7d7 !important;
+        }
+
+        /* KPI Card Styling */
+        .kpi-card {
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+            border: 1px solid #eef2f6;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .kpi-icon-wrap {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .kpi-primary { background-color: rgba(99, 102, 241, 0.12); }
+        .kpi-warning { background-color: rgba(245, 158, 11, 0.12); }
+        .kpi-success { background-color: rgba(16, 185, 129, 0.12); }
+        .kpi-danger  { background-color: rgba(239, 68, 68, 0.12); }
+        .kpi-info    { background-color: rgba(6, 182, 212, 0.12); }
+        .kpi-secondary { background-color: rgba(139, 92, 246, 0.12); }
+        .kpi-dark    { background-color: rgba(30, 41, 59, 0.12); }
+
+        /* Modern Filter Pills */
+        .report-status-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none !important;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            transition: all 0.2s ease;
+            line-height: 1.3;
+        }
+
+        .status-pill:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+            color: #1e293b;
+        }
+
+        .status-pill-count {
+            margin-left: 6px;
+            padding: 1px 7px;
+            border-radius: 10px;
+            font-size: 11px;
+            background-color: rgba(0, 0, 0, 0.06);
+            color: inherit;
+            font-weight: 700;
+        }
+
+        /* Pill Active Themes */
+        .status-pill-all.active {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+            color: #ffffff;
+        }
+        .status-pill-all.active .status-pill-count {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .status-pill-shipping.active {
+            background-color: #f59e0b;
+            border-color: #f59e0b;
+            color: #ffffff;
+        }
+        .status-pill-shipping.active .status-pill-count {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .status-pill-delivered.active {
+            background-color: #10b981;
+            border-color: #10b981;
+            color: #ffffff;
+        }
+        .status-pill-delivered.active .status-pill-count {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .status-pill-returned.active {
+            background-color: #ef4444;
+            border-color: #ef4444;
+            color: #ffffff;
+        }
+        .status-pill-returned.active .status-pill-count {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .status-pill-paid-return.active {
+            background-color: #06b6d4;
+            border-color: #06b6d4;
+            color: #ffffff;
+        }
+        .status-pill-paid-return.active .status-pill-count {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .status-pill-return-rcv.active {
+            background-color: #8b5cf6;
+            border-color: #8b5cf6;
+            color: #ffffff;
+        }
+        .status-pill-return-rcv.active .status-pill-count {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .status-pill-paid-return-rcv.active {
+            background-color: #1e293b;
+            border-color: #1e293b;
+            color: #ffffff;
+        }
+        .status-pill-paid-return-rcv.active .status-pill-count {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
         }
 
         /* Print styles */

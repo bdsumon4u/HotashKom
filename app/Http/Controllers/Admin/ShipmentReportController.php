@@ -11,6 +11,15 @@ use Illuminate\Support\Facades\DB;
 
 class ShipmentReportController extends Controller
 {
+    private const array REPORT_STATUSES = [
+        'SHIPPING',
+        'DELIVERED',
+        'RETURNED',
+        'PAID_RETURN',
+        'RETURN_RECEIVED',
+        'PAID_RETURN_RCV',
+    ];
+
     /**
      * Show the shipment report page
      */
@@ -23,7 +32,7 @@ class ShipmentReportController extends Controller
 
         // Generate shipped products report for the selected date range
         $productStatus = $request->get('product_status', 'ALL');
-        $statuses = $productStatus === 'ALL' ? ['SHIPPING', 'DELIVERED', 'RETURNED'] : [$productStatus];
+        $statuses = $productStatus === 'ALL' ? self::REPORT_STATUSES : [$productStatus];
 
         $shippedProductsData = (new ProductReportService)->generateProductsReport(
             $start,
@@ -63,8 +72,8 @@ class ShipmentReportController extends Controller
             ];
         })->all();
 
-        // Ensure keys for SHIPPING, DELIVERED, RETURNED always exist
-        foreach (['SHIPPING', 'DELIVERED', 'RETURNED'] as $status) {
+        // Ensure keys for all report statuses always exist
+        foreach (self::REPORT_STATUSES as $status) {
             if (! isset($statusBreakdown[$status])) {
                 $statusBreakdown[$status] = [
                     'count' => 0,
@@ -84,6 +93,9 @@ class ShipmentReportController extends Controller
                 'shipping' => $group->where('status', 'SHIPPING')->count(),
                 'delivered' => $group->where('status', 'DELIVERED')->count(),
                 'returned' => $group->where('status', 'RETURNED')->count(),
+                'paid_return' => $group->where('status', 'PAID_RETURN')->count(),
+                'return_received' => $group->where('status', 'RETURN_RECEIVED')->count(),
+                'paid_return_rcv' => $group->where('status', 'PAID_RETURN_RCV')->count(),
                 'total_subtotal' => $totalSubtotal,
                 'total_purchase_cost' => $totalPurchaseCost,
             ];
@@ -99,6 +111,9 @@ class ShipmentReportController extends Controller
                 'shipping' => $group->where('status', 'SHIPPING')->count(),
                 'delivered' => $group->where('status', 'DELIVERED')->count(),
                 'returned' => $group->where('status', 'RETURNED')->count(),
+                'paid_return' => $group->where('status', 'PAID_RETURN')->count(),
+                'return_received' => $group->where('status', 'RETURN_RECEIVED')->count(),
+                'paid_return_rcv' => $group->where('status', 'PAID_RETURN_RCV')->count(),
                 'total_subtotal' => $totalSubtotal,
                 'total_purchase_cost' => $totalPurchaseCost,
             ];
