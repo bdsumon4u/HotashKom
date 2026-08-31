@@ -88,28 +88,28 @@ class HomeSection extends Model
                     ->orWhereIn('id', $ids);
             }
 
-            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+            $ids = array_values(array_unique(array_filter(array_map('intval', (array) $ids))));
 
             if ($ids) {
-                if ($sorted == 'random') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');
-                } elseif ($sorted == 'updated_at') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
-                } elseif ($sorted == 'created_at') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE created_at END DESC');
-                } elseif ($sorted == 'selling_price') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE selling_price END');
+                $cases = [];
+                foreach ($ids as $index => $id) {
+                    $cases[] = "WHEN {$id} THEN {$index}";
                 }
-            } else {
-                if ($sorted == 'random') {
-                    $query->inRandomOrder();
-                } elseif ($sorted == 'updated_at') {
-                    $query->latest('updated_at');
-                } elseif ($sorted == 'created_at') {
-                    $query->latest('created_at');
-                } elseif ($sorted == 'selling_price') {
-                    $query->orderBy('selling_price');
-                }
+                $casesStr = implode(' ', $cases);
+                $elseVal = count($ids);
+                $query->orderByRaw("CASE id {$casesStr} ELSE {$elseVal} END ASC");
+            }
+
+            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+
+            if ($sorted == 'random') {
+                $query->inRandomOrder();
+            } elseif ($sorted == 'updated_at') {
+                $query->latest('updated_at');
+            } elseif ($sorted == 'created_at') {
+                $query->latest('created_at');
+            } elseif ($sorted == 'selling_price') {
+                $query->orderBy('selling_price');
             }
 
             return $query->with([
@@ -146,28 +146,28 @@ class HomeSection extends Model
 
             $query->take($rows * $cols);
 
-            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+            $ids = array_values(array_unique(array_filter(array_map('intval', (array) $ids))));
 
             if ($ids) {
-                if ($sorted == 'random') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');
-                } elseif ($sorted == 'updated_at') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
-                } elseif ($sorted == 'created_at') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE created_at END DESC');
-                } elseif ($sorted == 'selling_price') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE selling_price END');
+                $cases = [];
+                foreach ($ids as $index => $id) {
+                    $cases[] = "WHEN {$id} THEN {$index}";
                 }
-            } else {
-                if ($sorted == 'random') {
-                    $query->inRandomOrder();
-                } elseif ($sorted == 'updated_at') {
-                    $query->latest('updated_at');
-                } elseif ($sorted == 'created_at') {
-                    $query->latest('created_at');
-                } elseif ($sorted == 'selling_price') {
-                    $query->orderBy('selling_price');
-                }
+                $casesStr = implode(' ', $cases);
+                $elseVal = count($ids);
+                $query->orderByRaw("CASE id {$casesStr} ELSE {$elseVal} END ASC");
+            }
+
+            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+
+            if ($sorted == 'random') {
+                $query->inRandomOrder();
+            } elseif ($sorted == 'updated_at') {
+                $query->latest('updated_at');
+            } elseif ($sorted == 'created_at') {
+                $query->latest('created_at');
+            } elseif ($sorted == 'selling_price') {
+                $query->orderBy('selling_price');
             }
 
             return $query->with([
