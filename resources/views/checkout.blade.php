@@ -239,76 +239,39 @@
         padding-bottom: 40px;
     }
 
+    /* ==========================================================================
+       Modern Checkout Theme (Compact & Elegant)
+       ========================================================================== */
+    .checkout--modern {
+        background-color: #f8fafc;
+        min-height: 100vh;
+        padding-top: 10px;
+        padding-bottom: 24px;
+    }
+
     .modern-checkout-container {
-        max-width: 1060px;
+        max-width: 980px;
         margin: 0 auto;
-    }
-
-    .modern-checkout-topbar {
-        background-color: #ffffff;
-        border-radius: 10px;
-        padding: 12px 20px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-    }
-
-    .modern-brand-logo {
-        max-height: 38px;
-        width: auto;
-        object-fit: contain;
-    }
-
-    .modern-brand-text {
-        font-size: 20px;
-        font-weight: 800;
-        color: #1e293b;
-        letter-spacing: -0.5px;
-    }
-
-    .modern-topbar-phone {
-        font-size: 13.5px;
-        font-weight: 600;
-        color: #334155;
-        text-decoration: none;
-    }
-
-    .modern-topbar-phone:hover {
-        color: #0284c7;
-        text-decoration: none;
-    }
-
-    .modern-icon-phone {
-        color: #0284c7;
-    }
-
-    .modern-topbar-secure {
-        font-size: 13px;
-        font-weight: 600;
-        color: #64748b;
-    }
-
-    .modern-icon-shield {
-        color: #10b981;
     }
 
     .modern-card {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
         overflow: hidden;
-        margin-bottom: 20px;
+        margin-bottom: 12px;
     }
 
     .modern-card-header {
-        padding: 14px 18px;
+        padding: 8px 12px;
         border-bottom: 1px solid #f1f5f9;
         background-color: #ffffff;
     }
 
     .modern-header-icon {
-        width: 34px;
-        height: 34px;
+        width: 26px;
+        height: 26px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -328,37 +291,37 @@
     }
 
     .modern-card-title {
-        font-size: 16px;
+        font-size: 14.5px;
         font-weight: 700;
         color: #1e293b;
     }
 
     .modern-item-count {
-        font-size: 13.5px;
+        font-size: 12.5px;
         font-weight: 500;
         color: #64748b;
     }
 
     .modern-card-body {
-        padding: 18px 20px;
+        padding: 12px 14px;
     }
 
     .modern-form-group {
-        margin-bottom: 16px;
+        margin-bottom: 10px;
     }
 
     .modern-label {
-        font-size: 13.5px;
+        font-size: 12.5px;
         font-weight: 600;
         color: #334155;
-        margin-bottom: 6px;
+        margin-bottom: 3px;
     }
 
     .modern-input {
         border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-size: 14px;
+        border-radius: 6px;
+        padding: 7px 10px;
+        font-size: 13.5px;
         color: #1e293b;
         background-color: #ffffff;
         height: auto;
@@ -367,49 +330,49 @@
 
     .modern-input:focus {
         border-color: #0284c7;
-        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+        box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.12);
         outline: none;
     }
 
     .modern-textarea {
         resize: vertical;
-        min-height: 80px;
+        min-height: 55px;
     }
 
     .modern-textarea-sm {
         resize: vertical;
-        min-height: 60px;
+        min-height: 40px;
     }
 
     .modern-phone-wrapper {
-        border-radius: 8px;
+        border-radius: 6px;
     }
 
     .modern-phone-prefix {
         background-color: #f1f5f9;
         border: 1px solid #cbd5e1;
         border-right: none;
-        border-radius: 8px 0 0 8px;
-        padding: 0 14px;
-        font-size: 14px;
+        border-radius: 6px 0 0 6px;
+        padding: 0 10px;
+        font-size: 13.5px;
         font-weight: 600;
         color: #475569;
     }
 
     .modern-input-with-prefix {
-        border-radius: 0 8px 8px 0 !important;
+        border-radius: 0 6px 6px 0 !important;
     }
 
     .modern-shipping-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 8px;
     }
 
     .modern-shipping-card {
         border: 1.5px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 12px 14px;
+        border-radius: 6px;
+        padding: 7px 10px;
         display: flex;
         align-items: center;
         cursor: pointer;
@@ -427,7 +390,7 @@
     .modern-shipping-card.is-selected {
         border-color: #dc2626;
         background-color: #fffaf9;
-        box-shadow: 0 2px 6px rgba(220, 38, 38, 0.08);
+        box-shadow: 0 1px 4px rgba(220, 38, 38, 0.08);
     }
 
     .modern-shipping-radio {
@@ -437,8 +400,8 @@
     }
 
     .modern-shipping-custom-radio {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
         border: 2px solid #94a3b8;
         display: flex;
@@ -454,8 +417,8 @@
     }
 
     .modern-radio-dot {
-        width: 8px;
-        height: 8px;
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
         background-color: #dc2626;
         display: none;
@@ -466,8 +429,8 @@
     }
 
     .modern-shipping-icon-badge {
-        width: 34px;
-        height: 34px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         background-color: #f1f5f9;
         color: #64748b;
@@ -484,19 +447,19 @@
     }
 
     .modern-shipping-name {
-        font-size: 13.5px;
+        font-size: 12.5px;
         font-weight: 700;
         color: #1e293b;
     }
 
     .modern-shipping-cost {
-        font-size: 12px;
+        font-size: 11px;
         color: #64748b;
-        margin-top: 2px;
+        margin-top: 1px;
     }
 
     .modern-cart-item {
-        padding: 12px 0;
+        padding: 8px 0;
         border-bottom: 1px solid #f1f5f9;
     }
 
@@ -510,9 +473,9 @@
     }
 
     .modern-cart-thumb {
-        width: 76px;
-        height: 76px;
-        border-radius: 8px;
+        width: 60px;
+        height: 60px;
+        border-radius: 6px;
         border: 1px solid #e2e8f0;
         overflow: hidden;
         flex-shrink: 0;
@@ -526,10 +489,10 @@
     }
 
     .modern-cart-name {
-        font-size: 13.5px;
+        font-size: 13px;
         font-weight: 600;
         color: #1e293b;
-        line-height: 1.35;
+        line-height: 1.25;
     }
 
     .modern-cart-remove {
@@ -542,7 +505,7 @@
     }
 
     .modern-cart-price {
-        font-size: 13px;
+        font-size: 12.5px;
         color: #64748b;
     }
 
@@ -553,18 +516,18 @@
 
     .modern-qty-stepper {
         border: 1px solid #cbd5e1;
-        border-radius: 6px;
+        border-radius: 4px;
         overflow: hidden;
         background-color: #f8fafc;
     }
 
     .modern-qty-btn {
-        width: 30px;
-        height: 30px;
+        width: 26px;
+        height: 26px;
         border: none;
         background-color: #f1f5f9;
         color: #334155;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 600;
         display: flex;
         align-items: center;
@@ -579,14 +542,14 @@
     }
 
     .modern-qty-val {
-        width: 36px;
-        height: 30px;
+        width: 30px;
+        height: 26px;
         text-align: center;
         border: none;
         border-left: 1px solid #cbd5e1;
         border-right: 1px solid #cbd5e1;
         background-color: #ffffff;
-        font-size: 13.5px;
+        font-size: 12.5px;
         font-weight: 600;
         color: #1e293b;
         outline: none;
@@ -600,7 +563,7 @@
     }
 
     .modern-cart-item-total {
-        font-size: 13px;
+        font-size: 12.5px;
         color: #64748b;
     }
 
@@ -610,8 +573,9 @@
     }
 
     .modern-summary-row {
-        font-size: 14px;
+        font-size: 13px;
         color: #475569;
+        padding: 2px 0;
     }
 
     .modern-summary-value {
@@ -620,16 +584,21 @@
 
     .modern-dashed-divider {
         border-top: 1px dashed #cbd5e1;
+        margin: 8px 0;
     }
 
     .modern-total-label {
-        font-size: 15.5px;
+        font-size: 14px;
         color: #1e293b;
     }
 
     .modern-total-amount {
-        font-size: 18px;
+        font-size: 16.5px;
         color: #dc2626;
+    }
+
+    .modern-coupon-wrapper {
+        margin: 6px 0 !important;
     }
 
     .modern-coupon-wrapper .input-group {
@@ -638,12 +607,12 @@
     }
 
     .modern-input-coupon {
-        height: 38px !important;
+        height: 34px !important;
         border-radius: 6px 0 0 6px !important;
         border: 1px solid #cbd5e1;
         border-right: none;
-        font-size: 13.5px;
-        padding: 6px 12px;
+        font-size: 12.5px;
+        padding: 4px 10px;
         box-shadow: none;
         background-color: #ffffff;
     }
@@ -655,14 +624,14 @@
     }
 
     .modern-btn-coupon {
-        height: 38px !important;
+        height: 34px !important;
         border-radius: 0 6px 6px 0 !important;
         background-color: #334155;
         border: 1px solid #334155;
         color: #ffffff;
-        font-size: 13.5px;
+        font-size: 12.5px;
         font-weight: 600;
-        padding: 0 18px;
+        padding: 0 14px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -676,16 +645,20 @@
         color: #ffffff;
     }
 
+    .modern-terms-box {
+        margin-bottom: 8px !important;
+    }
+
     .modern-terms-label {
-        font-size: 13.5px;
+        font-size: 12.5px;
         color: #475569;
         cursor: pointer;
     }
 
     .modern-terms-checkbox {
         accent-color: #0284c7;
-        width: 16px;
-        height: 16px;
+        width: 15px;
+        height: 15px;
     }
 
     .modern-terms-link {
@@ -697,11 +670,11 @@
         background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
         border: 1px solid #b91c1c;
         color: #ffffff;
-        font-size: 18px;
+        font-size: 16.5px;
         font-weight: 700;
-        padding: 13px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.28);
+        padding: 10px 16px;
+        border-radius: 6px;
+        box-shadow: 0 3px 8px rgba(220, 38, 38, 0.25);
         transition: all 0.2s ease;
         animation: modernPulse 1.6s ease-in-out infinite alternate;
     }
@@ -710,7 +683,7 @@
         background: linear-gradient(180deg, #b91c1c 0%, #991b1b 100%);
         color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(220, 38, 38, 0.36);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.32);
     }
 
     .modern-lock-icon {
@@ -718,8 +691,9 @@
     }
 
     .modern-security-footer {
-        font-size: 12.5px;
+        font-size: 11.5px;
         color: #64748b;
+        margin-top: 6px;
     }
 
     .modern-lock-footer-icon {
@@ -728,7 +702,7 @@
 
     @keyframes modernPulse {
         0% { transform: scale(1); }
-        100% { transform: scale(1.02); }
+        100% { transform: scale(1.015); }
     }
 
     /* Responsive Mobile Ordering & Spacing */
@@ -759,12 +733,14 @@
             order: 1;
             margin-left: 0;
             margin-right: 0;
+            margin-bottom: 10px !important;
         }
 
         .modern-card-summary {
             order: 3;
             margin-left: 0;
             margin-right: 0;
+            margin-bottom: 10px !important;
         }
 
         .modern-checkout-actions {
@@ -773,15 +749,20 @@
             margin-right: 0;
         }
 
+        .modern-shipping-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
         .modern-card-body {
-            padding: 14px 14px;
+            padding: 10px 10px;
         }
     }
 
     @media (min-width: 992px) {
         .modern-col-summary {
             position: sticky;
-            top: 20px;
+            top: 15px;
         }
     }
 </style>

@@ -201,11 +201,11 @@
             {{-- Cart & Summary Column (Desktop Right, Mobile Top + Bottom) --}}
             <div class="col-12 col-lg-5 modern-col-summary">
                 {{-- Order Items Section --}}
-                <div class="mb-3 modern-card modern-card-order-items">
+                <div class="mb-2 modern-card modern-card-order-items">
                     <div class="modern-card-header d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center">
                             <div class="mr-2 modern-header-icon modern-icon-cart">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="9" cy="21" r="1"></circle>
                                     <circle cx="20" cy="21" r="1"></circle>
                                     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -223,7 +223,7 @@
                                 <div class="modern-cart-item" data-id="{{ $product->id }}">
                                     <div class="modern-cart-item-row d-flex">
                                         {{-- Thumbnail --}}
-                                        <div class="mr-3 modern-cart-thumb">
+                                        <div class="mr-2 modern-cart-thumb">
                                             <img src="{{ asset($product->options->image) }}" alt="{{ $product->name }}">
                                         </div>
 
@@ -237,14 +237,14 @@
                                                     class="p-0 ml-2 border-0 btn btn-link modern-cart-remove text-muted"
                                                     title="Remove item"
                                                     wire:click="remove('{{ $product->rowId }}')">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                         <line x1="18" y1="6" x2="6" y2="18"></line>
                                                         <line x1="6" y1="6" x2="18" y2="18"></line>
                                                     </svg>
                                                 </button>
                                             </div>
 
-                                            <div class="mt-2 modern-cart-meta d-flex align-items-center justify-content-between flex-wrap">
+                                            <div class="mt-1 modern-cart-meta d-flex align-items-center justify-content-between flex-wrap">
                                                 <div class="modern-cart-price">
                                                     Price: <span class="modern-price-highlight">TK {{ number_format($product->price, 0) }}</span>
                                                 </div>
@@ -279,7 +279,7 @@
                                     </div>
                                 </div>
                             @empty
-                                <div class="py-3 text-center rounded modern-empty-cart text-danger">
+                                <div class="py-2 text-center rounded modern-empty-cart text-danger">
                                     কার্ট খালি রয়েছে।
                                 </div>
                             @endforelse
@@ -291,7 +291,7 @@
                 <div class="modern-card modern-card-summary">
                     <div class="modern-card-header d-flex align-items-center">
                         <div class="mr-2 modern-header-icon modern-icon-summary">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14 2 14 8 20 8"></polyline>
                                 <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -311,19 +311,19 @@
                         @endphp
 
                         {{-- Subtotal --}}
-                        <div class="mb-2 modern-summary-row d-flex justify-content-between align-items-center">
+                        <div class="mb-1 modern-summary-row d-flex justify-content-between align-items-center">
                             <span class="modern-summary-label">সাবটোটাল ({{ cart()->count() }} আইটেম)</span>
                             <span class="modern-summary-value font-weight-semibold">TK {{ number_format($subTotal, 0) }}</span>
                         </div>
 
                         {{-- Delivery Fee --}}
-                        <div class="mb-2 modern-summary-row d-flex justify-content-between align-items-center">
+                        <div class="mb-1 modern-summary-row d-flex justify-content-between align-items-center">
                             <span class="modern-summary-label">ডেলিভারি চার্জ</span>
                             <span class="modern-summary-value font-weight-semibold">TK {{ number_format($deliveryFee, 0) }}</span>
                         </div>
 
                         {{-- Coupon Code (Collapsible / Clean) --}}
-                        <div class="my-2 modern-coupon-wrapper">
+                        <div class="my-1 modern-coupon-wrapper">
                             <div class="input-group input-group-sm">
                                 <input type="text"
                                     wire:model.live="coupon_code"
@@ -349,7 +349,7 @@
                         </div>
 
                         {{-- Dashed Separator --}}
-                        <div class="my-3 modern-dashed-divider"></div>
+                        <div class="my-2 modern-dashed-divider"></div>
 
                         {{-- Grand Total --}}
                         <div class="modern-summary-row modern-summary-total d-flex justify-content-between align-items-center">
@@ -360,8 +360,8 @@
                 </div>
 
                 {{-- Terms & Confirmation Section --}}
-                <div class="mt-3 modern-checkout-actions">
-                    <div class="mb-3 modern-terms-box d-flex justify-content-center align-items-center">
+                <div class="mt-2 modern-checkout-actions">
+                    <div class="mb-2 modern-terms-box d-flex justify-content-center align-items-center">
                         <label class="mb-0 modern-terms-label d-flex align-items-center">
                             <input type="checkbox" checked class="mr-2 modern-terms-checkbox">
                             <span>
@@ -377,7 +377,7 @@
                             wire:click="checkout"
                             wire:loading.attr="disabled"
                             class="btn btn-block modern-confirm-btn d-flex align-items-center justify-content-center">
-                            <svg class="mr-2 modern-lock-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="mr-2 modern-lock-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
@@ -385,8 +385,8 @@
                         </button>
                     </div>
 
-                    <div class="mt-2 text-center modern-security-footer d-flex align-items-center justify-content-center">
-                        <svg class="mr-1 modern-lock-footer-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="mt-1 text-center modern-security-footer d-flex align-items-center justify-content-center">
+                        <svg class="mr-1 modern-lock-footer-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
