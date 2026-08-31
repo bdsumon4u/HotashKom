@@ -628,9 +628,11 @@ class Checkout extends Component
         $template = setting('show_option')->checkout_template
             ?? config('app.checkout_template', 'legacy');
 
-        $view = $template === 'simple'
-            ? 'livewire.checkout-simple'
-            : 'livewire.checkout';
+        $view = match ($template) {
+            'modern' => 'livewire.checkout-modern',
+            'simple' => 'livewire.checkout-simple',
+            default => 'livewire.checkout',
+        };
 
         $cartProductIds = cart()->content()->pluck('id')->filter()->unique()->values()->toArray();
 

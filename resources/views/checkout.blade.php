@@ -229,14 +229,559 @@
         margin-top: 8px;
     }
 
-    @media (max-width: 767.98px) {
-        .simple-shipping-options {
-            flex-direction: column;
+    /* ==========================================================================
+       Modern Checkout Theme (Inspired by Screenshot)
+       ========================================================================== */
+    .checkout--modern {
+        background-color: #f8fafc;
+        min-height: 100vh;
+        padding-top: 16px;
+        padding-bottom: 40px;
+    }
+
+    .modern-checkout-container {
+        max-width: 1060px;
+        margin: 0 auto;
+    }
+
+    .modern-checkout-topbar {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 12px 20px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .modern-brand-logo {
+        max-height: 38px;
+        width: auto;
+        object-fit: contain;
+    }
+
+    .modern-brand-text {
+        font-size: 20px;
+        font-weight: 800;
+        color: #1e293b;
+        letter-spacing: -0.5px;
+    }
+
+    .modern-topbar-phone {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #334155;
+        text-decoration: none;
+    }
+
+    .modern-topbar-phone:hover {
+        color: #0284c7;
+        text-decoration: none;
+    }
+
+    .modern-icon-phone {
+        color: #0284c7;
+    }
+
+    .modern-topbar-secure {
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .modern-icon-shield {
+        color: #10b981;
+    }
+
+    .modern-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .modern-card-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid #f1f5f9;
+        background-color: #ffffff;
+    }
+
+    .modern-header-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .modern-icon-cart,
+    .modern-icon-user {
+        background-color: #e0f2fe;
+        color: #0284c7;
+    }
+
+    .modern-icon-summary {
+        background-color: #dcfce7;
+        color: #16a34a;
+    }
+
+    .modern-card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .modern-item-count {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: #64748b;
+    }
+
+    .modern-card-body {
+        padding: 18px 20px;
+    }
+
+    .modern-form-group {
+        margin-bottom: 16px;
+    }
+
+    .modern-label {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 6px;
+    }
+
+    .modern-input {
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+        color: #1e293b;
+        background-color: #ffffff;
+        height: auto;
+        transition: all 0.2s ease;
+    }
+
+    .modern-input:focus {
+        border-color: #0284c7;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+        outline: none;
+    }
+
+    .modern-textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .modern-textarea-sm {
+        resize: vertical;
+        min-height: 60px;
+    }
+
+    .modern-phone-wrapper {
+        border-radius: 8px;
+    }
+
+    .modern-phone-prefix {
+        background-color: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-right: none;
+        border-radius: 8px 0 0 8px;
+        padding: 0 14px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .modern-input-with-prefix {
+        border-radius: 0 8px 8px 0 !important;
+    }
+
+    .modern-shipping-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+    }
+
+    .modern-shipping-card {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        background-color: #ffffff;
+        margin-bottom: 0;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .modern-shipping-card:hover {
+        border-color: #cbd5e1;
+        background-color: #fafbfc;
+    }
+
+    .modern-shipping-card.is-selected {
+        border-color: #dc2626;
+        background-color: #fffaf9;
+        box-shadow: 0 2px 6px rgba(220, 38, 38, 0.08);
+    }
+
+    .modern-shipping-radio {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .modern-shipping-custom-radio {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid #94a3b8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #ffffff;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+    }
+
+    .modern-shipping-card.is-selected .modern-shipping-custom-radio {
+        border-color: #dc2626;
+    }
+
+    .modern-radio-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #dc2626;
+        display: none;
+    }
+
+    .modern-shipping-card.is-selected .modern-radio-dot {
+        display: block;
+    }
+
+    .modern-shipping-icon-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background-color: #f1f5f9;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+    }
+
+    .modern-shipping-icon-badge.icon-active {
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+
+    .modern-shipping-name {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .modern-shipping-cost {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 2px;
+    }
+
+    .modern-cart-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .modern-cart-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .modern-cart-item:first-child {
+        padding-top: 0;
+    }
+
+    .modern-cart-thumb {
+        width: 76px;
+        height: 76px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        flex-shrink: 0;
+        background-color: #f8fafc;
+    }
+
+    .modern-cart-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .modern-cart-name {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #1e293b;
+        line-height: 1.35;
+    }
+
+    .modern-cart-remove {
+        color: #94a3b8;
+        transition: color 0.15s;
+    }
+
+    .modern-cart-remove:hover {
+        color: #ef4444;
+    }
+
+    .modern-cart-price {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .modern-price-highlight {
+        color: #dc2626;
+        font-weight: 700;
+    }
+
+    .modern-qty-stepper {
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        overflow: hidden;
+        background-color: #f8fafc;
+    }
+
+    .modern-qty-btn {
+        width: 30px;
+        height: 30px;
+        border: none;
+        background-color: #f1f5f9;
+        color: #334155;
+        font-size: 16px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        transition: background-color 0.15s;
+    }
+
+    .modern-qty-btn:hover {
+        background-color: #e2e8f0;
+    }
+
+    .modern-qty-val {
+        width: 36px;
+        height: 30px;
+        text-align: center;
+        border: none;
+        border-left: 1px solid #cbd5e1;
+        border-right: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #1e293b;
+        outline: none;
+        -moz-appearance: textfield;
+    }
+
+    .modern-qty-val::-webkit-outer-spin-button,
+    .modern-qty-val::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .modern-cart-item-total {
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .modern-total-highlight {
+        color: #dc2626;
+        font-weight: 700;
+    }
+
+    .modern-summary-row {
+        font-size: 14px;
+        color: #475569;
+    }
+
+    .modern-summary-value {
+        color: #1e293b;
+    }
+
+    .modern-dashed-divider {
+        border-top: 1px dashed #cbd5e1;
+    }
+
+    .modern-total-label {
+        font-size: 15.5px;
+        color: #1e293b;
+    }
+
+    .modern-total-amount {
+        font-size: 18px;
+        color: #dc2626;
+    }
+
+    .modern-coupon-wrapper .input-group {
+        display: flex;
+        align-items: stretch;
+    }
+
+    .modern-input-coupon {
+        height: 38px !important;
+        border-radius: 6px 0 0 6px !important;
+        border: 1px solid #cbd5e1;
+        border-right: none;
+        font-size: 13.5px;
+        padding: 6px 12px;
+        box-shadow: none;
+        background-color: #ffffff;
+    }
+
+    .modern-input-coupon:focus {
+        border-color: #334155;
+        box-shadow: none;
+        outline: none;
+    }
+
+    .modern-btn-coupon {
+        height: 38px !important;
+        border-radius: 0 6px 6px 0 !important;
+        background-color: #334155;
+        border: 1px solid #334155;
+        color: #ffffff;
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 0 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        transition: all 0.15s ease;
+    }
+
+    .modern-btn-coupon:hover {
+        background-color: #1e293b;
+        border-color: #1e293b;
+        color: #ffffff;
+    }
+
+    .modern-terms-label {
+        font-size: 13.5px;
+        color: #475569;
+        cursor: pointer;
+    }
+
+    .modern-terms-checkbox {
+        accent-color: #0284c7;
+        width: 16px;
+        height: 16px;
+    }
+
+    .modern-terms-link {
+        color: #0284c7;
+        text-decoration: underline;
+    }
+
+    .modern-confirm-btn {
+        background: linear-gradient(180deg, #dc2626 0%, #b91c1c 100%);
+        border: 1px solid #b91c1c;
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 700;
+        padding: 13px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.28);
+        transition: all 0.2s ease;
+        animation: modernPulse 1.6s ease-in-out infinite alternate;
+    }
+
+    .modern-confirm-btn:hover {
+        background: linear-gradient(180deg, #b91c1c 0%, #991b1b 100%);
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(220, 38, 38, 0.36);
+    }
+
+    .modern-lock-icon {
+        color: #ffffff;
+    }
+
+    .modern-security-footer {
+        font-size: 12.5px;
+        color: #64748b;
+    }
+
+    .modern-lock-footer-icon {
+        color: #64748b;
+    }
+
+    @keyframes modernPulse {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.02); }
+    }
+
+    /* Responsive Mobile Ordering & Spacing */
+    @media (max-width: 991.98px) {
+        .modern-checkout-container {
+            padding-left: 0;
+            padding-right: 0;
         }
 
-        .simple-checkout-card,
-        .simple-order-card {
-            margin-bottom: 16px;
+        .modern-checkout-layout {
+            display: flex;
+            flex-direction: column;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        .modern-col-summary {
+            display: contents;
+        }
+
+        .modern-col-form {
+            order: 2;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        .modern-card-order-items {
+            order: 1;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .modern-card-summary {
+            order: 3;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .modern-checkout-actions {
+            order: 4;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .modern-card-body {
+            padding: 14px 14px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .modern-col-summary {
+            position: sticky;
+            top: 20px;
         }
     }
 </style>
@@ -246,8 +791,8 @@
     @php
         $checkoutTemplate = setting('show_option')->checkout_template ?? config('app.checkout_template', 'legacy');
     @endphp
-    <div class="block mt-1 checkout {{ $checkoutTemplate === 'simple' ? 'checkout--simple' : '' }}">
-        <div class="{{ $checkoutTemplate === 'simple' ? 'container-fluid px-lg-5' : 'container' }}">
+    <div class="block mt-1 checkout {{ $checkoutTemplate === 'simple' ? 'checkout--simple' : ($checkoutTemplate === 'modern' ? 'checkout--modern' : '') }}">
+        <div class="{{ $checkoutTemplate === 'simple' ? 'container-fluid px-lg-5' : ($checkoutTemplate === 'modern' ? 'container' : 'container') }}">
             <x-form checkoutform :action="route('checkout')" method="POST">
                 <livewire:checkout />
             </x-form>

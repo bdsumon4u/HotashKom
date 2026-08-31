@@ -39,6 +39,7 @@
                     <select class="form-control" name="show_option[checkout_template]" id="show_option-checkout_template">
                         <option value="legacy" @if ($checkoutTemplate == 'legacy') selected @endif>Legacy</option>
                         <option value="simple" @if ($checkoutTemplate == 'simple') selected @endif>Simple</option>
+                        <option value="modern" @if ($checkoutTemplate == 'modern') selected @endif>Modern</option>
                     </select>
                     <x-error field="show_option.checkout_template" />
                 </div>
