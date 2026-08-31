@@ -29,7 +29,7 @@ class Order extends Model
     const MANUAL = 1;
 
     protected $fillable = [
-        'admin_id', 'user_id', 'type', 'name', 'phone', 'email', 'address', 'status', 'status_at', 'shipped_at', 'products', 'note', 'data', 'tracking', 'courier_report', 'source_id',
+        'admin_id', 'user_id', 'type', 'name', 'phone', 'email', 'address', 'status', 'status_at', 'shipped_at', 'confirmed_at', 'products', 'note', 'data', 'tracking', 'courier_report', 'source_id',
     ];
 
     protected $attributes = [
@@ -55,6 +55,10 @@ class Order extends Model
             if (! $order->exists || $order->isDirty('status')) {
                 info('does not exist or status changed');
                 $order->adjustStock();
+
+                if ($order->status === 'CONFIRMED' && ! $order->isDirty('confirmed_at')) {
+                    $order->confirmed_at = now();
+                }
             }
 
             if (! $order->isDirty('data')) {
@@ -539,7 +543,7 @@ class Order extends Model
             ->logOnlyDirty()
             ->useLogName('orders')
             ->dontSubmitEmptyLogs()
-            ->dontLogIfAttributesChangedOnly(['status_at', 'updated_at'])
+            ->dontLogIfAttributesChangedOnly(['status_at', 'updated_at', 'confirmed_at'])
             ->logOnly(['admin_id', 'name', 'phone', 'address', 'status', 'status_at', 'products', 'note', 'data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal', 'data->packaging_charge']);
     }
 
@@ -655,6 +659,7 @@ class Order extends Model
             'courier_report' => 'array',
             'status_at' => 'datetime',
             'shipped_at' => 'datetime',
+            'confirmed_at' => 'datetime',
         ];
     }
 }

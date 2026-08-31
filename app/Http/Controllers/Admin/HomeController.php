@@ -29,7 +29,7 @@ class HomeController extends Controller
         $totalSQL = 'COUNT(*) as order_count, SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.subtotal"))) + SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.shipping_cost"))) - COALESCE(SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.discount"))), 0) as total_amount';
 
         $orderQ = Order::query()
-            ->whereBetween(request('date_type', 'status_at'), [
+            ->whereBetween(request('date_type', 'confirmed_at'), [
                 $_start->startOfDay()->toDateTimeString(),
                 $_end->endOfDay()->toDateTimeString(),
             ]);
@@ -43,7 +43,7 @@ class HomeController extends Controller
             $_start,
             $_end,
             ['CONFIRMED', 'PACKAGING', 'SHIPPING'],
-            request('date_type', 'status_at'),
+            request('date_type', 'confirmed_at'),
             request('staff_id')
         );
 

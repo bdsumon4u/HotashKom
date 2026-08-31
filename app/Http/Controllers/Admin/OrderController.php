@@ -611,6 +611,9 @@ class OrderController extends Controller
         if ($request->status == 'SHIPPING') {
             $data['shipped_at'] = now()->toDateTimeString();
         }
+        if ($request->status == 'CONFIRMED') {
+            $data['confirmed_at'] = now()->toDateTimeString();
+        }
         $orders = Order::whereIn('id', $request->order_id)->where('status', '!=', $request->status)->get();
 
         $orders->each->update($data);

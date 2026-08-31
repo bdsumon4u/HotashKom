@@ -16,7 +16,7 @@ final readonly class ProductReportService
         Carbon $startDate,
         Carbon $endDate,
         array $statuses,
-        ?string $dateType = 'status_at',
+        ?string $dateType = 'confirmed_at',
         ?int $staffId = null,
         ?Carbon $shippedAt = null
     ): array {

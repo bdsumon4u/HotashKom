@@ -25,7 +25,8 @@
             <div class="input-group">
                 <select name="date_type" id="datetype" class="form-control input-group-prepend" style="max-width: 150px;">
                     <option value="created_at" @if (request('date_type') == 'created_at') selected @endif>ORDER DATE</option>
-                    <option value="status_at" @if (request('date_type', 'status_at') == 'status_at') selected @endif>UPDATE DATE</option>
+                    <option value="confirmed_at" @if (request('date_type', 'confirmed_at') == 'confirmed_at') selected @endif>CONFIRM DATE</option>
+                    <option value="status_at" @if (request('date_type') == 'status_at') selected @endif>UPDATE DATE</option>
                 </select>
                 <input class="form-control" id="reportrange" type="text">
 
@@ -433,7 +434,7 @@
     <script>
         window._status = '{{ request('status') }}';
         window._staff = '{{ request('staff_id') }}';
-        window._type = '{{ request('date_type', 'created_at') }}';
+        window._type = '{{ request('date_type', 'confirmed_at') }}';
         window._start = moment('{{ $start }}');
         window._end = moment('{{ $end }}');
         window.reportRangeCB = function(start, end) {
