@@ -235,6 +235,7 @@
                         </a>
                     </li>
 
+                    @if(config('app.utm'))
                     <li>
                         <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.reports.utm' ? 'active' : '' }}"
                             href="{{ route('admin.reports.utm') }}">
@@ -242,6 +243,7 @@
                             <span>UTM</span>
                         </a>
                     </li>
+                    @endif
 
                     <li class="sidebar-title">
                         <h6>Users</h6>

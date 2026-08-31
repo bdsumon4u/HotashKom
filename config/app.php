@@ -26,6 +26,8 @@ return [
 
     'unregister_sw' => env('UNREGISTER_SW', false),
 
+    'utm' => env('UTM_ENABLED', true),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
