@@ -557,7 +557,9 @@
             <div class="shadow-sm card rounded-0">
                 <div class="p-3 card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 card-title">UTM Tracking</h5>
-                    @php($source = $order->utm_source)
+                    @php
+                        $source = $order->utm_source;
+                    @endphp
                     @if (! empty($source))
                         @php
                             $badgeClass = match (strtolower($source)) {
@@ -583,7 +585,9 @@
                     @endif
                 </div>
                 <div class="p-3 card-body">
-                    @php($utm = $order->utm)
+                    @php
+                        $utm = $order->utm;
+                    @endphp
                     @if (! empty($utm) || ! empty($source))
                         <table class="table table-sm table-bordered mb-0">
                             <tbody>

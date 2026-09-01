@@ -25,7 +25,9 @@
                             </thead>
                             <tbody>
                                 @foreach (['Pathao', 'SteadFast', 'RedX', 'PaperFly'] as $provider)
-                                    @php($providerReport = data_get($report, 'courierData.' . strtolower($provider)))
+                                    @php
+                                        $providerReport = data_get($report, 'courierData.'.strtolower($provider));
+                                    @endphp
                                     <tr>
                                         <th>{{ $provider }}</th>
                                         <td class="font-weight-bold">{{ data_get($providerReport, 'total_parcel', 0) }}</td>
@@ -40,8 +42,10 @@
                     </div>
                     <div style="flex: 1;display: flex;flex-direction: column;justify-content: center;"
                         class="p-2 border font-weight-bold">
-                        @php($summary = data_get($report, 'courierData.summary'))
-                        @php($failure = data_get($summary, 'total_parcel', 0) > 0 ? number_format((data_get($summary, 'cancelled_parcel', 0) / data_get($summary, 'total_parcel', 1)) * 100, 2) : 0)
+                        @php
+                            $summary = data_get($report, 'courierData.summary');
+                            $failure = data_get($summary, 'total_parcel', 0) > 0 ? number_format((data_get($summary, 'cancelled_parcel', 0) / data_get($summary, 'total_parcel', 1)) * 100, 2) : 0;
+                        @endphp
                         <div class="px-3 py-1 my-1 text-center border border-secondary">Summary:</div>
                         <div class="px-3 py-2 my-1 bg-success">Delivered: {{ data_get($summary, 'success_parcel', 0) }}
                             ({{ data_get($summary, 'success_ratio', 0) }}%)</div>
