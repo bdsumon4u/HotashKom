@@ -30,14 +30,11 @@ class UtmReportController extends Controller
                 $endD->endOfDay()->toDateTimeString(),
             ]);
 
-        if ($selectedSource) {
-            $ordersQuery->where(function ($q) use ($selectedSource): void {
-                $q->where('tracking->utm->utm_source', $selectedSource)
-                    ->orWhere('tracking->utm_source', $selectedSource);
-            });
-        }
-
         $allOrders = $ordersQuery->get();
+
+        if ($selectedSource) {
+            $allOrders = $allOrders->filter(fn (Order $order): bool => strtolower((string) $order->utm_source) === strtolower($selectedSource));
+        }
 
         $totalOrdersCount = $allOrders->count();
         $utmOrders = $allOrders->filter(fn (Order $order): bool => ! empty($order->utm_source));
@@ -51,8 +48,14 @@ class UtmReportController extends Controller
 
         foreach ($utmOrders as $order) {
             $source = strtolower(trim((string) ($order->utm_source ?? 'unknown')));
-            $campaign = trim((string) ($order->utm_campaign ?? 'None / Unnamed'));
-            $medium = strtolower(trim((string) ($order->utm_medium ?? 'None')));
+            $defaultCampaign = match ($source) {
+                'google' => 'Google Ads',
+                'facebook', 'fb' => 'Facebook Ads',
+                'tiktok' => 'TikTok Ads',
+                default => 'None / Unnamed',
+            };
+            $campaign = trim((string) ($order->utm_campaign ?: $defaultCampaign));
+            $medium = strtolower(trim((string) ($order->utm_medium ?: 'cpc')));
 
             $key = $campaign.'|'.$source.'|'.$medium;
 

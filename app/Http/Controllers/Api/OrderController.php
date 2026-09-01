@@ -125,8 +125,16 @@ class OrderController extends Controller
                         'youtube' => 'badge-danger',
                         default => 'badge-secondary',
                     };
+                    $sourceLabel = match (strtolower($source)) {
+                        'facebook', 'fb' => 'FB',
+                        'google' => 'GOOGLE',
+                        'tiktok' => 'TIKTOK',
+                        'instagram' => 'INSTAGRAM',
+                        'youtube' => 'YOUTUBE',
+                        default => strtoupper($source),
+                    };
                     $campaign = $row->utm_campaign ? ' title="Campaign: '.e($row->utm_campaign).'"' : '';
-                    $idHtml .= '<div class="mt-1"><span class="badge '.$badgeClass.'"'.$campaign.' style="font-size: 10px;">'.e(strtoupper($source)).'</span></div>';
+                    $idHtml .= '<div class="mt-1"><span class="badge '.$badgeClass.'"'.$campaign.' style="font-size: 10px;">'.e($sourceLabel).'</span></div>';
                 }
 
                 return $idHtml;

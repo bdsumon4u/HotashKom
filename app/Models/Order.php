@@ -371,7 +371,26 @@ class Order extends Model
 
     protected function utmSource(): Attribute
     {
-        return Attribute::get(fn (): ?string => $this->tracking['utm']['utm_source'] ?? $this->tracking['utm_source'] ?? null);
+        return Attribute::get(function (): ?string {
+            $source = $this->tracking['utm']['utm_source'] ?? $this->tracking['utm_source'] ?? null;
+            if ($source) {
+                return $source;
+            }
+
+            if (! empty($this->tracking['utm']['gclid']) || ! empty($this->tracking['gclid'])) {
+                return 'google';
+            }
+
+            if (! empty($this->tracking['utm']['fbclid']) || ! empty($this->tracking['fbclid']) || ! empty($this->tracking['fbc'])) {
+                return 'facebook';
+            }
+
+            if (! empty($this->tracking['utm']['ttclid']) || ! empty($this->tracking['ttclid'])) {
+                return 'tiktok';
+            }
+
+            return null;
+        });
     }
 
     protected function utmCampaign(): Attribute
@@ -381,7 +400,20 @@ class Order extends Model
 
     protected function utmMedium(): Attribute
     {
-        return Attribute::get(fn (): ?string => $this->tracking['utm']['utm_medium'] ?? $this->tracking['utm_medium'] ?? null);
+        return Attribute::get(function (): ?string {
+            $medium = $this->tracking['utm']['utm_medium'] ?? $this->tracking['utm_medium'] ?? null;
+            if ($medium) {
+                return $medium;
+            }
+
+            if (! empty($this->tracking['utm']['gclid']) || ! empty($this->tracking['gclid']) ||
+                ! empty($this->tracking['utm']['fbclid']) || ! empty($this->tracking['fbclid']) || ! empty($this->tracking['fbc']) ||
+                ! empty($this->tracking['utm']['ttclid']) || ! empty($this->tracking['ttclid'])) {
+                return 'cpc';
+            }
+
+            return null;
+        });
     }
 
     protected function isFreeDelivery(): Attribute

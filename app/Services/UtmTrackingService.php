@@ -36,6 +36,20 @@ class UtmTrackingService
 
         if ($hasUtmQuery) {
             $utmData = array_filter($utmParams);
+
+            if (empty($utmData['utm_source'])) {
+                if (! empty($utmData['gclid'])) {
+                    $utmData['utm_source'] = 'google';
+                    $utmData['utm_medium'] ??= 'cpc';
+                } elseif (! empty($utmData['fbclid'])) {
+                    $utmData['utm_source'] = 'facebook';
+                    $utmData['utm_medium'] ??= 'cpc';
+                } elseif (! empty($utmData['ttclid'])) {
+                    $utmData['utm_source'] = 'tiktok';
+                    $utmData['utm_medium'] ??= 'cpc';
+                }
+            }
+
             $utmData['landing_page'] = Str::limit($request->path(), 150);
             $utmData['captured_at'] = now()->toIso8601String();
 
@@ -84,6 +98,19 @@ class UtmTrackingService
         ]);
 
         if (! empty($directParams)) {
+            if (empty($directParams['utm_source'])) {
+                if (! empty($directParams['gclid'])) {
+                    $directParams['utm_source'] = 'google';
+                    $directParams['utm_medium'] ??= 'cpc';
+                } elseif (! empty($directParams['fbclid'])) {
+                    $directParams['utm_source'] = 'facebook';
+                    $directParams['utm_medium'] ??= 'cpc';
+                } elseif (! empty($directParams['ttclid'])) {
+                    $directParams['utm_source'] = 'tiktok';
+                    $directParams['utm_medium'] ??= 'cpc';
+                }
+            }
+
             $directParams['landing_page'] = Str::limit($request->path(), 150);
             $directParams['captured_at'] = now()->toIso8601String();
 
@@ -93,7 +120,7 @@ class UtmTrackingService
         // 2. Session
         if ($sessionData = session()->get(self::COOKIE_NAME)) {
             if (is_array($sessionData)) {
-                return $sessionData;
+                return $this->normalizeUtmData($sessionData);
             }
         }
 
@@ -102,11 +129,35 @@ class UtmTrackingService
         if ($cookieValue) {
             $decoded = json_decode((string) $cookieValue, true);
             if (is_array($decoded)) {
-                return $decoded;
+                return $this->normalizeUtmData($decoded);
             }
         }
 
         return [];
+    }
+
+    /**
+     * Normalize UTM data array to ensure source and medium are populated from click IDs if missing.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function normalizeUtmData(array $data): array
+    {
+        if (empty($data['utm_source'])) {
+            if (! empty($data['gclid'])) {
+                $data['utm_source'] = 'google';
+                $data['utm_medium'] ??= 'cpc';
+            } elseif (! empty($data['fbclid'])) {
+                $data['utm_source'] = 'facebook';
+                $data['utm_medium'] ??= 'cpc';
+            } elseif (! empty($data['ttclid'])) {
+                $data['utm_source'] = 'tiktok';
+                $data['utm_medium'] ??= 'cpc';
+            }
+        }
+
+        return $data;
     }
 
     private function hasExistingUtmCookie(Request $request): bool

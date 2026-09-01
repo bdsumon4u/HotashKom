@@ -553,36 +553,56 @@
                 <livewire:edit-order.courier-report :order="$order" wire:key="order-courier-report-{{ $order->id }}" />
             @endif
 
+            @if(config('app.utm'))
             <div class="shadow-sm card rounded-0">
                 <div class="p-3 card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 card-title">UTM Tracking</h5>
-                    @if (! empty($order->utm_source))
-                        <span class="badge badge-primary text-uppercase">{{ $order->utm_source }}</span>
+                    @php($source = $order->utm_source)
+                    @if (! empty($source))
+                        @php
+                            $badgeClass = match (strtolower($source)) {
+                                'facebook', 'fb' => 'badge-primary',
+                                'google' => 'badge-danger',
+                                'tiktok' => 'badge-dark',
+                                'instagram' => 'badge-info',
+                                'youtube' => 'badge-danger',
+                                default => 'badge-secondary',
+                            };
+                            $sourceLabel = match (strtolower($source)) {
+                                'facebook', 'fb' => 'FB',
+                                'google' => 'GOOGLE',
+                                'tiktok' => 'TIKTOK',
+                                'instagram' => 'INSTAGRAM',
+                                'youtube' => 'YOUTUBE',
+                                default => strtoupper($source),
+                            };
+                        @endphp
+                        <span class="badge {{ $badgeClass }} text-uppercase">{{ $sourceLabel }}</span>
                     @else
                         <span class="badge badge-secondary">Direct / None</span>
                     @endif
                 </div>
                 <div class="p-3 card-body">
                     @php($utm = $order->utm)
-                    @if (! empty($utm))
+                    @if (! empty($utm) || ! empty($source))
                         <table class="table table-sm table-bordered mb-0">
                             <tbody>
-                                @if (! empty($utm['utm_source']))
+                                @if (! empty($order->utm_source))
                                     <tr>
                                         <th width="35%" class="py-1 bg-light">Source</th>
-                                        <td class="py-1 font-weight-bold text-primary">{{ $utm['utm_source'] }}</td>
+                                        <td class="py-1 font-weight-bold text-primary text-uppercase">{{ $order->utm_source }}</td>
                                     </tr>
                                 @endif
-                                @if (! empty($utm['utm_medium']))
+                                @if (! empty($order->utm_medium))
                                     <tr>
                                         <th class="py-1 bg-light">Medium</th>
-                                        <td class="py-1">{{ $utm['utm_medium'] }}</td>
+                                        <td class="py-1">{{ $order->utm_medium }}</td>
                                     </tr>
                                 @endif
-                                @if (! empty($utm['utm_campaign']))
+                                @if (! empty($order->utm_campaign))
                                     <tr>
                                         <th class="py-1 bg-light">Campaign</th>
-                                        <td class="py-1 font-weight-bold">{{ $utm['utm_campaign'] }}</td>
+                                        <td class="py-1 font-weight-bold">{{ $order->utm_campaign }}</td>
                                     </tr>
                                 @endif
                                 @if (! empty($utm['utm_content']))
@@ -603,13 +623,13 @@
                                         <td class="py-1 text-truncate" style="max-width: 200px;" title="{{ $utm['landing_page'] }}">/{{ ltrim($utm['landing_page'], '/') }}</td>
                                     </tr>
                                 @endif
-                                @if (! empty($utm['fbclid']) || ! empty($utm['gclid']) || ! empty($utm['ttclid']))
+                                @if (! empty($utm['fbclid']) || ! empty($utm['gclid']) || ! empty($utm['ttclid']) || ! empty($order->tracking['gclid']) || ! empty($order->tracking['fbclid']) || ! empty($order->tracking['fbc']))
                                     <tr>
                                         <th class="py-1 bg-light">Click ID</th>
                                         <td class="py-1">
-                                            @if (! empty($utm['fbclid'])) <span class="badge badge-info">FBCLID</span> @endif
-                                            @if (! empty($utm['gclid'])) <span class="badge badge-success">GCLID</span> @endif
-                                            @if (! empty($utm['ttclid'])) <span class="badge badge-dark">TTCLID</span> @endif
+                                            @if (! empty($utm['fbclid']) || ! empty($order->tracking['fbclid']) || ! empty($order->tracking['fbc'])) <span class="badge badge-info">FBCLID</span> @endif
+                                            @if (! empty($utm['gclid']) || ! empty($order->tracking['gclid'])) <span class="badge badge-success">GCLID</span> @endif
+                                            @if (! empty($utm['ttclid']) || ! empty($order->tracking['ttclid'])) <span class="badge badge-dark">TTCLID</span> @endif
                                         </td>
                                     </tr>
                                 @endif
@@ -628,6 +648,7 @@
                     @endif
                 </div>
             </div>
+            @endif
         @endif
     </div>
 </div>
