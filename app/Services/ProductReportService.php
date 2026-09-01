@@ -20,11 +20,17 @@ final readonly class ProductReportService
         ?int $staffId = null,
         ?Carbon $shippedAt = null
     ): array {
+        $dateRange = [
+            $startDate->startOfDay()->toDateTimeString(),
+            $endDate->endOfDay()->toDateTimeString(),
+        ];
+
         $orderQuery = Order::query()
-            ->whereBetween($dateType, [
-                $startDate->startOfDay()->toDateTimeString(),
-                $endDate->endOfDay()->toDateTimeString(),
-            ]);
+            ->when(
+                $dateType === 'confirmed_at',
+                fn ($q) => $q->where(fn ($subQuery) => $subQuery->whereBetween('created_at', $dateRange)->orWhereBetween('confirmed_at', $dateRange)),
+                fn ($q) => $q->whereBetween($dateType ?? 'confirmed_at', $dateRange)
+            );
 
         if ($staffId) {
             $orderQuery->where('admin_id', $staffId);

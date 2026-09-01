@@ -117,11 +117,18 @@ class OrderController extends Controller
 
         $totalSQL = 'COUNT(*) as order_count, SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.subtotal"))) + SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.shipping_cost"))) - COALESCE(SUM(JSON_UNQUOTE(JSON_EXTRACT(data, "$.discount"))), 0) as total_amount';
 
+        $dateType = request('date_type', 'status_at');
+        $dateRange = [
+            $_start->startOfDay()->toDateTimeString(),
+            $_end->endOfDay()->toDateTimeString(),
+        ];
+
         $orderQ = Order::query()
-            ->whereBetween(request('date_type', 'status_at'), [
-                $_start->startOfDay()->toDateTimeString(),
-                $_end->endOfDay()->toDateTimeString(),
-            ]);
+            ->when(
+                $dateType === 'confirmed_at',
+                fn ($q) => $q->where(fn ($subQuery) => $subQuery->whereBetween('created_at', $dateRange)->orWhereBetween('confirmed_at', $dateRange)),
+                fn ($q) => $q->whereBetween($dateType, $dateRange)
+            );
 
         if ($request->staff_id) {
             $orderQ->where('admin_id', $request->staff_id);
