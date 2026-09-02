@@ -206,6 +206,10 @@ class PlaceOnindaOrder implements ShouldQueue
         $attributes['source_id'] = $resellerOrder->id;
         unset($attributes['id']);
 
+        // Explicitly preserve tracking and courier report from reseller order
+        $attributes['tracking'] = $resellerOrder->tracking;
+        $attributes['courier_report'] = $resellerOrder->courier_report;
+
         // Override specific attributes
         $attributes['admin_id'] = $resellerOrder->admin_id;
         $attributes['products'] = $mappedProducts;

@@ -357,9 +357,12 @@ class Order extends Model
     protected function tracking(): Attribute
     {
         return Attribute::make(
-            fn ($tracking): array => $tracking ? json_decode((string) $tracking, true) : [],
+            fn ($tracking): array => $tracking ? (is_array($tracking) ? $tracking : (json_decode((string) $tracking, true) ?: [])) : [],
             fn ($tracking) => $this->attributes['tracking'] = json_encode(
-                array_merge($this->tracking ?? [], is_array($tracking) ? $tracking : [])
+                array_merge(
+                    $this->tracking ?? [],
+                    is_array($tracking) ? $tracking : (is_string($tracking) ? (json_decode($tracking, true) ?: []) : [])
+                )
             ),
         );
     }

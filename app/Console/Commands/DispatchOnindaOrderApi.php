@@ -30,7 +30,7 @@ class DispatchOnindaOrderApi extends Command
         $this->info('Starting to process orders for Oninda API dispatch...');
 
         // Find orders placed within the last hour with null or 0 source_id
-        $orders = Order::where('created_at', '>=', now()->subHour())
+        $orders = Order::where('created_at', '>=', now()->subDay())
             ->where(function ($query): void {
                 $query->whereNull('source_id')
                     ->orWhere('source_id', 0);
