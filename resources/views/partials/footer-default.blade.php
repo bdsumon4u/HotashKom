@@ -70,6 +70,14 @@
                                         @case('youtube')
                                         <i class="fab fa-youtube"></i>
                                         @break
+                                        @case('pinterest')
+                                        <i class="fab fa-pinterest"></i>
+                                        @break
+                                        @case('tiktok')
+                                        <i class="fab fa-tiktok"></i>
+                                        @break
+                                        @default
+                                        <i class="fab fa-{{ $item }}"></i>
                                         @endswitch
                                     </a>
                                 </li>

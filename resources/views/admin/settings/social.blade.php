@@ -49,9 +49,9 @@
         <div class="col-md-6">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fab fa-linkedin"></i></span>
+                    <span class="input-group-text"><i class="fab fa-tiktok"></i></span>
                 </div>
-                <x-input type="url" name="social[linkedin][link]" :value="$social->linkedin->link ?? ''" />
+                <x-input type="url" name="social[tiktok][link]" :value="$social->tiktok->link ?? ''" />
             </div>
         </div>
     </div>
