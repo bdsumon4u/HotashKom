@@ -117,7 +117,7 @@
                     <a href="{{ $scheme }}://{{ $primaryDomain }}" target="_blank" class="btn btn-outline-primary btn-sm px-3 shadow-sm font-weight-bold" style="border-radius: 6px;">
                         <i class="fa fa-external-link-alt mr-1"></i> Visit Store
                     </a>
-                    <a href="{{ $scheme }}://{{ $primaryDomain }}/admin" target="_blank" class="btn btn-primary btn-sm px-3 shadow-sm font-weight-bold" style="border-radius: 6px;">
+                    <a href="{{ route('admin.tenants.impersonate', $tenant) }}" target="_blank" class="btn btn-primary btn-sm px-3 shadow-sm font-weight-bold" style="border-radius: 6px;">
                         <i class="fa fa-tachometer-alt mr-1"></i> Store Admin
                     </a>
                 </div>
@@ -248,6 +248,68 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danger Zone Card -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="saas-card" style="border-color: #fecaca;">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="background-color: #fef2f2;">
+                    <h6 class="mb-0 font-weight-bold text-danger">
+                        <i class="fa fa-exclamation-triangle mr-1"></i> Danger Zone
+                    </h6>
+                    <span class="badge badge-danger px-2 py-1" style="border-radius: 6px;">Irreversible Action</span>
+                </div>
+                <div class="p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center" style="gap: 16px;">
+                    <div>
+                        <h6 class="font-weight-bold text-dark mb-1">Delete this Tenant Store</h6>
+                        <p class="text-muted small mb-0">
+                            Permanently deletes the store, custom domains, settings, catalog (products, categories, brands), customer orders, and administrator accounts. All data with <code>tenant_id = {{ $tenant->id }}</code> will be purged from all tables.
+                        </p>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-danger btn-sm px-3 font-weight-bold shadow-sm" style="border-radius: 6px; white-space: nowrap;" data-toggle="modal" data-target="#deleteTenantModal">
+                            <i class="fa fa-trash-alt mr-1"></i> Delete Store
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Tenant Modal -->
+<div class="modal fade" id="deleteTenantModal" tabindex="-1" role="dialog" aria-labelledby="deleteTenantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow" style="border-radius: 12px; overflow: hidden;">
+            <div class="modal-header bg-danger text-white px-4 py-3">
+                <h5 class="modal-title font-weight-bold" id="deleteTenantModalLabel">
+                    <i class="fa fa-exclamation-triangle mr-1"></i> Delete Tenant Store
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body px-4 py-3">
+                <p class="text-dark font-weight-bold mb-2">Are you sure you want to permanently delete store "{{ $storeName }}"?</p>
+                <div class="alert alert-warning border-0 small mb-3" style="border-radius: 8px;">
+                    <i class="fa fa-info-circle mr-1"></i> <strong>This action cannot be undone.</strong> All records associated with <code>tenant_id = "{{ $tenant->id }}"</code> across all tables will be immediately purged.
+                </div>
+                <p class="text-muted small mb-0">
+                    Click the button below to confirm store deletion.
+                </p>
+            </div>
+            <div class="modal-footer bg-light border-top px-4 py-3">
+                <button type="button" class="btn btn-secondary btn-sm px-3" data-dismiss="modal">Cancel</button>
+                <form action="{{ route('admin.tenants.destroy', $tenant) }}" method="POST" class="m-0">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm px-4 shadow-sm font-weight-bold">
+                        <i class="fa fa-trash-alt mr-1"></i> Yes, Delete Store
+                    </button>
+                </form>
             </div>
         </div>
     </div>

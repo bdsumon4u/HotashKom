@@ -13,11 +13,12 @@ use Illuminate\Support\Str;
 class CreateTenantAction
 {
     public function __construct(
-        protected ProvisionTenantSettings $provisionTenantSettings
+        protected ProvisionTenantSettings $provisionTenantSettings,
+        protected CloneTenantResources $cloneTenantResources
     ) {}
 
     /**
-     * Create a new tenant with domains, admin user, and provisioned settings.
+     * Create a new tenant with domains, admin user, provisioned settings, and selective catalog resources.
      *
      * @param  array{
      *     id: string,
@@ -25,7 +26,16 @@ class CreateTenantAction
      *     custom_domain?: string|null,
      *     admin_name?: string|null,
      *     admin_email: string,
-     *     admin_password?: string|null
+     *     admin_password?: string|null,
+     *     clone_products?: bool,
+     *     clone_categories?: bool,
+     *     clone_brands?: bool,
+     *     clone_landing_pages?: bool,
+     *     clone_sliders?: bool,
+     *     clone_home_sections?: bool,
+     *     clone_menus?: bool,
+     *     clone_pages?: bool,
+     *     clone_blogs?: bool,
      * }  $data
      */
     public function execute(array $data): Tenant
@@ -77,7 +87,10 @@ class CreateTenantAction
             // 5. Provision Settings (from reference tenant or central platform)
             $this->provisionTenantSettings->execute($tenant);
 
-            // 6. Update company name in provisioned settings
+            // 6. Clone Selective Catalog & Content Resources
+            $this->cloneTenantResources->execute($tenant, $data);
+
+            // 7. Update company name in provisioned settings
             if (! empty($data['name'])) {
                 $companySetting = Setting::withoutTenancy()
                     ->where('tenant_id', $tenant->id)

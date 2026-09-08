@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
@@ -33,6 +34,29 @@ class Tenant extends BaseTenant
         'data' => 'array',
     ];
 
+    #[\Override]
+    public static function booted(): void
+    {
+        static::deleting(function ($tenant): void {
+            $tenant->admins()->delete();
+            $tenant->settings()->delete();
+
+            Product::withoutTenancy()->where('tenant_id', $tenant->id)->get()->each->delete();
+            Category::withoutTenancy()->where('tenant_id', $tenant->id)->get()->each->delete();
+            Brand::withoutTenancy()->where('tenant_id', $tenant->id)->get()->each->delete();
+            LandingPagePro::withoutTenancy()->where('tenant_id', $tenant->id)->get()->each->delete();
+            LandingPageProItem::withoutTenancy()->where('tenant_id', $tenant->id)->delete();
+            Slide::withoutTenancy()->where('tenant_id', $tenant->id)->delete();
+            HomeSection::withoutTenancy()->where('tenant_id', $tenant->id)->delete();
+            Menu::withoutTenancy()->where('tenant_id', $tenant->id)->get()->each->delete();
+            MenuItem::withoutTenancy()->where('tenant_id', $tenant->id)->delete();
+            Page::withoutTenancy()->where('tenant_id', $tenant->id)->delete();
+            Blog::withoutTenancy()->where('tenant_id', $tenant->id)->delete();
+            Attribute::withoutTenancy()->where('tenant_id', $tenant->id)->get()->each->delete();
+            Option::withoutTenancy()->where('tenant_id', $tenant->id)->delete();
+        });
+    }
+
     /**
      * Get custom columns that should be saved directly on the tenants table instead of JSON data.
      */
@@ -51,7 +75,8 @@ class Tenant extends BaseTenant
      */
     public function admins(): HasMany
     {
-        return $this->hasMany(Admin::class, 'tenant_id');
+        return $this->hasMany(Admin::class, 'tenant_id')
+            ->withoutGlobalScope(TenantScope::class);
     }
 
     /**
@@ -59,7 +84,8 @@ class Tenant extends BaseTenant
      */
     public function settings(): HasMany
     {
-        return $this->hasMany(Setting::class, 'tenant_id');
+        return $this->hasMany(Setting::class, 'tenant_id')
+            ->withoutGlobalScope(TenantScope::class);
     }
 
     /**
@@ -67,7 +93,8 @@ class Tenant extends BaseTenant
      */
     public function products(): HasMany
     {
-        return $this->hasMany(Product::class, 'tenant_id');
+        return $this->hasMany(Product::class, 'tenant_id')
+            ->withoutGlobalScope(TenantScope::class);
     }
 
     /**
@@ -75,6 +102,7 @@ class Tenant extends BaseTenant
      */
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class, 'tenant_id');
+        return $this->hasMany(Order::class, 'tenant_id')
+            ->withoutGlobalScope(TenantScope::class);
     }
 }

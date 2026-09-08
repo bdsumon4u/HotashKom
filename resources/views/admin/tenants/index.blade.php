@@ -149,6 +149,34 @@
         display: inline-block;
         box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
     }
+    .clone-resource-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 9px 11px;
+        background: #ffffff;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        user-select: none;
+        height: 100%;
+    }
+    .clone-resource-card:hover {
+        border-color: #cbd5e1;
+        background-color: #f8fafc;
+    }
+    .clone-resource-card.active {
+        border-color: #6366f1;
+        background-color: #f5f3ff;
+    }
+    .clone-resource-card input[type="checkbox"] {
+        margin-top: 3px;
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        accent-color: #4f46e5;
+    }
 </style>
 @endpush
 
@@ -249,7 +277,7 @@
     </div>
 
     <!-- Main Table Card -->
-    <div class="row">
+    <div class="row mb-5">
         <div class="col-sm-12">
             <div class="saas-card">
                 <!-- Header with Title & Search & Action Button -->
@@ -374,7 +402,7 @@
                                                 <a href="{{ $scheme }}://{{ $primaryDomain }}" target="_blank" class="action-btn btn-store" title="Open Storefront" data-toggle="tooltip">
                                                     <i class="fa fa-external-link-alt"></i>
                                                 </a>
-                                                <a href="{{ $scheme }}://{{ $primaryDomain }}/admin" target="_blank" class="action-btn btn-admin" title="Login to Store Admin" data-toggle="tooltip">
+                                                <a href="{{ route('admin.tenants.impersonate', $tenant) }}" target="_blank" class="action-btn btn-admin" title="Login to Store Admin" data-toggle="tooltip">
                                                     <i class="fa fa-tachometer-alt"></i>
                                                 </a>
                                             @endif
@@ -508,6 +536,122 @@
                         </div>
                     </div>
 
+                    <!-- Selective Baseline Data Cloning Section -->
+                    <div class="p-3 mb-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-copy text-primary mr-2"></i>
+                                <h6 class="mb-0 font-weight-bold text-dark" style="font-size: 13px;">Copy from Baseline / Reference Site</h6>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-primary py-0 px-2" style="font-size: 11px;" onclick="toggleAllCloneOptions(true)">Select All</button>
+                                <button type="button" class="btn btn-outline-secondary py-0 px-2" style="font-size: 11px;" onclick="toggleAllCloneOptions(false)">Clear All</button>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3">Choose which catalog & content resources to clone. Related dependencies (e.g. variations, category links, existing image IDs) are automatically handled.</p>
+
+                        <div class="row">
+                            <!-- Products -->
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <label class="clone-resource-card active" id="card_clone_products">
+                                    <input type="checkbox" name="clone_products" id="clone_products" value="1" checked onchange="onCloneProductsChange(this.checked)">
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px;">📦 Products</div>
+                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">Variations, Attributes & Options</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Categories -->
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <label class="clone-resource-card active" id="card_clone_categories">
+                                    <input type="checkbox" name="clone_categories" id="clone_categories" value="1" checked onchange="updateCardStyle(this)">
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px;">🏷️ Categories</div>
+                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">Full Category Tree Hierarchy</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Brands -->
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <label class="clone-resource-card active" id="card_clone_brands">
+                                    <input type="checkbox" name="clone_brands" id="clone_brands" value="1" checked onchange="updateCardStyle(this)">
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px;">🏢 Brands</div>
+                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">Brand Records & Associations</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Landing Pages -->
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <label class="clone-resource-card active" id="card_clone_landing_pages">
+                                    <input type="checkbox" name="clone_landing_pages" id="clone_landing_pages" value="1" checked onchange="onCloneLandingPagesChange(this.checked)">
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px;">🚀 Landing Pages</div>
+                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">Landing Page Pro & Items</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Sliders -->
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <label class="clone-resource-card active" id="card_clone_sliders">
+                                    <input type="checkbox" name="clone_sliders" id="clone_sliders" value="1" checked onchange="updateCardStyle(this)">
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px;">🖼️ Sliders & Banners</div>
+                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">Hero Carousel & Slide Items</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Home Sections -->
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <label class="clone-resource-card active" id="card_clone_home_sections">
+                                    <input type="checkbox" name="clone_home_sections" id="clone_home_sections" value="1" checked onchange="updateCardStyle(this)">
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px;">📑 Home Sections</div>
+                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">Homepage Layout & Grids</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Menus -->
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <label class="clone-resource-card active" id="card_clone_menus">
+                                    <input type="checkbox" name="clone_menus" id="clone_menus" value="1" checked onchange="updateCardStyle(this)">
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px;">🧭 Menus & Nav</div>
+                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">Header & Footer Navigation</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Pages -->
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <label class="clone-resource-card active" id="card_clone_pages">
+                                    <input type="checkbox" name="clone_pages" id="clone_pages" value="1" checked onchange="updateCardStyle(this)">
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px;">📄 Custom Pages</div>
+                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">About, Terms, Policies, etc.</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Blogs -->
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <label class="clone-resource-card active" id="card_clone_blogs">
+                                    <input type="checkbox" name="clone_blogs" id="clone_blogs" value="1" checked onchange="updateCardStyle(this)">
+                                    <div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 12px;">✍️ Blogs & Posts</div>
+                                        <div class="text-muted" style="font-size: 11px; line-height: 1.2;">Articles, Posts & Media</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="p-2 px-3 d-flex align-items-center" style="background-color: #eff6ff; border-radius: 6px; border: 1px solid #dbeafe;">
                         <i class="fa fa-magic text-primary mr-2" style="font-size: 14px;"></i>
                         <small class="text-primary font-weight-bold">
@@ -528,6 +672,56 @@
 
 <script>
     const centralHost = '{{ $centralHost }}';
+
+    function updateCardStyle(checkbox) {
+        let card = checkbox.closest('.clone-resource-card');
+        if (card) {
+            if (checkbox.checked) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        }
+    }
+
+    function onCloneLandingPagesChange(checked) {
+        let lpCb = document.getElementById('clone_landing_pages');
+        updateCardStyle(lpCb);
+        if (checked) {
+            let prodCb = document.getElementById('clone_products');
+            if (prodCb && !prodCb.checked) {
+                prodCb.checked = true;
+                updateCardStyle(prodCb);
+            }
+        }
+    }
+
+    function onCloneProductsChange(checked) {
+        let prodCb = document.getElementById('clone_products');
+        updateCardStyle(prodCb);
+        if (!checked) {
+            let lpCb = document.getElementById('clone_landing_pages');
+            if (lpCb && lpCb.checked) {
+                lpCb.checked = false;
+                updateCardStyle(lpCb);
+            }
+        }
+    }
+
+    function toggleAllCloneOptions(select) {
+        const ids = [
+            'clone_products', 'clone_categories', 'clone_brands',
+            'clone_landing_pages', 'clone_sliders', 'clone_home_sections',
+            'clone_menus', 'clone_pages', 'clone_blogs'
+        ];
+        ids.forEach(id => {
+            let cb = document.getElementById(id);
+            if (cb) {
+                cb.checked = select;
+                updateCardStyle(cb);
+            }
+        });
+    }
 
     function autoGenerateSlug(name) {
         let slugField = document.getElementById('id');

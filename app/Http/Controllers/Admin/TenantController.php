@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\Tenant\CreateTenantAction;
+use App\Actions\Tenant\DeleteTenantAction;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Domain;
 use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
 
 class TenantController extends Controller
@@ -48,7 +50,26 @@ class TenantController extends Controller
             'admin_name' => ['nullable', 'string', 'max:255'],
             'admin_email' => ['nullable', 'email', 'max:255', 'unique:admins,email'],
             'admin_password' => ['nullable', 'string', 'min:6'],
+            'clone_products' => ['nullable', 'boolean'],
+            'clone_categories' => ['nullable', 'boolean'],
+            'clone_brands' => ['nullable', 'boolean'],
+            'clone_landing_pages' => ['nullable', 'boolean'],
+            'clone_sliders' => ['nullable', 'boolean'],
+            'clone_home_sections' => ['nullable', 'boolean'],
+            'clone_menus' => ['nullable', 'boolean'],
+            'clone_pages' => ['nullable', 'boolean'],
+            'clone_blogs' => ['nullable', 'boolean'],
         ]);
+
+        $validated['clone_products'] = $request->boolean('clone_products');
+        $validated['clone_categories'] = $request->boolean('clone_categories');
+        $validated['clone_brands'] = $request->boolean('clone_brands');
+        $validated['clone_landing_pages'] = $request->boolean('clone_landing_pages');
+        $validated['clone_sliders'] = $request->boolean('clone_sliders');
+        $validated['clone_home_sections'] = $request->boolean('clone_home_sections');
+        $validated['clone_menus'] = $request->boolean('clone_menus');
+        $validated['clone_pages'] = $request->boolean('clone_pages');
+        $validated['clone_blogs'] = $request->boolean('clone_blogs');
 
         $createTenantAction->execute($validated);
 
@@ -83,14 +104,15 @@ class TenantController extends Controller
     }
 
     /**
-     * Remove the specified tenant from storage.
+     * Remove the specified tenant from storage and completely purge its data.
      */
-    public function destroy(Tenant $tenant): RedirectResponse
+    public function destroy(Tenant $tenant, DeleteTenantAction $deleteTenantAction): RedirectResponse
     {
-        $tenant->delete();
+        $tenantName = $tenant->data['name'] ?? $tenant->id;
+        $deleteTenantAction->execute($tenant);
 
         return redirect()->route('admin.tenants.index')
-            ->with('success', 'Tenant website deleted successfully.');
+            ->with('success', "Tenant website '{$tenantName}' and all associated data deleted successfully.");
     }
 
     /**
@@ -126,5 +148,56 @@ class TenantController extends Controller
         $domain->delete();
 
         return back()->with('success', "Domain {$domainName} removed successfully.");
+    }
+
+    /**
+     * Impersonate a tenant store by redirecting to a signed URL on the tenant domain.
+     */
+    public function impersonate(Tenant $tenant, Request $request): RedirectResponse
+    {
+        /** @var Admin|null $admin */
+        $admin = auth('admin')->user();
+        abort_unless($admin && ($admin->isSuperAdmin() || $admin->canAccessTenant($tenant)), 403, 'Unauthorized');
+
+        $domain = $tenant->domains->first()?->domain;
+        if (! $domain) {
+            return back()->with('error', 'This store has no active domain configured.');
+        }
+
+        $scheme = $request->getScheme() ?: 'https';
+        $tenantBase = "{$scheme}://{$domain}";
+
+        URL::forceRootUrl($tenantBase);
+        $signedUrl = URL::temporarySignedRoute(
+            'admin.tenants.impersonate.login',
+            now()->addMinutes(2),
+            ['admin' => $admin->id]
+        );
+        URL::forceRootUrl(null);
+
+        return redirect()->away($signedUrl);
+    }
+
+    /**
+     * Authenticate impersonation request on the tenant domain.
+     */
+    public function impersonateLogin(Request $request, Admin $admin): RedirectResponse
+    {
+        if (! $request->hasValidSignature()) {
+            abort(403, 'Invalid or expired impersonation link.');
+        }
+
+        if (! $admin->is_active) {
+            abort(403, 'Admin account is inactive.');
+        }
+
+        if (tenancy()->initialized && ! $admin->canAccessTenant(tenant())) {
+            abort(403, 'Unauthorized access for this tenant.');
+        }
+
+        auth('admin')->login($admin);
+        $request->session()->regenerate();
+
+        return redirect()->route('admin.home');
     }
 }

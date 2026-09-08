@@ -28,11 +28,15 @@ class MenuItem extends Model
         });
 
         static::saved(function ($item): void {
-            cacheMemo()->forget('menus:'.$item->menu->slug);
+            if ($item->menu?->slug) {
+                cacheMemo()->forget('menus:'.$item->menu->slug);
+            }
         });
 
         static::deleting(function ($item): void {
-            cacheMemo()->forget('menus:'.$item->menu->slug);
+            if ($item->menu?->slug) {
+                cacheMemo()->forget('menus:'.$item->menu->slug);
+            }
         });
     }
 

@@ -62,6 +62,10 @@ Route::group(['as' => 'admin.'], function (): void {
 
     // Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
 
+    Route::get('tenants/impersonate/{admin}', [TenantController::class, 'impersonateLogin'])
+        ->name('tenants.impersonate.login')
+        ->middleware('signed');
+
     Route::permanentRedirect('/admin', '/admin/dashboard'); // Permanent Redirect
     Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', CheckForMaintenanceDue::class]], function (): void {
         // Admin Level Namespace & 'admin' Prefix
@@ -91,6 +95,7 @@ Route::group(['as' => 'admin.'], function (): void {
         // Super Admin SaaS Tenant Management
         Route::get('tenants', [TenantController::class, 'index'])->name('tenants.index');
         Route::post('tenants', [TenantController::class, 'store'])->name('tenants.store');
+        Route::get('tenants/{tenant}/impersonate', [TenantController::class, 'impersonate'])->name('tenants.impersonate');
         Route::get('tenants/{tenant}', [TenantController::class, 'show'])->name('tenants.show');
         Route::put('tenants/{tenant}', [TenantController::class, 'update'])->name('tenants.update');
         Route::delete('tenants/{tenant}', [TenantController::class, 'destroy'])->name('tenants.destroy');

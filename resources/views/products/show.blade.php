@@ -143,8 +143,8 @@
                 <div class="product__content">
                     <div class="xzoom-container d-flex @unless(config('app.vertical_image_gallery')) flex-column @endunless">
                         <div class="original">
-                            <img class="xzoom" id="xzoom-default" src="{{ asset($product->base_image->src) }}"
-                                xoriginal="{{ asset($product->base_image->src) }}" />
+                            <img class="xzoom" id="xzoom-default" src="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}"
+                                xoriginal="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}" />
                             <div class="zoom-nav">
                                 <button class="zoom-control left">
                                     <i class="fa fa-chevron-left"></i>
@@ -155,11 +155,11 @@
                             </div>
                         </div>
                         <div class="mt-2 xzoom-thumbs d-flex @if(config('app.vertical_image_gallery')) flex-column @endif">
-                            <a href="{{ asset($product->base_image->src) }}"><img
+                            <a href="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}"><img
                                     data-detail="{{ route('products.show', $product) }}"
                                     class="xzoom-gallery product-base__image" width="80"
-                                    src="{{ asset($product->base_image->src) }}"
-                                    xpreview="{{ asset($product->base_image->src) }}"></a>
+                                    src="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}"
+                                    xpreview="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}"></a>
                             @php
                                 // Collect all variant base images
                                 $variantImages = $product->variations->pluck('base_image')->filter();
