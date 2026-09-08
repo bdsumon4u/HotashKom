@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class HomeSection extends Model
 {
+    use BelongsToTenant;
     use HasSEO;
 
     protected $fillable = [

@@ -10,16 +10,29 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Slide;
+use App\Services\UtmTrackingService;
 use Azmolla\Shoppingcart\Cart as CartInstance;
 use Azmolla\Shoppingcart\CartItem;
 use Azmolla\Shoppingcart\Facades\Cart;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+
+if (! function_exists('tenantCachePrefix')) {
+    function tenantCachePrefix(): string
+    {
+        if (! config('tenancy.enabled', true)) {
+            return '';
+        }
+
+        return function_exists('tenancy') && tenancy()->initialized ? 't_'.tenant('id').':' : '';
+    }
+}
 
 if (! function_exists('cacheMemo')) {
     function cacheMemo(): CacheManager|CacheRepository
@@ -35,16 +48,20 @@ if (! function_exists('cacheMemo')) {
 if (! function_exists('cacheSupportsTags')) {
     function cacheSupportsTags(): bool
     {
-        $store = cache()->getStore();
+        try {
+            $store = cache()->getStore();
 
-        return method_exists($store, 'tags');
+            return $store instanceof TaggableStore;
+        } catch (Throwable) {
+            return false;
+        }
     }
 }
 
 if (! function_exists('cacheNamespaceVersion')) {
     function cacheNamespaceVersion(string $namespace): int
     {
-        $key = 'cache_namespaces:'.$namespace;
+        $key = tenantCachePrefix().'cache_namespaces:'.$namespace;
         $version = cache()->get($key);
 
         if (! $version) {
@@ -59,7 +76,7 @@ if (! function_exists('cacheNamespaceVersion')) {
 if (! function_exists('bumpCacheNamespace')) {
     function bumpCacheNamespace(string $namespace): void
     {
-        $key = 'cache_namespaces:'.$namespace;
+        $key = tenantCachePrefix().'cache_namespaces:'.$namespace;
 
         if (cache()->has($key) && method_exists(cache(), 'increment')) {
             cache()->increment($key);
@@ -76,7 +93,7 @@ if (! function_exists('cacheNamespaceKey')) {
     {
         $version = cacheNamespaceVersion($namespace);
 
-        return $namespace.':v'.$version.':'.$key;
+        return tenantCachePrefix().$namespace.':v'.$version.':'.$key;
     }
 }
 
@@ -84,7 +101,7 @@ if (! function_exists('cacheRememberNamespaced')) {
     function cacheRememberNamespaced(string $namespace, string $key, DateTimeInterface|int|null $ttl, callable $callback): mixed
     {
         if (cacheSupportsTags()) {
-            return cache()->tags($namespace)->remember($key, $ttl, $callback);
+            return cache()->tags(tenantCachePrefix().$namespace)->remember($key, $ttl, $callback);
         }
 
         return cacheMemo()->remember(cacheNamespaceKey($key, $namespace), $ttl, $callback);
@@ -95,7 +112,7 @@ if (! function_exists('cacheRememberForeverNamespaced')) {
     function cacheRememberForeverNamespaced(string $namespace, string $key, callable $callback): mixed
     {
         if (cacheSupportsTags()) {
-            return cache()->tags($namespace)->rememberForever($key, $callback);
+            return cache()->tags(tenantCachePrefix().$namespace)->rememberForever($key, $callback);
         }
 
         return cacheMemo()->rememberForever(cacheNamespaceKey($key, $namespace), $callback);
@@ -122,7 +139,7 @@ if (! function_exists('cacheFlexibleNamespaced')) {
         }
 
         if (cacheSupportsTags()) {
-            return cache()->tags($namespace)->flexible($key, $ttl, $callback);
+            return cache()->tags(tenantCachePrefix().$namespace)->flexible($key, $ttl, $callback);
         }
 
         return cacheMemo()->flexible($cacheKey, $ttl, $callback);
@@ -133,7 +150,7 @@ if (! function_exists('cacheInvalidateNamespace')) {
     function cacheInvalidateNamespace(string $namespace): void
     {
         if (cacheSupportsTags()) {
-            cache()->tags($namespace)->flush();
+            cache()->tags(tenantCachePrefix().$namespace)->flush();
 
             return;
         }
@@ -145,37 +162,27 @@ if (! function_exists('cacheInvalidateNamespace')) {
 if (! function_exists('slides')) {
     function slides()
     {
-        static $slides = null;
-        if ($slides === null) {
-            $slides = cacheMemo()->rememberForever('slides', function () {
-                return Slide::whereIsActive(1)->get([
-                    'id', 'title', 'text', 'mobile_src', 'desktop_src', 'btn_name', 'btn_href',
-                ]);
-            });
-        }
-
-        return $slides;
+        return cacheMemo()->rememberForever(tenantCachePrefix().'slides', function () {
+            return Slide::whereIsActive(1)->get([
+                'id', 'title', 'text', 'mobile_src', 'desktop_src', 'btn_name', 'btn_href',
+            ]);
+        });
     }
 }
 
 if (! function_exists('sections')) {
     function sections()
     {
-        static $sections = null;
-        if ($sections === null) {
-            $sections = cacheMemo()->rememberForever('homesections', function () {
-                return HomeSection::orderBy('order', 'asc')->get();
-            });
-        }
-
-        return $sections;
+        return cacheMemo()->rememberForever(tenantCachePrefix().'homesections', function () {
+            return HomeSection::orderBy('order', 'asc')->get();
+        });
     }
 }
 
 if (! function_exists('categories')) {
     function categories()
     {
-        return cacheMemo()->remember('categories:carousel', now()->addHours(12), function () {
+        return cacheMemo()->remember(tenantCachePrefix().'categories:carousel', now()->addHours(12), function () {
             // Load categories with images only
             $categoriesWithImages = Category::with('image')
                 ->where('is_enabled', true)
@@ -213,7 +220,7 @@ if (! function_exists('categories')) {
 if (! function_exists('brands')) {
     function brands()
     {
-        return cacheMemo()->remember('brands:carousel', now()->addHours(12), function () {
+        return cacheMemo()->remember(tenantCachePrefix().'brands:carousel', now()->addHours(12), function () {
             // Load brands with images only
             $brandsWithImages = Brand::with('image')
                 ->where('is_enabled', true)
@@ -255,7 +262,7 @@ if (! function_exists('pageRoutes')) {
             Schema::hasTable((new Page)->getTable())
                 && Route::get('{page:slug}', PageController::class)
                     ->where('page', 'test-page|'.implode(
-                        '|', Page::get('slug')
+                        '|', Page::withoutTenancy()->get('slug')
                             ->map->slug
                             ->toArray()
                     ))
@@ -519,71 +526,113 @@ function storeOrUpdateCart($phone = null, $name = '', $address = null)
 
     $currentIdentifier = session()->getId();
     $instance = 'default';
+    $tenantId = tenancy()->initialized ? tenant('id') : null;
+
+    $utmData = app(UtmTrackingService::class)->getUtmData();
+    $tracking = ! empty($utmData) ? ['utm' => $utmData] : null;
 
     // Check if cart exists with current session identifier
-    $existingCart = DB::table('shopping_cart')
+    $existingCartQuery = DB::table('shopping_cart')
         ->where('identifier', $currentIdentifier)
-        ->where('instance', $instance)
-        ->first();
+        ->where('instance', $instance);
+    if ($tenantId !== null) {
+        $existingCartQuery->where('tenant_id', $tenantId);
+    }
+    $existingCart = $existingCartQuery->first();
 
     if ($existingCart) {
         // Update the existing cart with current session - merge content and update details
         $mergedContent = $content->union(unserialize($existingCart->content));
-        DB::table('shopping_cart')
+        $existingTracking = is_string($existingCart->tracking ?? null) ? json_decode($existingCart->tracking, true) : ($existingCart->tracking ?? []);
+        $finalTracking = array_merge($existingTracking ?: [], $tracking ?: []);
+
+        $updateQuery = DB::table('shopping_cart')
             ->where('identifier', $currentIdentifier)
-            ->where('instance', $instance)
-            ->update([
-                'name' => Cookie::get('name', $name),
-                'phone' => $phone,
-                'address' => $address,
-                'content' => serialize($mergedContent),
-                'updated_at' => now(),
-            ]);
+            ->where('instance', $instance);
+        if ($tenantId !== null) {
+            $updateQuery->where('tenant_id', $tenantId);
+        }
+
+        $updateData = [
+            'name' => Cookie::get('name', $name),
+            'phone' => $phone,
+            'address' => $address,
+            'content' => serialize($mergedContent),
+            'updated_at' => now(),
+        ];
+        if (! empty($finalTracking)) {
+            $updateData['tracking'] = json_encode($finalTracking);
+        }
+
+        $updateQuery->update($updateData);
 
         // Clean up any other carts with the same phone number to avoid duplicates
-        DB::table('shopping_cart')
+        $deleteDuplicatesQuery = DB::table('shopping_cart')
             ->where('phone', $phone)
             ->where('instance', $instance)
-            ->where('identifier', '!=', $currentIdentifier)
-            ->delete();
+            ->where('identifier', '!=', $currentIdentifier);
+        if ($tenantId !== null) {
+            $deleteDuplicatesQuery->where('tenant_id', $tenantId);
+        }
+        $deleteDuplicatesQuery->delete();
 
         return;
     }
 
     // Check if cart with same phone exists (from previous session)
-    $phoneCart = DB::table('shopping_cart')
+    $phoneCartQuery = DB::table('shopping_cart')
         ->where('phone', $phone)
-        ->where('instance', $instance)
-        ->first();
+        ->where('instance', $instance);
+    if ($tenantId !== null) {
+        $phoneCartQuery->where('tenant_id', $tenantId);
+    }
+    $phoneCart = $phoneCartQuery->first();
 
     if ($phoneCart) {
         // Merge with existing phone cart and delete the old one
         $mergedContent = $content->union(unserialize($phoneCart->content));
+        $phoneCartTracking = is_string($phoneCart->tracking ?? null) ? json_decode($phoneCart->tracking, true) : ($phoneCart->tracking ?? []);
+        $finalTracking = array_merge($phoneCartTracking ?: [], $tracking ?: []);
 
         // Delete old cart with different identifier
-        DB::table('shopping_cart')
+        $deleteOldCartQuery = DB::table('shopping_cart')
             ->where('phone', $phone)
-            ->where('instance', $instance)
-            ->delete();
+            ->where('instance', $instance);
+        if ($tenantId !== null) {
+            $deleteOldCartQuery->where('tenant_id', $tenantId);
+        }
+        $deleteOldCartQuery->delete();
     } else {
         // Use current cart content if no phone cart exists
         $mergedContent = $content;
+        $finalTracking = $tracking;
     }
 
     // Create or update cart with current session identifier
+    $conditions = [
+        'identifier' => $currentIdentifier,
+        'instance' => $instance,
+    ];
+    if ($tenantId !== null) {
+        $conditions['tenant_id'] = $tenantId;
+    }
+
+    $insertOrUpdatePayload = [
+        'tenant_id' => $tenantId,
+        'name' => Cookie::get('name', $name),
+        'phone' => $phone,
+        'address' => $address,
+        'content' => serialize($mergedContent),
+        'updated_at' => now(),
+    ];
+    if (! empty($finalTracking)) {
+        $insertOrUpdatePayload['tracking'] = json_encode($finalTracking);
+    }
+
     DB::table('shopping_cart')
         ->updateOrInsert(
-            [
-                'identifier' => $currentIdentifier,
-                'instance' => $instance,
-            ],
-            [
-                'name' => Cookie::get('name', $name),
-                'phone' => $phone,
-                'address' => $address,
-                'content' => serialize($mergedContent),
-                'updated_at' => now(),
-            ]
+            $conditions,
+            $insertOrUpdatePayload
         );
 }
 
@@ -608,82 +657,128 @@ function deleteOrUpdateCart()
 
     $currentIdentifier = session()->getId();
     $instance = 'default';
+    $tenantId = tenancy()->initialized ? tenant('id') : null;
+
+    $utmData = app(UtmTrackingService::class)->getUtmData();
+    $tracking = ! empty($utmData) ? ['utm' => $utmData] : null;
 
     // Check if cart exists with current session identifier
-    $existingCart = DB::table('shopping_cart')
+    $existingCartQuery = DB::table('shopping_cart')
         ->where('identifier', $currentIdentifier)
-        ->where('instance', $instance)
-        ->first();
+        ->where('instance', $instance);
+    if ($tenantId !== null) {
+        $existingCartQuery->where('tenant_id', $tenantId);
+    }
+    $existingCart = $existingCartQuery->first();
 
     if ($existingCart) {
         $remainingContent = unserialize($existingCart->content)->diffKeys($content);
         if ($remainingContent->isEmpty()) {
-            DB::table('shopping_cart')
+            $deleteQuery = DB::table('shopping_cart')
                 ->where('identifier', $currentIdentifier)
-                ->where('instance', $instance)
-                ->delete();
+                ->where('instance', $instance);
+            if ($tenantId !== null) {
+                $deleteQuery->where('tenant_id', $tenantId);
+            }
+            $deleteQuery->delete();
 
             return;
         }
-        DB::table('shopping_cart')
+        $existingTracking = is_string($existingCart->tracking ?? null) ? json_decode($existingCart->tracking, true) : ($existingCart->tracking ?? []);
+        $finalTracking = array_merge($existingTracking ?: [], $tracking ?: []);
+
+        $updateQuery = DB::table('shopping_cart')
             ->where('identifier', $currentIdentifier)
-            ->where('instance', $instance)
-            ->update([
-                'name' => Cookie::get('name'),
-                'phone' => $phone,
-                'content' => serialize($remainingContent),
-                'updated_at' => now(),
-            ]);
+            ->where('instance', $instance);
+        if ($tenantId !== null) {
+            $updateQuery->where('tenant_id', $tenantId);
+        }
+
+        $updateData = [
+            'name' => Cookie::get('name'),
+            'phone' => $phone,
+            'content' => serialize($remainingContent),
+            'updated_at' => now(),
+        ];
+        if (! empty($finalTracking)) {
+            $updateData['tracking'] = json_encode($finalTracking);
+        }
+
+        $updateQuery->update($updateData);
 
         return;
     }
 
     // Check if cart with same phone exists (from previous session)
-    $phoneCart = DB::table('shopping_cart')
+    $phoneCartQuery = DB::table('shopping_cart')
         ->where('phone', $phone)
-        ->where('instance', $instance)
-        ->first();
+        ->where('instance', $instance);
+    if ($tenantId !== null) {
+        $phoneCartQuery->where('tenant_id', $tenantId);
+    }
+    $phoneCart = $phoneCartQuery->first();
 
     if ($phoneCart) {
         $remainingContent = unserialize($phoneCart->content)->diffKeys($content);
         if ($remainingContent->isEmpty()) {
-            DB::table('shopping_cart')
+            $deleteQuery = DB::table('shopping_cart')
                 ->where('phone', $phone)
-                ->where('instance', $instance)
-                ->delete();
+                ->where('instance', $instance);
+            if ($tenantId !== null) {
+                $deleteQuery->where('tenant_id', $tenantId);
+            }
+            $deleteQuery->delete();
 
             return;
         }
+        $phoneCartTracking = is_string($phoneCart->tracking ?? null) ? json_decode($phoneCart->tracking, true) : ($phoneCart->tracking ?? []);
+        $finalTracking = array_merge($phoneCartTracking ?: [], $tracking ?: []);
+
         // Delete old cart and create new one with current session
-        DB::table('shopping_cart')
+        $deleteOldCartQuery = DB::table('shopping_cart')
             ->where('phone', $phone)
-            ->where('instance', $instance)
-            ->delete();
+            ->where('instance', $instance);
+        if ($tenantId !== null) {
+            $deleteOldCartQuery->where('tenant_id', $tenantId);
+        }
+        $deleteOldCartQuery->delete();
+
+        $insertData = [
+            'tenant_id' => $tenantId,
+            'name' => Cookie::get('name'),
+            'phone' => $phone,
+            'instance' => $instance,
+            'identifier' => $currentIdentifier,
+            'content' => serialize($remainingContent),
+            'updated_at' => now(),
+        ];
+        if (! empty($finalTracking)) {
+            $insertData['tracking'] = json_encode($finalTracking);
+        }
 
         DB::table('shopping_cart')
-            ->insert([
-                'name' => Cookie::get('name'),
-                'phone' => $phone,
-                'instance' => $instance,
-                'identifier' => $currentIdentifier,
-                'content' => serialize($remainingContent),
-                'updated_at' => now(),
-            ]);
+            ->insert($insertData);
 
         return;
     }
 
     // No existing cart with phone or current session, create new one
     if (! $content->isEmpty()) {
+        $insertData = [
+            'tenant_id' => $tenantId,
+            'name' => Cookie::get('name'),
+            'phone' => $phone,
+            'instance' => $instance,
+            'identifier' => $currentIdentifier,
+            'content' => serialize($content),
+            'updated_at' => now(),
+        ];
+        if (! empty($tracking)) {
+            $insertData['tracking'] = json_encode($tracking);
+        }
+
         DB::table('shopping_cart')
-            ->insert([
-                'name' => Cookie::get('name'),
-                'phone' => $phone,
-                'instance' => $instance,
-                'identifier' => $currentIdentifier,
-                'content' => serialize($content),
-                'updated_at' => now(),
-            ]);
+            ->insert($insertData);
     }
 }
 

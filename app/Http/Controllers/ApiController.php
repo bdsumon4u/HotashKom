@@ -20,7 +20,7 @@ class ApiController extends Controller
     public function saveCheckoutProgress(Request $request): void
     {
         $data = $request->json()->all();
-        if (empty($data) && !empty($request->getContent())) {
+        if (empty($data) && ! empty($request->getContent())) {
             $decoded = json_decode($request->getContent(), true);
             if (is_array($decoded)) {
                 $data = $decoded;
@@ -59,7 +59,26 @@ class ApiController extends Controller
 
     public function clearCache()
     {
-        Artisan::call('optimize:clear');
+        if (function_exists('tenancy') && tenancy()->initialized) {
+            // Tenant context: invalidate tenant-specific cache
+            bumpCacheNamespace('section_products');
+            bumpCacheNamespace('categories');
+            bumpCacheNamespace('brands');
+            \cacheMemo()->forget(tenantCachePrefix().'settings');
+            \cacheMemo()->forget(tenantCachePrefix().'slides');
+            \cacheMemo()->forget(tenantCachePrefix().'homesections');
+            \cacheMemo()->forget(tenantCachePrefix().'categories:carousel');
+            \cacheMemo()->forget(tenantCachePrefix().'brands:carousel');
+
+            if (cacheSupportsTags()) {
+                \cache()->tags(tenantCachePrefix().'section_products')->flush();
+                \cache()->tags(tenantCachePrefix().'categories')->flush();
+                \cache()->tags(tenantCachePrefix().'brands')->flush();
+            }
+        } else {
+            // Central context: run optimize:clear
+            Artisan::call('optimize:clear');
+        }
 
         // Only clear response cache if it's enabled
         if (config('cache.response_cache.enabled', false)) {
@@ -70,8 +89,6 @@ class ApiController extends Controller
                 // This prevents errors when Redis is not configured
             }
         }
-
-        Artisan::call('optimize');
 
         return back()->with('success', 'Cache has been cleared');
     }

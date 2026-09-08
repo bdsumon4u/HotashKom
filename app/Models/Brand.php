@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Jobs\CopyResourceToResellers;
 use App\Jobs\RemoveResourceFromResellers;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
@@ -11,6 +12,7 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class Brand extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasSEO;
 

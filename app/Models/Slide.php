@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 
 class Slide extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
         'mobile_src', 'desktop_src', 'title', 'text', 'btn_name', 'btn_href', 'is_active', 'object_fit',
     ];

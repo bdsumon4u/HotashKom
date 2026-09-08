@@ -3,6 +3,7 @@
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\CaptureUtmTracking;
 use App\Http\Middleware\EnsureSpaResponse;
+use App\Http\Middleware\InitializeTenancyIfTenantDomain;
 use App\Http\Middleware\LogDatabaseUsage;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Application;
@@ -12,6 +13,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Spatie\ResponseCache\Middlewares\CacheResponse;
 use Spatie\ResponseCache\Middlewares\DoNotCacheResponse;
+use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedByDomainException;
+use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 if (file_exists($path = __DIR__.'/../vendor/lib.php')) {
@@ -30,9 +35,15 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->web(append: [
+        $middleware->web(prepend: [
+            InitializeTenancyIfTenantDomain::class,
+        ], append: [
             EnsureSpaResponse::class,
             CaptureUtmTracking::class,
+        ]);
+
+        $middleware->api(prepend: [
+            InitializeTenancyIfTenantDomain::class,
         ]);
 
         $middleware->append(LogDatabaseUsage::class);
@@ -42,10 +53,20 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest' => RedirectIfAuthenticated::class,
             'response.cache' => CacheResponse::class,
             'doNotCacheResponse' => DoNotCacheResponse::class,
+            'tenancy.domain' => InitializeTenancyByDomain::class,
+            'tenancy.prevent_central' => PreventAccessFromCentralDomains::class,
         ])
             ->validateCsrfTokens(except: ['*']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (TenantCouldNotBeIdentifiedByDomainException $e, Request $request) {
+            abort(404, 'Store or tenant website not found.');
+        });
+
+        $exceptions->render(function (TenantCouldNotBeIdentifiedOnDomainException $e, Request $request) {
+            abort(404, 'Store or tenant website not found.');
+        });
+
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return response()->json([

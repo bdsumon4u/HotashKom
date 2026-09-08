@@ -130,6 +130,32 @@ class LoginController extends Controller
     }
 
     /**
+     * Attempt to log the user into the application.
+     *
+     * @return bool
+     */
+    protected function attemptLogin(Request $request)
+    {
+        $admin = $this->getUser();
+        if (! $admin) {
+            return false;
+        }
+
+        // If on a tenant domain/subdomain, admin must be Super Admin or belong to this tenant
+        if (tenancy()->initialized) {
+            $tenantId = tenant('id');
+            if ($admin->tenant_id !== null && $admin->tenant_id !== $tenantId) {
+                return false;
+            }
+        }
+
+        return $this->guard()->attempt(
+            $this->credentials($request),
+            $request->filled('remember')
+        );
+    }
+
+    /**
      * Log the user out of the application.
      *
      * @return Response

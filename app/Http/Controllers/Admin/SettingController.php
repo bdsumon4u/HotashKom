@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Repositories\SettingRepository;
 use App\Traits\ImageUploader;
 use Illuminate\Http\Response;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 class SettingController extends Controller
@@ -56,9 +57,13 @@ class SettingController extends Controller
             ];
         }
 
-        if (isset($data['logo'])) {
+        if (isset($data['logo']) && is_array($data['logo'])) {
             foreach ($data['logo'] as $type => $file) {
-                $data['logo'][$type] = $this->upload($file, $type);
+                if ($file instanceof UploadedFile) {
+                    $data['logo'][$type] = $this->upload($file, $type);
+                } else {
+                    unset($data['logo'][$type]);
+                }
             }
         }
 

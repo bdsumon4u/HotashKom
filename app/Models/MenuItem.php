@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class MenuItem extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
         'menu_id', 'name', 'href', 'order',
     ];

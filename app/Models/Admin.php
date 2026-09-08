@@ -38,8 +38,36 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role_id', 'is_active', 'last_order_received_at',
+        'tenant_id', 'name', 'email', 'password', 'role_id', 'is_active', 'last_order_received_at',
     ];
+
+    /**
+     * Get the tenant that the admin belongs to.
+     */
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class, 'tenant_id');
+    }
+
+    /**
+     * Check if admin is a global super admin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return is_null($this->tenant_id);
+    }
+
+    /**
+     * Check if admin belongs to a specific tenant.
+     */
+    public function isTenantAdmin(?string $tenantId = null): bool
+    {
+        if (is_null($this->tenant_id)) {
+            return false;
+        }
+
+        return $tenantId === null || $this->tenant_id === $tenantId;
+    }
 
     /**
      * The attributes that should be hidden for arrays.
@@ -105,7 +133,7 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
 
     public function canAccessTenant(Model $tenant): bool
     {
-        return true;
+        return $this->isSuperAdmin() || $this->tenant_id === $tenant->getTenantKey();
     }
 
     public function getTenants(Panel $panel): array|Collection

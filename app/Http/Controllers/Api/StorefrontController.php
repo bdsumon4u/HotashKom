@@ -14,6 +14,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
+use App\Services\UtmTrackingService;
 use App\Traits\ResolvesPackagingCharge;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -850,18 +851,26 @@ class StorefrontController extends Controller
         $identifier = 'api_'.str_replace('+', '', $phone);
         $instance = 'default';
 
+        $utmData = app(UtmTrackingService::class)->getUtmData($request);
+        $tracking = ! empty($utmData) ? ['utm' => $utmData] : null;
+
+        $payload = [
+            'name' => $data['name'] ?? '',
+            'phone' => $phone,
+            'address' => $data['address'] ?? null,
+            'content' => serialize($cartContent),
+            'updated_at' => now(),
+        ];
+        if (! empty($tracking)) {
+            $payload['tracking'] = json_encode($tracking);
+        }
+
         DB::table('shopping_cart')->updateOrInsert(
             [
                 'identifier' => $identifier,
                 'instance' => $instance,
             ],
-            [
-                'name' => $data['name'] ?? '',
-                'phone' => $phone,
-                'address' => $data['address'] ?? null,
-                'content' => serialize($cartContent),
-                'updated_at' => now(),
-            ]
+            $payload
         );
 
         // Clean up any other carts with the same phone number to avoid duplicates

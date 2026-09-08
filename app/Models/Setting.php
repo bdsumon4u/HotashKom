@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -9,36 +10,43 @@ use Illuminate\Support\Str;
 
 class Setting extends Model
 {
+    use BelongsToTenant;
+
     protected $fillable = [
-        'name', 'value',
+        'name', 'value', 'tenant_id',
     ];
 
-    protected static ?array $settingsArray = null;
+    protected static array $settingsArray = [];
 
     #[\Override]
     public static function booted(): void
     {
         static::saved(function ($setting): void {
-            cacheMemo()->put('settings:'.$setting->name, $setting->value);
-            cacheMemo()->forget('settings');
-            Cache::forget('settings');
-            self::$settingsArray = null;
+            $tenantKey = tenancy()->initialized ? tenant('id') : '__central__';
+            cacheMemo()->put(tenantCachePrefix().'settings:'.$setting->name, $setting->value);
+            cacheMemo()->forget(tenantCachePrefix().'settings');
+            Cache::forget(tenantCachePrefix().'settings');
+            unset(self::$settingsArray[$tenantKey]);
         });
 
-        static::deleted(function (): void {
-            cacheMemo()->forget('settings');
-            Cache::forget('settings');
-            self::$settingsArray = null;
+        static::deleted(function ($setting): void {
+            $tenantKey = tenancy()->initialized ? tenant('id') : '__central__';
+            cacheMemo()->forget(tenantCachePrefix().'settings:'.$setting->name);
+            cacheMemo()->forget(tenantCachePrefix().'settings');
+            Cache::forget(tenantCachePrefix().'settings');
+            unset(self::$settingsArray[$tenantKey]);
         });
     }
 
     public static function array()
     {
-        if (self::$settingsArray !== null) {
-            return self::$settingsArray;
+        $tenantKey = tenancy()->initialized ? tenant('id') : '__central__';
+
+        if (isset(self::$settingsArray[$tenantKey])) {
+            return self::$settingsArray[$tenantKey];
         }
 
-        return self::$settingsArray = cacheMemo()->rememberForever('settings', function () {
+        return self::$settingsArray[$tenantKey] = cacheMemo()->rememberForever(tenantCachePrefix().'settings', function () {
             $settings = self::all()->flatMap(fn ($setting): array => [$setting->name => $setting->value])->toArray();
 
             if (empty($settings['company'])) {

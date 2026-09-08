@@ -4,12 +4,15 @@ namespace App\Models;
 
 use App\Jobs\CopyResourceToResellers;
 use App\Jobs\RemoveResourceFromResellers;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Image extends Model
 {
+    use BelongsToTenant;
+
     protected $appends = ['size_human'];
 
     protected $fillable = [

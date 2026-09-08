@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShipmentReportController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\TenantController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UtmReportController;
 use App\Http\Middleware\CheckForMaintenanceDue;
@@ -86,6 +87,15 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::patch('/orders/{order}/update-quantity', [OrderController::class, 'updateQuantity'])->name('orders.update-quantity');
         Route::post('/logout-others/{admin}', [ApiController::class, 'logoutOthers'])->name('logout-others');
         Route::get('/customers', CustomerController::class)->name('customers');
+
+        // Super Admin SaaS Tenant Management
+        Route::get('tenants', [TenantController::class, 'index'])->name('tenants.index');
+        Route::post('tenants', [TenantController::class, 'store'])->name('tenants.store');
+        Route::get('tenants/{tenant}', [TenantController::class, 'show'])->name('tenants.show');
+        Route::put('tenants/{tenant}', [TenantController::class, 'update'])->name('tenants.update');
+        Route::delete('tenants/{tenant}', [TenantController::class, 'destroy'])->name('tenants.destroy');
+        Route::post('tenants/{tenant}/domains', [TenantController::class, 'addDomain'])->name('tenants.domains.add');
+        Route::delete('tenants/domains/{domain}', [TenantController::class, 'deleteDomain'])->name('tenants.domains.delete');
 
         Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
         Route::get('resellers/{reseller}/edit', [ResellerController::class, 'edit'])->name('resellers.edit');

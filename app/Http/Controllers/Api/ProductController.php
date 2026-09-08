@@ -26,7 +26,7 @@ class ProductController extends Controller
         ];
 
         $query = Product::query()
-            ->when(request('only'), fn ($query) => match(request('only')){
+            ->when(request('only'), fn ($query) => match (request('only')) {
                 'inactive' => $query->where('is_active', false),
                 'low-stock' => $query->where('should_track', true)->where('stock_count', '<=', 10),
             })

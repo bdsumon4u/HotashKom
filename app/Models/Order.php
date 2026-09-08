@@ -8,6 +8,7 @@ use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
 use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
+use App\Traits\BelongsToTenant;
 use Fuse\Fuse;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,7 @@ use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class Order extends Model
 {
+    use BelongsToTenant;
     use LogsActivity;
 
     const ONLINE = 0;

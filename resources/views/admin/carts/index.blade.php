@@ -36,10 +36,48 @@
                                         <td>
                                             <div><a style="display: flex; column-gap: 5px;"
                                                     href="{{ route('admin.orders.index', ['status' => '', 'phone' => $cart->phone]) }}"
-                                                    target="_blank">{{ $cart->name }} <i style="width: 15px;"
+                                                    target="_blank">{{ $cart->name ?: 'No Name' }} <i style="width: 15px;"
                                                         data-feather="link"> </i></a></div>
                                             <div class="mt-2"><a href="tel:{{ $cart->phone }}">{{ $cart->phone }}</a>
                                             </div>
+                                            @php
+                                                $tracking = is_string($cart->tracking ?? null) ? json_decode($cart->tracking, true) : ($cart->tracking ?? []);
+                                                $utm = $tracking['utm'] ?? [];
+                                                $source = $utm['utm_source'] ?? $tracking['utm_source'] ?? null;
+                                                if (! $source) {
+                                                    if (! empty($utm['gclid']) || ! empty($tracking['gclid'])) {
+                                                        $source = 'google';
+                                                    } elseif (! empty($utm['fbclid']) || ! empty($tracking['fbclid']) || ! empty($tracking['fbc'])) {
+                                                        $source = 'facebook';
+                                                    } elseif (! empty($utm['ttclid']) || ! empty($tracking['ttclid'])) {
+                                                        $source = 'tiktok';
+                                                    }
+                                                }
+                                            @endphp
+                                            @if (! empty($source))
+                                                @php
+                                                    $badgeClass = match (strtolower($source)) {
+                                                        'facebook', 'fb' => 'badge-primary',
+                                                        'google' => 'badge-danger',
+                                                        'tiktok' => 'badge-dark',
+                                                        'instagram' => 'badge-info',
+                                                        'youtube' => 'badge-danger',
+                                                        default => 'badge-secondary',
+                                                    };
+                                                    $sourceLabel = match (strtolower($source)) {
+                                                        'facebook', 'fb' => 'FB',
+                                                        'google' => 'GOOGLE',
+                                                        'tiktok' => 'TIKTOK',
+                                                        'instagram' => 'INSTAGRAM',
+                                                        'youtube' => 'YOUTUBE',
+                                                        default => strtoupper($source),
+                                                    };
+                                                    $campaignTitle = ! empty($utm['utm_campaign']) ? ' title="Campaign: '.e($utm['utm_campaign']).'"' : '';
+                                                @endphp
+                                                <div class="mt-2">
+                                                    <span class="badge {{ $badgeClass }}" {!! $campaignTitle !!} style="font-size: 10px;">{{ $sourceLabel }}</span>
+                                                </div>
+                                            @endif
                                         </td>
                                         <td>
                                             {{ $cart->address ?: 'N/A' }}

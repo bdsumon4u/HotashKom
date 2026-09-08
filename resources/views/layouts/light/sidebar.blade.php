@@ -333,6 +333,20 @@
                             </a>
                         </li>
                     @endif
+
+                    @if (config('tenancy.enabled') && auth('admin')->user()?->isSuperAdmin())
+                        <li class="sidebar-title">
+                            <h6>SaaS Platform</h6>
+                        </li>
+                        <li>
+                            <a class="nav-link menu-title link-nav {{ request()->is('admin/tenants*') ? 'active' : '' }}"
+                                href="{{ route('admin.tenants.index') }}">
+                                <i data-feather="globe"> </i>
+                                <span>Websites</span>
+                            </a>
+                        </li>
+                    @endif
+
                     <li class="sidebar-title">
                         <h6>Settings</h6>
                     </li>
