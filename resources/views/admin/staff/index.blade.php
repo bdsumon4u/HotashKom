@@ -51,13 +51,28 @@
                                                 </td>
                                             @endif
                                             <td>
-                                                <a href="{{ route('admin.staffs.edit', $admin->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                                @if(auth()->user()->is('admin') && $admin->id !== auth()->id() && !str_ends_with($admin->email, '@cyber32.com') && !str_ends_with($admin->email, '@hotash.tech'))
+                                                @php
+                                                    $isGlobalOnTenant = function_exists('tenancy') && tenancy()->initialized && $admin->isSuperAdmin();
+                                                    $canEdit = auth()->user()->is('admin') && (! $isGlobalOnTenant || auth()->user()->isSuperAdmin());
+                                                    $canDelete = auth()->user()->is('admin')
+                                                        && $admin->id !== auth()->id()
+                                                        && ! $admin->isSuperAdmin()
+                                                        && ! str_ends_with($admin->email, '@cyber32.com')
+                                                        && ! str_ends_with($admin->email, '@hotash.tech')
+                                                        && (! (function_exists('tenancy') && tenancy()->initialized) || auth()->user()->isSuperAdmin() || $admin->tenant_id === tenant('id'));
+                                                @endphp
+                                                @if($canEdit)
+                                                    <a href="{{ route('admin.staffs.edit', $admin->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                                @endif
+                                                @if($canDelete)
                                                     <form action="{{ route('admin.staffs.destroy', $admin->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this staff member?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                                     </form>
+                                                @endif
+                                                @if($isGlobalOnTenant)
+                                                    <span class="badge badge-light border text-muted py-1 px-2"><i class="fa fa-shield-alt mr-1"></i>Global Admin</span>
                                                 @endif
                                             </td>
                                         </tr>

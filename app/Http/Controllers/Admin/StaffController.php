@@ -19,6 +19,16 @@ class StaffController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
         $admins = Admin::query();
+
+        if (config('tenancy.enabled', true) && function_exists('tenancy') && tenancy()->initialized) {
+            $admins->where(function ($q): void {
+                $q->where('tenant_id', tenant('id'))
+                    ->orWhereNull('tenant_id');
+            });
+        } else {
+            $admins->whereNull('tenant_id');
+        }
+
         if (request()->has('role_id')) {
             $admins->where('role_id', request()->role_id);
         }
@@ -61,6 +71,10 @@ class StaffController extends Controller
 
         $data['is_active'] = true;
 
+        if (config('tenancy.enabled', true) && function_exists('tenancy') && tenancy()->initialized) {
+            $data['tenant_id'] = tenant('id');
+        }
+
         Admin::create($data);
 
         // Clear staff cache
@@ -88,6 +102,15 @@ class StaffController extends Controller
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
         abort_if($staff->email == 'support@hotash.tech' && request()->user()->email != 'support@hotash.tech', 403, 'You don\'t have permission.');
 
+        if (function_exists('tenancy') && tenancy()->initialized) {
+            if ($staff->isSuperAdmin() && ! request()->user()->isSuperAdmin()) {
+                abort(403, 'Tenant admin cannot edit a global super admin.');
+            }
+            if ($staff->tenant_id !== null && $staff->tenant_id !== tenant('id') && ! request()->user()->isSuperAdmin()) {
+                abort(403, 'Unauthorized access to this staff member.');
+            }
+        }
+
         return $this->view([
             'admin' => $staff,
             // Active session list requires the custom database session driver.
@@ -110,6 +133,16 @@ class StaffController extends Controller
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
         abort_if($staff->email == 'support@hotash.tech' && request()->user()->email != 'support@hotash.tech', 403, 'You don\'t have permission.');
+
+        if (function_exists('tenancy') && tenancy()->initialized) {
+            if ($staff->isSuperAdmin() && ! request()->user()->isSuperAdmin()) {
+                abort(403, 'Tenant admin cannot edit a global super admin.');
+            }
+            if ($staff->tenant_id !== null && $staff->tenant_id !== tenant('id') && ! request()->user()->isSuperAdmin()) {
+                abort(403, 'Unauthorized access to this staff member.');
+            }
+        }
+
         $data = $request->validate([
             'name' => ['required'],
             'email' => 'required|unique:admins,email,'.$staff->id,
@@ -140,6 +173,12 @@ class StaffController extends Controller
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
         abort_if($staff->id === request()->user()->id, 403, 'You cannot delete yourself.');
+        abort_if($staff->isSuperAdmin(), 403, 'Tenant admin cannot delete a global super admin.');
+
+        if (function_exists('tenancy') && tenancy()->initialized) {
+            abort_if($staff->tenant_id !== tenant('id'), 403, 'You cannot delete staff from another store.');
+        }
+
         abort_if(str_ends_with($staff->email, '@cyber32.com'), 403, 'You cannot delete staff with @cyber32.com email.');
         abort_if(str_ends_with($staff->email, '@hotash.tech'), 403, 'You cannot delete staff with @hotash.tech email.');
 

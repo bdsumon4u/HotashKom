@@ -32,6 +32,22 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
 
     const UPLOADER = 3;
 
+    #[\Override]
+    public static function booted(): void
+    {
+        static::deleting(function (self $admin): void {
+            if ($admin->isSuperAdmin()) {
+                if (function_exists('tenancy') && tenancy()->initialized) {
+                    throw new \Exception('Tenant admin cannot delete a global super admin.');
+                }
+
+                if (auth('admin')->check() && ! auth('admin')->user()->isSuperAdmin()) {
+                    throw new \Exception('Non-super admin cannot delete a global super admin.');
+                }
+            }
+        });
+    }
+
     /**
      * The attributes that are mass assignable.
      *
