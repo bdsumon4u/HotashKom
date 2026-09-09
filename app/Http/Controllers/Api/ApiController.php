@@ -613,7 +613,7 @@ class ApiController extends Controller
         info('redx webhook:', $request->all());
 
         // Validate token if configured in redx.access_token and passed in request
-        $expectedToken = config('redx.store_id');
+        $expectedToken = (string) config('redx.store_id');
         if ($expectedToken && $request->has('token')) {
             $providedToken = trim((string) $request->get('token'));
 
