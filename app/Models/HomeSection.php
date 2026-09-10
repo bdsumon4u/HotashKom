@@ -60,10 +60,12 @@ class HomeSection extends Model
     public function products($paginate = 0, $category = null)
     {
         if ($paginate || $category) {
-            $ids = $this->items ?? [];
-            $rows = $this->data->rows ?? 3;
-            $cols = $this->data->cols ?? 5;
+            $ids = array_values(array_filter(array_map('intval', (array) ($this->items ?? []))));
+            $rows = (int) ($this->data->rows ?? 3);
+            $cols = (int) ($this->data->cols ?? 5);
+            $source = $this->data->source ?? null;
             $sorted = setting('show_option')->product_sort ?? 'random';
+            $isSpecific = $source === 'specific' || ($source !== 'available' && ($category || $this->categories->isNotEmpty() || ! empty($ids)));
 
             // A fixed seed keeps random-looking pagination stable across requests.
             $randomSeed = crc32('home-section-'.$this->id) & 0x7FFFFFFF;
@@ -92,23 +94,31 @@ class HomeSection extends Model
                 $query->whereHas('categories', function ($query) use ($categoryIds): void {
                     $query->whereIn('categories.id', $categoryIds);
                 });
+            } elseif ($isSpecific) {
+                if (! empty($ids)) {
+                    $query->whereIn('products.id', $ids);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
             }
 
-            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
-
             if ($ids) {
+                $caseOrder = 'CASE products.id '.implode(' ', array_map(fn ($id, $i) => "WHEN {$id} THEN {$i}", $ids, range(1, count($ids)))).' ELSE 999999 END';
+
                 if ($sorted == 'random') {
-                    $query->orderByRaw(
-                        'CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND('.$randomSeed.') END'
-                    );
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, RAND({$randomSeed})");
                 } elseif ($sorted == 'updated_at') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.updated_at DESC");
                 } elseif ($sorted == 'created_at') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE created_at END DESC');
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.created_at DESC");
                 } elseif ($sorted == 'selling_price') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE selling_price END');
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.selling_price ASC");
+                } else {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC");
                 }
             } else {
+                $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+
                 if ($sorted == 'random') {
                     $query->inRandomOrder($randomSeed);
                 } elseif ($sorted == 'updated_at') {
@@ -131,10 +141,12 @@ class HomeSection extends Model
         }
 
         return cacheRememberNamespaced('section_products', 'section:'.$this->id, now()->addHours(2), function () {
-            $ids = $this->items ?? [];
-            $rows = $this->data->rows ?? 3;
-            $cols = $this->data->cols ?? 5;
+            $ids = array_values(array_filter(array_map('intval', (array) ($this->items ?? []))));
+            $rows = (int) ($this->data->rows ?? 3);
+            $cols = (int) ($this->data->cols ?? 5);
+            $source = $this->data->source ?? null;
             $sorted = setting('show_option')->product_sort ?? 'random';
+            $isSpecific = $source === 'specific' || ($source !== 'available' && ($this->categories->isNotEmpty() || ! empty($ids)));
 
             if ($this->type == 'carousel-grid') {
                 $rows *= $cols;
@@ -158,23 +170,33 @@ class HomeSection extends Model
                 $query->whereHas('categories', function ($query) use ($categoryIds): void {
                     $query->whereIn('categories.id', $categoryIds);
                 });
+            } elseif ($isSpecific) {
+                if (! empty($ids)) {
+                    $query->whereIn('products.id', $ids);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
             }
 
             $query->take($rows * $cols);
 
-            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
-
             if ($ids) {
+                $caseOrder = 'CASE products.id '.implode(' ', array_map(fn ($id, $i) => "WHEN {$id} THEN {$i}", $ids, range(1, count($ids)))).' ELSE 999999 END';
+
                 if ($sorted == 'random') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE RAND()*(10-1)+1 END');
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, RAND()*(10-1)+1");
                 } elseif ($sorted == 'updated_at') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE updated_at END DESC');
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.updated_at DESC");
                 } elseif ($sorted == 'created_at') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 2038 ELSE created_at END DESC');
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.created_at DESC");
                 } elseif ($sorted == 'selling_price') {
-                    $query->orderByRaw('CASE WHEN id IN ('.implode(',', $ids).') THEN 0 ELSE selling_price END');
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.selling_price ASC");
+                } else {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC");
                 }
             } else {
+                $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
+
                 if ($sorted == 'random') {
                     $query->inRandomOrder();
                 } elseif ($sorted == 'updated_at') {
