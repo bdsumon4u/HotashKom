@@ -33,35 +33,46 @@ class UtmReportController extends Controller
         $allOrders = $ordersQuery->get();
 
         if ($selectedSource) {
-            $allOrders = $allOrders->filter(fn (Order $order): bool => strtolower((string) $order->utm_source) === strtolower($selectedSource));
+            $allOrders = $allOrders->filter(function (Order $order) use ($selectedSource): bool {
+                $src = strtolower(trim((string) $order->utm_source));
+                if ($src === strtolower($selectedSource)) {
+                    return true;
+                }
+                $platform = self::resolvePlatformGroup($src);
+
+                return $platform['key'] === strtolower($selectedSource);
+            });
         }
 
         $totalOrdersCount = $allOrders->count();
         $utmOrders = $allOrders->filter(fn (Order $order): bool => ! empty($order->utm_source));
         $totalUtmOrdersCount = $utmOrders->count();
 
-        // Group orders by Campaign + Source + Medium, and by Source / Platform
+        // Group orders by Campaign + Source + Medium, and by Unified Platform Group
         $campaigns = [];
-        $sources = [];
-        $sourcesCount = [];
+        $platforms = [];
+        $platformsCount = [];
         $campaignsCount = [];
         $utmDeliveredRevenue = 0.0;
 
         foreach ($utmOrders as $order) {
             $source = strtolower(trim((string) ($order->utm_source ?? 'unknown')));
-            $defaultCampaign = match ($source) {
+            $platformMeta = self::resolvePlatformGroup($source);
+            $platformKey = $platformMeta['key'];
+
+            $defaultCampaign = match ($platformKey) {
                 'google' => 'Google Ads',
-                'facebook', 'fb' => 'Facebook Ads',
+                'meta' => 'Meta Ads',
                 'tiktok' => 'TikTok Ads',
                 default => 'None / Unnamed',
             };
             $campaign = trim((string) ($order->utm_campaign ?: $defaultCampaign));
             $medium = strtolower(trim((string) ($order->utm_medium ?: 'cpc')));
 
-            $key = $campaign.'|'.$source.'|'.$medium;
+            $campaignKey = $campaign.'|'.$source.'|'.$medium;
 
-            if (! isset($campaigns[$key])) {
-                $campaigns[$key] = [
+            if (! isset($campaigns[$campaignKey])) {
+                $campaigns[$campaignKey] = [
                     'campaign' => $campaign,
                     'source' => $source,
                     'medium' => $medium,
@@ -77,9 +88,13 @@ class UtmReportController extends Controller
                 ];
             }
 
-            if (! isset($sources[$source])) {
-                $sources[$source] = [
-                    'source' => $source,
+            if (! isset($platforms[$platformKey])) {
+                $platforms[$platformKey] = [
+                    'key' => $platformKey,
+                    'name' => $platformMeta['name'],
+                    'label' => $platformMeta['label'],
+                    'badge' => $platformMeta['badge'],
+                    'sources' => [],
                     'total' => 0,
                     'pending' => 0,
                     'confirmed' => 0,
@@ -92,53 +107,55 @@ class UtmReportController extends Controller
                 ];
             }
 
-            $campaigns[$key]['total']++;
-            $sources[$source]['total']++;
+            $campaigns[$campaignKey]['total']++;
+            $platforms[$platformKey]['total']++;
+            $platforms[$platformKey]['sources'][$source] = ($platforms[$platformKey]['sources'][$source] ?? 0) + 1;
 
             $status = (string) $order->status;
             if ($status === 'DELIVERED') {
-                $campaigns[$key]['delivered']++;
-                $sources[$source]['delivered']++;
+                $campaigns[$campaignKey]['delivered']++;
+                $platforms[$platformKey]['delivered']++;
                 $orderTotal = (float) $order->condition;
-                $campaigns[$key]['revenue'] += $orderTotal;
-                $sources[$source]['revenue'] += $orderTotal;
+                $campaigns[$campaignKey]['revenue'] += $orderTotal;
+                $platforms[$platformKey]['revenue'] += $orderTotal;
                 $utmDeliveredRevenue += $orderTotal;
             } elseif (in_array($status, ['RETURNED', 'PAID_RETURN'])) {
-                $campaigns[$key]['returned']++;
-                $sources[$source]['returned']++;
+                $campaigns[$campaignKey]['returned']++;
+                $platforms[$platformKey]['returned']++;
             } elseif ($status === 'CANCELLED') {
-                $campaigns[$key]['cancelled']++;
-                $sources[$source]['cancelled']++;
+                $campaigns[$campaignKey]['cancelled']++;
+                $platforms[$platformKey]['cancelled']++;
             } elseif ($status === 'CONFIRMED') {
-                $campaigns[$key]['confirmed']++;
-                $sources[$source]['confirmed']++;
+                $campaigns[$campaignKey]['confirmed']++;
+                $platforms[$platformKey]['confirmed']++;
             } elseif ($status === 'PACKAGING') {
-                $campaigns[$key]['packaging']++;
-                $sources[$source]['packaging']++;
+                $campaigns[$campaignKey]['packaging']++;
+                $platforms[$platformKey]['packaging']++;
             } elseif ($status === 'SHIPPING') {
-                $campaigns[$key]['shipping']++;
-                $sources[$source]['shipping']++;
+                $campaigns[$campaignKey]['shipping']++;
+                $platforms[$platformKey]['shipping']++;
             } else {
-                $campaigns[$key]['pending']++;
-                $sources[$source]['pending']++;
+                $campaigns[$campaignKey]['pending']++;
+                $platforms[$platformKey]['pending']++;
             }
 
-            $sourcesCount[$source] = ($sourcesCount[$source] ?? 0) + 1;
+            $platformsCount[$platformKey] = ($platformsCount[$platformKey] ?? 0) + 1;
             if ($campaign !== 'None / Unnamed') {
                 $campaignsCount[$campaign] = ($campaignsCount[$campaign] ?? 0) + 1;
             }
         }
 
-        arsort($sourcesCount);
+        arsort($platformsCount);
         arsort($campaignsCount);
 
-        // Sort campaigns and sources by total orders descending
+        // Sort campaigns and platforms by total orders descending
         uasort($campaigns, fn ($a, $b): int => $b['total'] <=> $a['total']);
-        uasort($sources, fn ($a, $b): int => $b['total'] <=> $a['total']);
+        uasort($platforms, fn ($a, $b): int => $b['total'] <=> $a['total']);
 
         // Summary calculations
-        $topSource = ! empty($sourcesCount) ? array_key_first($sourcesCount) : 'N/A';
-        $topSourceCount = ! empty($sourcesCount) ? reset($sourcesCount) : 0;
+        $topPlatformKey = ! empty($platformsCount) ? array_key_first($platformsCount) : 'N/A';
+        $topPlatformName = isset($platforms[$topPlatformKey]) ? $platforms[$topPlatformKey]['name'] : 'N/A';
+        $topPlatformCount = ! empty($platformsCount) ? reset($platformsCount) : 0;
 
         $topCampaign = ! empty($campaignsCount) ? array_key_first($campaignsCount) : 'N/A';
         $topCampaignCount = ! empty($campaignsCount) ? reset($campaignsCount) : 0;
@@ -161,13 +178,104 @@ class UtmReportController extends Controller
             'totalOrdersCount' => $totalOrdersCount,
             'totalUtmOrdersCount' => $totalUtmOrdersCount,
             'utmDeliveredRevenue' => $utmDeliveredRevenue,
-            'topSource' => $topSource,
-            'topSourceCount' => $topSourceCount,
+            'topSource' => $topPlatformName,
+            'topSourceCount' => $topPlatformCount,
             'topCampaign' => $topCampaign,
             'topCampaignCount' => $topCampaignCount,
             'overallDeliveryRate' => $overallDeliveryRate,
             'campaigns' => $campaigns,
-            'sources' => $sources,
+            'platforms' => $platforms,
         ]);
+    }
+
+    /**
+     * Resolve raw traffic source into a unified platform group.
+     *
+     * @return array{key: string, name: string, label: string, badge: string}
+     */
+    public static function resolvePlatformGroup(string $source): array
+    {
+        $sourceLower = strtolower(trim($source));
+
+        // Meta (Facebook, Instagram, Messenger, WhatsApp, Threads, etc.)
+        if (
+            in_array($sourceLower, ['facebook', 'fb', 'fb-sitelink', 'fb_sitelink', 'fb-ads', 'fbads', 'facebook_ads', 'instagram', 'ig', 'ig-story', 'meta', 'messenger', 'whatsapp', 'threads', 'an'])
+            || str_starts_with($sourceLower, 'fb-')
+            || str_starts_with($sourceLower, 'fb_')
+            || str_starts_with($sourceLower, 'ig-')
+            || str_contains($sourceLower, 'facebook')
+            || str_contains($sourceLower, 'instagram')
+        ) {
+            return [
+                'key' => 'meta',
+                'name' => 'Meta (Facebook / Instagram)',
+                'label' => 'META',
+                'badge' => 'badge-primary',
+            ];
+        }
+
+        // Google (Search, Ads, YouTube, Display, Shopping, etc.)
+        if (
+            in_array($sourceLower, ['google', 'google_ads', 'googleads', 'gads', 'adwords', 'youtube', 'yt', 'gmail', 'google-shopping'])
+            || str_contains($sourceLower, 'google')
+            || str_contains($sourceLower, 'youtube')
+        ) {
+            return [
+                'key' => 'google',
+                'name' => 'Google (Search / Ads / YouTube)',
+                'label' => 'GOOGLE',
+                'badge' => 'badge-danger',
+            ];
+        }
+
+        // TikTok
+        if (
+            in_array($sourceLower, ['tiktok', 'tt', 'tiktok_ads', 'tt_ads', 'bytedance', 'douyin'])
+            || str_contains($sourceLower, 'tiktok')
+        ) {
+            return [
+                'key' => 'tiktok',
+                'name' => 'TikTok',
+                'label' => 'TIKTOK',
+                'badge' => 'badge-dark',
+            ];
+        }
+
+        // Snapchat
+        if (in_array($sourceLower, ['snapchat', 'snap']) || str_contains($sourceLower, 'snap')) {
+            return [
+                'key' => 'snapchat',
+                'name' => 'Snapchat',
+                'label' => 'SNAPCHAT',
+                'badge' => 'badge-warning',
+            ];
+        }
+
+        // Twitter / X
+        if (in_array($sourceLower, ['twitter', 'x', 't.co']) || str_contains($sourceLower, 'twitter')) {
+            return [
+                'key' => 'twitter',
+                'name' => 'X / Twitter',
+                'label' => 'X / TWITTER',
+                'badge' => 'badge-dark',
+            ];
+        }
+
+        // Pinterest
+        if (in_array($sourceLower, ['pinterest', 'pin']) || str_contains($sourceLower, 'pinterest')) {
+            return [
+                'key' => 'pinterest',
+                'name' => 'Pinterest',
+                'label' => 'PINTEREST',
+                'badge' => 'badge-danger',
+            ];
+        }
+
+        return [
+            'key' => $sourceLower,
+            'name' => ucfirst($source),
+            'label' => strtoupper($source),
+            'badge' => 'badge-secondary',
+        ];
     }
 }

@@ -194,15 +194,15 @@
             <!-- Source / Platform Performance Table -->
             <div class="shadow-sm card rounded-0 mt-4">
                 <div class="p-3 card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 card-title">Source / Platform Performance Breakdown</h5>
-                    <span class="badge badge-light border">{{ count($sources) }} Platforms</span>
+                    <h5 class="mb-0 card-title">Platform Performance Breakdown</h5>
+                    <span class="badge badge-light border">{{ count($platforms) }} Platforms</span>
                 </div>
                 <div class="p-0 card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover mb-0">
                             <thead class="thead-light">
                                 <tr>
-                                    <th style="min-width: 150px;">Source / Platform</th>
+                                    <th style="min-width: 170px;">Platform Group</th>
                                     <th class="text-center" style="min-width: 80px;">Share (%)</th>
                                     <th class="text-center" style="min-width: 70px;">Total</th>
                                     <th class="text-center text-info" style="min-width: 70px;">Confirmed</th>
@@ -215,53 +215,45 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($sources as $sourceItem)
+                                @forelse ($platforms as $platform)
                                     @php
-                                        $sourceRate = $sourceItem['total'] > 0 ? round(($sourceItem['delivered'] / $sourceItem['total']) * 100, 1) : 0;
-                                        $shareRate = $totalUtmOrdersCount > 0 ? round(($sourceItem['total'] / $totalUtmOrdersCount) * 100, 1) : 0;
-                                        $sourceKey = strtolower($sourceItem['source']);
-                                        $badgeClass = match($sourceKey) {
-                                            'facebook', 'fb' => 'badge-primary',
-                                            'google' => 'badge-danger',
-                                            'tiktok' => 'badge-dark',
-                                            'instagram' => 'badge-info',
-                                            'youtube' => 'badge-danger',
-                                            default => 'badge-secondary',
-                                        };
-                                        $sourceLabel = match($sourceKey) {
-                                            'facebook', 'fb' => 'FB',
-                                            'google' => 'GOOGLE',
-                                            'tiktok' => 'TIKTOK',
-                                            'instagram' => 'INSTAGRAM',
-                                            'youtube' => 'YOUTUBE',
-                                            default => strtoupper($sourceItem['source']),
-                                        };
+                                        $platformRate = $platform['total'] > 0 ? round(($platform['delivered'] / $platform['total']) * 100, 1) : 0;
+                                        $shareRate = $totalUtmOrdersCount > 0 ? round(($platform['total'] / $totalUtmOrdersCount) * 100, 1) : 0;
                                     @endphp
                                     <tr>
                                         <td>
-                                            <span class="badge {{ $badgeClass }} text-uppercase font-weight-bold" style="font-size: 11px;">{{ $sourceLabel }}</span>
-                                            <span class="ml-2 font-weight-bold text-dark">{{ ucfirst($sourceItem['source']) }}</span>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge {{ $platform['badge'] }} text-uppercase font-weight-bold mr-2" style="font-size: 11px;">{{ $platform['label'] }}</span>
+                                                <span class="font-weight-bold text-dark">{{ $platform['name'] }}</span>
+                                            </div>
+                                            @if (! empty($platform['sources']) && count($platform['sources']) > 1)
+                                                <div class="mt-1 text-muted" style="font-size: 11px;">
+                                                    @foreach ($platform['sources'] as $srcName => $srcCount)
+                                                        <span class="mr-2"><span class="badge badge-light border">{{ $srcName }}</span> {{ number_format($srcCount) }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @endif
                                         </td>
                                         <td class="text-center font-weight-bold text-muted">
                                             {{ $shareRate }}%
                                         </td>
-                                        <td class="text-center font-weight-bold">{{ $sourceItem['total'] }}</td>
-                                        <td class="text-center">{{ $sourceItem['confirmed'] }}</td>
-                                        <td class="text-center">{{ $sourceItem['shipping'] + $sourceItem['packaging'] }}</td>
-                                        <td class="text-center font-weight-bold text-success">{{ $sourceItem['delivered'] }}</td>
-                                        <td class="text-center text-danger">{{ $sourceItem['cancelled'] }}</td>
-                                        <td class="text-center text-warning">{{ $sourceItem['returned'] }}</td>
-                                        <td class="text-right font-weight-bold">{!! theMoney($sourceItem['revenue']) !!}</td>
+                                        <td class="text-center font-weight-bold">{{ number_format($platform['total']) }}</td>
+                                        <td class="text-center">{{ number_format($platform['confirmed']) }}</td>
+                                        <td class="text-center">{{ number_format($platform['shipping'] + $platform['packaging']) }}</td>
+                                        <td class="text-center font-weight-bold text-success">{{ number_format($platform['delivered']) }}</td>
+                                        <td class="text-center text-danger">{{ number_format($platform['cancelled']) }}</td>
+                                        <td class="text-center text-warning">{{ number_format($platform['returned']) }}</td>
+                                        <td class="text-right font-weight-bold">{!! theMoney($platform['revenue']) !!}</td>
                                         <td class="text-center">
-                                            <span class="badge {{ $sourceRate >= 50 ? 'badge-success' : ($sourceRate >= 25 ? 'badge-warning' : 'badge-light border') }}">
-                                                {{ $sourceRate }}%
+                                            <span class="badge {{ $platformRate >= 50 ? 'badge-success' : ($platformRate >= 25 ? 'badge-warning' : 'badge-light border') }}">
+                                                {{ $platformRate }}%
                                             </span>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
                                         <td colspan="10" class="py-4 text-center text-muted">
-                                            <i class="fa fa-info-circle mr-1"></i> No source-attributed orders found in this date range.
+                                            <i class="fa fa-info-circle mr-1"></i> No platform-attributed orders found in this date range.
                                         </td>
                                     </tr>
                                 @endforelse
