@@ -208,7 +208,7 @@ class UtmReportController extends Controller
         ) {
             return [
                 'key' => 'meta',
-                'name' => 'Meta (Facebook / Instagram)',
+                'name' => 'Meta',
                 'label' => 'META',
                 'badge' => 'badge-primary',
             ];
@@ -222,7 +222,7 @@ class UtmReportController extends Controller
         ) {
             return [
                 'key' => 'google',
-                'name' => 'Google (Search / Ads / YouTube)',
+                'name' => 'Google',
                 'label' => 'GOOGLE',
                 'badge' => 'badge-danger',
             ];

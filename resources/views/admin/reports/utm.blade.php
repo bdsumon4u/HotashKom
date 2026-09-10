@@ -202,7 +202,7 @@
                         <table class="table table-bordered table-striped table-hover mb-0">
                             <thead class="thead-light">
                                 <tr>
-                                    <th style="min-width: 170px;">Platform Group</th>
+                                    <th style="min-width: 140px;">Platform</th>
                                     <th class="text-center" style="min-width: 80px;">Share (%)</th>
                                     <th class="text-center" style="min-width: 70px;">Total</th>
                                     <th class="text-center text-info" style="min-width: 70px;">Confirmed</th>
@@ -226,13 +226,6 @@
                                                 <span class="badge {{ $platform['badge'] }} text-uppercase font-weight-bold mr-2" style="font-size: 11px;">{{ $platform['label'] }}</span>
                                                 <span class="font-weight-bold text-dark">{{ $platform['name'] }}</span>
                                             </div>
-                                            @if (! empty($platform['sources']) && count($platform['sources']) > 1)
-                                                <div class="mt-1 text-muted" style="font-size: 11px;">
-                                                    @foreach ($platform['sources'] as $srcName => $srcCount)
-                                                        <span class="mr-2"><span class="badge badge-light border">{{ $srcName }}</span> {{ number_format($srcCount) }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @endif
                                         </td>
                                         <td class="text-center font-weight-bold text-muted">
                                             {{ $shareRate }}%
