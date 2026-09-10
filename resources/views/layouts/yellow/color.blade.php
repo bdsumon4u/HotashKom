@@ -221,6 +221,8 @@
 
     .product-card__addtocart,
     .product__addtocart {
+        padding-left: 1rem;
+        padding-right: 1rem;
         background-color: {{ $color->add_to_cart->background_color ?? null }} !important;
         border-color: {{ $color->add_to_cart->background_color ?? null }} !important;
         color: {{ $color->add_to_cart->text_color ?? null }} !important;
@@ -235,6 +237,8 @@
 
     .product-card__ordernow,
     .product__ordernow {
+        padding-left: 1rem;
+        padding-right: 1rem;
         background-color: {{ $color->order_now->background_color ?? null }} !important;
         border-color: {{ $color->order_now->background_color ?? null }} !important;
         color: {{ $color->order_now->text_color ?? null }} !important;
