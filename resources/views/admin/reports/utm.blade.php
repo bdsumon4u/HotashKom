@@ -190,6 +190,86 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Source / Platform Performance Table -->
+            <div class="shadow-sm card rounded-0 mt-4">
+                <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 card-title">Source / Platform Performance Breakdown</h5>
+                    <span class="badge badge-light border">{{ count($sources) }} Platforms</span>
+                </div>
+                <div class="p-0 card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th style="min-width: 150px;">Source / Platform</th>
+                                    <th class="text-center" style="min-width: 80px;">Share (%)</th>
+                                    <th class="text-center" style="min-width: 70px;">Total</th>
+                                    <th class="text-center text-info" style="min-width: 70px;">Confirmed</th>
+                                    <th class="text-center text-primary" style="min-width: 70px;">Shipping</th>
+                                    <th class="text-center text-success" style="min-width: 70px;">Delivered</th>
+                                    <th class="text-center text-danger" style="min-width: 70px;">Cancelled</th>
+                                    <th class="text-center text-warning" style="min-width: 70px;">Returned</th>
+                                    <th class="text-right" style="min-width: 120px;">Revenue</th>
+                                    <th class="text-center" style="min-width: 90px;">Success Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($sources as $sourceItem)
+                                    @php
+                                        $sourceRate = $sourceItem['total'] > 0 ? round(($sourceItem['delivered'] / $sourceItem['total']) * 100, 1) : 0;
+                                        $shareRate = $totalUtmOrdersCount > 0 ? round(($sourceItem['total'] / $totalUtmOrdersCount) * 100, 1) : 0;
+                                        $sourceKey = strtolower($sourceItem['source']);
+                                        $badgeClass = match($sourceKey) {
+                                            'facebook', 'fb' => 'badge-primary',
+                                            'google' => 'badge-danger',
+                                            'tiktok' => 'badge-dark',
+                                            'instagram' => 'badge-info',
+                                            'youtube' => 'badge-danger',
+                                            default => 'badge-secondary',
+                                        };
+                                        $sourceLabel = match($sourceKey) {
+                                            'facebook', 'fb' => 'FB',
+                                            'google' => 'GOOGLE',
+                                            'tiktok' => 'TIKTOK',
+                                            'instagram' => 'INSTAGRAM',
+                                            'youtube' => 'YOUTUBE',
+                                            default => strtoupper($sourceItem['source']),
+                                        };
+                                    @endphp
+                                    <tr>
+                                        <td>
+                                            <span class="badge {{ $badgeClass }} text-uppercase font-weight-bold" style="font-size: 11px;">{{ $sourceLabel }}</span>
+                                            <span class="ml-2 font-weight-bold text-dark">{{ ucfirst($sourceItem['source']) }}</span>
+                                        </td>
+                                        <td class="text-center font-weight-bold text-muted">
+                                            {{ $shareRate }}%
+                                        </td>
+                                        <td class="text-center font-weight-bold">{{ $sourceItem['total'] }}</td>
+                                        <td class="text-center">{{ $sourceItem['confirmed'] }}</td>
+                                        <td class="text-center">{{ $sourceItem['shipping'] + $sourceItem['packaging'] }}</td>
+                                        <td class="text-center font-weight-bold text-success">{{ $sourceItem['delivered'] }}</td>
+                                        <td class="text-center text-danger">{{ $sourceItem['cancelled'] }}</td>
+                                        <td class="text-center text-warning">{{ $sourceItem['returned'] }}</td>
+                                        <td class="text-right font-weight-bold">{!! theMoney($sourceItem['revenue']) !!}</td>
+                                        <td class="text-center">
+                                            <span class="badge {{ $sourceRate >= 50 ? 'badge-success' : ($sourceRate >= 25 ? 'badge-warning' : 'badge-light border') }}">
+                                                {{ $sourceRate }}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="10" class="py-4 text-center text-muted">
+                                            <i class="fa fa-info-circle mr-1"></i> No source-attributed orders found in this date range.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

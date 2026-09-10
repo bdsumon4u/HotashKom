@@ -40,8 +40,9 @@ class UtmReportController extends Controller
         $utmOrders = $allOrders->filter(fn (Order $order): bool => ! empty($order->utm_source));
         $totalUtmOrdersCount = $utmOrders->count();
 
-        // Group orders by Campaign + Source + Medium
+        // Group orders by Campaign + Source + Medium, and by Source / Platform
         $campaigns = [];
+        $sources = [];
         $sourcesCount = [];
         $campaignsCount = [];
         $utmDeliveredRevenue = 0.0;
@@ -76,26 +77,50 @@ class UtmReportController extends Controller
                 ];
             }
 
+            if (! isset($sources[$source])) {
+                $sources[$source] = [
+                    'source' => $source,
+                    'total' => 0,
+                    'pending' => 0,
+                    'confirmed' => 0,
+                    'packaging' => 0,
+                    'shipping' => 0,
+                    'delivered' => 0,
+                    'returned' => 0,
+                    'cancelled' => 0,
+                    'revenue' => 0.0,
+                ];
+            }
+
             $campaigns[$key]['total']++;
+            $sources[$source]['total']++;
 
             $status = (string) $order->status;
             if ($status === 'DELIVERED') {
                 $campaigns[$key]['delivered']++;
+                $sources[$source]['delivered']++;
                 $orderTotal = (float) $order->condition;
                 $campaigns[$key]['revenue'] += $orderTotal;
+                $sources[$source]['revenue'] += $orderTotal;
                 $utmDeliveredRevenue += $orderTotal;
             } elseif (in_array($status, ['RETURNED', 'PAID_RETURN'])) {
                 $campaigns[$key]['returned']++;
+                $sources[$source]['returned']++;
             } elseif ($status === 'CANCELLED') {
                 $campaigns[$key]['cancelled']++;
+                $sources[$source]['cancelled']++;
             } elseif ($status === 'CONFIRMED') {
                 $campaigns[$key]['confirmed']++;
+                $sources[$source]['confirmed']++;
             } elseif ($status === 'PACKAGING') {
                 $campaigns[$key]['packaging']++;
+                $sources[$source]['packaging']++;
             } elseif ($status === 'SHIPPING') {
                 $campaigns[$key]['shipping']++;
+                $sources[$source]['shipping']++;
             } else {
                 $campaigns[$key]['pending']++;
+                $sources[$source]['pending']++;
             }
 
             $sourcesCount[$source] = ($sourcesCount[$source] ?? 0) + 1;
@@ -107,8 +132,9 @@ class UtmReportController extends Controller
         arsort($sourcesCount);
         arsort($campaignsCount);
 
-        // Sort campaigns by total orders descending
+        // Sort campaigns and sources by total orders descending
         uasort($campaigns, fn ($a, $b): int => $b['total'] <=> $a['total']);
+        uasort($sources, fn ($a, $b): int => $b['total'] <=> $a['total']);
 
         // Summary calculations
         $topSource = ! empty($sourcesCount) ? array_key_first($sourcesCount) : 'N/A';
@@ -141,6 +167,7 @@ class UtmReportController extends Controller
             'topCampaignCount' => $topCampaignCount,
             'overallDeliveryRate' => $overallDeliveryRate,
             'campaigns' => $campaigns,
+            'sources' => $sources,
         ]);
     }
 }
