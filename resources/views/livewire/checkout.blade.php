@@ -224,7 +224,7 @@
                     </tbody>
                     <tfoot class="checkout__totals-footer">
                         <tr>
-                            <th>{{isOninda() ? 'Buying' : ''}}</th>
+                            <th>{{isOninda() ? 'Buying' : ''}} Total</th>
                             <td>{!! theMoney(max(cart()->total() - $coupon_discount, 0) + (isOninda() && config('app.resell') ? $packagingCharge : 0)) !!}</td>
                         </tr>
                         @if (isOninda())
