@@ -62,10 +62,12 @@ class HomeSection extends Model
     public function products($paginate = 0, $category = null)
     {
         if ($paginate || $category) {
-            $ids = $this->items ?? [];
-            $rows = $this->data->rows ?? 3;
-            $cols = $this->data->cols ?? 5;
+            $ids = array_values(array_filter(array_map('intval', (array) ($this->items ?? []))));
+            $rows = (int) ($this->data->rows ?? 3);
+            $cols = (int) ($this->data->cols ?? 5);
+            $source = $this->data->source ?? null;
             $sorted = setting('show_option')->product_sort ?? 'random';
+            $isSpecific = $source === 'specific' || ($source !== 'available' && ($category || $this->categories->isNotEmpty() || ! empty($ids)));
 
             if ($this->type == 'carousel-grid') {
                 $rows *= $cols;
@@ -78,40 +80,53 @@ class HomeSection extends Model
                 ->whereIsActive(1)
                 ->whereNull('parent_id');
 
-            if ($category) {
-                $query->whereHas('categories', function ($query) use ($category): void {
-                    $query->where('categories.id', $category);
-                });
-            } elseif (($this->data->source ?? false) == 'specific') {
-                $categoryIds = $this->categories()->pluck('categories.id')->toArray();
+            // Strict category filtering for category-based visual sections.
+            // Products manually pinned in $items can be prioritised, but cannot
+            // bypass the section's selected category/category-child rules.
+            $categoryIds = $category
+                ? [(int) $category]
+                : $this->categories()->pluck('categories.id')->map(
+                    static fn ($id): int => (int) $id
+                )->all();
+
+            if ($categoryIds) {
                 $query->whereHas('categories', function ($query) use ($categoryIds): void {
                     $query->whereIn('categories.id', $categoryIds);
-                })
-                    ->orWhereIn('id', $ids);
+                });
+            } elseif ($isSpecific) {
+                if (! empty($ids)) {
+                    $query->whereIn('products.id', $ids);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
             }
-
-            $ids = array_values(array_unique(array_filter(array_map('intval', (array) $ids))));
 
             if ($ids) {
-                $cases = [];
-                foreach ($ids as $index => $id) {
-                    $cases[] = "WHEN {$id} THEN {$index}";
+                $caseOrder = 'CASE products.id '.implode(' ', array_map(fn ($id, $i) => "WHEN {$id} THEN {$i}", $ids, range(1, count($ids)))).' ELSE 999999 END';
+
+                if ($sorted == 'random') {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, RAND()*(10-1)+1");
+                } elseif ($sorted == 'updated_at') {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.updated_at DESC");
+                } elseif ($sorted == 'created_at') {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.created_at DESC");
+                } elseif ($sorted == 'selling_price') {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.selling_price ASC");
+                } else {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC");
                 }
-                $casesStr = implode(' ', $cases);
-                $elseVal = count($ids);
-                $query->orderByRaw("CASE id {$casesStr} ELSE {$elseVal} END ASC");
-            }
+            } else {
+                $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
 
-            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
-
-            if ($sorted == 'random') {
-                $query->inRandomOrder();
-            } elseif ($sorted == 'updated_at') {
-                $query->latest('updated_at');
-            } elseif ($sorted == 'created_at') {
-                $query->latest('created_at');
-            } elseif ($sorted == 'selling_price') {
-                $query->orderBy('selling_price');
+                if ($sorted == 'random') {
+                    $query->inRandomOrder();
+                } elseif ($sorted == 'updated_at') {
+                    $query->latest('updated_at');
+                } elseif ($sorted == 'created_at') {
+                    $query->latest('created_at');
+                } elseif ($sorted == 'selling_price') {
+                    $query->orderBy('selling_price');
+                }
             }
 
             return $query->with([
@@ -122,10 +137,12 @@ class HomeSection extends Model
         }
 
         return cacheRememberNamespaced('section_products', 'section:'.$this->id, now()->addHours(2), function () {
-            $ids = $this->items ?? [];
-            $rows = $this->data->rows ?? 3;
-            $cols = $this->data->cols ?? 5;
+            $ids = array_values(array_filter(array_map('intval', (array) ($this->items ?? []))));
+            $rows = (int) ($this->data->rows ?? 3);
+            $cols = (int) ($this->data->cols ?? 5);
+            $source = $this->data->source ?? null;
             $sorted = setting('show_option')->product_sort ?? 'random';
+            $isSpecific = $source === 'specific' || ($source !== 'available' && ($this->categories->isNotEmpty() || ! empty($ids)));
 
             if ($this->type == 'carousel-grid') {
                 $rows *= $cols;
@@ -138,38 +155,50 @@ class HomeSection extends Model
                 ->whereIsActive(1)
                 ->whereNull('parent_id');
 
-            if (($this->data->source ?? false) == 'specific') {
-                $categoryIds = $this->categories()->pluck('categories.id')->toArray();
+            $categoryIds = $this->categories()->pluck('categories.id')->map(
+                static fn ($id): int => (int) $id
+            )->all();
+
+            if ($categoryIds) {
                 $query->whereHas('categories', function ($query) use ($categoryIds): void {
                     $query->whereIn('categories.id', $categoryIds);
-                })
-                    ->orWhereIn('id', $ids);
+                });
+            } elseif ($isSpecific) {
+                if (! empty($ids)) {
+                    $query->whereIn('products.id', $ids);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
             }
 
             $query->take($rows * $cols);
 
-            $ids = array_values(array_unique(array_filter(array_map('intval', (array) $ids))));
-
             if ($ids) {
-                $cases = [];
-                foreach ($ids as $index => $id) {
-                    $cases[] = "WHEN {$id} THEN {$index}";
+                $caseOrder = 'CASE products.id '.implode(' ', array_map(fn ($id, $i) => "WHEN {$id} THEN {$i}", $ids, range(1, count($ids)))).' ELSE 999999 END';
+
+                if ($sorted == 'random') {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, RAND()*(10-1)+1");
+                } elseif ($sorted == 'updated_at') {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.updated_at DESC");
+                } elseif ($sorted == 'created_at') {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.created_at DESC");
+                } elseif ($sorted == 'selling_price') {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC, products.selling_price ASC");
+                } else {
+                    $query->orderByRaw("{$caseOrder} ASC, (new_arrival = 1 OR hot_sale = 1) DESC");
                 }
-                $casesStr = implode(' ', $cases);
-                $elseVal = count($ids);
-                $query->orderByRaw("CASE id {$casesStr} ELSE {$elseVal} END ASC");
-            }
+            } else {
+                $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
 
-            $query->orderByRaw('(new_arrival = 1 OR hot_sale = 1) DESC');
-
-            if ($sorted == 'random') {
-                $query->inRandomOrder();
-            } elseif ($sorted == 'updated_at') {
-                $query->latest('updated_at');
-            } elseif ($sorted == 'created_at') {
-                $query->latest('created_at');
-            } elseif ($sorted == 'selling_price') {
-                $query->orderBy('selling_price');
+                if ($sorted == 'random') {
+                    $query->inRandomOrder();
+                } elseif ($sorted == 'updated_at') {
+                    $query->latest('updated_at');
+                } elseif ($sorted == 'created_at') {
+                    $query->latest('created_at');
+                } elseif ($sorted == 'selling_price') {
+                    $query->orderBy('selling_price');
+                }
             }
 
             return $query->with([
