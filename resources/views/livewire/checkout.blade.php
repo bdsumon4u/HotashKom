@@ -165,7 +165,7 @@
                 <table class="checkout__totals">
                     <tbody class="checkout__totals-subtotals">
                         <tr>
-                            <th>Buying Subtotal</th>
+                            <th>{{isOninda() ? 'Buying' : ''}} Subtotal</th>
                             <td class="checkout-subtotal">{!! theMoney(cart()->subTotal()) !!}</td>
                         </tr>
                         @if (isOninda())
@@ -176,7 +176,7 @@
                         @endif
                         @if ($shipping && ($fee = cart()->getCost('deliveryFee')))
                         <tr>
-                            <th style="white-space:nowrap;">Our Delivery Charge</th>
+                            <th style="white-space:nowrap;">{{isOninda() ? 'Our' : ''}} Delivery Charge</th>
                             <td class="shipping">{!! theMoney($fee) !!}</td>
                         </tr>
                         @endif
@@ -224,7 +224,7 @@
                     </tbody>
                     <tfoot class="checkout__totals-footer">
                         <tr>
-                            <th>Buying</th>
+                            <th>{{isOninda() ? 'Buying' : ''}}</th>
                             <td>{!! theMoney(max(cart()->total() - $coupon_discount, 0) + (isOninda() && config('app.resell') ? $packagingCharge : 0)) !!}</td>
                         </tr>
                         @if (isOninda())
@@ -283,7 +283,7 @@
                 <table class="checkout__totals">
                     <tbody class="checkout__totals-subtotals">
                         <tr>
-                            <th style="white-space:nowrap;font-size:14px;">Buying Subtotal</th>
+                            <th style="white-space:nowrap;font-size:14px;">{{isOninda() ? 'Buying' : ''}} Subtotal</th>
                             <td style="white-space:nowrap;" class="checkout-subtotal desktop">{!!
                                 theMoney(cart()->subTotal()) !!}</td>
                         </tr>
@@ -295,7 +295,7 @@
                         @endif
                         @if ($shipping && ($fee = cart()->getCost('deliveryFee')))
                         <tr>
-                            <th style="white-space:nowrap;font-size:14px;">Our Delivery Charge</th>
+                            <th style="white-space:nowrap;font-size:14px;">{{isOninda() ? 'Our' : ''}} Delivery Charge</th>
                             <td class="shipping">{!! theMoney($fee) !!}</td>
                         </tr>
                         @endif
@@ -343,7 +343,7 @@
                     </tbody>
                     <tfoot class="checkout__totals-footer">
                         <tr>
-                            <th style="white-space:nowrap;font-size:18px;">Buying Total</th>
+                            <th style="white-space:nowrap;font-size:18px;">{{isOninda() ? 'Buying' : ''}} Total</th>
                             <td style="font-size:14px;">
                                 <span>{!! theMoney(max(cart()->total() - $coupon_discount, 0) + (isOninda() && config('app.resell') ? $packagingCharge : 0)) !!}</span>
                             </td>
