@@ -69,7 +69,7 @@
                         @if (setting('show_option')->email ?? false)
                             <div class="modern-form-group">
                                 <label class="modern-label">
-                                    আপনার ইমেইল
+                                    আপনার ইমেইল (অপশনাল)
                                 </label>
                                 <x-input type="email"
                                     name="email"

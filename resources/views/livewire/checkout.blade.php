@@ -49,7 +49,7 @@
                 @if (setting('show_option')->email ?? false)
                 <div class="form-row">
                     <div class="m-0 form-group col-md-3">
-                        <label>কাস্টমারের ইমেইল:</label>
+                        <label>ইমেইল (অপশনাল):</label>
                     </div>
                     <div class="form-group col-md-9">
                         <x-input type="email" name="email" wire:model="email" place-holder="কাস্টমারের ইমেইল ঠিকানা লিখুন।"

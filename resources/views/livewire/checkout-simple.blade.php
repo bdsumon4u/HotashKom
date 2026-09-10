@@ -55,7 +55,7 @@
                 @if (setting('show_option')->email ?? false)
                     <div class="simple-form-group">
                         <label class="simple-label">
-                            আপনার ইমেইল
+                            আপনার ইমেইল (অপশনাল)
                         </label>
                         <x-input type="email"
                             name="email"
