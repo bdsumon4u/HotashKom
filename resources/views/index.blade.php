@@ -275,21 +275,22 @@
     ])
 @endif
 @if ($section->type == 'banner')
-    @php($pseudoColumns = (array)$section->data->columns)
+    @php($pseudoColumns = (array) ($section->data->columns ?? []))
+    @if(! empty($pseudoColumns['width']) && is_array($pseudoColumns['width']))
     <div class="block block-banner">
         <div class="container-fluid">
             <div class="row">
                 @foreach($pseudoColumns['width'] as $i => $width)
-                <div class="col-md-{{$width}} mb-3">
-                    @php($link = $pseudoColumns['link'][$i])
+                <div class="col-md-{{ $width }} mb-3">
+                    @php($link = $pseudoColumns['link'][$i] ?? null)
                     @php($link = $link && $link != '#' ? $link : null)
                     @php($link = $link ? url($link) : null)
-                    @php($categories = implode(',', ((array)($pseudoColumns['categories'] ?? []))[$i] ?? []))
+                    @php($categories = implode(',', ((array) ($pseudoColumns['categories'] ?? []))[$i] ?? []))
                     <a href="{{ $link ?? route('products.index', $categories ? ['filter_category' => $categories] : []) }}" @if(! $link) wire:navigate.hover @endif>
                         <img
-                            data-aos="{{$pseudoColumns['animation'][$i]}}"
+                            data-aos="{{ $pseudoColumns['animation'][$i] ?? '' }}"
                             class="border img-fluid w-100"
-                            src="{{ cdn($pseudoColumns['image'][$i]) }}"
+                            src="{{ cdn($pseudoColumns['image'][$i] ?? '') }}"
                             alt="Image"
                         >
                     </a>
@@ -298,6 +299,7 @@
             </div>
         </div>
     </div>
+    @endif
 @endif
 @if ($section->type == 'content')
     @php($page = \App\Models\Page::find($section->data->page_id ?? null))

@@ -17,8 +17,8 @@ class BannerSection extends Component
     public function mount(): void
     {
         if (isset($this->section)) {
-            $pseudoColumns = (array) $this->section->data->columns;
-            foreach ($pseudoColumns['width'] as $i => $width) {
+            $pseudoColumns = (array) ($this->section->data->columns ?? []);
+            foreach ($pseudoColumns['width'] ?? [] as $i => $width) {
                 $this->columns[] = [
                     'image' => $pseudoColumns['image'][$i] ?? null,
                     'width' => old('data.columns.width.'.$i, $width),
