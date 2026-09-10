@@ -1,151 +1,64 @@
-<div class="simple-cart-table-wrapper">
-    {{-- Desktop Table View --}}
-    <div class="d-none d-md-block table-responsive">
-        <table class="table mb-0 simple-cart-table">
-            <thead>
-                <tr>
-                    <th class="text-left align-middle">Product</th>
-                    <th class="text-center align-middle">Buy Price</th>
+<div class="table-responsive">
+    <table class="cart__table cart-table">
+        <thead class="cart-table__head">
+            <tr class="cart-table__row">
+                <th class="cart-table__column cart-table__column--image">Image</th>
+                <th class="cart-table__column cart-table__column--product">Product</th>
+                <th class="cart-table__column cart-table__column--price">Buy Price</th>
+                @if (isOninda())
+                <th class="cart-table__column cart-table__column--price">Sell Price</th>
+                @endif
+                <th class="cart-table__column cart-table__column--quantity">Quantity</th>
+                <th class="cart-table__column cart-table__column--total">Total</th>
+                <th class="cart-table__column cart-table__column--remove"></th>
+            </tr>
+        </thead>
+        <tbody class="cart-table__body">
+            @forelse (cart()->content() as $product)
+                <tr class="cart-table__row" data-id="{{ $product->id }}">
+                    <td class="cart-table__column cart-table__column--image p-1">
+                        <a href="{{ route('products.show', $product->options->slug) }}" wire:navigate.hover>
+                            <img src="{{ asset($product->options->image) }}" style="min-width: 36px;" alt=""></a>
+                    </td>
+                    <td class="cart-table__column cart-table__column--product">
+                        <a href="{{ route('products.show', $product->options->slug) }}"
+                            class="cart-table__product-name" wire:navigate.hover>{{ $product->name }}</a>
+                    </td>
+                    <td class="cart-table__column cart-table__column--price" data-title="Price">TK {{ $product->price }}</td>
                     @if (isOninda())
-                        <th class="text-center align-middle">Sell Price</th>
-                    @endif
-                    <th class="text-center align-middle">Quantity</th>
-                    <th class="text-right align-middle">Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse (cart()->content() as $product)
-                    <tr data-id="{{ $product->id }}">
-                        <td class="align-middle">
-                            <div class="d-flex align-items-center">
-                                <button type="button"
-                                    class="p-0 mr-3 btn btn-link text-danger simple-cart-remove"
-                                    aria-label="Remove"
-                                    wire:click="remove('{{ $product->rowId }}')">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                                <div class="mr-3 simple-cart-thumb">
-                                    <img src="{{ asset($product->options->image) }}" alt="{{ $product->name }}">
-                                </div>
-                                <div class="simple-cart-product">
-                                    <div class="font-weight-semibold">
-                                        {{ $product->name }}
-                                    </div>
-                                </div>
+                    <td class="cart-table__column cart-table__column--price" data-title="Price">
+                        <div class="input-group input-group-sm">
+                            <input type="number" class="form-control form-control-sm" 
+                                x-model="retail['{{$product->id}}'].price" 
+                                min="0" @focus="$event.target.select()" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">৳</span>
                             </div>
-                        </td>
-                        <td class="text-center align-middle">
-                            {!! theMoney($product->price) !!}
-                        </td>
-                        @if (isOninda())
-                            <td class="text-center align-middle">
-                                <div class="d-inline-flex align-items-center">
-                                    <input type="number"
-                                        class="form-control form-control-sm text-center"
-                                        x-model="retail['{{ $product->id }}'].price"
-                                        min="0"
-                                        @focus="$event.target.select()" />
-                                </div>
-                            </td>
-                        @endif
-                        <td class="text-center align-middle">
-                            <div class="d-inline-flex align-items-center simple-qty-control">
-                                <button type="button"
-                                    class="btn btn-sm simple-qty-btn simple-qty-btn--minus"
-                                    wire:click="decreaseQuantity('{{ $product->rowId }}')">-</button>
-                                <input class="mx-1 text-center simple-qty-input"
-                                    type="number"
-                                    min="1"
-                                    value="{{ $product->qty }}"
-                                    readonly>
-                                <button type="button"
-                                    class="btn btn-sm simple-qty-btn simple-qty-btn--plus"
-                                    wire:click="increaseQuantity('{{ $product->rowId }}')">+</button>
-                            </div>
-                        </td>
-                        <td class="text-right align-middle">
-                            {!! theMoney($product->price * $product->qty) !!}
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="py-3 text-center text-danger font-weight-semibold">
-                            No items in cart.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    {{-- Mobile Card View --}}
-    <div class="d-block d-md-none">
-        @forelse (cart()->content() as $product)
-            <div class="card mb-3 border shadow-sm" data-id="{{ $product->id }}">
-                <div class="card-body p-3">
-                    <div class="d-flex position-relative mb-2">
-                        <div class="w-100 text-center font-weight-semibold text-secondary px-4" style="font-size: 16px;">
-                            {{ $product->name }}
                         </div>
-                        <button type="button"
-                            class="p-0 btn btn-link text-muted position-absolute"
-                            style="right: 0; top: 0;"
-                            aria-label="Remove"
+                    </td>
+                    @endif
+                    <td class="cart-table__column cart-table__column--quantity" data-title="Quantity">
+                        <div class="input-number product__quantity">
+                            <input class="form-control input-number__input" type="number" min="1"
+                                value="{{ $product->qty }}" max="{{ $product->max }}" readonly />
+                            <div class="input-number__add" wire:click="increaseQuantity('{{ $product->rowId }}')"></div>
+                            <div class="input-number__sub" wire:click="decreaseQuantity('{{ $product->rowId }}')"></div>
+                        </div>
+                    </td>
+                    <td class="cart-table__column cart-table__column--total" data-title="Total">TK
+                        {{ $product->price * $product->qty }}</td>
+                    <td class="cart-table__column cart-table__column--remove">
+                        <button type="button" class="btn btn-light btn-sm btn-svg-icon"
                             wire:click="remove('{{ $product->rowId }}')">
-                            <span aria-hidden="true" style="font-size: 24px; line-height: 1;">&times;</span>
+                            <svg width="12px" height="12px" viewBox="0 0 12 12"><path d="M10.8 10.8c-.4.4-1 .4-1.4 0L6 7.4l-3.4 3.4c-.4.4-1 .4-1.4 0-.4-.4-.4-1 0-1.4L4.6 6 1.2 2.6c-.4-.4-.4-1 0-1.4.4-.4 1-.4 1.4 0L6 4.6l3.4-3.4c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4L7.4 6l3.4 3.4c.4.4.4 1 0 1.4z"/></svg>
                         </button>
-                    </div>
-                    
-                    <hr class="mt-2 mb-3">
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="font-weight-bold" style="font-size: 16px;">Price:</span>
-                        <span class="font-weight-normal" style="font-size: 16px;">{!! theMoney($product->price) !!}</span>
-                    </div>
-
-                    @if (isOninda())
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="font-weight-bold" style="font-size: 16px;">Sell Price:</span>
-                            <div style="width: 100px;">
-                                <input type="number"
-                                    class="form-control form-control-sm text-center"
-                                    x-model="retail['{{ $product->id }}'].price"
-                                    min="0"
-                                    @focus="$event.target.select()" />
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="font-weight-bold" style="font-size: 16px;">Quantity:</span>
-                        <div class="d-inline-flex align-items-center">
-                            <button type="button"
-                                class="btn btn-sm btn-light border"
-                                wire:click="decreaseQuantity('{{ $product->rowId }}')" style="width: 36px; height: 36px; padding: 0; background-color: #e9ecef; font-size: 18px; line-height: 1;">-</button>
-                            <input class="mx-0 text-center border-top border-bottom bg-light"
-                                type="number"
-                                min="1"
-                                value="{{ $product->qty }}"
-                                style="width: 44px; height: 36px; outline: none; box-shadow: none; border-left: 0; border-right: 0; border-color: #dee2e6 !important;"
-                                readonly>
-                            <button type="button"
-                                class="btn btn-sm btn-light border"
-                                wire:click="increaseQuantity('{{ $product->rowId }}')" style="width: 36px; height: 36px; padding: 0; background-color: #e9ecef; font-size: 18px; line-height: 1;">+</button>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="font-weight-bold" style="font-size: 16px;">Total:</span>
-                        <span class="font-weight-normal" style="font-size: 16px;">{!! theMoney($product->price * $product->qty) !!}</span>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="py-3 text-center text-danger font-weight-semibold bg-white rounded border">
-                No items in cart.
-            </div>
-        @endforelse
-    </div>
+                    </td>
+                </tr>
+            @empty
+                <tr class="bg-danger">
+                    <td colspan="6" class="py-2 text-center">No Items In Cart.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 </div>
-
-
