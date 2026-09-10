@@ -299,7 +299,12 @@
         })
         ->all();
 
-    $videoUrl = data_get($sections, 'video.url', 'https://www.youtube.com/embed/dQw4w9WgXcQ');
+    $rawVideoUrl = (string) data_get($sections, 'video.url', 'https://www.youtube.com/embed/dQw4w9WgXcQ');
+    if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i', $rawVideoUrl, $matches)) {
+        $videoUrl = 'https://www.youtube.com/embed/' . $matches[1];
+    } else {
+        $videoUrl = $rawVideoUrl;
+    }
     $heroImageUrl = data_get($sections, 'hero.image_src');
 
     $defaultSectionOrder = array_keys(\App\Models\LandingPagePro::reorderableSectionLabels());

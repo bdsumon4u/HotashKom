@@ -4,7 +4,15 @@
             <h2 class="mb-8 text-2xl font-black text-green-900">
                 {{ data_get($sections, 'video.title', 'ভিডিওতে বিস্তারিত দেখুন') }}</h2>
             <div class="aspect-video overflow-hidden rounded-md border-[10px] border-white shadow-2xl">
-                <iframe class="w-full h-full" src="{{ $videoUrl }}" frameborder="0" allowfullscreen></iframe>
+                <iframe 
+                    class="w-full h-full" 
+                    src="{{ $videoUrl }}" 
+                    title="{{ data_get($sections, 'video.title', 'YouTube video player') }}"
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin" 
+                    allowfullscreen>
+                </iframe>
             </div>
         </div>
     </section>
