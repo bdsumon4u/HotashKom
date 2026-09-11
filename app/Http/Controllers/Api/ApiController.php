@@ -617,11 +617,14 @@ class ApiController extends Controller
         if ($expectedToken && $request->has('token')) {
             $providedToken = trim((string) $request->get('token'));
 
-            if ($providedToken !== $expectedToken) {
-                info('redx webhook token mismatch', [
-                    'provided' => $providedToken,
-                ]);
+            info('redx webhook token mismatch', [
+                'provided' => $providedToken,
+                'expected' => $expectedToken,
+                'provided-type' => gettype($providedToken),
+                'expected-type' => gettype($expectedToken),
+            ]);
 
+            if ($providedToken != $expectedToken) {
                 return response()->json(['message' => 'Unauthorized'], 401);
             }
         }
