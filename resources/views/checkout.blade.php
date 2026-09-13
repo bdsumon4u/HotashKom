@@ -337,11 +337,7 @@
     <div class="block py-2 checkout-wrapper" style="background: #f8fafc;">
         <div class="container py-1">
             <x-form checkoutform :action="route('checkout')" method="POST">
-                @if ($checkoutTemplate === 'simple')
-                    <livewire:checkout-simple />
-                @else
-                    <livewire:checkout />
-                @endif
+                <livewire:checkout />
             </x-form>
         </div>
     </div>
