@@ -250,7 +250,7 @@
 
 @push('styles')
 <style>
-/* NEHMART_PREMIUM_CHECKOUT_LEGACY */
+/* BAGBAZARBD_PREMIUM_CHECKOUT_LEGACY */
 .checkout:not(.checkout--simple) {
     padding: 24px 0 38px;
     background: radial-gradient(circle at top right, rgba(29,191,115,.10), transparent 34%), linear-gradient(180deg,#f7fcf9,#fff 65%);

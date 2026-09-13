@@ -61,14 +61,14 @@
         --brand-text-hover: {{ $primaryTextHover }};
 
         /* Universal component color tokens */
-        --nm-green: var(--brand);
-        --nm-green-dark: var(--brand-dark);
-        --nm-green-hover: var(--brand-hover);
-        --nm-green-soft: var(--brand-soft);
-        --nm-green-light: var(--brand-light);
-        --nm-green-border: var(--brand-border);
-        --nm-category-brand: var(--brand);
-        --nm-blog-green: var(--brand);
+        --bb-green: var(--brand);
+        --bb-green-dark: var(--brand-dark);
+        --bb-green-hover: var(--brand-hover);
+        --bb-green-soft: var(--brand-soft);
+        --bb-green-light: var(--brand-light);
+        --bb-green-border: var(--brand-border);
+        --bb-category-brand: var(--brand);
+        --bb-blog-green: var(--brand);
     }
 
     ::placeholder {
@@ -337,7 +337,7 @@
         border-color: {{ $color->primary->background_color ?? null }} !important;
     }
 
-    /* NehMart nav bottom border removal */
+    /* BagBazarBD nav bottom border removal */
     .site-header .nav-panel {
         border-bottom: 0 !important;
         box-shadow: none !important;
@@ -348,7 +348,7 @@
         border-bottom: 0 !important;
         box-shadow: none !important;
     }
-    /* NEHMART_PREMIUM_DROPDOWN_VISUAL_ONLY */
+    /* BAGBAZARBD_PREMIUM_DROPDOWN_VISUAL_ONLY */
     .nav-panel__departments .departments__button {
         background: linear-gradient(135deg, #344d64, #293f54) !important;
         border-color: rgba(255, 255, 255, .12) !important;
@@ -400,7 +400,7 @@
     }
 </style>
 
-    {{-- NehMart selected page top seam removal --}}
+    {{-- BagBazarBD selected page top seam removal --}}
     @if (request()->is('products', 'products/*', 'contact-us', 'about-us'))
     <style>
         /*

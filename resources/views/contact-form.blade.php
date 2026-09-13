@@ -8,22 +8,22 @@
     $siteMapEcode = data_get(setting('company'), 'gmap_ecode') ?: null;
 @endphp
 
-<div class="nm-contact-page">
+<div class="bb-contact-page">
 
     <style>
-        .nm-contact-page {
-            --nm-ink: #101828;
-            --nm-text: #475467;
-            --nm-muted: #667085;
-            --nm-line: #EAECF0;
-            --nm-bg: #F7F9F8;
-            --nm-white: #FFFFFF;
-            --nm-warn: #FFF8E7;
-            --nm-warn-line: #F2D38A;
-            --nm-shadow: 0 16px 45px rgba(16, 24, 40, .08);
-            --nm-shadow-soft: 0 6px 22px rgba(16, 24, 40, .06);
+        .bb-contact-page {
+            --bb-ink: #101828;
+            --bb-text: #475467;
+            --bb-muted: #667085;
+            --bb-line: #EAECF0;
+            --bb-bg: #F7F9F8;
+            --bb-white: #FFFFFF;
+            --bb-warn: #FFF8E7;
+            --bb-warn-line: #F2D38A;
+            --bb-shadow: 0 16px 45px rgba(16, 24, 40, .08);
+            --bb-shadow-soft: 0 6px 22px rgba(16, 24, 40, .06);
 
-            color: var(--nm-ink);
+            color: var(--bb-ink);
             font-family:
                 Inter,
                 "Noto Sans Bengali",
@@ -43,18 +43,18 @@
             padding-bottom: 70px;
         }
 
-        .nm-contact-page *,
-        .nm-contact-page *::before,
-        .nm-contact-page *::after {
+        .bb-contact-page *,
+        .bb-contact-page *::before,
+        .bb-contact-page *::after {
             box-sizing: border-box;
         }
 
-        .nm-contact-shell {
+        .bb-contact-shell {
             width: min(1180px, calc(100% - 32px));
             margin: 0 auto;
         }
 
-        .nm-contact-hero {
+        .bb-contact-hero {
             position: relative;
             overflow: hidden;
             padding: 70px 0 62px;
@@ -78,7 +78,7 @@
             color: #fff;
         }
 
-        .nm-contact-hero::after {
+        .bb-contact-hero::after {
             content: "";
             position: absolute;
             width: 340px;
@@ -89,13 +89,13 @@
             bottom: -190px;
         }
 
-        .nm-contact-hero-inner {
+        .bb-contact-hero-inner {
             position: relative;
             z-index: 2;
             max-width: 760px;
         }
 
-        .nm-contact-eyebrow {
+        .bb-contact-eyebrow {
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -110,15 +110,15 @@
             letter-spacing: .02em;
         }
 
-        .nm-contact-eyebrow-dot {
+        .bb-contact-eyebrow-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--nm-green);
+            background: var(--bb-green);
             box-shadow: 0 0 0 5px rgba(0,196,106,.13);
         }
 
-        .nm-contact-hero h1 {
+        .bb-contact-hero h1 {
             margin: 0;
             color: #fff;
             font-size: clamp(36px, 5vw, 58px);
@@ -127,7 +127,7 @@
             letter-spacing: -.035em;
         }
 
-        .nm-contact-hero p {
+        .bb-contact-hero p {
             max-width: 690px;
             margin: 20px 0 0;
             color: #CFDAD4;
@@ -135,14 +135,14 @@
             line-height: 1.8;
         }
 
-        .nm-contact-actions {
+        .bb-contact-actions {
             display: flex;
             flex-wrap: wrap;
             gap: 12px;
             margin-top: 30px;
         }
 
-        .nm-contact-btn {
+        .bb-contact-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -159,102 +159,102 @@
                 background .2s ease;
         }
 
-        .nm-contact-btn:hover {
+        .bb-contact-btn:hover {
             transform: translateY(-2px);
         }
 
-        .nm-contact-btn-primary {
-            background: var(--nm-green);
+        .bb-contact-btn-primary {
+            background: var(--bb-green);
             color: #082318 !important;
             box-shadow: 0 10px 24px rgba(0,196,106,.23);
         }
 
-        .nm-contact-btn-primary:hover {
+        .bb-contact-btn-primary:hover {
             background: #00B65F;
         }
 
-        .nm-contact-btn-secondary {
+        .bb-contact-btn-secondary {
             color: #fff !important;
             border: 1px solid rgba(255,255,255,.18);
             background: rgba(255,255,255,.08);
         }
 
-        .nm-contact-btn svg,
-        .nm-info-icon svg,
-        .nm-help-icon svg,
-        .nm-security-icon svg {
+        .bb-contact-btn svg,
+        .bb-info-icon svg,
+        .bb-help-icon svg,
+        .bb-security-icon svg {
             width: 20px;
             height: 20px;
             flex: 0 0 auto;
         }
 
-        .nm-contact-info-wrap {
+        .bb-contact-info-wrap {
             position: relative;
             z-index: 4;
             margin-top: -28px;
         }
 
-        .nm-contact-info-grid {
+        .bb-contact-info-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 16px;
         }
 
-        .nm-info-card {
+        .bb-info-card {
             min-width: 0;
             padding: 22px;
-            border: 1px solid var(--nm-line);
+            border: 1px solid var(--bb-line);
             border-radius: 18px;
-            background: var(--nm-white);
-            box-shadow: var(--nm-shadow-soft);
+            background: var(--bb-white);
+            box-shadow: var(--bb-shadow-soft);
         }
 
-        .nm-info-icon {
+        .bb-info-icon {
             width: 43px;
             height: 43px;
             display: grid;
             place-items: center;
             margin-bottom: 17px;
             border-radius: 12px;
-            color: var(--nm-green-dark);
-            background: var(--nm-green-soft);
+            color: var(--bb-green-dark);
+            background: var(--bb-green-soft);
         }
 
-        .nm-info-label {
+        .bb-info-label {
             margin-bottom: 7px;
-            color: var(--nm-muted);
+            color: var(--bb-muted);
             font-size: 12px;
             font-weight: 750;
             text-transform: uppercase;
             letter-spacing: .055em;
         }
 
-        .nm-info-value {
-            color: var(--nm-ink);
+        .bb-info-value {
+            color: var(--bb-ink);
             font-size: 15px;
             line-height: 1.65;
             font-weight: 700;
             overflow-wrap: anywhere;
         }
 
-        .nm-info-value a {
+        .bb-info-value a {
             color: inherit;
             text-decoration: none;
         }
 
-        .nm-contact-main {
+        .bb-contact-main {
             padding-top: 58px;
         }
 
-        .nm-section-heading {
+        .bb-section-heading {
             max-width: 680px;
             margin-bottom: 26px;
         }
 
-        .nm-section-kicker {
+        .bb-section-kicker {
             display: block;
             margin-bottom: 8px;
-            color: var(--nm-green-dark);
+            color: var(--bb-green-dark);
             font-size: 13px;
             line-height: 1;
             font-weight: 800;
@@ -262,69 +262,69 @@
             letter-spacing: .055em;
         }
 
-        .nm-section-heading h2 {
+        .bb-section-heading h2 {
             margin: 0;
-            color: var(--nm-ink);
+            color: var(--bb-ink);
             font-size: clamp(27px, 3.2vw, 38px);
             line-height: 1.2;
             letter-spacing: -.025em;
         }
 
-        .nm-section-heading p {
+        .bb-section-heading p {
             margin: 12px 0 0;
-            color: var(--nm-text);
+            color: var(--bb-text);
             font-size: 15px;
             line-height: 1.8;
         }
 
-        .nm-contact-form-map-grid {
+        .bb-contact-form-map-grid {
             display: grid;
             grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
             gap: 24px;
             align-items: stretch;
         }
 
-        .nm-form-card,
-        .nm-map-card {
+        .bb-form-card,
+        .bb-map-card {
             overflow: hidden;
-            border: 1px solid var(--nm-line);
+            border: 1px solid var(--bb-line);
             border-radius: 22px;
             background: #fff;
-            box-shadow: var(--nm-shadow);
+            box-shadow: var(--bb-shadow);
         }
 
-        .nm-form-card {
+        .bb-form-card {
             padding: 30px;
         }
 
-        .nm-card-heading {
+        .bb-card-heading {
             margin-bottom: 23px;
         }
 
-        .nm-card-heading h3 {
+        .bb-card-heading h3 {
             margin: 0;
-            color: var(--nm-ink);
+            color: var(--bb-ink);
             font-size: 23px;
             line-height: 1.3;
             letter-spacing: -.018em;
         }
 
-        .nm-card-heading p {
+        .bb-card-heading p {
             margin: 8px 0 0;
-            color: var(--nm-text);
+            color: var(--bb-text);
             font-size: 14px;
             line-height: 1.7;
         }
 
-        .nm-form-card form {
+        .bb-form-card form {
             width: 100%;
         }
 
-        .nm-form-card form > * {
+        .bb-form-card form > * {
             margin-bottom: 15px;
         }
 
-        .nm-form-card label {
+        .bb-form-card label {
             display: block;
             margin-bottom: 7px;
             color: #344054;
@@ -332,9 +332,9 @@
             font-weight: 700;
         }
 
-        .nm-form-card input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-        .nm-form-card textarea,
-        .nm-form-card select {
+        .bb-form-card input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+        .bb-form-card textarea,
+        .bb-form-card select {
             width: 100% !important;
             min-height: 49px;
             padding: 12px 14px !important;
@@ -342,7 +342,7 @@
             border-radius: 11px !important;
             outline: none !important;
             background: #fff !important;
-            color: var(--nm-ink) !important;
+            color: var(--bb-ink) !important;
             font-family: inherit !important;
             font-size: 14px !important;
             line-height: 1.5;
@@ -352,27 +352,27 @@
                 box-shadow .18s ease;
         }
 
-        .nm-form-card textarea {
+        .bb-form-card textarea {
             min-height: 145px !important;
             resize: vertical;
         }
 
-        .nm-form-card input:focus,
-        .nm-form-card textarea:focus,
-        .nm-form-card select:focus {
-            border-color: var(--nm-green) !important;
+        .bb-form-card input:focus,
+        .bb-form-card textarea:focus,
+        .bb-form-card select:focus {
+            border-color: var(--bb-green) !important;
             box-shadow:
                 0 0 0 4px rgba(0,196,106,.10)
                 !important;
         }
 
-        .nm-form-card button,
-        .nm-form-card input[type="submit"] {
+        .bb-form-card button,
+        .bb-form-card input[type="submit"] {
             min-height: 49px !important;
             padding: 0 22px !important;
             border: 0 !important;
             border-radius: 11px !important;
-            background: var(--nm-green) !important;
+            background: var(--bb-green) !important;
             color: #082318 !important;
             font-family: inherit !important;
             font-size: 14px !important;
@@ -384,42 +384,42 @@
                 background .18s ease;
         }
 
-        .nm-form-card button:hover,
-        .nm-form-card input[type="submit"]:hover {
+        .bb-form-card button:hover,
+        .bb-form-card input[type="submit"]:hover {
             background: #00B65F !important;
             transform: translateY(-1px);
         }
 
-        .nm-map-card {
+        .bb-map-card {
             min-height: 520px;
             display: flex;
             flex-direction: column;
         }
 
-        .nm-map-top {
+        .bb-map-top {
             padding: 24px 25px 19px;
         }
 
-        .nm-map-top h3 {
+        .bb-map-top h3 {
             margin: 0;
-            color: var(--nm-ink);
+            color: var(--bb-ink);
             font-size: 21px;
         }
 
-        .nm-map-top p {
+        .bb-map-top p {
             margin: 8px 0 0;
-            color: var(--nm-text);
+            color: var(--bb-text);
             font-size: 14px;
             line-height: 1.7;
         }
 
-        .nm-map-frame {
+        .bb-map-frame {
             flex: 1;
             min-height: 375px;
             background: #EEF2F0;
         }
 
-        .nm-map-frame iframe {
+        .bb-map-frame iframe {
             display: block !important;
             width: 100% !important;
             height: 100% !important;
@@ -427,7 +427,7 @@
             border: 0 !important;
         }
 
-        .nm-order-note {
+        .bb-order-note {
             display: flex;
             gap: 12px;
             align-items: flex-start;
@@ -441,23 +441,23 @@
             line-height: 1.7;
         }
 
-        .nm-order-note strong {
-            color: var(--nm-ink);
+        .bb-order-note strong {
+            color: var(--bb-ink);
         }
 
-        .nm-help-section {
+        .bb-help-section {
             padding-top: 70px;
         }
 
-        .nm-help-grid {
+        .bb-help-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
         }
 
-        .nm-help-card {
+        .bb-help-card {
             padding: 23px;
-            border: 1px solid var(--nm-line);
+            border: 1px solid var(--bb-line);
             border-radius: 18px;
             background: #fff;
             transition:
@@ -466,49 +466,49 @@
                 border-color .2s ease;
         }
 
-        .nm-help-card:hover {
+        .bb-help-card:hover {
             transform: translateY(-3px);
             border-color: rgba(0,196,106,.28);
-            box-shadow: var(--nm-shadow-soft);
+            box-shadow: var(--bb-shadow-soft);
         }
 
-        .nm-help-icon {
+        .bb-help-icon {
             width: 42px;
             height: 42px;
             display: grid;
             place-items: center;
             margin-bottom: 16px;
             border-radius: 12px;
-            color: var(--nm-green-dark);
-            background: var(--nm-green-soft);
+            color: var(--bb-green-dark);
+            background: var(--bb-green-soft);
         }
 
-        .nm-help-card h3 {
+        .bb-help-card h3 {
             margin: 0 0 7px;
-            color: var(--nm-ink);
+            color: var(--bb-ink);
             font-size: 16px;
             line-height: 1.4;
         }
 
-        .nm-help-card p {
+        .bb-help-card p {
             margin: 0;
-            color: var(--nm-text);
+            color: var(--bb-text);
             font-size: 13px;
             line-height: 1.7;
         }
 
-        .nm-security {
+        .bb-security {
             display: grid;
             grid-template-columns: auto 1fr;
             gap: 18px;
             margin-top: 58px;
             padding: 26px 28px;
-            border: 1px solid var(--nm-warn-line);
+            border: 1px solid var(--bb-warn-line);
             border-radius: 19px;
-            background: var(--nm-warn);
+            background: var(--bb-warn);
         }
 
-        .nm-security-icon {
+        .bb-security-icon {
             width: 46px;
             height: 46px;
             display: grid;
@@ -518,20 +518,20 @@
             background: rgba(255,255,255,.75);
         }
 
-        .nm-security h2 {
+        .bb-security h2 {
             margin: 0 0 7px;
             color: #513B08;
             font-size: 19px;
         }
 
-        .nm-security p {
+        .bb-security p {
             margin: 0;
             color: #725B25;
             font-size: 14px;
             line-height: 1.75;
         }
 
-        .nm-contact-bottom {
+        .bb-contact-bottom {
             margin-top: 34px;
             padding: 31px;
             border-radius: 20px;
@@ -545,101 +545,101 @@
             text-align: center;
         }
 
-        .nm-contact-bottom h2 {
+        .bb-contact-bottom h2 {
             margin: 0;
-            color: var(--nm-ink);
+            color: var(--bb-ink);
             font-size: 23px;
         }
 
-        .nm-contact-bottom p {
+        .bb-contact-bottom p {
             max-width: 680px;
             margin: 10px auto 20px;
-            color: var(--nm-text);
+            color: var(--bb-text);
             font-size: 14px;
             line-height: 1.75;
         }
 
         @media (max-width: 1000px) {
-            .nm-contact-info-grid {
+            .bb-contact-info-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .nm-contact-form-map-grid {
+            .bb-contact-form-map-grid {
                 grid-template-columns: 1fr;
             }
 
-            .nm-map-card {
+            .bb-map-card {
                 min-height: 470px;
             }
         }
 
         @media (max-width: 760px) {
-            .nm-contact-hero {
+            .bb-contact-hero {
                 padding: 52px 0 54px;
             }
 
-            .nm-contact-hero p {
+            .bb-contact-hero p {
                 font-size: 15px;
             }
 
-            .nm-contact-info-wrap {
+            .bb-contact-info-wrap {
                 margin-top: -20px;
             }
 
-            .nm-help-grid {
+            .bb-help-grid {
                 grid-template-columns: 1fr 1fr;
             }
 
-            .nm-form-card {
+            .bb-form-card {
                 padding: 22px 18px;
             }
 
-            .nm-contact-main,
-            .nm-help-section {
+            .bb-contact-main,
+            .bb-help-section {
                 padding-top: 48px;
             }
         }
 
         @media (max-width: 540px) {
-            .nm-contact-shell {
+            .bb-contact-shell {
                 width: min(100% - 22px, 1180px);
             }
 
-            .nm-contact-info-grid,
-            .nm-help-grid {
+            .bb-contact-info-grid,
+            .bb-help-grid {
                 grid-template-columns: 1fr;
             }
 
-            .nm-info-card {
+            .bb-info-card {
                 padding: 18px;
             }
 
-            .nm-contact-actions {
+            .bb-contact-actions {
                 flex-direction: column;
             }
 
-            .nm-contact-btn {
+            .bb-contact-btn {
                 width: 100%;
             }
 
-            .nm-security {
+            .bb-security {
                 grid-template-columns: 1fr;
                 padding: 22px;
             }
 
-            .nm-contact-bottom {
+            .bb-contact-bottom {
                 padding: 26px 18px;
             }
         }
     </style>
 
 
-    <section class="nm-contact-hero">
-        <div class="nm-contact-shell">
-            <div class="nm-contact-hero-inner">
+    <section class="bb-contact-hero">
+        <div class="bb-contact-shell">
+            <div class="bb-contact-hero-inner">
 
-                <div class="nm-contact-eyebrow">
-                    <span class="nm-contact-eyebrow-dot"></span>
+                <div class="bb-contact-eyebrow">
+                    <span class="bb-contact-eyebrow-dot"></span>
                     {{ $siteBrand }} Customer Care
                 </div>
 
@@ -652,11 +652,11 @@
                     করলে আমরা দ্রুত বিষয়টি পর্যালোচনা করতে পারব।
                 </p>
 
-                <div class="nm-contact-actions">
+                <div class="bb-contact-actions">
 
                     @if($sitePhone)
                     <a
-                        class="nm-contact-btn nm-contact-btn-primary"
+                        class="bb-contact-btn bb-contact-btn-primary"
                         href="tel:{{ $sitePhone }}">
 
                         <svg
@@ -683,7 +683,7 @@
                     @endif
 
                     <!--email_off--><a
-                        class="nm-contact-btn nm-contact-btn-secondary"
+                        class="bb-contact-btn bb-contact-btn-secondary"
                         href="mailto:{{ $siteEmail }}">
 
                         <svg
@@ -707,13 +707,13 @@
     </section>
 
 
-    <div class="nm-contact-info-wrap">
-        <div class="nm-contact-shell">
+    <div class="bb-contact-info-wrap">
+        <div class="bb-contact-shell">
 
-            <div class="nm-contact-info-grid">
+            <div class="bb-contact-info-grid">
 
-                <div class="nm-info-card">
-                    <div class="nm-info-icon">
+                <div class="bb-info-card">
+                    <div class="bb-info-icon">
                         <svg
                             viewBox="0 0 24 24"
                             fill="none"
@@ -727,9 +727,9 @@
                         </svg>
                     </div>
 
-                    <div class="nm-info-label">হেল্পলাইন</div>
+                    <div class="bb-info-label">হেল্পলাইন</div>
 
-                    <div class="nm-info-value">
+                    <div class="bb-info-value">
                         <a href="tel:+8801850602003">
                             01850602003
                         </a>
@@ -737,8 +737,8 @@
                 </div>
 
 
-                <div class="nm-info-card">
-                    <div class="nm-info-icon">
+                <div class="bb-info-card">
+                    <div class="bb-info-icon">
                         <svg
                             viewBox="0 0 24 24"
                             fill="none"
@@ -754,9 +754,9 @@
                         </svg>
                     </div>
 
-                    <div class="nm-info-label">ইমেইল</div>
+                    <div class="bb-info-label">ইমেইল</div>
 
-                    <div class="nm-info-value">
+                    <div class="bb-info-value">
                         <!--email_off--><a href="mailto:{{ $siteEmail }}">
                             {{ $siteEmail }}
                         </a><!--/email_off-->
@@ -764,8 +764,8 @@
                 </div>
 
 
-                <div class="nm-info-card">
-                    <div class="nm-info-icon">
+                <div class="bb-info-card">
+                    <div class="bb-info-icon">
                         <svg
                             viewBox="0 0 24 24"
                             fill="none"
@@ -777,9 +777,9 @@
                         </svg>
                     </div>
 
-                    <div class="nm-info-label">অফিস</div>
+                    <div class="bb-info-label">অফিস</div>
 
-                    <div class="nm-info-value">
+                    <div class="bb-info-value">
                         Noyamela (Beside Primary School),
                         Dinajpur - Biral Rd, Biral 5210,
                         Dinajpur
@@ -787,8 +787,8 @@
                 </div>
 
 
-                <div class="nm-info-card">
-                    <div class="nm-info-icon">
+                <div class="bb-info-card">
+                    <div class="bb-info-icon">
                         <svg
                             viewBox="0 0 24 24"
                             fill="none"
@@ -799,9 +799,9 @@
                         </svg>
                     </div>
 
-                    <div class="nm-info-label">সাপোর্ট সময়</div>
+                    <div class="bb-info-label">সাপোর্ট সময়</div>
 
-                    <div class="nm-info-value">
+                    <div class="bb-info-value">
                         Saturday - Thursday<br>
                         9:00 AM - 8:00 PM<br>
                         Friday: Closed
@@ -813,11 +813,11 @@
     </div>
 
 
-    <main class="nm-contact-main">
-        <div class="nm-contact-shell">
+    <main class="bb-contact-main">
+        <div class="bb-contact-shell">
 
-            <div class="nm-section-heading">
-                <span class="nm-section-kicker">
+            <div class="bb-section-heading">
+                <span class="bb-section-kicker">
                     Customer Support
                 </span>
 
@@ -832,11 +832,11 @@
             </div>
 
 
-            <div class="nm-contact-form-map-grid">
+            <div class="bb-contact-form-map-grid">
 
-                <div class="nm-form-card">
+                <div class="bb-form-card">
 
-                    <div class="nm-card-heading">
+                    <div class="bb-card-heading">
                         <h3>একটি বার্তা পাঠান</h3>
 
                         <p>
@@ -958,7 +958,7 @@
 <form
     method="POST"
     action="{{ route('contact.submit') }}"
-    class="nm-real-contact-form"
+    class="bb-real-contact-form"
 >
 
     @csrf
@@ -1044,7 +1044,7 @@
 
 
 
-                    <div class="nm-order-note">
+                    <div class="bb-order-note">
                         <div>
                             <strong>
                                 অর্ডার সংক্রান্ত সহায়তা?
@@ -1060,9 +1060,9 @@
 
 
                 @if ($siteMapEcode || $siteAddress)
-                <div class="nm-map-card">
+                <div class="bb-map-card">
 
-                    <div class="nm-map-top">
+                    <div class="bb-map-top">
                         <h3>আমাদের অবস্থান</h3>
 
                         @if ($siteAddress)
@@ -1073,7 +1073,7 @@
                     </div>
 
                     @if ($siteMapEcode)
-                    <div class="nm-map-frame">
+                    <div class="bb-map-frame">
                         @if(str_starts_with(trim($siteMapEcode), '<iframe'))
                             {!! $siteMapEcode !!}
                         @else
@@ -1097,10 +1097,10 @@
             </div>
 
 
-            <section class="nm-help-section">
+            <section class="bb-help-section">
 
-                <div class="nm-section-heading">
-                    <span class="nm-section-kicker">
+                <div class="bb-section-heading">
+                    <span class="bb-section-kicker">
                         How We Can Help
                     </span>
 
@@ -1116,10 +1116,10 @@
                 </div>
 
 
-                <div class="nm-help-grid">
+                <div class="bb-help-grid">
 
-                    <div class="nm-help-card">
-                        <div class="nm-help-icon">
+                    <div class="bb-help-card">
+                        <div class="bb-help-icon">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -1142,8 +1142,8 @@
                     </div>
 
 
-                    <div class="nm-help-card">
-                        <div class="nm-help-icon">
+                    <div class="bb-help-card">
+                        <div class="bb-help-icon">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -1166,8 +1166,8 @@
                     </div>
 
 
-                    <div class="nm-help-card">
-                        <div class="nm-help-icon">
+                    <div class="bb-help-card">
+                        <div class="bb-help-icon">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -1189,8 +1189,8 @@
                     </div>
 
 
-                    <div class="nm-help-card">
-                        <div class="nm-help-icon">
+                    <div class="bb-help-card">
+                        <div class="bb-help-icon">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -1211,8 +1211,8 @@
                     </div>
 
 
-                    <div class="nm-help-card">
-                        <div class="nm-help-icon">
+                    <div class="bb-help-card">
+                        <div class="bb-help-icon">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -1238,8 +1238,8 @@
                     </div>
 
 
-                    <div class="nm-help-card">
-                        <div class="nm-help-icon">
+                    <div class="bb-help-card">
+                        <div class="bb-help-icon">
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -1264,9 +1264,9 @@
             </section>
 
 
-            <section class="nm-security">
+            <section class="bb-security">
 
-                <div class="nm-security-icon">
+                <div class="bb-security-icon">
                     <svg
                         viewBox="0 0 24 24"
                         fill="none"
@@ -1297,7 +1297,7 @@
             </section>
 
 
-            <section class="nm-contact-bottom">
+            <section class="bb-contact-bottom">
 
                 <h2>
                     আরও সহায়তা প্রয়োজন?
@@ -1309,19 +1309,19 @@
                 </p>
 
                 <div
-                    class="nm-contact-actions"
+                    class="bb-contact-actions"
                     style="justify-content:center;margin-top:0">
 
                     @if($sitePhone)
                     <a
-                        class="nm-contact-btn nm-contact-btn-primary"
+                        class="bb-contact-btn bb-contact-btn-primary"
                         href="tel:{{ $sitePhone }}">
                         কল করুন
                     </a>
                     @endif
 
                     <!--email_off--><a
-                        class="nm-contact-btn"
+                        class="bb-contact-btn"
                         style="
                             background:#fff;
                             color:#101828;

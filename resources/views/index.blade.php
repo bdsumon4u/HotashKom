@@ -111,11 +111,11 @@
 @push('styles')
 <style>
 /* Premium home trust strip */
-.nm-home-trust-strip {
+.bb-home-trust-strip {
     margin: 26px 0 38px;
 }
 
-.nm-home-trust-strip .block-features__list {
+.bb-home-trust-strip .block-features__list {
     display: flex;
     gap: 13px;
     padding: 14px;
@@ -127,7 +127,7 @@
     box-shadow: 0 10px 28px rgba(15, 72, 42, .08);
 }
 
-.nm-home-trust-strip .block-features__item {
+.bb-home-trust-strip .block-features__item {
     display: flex;
     flex: 1 1 0;
     align-items: center;
@@ -140,11 +140,11 @@
     transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
-.nm-home-trust-strip .block-features__divider {
+.bb-home-trust-strip .block-features__divider {
     display: none;
 }
 
-.nm-home-trust-strip .block-features__icon {
+.bb-home-trust-strip .block-features__icon {
     display: inline-flex;
     flex: 0 0 58px;
     align-items: center;
@@ -158,18 +158,18 @@
     border-radius: 16px;
 }
 
-.nm-home-trust-strip .block-features__icon svg {
+.bb-home-trust-strip .block-features__icon svg {
     width: 31px !important;
     height: 31px !important;
     fill: currentColor;
     stroke: currentColor;
 }
 
-.nm-home-trust-strip .block-features__content {
+.bb-home-trust-strip .block-features__content {
     min-width: 0;
 }
 
-.nm-home-trust-strip .block-features__title {
+.bb-home-trust-strip .block-features__title {
     margin-bottom: 5px;
     color: #234033;
     font-size: 17px;
@@ -177,7 +177,7 @@
     line-height: 1.25;
 }
 
-.nm-home-trust-strip .block-features__subtitle {
+.bb-home-trust-strip .block-features__subtitle {
     color: #617369;
     font-size: 13px;
     font-weight: 500;
@@ -185,7 +185,7 @@
 }
 
 @media (hover: hover) {
-    .nm-home-trust-strip .block-features__item:hover {
+    .bb-home-trust-strip .block-features__item:hover {
         border-color: #a7e8c5;
         box-shadow: 0 10px 20px rgba(11, 118, 67, .11);
         transform: translateY(-3px);
@@ -414,7 +414,7 @@
 @php
     $serviceIcons = config('services.service_icons', []);
 @endphp
-<div class="block block-features block-features--layout--classic nm-home-trust-strip d-none d-md-block">
+<div class="block block-features block-features--layout--classic bb-home-trust-strip d-none d-md-block">
     <div class="container">
         <div class="block-features__list">
             @foreach(config('services.services', []) as $num => $icon)

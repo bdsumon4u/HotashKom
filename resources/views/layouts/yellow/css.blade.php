@@ -51,7 +51,7 @@
 </style>
 
 <style>
-/* NEHMART_CATEGORY_CAROUSEL_PREMIUM_V2 */
+/* BAGBAZARBD_CATEGORY_CAROUSEL_PREMIUM_V2 */
 /* Visual styling only. Owl Carousel sizing and layout remain unchanged. */
 
 .home-category-carousel .block-header {

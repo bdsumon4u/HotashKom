@@ -21,10 +21,10 @@
 @endphp
 
 @if ($nmGuideData && $nmRelatedGuides->isNotEmpty())
-    <section class="nm-category-guides"
-             aria-labelledby="nm-category-guides-title">
+    <section class="bb-category-guides"
+             aria-labelledby="bb-category-guides-title">
 
-        <div class="nm-category-section-heading">
+        <div class="bb-category-section-heading">
 
             <div>
 
@@ -32,7 +32,7 @@
                     Helpful Guides
                 </span>
 
-                <h2 id="nm-category-guides-title">
+                <h2 id="bb-category-guides-title">
                     {{ $nmGuideData['title'] }}
                 </h2>
 
@@ -44,13 +44,13 @@
 
         </div>
 
-        <div class="nm-category-guide-grid">
+        <div class="bb-category-guide-grid">
 
             @foreach ($nmRelatedGuides as $nmGuide)
 
-                <article class="nm-category-guide-card">
+                <article class="bb-category-guide-card">
 
-                    <span class="nm-category-guide-label">
+                    <span class="bb-category-guide-label">
                         Buying Guide
                     </span>
 
@@ -64,7 +64,7 @@
 
                     <a
                         href="{{ route('blogs.show', $nmGuide) }}"
-                        class="nm-category-guide-link"
+                        class="bb-category-guide-link"
                     >
                         গাইডটি পড়ুন →
                     </a>

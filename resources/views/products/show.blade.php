@@ -238,17 +238,17 @@
                 </div>
             </div>
             <div id="accordion" class="mt-3">
-                <div class="card nm-product-description-card">
+                <div class="card bb-product-description-card">
                     @once
                         <link rel="stylesheet" href="{{ asset('css/hk-product-description-premium.css') }}">
                     @endonce
                     <div class="p-0 card-header">
-                        <a class="px-4 card-link nm-product-description-title" datatoggle="collapse" href="javascript:void(false)">
+                        <a class="px-4 card-link bb-product-description-title" datatoggle="collapse" href="javascript:void(false)">
                             Product Description
                         </a>
                     </div>
                     <div id="collapseOne" class="collapse show" data-parent="#accordion">
-                        <div class="p-2 card-body nm-product-description-body">
+                        <div class="p-2 card-body bb-product-description-body">
                             @if ($product->desc_img && $product->desc_img_pos == 'before_content')
                                 <div class="text-center">
                                     @foreach ($product->images as $image)
@@ -258,7 +258,7 @@
                                 </div>
                             @endif
 
-                            <div class="nm-product-description">
+                            <div class="bb-product-description">
                                 {!! fix_youtube_embeds($product->description) !!}
                             </div>
 
@@ -285,7 +285,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-3 card nm-customer-reviews-card">
+                <div class="mt-3 card bb-customer-reviews-card">
                     <div class="p-0 card-header">
                         <a class="px-4 card-link" data-toggle="collapse" href="javascript:void(false)" aria-expanded="false">
                             Customer Reviews

@@ -121,7 +121,7 @@
 </style>
 {{-- COMPACT BLOG TOC END --}}
 
-<div class="block nm-blog-article-page">
+<div class="block bb-blog-article-page">
     <div class="container">
         <!-- Custom CSS for blog article readability -->
         <style>
@@ -306,7 +306,7 @@
             }
         </style>
 
-        <article class="blog-post nm-blog-article-premium">
+        <article class="blog-post bb-blog-article-premium">
             <header class="blog-post__header">
                 <div class="blog-post__meta">
                     <i class="far fa-calendar-alt"></i>
@@ -357,31 +357,31 @@
             @include('blogs.partials.faqs', ['blog' => $blog])
 
             <section
-                class="nm-blog-links-v3"
-                aria-labelledby="nm-blog-more-guides">
+                class="bb-blog-links-v3"
+                aria-labelledby="bb-blog-more-guides">
 
                 @if(
                     isset($relatedBlogs)
                     && $relatedBlogs->isNotEmpty()
                 )
-                    <div class="nm-blog-links-v3__related">
+                    <div class="bb-blog-links-v3__related">
 
                         <h2
-                            id="nm-blog-more-guides"
-                            class="nm-blog-links-v3__heading">
+                            id="bb-blog-more-guides"
+                            class="bb-blog-links-v3__heading">
                             আরও {{ $company->name ?? 'প্রাসঙ্গিক' }} গাইড
                         </h2>
 
-                        <div class="nm-blog-links-v3__grid">
+                        <div class="bb-blog-links-v3__grid">
 
                             @foreach(
                                 $relatedBlogs as $relatedBlog
                             )
                                 <article
-                                    class="nm-blog-links-v3__card">
+                                    class="bb-blog-links-v3__card">
 
                                     <a
-                                        class="nm-blog-links-v3__card-link"
+                                        class="bb-blog-links-v3__card-link"
                                         href="{{ route('blogs.show', ['blog' => $relatedBlog->slug]) }}">
 
                                         {{ $relatedBlog->title }}
@@ -401,25 +401,25 @@
                     || ($nextBlog ?? null)
                 )
                     <nav
-                        class="nm-blog-links-v3__nav"
+                        class="bb-blog-links-v3__nav"
                         aria-label="Blog article navigation">
 
                         <div
-                            class="nm-blog-links-v3__nav-side">
+                            class="bb-blog-links-v3__nav-side">
 
                             @if($previousBlog ?? null)
 
                                 <a
-                                    class="nm-blog-links-v3__nav-link"
+                                    class="bb-blog-links-v3__nav-link"
                                     href="{{ route('blogs.show', ['blog' => $previousBlog->slug]) }}">
 
                                     <span
-                                        class="nm-blog-links-v3__nav-label">
+                                        class="bb-blog-links-v3__nav-label">
                                         ← আগের গাইড
                                     </span>
 
                                     <span
-                                        class="nm-blog-links-v3__nav-title">
+                                        class="bb-blog-links-v3__nav-title">
                                         {{ $previousBlog->title }}
                                     </span>
 
@@ -431,21 +431,21 @@
 
 
                         <div
-                            class="nm-blog-links-v3__nav-side nm-blog-links-v3__nav-side--next">
+                            class="bb-blog-links-v3__nav-side bb-blog-links-v3__nav-side--next">
 
                             @if($nextBlog ?? null)
 
                                 <a
-                                    class="nm-blog-links-v3__nav-link"
+                                    class="bb-blog-links-v3__nav-link"
                                     href="{{ route('blogs.show', ['blog' => $nextBlog->slug]) }}">
 
                                     <span
-                                        class="nm-blog-links-v3__nav-label">
+                                        class="bb-blog-links-v3__nav-label">
                                         পরের গাইড →
                                     </span>
 
                                     <span
-                                        class="nm-blog-links-v3__nav-title">
+                                        class="bb-blog-links-v3__nav-title">
                                         {{ $nextBlog->title }}
                                     </span>
 
@@ -482,30 +482,30 @@
 <style>
 /* Blog internal links styles */
 
-.nm-blog-links-v3 {
+.bb-blog-links-v3 {
     margin-top: 3rem;
     padding-top: 2rem;
     border-top: 1px solid #e7e7e7;
 }
 
-.nm-blog-links-v3__heading {
+.bb-blog-links-v3__heading {
     margin: 0 0 1.25rem;
     font-size: 1.5rem;
     line-height: 1.4;
 }
 
-.nm-blog-links-v3__grid {
+.bb-blog-links-v3__grid {
     display: grid;
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
     gap: 1rem;
 }
 
-.nm-blog-links-v3__card {
+.bb-blog-links-v3__card {
     min-width: 0;
 }
 
-.nm-blog-links-v3__card-link {
+.bb-blog-links-v3__card-link {
     display: block;
     height: 100%;
     padding: 1rem 1.1rem;
@@ -521,7 +521,7 @@
         transform .2s ease;
 }
 
-.nm-blog-links-v3__card-link:hover {
+.bb-blog-links-v3__card-link:hover {
     color: #222;
     text-decoration: underline;
     transform: translateY(-1px);
@@ -529,7 +529,7 @@
         0 4px 15px rgba(0,0,0,.06);
 }
 
-.nm-blog-links-v3__nav {
+.bb-blog-links-v3__nav {
     display: grid;
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
@@ -537,15 +537,15 @@
     margin-top: 2rem;
 }
 
-.nm-blog-links-v3__nav-side {
+.bb-blog-links-v3__nav-side {
     min-width: 0;
 }
 
-.nm-blog-links-v3__nav-side--next {
+.bb-blog-links-v3__nav-side--next {
     text-align: right;
 }
 
-.nm-blog-links-v3__nav-link {
+.bb-blog-links-v3__nav-link {
     display: flex;
     flex-direction: column;
     gap: .4rem;
@@ -558,32 +558,32 @@
     text-decoration: none;
 }
 
-.nm-blog-links-v3__nav-link:hover {
+.bb-blog-links-v3__nav-link:hover {
     color: #222;
     text-decoration: none;
     box-shadow:
         0 4px 15px rgba(0,0,0,.06);
 }
 
-.nm-blog-links-v3__nav-label {
+.bb-blog-links-v3__nav-label {
     color: #6b7280;
     font-size: .82rem;
     font-weight: 600;
 }
 
-.nm-blog-links-v3__nav-title {
+.bb-blog-links-v3__nav-title {
     font-weight: 600;
     line-height: 1.45;
 }
 
 @media (max-width: 767px) {
 
-    .nm-blog-links-v3__grid,
-    .nm-blog-links-v3__nav {
+    .bb-blog-links-v3__grid,
+    .bb-blog-links-v3__nav {
         grid-template-columns: 1fr;
     }
 
-    .nm-blog-links-v3__nav-side--next {
+    .bb-blog-links-v3__nav-side--next {
         text-align: left;
     }
 }

@@ -67,14 +67,14 @@
 @push('styles')
 <style>
 /* Premium home section products */
-.nm-home-section-products-page {
+.bb-home-section-products-page {
     padding: 22px 0 40px;
     background:
         radial-gradient(circle at top right, rgba(29,191,115,.10), transparent 32%),
         linear-gradient(180deg, #fbfffc 0%, #ffffff 65%);
 }
 
-.nm-home-section-products-page .products-view__options {
+.bb-home-section-products-page .products-view__options {
     margin-bottom: 18px;
     padding: 14px 16px;
     border: 1px solid #dcebe3;
@@ -83,34 +83,34 @@
     box-shadow: 0 6px 16px rgba(22,58,39,.06);
 }
 
-.nm-home-section-products-page .view-options__legend {
+.bb-home-section-products-page .view-options__legend {
     color: #2b4a38;
     font-size: 14px;
     font-weight: 700;
 }
 
-.nm-home-section-products-page .filter-sidebar,
-.nm-home-section-products-page .filter-sidebar.placeholder-glow {
+.bb-home-section-products-page .filter-sidebar,
+.bb-home-section-products-page .filter-sidebar.placeholder-glow {
     border: 1px solid #dcebe3 !important;
     border-radius: 13px !important;
     background: #ffffff !important;
     box-shadow: 0 7px 18px rgba(22,58,39,.07);
 }
 
-.nm-home-section-products-page .filter-sidebar__title {
+.bb-home-section-products-page .filter-sidebar__title {
     color: #173c2a;
     font-weight: 800;
 }
 
-.nm-home-section-products-page .filter-block {
+.bb-home-section-products-page .filter-block {
     border-bottom-color: #e8f1eb;
 }
 
-.nm-home-section-products-page .products-list__body {
+.bb-home-section-products-page .products-list__body {
     row-gap: 18px;
 }
 
-.nm-home-section-products-page .product-card {
+.bb-home-section-products-page .product-card {
     overflow: hidden;
     border: 1px solid #d9e9df;
     border-radius: 13px;
@@ -119,30 +119,30 @@
     transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
 
-.nm-home-section-products-page .product-card:hover {
+.bb-home-section-products-page .product-card:hover {
     transform: translateY(-4px);
     border-color: #8bdab0;
     box-shadow: 0 13px 25px rgba(22,58,39,.15);
 }
 
-.nm-home-section-products-page .product-card__image {
+.bb-home-section-products-page .product-card__image {
     background: linear-gradient(145deg, #f8fdf9, #edf8f1);
 }
 
-.nm-home-section-products-page .product-card__image img {
+.bb-home-section-products-page .product-card__image img {
     transition: transform .28s ease;
 }
 
-.nm-home-section-products-page .product-card:hover .product-card__image img {
+.bb-home-section-products-page .product-card:hover .product-card__image img {
     transform: scale(1.035);
 }
 
-.nm-home-section-products-page .product-card__info {
+.bb-home-section-products-page .product-card__info {
     padding-top: 13px;
     padding-bottom: 6px;
 }
 
-.nm-home-section-products-page .product-card__name a {
+.bb-home-section-products-page .product-card__name a {
     display: -webkit-box;
     overflow: hidden;
     min-height: 42px;
@@ -153,26 +153,26 @@
     line-height: 1.35;
 }
 
-.nm-home-section-products-page .product-card__prices,
-.nm-home-section-products-page .product-card__new-price {
+.bb-home-section-products-page .product-card__prices,
+.bb-home-section-products-page .product-card__new-price {
     color: #078d4d;
     font-size: 16px;
     font-weight: 800 !important;
 }
 
-.nm-home-section-products-page .product-card__old-price {
+.bb-home-section-products-page .product-card__old-price {
     margin-left: 7px;
     color: #e94a4a;
     font-size: 13px;
     font-weight: 600 !important;
 }
 
-.nm-home-section-products-page .product-card__buttons {
+.bb-home-section-products-page .product-card__buttons {
     margin-top: 11px;
 }
 
-.nm-home-section-products-page .product-card__addtocart,
-.nm-home-section-products-page .product-card__ordernow {
+.bb-home-section-products-page .product-card__addtocart,
+.bb-home-section-products-page .product-card__ordernow {
     width: 100%;
     min-height: 44px;
     border: 0;
@@ -181,53 +181,53 @@
     font-weight: 800;
 }
 
-.nm-home-section-products-page .category-brand-content-section {
+.bb-home-section-products-page .category-brand-content-section {
     border: 1px solid #dcebe3 !important;
     border-radius: 13px;
     box-shadow: 0 7px 18px rgba(22,58,39,.07) !important;
 }
 
 @media (max-width: 767.98px) {
-    .nm-home-section-products-page {
+    .bb-home-section-products-page {
         padding: 12px 0 26px;
     }
 
-    .nm-home-section-products-page .products-view__options {
+    .bb-home-section-products-page .products-view__options {
         margin-bottom: 12px;
         padding: 11px 12px;
         border-radius: 9px;
     }
 
-    .nm-home-section-products-page .filter-sidebar {
+    .bb-home-section-products-page .filter-sidebar {
         margin-bottom: 12px !important;
         border-radius: 10px !important;
     }
 
-    .nm-home-section-products-page .products-list__body {
+    .bb-home-section-products-page .products-list__body {
         row-gap: 12px;
     }
 
-    .nm-home-section-products-page .product-card {
+    .bb-home-section-products-page .product-card {
         border-radius: 10px;
     }
 
-    .nm-home-section-products-page .product-card__info {
+    .bb-home-section-products-page .product-card__info {
         padding-top: 10px;
         padding-bottom: 4px;
     }
 
-    .nm-home-section-products-page .product-card__name a {
+    .bb-home-section-products-page .product-card__name a {
         min-height: 37px;
         font-size: 13px;
     }
 
-    .nm-home-section-products-page .product-card__prices,
-    .nm-home-section-products-page .product-card__new-price {
+    .bb-home-section-products-page .product-card__prices,
+    .bb-home-section-products-page .product-card__new-price {
         font-size: 14px;
     }
 
-    .nm-home-section-products-page .product-card__addtocart,
-    .nm-home-section-products-page .product-card__ordernow {
+    .bb-home-section-products-page .product-card__addtocart,
+    .bb-home-section-products-page .product-card__ordernow {
         min-height: 39px;
         border-radius: 7px;
         font-size: 13px;
@@ -416,7 +416,7 @@
         </div>
     @endif
 
-    <div @if($isPremiumCategoryPage) id="nm-category-products" @endif class="block {{ request()->is('shop') ? 'nm-shop-products-block' : '' }} {{ isset($section) ? 'nm-home-section-products-page' : '' }}" style="@if($isPremiumCategoryPage) scroll-margin-top: 115px; @endif">
+    <div @if($isPremiumCategoryPage) id="bb-category-products" @endif class="block {{ request()->is('shop') ? 'bb-shop-products-block' : '' }} {{ isset($section) ? 'bb-home-section-products-page' : '' }}" style="@if($isPremiumCategoryPage) scroll-margin-top: 115px; @endif">
         <div class="products-view">
             <div class="container">
                 <div class="row">
@@ -587,9 +587,9 @@
                         @if ($descriptionContent)
                             <div
                                 @if($isPremiumCategoryPage)
-                                    id="nm-category-buying-guide"
+                                    id="bb-category-buying-guide"
                                 @endif
-                                class="card mt-4 category-brand-content-section border-0 shadow-sm {{ $isPremiumCategoryPage ? 'nm-category-seo-content' : '' }}"
+                                class="card mt-4 category-brand-content-section border-0 shadow-sm {{ $isPremiumCategoryPage ? 'bb-category-seo-content' : '' }}"
                             >
                                 <div class="card-body p-4 text-justify">
                                     {!! $descriptionContent !!}

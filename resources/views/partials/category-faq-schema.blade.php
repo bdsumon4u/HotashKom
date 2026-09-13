@@ -96,7 +96,7 @@
 @endphp
 
 @if ($nmFaqSchema)
-<script type="application/ld+json" id="nm-category-faq-schema">
+<script type="application/ld+json" id="bb-category-faq-schema">
 {!! json_encode(
     $nmFaqSchema,
     JSON_UNESCAPED_UNICODE

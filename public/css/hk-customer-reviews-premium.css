@@ -9,7 +9,7 @@
    OUTER CARD
    ===================================================== */
 
-#accordion .nm-customer-reviews-card {
+#accordion .bb-customer-reviews-card {
     overflow: hidden;
     background: #fff;
     border: 1px solid #dfeae4 !important;
@@ -24,7 +24,7 @@
    ===================================================== */
 
 #accordion
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 > .card-header {
     padding: 0 !important;
     background:
@@ -37,7 +37,7 @@
 }
 
 #accordion
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .card-link {
     display: flex;
     align-items: center;
@@ -52,14 +52,14 @@
 }
 
 #accordion
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .card-link:not(.collapsed) {
     color: #1e3027 !important;
     border-bottom: 0 !important;
 }
 
 #accordion
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .card-link::before {
     content: "★";
     display: inline-flex;
@@ -76,7 +76,7 @@
 }
 
 #accordion
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .card-link .badge {
     margin-left: auto !important;
     padding: 5px 9px;
@@ -94,7 +94,7 @@
    ===================================================== */
 
 #accordion
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 > .collapse
 > .card-body {
     padding: 20px !important;
@@ -105,7 +105,7 @@
    REVIEW SUMMARY
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .reviews-summary {
     margin-bottom: 18px !important;
     padding: 15px 17px;
@@ -114,16 +114,16 @@
     border-radius: 12px;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .reviews-summary h5 {
     color: #26382f;
     font-size: 17px;
     font-weight: 800;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .reviews-summary .fa-star,
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .reviews-summary .fa-star-half-alt {
     color: #f5aa16 !important;
 }
@@ -133,7 +133,7 @@
    WRITE REVIEW FORM CARD
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-form-container {
     margin-bottom: 18px !important;
     padding: 20px;
@@ -147,7 +147,7 @@
     border-radius: 14px;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-form-container > h6 {
     display: flex;
     align-items: center;
@@ -158,7 +158,7 @@
     font-weight: 800;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-form-container > h6::before {
     content: "✓";
     display: inline-flex;
@@ -173,7 +173,7 @@
     font-weight: 800;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-form-container > p {
     margin-left: 34px;
     margin-bottom: 18px !important;
@@ -187,7 +187,7 @@
    FORM LABELS
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form label {
     margin-bottom: 6px;
     color: #35473d;
@@ -195,7 +195,7 @@
     font-weight: 700;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .text-danger {
     color: #db4747 !important;
 }
@@ -205,7 +205,7 @@
    INPUTS / TEXTAREA
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .form-control {
     height: 45px;
     padding: 9px 12px;
@@ -221,12 +221,12 @@
         background .18s ease;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .form-control::placeholder {
     color: #9aa69f;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .form-control:focus {
     background: #fff;
     border-color: #1DBF73;
@@ -235,7 +235,7 @@
     outline: 0;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form textarea.form-control {
     min-height: 118px;
     height: auto;
@@ -244,7 +244,7 @@
     resize: vertical;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .form-text {
     margin-top: 6px;
     color: #7b8981 !important;
@@ -257,7 +257,7 @@
    FORM GROUP SPACING
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .form-group {
     margin-bottom: 17px;
 }
@@ -267,7 +267,7 @@
    STAR RATING
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .rating-input {
     min-height: 45px;
     display: flex;
@@ -281,7 +281,7 @@
     border-radius: 9px;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .rating-input label {
     margin: 0 !important;
     color: #d9e0dc;
@@ -293,23 +293,23 @@
         transform .16s ease;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .rating-input label:hover {
     transform: translateY(-1px);
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .rating-input input[type="radio"]:checked ~ label,
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .rating-input label:hover,
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .rating-input label:hover ~ label {
     color: #f5aa16;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .rating-input .rating-radio:focus + label,
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .rating-input .rating-radio:focus-visible + label {
     outline: 2px solid #1DBF73;
     outline-offset: 2px;
@@ -321,7 +321,7 @@
    RECOMMEND CHECKBOX
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .form-check {
     display: inline-flex;
     align-items: center;
@@ -333,7 +333,7 @@
     border-radius: 9px;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .form-check-input {
     position: static;
     width: 17px;
@@ -343,7 +343,7 @@
     cursor: pointer;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .form-check-label {
     margin: 0;
     color: #405148;
@@ -357,7 +357,7 @@
    SUBMIT BUTTON
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form
 button[type="submit"].btn-primary {
     min-width: 175px;
@@ -378,7 +378,7 @@ button[type="submit"].btn-primary {
         transform .18s ease;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form
 button[type="submit"].btn-primary:hover {
     color: #fff;
@@ -389,7 +389,7 @@ button[type="submit"].btn-primary:hover {
     transform: translateY(-1px);
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form
 button[type="submit"].btn-primary:focus {
     outline: none;
@@ -402,7 +402,7 @@ button[type="submit"].btn-primary:focus {
    ALERTS
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #review-form .alert {
     padding: 10px 12px;
     border-radius: 9px;
@@ -414,12 +414,12 @@ button[type="submit"].btn-primary:focus {
    REVIEW LIST
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .reviews-list {
     margin-top: 18px !important;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .reviews-list > h6 {
     margin-bottom: 12px !important;
     color: #26382f;
@@ -432,7 +432,7 @@ button[type="submit"].btn-primary:focus {
    EXISTING REVIEW ITEM
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-item {
     margin-bottom: 10px;
     padding: 14px !important;
@@ -445,7 +445,7 @@ button[type="submit"].btn-primary:focus {
         box-shadow .18s ease;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-item:hover {
     background: #fbfdfc;
     border-color: #d9e7df !important;
@@ -453,38 +453,38 @@ button[type="submit"].btn-primary:focus {
         0 5px 15px rgba(31, 75, 54, .045);
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-avatar img {
     border: 2px solid #dce9e2;
     box-shadow: none;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-author-name {
     color: #24362c;
     font-size: 14px;
     font-weight: 800;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-date {
     color: #87948d !important;
     font-size: 11px;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-text {
     color: #53635a;
     font-size: 13px;
     line-height: 1.65;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-rating i {
     font-size: 13px;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .review-recommend-badge {
     padding: 5px 8px;
     color: #14824e;
@@ -499,7 +499,7 @@ button[type="submit"].btn-primary:focus {
    LOAD MORE
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #load-more-reviews {
     min-height: 40px;
     padding: 8px 15px;
@@ -511,7 +511,7 @@ button[type="submit"].btn-primary:focus {
     font-weight: 700;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 #load-more-reviews:hover {
     color: #fff;
     background: var(--brand);
@@ -523,7 +523,7 @@ button[type="submit"].btn-primary:focus {
    EMPTY STATE
    ===================================================== */
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .reviews-list
 > .text-center.text-muted {
     margin-top: 4px;
@@ -533,7 +533,7 @@ button[type="submit"].btn-primary:focus {
     border-radius: 11px;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .reviews-list
 > .text-center.text-muted
 .fa-comments {
@@ -542,7 +542,7 @@ button[type="submit"].btn-primary:focus {
     font-size: 32px;
 }
 
-.nm-customer-reviews-card
+.bb-customer-reviews-card
 .reviews-list
 > .text-center.text-muted p {
     margin: 0;
@@ -559,20 +559,20 @@ button[type="submit"].btn-primary:focus {
 @media (max-width: 991px) {
 
     #accordion
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .card-link {
         padding: 16px 18px !important;
         font-size: 19px;
     }
 
     #accordion
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     > .collapse
     > .card-body {
         padding: 17px !important;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .review-form-container {
         padding: 17px;
     }
@@ -586,12 +586,12 @@ button[type="submit"].btn-primary:focus {
 @media (max-width: 575px) {
 
     #accordion
-    .nm-customer-reviews-card {
+    .bb-customer-reviews-card {
         border-radius: 13px;
     }
 
     #accordion
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .card-link {
         gap: 8px;
         padding: 14px !important;
@@ -599,7 +599,7 @@ button[type="submit"].btn-primary:focus {
     }
 
     #accordion
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .card-link::before {
         flex-basis: 30px;
         width: 30px;
@@ -609,69 +609,69 @@ button[type="submit"].btn-primary:focus {
     }
 
     #accordion
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     > .collapse
     > .card-body {
         padding: 12px !important;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .review-form-container {
         padding: 14px;
         border-radius: 11px;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .review-form-container > p {
         margin-left: 0;
         font-size: 11px !important;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     #review-form .form-control {
         height: 44px;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     #review-form textarea.form-control {
         min-height: 105px;
         height: auto;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .rating-input {
         min-height: 44px;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .rating-input label {
         font-size: 25px;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     #review-form
     button[type="submit"].btn-primary {
         width: 100%;
         min-width: 0;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .review-item {
         padding: 12px !important;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .review-avatar {
         margin-right: 10px !important;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .review-avatar img {
         width: 40px;
         height: 40px;
     }
 
-    .nm-customer-reviews-card
+    .bb-customer-reviews-card
     .review-content
     > .d-flex {
         flex-direction: column;

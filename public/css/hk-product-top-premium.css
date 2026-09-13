@@ -455,7 +455,7 @@
    DELIVERY CHARGE CARD
    ===================================================== */
 
-.nm-delivery-charge-card {
+.bb-delivery-charge-card {
     margin: 10px 0 14px;
     overflow: hidden;
     background: #fff;
@@ -464,7 +464,7 @@
     box-shadow: 0 8px 24px rgba(25, 76, 52, .07);
 }
 
-.nm-delivery-charge-head {
+.bb-delivery-charge-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -474,14 +474,14 @@
     border-bottom: 1px solid #e1efe7;
 }
 
-.nm-delivery-charge-heading {
+.bb-delivery-charge-heading {
     display: flex;
     align-items: center;
     gap: 10px;
     min-width: 0;
 }
 
-.nm-delivery-charge-icon {
+.bb-delivery-charge-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -493,16 +493,16 @@
     border-radius: 10px;
 }
 
-.nm-delivery-charge-icon svg {
+.bb-delivery-charge-icon svg {
     width: 21px;
     height: 21px;
 }
 
-.nm-delivery-charge-copy {
+.bb-delivery-charge-copy {
     min-width: 0;
 }
 
-.nm-delivery-charge-title {
+.bb-delivery-charge-title {
     display: block;
     color: #17261f;
     font-size: 16px;
@@ -510,7 +510,7 @@
     line-height: 1.3;
 }
 
-.nm-delivery-charge-subtitle {
+.bb-delivery-charge-subtitle {
     display: block;
     margin-top: 2px;
     color: #738078;
@@ -518,7 +518,7 @@
     line-height: 1.4;
 }
 
-.nm-delivery-charge-badge {
+.bb-delivery-charge-badge {
     flex: 0 0 auto;
     padding: 6px 10px;
     color: #13814d;
@@ -530,25 +530,25 @@
     white-space: nowrap;
 }
 
-.nm-delivery-charge-body {
+.bb-delivery-charge-body {
     padding: 14px;
 }
 
-.nm-delivery-charge-grid {
+.bb-delivery-charge-grid {
     display: grid;
     gap: 10px;
 }
 
-.nm-delivery-charge-grid--cols-2 {
+.bb-delivery-charge-grid--cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.nm-delivery-charge-grid--stacked {
+.bb-delivery-charge-grid--stacked {
     grid-template-columns: 1fr;
     gap: 8px;
 }
 
-.nm-delivery-charge-item {
+.bb-delivery-charge-item {
     min-width: 0;
     padding: 13px;
     background: #fbfdfc;
@@ -556,7 +556,7 @@
     border-radius: 11px;
 }
 
-.nm-delivery-charge-grid--stacked .nm-delivery-charge-item {
+.bb-delivery-charge-grid--stacked .bb-delivery-charge-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -564,7 +564,7 @@
     padding: 11px 14px;
 }
 
-.nm-delivery-area-label {
+.bb-delivery-area-label {
     display: block;
     color: #26372e;
     font-size: 12px;
@@ -572,12 +572,12 @@
     line-height: 1.4;
 }
 
-.nm-delivery-charge-grid--stacked .nm-delivery-area-label {
+.bb-delivery-charge-grid--stacked .bb-delivery-area-label {
     font-size: 13px;
     line-height: 1.35;
 }
 
-.nm-delivery-area-note {
+.bb-delivery-area-note {
     display: block;
     margin-top: 2px;
     color: #7a8780;
@@ -585,7 +585,7 @@
     line-height: 1.35;
 }
 
-.nm-delivery-charge-price {
+.bb-delivery-charge-price {
     display: block;
     margin-top: 8px;
     color: var(--brand-dark, #14955a);
@@ -594,14 +594,14 @@
     line-height: 1.15;
 }
 
-.nm-delivery-charge-grid--stacked .nm-delivery-charge-price {
+.bb-delivery-charge-grid--stacked .bb-delivery-charge-price {
     margin-top: 0;
     font-size: 20px;
     white-space: nowrap;
     text-align: right;
 }
 
-.nm-delivery-charge-trust {
+.bb-delivery-charge-trust {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -615,7 +615,7 @@
     line-height: 1.45;
 }
 
-.nm-delivery-charge-check {
+.bb-delivery-charge-check {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -630,24 +630,24 @@
 }
 
 @media (max-width: 575px) {
-    .nm-delivery-charge-head {
+    .bb-delivery-charge-head {
         padding: 12px;
     }
 
-    .nm-delivery-charge-badge {
+    .bb-delivery-charge-badge {
         display: none;
     }
 
-    .nm-delivery-charge-body {
+    .bb-delivery-charge-body {
         padding: 12px;
     }
 
-    .nm-delivery-charge-grid {
+    .bb-delivery-charge-grid {
         grid-template-columns: 1fr !important;
         gap: 8px;
     }
 
-    .nm-delivery-charge-item {
+    .bb-delivery-charge-item {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
@@ -655,11 +655,11 @@
         padding: 11px 12px !important;
     }
 
-    .nm-delivery-area-label {
+    .bb-delivery-area-label {
         font-size: 12px;
     }
 
-    .nm-delivery-charge-price {
+    .bb-delivery-charge-price {
         margin-top: 0 !important;
         text-align: right;
         font-size: 20px;

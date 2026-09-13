@@ -34,12 +34,12 @@
             : null;
 @endphp
 
-<section class="nm-category-hero"
-         aria-labelledby="nm-category-title">
+<section class="bb-category-hero"
+         aria-labelledby="bb-category-title">
 
     <div class="container">
 
-        <nav class="nm-category-breadcrumb"
+        <nav class="bb-category-breadcrumb"
              aria-label="Breadcrumb">
 
             <a href="{{ url('/') }}">
@@ -60,27 +60,27 @@
 
         </nav>
 
-        <div class="nm-category-hero-grid">
+        <div class="bb-category-hero-grid">
 
-            <div class="nm-category-hero-copy">
+            <div class="bb-category-hero-copy">
 
                 @if (!empty($nmConfig['eyebrow']))
-                    <span class="nm-category-eyebrow">
+                    <span class="bb-category-eyebrow">
                         {{ $nmConfig['eyebrow'] }}
                     </span>
                 @endif
 
-                <h1 id="nm-category-title">
+                <h1 id="bb-category-title">
                     {{ $categoryPageTitle ?? $nmPremiumCategory?->name }}
                 </h1>
 
                 @if (!empty($categoryPageIntro))
-                    <p class="nm-category-intro">
+                    <p class="bb-category-intro">
                         {{ $categoryPageIntro }}
                     </p>
                 @endif
 
-                <div class="nm-category-quick-info">
+                <div class="bb-category-quick-info">
 
                     @if ($nmProductTotal !== null)
                         <span>
@@ -101,17 +101,17 @@
 
                 </div>
 
-                <div class="nm-category-actions">
+                <div class="bb-category-actions">
 
-                    <a href="#nm-category-products"
-                       class="nm-category-primary-btn"
-                       onclick="document.getElementById('nm-category-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return false;">
+                    <a href="#bb-category-products"
+                       class="bb-category-primary-btn"
+                       onclick="document.getElementById('bb-category-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return false;">
                         পণ্য দেখুন
                     </a>
 
-                    <a href="#nm-category-buying-guide"
-                       class="nm-category-secondary-btn"
-                       onclick="document.getElementById('nm-category-buying-guide')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return false;">
+                    <a href="#bb-category-buying-guide"
+                       class="bb-category-secondary-btn"
+                       onclick="document.getElementById('bb-category-buying-guide')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return false;">
                         Buying Guide
                     </a>
 
@@ -120,9 +120,9 @@
             </div>
 
             @if (!empty($nmConfig['help_title']) || !empty($nmConfig['help_text']))
-                <aside class="nm-category-help-card">
+                <aside class="bb-category-help-card">
 
-                    <span class="nm-category-help-kicker">
+                    <span class="bb-category-help-kicker">
                         সহজে পণ্য খুঁজুন
                     </span>
 
@@ -149,10 +149,10 @@
 
         @if ($nmChildren->isNotEmpty())
 
-            <div id="nm-category-subcategories"
-                 class="nm-category-subcategories">
+            <div id="bb-category-subcategories"
+                 class="bb-category-subcategories">
 
-                <div class="nm-category-section-heading">
+                <div class="bb-category-section-heading">
 
                     <div>
 
@@ -174,17 +174,17 @@
 
                 </div>
 
-                <div class="nm-category-child-grid">
+                <div class="bb-category-child-grid">
 
                     @foreach ($nmChildren as $nmChild)
 
                         <a
                             href="{{ route('category.show', $nmChild) }}"
-                            class="nm-category-child-card"
+                            class="bb-category-child-card"
                         >
 
                             <span
-                                class="nm-category-child-icon"
+                                class="bb-category-child-icon"
                                 aria-hidden="true"
                             >
                                 {{
@@ -198,7 +198,7 @@
                                 }}
                             </span>
 
-                            <span class="nm-category-child-copy">
+                            <span class="bb-category-child-copy">
 
                                 <strong>
                                     {{ $nmChild->name }}
@@ -216,7 +216,7 @@
                             </span>
 
                             <span
-                                class="nm-category-child-arrow"
+                                class="bb-category-child-arrow"
                                 aria-hidden="true"
                             >
                                 →

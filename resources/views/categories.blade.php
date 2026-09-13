@@ -10,18 +10,18 @@
 @push('styles')
 <style>
 /* Premium categories page styling */
-.nm-categories-page {
+.bb-categories-page {
     padding: 14px 0 38px;
     background:
         radial-gradient(circle at top right, rgba(29,191,115,.09), transparent 28%),
         linear-gradient(180deg, #fbfffc 0%, #ffffff 70%);
 }
 
-.nm-categories-page .products-list__body {
+.bb-categories-page .products-list__body {
     row-gap: 22px;
 }
 
-.nm-categories-page .product-card {
+.bb-categories-page .product-card {
     display: flex;
     height: 100%;
     flex-direction: column;
@@ -33,25 +33,25 @@
     transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
 }
 
-.nm-categories-page .product-card:hover {
+.bb-categories-page .product-card:hover {
     transform: translateY(-5px);
     border-color: #8fddb3;
     box-shadow: 0 15px 29px rgba(22, 58, 39, .15);
 }
 
-.nm-categories-page .product-card__image {
+.bb-categories-page .product-card__image {
     aspect-ratio: 1 / 1;
     overflow: hidden;
     background: linear-gradient(145deg, #f6fdf8, #ecf8f0);
 }
 
-.nm-categories-page .product-card__image > a {
+.bb-categories-page .product-card__image > a {
     display: block;
     width: 100%;
     height: 100%;
 }
 
-.nm-categories-page .product-card__image img {
+.bb-categories-page .product-card__image img {
     display: block;
     width: 100%;
     height: 100%;
@@ -59,11 +59,11 @@
     transition: transform .3s ease;
 }
 
-.nm-categories-page .product-card:hover .product-card__image img {
+.bb-categories-page .product-card:hover .product-card__image img {
     transform: scale(1.055);
 }
 
-.nm-categories-page .product-card__info {
+.bb-categories-page .product-card__info {
     display: flex;
     min-height: 68px;
     align-items: center;
@@ -73,21 +73,21 @@
     background: #ffffff;
 }
 
-.nm-categories-page .product-card__name {
+.bb-categories-page .product-card__name {
     width: 100%;
     text-align: center;
     display: grid;
     place-content: center;
 }
 
-.nm-categories-page .product-card__name h6 {
+.bb-categories-page .product-card__name h6 {
     margin: 0;
     font-size: 16px;
     font-weight: 800;
     line-height: 1.35;
 }
 
-.nm-categories-page .product-card__name a {
+.bb-categories-page .product-card__name a {
     display: -webkit-box;
     overflow: hidden;
     -webkit-box-orient: vertical;
@@ -96,29 +96,29 @@
     text-decoration: none;
 }
 
-.nm-categories-page .product-card:hover .product-card__name a {
+.bb-categories-page .product-card:hover .product-card__name a {
     color: #078b4b;
 }
 
 @media (max-width: 767.98px) {
-    .nm-categories-page {
+    .bb-categories-page {
         padding: 8px 0 24px;
     }
 
-    .nm-categories-page .products-list__body {
+    .bb-categories-page .products-list__body {
         row-gap: 12px;
     }
 
-    .nm-categories-page .product-card {
+    .bb-categories-page .product-card {
         border-radius: 11px;
     }
 
-    .nm-categories-page .product-card__info {
+    .bb-categories-page .product-card__info {
         min-height: 55px;
         padding: 8px 9px;
     }
 
-    .nm-categories-page .product-card__name h6 {
+    .bb-categories-page .product-card__name h6 {
         font-size: 13px;
     }
 }
@@ -133,7 +133,7 @@
     'page_title' => 'All Categories'
 ])
 
-<div class="block block-products-carousel mt-1 nm-categories-page">
+<div class="block block-products-carousel mt-1 bb-categories-page">
     <div class="container">
         <div class="products-view__list products-list" data-layout="grid-5-full" data-with-features="false">
             <div class="products-list__body">

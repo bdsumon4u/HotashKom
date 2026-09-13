@@ -252,40 +252,40 @@
             @endphp
 
             @if ($areaColumns->isNotEmpty())
-                <section class="nm-delivery-charge-card" aria-label="Delivery Charge">
-                    <div class="nm-delivery-charge-head">
-                        <div class="nm-delivery-charge-heading">
-                            <span class="nm-delivery-charge-icon" aria-hidden="true">
+                <section class="bb-delivery-charge-card" aria-label="Delivery Charge">
+                    <div class="bb-delivery-charge-head">
+                        <div class="bb-delivery-charge-heading">
+                            <span class="bb-delivery-charge-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M3 6.5h11v9H3v-9Zm11 3h3.4l2.6 3v3H14v-6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
                                     <circle cx="7" cy="17" r="1.7" stroke="currentColor" stroke-width="1.8"/>
                                     <circle cx="17" cy="17" r="1.7" stroke="currentColor" stroke-width="1.8"/>
                                 </svg>
                             </span>
-                            <span class="nm-delivery-charge-copy">
-                                <strong class="nm-delivery-charge-title">
+                            <span class="bb-delivery-charge-copy">
+                                <strong class="bb-delivery-charge-title">
                                     Delivery Charge
                                 </strong>
                             </span>
                         </div>
                     </div>
 
-                    <div class="nm-delivery-charge-body">
-                        <div class="nm-delivery-charge-grid {{ $isTwoColumns ? 'nm-delivery-charge-grid--cols-2' : 'nm-delivery-charge-grid--stacked' }}">
+                    <div class="bb-delivery-charge-body">
+                        <div class="bb-delivery-charge-grid {{ $isTwoColumns ? 'bb-delivery-charge-grid--cols-2' : 'bb-delivery-charge-grid--stacked' }}">
                             @foreach ($areaColumns as $col)
-                                <div class="nm-delivery-charge-item">
-                                    <span class="nm-delivery-area-label">
+                                <div class="bb-delivery-charge-item">
+                                    <span class="bb-delivery-area-label">
                                         {{ $col['name'] }}
                                     </span>
-                                    <span class="nm-delivery-charge-price">
+                                    <span class="bb-delivery-charge-price">
                                         {!! theMoney($col['cost']) !!}
                                     </span>
                                 </div>
                             @endforeach
                         </div>
 
-                        <div class="nm-delivery-charge-trust">
-                            <span class="nm-delivery-charge-check" aria-hidden="true">
+                        <div class="bb-delivery-charge-trust">
+                            <span class="bb-delivery-charge-check" aria-hidden="true">
                                 ✓
                             </span>
                             <span>

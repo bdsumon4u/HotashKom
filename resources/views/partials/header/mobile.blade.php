@@ -1,4 +1,4 @@
-<style id="nm-ios-safari-logo-fix">@supports (-webkit-touch-callout:none){@media(max-width:375px){.mobile-header__body{min-width:0}.mobile-header__logo{display:flex!important;align-items:center!important;flex:0 0 112px!important;width:112px!important;min-width:112px!important;margin:0 8px!important}.mobile-header__logo img{display:block!important;width:112px!important;max-width:112px!important;height:auto!important;max-height:32px!important}.mobile-header__indicators{flex:0 0 auto!important}}}</style>
+<style id="bb-ios-safari-logo-fix">@supports (-webkit-touch-callout:none){@media(max-width:375px){.mobile-header__body{min-width:0}.mobile-header__logo{display:flex!important;align-items:center!important;flex:0 0 112px!important;width:112px!important;min-width:112px!important;margin:0 8px!important}.mobile-header__logo img{display:block!important;width:112px!important;max-width:112px!important;height:auto!important;max-height:32px!important}.mobile-header__indicators{flex:0 0 auto!important}}}</style>
 <header class="site__header d-lg-none">
     @include('partials.topbar')
     <div class="mobile-header mobile-header--sticky">
