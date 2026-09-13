@@ -619,434 +619,460 @@
     }
 
     /* ===================================================
-       MODERN COMPACT CHECKOUT REDESIGN (EXACT MATCH)
+       ASELLBD STYLE CLEAN CHECKOUT REDESIGN
        =================================================== */
-    .bb-checkout-container {
-        background-color: #f8fafc;
-        padding: 10px 0 24px;
+    .checkout-wrapper {
+        background-color: #f8fafc !important;
+        padding: 16px 0 32px !important;
     }
 
-    .bb-co-card {
+    .checkout-wrapper .container {
+        max-width: 1040px !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .asell-checkout-wrap {
+        width: 100%;
+    }
+
+    .asell-card {
         background: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
-        border-radius: 6px !important;
-        box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.04) !important;
-        padding: 12px 15px !important;
-        margin-bottom: 10px !important;
+        border-radius: 4px !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
     }
 
-    .bb-co-card-header {
-        display: flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        padding-bottom: 8px !important;
-        margin-bottom: 10px !important;
-        border-bottom: 1px solid #f1f5f9 !important;
+    .asell-form-card {
+        padding: 16px 20px !important;
     }
 
-    .bb-co-card-icon {
-        width: 26px !important;
-        height: 26px !important;
-        min-width: 26px !important;
-        border-radius: 50% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 11.5px !important;
+    /* Red Notice Banner */
+    .asell-notice-banner {
+        border: 1px dashed #ef4444 !important;
+        background: #fff5f5 !important;
+        color: #dc2626 !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+        padding: 8px 14px !important;
+        border-radius: 4px !important;
+        margin-bottom: 16px !important;
+        line-height: 1.4 !important;
     }
 
-    .bb-co-card-title {
-        font-size: 14.5px !important;
+    .asell-notice-highlight {
+        color: #b91c1c !important;
         font-weight: 800 !important;
-        color: #0f172a !important;
-        margin: 0 !important;
-        line-height: 1.2 !important;
     }
 
-    .bb-co-form-group {
-        margin-bottom: 9px !important;
+    /* Horizontal Form Rows */
+    .asell-form-row {
+        display: flex !important;
+        align-items: flex-start !important;
+        margin-bottom: 11px !important;
     }
 
-    .bb-co-label {
-        font-size: 12.5px !important;
+    .asell-form-label {
+        width: 135px !important;
+        min-width: 135px !important;
+        font-size: 13.5px !important;
         font-weight: 700 !important;
         color: #1e293b !important;
-        margin-bottom: 3px !important;
-        display: block !important;
+        padding-top: 7px !important;
+        margin-bottom: 0 !important;
     }
 
-    .bb-co-input,
-    .bb-co-textarea {
+    .asell-form-field {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+
+    .asell-input,
+    .asell-textarea,
+    .asell-select {
         background: #ffffff !important;
-        border: 1.5px solid #e2e8f0 !important;
-        border-radius: 5px !important;
-        padding: 6px 11px !important;
-        font-size: 13px !important;
-        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 4px !important;
+        padding: 7px 12px !important;
+        font-size: 13.5px !important;
+        color: #1e293b !important;
         width: 100% !important;
-        min-height: 36px !important;
-        transition: all 0.2s ease !important;
+        min-height: 38px !important;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
         box-sizing: border-box !important;
     }
 
-    .bb-co-textarea {
+    .asell-textarea {
         min-height: 60px !important;
     }
 
-    .bb-co-input:focus,
-    .bb-co-textarea:focus {
-        border-color: var(--brand, #ca3d1c) !important;
-        box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.12) !important;
+    .asell-input:focus,
+    .asell-textarea:focus,
+    .asell-select:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
         outline: none !important;
         background: #ffffff !important;
     }
 
-    .bb-co-phone-group {
+    .asell-phone-group {
         display: flex !important;
         align-items: stretch !important;
     }
 
-    .bb-co-prefix {
+    .asell-prefix {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         background: #f1f5f9 !important;
-        border: 1.5px solid #e2e8f0 !important;
+        border: 1px solid #cbd5e1 !important;
         border-right: none !important;
-        border-radius: 5px 0 0 5px !important;
+        border-radius: 4px 0 0 4px !important;
         padding: 0 10px !important;
         font-weight: 700 !important;
         color: #475569 !important;
-        font-size: 12.5px !important;
+        font-size: 13px !important;
     }
 
-    .bb-co-phone-group .bb-co-input {
-        border-radius: 0 5px 5px 0 !important;
+    .asell-phone-group .asell-input {
+        border-radius: 0 4px 4px 0 !important;
     }
 
-    /* Delivery Area 2-Tile Grid */
-    .bb-co-delivery-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
-    }
-
-    @media (max-width: 575px) {
-        .bb-co-delivery-grid {
-            grid-template-columns: 1fr !important;
-        }
-    }
-
-    .bb-co-delivery-tile {
+    /* Radio Shipping Options */
+    .asell-shipping-options {
         display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 16px !important;
+        padding-top: 7px !important;
+    }
+
+    .asell-radio-label {
+        display: inline-flex !important;
         align-items: center !important;
-        gap: 8px !important;
-        padding: 7px 10px !important;
-        border: 1.5px solid #e2e8f0 !important;
-        border-radius: 5px !important;
-        background: #ffffff !important;
+        gap: 6px !important;
         cursor: pointer !important;
-        margin: 0 !important;
-        transition: all 0.2s ease !important;
+        font-size: 13.5px !important;
+        color: #1e293b !important;
+        font-weight: 600 !important;
+        margin-bottom: 0 !important;
     }
 
-    .bb-co-delivery-tile.is-selected {
-        border-color: #dc2626 !important;
-        background: #ffffff !important;
-        box-shadow: 0 0 0 1px #dc2626 !important;
-    }
-
-    .bb-co-radio-circle {
+    .asell-radio-input {
+        accent-color: #2563eb !important;
         width: 16px !important;
         height: 16px !important;
-        min-width: 16px !important;
-        border-radius: 50% !important;
-        border: 2px solid #cbd5e1 !important;
+        margin: 0 !important;
+        cursor: pointer !important;
+    }
+
+    /* Right Column - Summary Card */
+    .asell-summary-card {
+        padding: 20px 22px !important;
+    }
+
+    .asell-summary-heading {
+        font-size: 22px !important;
+        font-weight: 800 !important;
+        color: #1e293b !important;
+        margin-bottom: 16px !important;
+        letter-spacing: -0.01em !important;
+    }
+
+    /* Coupon Box */
+    .asell-coupon-box {
+        margin-bottom: 16px !important;
+    }
+
+    .asell-coupon-label {
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        color: #475569 !important;
+        margin-bottom: 5px !important;
+        display: block !important;
+    }
+
+    .asell-coupon-input-group {
         display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+        align-items: stretch !important;
+    }
+
+    .asell-coupon-input {
+        border: 1px solid #cbd5e1 !important;
+        border-right: none !important;
+        border-radius: 4px 0 0 4px !important;
+        padding: 7px 12px !important;
+        font-size: 13px !important;
+        flex: 1 1 auto !important;
+        min-height: 38px !important;
+        outline: none !important;
+    }
+
+    .asell-coupon-input:focus {
+        border-color: #3b82f6 !important;
+    }
+
+    .asell-coupon-btn {
+        border: 1px solid #3b82f6 !important;
+        background: #ffffff !important;
+        color: #2563eb !important;
+        font-weight: 700 !important;
+        font-size: 13px !important;
+        padding: 0 18px !important;
+        border-radius: 0 4px 4px 0 !important;
+        cursor: pointer !important;
         transition: all 0.15s ease !important;
     }
 
-    .bb-co-radio-circle.is-checked {
-        border-color: #dc2626 !important;
+    .asell-coupon-btn:hover {
+        background: #2563eb !important;
+        color: #ffffff !important;
     }
 
-    .bb-co-radio-dot {
-        width: 7px !important;
-        height: 7px !important;
-        border-radius: 50% !important;
-        background: #dc2626 !important;
+    /* Summary Lines */
+    .asell-summary-rows {
+        margin-top: 14px !important;
+        border-top: 1px solid #f1f5f9 !important;
+        padding-top: 14px !important;
     }
 
-    .bb-co-tile-icon {
-        width: 26px !important;
-        height: 26px !important;
-        min-width: 26px !important;
-        border-radius: 50% !important;
+    .asell-summary-line {
         display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 11.5px !important;
-        background: #f1f5f9;
-        color: #64748b;
-    }
-
-    .bb-co-delivery-tile.is-selected .bb-co-tile-icon {
-        background: #fef2f2 !important;
-        color: #dc2626 !important;
-    }
-
-    .bb-co-tile-info {
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
-    }
-
-    .bb-co-tile-title {
-        font-size: 12.5px !important;
-        font-weight: 700 !important;
-        color: #0f172a !important;
-        line-height: 1.2 !important;
-    }
-
-    .bb-co-tile-charge {
-        font-size: 11px !important;
-        color: #64748b !important;
-        margin-top: 1px !important;
-    }
-
-    /* Cart Items in Right Card */
-    .bb-co-item-row {
-        display: flex !important;
-        align-items: center !important;
         justify-content: space-between !important;
-        padding: 8px 0 !important;
-        border-bottom: 1px solid #f1f5f9 !important;
-        gap: 8px !important;
+        align-items: center !important;
+        margin-bottom: 10px !important;
+        font-size: 14px !important;
     }
 
-    .bb-co-item-row:last-child {
-        border-bottom: none !important;
-        padding-bottom: 2px !important;
+    .asell-line-label {
+        color: #334155 !important;
+        font-weight: 700 !important;
     }
 
-    .bb-co-item-thumb {
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
-        border-radius: 5px !important;
-        border: 1px solid #e2e8f0 !important;
-        overflow: hidden !important;
-        background: #f8fafc !important;
+    .asell-line-value {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+
+    .asell-total-line {
+        margin-top: 14px !important;
+        padding-top: 12px !important;
+        border-top: 1px solid #f1f5f9 !important;
+        margin-bottom: 14px !important;
+    }
+
+    .asell-total-label {
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+    }
+
+    .asell-total-val {
+        font-size: 17px !important;
+        font-weight: 800 !important;
+        color: #0f172a !important;
+    }
+
+    /* Terms */
+    .asell-terms-wrap {
+        margin-bottom: 16px !important;
+    }
+
+    .asell-terms-label {
+        font-size: 12.5px !important;
+        color: #475569 !important;
         display: flex !important;
         align-items: center !important;
-        justify-content: center !important;
+        gap: 6px !important;
+        cursor: pointer !important;
+        margin-bottom: 0 !important;
     }
 
-    .bb-co-item-thumb img {
+    .asell-terms-cb {
+        accent-color: #2563eb !important;
+        width: 15px !important;
+        height: 15px !important;
+        margin: 0 !important;
+    }
+
+    .asell-terms-link {
+        color: #0284c7 !important;
+        text-decoration: underline !important;
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        font: inherit !important;
+        cursor: pointer !important;
+    }
+
+    /* Confirm Order CTA */
+    .asell-btn-confirm {
         width: 100% !important;
-        height: 100% !important;
-        object-fit: contain !important;
+        background: #2f435a !important;
+        color: #ffffff !important;
+        font-size: 16px !important;
+        font-weight: 800 !important;
+        padding: 12px 16px !important;
+        border-radius: 4px !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: background 0.15s ease, transform 0.1s ease !important;
+        box-shadow: 0 2px 6px rgba(47, 67, 90, 0.25) !important;
+        text-align: center !important;
     }
 
-    .bb-co-item-details {
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
+    .asell-btn-confirm:hover {
+        background: #243447 !important;
+        transform: translateY(-1px) !important;
+        color: #ffffff !important;
     }
 
-    .bb-co-item-name {
-        font-size: 12.5px !important;
+    .asell-trust-badge {
+        text-align: center !important;
+        margin-top: 10px !important;
+        font-size: 12px !important;
+        color: #64748b !important;
+    }
+
+    /* Bottom Section: Product Overview */
+    .asell-product-overview-wrap {
+        margin-top: 20px !important;
+    }
+
+    .asell-overview-heading {
+        font-size: 18px !important;
+        font-weight: 800 !important;
+        color: #1e293b !important;
+        margin-bottom: 10px !important;
+        letter-spacing: -0.01em !important;
+    }
+
+    .asell-overview-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 4px !important;
+        overflow: hidden !important;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    .asell-product-table thead th {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        font-size: 13px !important;
         font-weight: 700 !important;
-        color: #0f172a !important;
-        line-height: 1.25 !important;
-        margin-bottom: 2px !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        border-top: none !important;
+        padding: 10px 14px !important;
+    }
+
+    .asell-product-table tbody td {
+        vertical-align: middle !important;
+        padding: 12px 14px !important;
+        border-top: 1px solid #f1f5f9 !important;
+        font-size: 13.5px !important;
+    }
+
+    .asell-item-img {
+        width: 48px !important;
+        height: 48px !important;
+        object-fit: cover !important;
+        border-radius: 4px !important;
+        border: 1px solid #e2e8f0 !important;
+    }
+
+    .asell-item-title {
+        font-weight: 700 !important;
+        color: #1e293b !important;
+        text-decoration: none !important;
+        font-size: 13.5px !important;
+        line-height: 1.35 !important;
         display: -webkit-box !important;
         -webkit-line-clamp: 2 !important;
         -webkit-box-orient: vertical !important;
         overflow: hidden !important;
-        text-decoration: none !important;
     }
 
-    .bb-co-item-unit-price {
-        font-size: 11.5px !important;
-        color: #64748b !important;
+    .asell-item-title:hover {
+        color: #2563eb !important;
     }
 
-    .bb-co-item-unit-price strong {
-        color: #dc2626 !important;
+    .asell-price-cell {
+        font-weight: 600 !important;
+        color: #334155 !important;
     }
 
-    .bb-co-item-actions {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-end !important;
-        gap: 2px !important;
-        min-width: 70px !important;
-    }
-
-    .bb-co-item-remove {
-        background: none !important;
-        border: none !important;
-        color: #94a3b8 !important;
-        cursor: pointer !important;
-        padding: 0 !important;
-        font-size: 12px !important;
-        line-height: 1 !important;
-        transition: color 0.15s ease !important;
-    }
-
-    .bb-co-item-remove:hover {
-        color: #ef4444 !important;
-    }
-
-    .bb-co-stepper {
+    .asell-stepper {
         display: inline-flex !important;
         align-items: center !important;
         border: 1px solid #cbd5e1 !important;
         border-radius: 4px !important;
         overflow: hidden !important;
-        background: #ffffff !important;
-        height: 24px !important;
     }
 
-    .bb-co-stepper-btn {
-        width: 20px !important;
-        height: 24px !important;
-        border: none !important;
+    .asell-stepper-btn {
         background: #f8fafc !important;
-        color: #475569 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 11.5px !important;
-        font-weight: 700 !important;
-        cursor: pointer !important;
-        transition: background 0.15s ease !important;
-        padding: 0 !important;
-    }
-
-    .bb-co-stepper-btn:hover {
-        background: #e2e8f0 !important;
-        color: #0f172a !important;
-    }
-
-    .bb-co-stepper-val {
-        width: 22px !important;
-        text-align: center !important;
-        font-size: 11.5px !important;
-        font-weight: 700 !important;
-        color: #0f172a !important;
-        line-height: 24px !important;
-    }
-
-    .bb-co-item-total {
-        font-size: 11.5px !important;
-        color: #64748b !important;
-    }
-
-    .bb-co-item-total strong {
-        color: #dc2626 !important;
-        font-size: 11.5px !important;
-    }
-
-    /* Order Summary Card */
-    .bb-co-summary-row {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        font-size: 12.5px !important;
-        margin-bottom: 6px !important;
-        color: #475569 !important;
-    }
-
-    .bb-co-summary-row strong {
-        color: #0f172a !important;
-        font-weight: 700 !important;
-    }
-
-    .bb-co-coupon-group {
-        margin: 8px 0 !important;
-    }
-
-    .bb-co-coupon-input {
-        border-radius: 5px 0 0 5px !important;
-        border: 1.5px solid #cbd5e1 !important;
-        border-right: none !important;
-        padding: 5px 10px !important;
-        font-size: 12px !important;
-        height: 32px !important;
-    }
-
-    .bb-co-coupon-btn {
-        background: #1e293b !important;
-        border: 1.5px solid #1e293b !important;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        border-radius: 0 5px 5px 0 !important;
-        padding: 0 12px !important;
-        font-size: 12px !important;
-        height: 32px !important;
-        transition: background 0.15s ease !important;
-    }
-
-    .bb-co-coupon-btn:hover {
-        background: #0f172a !important;
-    }
-
-    .bb-co-divider {
-        border-top: 1px dashed #cbd5e1 !important;
-        margin: 8px 0 !important;
-    }
-
-    .bb-co-total-row {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        margin: 8px 0 !important;
-    }
-
-    .bb-co-total-label {
-        font-size: 13.5px !important;
-        font-weight: 800 !important;
-        color: #0f172a !important;
-    }
-
-    .bb-co-total-amount {
-        font-size: 18px !important;
-        font-weight: 900 !important;
-        color: #dc2626 !important;
-    }
-
-    .bb-btn-order-confirm {
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
         border: none !important;
-        color: #ffffff !important;
-        font-size: 15px !important;
-        font-weight: 800 !important;
-        height: 42px !important;
-        border-radius: 5px !important;
-        box-shadow: 0 3px 12px rgba(220, 38, 38, 0.3) !important;
-        transition: all 0.2s ease !important;
+        width: 26px !important;
+        height: 26px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        width: 100% !important;
-        letter-spacing: -0.01em !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        color: #334155 !important;
         cursor: pointer !important;
+        padding: 0 !important;
+        transition: background 0.15s ease !important;
     }
 
-    .bb-btn-order-confirm:hover {
-        background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4) !important;
-        color: #ffffff !important;
+    .asell-stepper-btn:hover {
+        background: #e2e8f0 !important;
     }
 
-    .bb-co-trust-footer {
-        font-size: 11px !important;
-        color: #64748b !important;
+    .asell-stepper-val {
+        min-width: 28px !important;
         text-align: center !important;
-        margin-top: 6px !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+    }
+
+    .asell-subtotal-cell strong {
+        color: #0f172a !important;
+        font-weight: 800 !important;
+    }
+
+    .asell-remove-btn {
+        background: none !important;
+        border: none !important;
+        color: #94a3b8 !important;
+        font-size: 15px !important;
+        cursor: pointer !important;
+        padding: 4px 8px !important;
+        transition: color 0.15s ease !important;
+    }
+
+    .asell-remove-btn:hover {
+        color: #ef4444 !important;
+    }
+
+    @media (max-width: 575.98px) {
+        .asell-form-row {
+            display: block !important;
+            margin-bottom: 12px !important;
+        }
+
+        .asell-form-label {
+            display: block !important;
+            width: 100% !important;
+            padding-top: 0 !important;
+            margin-bottom: 4px !important;
+        }
+
+        .asell-form-card,
+        .asell-summary-card {
+            padding: 14px 14px !important;
+        }
     }
 
     .site-footer__widgets {
