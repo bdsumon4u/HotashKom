@@ -552,20 +552,26 @@
     .bb-services-shield-icon {
         color: var(--brand) !important;
         font-size: 16px !important;
+        margin-right: 8px !important;
     }
 
     .bb-services-list {
         display: flex !important;
         flex-direction: column !important;
-        gap: 10px !important;
+        gap: 8px !important;
     }
 
     .bb-service-item {
-        padding: 10px 10px !important;
+        padding: 10px 12px !important;
         border-radius: 6px !important;
         background: #f8fafc !important;
         border: 1px solid #f1f5f9 !important;
+        margin-bottom: 8px !important;
         transition: all 0.2s ease !important;
+    }
+
+    .bb-service-item:last-child {
+        margin-bottom: 0 !important;
     }
 
     .bb-service-item:hover {
@@ -576,9 +582,9 @@
     }
 
     .bb-service-icon-box {
-        width: 36px !important;
-        height: 36px !important;
-        min-width: 36px !important;
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
         border-radius: 6px !important;
         background: rgba(var(--brand-rgb), 0.1) !important;
         color: var(--brand-dark) !important;
@@ -586,6 +592,9 @@
         align-items: center !important;
         justify-content: center !important;
         font-size: 15px !important;
+        margin-right: 12px !important;
+        flex-shrink: 0 !important;
+        margin-top: 1px !important;
     }
 
     .bb-service-icon-box svg {
@@ -1038,5 +1047,9 @@
         color: #64748b !important;
         text-align: center !important;
         margin-top: 6px !important;
+    }
+
+    .site-footer__widgets {
+        padding: 0 !important;
     }
 </style>

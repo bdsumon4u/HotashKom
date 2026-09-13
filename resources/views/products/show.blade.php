@@ -225,8 +225,8 @@
                                 </div>
                             @endif
                             <div class="bb-product-services-card d-none d-md-block">
-                                <div class="bb-services-card-header d-flex align-items-center gap-2">
-                                    <i class="fas fa-shield-halved bb-services-shield-icon"></i>
+                                <div class="bb-services-card-header d-flex align-items-center">
+                                    <i class="fas fa-shield-halved bb-services-shield-icon mr-2"></i>
                                     <span>আমাদের সেবা ও নিশ্চয়তা</span>
                                 </div>
                                 <div class="bb-services-list">
@@ -241,8 +241,8 @@
                                     @endphp
                                     @foreach (config('services.services', []) as $num => $icon)
                                         @if (!empty($services->$num->title))
-                                            <div class="bb-service-item d-flex align-items-start gap-3">
-                                                <div class="bb-service-icon-box">
+                                            <div class="bb-service-item d-flex align-items-start">
+                                                <div class="bb-service-icon-box mr-3">
                                                     @if (!empty($serviceIcons[$num]))
                                                         {!! str_replace('<svg ', '<svg width="20px" height="20px" fill="currentColor" ', $serviceIcons[$num]) !!}
                                                     @else
