@@ -111,7 +111,7 @@
     min-height: 35px;
     padding: 7px 12px;
     border: 1px solid rgba(29,191,115,.21);
-    border-radius: 999px;
+    border-radius: 4px;
     background: rgba(255,255,255,.72);
     color: #53625b;
     font-size: 13px;
@@ -137,7 +137,7 @@
     align-items: center;
     min-height: 46px;
     padding: 11px 20px;
-    border-radius: 9px;
+    border-radius: 5px;
     font-size: 14px;
     font-weight: 750;
     text-decoration: none !important;
@@ -178,7 +178,7 @@
     padding: 25px;
     background: #17231d;
     border: 1px solid rgba(255,255,255,.08);
-    border-radius: 16px;
+    border-radius: 6px;
     box-shadow: 0 20px 45px rgba(20,39,29,.12);
 }
 
@@ -257,7 +257,7 @@
     padding: 15px;
     background: #fff;
     border: 1px solid var(--bb-category-line);
-    border-radius: 11px;
+    border-radius: 4px;
     color: inherit !important;
     text-decoration: none !important;
     box-shadow: 0 4px 14px rgba(35,57,46,.035);
@@ -281,7 +281,7 @@
     width: 38px;
     height: 38px;
     margin-right: 11px;
-    border-radius: 10px;
+    border-radius: 4px;
     background: var(--bb-category-soft);
     color: var(--bb-category-brand-dark);
     font-size: 16px;
@@ -325,7 +325,7 @@
 .bb-category-seo-content {
     margin-top: 34px !important;
     border: 1px solid #e3ebe6 !important;
-    border-radius: 14px !important;
+    border-radius: 6px !important;
     background: #fff;
     box-shadow: 0 8px 32px rgba(28,55,41,.055) !important;
 }
@@ -515,7 +515,7 @@
     margin-top: 48px;
     padding: 38px;
     border: 1px solid #dfeae4;
-    border-radius: 18px;
+    border-radius: 6px;
     background:
         radial-gradient(
             circle at 100% 0,
@@ -577,7 +577,7 @@
     min-width: 0;
     padding: 22px;
     border: 1px solid #e0e9e4;
-    border-radius: 13px;
+    border-radius: 4px;
     background: #fff;
     box-shadow: 0 5px 18px rgba(27,61,43,.035);
     transition:
@@ -599,7 +599,7 @@
     flex: 0 0 38px;
     width: 38px;
     height: 38px;
-    border-radius: 10px;
+    border-radius: 4px;
     background: #eefaf4;
     color: #10985a;
     font-size: 12px;
@@ -637,7 +637,7 @@
     gap: 22px;
     margin-top: 20px;
     padding: 20px 22px;
-    border-radius: 12px;
+    border-radius: 6px;
     background: #19261f;
 }
 
@@ -665,7 +665,7 @@
     justify-content: center;
     min-height: 42px;
     padding: 9px 17px;
-    border-radius: 8px;
+    border-radius: 4px;
     background: var(--brand);
     color: #fff !important;
     font-size: 13px;
@@ -682,7 +682,7 @@
     .bb-premium-faq {
         margin-top: 35px;
         padding: 24px 16px;
-        border-radius: 14px;
+        border-radius: 6px;
     }
 
     .bb-faq-heading {

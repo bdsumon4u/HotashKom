@@ -12,376 +12,310 @@
         </div>
     </div>
     @else
-    <div class="pr-1 col-12 col-md-8">
-        <div class="card mb-lg-0">
-            <div class="p-3 card-body">
-                <div class="mb-2 text-center border text-danger" style="padding: 2px 10px; font-size: 1.25rem;">
-                    নিচের তথ্যগুলো সঠিকভাবে পূরণ করে <strong>কনফার্ম অর্ডার</strong> বাটনে ক্লিক করুন।
-                </div>
-                <div class="form-row">
-                    <div class="m-0 form-group col-md-3">
-                        <label>কাস্টমারের নাম: <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="form-group col-md-9">
-                        <x-input name="name" wire:model="name" place-holder="এখানে কাস্টমারের নাম লিখুন।"
-                            placeholder="Type customer's name here." />
-                        <x-error field="name" />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="m-0 form-group col-md-3">
-                        <label>মোবাইল নম্বর: <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="form-group col-md-9">
-                        <div class="input-group">
-                            @unless (setting('show_option')->hide_phone_prefix ?? false)
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">+880</span>
-                            </div>
-                            @endunless
-                            <x-input type="tel" name="phone" wire:model="phone"
-                                place-holder="কাস্টমারের ফোন নম্বর লিখুন।"
-                                placeholder="Type customer's phone number." />
-                            <x-error field="phone" />
-                        </div>
-                    </div>
-                </div>
-                {{-- Email field is always visible for Google Customer Reviews --}}
-                <div class="form-row">
-                    <div class="m-0 form-group col-md-3">
-                        <label>ইমেইল ঠিকানা <small class="text-muted">(ঐচ্ছিক)</small>:</label>
-                    </div>
-                    <div class="form-group col-md-9">
-                        <x-input type="email" name="email" wire:model="email" place-holder="কাস্টমারের ইমেইল ঠিকানা লিখুন।"
-                            placeholder="Type customer's email address here." />
-                        <x-error field="email" />
-                        <small class="form-text text-muted">ইমেইল দিলে Google থেকে কেনাকাটার অভিজ্ঞতা জানানোর অনুরোধ আসতে পারে।</small>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="m-0 form-group col-md-3">
-                        <label class="d-block"><label>ডেলিভারি এরিয়া: <span class="text-danger">*</span></label>
-                    </div>
-                     <div class="form-group col-md-9">
-                        <div class="form-control @error('shipping') is-invalid @enderror h-auto">
-                            @foreach (app(\App\Services\DeliveryAreaService::class)->getDeliveryAreas() as $index => $area)
-                                <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" wire:model.live="shipping"
-                                        @change="$wire.updateField('shipping', $event.target.value)"
-                                        class="custom-control-input" id="shipping-area-{{ $index }}" name="shipping" value="{{ data_get($area, 'name') }}">
-                                    <label class="custom-control-label" for="shipping-area-{{ $index }}">
-                                        {{ data_get($area, 'name') }}
-                                        @if(cart()->subTotal()) ({{ $isFreeDelivery ? 'FREE' : $this->shippingCost(data_get($area, 'name')) }}
-                                        টাকা) @endif
-                                    </label>
-                                </div>
-                            @endforeach
-                        </div>
-                        <x-error field="shipping" />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="m-0 form-group col-md-3">
-                        <label>কাস্টমারের ঠিকানা: <span class="text-danger">*</span></label>
-                    </div>
-                    <div class="form-group col-md-9">
-                        <x-textarea name="address" wire:model="address"
-                            place-holder="এখানে কাস্টমারের পুরো ঠিকানা লিখুন।"
-                            placeholder="Type customer's address here."></x-textarea>
-                        <x-error field="address" />
-                    </div>
-                </div>
-                @unless (setting('show_option')->hide_checkout_note ?? false)
-                <div class="form-row">
-                    <div class="m-0 form-group col-md-3">
-                        <label>নোট (অপশনাল):</label>
-                    </div>
-                    <div class="form-group col-md-9">
-                        <x-textarea name="note" wire:model="note" placeholder="আপনি চাইলে কোন নোট লিখতে পারেন।">
-                        </x-textarea>
-                        <x-error field="note" />
-                    </div>
-                </div>
-                @endunless
+    {{-- Left Column: Delivery Information Card --}}
+    <div class="col-12 col-lg-7 pr-lg-2">
+        <div class="bb-co-card">
+            <div class="bb-co-card-header">
+                <span class="bb-co-card-icon" style="background: #e0e7ff; color: #4338ca;">
+                    <i class="fas fa-user"></i>
+                </span>
+                <h3 class="bb-co-card-title">ডেলিভারি তথ্য দিন</h3>
+            </div>
 
-                @if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false))
-                <div class="form-row">
-                    <div class="m-0 form-group col-md-3">
-                        <label>জেলা: @if(setting('Pathao')->user_required_city_area ?? false)<span class="text-danger">*</span>@endif</label>
-                    </div>
-                    <div class="form-group col-md-9">
-                        <select class="form-control @error('city_id') is-invalid @enderror" wire:model.live="city_id">
-                            <option value="">জেলা নির্বাচন করুন</option>
-                            @foreach ($pathaoCities as $city)
-                            <option value="{{ $city->city_id }}">{{ $city->city_name }}</option>
-                            @endforeach
-                        </select>
-                        <x-error field="city_id" />
-                    </div>
+            <div class="bb-co-form-group">
+                <label class="bb-co-label">
+                    আপনার নাম <span class="text-danger">*</span>
+                </label>
+                <x-input name="name" wire:model="name" class="bb-co-input"
+                    place-holder="আপনার সম্পূর্ণ নাম লিখুন"
+                    placeholder="আপনার সম্পূর্ণ নাম লিখুন" />
+                <x-error field="name" />
+            </div>
+
+            <div class="bb-co-form-group">
+                <label class="bb-co-label">
+                    আপনার মোবাইল <span class="text-danger">*</span>
+                </label>
+                <div class="bb-co-phone-group @error('phone') is-invalid @enderror">
+                    @unless (setting('show_option')->hide_phone_prefix ?? false)
+                        <span class="bb-co-prefix">+88</span>
+                    @endunless
+                    <x-input type="tel" name="phone" wire:model="phone" class="bb-co-input"
+                        place-holder="আপনার মোবাইল নম্বর"
+                        placeholder="আপনার মোবাইল নম্বর" />
                 </div>
-                <div class="form-row">
-                    <div class="m-0 form-group col-md-3">
-                        <label>এলাকা: @if(setting('Pathao')->user_required_city_area ?? false)<span class="text-danger">*</span>@endif</label>
-                    </div>
-                    <div class="form-group col-md-9">
-                        <div wire:loading.class="d-flex" wire:target="city_id" class="d-none h-100 align-items-center">
-                            এলাকা লোড হচ্ছে...
+                <x-error field="phone" />
+            </div>
+
+            @if (setting('show_option')->email ?? false)
+            <div class="bb-co-form-group">
+                <label class="bb-co-label">
+                    আপনার ইমেইল <small class="text-muted">(ঐচ্ছিক)</small>
+                </label>
+                <x-input type="email" name="email" wire:model="email" class="bb-co-input"
+                    place-holder="আপনার ইমেইল ঠিকানা লিখুন"
+                    placeholder="আপনার ইমেইল ঠিকানা লিখুন" />
+                <x-error field="email" />
+            </div>
+            @endif
+
+            <div class="bb-co-form-group">
+                <label class="bb-co-label">
+                    আপনার ঠিকানা <span class="text-danger">*</span>
+                </label>
+                <x-textarea name="address" wire:model="address" class="bb-co-textarea" rows="2"
+                    place-holder="বিস্তারিত ঠিকানা লিখুন (বাসা, রোড, এরিয়া, ল্যান্ডমার্ক)"
+                    placeholder="বিস্তারিত ঠিকানা লিখুন (বাসা, রোড, এরিয়া, ল্যান্ডমার্ক)"></x-textarea>
+                <x-error field="address" />
+            </div>
+
+            <div class="bb-co-form-group">
+                <label class="bb-co-label">
+                    ডেলিভারি এরিয়া <span class="text-danger">*</span>
+                </label>
+                <div class="bb-co-delivery-grid">
+                    @foreach (app(\App\Services\DeliveryAreaService::class)->getDeliveryAreas() as $index => $area)
+                        @php
+                            $areaName = data_get($area, 'name');
+                            $isSelected = ($shipping === $areaName);
+                            $cost = $isFreeDelivery ? 'FREE' : 'TK ' . $this->shippingCost($areaName);
+                        @endphp
+                        <label class="bb-co-delivery-tile {{ $isSelected ? 'is-selected' : '' }}" style="cursor: pointer;">
+                            <input type="radio" wire:model.live="shipping"
+                                @change="$wire.updateField('shipping', $event.target.value)"
+                                name="shipping" value="{{ $areaName }}" style="display: none;">
+                            <div class="bb-co-radio-circle {{ $isSelected ? 'is-checked' : '' }}">
+                                @if($isSelected)
+                                    <div class="bb-co-radio-dot"></div>
+                                @endif
+                            </div>
+                            <div class="bb-co-tile-icon">
+                                <i class="fas fa-location-dot"></i>
+                            </div>
+                            <div class="bb-co-tile-info">
+                                <div class="bb-co-tile-title">{{ $areaName }}</div>
+                                <div class="bb-co-tile-charge">ডেলিভারি চার্জ: {{ $cost }}</div>
+                            </div>
+                        </label>
+                    @endforeach
+                </div>
+                <x-error field="shipping" />
+            </div>
+
+            @unless (setting('show_option')->hide_checkout_note ?? false)
+            <div class="bb-co-form-group">
+                <label class="bb-co-label">
+                    নোট <small class="text-muted">(অপশনাল)</small>
+                </label>
+                <x-textarea name="note" wire:model="note" class="bb-co-textarea" rows="2"
+                    place-holder="আপনার অর্ডার সম্পর্কে কিছু জানাতে চাইলে লিখুন..."
+                    placeholder="আপনার অর্ডার সম্পর্কে কিছু জানাতে চাইলে লিখুন..."></x-textarea>
+                <x-error field="note" />
+            </div>
+            @endunless
+
+            @if ((setting('Pathao')->enabled ?? false) && (setting('Pathao')->user_selects_city_area ?? false))
+            <div class="bb-co-form-group">
+                <label class="bb-co-label">
+                    জেলা @if(setting('Pathao')->user_required_city_area ?? false)<span class="text-danger">*</span>@endif
+                </label>
+                <select class="bb-co-input @error('city_id') is-invalid @enderror" wire:model.live="city_id">
+                    <option value="">জেলা নির্বাচন করুন</option>
+                    @foreach ($pathaoCities as $city)
+                        <option value="{{ $city->city_id }}">{{ $city->city_name }}</option>
+                    @endforeach
+                </select>
+                <x-error field="city_id" />
+            </div>
+            <div class="bb-co-form-group">
+                <label class="bb-co-label">
+                    এলাকা @if(setting('Pathao')->user_required_city_area ?? false)<span class="text-danger">*</span>@endif
+                </label>
+                <div wire:loading.class="d-flex" wire:target="city_id" class="d-none py-1 align-items-center text-muted" style="font-size: 12px;">
+                    এলাকা লোড হচ্ছে...
+                </div>
+                <select wire:loading.remove wire:target="city_id"
+                    class="bb-co-input @error('area_id') is-invalid @enderror" wire:model.live="area_id">
+                    <option value="">এলাকা নির্বাচন করুন</option>
+                    @foreach ($pathaoAreas as $area)
+                        <option value="{{ $area->zone_id }}">{{ $area->zone_name }}</option>
+                    @endforeach
+                </select>
+                <x-error field="area_id" />
+            </div>
+            @endif
+        </div>
+    </div>
+
+    {{-- Right Column: Your Order & Order Summary Cards --}}
+    <div class="col-12 col-lg-5 pl-lg-2">
+        {{-- Card 1: Your Order --}}
+        <div class="bb-co-card">
+            <div class="bb-co-card-header">
+                <span class="bb-co-card-icon" style="background: #e0f2fe; color: #0284c7;">
+                    <i class="fas fa-bag-shopping"></i>
+                </span>
+                <h3 class="bb-co-card-title">আপনার অর্ডার ({{ cart()->count() }} টি আইটেম)</h3>
+            </div>
+
+            <div class="bb-co-items-list">
+                @forelse (cart()->content() as $product)
+                    <div class="bb-co-item-row" wire:key="cart-item-{{ $product->rowId }}">
+                        <div class="bb-co-item-thumb">
+                            <a href="{{ route('products.show', $product->options->slug) }}" wire:navigate.hover>
+                                <img src="{{ asset($product->options->image) }}" alt="{{ $product->name }}">
+                            </a>
                         </div>
-                        <select wire:loading.remove wire:target="city_id"
-                            class="form-control @error('area_id') is-invalid @enderror" wire:model.live="area_id">
-                            <option value="">এলাকা নির্বাচন করুন</option>
-                            @foreach ($pathaoAreas as $area)
-                            <option value="{{ $area->zone_id }}">{{ $area->zone_name }}</option>
-                            @endforeach
-                        </select>
-                        <x-error field="area_id" />
+                        <div class="bb-co-item-details">
+                            <a href="{{ route('products.show', $product->options->slug) }}" class="bb-co-item-name" wire:navigate.hover>
+                                {{ $product->name }}
+                            </a>
+                            <div class="bb-co-item-unit-price">
+                                মূল্য: <strong>TK {{ number_format($product->price) }}</strong>
+                            </div>
+                        </div>
+                        <div class="bb-co-item-actions">
+                            <button type="button" class="bb-co-item-remove" wire:click="remove('{{ $product->rowId }}')" title="মুছে ফেলুন">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <div class="bb-co-stepper">
+                                <button type="button" class="bb-co-stepper-btn" wire:click="decreaseQuantity('{{ $product->rowId }}')">-</button>
+                                <span class="bb-co-stepper-val">{{ $product->qty }}</span>
+                                <button type="button" class="bb-co-stepper-btn" wire:click="increaseQuantity('{{ $product->rowId }}')">+</button>
+                            </div>
+                            <div class="bb-co-item-total">
+                                মোট: <strong>TK {{ number_format($product->price * $product->qty) }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="py-3 text-center text-muted" style="font-size: 12.5px;">
+                        <i class="fas fa-cart-shopping fa-2x mb-1 d-block text-muted"></i>
+                        কার্টে কোনো পণ্য নেই
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        {{-- Card 2: Order Summary --}}
+        <div class="bb-co-card">
+            <div class="bb-co-card-header">
+                <span class="bb-co-card-icon" style="background: #dcfce7; color: #16a34a;">
+                    <i class="fas fa-receipt"></i>
+                </span>
+                <h3 class="bb-co-card-title">অর্ডার সামারি</h3>
+            </div>
+
+            <div class="bb-co-summary-row">
+                <span>সাবটোটাল ({{ cart()->count() }} আইটেম)</span>
+                <strong>{!! theMoney(cart()->subTotal()) !!}</strong>
+            </div>
+
+            @if (isOninda())
+                <div class="bb-co-summary-row">
+                    <span>Selling Subtotal</span>
+                    <strong x-text="format(subtotal)"></strong>
+                </div>
+            @endif
+
+            <div class="bb-co-summary-row">
+                <span>ডেলিভারি চার্জ</span>
+                <strong>
+                    @if ($shipping && ($fee = cart()->getCost('deliveryFee')))
+                        {!! theMoney($fee) !!}
+                    @elseif ($isFreeDelivery)
+                        <span class="text-success">FREE</span>
+                    @else
+                        TK 0
+                    @endif
+                </strong>
+            </div>
+
+            @if (isOninda())
+                @if(config('app.resell'))
+                    <div class="bb-co-summary-row">
+                        <span>Packaging Charge</span>
+                        <strong>{!! theMoney($packagingCharge) !!}</strong>
+                    </div>
+                @endif
+                <div class="bb-co-summary-row">
+                    <span>Your Delivery Charge</span>
+                    <input type="text" @focus="$event.target.select()" step="10"
+                        class="form-control form-control-sm text-right" style="width: 100px;"
+                        x-model="retail_delivery"
+                        wire:model.live="retailDeliveryFee" />
+                </div>
+                <div class="bb-co-summary-row">
+                    <span>Advanced</span>
+                    <input type="text" @focus="$event.target.select()" step="10"
+                        class="form-control form-control-sm text-right" style="width: 100px;"
+                        x-model="advanced"
+                        wire:model.live="advanced" />
+                </div>
+                <div class="bb-co-summary-row">
+                    <span>Discount (TK)</span>
+                    <input type="text" @focus="$event.target.select()" x-model="retailDiscount" step="10"
+                        min="0" class="form-control form-control-sm text-right" style="width: 100px;"
+                        wire:model.live="retailDiscount" />
+                </div>
+            @endif
+
+            @if($applied_coupon)
+                <div class="bb-co-summary-row text-success">
+                    <span>Coupon Discount</span>
+                    <strong>-{!! theMoney($coupon_discount) !!}</strong>
+                </div>
+            @endif
+
+            {{-- Coupon Input --}}
+            <div class="bb-co-coupon-group">
+                <div class="input-group">
+                    <input type="text" wire:model.live="coupon_code" wire:change="applyCoupon"
+                        class="form-control bb-co-coupon-input @error('coupon_code') is-invalid @enderror"
+                        placeholder="কুপন কোড লিখুন" />
+                    <div class="input-group-append">
+                        <button type="button" wire:click="applyCoupon" wire:loading.attr="disabled"
+                            class="btn bb-co-coupon-btn">প্রয়োগ</button>
                     </div>
                 </div>
+                <x-error field="coupon_code" />
+                @if($applied_coupon)
+                    <div class="mt-1 d-flex align-items-center justify-content-between text-success" style="font-size: 11.5px; font-weight: 700;">
+                        <span><i class="fas fa-tag mr-1"></i> "{{ $applied_coupon->name }}" প্রয়োগ করা হয়েছে</span>
+                        <button type="button" wire:click="removeCoupon" class="p-0 btn btn-link text-danger" style="font-size: 11.5px; text-decoration: none;">মুছুন</button>
+                    </div>
                 @endif
             </div>
-            <div class="card-divider d-md-none"></div>
-            <div class="card-body d-md-none">
-                <h3 class="mb-0 card-title">Your Order</h3>
-                <div class="ordered-products"></div>
-                <div class="mb-3">
-                    <label class="d-block">Coupon Code</label>
-                    <div class="input-group">
-                        <input type="text" wire:model.live="coupon_code" wire:change="applyCoupon"
-                            class="form-control @error('coupon_code') is-invalid @enderror"
-                            placeholder="Enter coupon code" />
-                        <div class="input-group-append">
-                            <button type="button" wire:click="applyCoupon" wire:loading.attr="disabled"
-                                class="btn btn-outline-primary">Apply</button>
-                        </div>
-                    </div>
-                    <x-error field="coupon_code" />
-                    @if($applied_coupon)
-                        <div class="mt-1 text-success">
-                            Coupon "{{ $applied_coupon->name }}" applied. Discount: {!! theMoney($coupon_discount) !!}
-                            <button type="button" wire:click="removeCoupon" class="p-0 btn btn-link btn-sm text-danger">Remove</button>
-                        </div>
-                    @endif
-                </div>
-                <table class="checkout__totals">
-                    <tbody class="checkout__totals-subtotals">
-                        <tr>
-                            <th>Buying Subtotal</th>
-                            <td class="checkout-subtotal">{!! theMoney(cart()->subTotal()) !!}</td>
-                        </tr>
-                        @if (isOninda())
-                        <tr>
-                            <th>Selling Subtotal</th>
-                            <td x-text="format(subtotal)"></td>
-                        </tr>
-                        @endif
-                        @if ($shipping && ($fee = cart()->getCost('deliveryFee')))
-                        <tr>
-                            <th style="white-space:nowrap;">Our Delivery Charge</th>
-                            <td class="shipping">{!! theMoney($fee) !!}</td>
-                        </tr>
-                        @endif
-                        @if (isOninda())
-                        @if(config('app.resell'))
-                        <tr>
-                            <th style="white-space:nowrap;">Packaging Charge</th>
-                            <td>{!! theMoney($packagingCharge) !!}</td>
-                        </tr>
-                        @endif
-                        <tr>
-                            <th style="white-space:nowrap;">Your Delivery Charge</th>
-                            <td>
-                                <input type="text" @focus="$event.target.select()" step="10"
-                                    class="form-control form-control-sm"
-                                    x-model="retail_delivery"
-                                    wire:model.live="retailDeliveryFee" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Advanced</th>
-                            <td>
-                                <input type="text" @focus="$event.target.select()" step="10"
-                                    class="form-control form-control-sm"
-                                    x-model="advanced"
-                                    wire:model.live="advanced" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Discount (TK)</th>
-                            <td>
-                                <input type="text" @focus="$event.target.select()" x-model="retailDiscount" step="10"
-                                    min="0" class="form-control form-control-sm"
-                                    wire:model.live="retailDiscount" />
-                                <x-error field="retailDiscount" />
-                            </td>
-                        </tr>
-                        @endif
-                        @if($applied_coupon)
-                        <tr>
-                            <th>Coupon Discount</th>
-                            <td class="text-success">{!! theMoney($coupon_discount) !!}</td>
-                        </tr>
-                        @endif
-                    </tbody>
-                    <tfoot class="checkout__totals-footer">
-                        <tr>
-                            <th>Buying</th>
-                            <td>{!! theMoney(max(cart()->total() - $coupon_discount, 0) + (isOninda() && config('app.resell') ? $packagingCharge : 0)) !!}</td>
-                        </tr>
-                        @if (isOninda())
-                        <tr>
-                            <th>Selling</th>
-                            <td
-                                x-text="format(subtotal + Number(retail_delivery) - Number(advanced) - Number(retailDiscount))">
-                            </td>
-                        </tr>
-                        @endif
-                    </tfoot>
-                </table>
-                <div class="checkout__agree form-group">
-                    <div class="form-check">
-                        <span class="form-check-input input-check">
-                            <span class="input-check__body">
-                                <input class="input-check__input" type="checkbox" id="checkout-terms-mobile" checked>
-                                <span class="input-check__box"></span>
-                                <svg class="input-check__icon" width="9px" height="7px" viewBox="0 0 9 7"><path d="M9.002 1.396L3.461 7.002-.002 3.498l1.385-1.402 2.078 2.103L7.617-.006l1.385 1.402z"/></svg>
-                            </span>
-                        </span>
-                        <label class="form-check-label" for="checkout-terms-mobile">I agree to the </label> <button type="button" class="terms-new-tab text-info" aria-label="Open Terms and Conditions in a new tab" style="padding:0;border:0;background:transparent;text-decoration:underline;cursor:pointer;font:inherit;" onclick="event.preventDefault(); event.stopPropagation(); var termsWindow=window.open(`{{ url('/terms-and-conditions') }}`, `_blank`); if(termsWindow){termsWindow.opener=null;} return false;">terms and conditions</button>*
-                    </div>
-                </div>
-                <button type="button" wire:click="checkout" wire:loading.attr="disabled"
-                    class="text-white btn btn-primary btn-xl btn-block">{{ setting('show_option')->checkout_button_text ?? 'কনফার্ম অর্ডার' }}</button>
+
+            <div class="bb-co-divider"></div>
+
+            <div class="bb-co-total-row">
+                <span class="bb-co-total-label">মোট পরিশোধযোগ্য</span>
+                <span class="bb-co-total-amount">{!! theMoney(max(cart()->total() - $coupon_discount, 0) + (isOninda() && config('app.resell') ? $packagingCharge : 0)) !!}</span>
             </div>
-        </div>
-    </div>
-    <div class="pl-1 mt-4 d-none d-md-block col-12 col-md-4 mt-lg-0">
-        <div class="mb-0 card">
-            <div class="card-body">
-                <h3 class="card-title">Your Order</h3>
-                <div class="ordered-products"></div>
-                <div class="mb-3">
-                    <label class="d-block">Coupon Code</label>
-                    <div class="input-group">
-                        <input type="text" wire:model.live="coupon_code" wire:change="applyCoupon"
-                            class="form-control @error('coupon_code') is-invalid @enderror"
-                            placeholder="Enter coupon code" />
-                        <div class="input-group-append">
-                            <button type="button" wire:click="applyCoupon" wire:loading.attr="disabled"
-                                class="btn btn-outline-primary">Apply</button>
-                        </div>
-                    </div>
-                    <x-error field="coupon_code" />
-                    @if($applied_coupon)
-                        <div class="mt-1 text-success">
-                            Coupon "{{ $applied_coupon->name }}" applied. Discount: {!! theMoney($coupon_discount) !!}
-                            <button type="button" wire:click="removeCoupon" class="p-0 btn btn-link btn-sm text-danger">Remove</button>
-                        </div>
-                    @endif
+
+            @if (isOninda())
+                <div class="bb-co-summary-row">
+                    <span class="bb-co-total-label">Selling Total</span>
+                    <span class="bb-co-total-amount" style="font-size: 17px;"
+                        x-text="format(subtotal + Number(retail_delivery) - Number(advanced) - Number(retailDiscount))"></span>
                 </div>
-                <table class="checkout__totals">
-                    <tbody class="checkout__totals-subtotals">
-                        <tr>
-                            <th style="white-space:nowrap;font-size:14px;">Buying Subtotal</th>
-                            <td style="white-space:nowrap;" class="checkout-subtotal desktop">{!!
-                                theMoney(cart()->subTotal()) !!}</td>
-                        </tr>
-                        @if (isOninda())
-                        <tr>
-                            <th style="white-space:nowrap;font-size:14px;">Selling Subtotal</th>
-                            <td x-text="format(subtotal)"></td>
-                        </tr>
-                        @endif
-                        @if ($shipping && ($fee = cart()->getCost('deliveryFee')))
-                        <tr>
-                            <th style="white-space:nowrap;font-size:14px;">Our Delivery Charge</th>
-                            <td class="shipping">{!! theMoney($fee) !!}</td>
-                        </tr>
-                        @endif
-                        @if (isOninda())
-                        @if(config('app.resell'))
-                        <tr>
-                            <th style="white-space:nowrap;font-size:14px;">Packaging Charge</th>
-                            <td>{!! theMoney($packagingCharge) !!}</td>
-                        </tr>
-                        @endif
-                        <tr>
-                            <th style="white-space:nowrap;font-size:14px;">Your Delivery Charge</th>
-                            <td>
-                                <input type="text" @focus="$event.target.select()" step="10"
-                                    class="form-control form-control-sm"
-                                    x-model="retail_delivery"
-                                    wire:model.live="retailDeliveryFee" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style="font-size:14px;">Advanced</th>
-                            <td>
-                                <input type="text" @focus="$event.target.select()" step="10"
-                                    class="form-control form-control-sm"
-                                    x-model="advanced"
-                                    wire:model.live="advanced" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style="font-size:14px;">Discount (TK)</th>
-                            <td>
-                                <input type="text" @focus="$event.target.select()" x-model="retailDiscount" step="10"
-                                    min="0" class="form-control form-control-sm"
-                                    wire:model.live="retailDiscount" />
-                                <x-error field="retailDiscount" />
-                            </td>
-                        </tr>
-                        @endif
-                        @if($applied_coupon)
-                        <tr>
-                            <th style="font-size:14px;">Coupon Discount</th>
-                            <td class="text-success">{!! theMoney($coupon_discount) !!}</td>
-                        </tr>
-                        @endif
-                    </tbody>
-                    <tfoot class="checkout__totals-footer">
-                        <tr>
-                            <th style="white-space:nowrap;font-size:18px;">Buying Total</th>
-                            <td style="font-size:14px;">
-                                <span>{!! theMoney(max(cart()->total() - $coupon_discount, 0) + (isOninda() && config('app.resell') ? $packagingCharge : 0)) !!}</span>
-                            </td>
-                        </tr>
-                        @if (isOninda())
-                        <tr>
-                            <th style="white-space:nowrap;font-size:18px;">Selling Total</th>
-                            <td style="font-size:14px;">
-                                <span
-                                    x-text="format(subtotal + Number(retail_delivery) - Number(advanced) - Number(retailDiscount))"></span>
-                            </td>
-                        </tr>
-                        @endif
-                    </tfoot>
-                </table>
-                <div class="d-none d-md-block">
-                    <div class="checkout__agree form-group">
-                        <div class="form-check">
-                            <span class="form-check-input input-check">
-                                <span class="input-check__body">
-                                    <input class="input-check__input" type="checkbox" id="checkout-terms-desktop"
-                                        checked>
-                                    <span class="input-check__box"></span>
-                                    <svg class="input-check__icon" width="9px" height="7px" viewBox="0 0 9 7"><path d="M9.002 1.396L3.461 7.002-.002 3.498l1.385-1.402 2.078 2.103L7.617-.006l1.385 1.402z"/></svg>
-                                </span>
-                            </span>
-                            <label class="form-check-label" for="checkout-terms-desktop">I agree to the </label> <button type="button" class="terms-new-tab text-info" aria-label="Open Terms and Conditions in a new tab" style="padding:0;border:0;background:transparent;text-decoration:underline;cursor:pointer;font:inherit;" onclick="event.preventDefault(); event.stopPropagation(); var termsWindow=window.open(`{{ url('/terms-and-conditions') }}`, `_blank`); if(termsWindow){termsWindow.opener=null;} return false;">terms and conditions</button>*
-                        </div>
-                    </div>
-                    <button type="button" wire:click="checkout" wire:loading.attr="disabled"
-                        class="text-white btn btn-primary btn-xl btn-block">{{ setting('show_option')->checkout_button_text ?? 'কনফার্ম অর্ডার' }}</button>
-                </div>
+            @endif
+
+            <div class="mb-2 d-flex align-items-center" style="font-size: 12px; color: #64748b;">
+                <input type="checkbox" id="checkout-terms-cb" checked class="mr-2" style="width: 15px; height: 15px; accent-color: #dc2626;">
+                <label for="checkout-terms-cb" class="mb-0" style="cursor: pointer;">
+                    আমি <button type="button" class="terms-new-tab text-danger font-weight-bold" aria-label="Open Terms and Conditions in a new tab" style="padding:0;border:0;background:transparent;text-decoration:underline;cursor:pointer;font:inherit;" onclick="event.preventDefault(); event.stopPropagation(); var termsWindow=window.open(`{{ url('/terms-and-conditions') }}`, `_blank`); if(termsWindow){termsWindow.opener=null;} return false;">শর্তাবলী ও নিয়ামাবলীতে</button> সম্মত আছি।
+                </label>
             </div>
-        </div>
-    </div>
-    <div class="col-12">
-        <div class="card">
-            <div class="p-1 card-body">
-                <h4 class="p-2">Product Overview</h4>
-                @include('partials.cart-table')
+
+            <button type="button" place-order wire:click="checkout" wire:loading.attr="disabled"
+                class="bb-btn-order-confirm">
+                <i class="fas fa-lock mr-2"></i> {{ setting('show_option')->checkout_button_text ?? 'অর্ডার কনফার্ম করুন' }}
+            </button>
+
+            <div class="bb-co-trust-footer">
+                <i class="fas fa-shield-check text-success mr-1"></i> আপনার তথ্য ১০০% নিরাপদ এবং গোপন রাখা হবে
             </div>
         </div>
     </div>
@@ -412,3 +346,4 @@
     })();
 </script>
 @endscript
+

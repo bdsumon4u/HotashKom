@@ -1,57 +1,74 @@
-<div class="product-card" data-id="{{ $product->id }}"
+<div class="product-card bb-modern-card" data-id="{{ $product->id }}"
     data-max="{{ $product->should_track ? $product->stock_count : -1 }}">
-    @if ($is_free_delivery)
-        <div class="product-card__ribbon">
-            <span class="badge badge--free-delivery">Free Delivery</span>
-        </div>
-    @endif
+    
     @php
         $in_stock = !$product->should_track || $product->stock_count > 0;
+        $has_discount = $product->price && $product->selling_price && $product->price > $product->selling_price;
+        $discount_percentage = $has_discount ? round((($product->price - $product->selling_price) / $product->price) * 100) : 0;
     @endphp
-    <div class="product-card__badges-list">
-        @if (!$in_stock)
-            <div class="product-card__badge product-card__badge--sale">Sold</div>
-        @endif
 
-    </div>
-    <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
-    <a href="{{ route('products.show', $product) }}"
-       
-        style="display: block; width: 100%; height: 100%;">
-
-        @php
-            $productImageSrc = optional($product->base_image)->src;
-            $productImageAlt = optional($product->base_image)->alt_text
-                ?: $product->name;
-        @endphp
-
-        <img
-            src="{{ cdn($productImageSrc, 320, 320) }}"
-            srcset="
-                {{ cdn($productImageSrc, 320, 320) }} 320w,
-                {{ cdn($productImageSrc, 480, 480) }} 480w
-            "
-            sizes="
-                (max-width: 575px) 50vw,
-                (max-width: 991px) 33vw,
-                (max-width: 1199px) 25vw,
-                220px
-            "
-            alt="{{ $productImageAlt }}"
-            width="480"
-            height="480"
-            loading="lazy"
-            decoding="async"
-            style="width: 100%; height: 100%; object-fit: contain; background: #fff;"
-        >
-    </a>
-</div>        
-
-    <div class="product-card__info">
-        <div class="product-card__name">
-            <a href="{{ route('products.show', $product) }}"
-                data-name="{{ $product->var_name }}">{{ $product->name }}</a>
+    <!-- Card Top Badges -->
+    <div class="bb-card-badges d-flex justify-content-between align-items-center w-100 position-absolute" style="top: 14px; left: 0; padding: 0 14px; z-index: 5; pointer-events: none;">
+        <div>
+            @if (!$in_stock)
+                <span class="badge badge-danger px-2 py-1 font-weight-bold" style="border-radius: 3px; font-size: 10px; text-transform: uppercase;">Sold Out</span>
+            @elseif ($has_discount)
+                <span class="badge text-white font-weight-bold" style="background: #ef4444; border-radius: 3px; padding: 3px 6px; font-size: 11px; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);">
+                    -{{ $discount_percentage }}%
+                </span>
+            @endif
         </div>
+
+        <div>
+            @if ($is_free_delivery)
+                <span class="badge text-dark font-weight-bold d-flex align-items-center gap-1" style="background: #ecfdf5; color: #059669 !important; border: 1px solid #a7f3d0; border-radius: 3px; padding: 3px 6px; font-size: 10px;">
+                    <i class="fas fa-truck-fast"></i> Free
+                </span>
+            @endif
+        </div>
+    </div>
+
+    <!-- Image Container with soft backdrop and rounded inner frame -->
+    <div class="product-card__image bb-card-img-shell" style="aspect-ratio: 1 / 1; overflow: hidden; position: relative; margin: 8px 8px 0; border-radius: 4px; background: #f8fafc;">
+        <a href="{{ route('products.show', $product) }}"
+            style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 10px;" wire:navigate.hover>
+            @php
+                $productImageSrc = optional($product->base_image)->src;
+                $productImageAlt = optional($product->base_image)->alt_text ?: $product->name;
+            @endphp
+            <img
+                src="{{ cdn($productImageSrc, 320, 320) }}"
+                srcset="
+                    {{ cdn($productImageSrc, 320, 320) }} 320w,
+                    {{ cdn($productImageSrc, 480, 480) }} 480w
+                "
+                sizes="
+                    (max-width: 575px) 50vw,
+                    (max-width: 991px) 33vw,
+                    (max-width: 1199px) 25vw,
+                    220px
+                "
+                alt="{{ $productImageAlt }}"
+                width="480"
+                height="480"
+                loading="lazy"
+                decoding="async"
+                class="bb-product-img"
+                style="max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s ease;"
+            >
+        </a>
+    </div>        
+
+    <!-- Product Details -->
+    <div class="product-card__info" style="display: flex; flex-direction: column; padding: 8px 10px 0; flex: 0 0 auto;">
+        <!-- Product Name -->
+        <div class="product-card__name" style="flex: 0 0 auto; min-height: auto; margin-bottom: 2px !important;">
+            <a href="{{ route('products.show', $product) }}"
+                data-name="{{ $product->var_name }}" class="bb-product-title font-weight-bold" style="font-size: 13.5px; line-height: 1.35; color: #1e293b; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-decoration: none; min-height: auto;" wire:navigate.hover>
+                {{ $product->name }}
+            </a>
+        </div>
+
         @php
             // Use loaded reviews if available to avoid N+1 queries
             $approvedReviews = $product->relationLoaded('reviews') ? $product->reviews : collect();
@@ -69,34 +86,24 @@
             }
         @endphp
         @if ($averageRating > 0)
-            <div class="gap-2 d-flex align-items-center" style="font-size: 0.875rem;">
-                <div class="d-flex align-items-center" style="margin-top: -1px;">
+            <div class="gap-1 mb-1 d-flex align-items-center" style="font-size: 11px;">
+                <div class="d-flex align-items-center text-warning" style="font-size: 10px;">
                     @for ($i = 1; $i <= 5; $i++)
                         @if ($i <= floor($averageRating))
-                            <i class="fa fa-star text-warning" style="font-size: 0.75rem;"></i>
+                            <i class="fa fa-star"></i>
                         @elseif($i - 0.5 <= $averageRating)
-                            <i class="fa fa-star-half-alt text-warning" style="font-size: 0.75rem;"></i>
+                            <i class="fa fa-star-half-alt"></i>
                         @else
-                            <i class="far fa-star text-muted" style="font-size: 0.75rem;"></i>
+                            <i class="far fa-star text-muted"></i>
                         @endif
                     @endfor
                 </div>
-                <span class="text-muted small" style="margin-top: 1px;">
-                    <strong>{{ number_format($averageRating, 1) }}</strong>
-                    ({{ $totalReviews }} {{ Str::plural('review', $totalReviews) }})
+                <span class="text-muted ml-1 font-weight-bold">
+                    {{ number_format($averageRating, 1) }}
                 </span>
             </div>
         @endif
-    </div>
-    <div class="product-card__actions">
-        <div class="product-card__availability">Availability:
-            @if (!$product->should_track)
-                <span class="text-success">In Stock</span>
-            @else
-                <span class="text-{{ $product->stock_count ? 'success' : 'danger' }}">{{ $product->stock_count }} In
-                    Stock</span>
-            @endif
-        </div>
+
         @php
             $show_option = setting('show_option');
             $guest_can_see_price = (bool) ($show_option->guest_can_see_price ?? false);
@@ -105,71 +112,85 @@
                 !$guest_can_see_price &&
                 (auth('user')->guest() || (auth('user')->check() && !auth('user')->user()->is_verified));
         @endphp
-        <div class="product-card__prices {{ $product->selling_price == $product->price ? '' : 'has-special' }}" style="font-size: 13px; font-weight: normal; line-height: 1.5; margin-top: 4px;">
+
+        <!-- Prices Row Container -->
+        <div class="product-card__prices" style="margin-top: 2px !important; margin-bottom: 8px !important; padding: 0 !important; flex: 0 0 auto;">
             @if (isOninda() && (app()->bound('app.resell') ? app('app.resell') : config('app.resell')))
-                <div class="product-card__retail-price" style="margin-bottom: 2px;">
-                    <span style="color: #6b7280; font-weight: 500;">Retail price:</span>
-                    <span style="font-weight: 700; color: #111827;">{!! theMoney($product->retailPrice()) !!}</span>
+                <div class="product-card__retail-price mb-1 d-flex justify-content-between align-items-center" style="font-size: 12px;">
+                    <span style="color: #64748b; font-weight: 500;">Retail:</span>
+                    <strong style="color: #0f172a;">{!! theMoney($product->retailPrice()) !!}</strong>
                 </div>
-                <div class="product-card__wholesale-price">
+                <div class="product-card__wholesale-price d-flex align-items-baseline justify-content-between" style="font-size: 12px;">
                     @if (auth('user')->guest())
-                        <span style="color: #6b7280; font-weight: 500;">Wholesale price:</span>
-                        <a href="{{ Route::has('auth.login') ? route('auth.login') : route('user.login') }}" style="color: #2563eb; font-weight: 700; text-decoration: none; border-bottom: 1px dashed #2563eb; padding-bottom: 1px;">Login</a>
+                        <span style="color: #64748b; font-weight: 500;">Wholesale:</span>
+                        <a href="{{ Route::has('auth.login') ? route('auth.login') : route('user.login') }}" style="color: #2563eb; font-weight: 700; text-decoration: none;">Login</a>
                     @elseif ($should_hide_price)
-                        <span class="product-card__new-price text-danger" style="font-weight: 700; font-size: 12px;">
-                            Verify account to see price
-                        </span>
+                        <span class="text-danger font-weight-bold">Verify account</span>
                     @elseif ($product->selling_price == $product->price)
-                        <span style="font-weight: 700; color: #111827;">{!! $product->price ? theMoney($product->price) : 'Contact for price' !!}</span>
+                        <span class="font-weight-bold" style="color: var(--brand-dark); font-size: 15px;">{!! $product->price ? theMoney($product->price) : 'Contact' !!}</span>
                     @else
-                        <span class="product-card__new-price" style="font-weight: 700;">{!! theMoney($product->selling_price) !!}</span>
-                        <span class="product-card__old-price" style="margin-left: 4px;">{!! theMoney($product->price) !!}</span>
+                        <span class="font-weight-bold" style="color: var(--brand-dark); font-size: 15px;">{!! theMoney($product->selling_price) !!}</span>
+                        <span class="text-muted" style="text-decoration: line-through; font-size: 12px;">{!! theMoney($product->price) !!}</span>
                     @endif
                 </div>
             @else
                 @if ($should_hide_price)
-                    <span class="product-card__new-price text-danger">
-                        {{ auth('user')->guest() ? 'Login to see price' : 'Verify account to see price' }}
+                    <span class="text-danger font-weight-bold" style="font-size: 12px;">
+                        {{ auth('user')->guest() ? 'Login to see price' : 'Verify account' }}
                     </span>
                 @elseif ($product->selling_price == $product->price)
-                    {!! $product->price ? theMoney($product->price) : 'Contact for price' !!}
+                    <div class="d-flex align-items-baseline">
+                        <span class="product-card__new-price font-weight-bold" style="color: var(--brand-dark); font-size: 16px;">
+                            {!! $product->price ? theMoney($product->price) : 'Contact for price' !!}
+                        </span>
+                    </div>
                 @else
-                    <span class="product-card__new-price">{!! theMoney($product->selling_price) !!}</span>
-                    <span class="product-card__old-price">{!! theMoney($product->price) !!}</span>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="product-card__new-price font-weight-bold" style="color: var(--brand-dark); font-size: 16px;">
+                            {!! theMoney($product->selling_price) !!}
+                        </span>
+                        <span class="product-card__old-price" style="color: #94a3b8; text-decoration: line-through; font-size: 13px;">
+                            {!! theMoney($product->price) !!}
+                        </span>
+                    </div>
                 @endif
             @endif
         </div>
+    </div>
+
+    <!-- Actions / Buttons Row (Centered) -->
+    <div class="product-card__actions" style="padding: 0 10px 10px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: auto; box-sizing: border-box;">
         @if (!isOninda())
-            <div class="product-card__buttons">
+            <div class="product-card__buttons w-100 d-flex justify-content-center align-items-center" style="margin: 0 !important; width: 100% !important;">
                 @php
                     $available = !$product->should_track || $product->stock_count > 0;
                     $has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1;
                 @endphp
                 @if (($show_option->product_grid_button ?? false) == 'add_to_cart')
                     @if ($has_variations)
-                        <a href="{{ route('products.show', $product) }}" wire:navigate.hover class="btn btn-primary product-card__addtocart" style="text-decoration: none;">
-                            {!! $show_option->add_to_cart_icon ?? null !!}
-                            <span class="ml-1">{{ $show_option->add_to_cart_text ?? '' }}</span>
+                        <a href="{{ route('products.show', $product) }}" wire:navigate.hover class="btn bb-btn-card product-card__addtocart w-100 d-flex align-items-center justify-content-center text-center gap-2" style="text-decoration: none; width: 100% !important; margin: 0 auto !important;">
+                            <i class="fas fa-cart-plus mr-1" style="font-size: 14px;"></i>
+                            <span>{{ $show_option->add_to_cart_text ?? 'Add to Cart' }}</span>
                         </a>
                     @else
-                        <button wire:click="addToCart" class="btn btn-primary product-card__addtocart" type="button"
-                            {{ $available ? '' : 'disabled' }}>
-                            {!! $show_option->add_to_cart_icon ?? null !!}
-                            <span class="ml-1">{{ $show_option->add_to_cart_text ?? '' }}</span>
+                        <button wire:click="addToCart" class="btn bb-btn-card product-card__addtocart w-100 d-flex align-items-center justify-content-center text-center gap-2" type="button"
+                            {{ $available ? '' : 'disabled' }} style="width: 100% !important; margin: 0 auto !important;">
+                            <i class="fas fa-cart-plus mr-1" style="font-size: 14px;"></i>
+                            <span>{{ $show_option->add_to_cart_text ?? 'Add to Cart' }}</span>
                         </button>
                     @endif
                 @endif
                 @if (($show_option->product_grid_button ?? false) == 'order_now')
                     @if ($has_variations)
-                        <a href="{{ route('products.show', $product) }}" wire:navigate.hover class="btn btn-primary product-card__ordernow" style="text-decoration: none;">
-                            {!! $show_option->order_now_icon ?? null !!}
-                            <span class="ml-1">{{ $show_option->order_now_text ?? '' }}</span>
+                        <a href="{{ route('products.show', $product) }}" wire:navigate.hover class="btn bb-btn-card-order product-card__ordernow w-100 d-flex align-items-center justify-content-center text-center gap-2" style="text-decoration: none; width: 100% !important; margin: 0 auto !important;">
+                            <i class="fas fa-bag-shopping mr-1" style="font-size: 14px;"></i>
+                            <span>{{ $show_option->order_now_text ?? 'অর্ডার করুন' }}</span>
                         </a>
                     @else
-                        <button wire:click="addToCart('kart')" class="btn btn-primary product-card__ordernow" type="button"
-                            {{ $available ? '' : 'disabled' }}>
-                            {!! $show_option->order_now_icon ?? null !!}
-                            <span class="ml-1">{{ $show_option->order_now_text ?? '' }}</span>
+                        <button wire:click="addToCart('kart')" class="btn bb-btn-card-order product-card__ordernow w-100 d-flex align-items-center justify-content-center text-center gap-2" type="button"
+                            {{ $available ? '' : 'disabled' }} style="width: 100% !important; margin: 0 auto !important;">
+                            <i class="fas fa-bag-shopping mr-1" style="font-size: 14px;"></i>
+                            <span>{{ $show_option->order_now_text ?? 'অর্ডার করুন' }}</span>
                         </button>
                     @endif
                 @endif

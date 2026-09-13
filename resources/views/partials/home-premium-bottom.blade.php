@@ -46,7 +46,7 @@
         padding: 25px 20px;
         background: #fff;
         border: 1px solid #dcefe4;
-        border-radius: 14px;
+        border-radius: 6px;
         box-shadow: 0 8px 22px rgba(20, 69, 43, .06);
     }
 
@@ -56,7 +56,7 @@
         height: 43px;
         margin-bottom: 16px;
         place-items: center;
-        border-radius: 10px;
+        border-radius: 4px;
         background: var(--brand-soft);
         color: var(--bb-green-dark);
         font-size: 21px;
@@ -81,7 +81,7 @@
         overflow: hidden;
         padding: 47px;
         background: linear-gradient(135deg, var(--bb-green-dark), var(--bb-green));
-        border-radius: 17px;
+        border-radius: 6px;
         color: #fff;
         position: relative;
     }
@@ -140,7 +140,7 @@
         padding: 18px;
         background: rgba(255, 255, 255, .12);
         border: 1px solid rgba(255, 255, 255, .18);
-        border-radius: 11px;
+        border-radius: 4px;
     }
 
     .bb-home-step b {
@@ -189,7 +189,7 @@
         justify-content: center;
         min-height: 45px;
         padding: 9px 18px;
-        border-radius: 8px;
+        border-radius: 4px;
         background: var(--bb-green);
         color: #fff !important;
         font-size: 14px;
@@ -213,7 +213,7 @@
     .bb-home-category-list a {
         padding: 10px 14px;
         border: 1px solid #d3ebdd;
-        border-radius: 8px;
+        border-radius: 4px;
         background: #fff;
         color: #315442 !important;
         font-size: 14px;
@@ -231,7 +231,7 @@
     .bb-home-cta {
         margin-top: 56px;
         padding: 52px 25px;
-        border-radius: 17px;
+        border-radius: 6px;
         background: #183d2b;
         text-align: center;
     }

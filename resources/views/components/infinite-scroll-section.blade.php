@@ -330,39 +330,38 @@
                 return div;
             },
 
-
             getProductHTML(product, index) {
                 const productId = product.id || index;
                 const productName = product.name || 'Product';
                 const productSlug = product.slug || productId;
-                const productPrice = product.price || 0;
-                const productSellingPrice = product.selling_price || productPrice;
+                const productPrice = Number(product.price) || 0;
+                const productSellingPrice = Number(product.selling_price) || productPrice;
                 const productImage320 =
-    product.base_image_url_320 ||
-    product.base_image_url ||
-    '/images/placeholder.jpg';
+                    product.base_image_url_320 ||
+                    product.base_image_url ||
+                    '/images/placeholder.jpg';
 
-const productImage480 =
-    product.base_image_url_480 ||
-    productImage320;
+                const productImage480 =
+                    product.base_image_url_480 ||
+                    productImage320;
 
-const productImageAlt = String(
-    product.base_image_alt || productName
-)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+                const productImageAlt = String(
+                    product.base_image_alt || productName
+                )
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
                 const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                 const inStock = !product.should_track || (product.stock_count || 0) > 0;
-                const hasDiscount = productPrice !== productSellingPrice;
+                const hasDiscount = productPrice > 0 && productSellingPrice > 0 && productPrice > productSellingPrice;
+                const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
 
                 // Get button configuration from PHP (passed via data attributes)
                 const showOption = this.getShowOption();
 
                 let discountText = '';
                 if (hasDiscount && productPrice > 0) {
-                    const discountPercent = Math.round(((productPrice - productSellingPrice) * 100) / productPrice);
                     const template = (showOption.discount_text || '').toString();
                     discountText = template.replace('[percent]', discountPercent);
                     if (!discountText.trim()) {
@@ -382,46 +381,40 @@ const productImageAlt = String(
                     const buttonType = showOption.product_grid_button || 'add_to_cart';
 
                     if (buttonType === 'add_to_cart') {
+                        const text = showOption.add_to_cart_text || 'Add to Cart';
                         if (hasVariations) {
                             buttonsHTML = `
-                                     <div class="product-card__buttons">
-                                         <a class="btn btn-primary product-card__addtocart" href="${productUrl}" wire:navigate.hover style="text-decoration: none;">
-                                             ${showOption.add_to_cart_icon || ''}
-                                             <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
-                                         </a>
-                                     </div>
-                                 `;
+                                <a href="${productUrl}" wire:navigate.hover class="btn bb-btn-card product-card__addtocart w-100 d-flex align-items-center justify-content-center text-center gap-2" style="text-decoration: none; width: 100% !important; margin: 0 auto !important;">
+                                    <i class="fas fa-cart-plus mr-1" style="font-size: 14px;"></i>
+                                    <span>${text}</span>
+                                </a>
+                            `;
                         } else {
                             buttonsHTML = `
-                                     <div class="product-card__buttons">
-                                         <button class="btn btn-primary product-card__addtocart" type="button" ${disabledAttr}
-                                                 data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
-                                             ${showOption.add_to_cart_icon || ''}
-                                             <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
-                                         </button>
-                                     </div>
-                                 `;
+                                <button class="btn bb-btn-card product-card__addtocart w-100 d-flex align-items-center justify-content-center text-center gap-2" type="button" ${disabledAttr}
+                                        data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)" style="width: 100% !important; margin: 0 auto !important;">
+                                    <i class="fas fa-cart-plus mr-1" style="font-size: 14px;"></i>
+                                    <span>${text}</span>
+                                </button>
+                            `;
                         }
                     } else if (buttonType === 'order_now') {
+                        const text = showOption.order_now_text || 'অর্ডার করুন';
                         if (hasVariations) {
                             buttonsHTML = `
-                                     <div class="product-card__buttons">
-                                         <a class="btn btn-primary product-card__ordernow order-now-drift" href="${productUrl}" wire:navigate.hover style="text-decoration: none;">
-                                             ${showOption.order_now_icon || ''}
-                                             <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
-                                         </a>
-                                     </div>
-                                 `;
+                                <a href="${productUrl}" wire:navigate.hover class="btn bb-btn-card-order product-card__ordernow w-100 d-flex align-items-center justify-content-center text-center gap-2" style="text-decoration: none; width: 100% !important; margin: 0 auto !important;">
+                                    <i class="fas fa-bag-shopping mr-1" style="font-size: 14px;"></i>
+                                    <span>${text}</span>
+                                </a>
+                            `;
                         } else {
                             buttonsHTML = `
-                                     <div class="product-card__buttons">
-                                         <button class="btn btn-primary product-card__ordernow order-now-drift" type="button" ${disabledAttr}
-                                                 data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
-                                             ${showOption.order_now_icon || ''}
-                                             <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
-                                         </button>
-                                     </div>
-                                 `;
+                                <button class="btn bb-btn-card-order product-card__ordernow w-100 d-flex align-items-center justify-content-center text-center gap-2" type="button" ${disabledAttr}
+                                        data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)" style="width: 100% !important; margin: 0 auto !important;">
+                                    <i class="fas fa-bag-shopping mr-1" style="font-size: 14px;"></i>
+                                    <span>${text}</span>
+                                </button>
+                            `;
                         }
                     }
                 }
@@ -431,90 +424,125 @@ const productImageAlt = String(
                 const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !userIsVerified);
                 const appResell = this.getAppResell();
 
+                const theMoney = (price) => `TK&nbsp;<span>${parseFloat(price || 0).toLocaleString('en-US')}</span>`;
+
                 let priceHTML = '';
                 if (isOninda && appResell) {
                     const retailPrice = product.retail_price || Math.round(productSellingPrice * 1.4);
-                    const retailPriceHTML = `<div class="product-card__retail-price" style="margin-bottom: 2px;">
-                        <span style="color: #6b7280; font-weight: 500;">Retail price:</span>
-                        <span style="font-weight: 700; color: #111827;">Tk. ${retailPrice}</span>
+                    const retailPriceHTML = `<div class="product-card__retail-price mb-1 d-flex justify-content-between align-items-center" style="font-size: 12px;">
+                        <span style="color: #64748b; font-weight: 500;">Retail:</span>
+                        <strong style="color: #0f172a;">${theMoney(retailPrice)}</strong>
                     </div>`;
                     let wholesalePriceHTML = '';
 
                     if (userIsGuest) {
-                        wholesalePriceHTML = `<div class="product-card__wholesale-price">
-                            <span style="color: #6b7280; font-weight: 500;">Wholesale price:</span>
-                            <a href="{{ Route::has('auth.login') ? route('auth.login') : route('user.login') }}" style="color: #2563eb; font-weight: 700; text-decoration: none; border-bottom: 1px dashed #2563eb; padding-bottom: 1px;">Login</a>
+                        wholesalePriceHTML = `<div class="product-card__wholesale-price d-flex align-items-baseline justify-content-between" style="font-size: 12px;">
+                            <span style="color: #64748b; font-weight: 500;">Wholesale:</span>
+                            <a href="{{ Route::has('auth.login') ? route('auth.login') : route('user.login') }}" style="color: #2563eb; font-weight: 700; text-decoration: none;">Login</a>
                         </div>`;
                     } else if (shouldHidePrice) {
                         wholesalePriceHTML = `<div class="product-card__wholesale-price">
-                            <span class="product-card__new-price text-danger" style="font-weight: 700; font-size: 12px;">Verify account to see price</span>
+                            <span class="text-danger font-weight-bold" style="font-size: 12px;">Verify account</span>
                         </div>`;
                     } else if (hasDiscount) {
-                        wholesalePriceHTML = `<div class="product-card__wholesale-price">
-                            <span class="product-card__new-price" style="font-weight: 700;">Tk. ${productSellingPrice}</span>
-                            <span class="product-card__old-price" style="margin-left: 4px;">Tk. ${productPrice}</span>
+                        wholesalePriceHTML = `<div class="product-card__wholesale-price d-flex align-items-baseline justify-content-between" style="font-size: 12px;">
+                            <span class="font-weight-bold" style="color: var(--brand-dark); font-size: 15px;">${theMoney(productSellingPrice)}</span>
+                            <span class="text-muted" style="text-decoration: line-through; font-size: 12px;">${theMoney(productPrice)}</span>
                         </div>`;
                     } else {
                         wholesalePriceHTML = `<div class="product-card__wholesale-price">
-                            <span style="font-weight: 700; color: #111827;">Tk. ${productPrice}</span>
+                            <span class="font-weight-bold" style="color: var(--brand-dark); font-size: 15px;">${theMoney(productPrice)}</span>
                         </div>`;
                     }
 
                     priceHTML = `${retailPriceHTML}${wholesalePriceHTML}`;
                 } else {
                     if (shouldHidePrice) {
-                        priceHTML = `<span class="product-card__new-price text-danger">${
-                                 userIsGuest ? 'Login to see price' : 'Verify account to see price'
-                             }</span>`;
+                        priceHTML = `<span class="text-danger font-weight-bold" style="font-size: 12px;">${
+                            userIsGuest ? 'Login to see price' : 'Verify account'
+                        }</span>`;
                     } else if (hasDiscount) {
-                        priceHTML =
-                            `<span class="product-card__new-price">Tk. ${productSellingPrice}</span><span class="product-card__old-price">Tk. ${productPrice}</span>`;
+                        priceHTML = `
+                            <div class="d-flex align-items-baseline gap-2">
+                                <span class="product-card__new-price font-weight-bold" style="color: var(--brand-dark); font-size: 16px;">
+                                    ${theMoney(productSellingPrice)}
+                                </span>
+                                <span class="product-card__old-price" style="color: #94a3b8; text-decoration: line-through; font-size: 13px;">
+                                    ${theMoney(productPrice)}
+                                </span>
+                            </div>
+                        `;
                     } else {
-                        priceHTML = `Tk. ${productPrice}`;
+                        priceHTML = `
+                            <div class="d-flex align-items-baseline">
+                                <span class="product-card__new-price font-weight-bold" style="color: var(--brand-dark); font-size: 16px;">
+                                    ${productPrice ? theMoney(productPrice) : 'Contact for price'}
+                                </span>
+                            </div>
+                        `;
                     }
                 }
 
                 return `
-                         <div class="product-card" data-id="${productId}" data-max="${product.should_track ? (product.stock_count || 0) : -1}">
-                             ${product.free_delivery ? '<div class="product-card__ribbon"><span class="badge badge--free-delivery">Free Delivery</span></div>' : ''}
-                             <div class="product-card__badges-list">
-                                ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
-                             </div>
-                             <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
-                                 <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
-                                     <img
-    src="${productImage320}"
-    srcset="${productImage320} 320w, ${productImage480} 480w"
-    sizes="(max-width: 575px) 50vw, (max-width: 991px) 33vw, (max-width: 1199px) 25vw, 220px"
-    alt="${productImageAlt}"
-    width="480"
-    height="480"
-    loading="lazy"
-    decoding="async"
-    style="width: 100%; height: 100%; object-fit: cover;"
->
-                                 </a>
-                             </div>
-                             <div class="product-card__info">
-                                 <div class="product-card__name">
-                                     <a href="${productUrl}" class="product-link" wire:navigate.hover data-name="${product.var_name || productName}">${productName}</a>
-                                 </div>
-                                 ${this.getRatingHTML(product)}
-                             </div>
-                             <div class="product-card__actions">
-                                 <div class="product-card__availability">Availability:
-                                     ${!product.should_track ?
-                                         '<span class="text-success">In Stock</span>' :
-                                         `<span class="text-${(product.stock_count || 0) ? 'success' : 'danger'}">${product.stock_count || 0} In Stock</span>`
-                                     }
-                                 </div>
-                                  <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}" ${isOninda && appResell ? 'style="font-size: 13px; font-weight: normal; line-height: 1.5; margin-top: 4px;"' : ''}>
-                                     ${priceHTML}
-                                  </div>
-                                 ${buttonsHTML}
-                             </div>
-                         </div>
-                     `;
+                    <div class="product-card bb-modern-card" data-id="${productId}" data-max="${product.should_track ? (product.stock_count || 0) : -1}">
+                        <!-- Card Top Badges -->
+                        <div class="bb-card-badges d-flex justify-content-between align-items-center w-100 position-absolute" style="top: 14px; left: 0; padding: 0 14px; z-index: 5; pointer-events: none;">
+                            <div>
+                                ${!inStock ? 
+                                    '<span class="badge badge-danger px-2 py-1 font-weight-bold" style="border-radius: 3px; font-size: 10px; text-transform: uppercase;">Sold Out</span>' : 
+                                    (hasDiscount && discountPercent > 0 ? `<span class="badge text-white font-weight-bold" style="background: #ef4444; border-radius: 3px; padding: 3px 6px; font-size: 11px; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);">${discountText || ('-' + discountPercent + '%')}</span>` : '')
+                                }
+                            </div>
+                            <div>
+                                ${product.free_delivery ? '<span class="badge text-dark font-weight-bold d-flex align-items-center gap-1" style="background: #ecfdf5; color: #059669 !important; border: 1px solid #a7f3d0; border-radius: 3px; padding: 3px 6px; font-size: 10px;"><i class="fas fa-truck-fast"></i> Free</span>' : ''}
+                            </div>
+                        </div>
+
+                        <!-- Image Container with soft backdrop and rounded inner frame -->
+                        <div class="product-card__image bb-card-img-shell" style="aspect-ratio: 1 / 1; overflow: hidden; position: relative; margin: 8px 8px 0; border-radius: 4px; background: #f8fafc;">
+                            <a href="${productUrl}" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 10px;" wire:navigate.hover>
+                                <img
+                                    src="${productImage320}"
+                                    srcset="${productImage320} 320w, ${productImage480} 480w"
+                                    sizes="(max-width: 575px) 50vw, (max-width: 991px) 33vw, (max-width: 1199px) 25vw, 220px"
+                                    alt="${productImageAlt}"
+                                    width="480"
+                                    height="480"
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="bb-product-img"
+                                    style="max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s ease;"
+                                >
+                            </a>
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="product-card__info" style="display: flex; flex-direction: column; padding: 8px 10px 0; flex: 0 0 auto;">
+                            <!-- Product Name -->
+                            <div class="product-card__name" style="flex: 0 0 auto; min-height: auto; margin-bottom: 2px !important;">
+                                <a href="${productUrl}" data-name="${product.var_name || productName}" class="bb-product-title font-weight-bold" style="font-size: 13.5px; line-height: 1.35; color: #1e293b; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-decoration: none; min-height: auto;" wire:navigate.hover>
+                                    ${productName}
+                                </a>
+                            </div>
+
+                            ${this.getRatingHTML ? this.getRatingHTML(product) : ''}
+
+                            <!-- Prices Row Container (Dedicated Line 1) -->
+                            <div class="product-card__prices" style="margin-top: 2px !important; margin-bottom: 8px !important; padding: 0 !important; flex: 0 0 auto;">
+                                ${priceHTML}
+                            </div>
+                        </div>
+
+                        <!-- Actions / Buttons Row (Dedicated Line 2: Full width centered button) -->
+                        <div class="product-card__actions" style="padding: 0 10px 10px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: auto; box-sizing: border-box;">
+                            ${!isOninda ? `
+                                <div class="product-card__buttons w-100 d-flex justify-content-center align-items-center" style="margin: 0 !important; width: 100% !important;">
+                                    ${buttonsHTML}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
             },
 
             getShowOption() {

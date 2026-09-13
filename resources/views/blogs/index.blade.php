@@ -1,20 +1,20 @@
 @extends('layouts.yellow.master')
 
 @php
-    $nmBrandName = $company->name ?? config('app.name');
-    $nmSeoPage = max(1, (int) request()->query('page', 1));
+    $bbBrandName = $company->name ?? config('app.name');
+    $bbSeoPage = max(1, (int) request()->query('page', 1));
 
-    $nmSeoDescription = $nmSeoPage === 1
-        ? $nmBrandName . ' Blog থেকে ইলেকট্রনিকস, কিচেন, হোম, বিউটি ও লাইফস্টাইল পণ্য কেনার গাইড, ব্যবহারবিধি, নিরাপত্তা টিপস এবং সঠিক পণ্য বাছাইয়ের প্রয়োজনীয় তথ্য জানুন।'
-        : $nmBrandName . ' Blog-এর পণ্য কেনার গাইড ও ব্যবহারিক টিপসের আরও লেখা পড়ুন। এটি Blog archive-এর Page ' . $nmSeoPage . '; কিচেন, হোম, ইলেকট্রনিকস, বিউটি ও লাইফস্টাইল পণ্য সম্পর্কে প্রয়োজনীয় তথ্য পান।';
+    $bbSeoDescription = $bbSeoPage === 1
+        ? $bbBrandName . ' Blog থেকে ইলেকট্রনিকস, কিচেন, হোম, বিউটি ও লাইফস্টাইল পণ্য কেনার গাইড, ব্যবহারবিধি, নিরাপত্তা টিপস এবং সঠিক পণ্য বাছাইয়ের প্রয়োজনীয় তথ্য জানুন।'
+        : $bbBrandName . ' Blog-এর পণ্য কেনার গাইড ও ব্যবহারিক টিপসের আরও লেখা পড়ুন। এটি Blog archive-এর Page ' . $bbSeoPage . '; কিচেন, হোম, ইলেকট্রনিকস, বিউটি ও লাইফস্টাইল পণ্য সম্পর্কে প্রয়োজনীয় তথ্য পান।';
 @endphp
 
 @section('seo_tags')
-    <title>{{ $nmBrandName }} - Blog | পণ্য কেনার গাইড ও ব্যবহারিক টিপস{{ $nmSeoPage > 1 ? ' | Page ' . $nmSeoPage : '' }}</title>
-    <meta name="description" content="{{ $nmSeoDescription }}">
+    <title>{{ $bbBrandName }} - Blog | পণ্য কেনার গাইড ও ব্যবহারিক টিপস{{ $bbSeoPage > 1 ? ' | Page ' . $bbSeoPage : '' }}</title>
+    <meta name="description" content="{{ $bbSeoDescription }}">
 @endsection
 
-@section('title', 'Blog | পণ্য কেনার গাইড ও ব্যবহারিক টিপস' . ($nmSeoPage > 1 ? ' | Page ' . $nmSeoPage : ''))
+@section('title', 'Blog | পণ্য কেনার গাইড ও ব্যবহারিক টিপস' . ($bbSeoPage > 1 ? ' | Page ' . $bbSeoPage : ''))
 
 @section('content')
 <style>
@@ -45,23 +45,23 @@
 </style>
 
 @php
-    $nmPage = max(1, (int) $blogs->currentPage());
+    $bbPage = max(1, (int) $blogs->currentPage());
 
-    $nmTitle = function ($blog) use ($nmBrandName) {
-        return trim((string) (data_get($blog, 'title') ?: data_get($blog, 'name') ?: ($nmBrandName . ' Buying Guide')));
+    $bbTitle = function ($blog) use ($bbBrandName) {
+        return trim((string) (data_get($blog, 'title') ?: data_get($blog, 'name') ?: ($bbBrandName . ' Buying Guide')));
     };
 
-    $nmUrl = function ($blog) {
+    $bbUrl = function ($blog) {
         return route('blogs.show', ['blog' => data_get($blog, 'slug')]);
     };
 
-    $nmDateValue = function ($blog) {
+    $bbDateValue = function ($blog) {
         $value = data_get($blog, 'published_at') ?: data_get($blog, 'created_at');
         if (!$value) return null;
         try { return \Illuminate\Support\Carbon::parse($value); } catch (\Throwable $e) { return null; }
     };
 
-    $nmExcerpt = function ($blog) {
+    $bbExcerpt = function ($blog) {
         foreach (['excerpt','short_description','description','content','body'] as $field) {
             $value = data_get($blog, $field);
             if (is_string($value) && trim(strip_tags($value)) !== '') {
@@ -74,27 +74,27 @@
         return 'সহজ ভাষায় প্রয়োজনীয় তথ্য, ব্যবহারিক পরামর্শ এবং কেনার আগে গুরুত্বপূর্ণ বিষয়গুলো জেনে নিন।';
     };
 
-    $nmImage = function ($blog) {
+    $bbImage = function ($blog) {
         $image = data_get($blog, 'base_image_src') ?: data_get($blog, 'image.src');
         return $image ? asset($image) : null;
     };
 
-    $nmExcerpt = function ($blog) {
+    $bbExcerpt = function ($blog) {
         $content = data_get($blog, 'excerpt') ?: data_get($blog, 'content') ?: '';
         return \Illuminate\Support\Str::limit(strip_tags((string) $content), 120);
     };
 
-    $nmFeatured = $nmPage === 1 ? $blogs->getCollection()->first() : null;
-    $nmItems = $nmPage === 1 ? $blogs->getCollection()->slice(1) : $blogs->getCollection();
+    $bbFeatured = $bbPage === 1 ? $blogs->getCollection()->first() : null;
+    $bbItems = $bbPage === 1 ? $blogs->getCollection()->slice(1) : $blogs->getCollection();
 @endphp
 
 <div class="bb-blog-page">
 <div class="bb-blog-shell">
 
 <header class="bb-blog-hero">
-<div class="bb-blog-eyebrow">{{ $nmBrandName }} Knowledge Hub</div>
-<h1>@if($nmPage > 1) {{ $nmBrandName }} Blog &amp; Buying Guides – Page {{ $nmPage }} @else {{ $nmBrandName }} Blog &amp; Buying Guides @endif</h1>
-<p>বাংলাদেশে অনলাইন শপিংয়ের আগে পণ্য সম্পর্কে পরিষ্কার ধারণা পেতে {{ $nmBrandName }}-এর buying guide, ব্যবহারিক tips, safety guidance এবং product-care articles পড়ুন। আমাদের লক্ষ্য হলো শুধু পণ্য দেখানো নয়, বরং প্রয়োজন অনুযায়ী সঠিক product বেছে নেওয়ার জন্য সহজ ও কাজে লাগার মতো তথ্য দেওয়া।</p>
+<div class="bb-blog-eyebrow">{{ $bbBrandName }} Knowledge Hub</div>
+<h1>@if($bbPage > 1) {{ $bbBrandName }} Blog &amp; Buying Guides – Page {{ $bbPage }} @else {{ $bbBrandName }} Blog &amp; Buying Guides @endif</h1>
+<p>বাংলাদেশে অনলাইন শপিংয়ের আগে পণ্য সম্পর্কে পরিষ্কার ধারণা পেতে {{ $bbBrandName }}-এর buying guide, ব্যবহারিক tips, safety guidance এবং product-care articles পড়ুন। আমাদের লক্ষ্য হলো শুধু পণ্য দেখানো নয়, বরং প্রয়োজন অনুযায়ী সঠিক product বেছে নেওয়ার জন্য সহজ ও কাজে লাগার মতো তথ্য দেওয়া।</p>
 <div class="bb-blog-meta-row">
 <span class="bb-blog-meta-pill">{{ $blogs->total() }}টি প্রকাশিত গাইড</span>
 <span class="bb-blog-meta-pill">Buying Guides</span>
@@ -104,56 +104,56 @@
 </header>
 
 <div class="bb-blog-section-head">
-<h2>{{ $nmPage > 1 ? 'More Buying Guides' : 'Latest Buying Guides' }}</h2>
+<h2>{{ $bbPage > 1 ? 'More Buying Guides' : 'Latest Buying Guides' }}</h2>
 <p>Product features, practical use, maintenance, safety এবং কেনার আগে যাচাই করার গুরুত্বপূর্ণ বিষয়গুলো সহজভাবে জানুন।</p>
 </div>
 
-@if($nmFeatured)
+@if($bbFeatured)
 @php
-$featuredTitle=$nmTitle($nmFeatured);$featuredUrl=$nmUrl($nmFeatured);$featuredImage=$nmImage($nmFeatured);$featuredDate=$nmDateValue($nmFeatured);
+$featuredTitle=$bbTitle($bbFeatured);$featuredUrl=$bbUrl($bbFeatured);$featuredImage=$bbImage($bbFeatured);$featuredDate=$bbDateValue($bbFeatured);
 @endphp
 <article class="bb-blog-featured">
 <a class="bb-blog-featured-media" href="{{ $featuredUrl }}" aria-label="{{ $featuredTitle }}">
 @if($featuredImage)
 <img src="{{ $featuredImage }}" alt="{{ $featuredTitle }}" loading="eager" fetchpriority="high" decoding="async">
 @else
-<div class="bb-blog-placeholder">{{ $nmBrandName }} Buying Guide</div>
+<div class="bb-blog-placeholder">{{ $bbBrandName }} Buying Guide</div>
 @endif
 </a>
 <div class="bb-blog-featured-body">
 <span class="bb-blog-badge">Featured Guide</span>
 @if($featuredDate)<time class="bb-blog-date" datetime="{{ $featuredDate->toDateString() }}">{{ $featuredDate->format('M d, Y') }}</time>@endif
 <h3><a href="{{ $featuredUrl }}">{{ $featuredTitle }}</a></h3>
-<p>{{ $nmExcerpt($nmFeatured) }}</p>
+<p>{{ $bbExcerpt($bbFeatured) }}</p>
 <a class="bb-blog-read" href="{{ $featuredUrl }}">Read Buying Guide</a>
 </div>
 </article>
 @endif
 
-@if($nmItems->count())
+@if($bbItems->count())
 <div class="bb-blog-grid">
-@foreach($nmItems as $blog)
+@foreach($bbItems as $blog)
 @php
-$blogTitle=$nmTitle($blog);$blogUrl=$nmUrl($blog);$blogImage=$nmImage($blog);$blogDate=$nmDateValue($blog);
+$blogTitle=$bbTitle($blog);$blogUrl=$bbUrl($blog);$blogImage=$bbImage($blog);$blogDate=$bbDateValue($blog);
 @endphp
 <article class="bb-blog-card">
 <a class="bb-blog-card-media" href="{{ $blogUrl }}" aria-label="{{ $blogTitle }}">
 @if($blogImage)
 <img src="{{ $blogImage }}" alt="{{ $blogTitle }}" loading="lazy" decoding="async">
 @else
-<div class="bb-blog-placeholder">{{ $nmBrandName }} Buying Guide</div>
+<div class="bb-blog-placeholder">{{ $bbBrandName }} Buying Guide</div>
 @endif
 </a>
 <div class="bb-blog-card-body">
 @if($blogDate)<time class="bb-blog-date" datetime="{{ $blogDate->toDateString() }}">{{ $blogDate->format('M d, Y') }}</time>@endif
 <h3><a href="{{ $blogUrl }}">{{ $blogTitle }}</a></h3>
-<p>{{ $nmExcerpt($blog) }}</p>
+<p>{{ $bbExcerpt($blog) }}</p>
 <a class="bb-blog-card-link" href="{{ $blogUrl }}">Read Guide →</a>
 </div>
 </article>
 @endforeach
 </div>
-@elseif(!$nmFeatured)
+@elseif(!$bbFeatured)
 <div class="bb-blog-empty">এই মুহূর্তে কোনো blog article পাওয়া যায়নি।</div>
 @endif
 
@@ -163,10 +163,10 @@ $blogTitle=$nmTitle($blog);$blogUrl=$nmUrl($blog);$blogImage=$nmImage($blog);$bl
 </div>
 @endif
 
-@if($nmPage === 1)
+@if($bbPage === 1)
 <section class="bb-blog-trust">
 <div>
-<h2>{{ $nmBrandName }}-এর Buying Guides কেন পড়বেন?</h2>
+<h2>{{ $bbBrandName }}-এর Buying Guides কেন পড়বেন?</h2>
 <p>আমাদের guides-এ product কেনার আগে কী যাচাই করবেন, কোন feature আপনার প্রয়োজনের জন্য গুরুত্বপূর্ণ, safe use, maintenance এবং বাস্তব shopping decision-এর প্রয়োজনীয় বিষয়গুলো সহজভাবে সাজানো হয়। Product availability, price বা specification সময়ের সঙ্গে পরিবর্তিত হতে পারে, তাই purchase-এর আগে সংশ্লিষ্ট product page-এর বর্তমান তথ্যও যাচাই করুন।</p>
 </div>
 <div class="bb-blog-trust-links">

@@ -27,20 +27,30 @@
         .review-rating-link:active {
             opacity: 0.5;
         }
-        #accordion .card-link {
-            display: block;
-            font-size: 20px;
-            padding: 18px 48px;
-            border-bottom: 2px solid transparent;
-            color: inherit;
-            font-weight: 500;
-            border-radius: 3px 3px 0 0;
-            transition: all .15s;
+        #accordion .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+            margin-bottom: 16px;
         }
-
-        #accordion .card-link:not(.collapsed) {
-            border-bottom: 2px solid #000;
-            color: #000;
+        #accordion .card-header {
+            background: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        #accordion .card-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 16px;
+            padding: 16px 20px;
+            color: #0f172a;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all .2s;
+        }
+        #accordion .card-link:hover {
+            color: var(--brand);
         }
 
         iframe {
@@ -63,11 +73,11 @@
 
         .product__content {
             @if ($services->enabled ?? false)
-                grid-template-columns: [gallery] calc(40% - 30px) [info] calc(40% - 35px) [sidebar] calc(25% - 10px);
+                grid-template-columns: [gallery] minmax(0, 4.2fr) [info] minmax(0, 4.8fr) [sidebar] minmax(0, 3fr);
             @else
-                grid-template-columns: [gallery] calc(50% - 30px) [info] calc(50% - 35px);
+                grid-template-columns: [gallery] minmax(0, 5fr) [info] minmax(0, 5fr);
             @endif
-            grid-column-gap: 10px;
+            grid-column-gap: 16px;
         }
 
         img {
@@ -200,38 +210,53 @@
                     <livewire:product-detail :product="$product" :show-brand-category="!($services->enabled ?? false)" />
                     <!-- .product__info / end -->
                     @if ($services->enabled ?? false)
-                        <div>
+                        <div class="product__sidebar-features">
                             @if ($product->variations->isNotEmpty())
-                                <div class="p-3 mt-2 mb-2 border product__footer">
+                                <div class="p-3 mb-3 product__categories-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);">
                                     <div class="product__tags tags">
-                                        <div class="mt-2">
-                                            <p class="mr-2 mb-0 text-secondary d-inline-block">Categories:</p>
+                                        <div class="d-flex flex-wrap align-items-center gap-1">
+                                            <span class="mr-1 text-muted font-weight-bold" style="font-size: 13px;">Categories:</span>
                                             @foreach ($product->categories as $category)
                                                 <a href="{{ route('category.show', $category) }}"
-                                                    class="badge badge-primary">{{ $category->name }}</a>
+                                                    class="badge px-2 py-1" style="background: rgba(var(--brand-rgb), 0.1); color: var(--brand-dark); border-radius: 3px; font-size: 12px; font-weight: 700; text-decoration: none;" wire:navigate.hover>{{ $category->name }}</a>
                                             @endforeach
                                         </div>
                                     </div>
                                 </div>
                             @endif
-                            <div class="block-features__list flex-column d-none d-md-block">
-                                @php
-                                    $serviceIcons = config('services.service_icons', []);
-                                @endphp
-                                @foreach (config('services.services', []) as $num => $icon)
-                                    <div class="block-features__item">
-                                        <div class="block-features__icon">
-                                            {!! str_replace('<svg ', '<svg width="48px" height="48px" ', $serviceIcons[$num] ?? '') !!}
-                                        </div>
-                                        <div class="block-features__content">
-                                            <div class="block-features__title">{{ $services->$num->title }}</div>
-                                            <div class="block-features__subtitle">{{ $services->$num->detail }}</div>
-                                        </div>
-                                    </div>
-                                    @if (!$loop->last)
-                                        <div class="block-features__divider"></div>
-                                    @endif
-                                @endforeach
+                            <div class="bb-product-services-card d-none d-md-block">
+                                <div class="bb-services-card-header d-flex align-items-center gap-2">
+                                    <i class="fas fa-shield-halved bb-services-shield-icon"></i>
+                                    <span>আমাদের সেবা ও নিশ্চয়তা</span>
+                                </div>
+                                <div class="bb-services-list">
+                                    @php
+                                        $serviceIcons = config('services.service_icons', []);
+                                        $fallbackIcons = [
+                                            'one' => '<i class="fas fa-clipboard-check"></i>',
+                                            'two' => '<i class="fas fa-headset"></i>',
+                                            'three' => '<i class="fas fa-hand-holding-dollar"></i>',
+                                            'four' => '<i class="fas fa-star-half-stroke"></i>',
+                                        ];
+                                    @endphp
+                                    @foreach (config('services.services', []) as $num => $icon)
+                                        @if (!empty($services->$num->title))
+                                            <div class="bb-service-item d-flex align-items-start gap-3">
+                                                <div class="bb-service-icon-box">
+                                                    @if (!empty($serviceIcons[$num]))
+                                                        {!! str_replace('<svg ', '<svg width="20px" height="20px" fill="currentColor" ', $serviceIcons[$num]) !!}
+                                                    @else
+                                                        {!! $fallbackIcons[$num] ?? '<i class="fas fa-check"></i>' !!}
+                                                    @endif
+                                                </div>
+                                                <div class="bb-service-content flex-grow-1">
+                                                    <div class="bb-service-title font-weight-bold">{{ $services->$num->title }}</div>
+                                                    <div class="bb-service-desc">{{ $services->$num->detail }}</div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     @endif

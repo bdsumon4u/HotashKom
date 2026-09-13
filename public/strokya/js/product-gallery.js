@@ -118,9 +118,7 @@
                     const userIsVerified = this.$el.dataset.userVerified === 'true';
                     const shouldHidePrice = isOninda && !guestCanSeePrice && (userIsGuest || !userIsVerified);
 
-                    const formatPrice = (price) => {
-                        return `TK&nbsp;<span>${parseFloat(price).toLocaleString('en-US')}</span>`;
-                    };
+                    const theMoney = (price) => `TK&nbsp;<span>${parseFloat(price || 0).toLocaleString('en-US')}</span>`;
 
                     let buttonsHTML = '';
                     if (!isOninda) {
@@ -128,47 +126,50 @@
                         const disabledAttr = available ? '' : 'disabled';
 
                         if (showOption.product_grid_button === 'add_to_cart') {
+                            const text = showOption.add_to_cart_text || 'Add to Cart';
                             buttonsHTML = `
-                                <div class="product-card__buttons">
-                                    <button class="btn btn-primary product-card__addtocart" type="button" ${disabledAttr}
-                                            data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
-                                        ${showOption.add_to_cart_icon || ''}
-                                        <span class="ml-1">${showOption.add_to_cart_text || 'Add to Cart'}</span>
-                                    </button>
-                                </div>
+                                <button class="btn bb-btn-card product-card__addtocart w-100 d-flex align-items-center justify-content-center text-center gap-2" type="button" ${disabledAttr}
+                                        data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)" style="width: 100% !important; margin: 0 auto !important;">
+                                    <i class="fas fa-cart-plus mr-1" style="font-size: 14px;"></i>
+                                    <span>${text}</span>
+                                </button>
                             `;
                         } else if (showOption.product_grid_button === 'order_now') {
+                            const text = showOption.order_now_text || 'অর্ডার করুন';
                             buttonsHTML = `
-                                <div class="product-card__buttons">
-                                    <button class="btn btn-primary product-card__ordernow" type="button" ${disabledAttr}
-                                            data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
-                                        ${showOption.order_now_icon || ''}
-                                        <span class="ml-1">${showOption.order_now_text || 'Order Now'}</span>
-                                    </button>
-                                </div>
+                                <button class="btn bb-btn-card-order product-card__ordernow w-100 d-flex align-items-center justify-content-center text-center gap-2" type="button" ${disabledAttr}
+                                        data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)" style="width: 100% !important; margin: 0 auto !important;">
+                                    <i class="fas fa-bag-shopping mr-1" style="font-size: 14px;"></i>
+                                    <span>${text}</span>
+                                </button>
                             `;
                         }
                     }
 
                     let priceHTML = '';
                     if (shouldHidePrice) {
-                        priceHTML = `<span class="product-card__new-price text-danger">${
-                            userIsGuest ? 'Login to see price' : 'Verify account to see price'
+                        priceHTML = `<span class="text-danger font-weight-bold" style="font-size: 12px;">${
+                            userIsGuest ? 'Login to see price' : 'Verify account'
                         }</span>`;
                     } else if (hasDiscount) {
-                        priceHTML =
-                            `<span class="product-card__new-price">${formatPrice(productSellingPrice)}</span><span class="product-card__old-price">${formatPrice(productPrice)}</span>`;
+                        priceHTML = `
+                            <div class="d-flex align-items-baseline gap-2">
+                                <span class="product-card__new-price font-weight-bold" style="color: var(--brand-dark); font-size: 16px;">
+                                    ${theMoney(productSellingPrice)}
+                                </span>
+                                <span class="product-card__old-price" style="color: #94a3b8; text-decoration: line-through; font-size: 13px;">
+                                    ${theMoney(productPrice)}
+                                </span>
+                            </div>
+                        `;
                     } else {
-                        priceHTML = formatPrice(productSellingPrice);
-                    }
-
-                    let discountText = '';
-                    if (hasDiscount) {
-                        const template = (showOption.discount_text || '').toString();
-                        discountText = template.replace('[percent]', discountPercent);
-                        if (!discountText.trim()) {
-                            discountText = '';
-                        }
+                        priceHTML = `
+                            <div class="d-flex align-items-baseline">
+                                <span class="product-card__new-price font-weight-bold" style="color: var(--brand-dark); font-size: 16px;">
+                                    ${productPrice ? theMoney(productPrice) : 'Contact for price'}
+                                </span>
+                            </div>
+                        `;
                     }
 
                     const getRatingHTML = (product) => {
@@ -182,59 +183,59 @@
                         let starsHTML = '';
                         for (let i = 1; i <= 5; i++) {
                             if (i <= Math.floor(averageRating)) {
-                                starsHTML +=
-                                    '<i class="fa fa-star text-warning" style="font-size: 0.75rem;"></i>';
+                                starsHTML += '<i class="fa fa-star"></i>';
                             } else if (i - 0.5 <= averageRating) {
-                                starsHTML +=
-                                    '<i class="fa fa-star-half-alt text-warning" style="font-size: 0.75rem;"></i>';
+                                starsHTML += '<i class="fa fa-star-half-alt"></i>';
                             } else {
-                                starsHTML +=
-                                    '<i class="far fa-star text-muted" style="font-size: 0.75rem;"></i>';
+                                starsHTML += '<i class="far fa-star text-muted"></i>';
                             }
                         }
 
-                        const reviewText = totalReviews === 1 ? 'review' : 'reviews';
-
                         return `
-                            <div class="gap-2 d-flex align-items-center" style="font-size: 0.875rem;">
-                                <div class="d-flex align-items-center" style="margin-top: -1px;">
+                            <div class="gap-1 mb-1 d-flex align-items-center" style="font-size: 11px;">
+                                <div class="d-flex align-items-center text-warning" style="font-size: 10px;">
                                     ${starsHTML}
                                 </div>
-                                <span class="text-muted small" style="margin-top: 1px;">
-                                    <strong>${averageRating.toFixed(1)}</strong>
-                                    (${totalReviews} ${reviewText})
+                                <span class="text-muted ml-1 font-weight-bold">
+                                    ${averageRating.toFixed(1)}
                                 </span>
                             </div>
                         `;
                     };
 
                     return `
-                        <div class="product-card" data-id="${productId}" data-max="${shouldTrack ? (stockCount || 0) : -1}">
-                            <div class="product-card__badges-list">
-                                ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
-                            </div>
-                            <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">
-                                <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
-                                    <img src="${productImage}" alt="Base Image" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
-                                </a>
-                            </div>
-                            <div class="product-card__info">
-                                <div class="product-card__name">
-                                    <a href="${productUrl}" class="product-link" wire:navigate.hover data-name="${product.var_name || productName}">${productName}</a>
-                                </div>
-                                ${getRatingHTML(product)}
-                            </div>
-                            <div class="product-card__actions">
-                                <div class="product-card__availability">Availability:
-                                    ${!shouldTrack ?
-                                        '<span class="text-success">In Stock</span>' :
-                                        `<span class="text-${(stockCount || 0) > 0 ? 'success' : 'danger'}">${stockCount || 0} In Stock</span>`
+                        <div class="product-card bb-modern-card" data-id="${productId}" data-max="${shouldTrack ? (stockCount || 0) : -1}">
+                            <div class="bb-card-badges d-flex justify-content-between align-items-center w-100 position-absolute" style="top: 14px; left: 0; padding: 0 14px; z-index: 5; pointer-events: none;">
+                                <div>
+                                    ${!inStock ? 
+                                        '<span class="badge badge-danger px-2 py-1 font-weight-bold" style="border-radius: 3px; font-size: 10px; text-transform: uppercase;">Sold Out</span>' : 
+                                        (hasDiscount && discountPercent > 0 ? `<span class="badge text-white font-weight-bold" style="background: #ef4444; border-radius: 3px; padding: 3px 6px; font-size: 11px; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);">-${discountPercent}%</span>` : '')
                                     }
                                 </div>
-                                <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}">
+                                <div>
+                                    ${product.free_delivery ? '<span class="badge text-dark font-weight-bold d-flex align-items-center gap-1" style="background: #ecfdf5; color: #059669 !important; border: 1px solid #a7f3d0; border-radius: 3px; padding: 3px 6px; font-size: 10px;"><i class="fas fa-truck-fast"></i> Free</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="product-card__image bb-card-img-shell" style="aspect-ratio: 1 / 1; overflow: hidden; position: relative; margin: 8px 8px 0; border-radius: 4px; background: #f8fafc;">
+                                <a href="${productUrl}" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 10px;" wire:navigate.hover>
+                                    <img src="${productImage}" alt="${productName}" class="bb-product-img" style="max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s ease;" loading="lazy">
+                                </a>
+                            </div>
+                            <div class="product-card__info" style="display: flex; flex-direction: column; padding: 8px 10px 0; flex: 0 0 auto;">
+                                <div class="product-card__name" style="flex: 0 0 auto; min-height: auto; margin-bottom: 2px !important;">
+                                    <a href="${productUrl}" class="bb-product-title font-weight-bold" style="font-size: 13.5px; line-height: 1.35; color: #1e293b; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-decoration: none; min-height: auto;" wire:navigate.hover data-name="${product.var_name || productName}">${productName}</a>
+                                </div>
+                                ${getRatingHTML(product)}
+                                <div class="product-card__prices" style="margin-top: 2px !important; margin-bottom: 8px !important; padding: 0 !important; flex: 0 0 auto;">
                                     ${priceHTML}
                                 </div>
-                                ${buttonsHTML}
+                            </div>
+                            <div class="product-card__actions" style="padding: 0 10px 10px; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: auto; box-sizing: border-box;">
+                                ${!isOninda ? `
+                                    <div class="product-card__buttons w-100 d-flex justify-content-center align-items-center" style="margin: 0 !important; width: 100% !important;">
+                                        ${buttonsHTML}
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                     `;

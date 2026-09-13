@@ -1,5 +1,5 @@
 @php
-    $nmFaqEntities = [];
+    $bbFaqEntities = [];
 
     if (
         isset($category)
@@ -7,78 +7,78 @@
         && !empty($category->content)
     ) {
 
-        $nmContent = $category->content;
+        $bbContent = $category->content;
 
-        $nmStart = strpos(
-            $nmContent,
+        $bbStart = strpos(
+            $bbContent,
             '<!-- NM FAQ START -->'
         );
 
-        $nmEnd = strpos(
-            $nmContent,
+        $bbEnd = strpos(
+            $bbContent,
             '<!-- NM FAQ END -->'
         );
 
         if (
-            $nmStart !== false
-            && $nmEnd !== false
-            && $nmEnd > $nmStart
+            $bbStart !== false
+            && $bbEnd !== false
+            && $bbEnd > $bbStart
         ) {
 
-            $nmFaqHtml = substr(
-                $nmContent,
-                $nmStart,
-                $nmEnd - $nmStart
+            $bbFaqHtml = substr(
+                $bbContent,
+                $bbStart,
+                $bbEnd - $bbStart
             );
 
             preg_match_all(
                 '/<h3\b[^>]*>(.*?)<\/h3>\s*<p\b[^>]*>(.*?)<\/p>/is',
-                $nmFaqHtml,
-                $nmMatches,
+                $bbFaqHtml,
+                $bbMatches,
                 PREG_SET_ORDER
             );
 
-            foreach ($nmMatches as $nmMatch) {
+            foreach ($bbMatches as $bbMatch) {
 
-                $nmQuestion = html_entity_decode(
-                    strip_tags($nmMatch[1]),
+                $bbQuestion = html_entity_decode(
+                    strip_tags($bbMatch[1]),
                     ENT_QUOTES | ENT_HTML5,
                     'UTF-8'
                 );
 
-                $nmAnswer = html_entity_decode(
-                    strip_tags($nmMatch[2]),
+                $bbAnswer = html_entity_decode(
+                    strip_tags($bbMatch[2]),
                     ENT_QUOTES | ENT_HTML5,
                     'UTF-8'
                 );
 
-                $nmQuestion = trim(
+                $bbQuestion = trim(
                     preg_replace(
                         '/\s+/u',
                         ' ',
-                        $nmQuestion
+                        $bbQuestion
                     )
                 );
 
-                $nmAnswer = trim(
+                $bbAnswer = trim(
                     preg_replace(
                         '/\s+/u',
                         ' ',
-                        $nmAnswer
+                        $bbAnswer
                     )
                 );
 
                 if (
-                    $nmQuestion !== ''
-                    && $nmAnswer !== ''
+                    $bbQuestion !== ''
+                    && $bbAnswer !== ''
                 ) {
 
-                    $nmFaqEntities[] = [
+                    $bbFaqEntities[] = [
                         '@type' => 'Question',
-                        'name' => $nmQuestion,
+                        'name' => $bbQuestion,
                         'acceptedAnswer' => [
                             '@type' => 'Answer',
-                            'text' => $nmAnswer,
+                            'text' => $bbAnswer,
                         ],
                     ];
                 }
@@ -86,19 +86,19 @@
         }
     }
 
-    $nmFaqSchema = count($nmFaqEntities)
+    $bbFaqSchema = count($bbFaqEntities)
         ? [
             '@context' => 'https://schema.org',
             '@type' => 'FAQPage',
-            'mainEntity' => $nmFaqEntities,
+            'mainEntity' => $bbFaqEntities,
         ]
         : null;
 @endphp
 
-@if ($nmFaqSchema)
+@if ($bbFaqSchema)
 <script type="application/ld+json" id="bb-category-faq-schema">
 {!! json_encode(
-    $nmFaqSchema,
+    $bbFaqSchema,
     JSON_UNESCAPED_UNICODE
     | JSON_UNESCAPED_SLASHES
     | JSON_HEX_TAG

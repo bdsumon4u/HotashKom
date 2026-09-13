@@ -1,16 +1,16 @@
 @php
-    $nmGuideData = $category instanceof \App\Models\Category
+    $bbGuideData = $category instanceof \App\Models\Category
         ? $category->getPremiumGuideData()
         : null;
 
-    $nmRelatedGuides = collect();
+    $bbRelatedGuides = collect();
 
-    if ($nmGuideData && !empty($nmGuideData['patterns'])) {
-        $nmPatterns = $nmGuideData['patterns'];
+    if ($bbGuideData && !empty($bbGuideData['patterns'])) {
+        $bbPatterns = $bbGuideData['patterns'];
 
-        $nmRelatedGuides = \App\Models\Blog::query()
-            ->where(function ($query) use ($nmPatterns) {
-                foreach ($nmPatterns as $pattern) {
+        $bbRelatedGuides = \App\Models\Blog::query()
+            ->where(function ($query) use ($bbPatterns) {
+                foreach ($bbPatterns as $pattern) {
                     $query->orWhere('slug', 'like', '%' . $pattern . '%');
                 }
             })
@@ -20,7 +20,7 @@
     }
 @endphp
 
-@if ($nmGuideData && $nmRelatedGuides->isNotEmpty())
+@if ($bbGuideData && $bbRelatedGuides->isNotEmpty())
     <section class="bb-category-guides"
              aria-labelledby="bb-category-guides-title">
 
@@ -33,7 +33,7 @@
                 </span>
 
                 <h2 id="bb-category-guides-title">
-                    {{ $nmGuideData['title'] }}
+                    {{ $bbGuideData['title'] }}
                 </h2>
 
             </div>
@@ -46,7 +46,7 @@
 
         <div class="bb-category-guide-grid">
 
-            @foreach ($nmRelatedGuides as $nmGuide)
+            @foreach ($bbRelatedGuides as $bbGuide)
 
                 <article class="bb-category-guide-card">
 
@@ -56,14 +56,14 @@
 
                     <h3>
 
-                        <a href="{{ route('blogs.show', $nmGuide) }}">
-                            {{ $nmGuide->title }}
+                        <a href="{{ route('blogs.show', $bbGuide) }}">
+                            {{ $bbGuide->title }}
                         </a>
 
                     </h3>
 
                     <a
-                        href="{{ route('blogs.show', $nmGuide) }}"
+                        href="{{ route('blogs.show', $bbGuide) }}"
                         class="bb-category-guide-link"
                     >
                         গাইডটি পড়ুন →

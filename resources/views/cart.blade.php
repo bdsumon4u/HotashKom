@@ -45,36 +45,38 @@
     'page_title' => 'Cart Details'
 ])
 
-<div class="block cart">
+<div class="block cart py-4" style="background: #f8fafc;">
     <div class="container">
-        <div class="pt-5 row">
+        <div class="row">
             <div class="col-12 col-lg-8">
                 @if(cart()->count() > 0)
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">
-                                <i class="fa fa-shopping-cart mr-2"></i>
-                                Shopping Cart ({{ cart()->count() }} items)
+                    <div class="card" style="border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(15,23,42,0.06); overflow: hidden;">
+                        <div class="card-header bg-white" style="border-bottom: 1px solid #f1f5f9; padding: 18px 24px;">
+                            <h4 class="mb-0 font-weight-bold text-dark" style="font-size: 18px;">
+                                <i class="fas fa-shopping-cart text-success mr-2"></i>
+                                Shopping Cart ({{ cart()->count() }} {{ Str::plural('item', cart()->count()) }})
                             </h4>
                         </div>
-                        <div class="card-body p-0">
+                        <div class="card-body p-3">
                             @include('partials.cart-table')
                         </div>
                     </div>
 
-                    <div class="mt-3 text-center">
-                        <a href="{{ route('reseller.products') }}" class="btn btn-outline-primary">
+                    <div class="mt-3">
+                        <a href="{{ route('reseller.products') }}" class="btn btn-outline-secondary font-weight-bold" style="border-radius: 10px;">
                             <i class="fa fa-arrow-left mr-2"></i>Continue Shopping
                         </a>
                     </div>
                 @else
-                    <div class="card">
+                    <div class="card" style="border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(15,23,42,0.06);">
                         <div class="card-body text-center py-5">
-                            <i class="fa fa-shopping-cart fa-3x text-muted mb-3"></i>
-                            <h4>Your cart is empty</h4>
-                            <p class="text-muted">Add some products to get started!</p>
-                            <a href="{{ route('reseller.products') }}" class="btn btn-primary">
-                                <i class="fa fa-shopping-bag mr-2"></i>Browse Products
+                            <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; border-radius: 50%; background: #f1f5f9; color: #94a3b8; font-size: 32px;">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <h4 class="font-weight-bold text-dark">Your cart is empty</h4>
+                            <p class="text-muted">Explore our collection and add your favorite bags to the cart.</p>
+                            <a href="{{ url('/') }}" class="btn font-weight-bold text-white px-4 py-2" style="background: linear-gradient(135deg, var(--brand), var(--brand-dark)); border-radius: 10px;">
+                                <i class="fas fa-bag-shopping mr-2"></i>Browse Products
                             </a>
                         </div>
                     </div>
@@ -82,37 +84,38 @@
             </div>
 
             @if(cart()->count() > 0)
-                <div class="col-12 col-lg-4">
-                    <div class="card cart-summary">
-                        <div class="card-header">
-                            <h5 class="mb-0">Order Summary</h5>
+                <div class="col-12 col-lg-4 mt-4 mt-lg-0">
+                    <div class="card cart-summary" style="border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(15,23,42,0.06); position: sticky; top: 20px;">
+                        <div class="card-header bg-white" style="border-bottom: 1px solid #f1f5f9; padding: 18px 24px;">
+                            <h5 class="mb-0 font-weight-bold text-dark" style="font-size: 17px;">Order Summary</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-4">
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between mb-2">
-                                    <span>Buying Subtotal:</span>
-                                    <strong>{!! theMoney(cart()->subTotal()) !!}</strong>
+                                    <span class="text-muted font-weight-bold">Subtotal:</span>
+                                    <strong class="text-dark" style="font-size: 16px;">{!! theMoney(cart()->subTotal()) !!}</strong>
                                 </div>
                                 @if(isOninda())
                                     <div class="d-flex justify-content-between mb-2">
-                                        <span>Selling Subtotal:</span>
-                                        <strong id="selling-subtotal">Calculating...</strong>
+                                        <span class="text-muted font-weight-bold">Selling Subtotal:</span>
+                                        <strong id="selling-subtotal" class="text-success">Calculating...</strong>
                                     </div>
                                 @endif
                             </div>
 
-                            <hr>
+                            <hr style="border-color: #f1f5f9;">
 
                             <div class="mb-3">
-                                <a href="{{ route('checkout') }}" class="btn btn-primary btn-block btn-lg" wire:navigate.hover>
-                                    <i class="fa fa-credit-card mr-2"></i>Proceed to Checkout
+                                <a href="{{ route('checkout') }}" class="btn btn-block btn-lg font-weight-bold text-white d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, var(--brand), var(--brand-dark)); border: none; border-radius: 12px; min-height: 48px; box-shadow: 0 4px 14px rgba(var(--brand-rgb), 0.3);" wire:navigate.hover>
+                                    <i class="fas fa-lock"></i>
+                                    <span>Proceed to Checkout</span>
                                 </a>
                             </div>
 
                             <div class="text-center">
                                 <small class="text-muted">
-                                    <i class="fa fa-info-circle mr-1"></i>
-                                    You can continue shopping or proceed to checkout
+                                    <i class="fas fa-shield-halved text-success mr-1"></i>
+                                    100% Safe & Secure Checkout
                                 </small>
                             </div>
                         </div>

@@ -1,20 +1,20 @@
 @php
-    $nmPremiumCategory = $category ?? null;
+    $bbPremiumCategory = $category ?? null;
 
-    $nmConfig = $nmPremiumCategory instanceof \App\Models\Category
-        ? $nmPremiumCategory->getPremiumHeaderData()
+    $bbConfig = $bbPremiumCategory instanceof \App\Models\Category
+        ? $bbPremiumCategory->getPremiumHeaderData()
         : [
             'eyebrow' => $company->name ?? config('app.name'),
             'help_title' => 'আপনার প্রয়োজন অনুযায়ী বিভাগ বেছে নিন',
             'help_text' => 'প্রাসঙ্গিক subcategory থেকে প্রয়োজনীয় পণ্য সহজে খুঁজে নিন।',
-            'section_title' => ($nmPremiumCategory?->name ? $nmPremiumCategory->name . '-এর বিভাগগুলো' : null),
+            'section_title' => ($bbPremiumCategory?->name ? $bbPremiumCategory->name . '-এর বিভাগগুলো' : null),
             'section_text' => 'প্রয়োজনীয় product type দ্রুত খুঁজে পেতে নিচের বিভাগগুলো ব্যবহার করুন।',
         ];
 
-    $nmChildren = collect();
+    $bbChildren = collect();
 
-    if ($nmPremiumCategory instanceof \App\Models\Category) {
-        $nmChildren = $nmPremiumCategory->childrens()
+    if ($bbPremiumCategory instanceof \App\Models\Category) {
+        $bbChildren = $bbPremiumCategory->childrens()
             ->where('is_enabled', true)
             ->withCount([
                 'products as active_products_count' => function ($query) {
@@ -27,7 +27,7 @@
             ->get();
     }
 
-    $nmProductTotal =
+    $bbProductTotal =
         isset($products)
         && method_exists($products, 'total')
             ? $products->total()
@@ -55,7 +55,7 @@
             <span aria-hidden="true">/</span>
 
             <span aria-current="page">
-                {{ $nmPremiumCategory?->name }}
+                {{ $bbPremiumCategory?->name }}
             </span>
 
         </nav>
@@ -64,14 +64,14 @@
 
             <div class="bb-category-hero-copy">
 
-                @if (!empty($nmConfig['eyebrow']))
+                @if (!empty($bbConfig['eyebrow']))
                     <span class="bb-category-eyebrow">
-                        {{ $nmConfig['eyebrow'] }}
+                        {{ $bbConfig['eyebrow'] }}
                     </span>
                 @endif
 
                 <h1 id="bb-category-title">
-                    {{ $categoryPageTitle ?? $nmPremiumCategory?->name }}
+                    {{ $categoryPageTitle ?? $bbPremiumCategory?->name }}
                 </h1>
 
                 @if (!empty($categoryPageIntro))
@@ -82,10 +82,10 @@
 
                 <div class="bb-category-quick-info">
 
-                    @if ($nmProductTotal !== null)
+                    @if ($bbProductTotal !== null)
                         <span>
                             <strong>
-                                {{ number_format($nmProductTotal) }}
+                                {{ number_format($bbProductTotal) }}
                             </strong>
                             পণ্য
                         </span>
@@ -119,22 +119,22 @@
 
             </div>
 
-            @if (!empty($nmConfig['help_title']) || !empty($nmConfig['help_text']))
+            @if (!empty($bbConfig['help_title']) || !empty($bbConfig['help_text']))
                 <aside class="bb-category-help-card">
 
                     <span class="bb-category-help-kicker">
                         সহজে পণ্য খুঁজুন
                     </span>
 
-                    @if (!empty($nmConfig['help_title']))
+                    @if (!empty($bbConfig['help_title']))
                         <strong>
-                            {{ $nmConfig['help_title'] }}
+                            {{ $bbConfig['help_title'] }}
                         </strong>
                     @endif
 
-                    @if (!empty($nmConfig['help_text']))
+                    @if (!empty($bbConfig['help_text']))
                         <p>
-                            {{ $nmConfig['help_text'] }}
+                            {{ $bbConfig['help_text'] }}
                         </p>
                     @endif
 
@@ -147,7 +147,7 @@
 
         </div>
 
-        @if ($nmChildren->isNotEmpty())
+        @if ($bbChildren->isNotEmpty())
 
             <div id="bb-category-subcategories"
                  class="bb-category-subcategories">
@@ -161,14 +161,14 @@
                         </span>
 
                         <h2>
-                            {{ $nmConfig['section_title'] ?? ($nmPremiumCategory?->name . '-এর বিভাগগুলো') }}
+                            {{ $bbConfig['section_title'] ?? ($bbPremiumCategory?->name . '-এর বিভাগগুলো') }}
                         </h2>
 
                     </div>
 
-                    @if (!empty($nmConfig['section_text']))
+                    @if (!empty($bbConfig['section_text']))
                         <p>
-                            {{ $nmConfig['section_text'] }}
+                            {{ $bbConfig['section_text'] }}
                         </p>
                     @endif
 
@@ -176,10 +176,10 @@
 
                 <div class="bb-category-child-grid">
 
-                    @foreach ($nmChildren as $nmChild)
+                    @foreach ($bbChildren as $bbChild)
 
                         <a
-                            href="{{ route('category.show', $nmChild) }}"
+                            href="{{ route('category.show', $bbChild) }}"
                             class="bb-category-child-card"
                         >
 
@@ -190,7 +190,7 @@
                                 {{
                                     mb_strtoupper(
                                         mb_substr(
-                                            $nmChild->name,
+                                            $bbChild->name,
                                             0,
                                             1
                                         )
@@ -201,13 +201,13 @@
                             <span class="bb-category-child-copy">
 
                                 <strong>
-                                    {{ $nmChild->name }}
+                                    {{ $bbChild->name }}
                                 </strong>
 
                                 <small>
                                     {{
                                         number_format(
-                                            $nmChild->active_products_count
+                                            $bbChild->active_products_count
                                         )
                                     }}
                                     পণ্য

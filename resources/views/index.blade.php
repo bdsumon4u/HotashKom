@@ -112,19 +112,18 @@
 <style>
 /* Premium home trust strip */
 .bb-home-trust-strip {
-    margin: 26px 0 38px;
+    margin: 32px 0 32px !important;
+    padding-top: 4px;
 }
 
 .bb-home-trust-strip .block-features__list {
     display: flex;
-    gap: 13px;
-    padding: 14px;
-    background:
-        radial-gradient(circle at 6% 0%, rgba(var(--brand-rgb), .12), transparent 26%),
-        linear-gradient(135deg, var(--brand-soft) 0%, #ffffff 58%, var(--brand-soft) 100%);
-    border: 1px solid #d8eee2;
-    border-radius: 18px;
-    box-shadow: 0 10px 28px rgba(15, 72, 42, .08);
+    gap: 12px;
+    padding: 0;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0;
 }
 
 .bb-home-trust-strip .block-features__item {
@@ -132,11 +131,11 @@
     flex: 1 1 0;
     align-items: center;
     min-width: 0;
-    padding: 17px 18px;
+    padding: 12px 14px;
     background: #ffffff;
-    border: 1px solid #e2f0e8;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(17, 76, 46, .045);
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
     transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
@@ -146,23 +145,25 @@
 
 .bb-home-trust-strip .block-features__icon {
     display: inline-flex;
-    flex: 0 0 58px;
+    flex: 0 0 44px;
     align-items: center;
     justify-content: center;
-    width: 58px;
-    height: 58px;
-    margin-right: 15px;
+    width: 44px;
+    height: 44px;
+    margin-right: 12px;
     color: var(--brand-dark);
-    background: linear-gradient(145deg, var(--brand-soft), #ffffff);
-    border: 1px solid var(--brand-border);
-    border-radius: 16px;
+    background: rgba(var(--brand-rgb), 0.08);
+    border: 1px solid rgba(var(--brand-rgb), 0.15);
+    border-radius: 6px;
+    font-size: 18px;
+    transition: all 0.2s ease;
 }
 
 .bb-home-trust-strip .block-features__icon svg {
-    width: 31px !important;
-    height: 31px !important;
+    width: 22px !important;
+    height: 22px !important;
     fill: currentColor;
-    stroke: currentColor;
+    color: var(--brand-dark);
 }
 
 .bb-home-trust-strip .block-features__content {
@@ -170,25 +171,33 @@
 }
 
 .bb-home-trust-strip .block-features__title {
-    margin-bottom: 5px;
-    color: #234033;
-    font-size: 17px;
-    font-weight: 800;
-    line-height: 1.25;
+    margin-bottom: 2px;
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
 }
 
 .bb-home-trust-strip .block-features__subtitle {
-    color: #617369;
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.55;
+    color: #64748b;
+    font-size: 11.5px;
+    font-weight: 400;
+    line-height: 1.45;
 }
 
 @media (hover: hover) {
     .bb-home-trust-strip .block-features__item:hover {
-        border-color: #a7e8c5;
-        box-shadow: 0 10px 20px rgba(11, 118, 67, .11);
-        transform: translateY(-3px);
+        border-color: rgba(var(--brand-rgb), 0.4);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+        transform: translateY(-2px);
+    }
+    .bb-home-trust-strip .block-features__item:hover .block-features__icon {
+        background: var(--brand);
+        color: #ffffff;
+    }
+    .bb-home-trust-strip .block-features__item:hover .block-features__icon svg {
+        fill: #ffffff !important;
+        color: #ffffff !important;
     }
 }
 </style>
@@ -214,7 +223,7 @@
 .block-products-carousel .block-header__title a {
     display: inline-flex;
     align-items: center;
-    min-height: 50px;
+    min-height: 40px;
     padding: 10px 21px;
     border-radius: 10px;
     background: linear-gradient(135deg, var(--brand-dark), var(--brand));
@@ -252,7 +261,7 @@
 
 .block-products-carousel .block-header__arrow {
     width: 42px;
-    height: 42px;
+    height: 32px;
     border: 0;
     border-radius: 9px;
     background: var(--brand);
@@ -328,23 +337,28 @@
 }
 
 .block-products-carousel .product-card__buttons {
-    margin-top: 11px;
+    margin-top: 0 !important;
 }
 
 .block-products-carousel .product-card__addtocart,
 .block-products-carousel .product-card__ordernow {
-    width: 100%;
-    min-height: 44px;
+    width: 100% !important;
+    min-height: 38px !important;
+    height: 38px !important;
     border: 0;
-    border-radius: 8px;
-    box-shadow: 0 7px 14px rgba(var(--brand-rgb), .18);
+    border-radius: 4px !important;
+    box-shadow: 0 4px 12px rgba(var(--brand-rgb), .2) !important;
     font-weight: 800;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
 }
 
 @media (max-width: 767.98px) {
     .block-products-carousel {
         padding: 16px 0 20px;
-        border-radius: 10px;
+        border-radius: 6px;
     }
 
     .block-products-carousel .block-header {
@@ -352,10 +366,10 @@
     }
 
     .block-products-carousel .block-header__title a {
-        min-height: 40px;
-        padding: 8px 13px;
-        border-radius: 8px;
-        font-size: 17px;
+        min-height: 36px;
+        padding: 6px 12px;
+        border-radius: 5px;
+        font-size: 16px;
     }
 
     .block-products-carousel .block-header__divider {
@@ -363,27 +377,28 @@
     }
 
     .block-products-carousel .btn-all {
-        padding: 6px 9px;
+        padding: 5px 8px;
         font-size: 12px;
+        border-radius: 4px;
     }
 
     .block-products-carousel .block-header__arrow {
-        width: 35px;
-        height: 35px;
-        border-radius: 7px;
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
     }
 
     .block-products-carousel .product-card {
-        border-radius: 10px;
+        border-radius: 6px;
     }
 
     .block-products-carousel .product-card__info {
-        padding-top: 10px;
-        padding-bottom: 4px;
+        padding-top: 8px !important;
+        padding-bottom: 0 !important;
     }
 
     .block-products-carousel .product-card__name a {
-        min-height: 37px;
+        min-height: auto !important;
         font-size: 13px;
     }
 
@@ -394,9 +409,10 @@
 
     .block-products-carousel .product-card__addtocart,
     .block-products-carousel .product-card__ordernow {
-        min-height: 39px;
-        border-radius: 7px;
-        font-size: 13px;
+        min-height: 36px !important;
+        height: 36px !important;
+        border-radius: 4px !important;
+        font-size: 12.5px;
     }
 }
 </style>
@@ -413,22 +429,31 @@
 @if(($services = setting('services'))->enabled ?? false)
 @php
     $serviceIcons = config('services.service_icons', []);
+    $fallbackIcons = [
+        'one' => '<i class="fas fa-clipboard-check"></i>',
+        'two' => '<i class="fas fa-headset"></i>',
+        'three' => '<i class="fas fa-hand-holding-dollar"></i>',
+        'four' => '<i class="fas fa-star-half-stroke"></i>',
+    ];
 @endphp
 <div class="block block-features block-features--layout--classic bb-home-trust-strip d-none d-md-block">
     <div class="container">
         <div class="block-features__list">
             @foreach(config('services.services', []) as $num => $icon)
-                <div class="block-features__item">
-                    <div class="block-features__icon">
-                        {!! str_replace('<svg ', '<svg width="48px" height="48px" ', $serviceIcons[$num] ?? '') !!}
+                @if (!empty($services->$num->title))
+                    <div class="block-features__item">
+                        <div class="block-features__icon">
+                            @if (!empty($serviceIcons[$num]))
+                                {!! str_replace('<svg ', '<svg width="22px" height="22px" fill="currentColor" ', $serviceIcons[$num]) !!}
+                            @else
+                                {!! $fallbackIcons[$num] ?? '<i class="fas fa-shield-check"></i>' !!}
+                            @endif
+                        </div>
+                        <div class="block-features__content">
+                            <div class="block-features__title">{{ $services->$num->title }}</div>
+                            <div class="block-features__subtitle">{{ $services->$num->detail }}</div>
+                        </div>
                     </div>
-                    <div class="block-features__content">
-                        <div class="block-features__title">{{ $services->$num->title }}</div>
-                        <div class="block-features__subtitle">{{ $services->$num->detail }}</div>
-                    </div>
-                </div>
-                @if(!$loop->last)
-                    <div class="block-features__divider"></div>
                 @endif
             @endforeach
         </div>
@@ -630,103 +655,105 @@
 
 @include('partials.home-premium-bottom')
 
-<!-- HotashKom Home SEO & Google Reviews Section -->
+<!-- BagBazarBD Home SEO & Google Reviews Section -->
 <style>
-    .neh-home-trust-section {
-        padding: 55px 0;
-        background: #f7f9f8;
-        border-top: 1px solid #e5e9e7;
+    .bb-home-trust-section {
+        padding: 60px 0;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
     }
 
-    .neh-home-intro {
-        max-width: 900px;
-        margin: 0 auto 35px;
+    .bb-home-intro {
+        max-width: 860px;
+        margin: 0 auto 40px;
         text-align: center;
     }
 
-    .neh-home-main-heading {
-        margin: 0 0 14px;
-        color: #2f363d;
+    .bb-home-main-heading {
+        margin: 0 0 16px;
+        color: #0f172a;
         font-size: 32px;
         line-height: 1.35;
-        font-weight: 700;
+        font-weight: 800;
+        letter-spacing: -0.02em;
     }
 
-    .neh-home-intro p {
+    .bb-home-intro p {
         margin: 0;
-        color: #606971;
+        color: #64748b;
         font-size: 16px;
         line-height: 1.8;
     }
 
-    .neh-google-review-card,
-    .neh-google-map {
+    .bb-google-review-card,
+    .bb-google-map {
         height: 100%;
         overflow: hidden;
         background: #ffffff;
-        border: 1px solid #e2e8e5;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(31, 45, 38, 0.07);
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06);
     }
 
-    .neh-google-review-card {
+    .bb-google-review-card {
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 35px;
+        padding: 40px;
     }
 
-    .neh-google-review-label {
+    .bb-google-review-label {
         margin-bottom: 12px;
         color: var(--brand);
-        font-size: 14px;
-        font-weight: 700;
-        letter-spacing: .3px;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: .05em;
         text-transform: uppercase;
     }
 
-    .neh-google-review-title {
+    .bb-google-review-title {
         margin: 0 0 14px;
-        color: #2f363d;
-        font-size: 25px;
+        color: #0f172a;
+        font-size: 24px;
         line-height: 1.4;
-        font-weight: 700;
+        font-weight: 800;
     }
 
-    .neh-google-review-text {
+    .bb-google-review-text {
         margin: 0 0 24px;
-        color: #606971;
+        color: #64748b;
         font-size: 15px;
         line-height: 1.8;
     }
 
-    .neh-google-review-button {
+    .bb-google-review-button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         align-self: flex-start;
-        min-height: 46px;
-        padding: 11px 22px;
+        min-height: 48px;
+        padding: 12px 24px;
         color: #ffffff !important;
-        background: var(--brand);
-        border-radius: 6px;
+        background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+        border-radius: 10px;
         font-size: 15px;
-        font-weight: 700;
+        font-weight: 800;
         text-decoration: none !important;
-        transition: background .2s ease, transform .2s ease;
+        box-shadow: 0 4px 14px rgba(var(--brand-rgb), 0.25);
+        transition: transform .2s ease, box-shadow .2s ease;
     }
 
-    .neh-google-review-button:hover {
+    .bb-google-review-button:hover {
         color: #ffffff !important;
-        background: var(--brand-dark);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(var(--brand-rgb), 0.35);
     }
 
-    .neh-google-review-button i {
+    .bb-google-review-button i {
         margin-right: 9px;
     }
 
-    .neh-google-map iframe {
+    .bb-google-map iframe {
         display: block;
         width: 100%;
         height: 360px;
@@ -734,37 +761,37 @@
     }
 
     @media (max-width: 991.98px) {
-        .neh-google-review-card {
+        .bb-google-review-card {
             margin-bottom: 20px;
         }
     }
 
     @media (max-width: 575.98px) {
-        .neh-home-trust-section {
-            padding: 38px 0;
+        .bb-home-trust-section {
+            padding: 40px 0;
         }
 
-        .neh-home-intro {
+        .bb-home-intro {
             margin-bottom: 25px;
         }
 
-        .neh-home-main-heading {
-            font-size: 25px;
+        .bb-home-main-heading {
+            font-size: 24px;
         }
 
-        .neh-google-review-card {
+        .bb-google-review-card {
             padding: 25px 20px;
         }
 
-        .neh-google-review-title {
-            font-size: 21px;
+        .bb-google-review-title {
+            font-size: 20px;
         }
 
-        .neh-google-review-button {
+        .bb-google-review-button {
             width: 100%;
         }
 
-        .neh-google-map iframe {
+        .bb-google-map iframe {
             height: 300px;
         }
     }
@@ -775,10 +802,10 @@
     $gmapEcode = data_get(setting('company'), 'gmap_ecode') ?: null;
 @endphp
 
-<section class="neh-home-trust-section" aria-labelledby="neh-home-main-heading">
+<section class="bb-home-trust-section" aria-labelledby="bb-home-main-heading">
     <div class="container">
-        <div class="neh-home-intro">
-            <h1 id="neh-home-main-heading" class="neh-home-main-heading">
+        <div class="bb-home-intro">
+            <h1 id="bb-home-main-heading" class="bb-home-main-heading">
                 {{ $homeHeading }}
             </h1>
 
@@ -790,14 +817,14 @@
 
         <div class="row align-items-stretch">
             <div class="{{ $gmapEcode ? 'col-lg-5 mb-4 mb-lg-0' : 'col-12' }}">
-                <div class="neh-google-review-card">
-                    <div class="neh-google-review-label">Google Business Profile</div>
+                <div class="bb-google-review-card">
+                    <div class="bb-google-review-label">Google Business Profile</div>
 
-                    <h2 class="neh-google-review-title">
+                    <h2 class="bb-google-review-title">
                         Google-এ {{ $siteBrand }}-এর গ্রাহক মতামত
                     </h2>
 
-                    <p class="neh-google-review-text">
+                    <p class="bb-google-review-text">
                         {{ $siteBrand }} থেকে কেনাকাটা ও সেবা নেওয়া গ্রাহকদের অভিজ্ঞতা এবং মতামত
                         আমাদের Google Business Profile-এ দেখুন।
                     </p>
@@ -805,7 +832,7 @@
                     @if(isset($company->gmap_ecode) && !str_starts_with($company->gmap_ecode, '<iframe'))
                     <a
                         href="{{ $company->gmap_ecode }}"
-                        class="neh-google-review-button"
+                        class="bb-google-review-button"
                         target="_blank"
                         rel="noopener noreferrer"
                     >
@@ -818,13 +845,13 @@
 
             @if($gmapEcode)
             <div class="col-lg-7">
-                <div class="neh-google-map">
+                <div class="bb-google-map">
                     <button
                         type="button"
-                        class="neh-google-map-loader"
+                        class="bb-google-map-loader"
                         data-map-src="{{ $gmapEcode }}"
                         aria-label="Load {{ $siteBrand }} interactive Google Map"
-                        style="width:100%;height:100%;min-height:320px;border:0;border-radius:inherit;background:#f4fbf7;color:#263746;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;padding:25px;"
+                        style="width:100%;height:100%;min-height:320px;border:0;border-radius:inherit;background:#f8fafc;color:#0f172a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;padding:25px;"
                     >
                         <span aria-hidden="true" style="font-size:42px;line-height:1;">📍</span>
 
@@ -832,7 +859,7 @@
                             {{ $siteBrand }} Google Map
                         </strong>
 
-                        <span style="font-size:14px;">
+                        <span style="font-size:14px; color: #64748b;">
                             Interactive map দেখতে ক্লিক করুন
                         </span>
                     </button>
@@ -852,7 +879,7 @@
         window.hkMapLoaderBound = true;
 
         document.addEventListener('click', function (event) {
-            const button = event.target.closest('.neh-google-map-loader');
+            const button = event.target.closest('.bb-google-map-loader');
 
             if (!button) {
                 return;

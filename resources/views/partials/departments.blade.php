@@ -51,9 +51,9 @@
                 </ul>
             </div>
         </div>
-        <button class="departments__button">
+        <button class="departments__button" type="button">
             <svg class="departments__button-icon" width="18px" height="14px" viewBox="0 0 18 14"><path d="M0 8V6h18v2H0zm0-8h18v2H0V0zm14 14H0v-2h14v2z"/></svg>
-            Shop By Category
+            <span class="departments__button-title">Shop By Category</span>
             <svg class="departments__button-arrow" width="9px" height="6px" viewBox="0 0 9 6"><path d="M.2.4c.4-.4 1-.5 1.4-.1l2.9 3 2.9-3c.4-.4 1.1-.4 1.4.1.3.4.3.9-.1 1.3L4.5 6 .3 1.6C-.1 1.3-.1.7.2.4z"/></svg>
         </button>
     </div><!-- .departments / end -->

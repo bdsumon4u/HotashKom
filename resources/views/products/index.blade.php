@@ -168,23 +168,28 @@
 }
 
 .bb-home-section-products-page .product-card__buttons {
-    margin-top: 11px;
+    margin-top: 0 !important;
 }
 
 .bb-home-section-products-page .product-card__addtocart,
 .bb-home-section-products-page .product-card__ordernow {
-    width: 100%;
-    min-height: 44px;
+    width: 100% !important;
+    min-height: 38px !important;
+    height: 38px !important;
     border: 0;
-    border-radius: 8px;
-    box-shadow: 0 7px 14px rgba(22,185,108,.18);
+    border-radius: 4px !important;
+    box-shadow: 0 4px 12px rgba(22,185,108,.2) !important;
     font-weight: 800;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
 }
 
 .bb-home-section-products-page .category-brand-content-section {
     border: 1px solid #dcebe3 !important;
-    border-radius: 13px;
-    box-shadow: 0 7px 18px rgba(22,58,39,.07) !important;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(22,58,39,.06) !important;
 }
 
 @media (max-width: 767.98px) {
@@ -195,12 +200,12 @@
     .bb-home-section-products-page .products-view__options {
         margin-bottom: 12px;
         padding: 11px 12px;
-        border-radius: 9px;
+        border-radius: 6px;
     }
 
     .bb-home-section-products-page .filter-sidebar {
         margin-bottom: 12px !important;
-        border-radius: 10px !important;
+        border-radius: 6px !important;
     }
 
     .bb-home-section-products-page .products-list__body {
@@ -208,16 +213,16 @@
     }
 
     .bb-home-section-products-page .product-card {
-        border-radius: 10px;
+        border-radius: 6px;
     }
 
     .bb-home-section-products-page .product-card__info {
-        padding-top: 10px;
-        padding-bottom: 4px;
+        padding-top: 8px !important;
+        padding-bottom: 0 !important;
     }
 
     .bb-home-section-products-page .product-card__name a {
-        min-height: 37px;
+        min-height: auto !important;
         font-size: 13px;
     }
 
@@ -228,9 +233,10 @@
 
     .bb-home-section-products-page .product-card__addtocart,
     .bb-home-section-products-page .product-card__ordernow {
-        min-height: 39px;
-        border-radius: 7px;
-        font-size: 13px;
+        min-height: 36px !important;
+        height: 36px !important;
+        border-radius: 4px !important;
+        font-size: 12.5px;
     }
 }
 </style>
@@ -394,20 +400,21 @@
                     align-items:center;
                     flex-wrap:wrap;
                     gap:8px;
-                    padding:10px 16px;
-                    color:#3d464d;
-                    font-size:15px;
-                    background:var(--brand-soft);
-                    border:1px solid var(--brand-border);
+                    padding:10px 18px;
+                    color:#334155;
+                    font-size:14px;
+                    background:#ffffff;
+                    border:1px solid #e2e8f0;
                     border-left:4px solid var(--brand);
-                    border-radius:6px;
+                    border-radius:10px;
+                    box-shadow:0 2px 8px rgba(15,23,42,0.04);
                  ">
 
                 <i class="fa fa-folder-open"
                    aria-hidden="true"
                    style="color:var(--brand-dark);"></i>
 
-                <span>বর্তমান বিভাগ:</span>
+                <span>বর্তমান ক্যাটাগরি:</span>
 
                 <strong style="color:var(--brand-dark);">
                     {{ $categoryContextName }}

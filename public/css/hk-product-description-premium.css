@@ -4,7 +4,7 @@
 
 .bb-product-description-card {
     border: 0 !important;
-    border-radius: 16px !important;
+    border-radius: 6px !important;
     background: #ffffff;
     box-shadow: 0 8px 28px rgba(18, 38, 28, 0.06);
     overflow: hidden;
@@ -414,7 +414,7 @@
 /* Clean outer container */
 .bb-product-description-card {
     border: 1px solid #e8efeb !important;
-    border-radius: 18px !important;
+    border-radius: 6px !important;
     box-shadow:
         0 10px 35px rgba(22, 52, 36, 0.055) !important;
 }
@@ -493,7 +493,7 @@
     width: 46px;
     height: 2px;
 
-    border-radius: 20px;
+    border-radius: 2px;
 
     background:
         linear-gradient(
@@ -565,7 +565,7 @@
 @media (max-width: 767px) {
 
     .bb-product-description-card {
-        border-radius: 13px !important;
+        border-radius: 6px !important;
     }
 
     .bb-product-description {
