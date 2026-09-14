@@ -1,4 +1,4 @@
-@if(in_array(request()->path(), ['terms-and-conditions', 'privacy-policy', 'disclaimer', 'return-and-refund-policy', 'shipping-and-delivery-policy'], true) === false)
+@if(in_array(request()->path(), ['terms-and-conditions', 'privacy-policy', 'disclaimer'], true) === false)
 {{-- NM PREMIUM LEGAL PAGE HEADER HIDE --}}
 <div class="page-header">
     <div class="container page-header__container">

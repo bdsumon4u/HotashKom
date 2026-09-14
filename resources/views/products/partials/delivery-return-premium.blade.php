@@ -133,45 +133,12 @@ $delivery_text = $product->delivery_text ?? setting('delivery_text') ?? '';
 </style>
 
 <div class="bb-policy-shell">
-    <div class="bb-policy-summary">
-        <div class="bb-policy-return">
-            <div class="bb-policy-return-title">
-                সমস্যা হলে কী করবেন?
-            </div>
-
-            <p>
-                ভুল পণ্য, delivery damage বা missing item থাকলে
-                পণ্য পাওয়ার ৩ দিনের মধ্যে আমাদের সঙ্গে যোগাযোগ করুন।
-            </p>
-
-            <p>
-                Original box, packaging এবং included accessories
-                সংরক্ষণ করুন। পণ্যভেদে আলাদা return condition
-                প্রযোজ্য হতে পারে।
-            </p>
-        </div>
-
-        <div class="bb-policy-links">
-            <a href="{{ url('/shipping-and-delivery-policy') }}">
-                Shipping Policy
-            </a>
-
-            <a href="{{ url('/return-and-refund-policy') }}">
-                Return & Refund Policy
-            </a>
-        </div>
-    </div>
-
     @if ($delivery_text !== '')
-        <details class="bb-policy-details">
-            <summary>এই পণ্যের Delivery & Return Policy</summary>
-
-            <div class="bb-policy-detail-body">
-                {{-- CLOUDFLARE_EMAIL_OFF_DELIVERY --}}
-                <!--email_off-->
-                {!! $delivery_text !!}
-                <!--/email_off-->
-            </div>
-        </details>
+        <div class="bb-policy-detail-body">
+            {{-- CLOUDFLARE_EMAIL_OFF_DELIVERY --}}
+            <!--email_off-->
+            {!! $delivery_text !!}
+            <!--/email_off-->
+        </div>
     @endif
 </div>

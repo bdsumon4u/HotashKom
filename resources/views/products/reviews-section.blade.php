@@ -29,39 +29,45 @@
 
 <div class="reviews-section">
     @if ($totalReviews > 0)
-        <div class="mb-4 reviews-summary">
-            <div class="mb-3 d-flex align-items-center justify-content-between">
+        <div class="reviews-summary d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="reviews-summary-score">{{ number_format($averageRating, 1) }}</div>
                 <div>
-                    <h5 class="mb-1">Customer Reviews</h5>
-                    <div class="gap-2 d-flex align-items-center">
-                        <div class="d-flex align-items-center">
-                            @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <= floor($averageRating))
-                                    <i class="fa fa-star text-warning"></i>
-                                @elseif($i - 0.5 <= $averageRating)
-                                    <i class="fa fa-star-half-alt text-warning"></i>
-                                @else
-                                    <i class="far fa-star text-muted"></i>
-                                @endif
-                            @endfor
-                        </div>
-                        <span class="ml-2">
-                            <strong>{{ number_format($averageRating, 1) }}</strong> out of 5
-                        </span>
-                        <span class="text-muted">
-                            ({{ $totalReviews }} {{ Str::plural('review', $totalReviews) }})
-                        </span>
+                    <div class="reviews-summary-stars">
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= floor($averageRating))
+                                <i class="fa fa-star"></i>
+                            @elseif($i - 0.5 <= $averageRating)
+                                <i class="fa fa-star-half-alt"></i>
+                            @else
+                                <i class="far fa-star" style="color: #cbd5e1;"></i>
+                            @endif
+                        @endfor
+                    </div>
+                    <div class="reviews-summary-count">
+                        Based on {{ $totalReviews }} {{ Str::plural('verified review', $totalReviews) }}
                     </div>
                 </div>
+            </div>
+            <div>
+                <a href="#review-form-container" class="reviews-write-btn" onclick="document.getElementById('order_id')?.focus()">
+                    <i class="fas fa-pen-to-square"></i>
+                    <span>Write a Review</span>
+                </a>
             </div>
         </div>
     @endif
 
-    <div class="mb-4 review-form-container" id="review-form-container"
+    <div class="review-form-container" id="review-form-container"
         data-review-submitted="{{ session('review_submitted') ? 'true' : 'false' }}">
-        <h6 class="mb-3">Write a Review</h6>
-        <p class="mb-3 text-muted small">To submit a review, please provide your order ID and phone number to verify
-            your purchase.</p>
+        <div class="review-form-header">
+            <span class="review-form-badge"><i class="fas fa-pen-to-square"></i></span>
+            <div>
+                <h6 class="review-form-title">Write a Customer Review</h6>
+                <p class="review-form-subtitle">Share your experience to help others make the right choice</p>
+            </div>
+        </div>
+
         <form action="{{ route('products.reviews.store', $product) }}" method="POST" id="review-form">
             @csrf
             <div class="row">
@@ -69,11 +75,10 @@
                     <div class="form-group">
                         <label for="order_id">Order ID <span class="text-danger">*</span></label>
                         <input type="text" name="order_id" id="order_id" class="form-control"
-                            placeholder="Enter your order ID" value="{{ old('order_id') }}" required>
-                        <small class="form-text text-muted">You can find your order ID in your order
-                            confirmation.</small>
+                            placeholder="e.g. 10582" value="{{ old('order_id') }}" required>
+                        <small class="form-text text-muted">Found in your order confirmation SMS.</small>
                         @error('order_id')
-                            <small class="text-danger d-block">{{ $message }}</small>
+                            <small class="text-danger d-block mt-1">{{ $message }}</small>
                         @enderror
                     </div>
                 </div>
@@ -81,29 +86,31 @@
                     <div class="form-group">
                         <label for="phone_number">Phone Number <span class="text-danger">*</span></label>
                         <input type="text" name="phone_number" id="phone_number" class="form-control"
-                            placeholder="Enter your phone number" value="{{ old('phone_number') }}" required>
-                        <small class="form-text text-muted">Must match the phone number used for the order.</small>
+                            placeholder="017XXXXXXXX" value="{{ old('phone_number') }}" required>
+                        <small class="form-text text-muted">Phone number used during purchase.</small>
                         @error('phone_number')
-                            <small class="text-danger d-block">{{ $message }}</small>
+                            <small class="text-danger d-block mt-1">{{ $message }}</small>
                         @enderror
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="rating">Rating <span class="text-danger">*</span></label>
-                        <div class="rating-input">
-                            @for ($i = 5; $i >= 1; $i--)
-                                <input type="radio" name="rating" value="{{ $i }}"
-                                    id="rating-{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}
-                                    class="rating-radio">
-                                <label for="rating-{{ $i }}" class="star-label">
-                                    <i class="far fa-star"></i>
-                                </label>
-                            @endfor
+                        <label for="rating">Your Rating <span class="text-danger">*</span></label>
+                        <div class="rating-input-wrapper">
+                            <div class="rating-input">
+                                @for ($i = 5; $i >= 1; $i--)
+                                    <input type="radio" name="rating" value="{{ $i }}"
+                                        id="rating-{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}
+                                        class="rating-radio">
+                                    <label for="rating-{{ $i }}" class="star-label">
+                                        <i class="far fa-star"></i>
+                                    </label>
+                                @endfor
+                            </div>
                         </div>
                         <input type="hidden" name="rating_required" value="1" id="rating-required-field">
                         @error('rating')
-                            <small class="text-danger d-block">{{ $message }}</small>
+                            <small class="text-danger d-block mt-1">{{ $message }}</small>
                         @enderror
                     </div>
                 </div>
@@ -112,40 +119,49 @@
             <div class="form-group">
                 <label for="review">Your Review <span class="text-danger">*</span></label>
                 <textarea name="review" id="review" rows="4" class="form-control"
-                    placeholder="Share your experience with this product..." required minlength="10" maxlength="1000">{{ old('review') }}</textarea>
+                    placeholder="What did you like or dislike about this product? How is the quality?" required minlength="10" maxlength="1000">{{ old('review') }}</textarea>
                 <small class="form-text text-muted">Minimum 10 characters, maximum 1000 characters.</small>
                 @error('review')
-                    <small class="text-danger d-block">{{ $message }}</small>
+                    <small class="text-danger d-block mt-1">{{ $message }}</small>
                 @enderror
             </div>
-            <div class="form-group">
-                <div class="form-check">
+
+            <div class="form-group mb-3">
+                <label class="form-check" for="recommend">
                     <input type="checkbox" name="recommend" value="1" id="recommend" class="form-check-input"
-                        {{ old('recommend') ? 'checked' : '' }}>
-                    <label class="form-check-label" for="recommend">
-                        I recommend this product
-                    </label>
-                </div>
+                        {{ old('recommend', true) ? 'checked' : '' }}>
+                    <span class="form-check-label">
+                        <i class="fas fa-thumbs-up mr-1 text-primary"></i> I recommend this product
+                    </span>
+                </label>
             </div>
+
             @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-success d-flex align-items-center gap-2 mb-3">
+                    <i class="fas fa-circle-check"></i>
+                    <div>{{ session('success') }}</div>
+                </div>
             @endif
             @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="mb-0">
+                <div class="alert alert-danger mb-3">
+                    <ul class="mb-0 pl-3">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
             @endif
-            <button type="submit" class="btn btn-primary">Submit Review</button>
+
+            <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-2">
+                <i class="fas fa-paper-plane"></i>
+                <span>Submit Review</span>
+            </button>
         </form>
     </div>
 
     <div class="reviews-list" id="reviews-list">
         @if ($reviews->count() > 0)
-            <h6 class="mb-3">Recent Reviews</h6>
+            <h6 class="reviews-list-title">Verified Customer Reviews ({{ $totalReviews }})</h6>
             @foreach ($reviews as $review)
                 @php
                     $userName = $review->user->name ?? 'Anonymous';
@@ -166,35 +182,41 @@
                         '&color=fff&size=64&bold=true&format=png';
                     $rating = $review->ratings->where('key', 'overall')->first()->value ?? 0;
                 @endphp
-                <div class="p-2 review-item border-bottom">
-                    <div class="d-flex">
-                        <div class="mr-3 review-avatar">
+                <div class="review-item">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="review-avatar flex-shrink-0">
                             <img src="{{ $avatarUrl }}" alt="{{ $userName }}" class="rounded-circle"
-                                width="48" height="48"
+                                width="44" height="44"
                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'64\' height=\'64\'%3E%3Crect fill=\'%23ddd\' width=\'64\' height=\'64\'/%3E%3Ctext fill=\'%23999\' font-family=\'Arial\' font-size=\'24\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\'%3E{{ $userInitials }}%3C/text%3E%3C/svg%3E'">
                         </div>
-                        <div class="review-content flex-grow-1">
-                            <div class="mb-2 d-flex justify-content-between align-items-start">
-                                <div>
+                        <div class="review-content flex-grow-1 min-w-0">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
                                     <strong class="review-author-name">{{ $userName }}</strong>
-                                    <span
-                                        class="ml-2 text-muted small review-date">{{ $review->created_at->diffForHumans() }}</span>
+                                    <span class="review-verified-badge">
+                                        <i class="fas fa-circle-check"></i> Verified Buyer
+                                    </span>
                                 </div>
-                                <div class="d-flex align-items-center review-rating">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        @if ($i <= $rating)
-                                            <i class="fa fa-star text-warning"></i>
-                                        @else
-                                            <i class="far fa-star text-muted"></i>
-                                        @endif
-                                    @endfor
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="review-rating">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            @if ($i <= $rating)
+                                                <i class="fa fa-star"></i>
+                                            @else
+                                                <i class="far fa-star" style="color: #cbd5e1 !important;"></i>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <span class="review-date">{{ $review->created_at->diffForHumans() }}</span>
                                 </div>
                             </div>
-                            <p class="mb-2 review-text">{{ $review->review }}</p>
+                            <div class="review-text">{{ $review->review }}</div>
                             @if ($review->recommend)
-                                <span class="badge badge-success review-recommend-badge">
-                                    <i class="fa fa-check"></i> Recommended
-                                </span>
+                                <div class="mt-2">
+                                    <span class="review-recommend-badge">
+                                        <i class="fas fa-thumbs-up text-primary"></i> Recommends this product
+                                    </span>
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -202,132 +224,27 @@
             @endforeach
 
             @if ($totalReviews > $perPage)
-                <button type="button" class="btn btn-outline-primary" id="load-more-reviews"
-                    data-product-slug="{{ $product->slug }}" data-page="1">
-                    Load More Reviews
-                </button>
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-outline-primary" id="load-more-reviews"
+                        data-product-slug="{{ $product->slug }}" data-page="1">
+                        Load More Reviews
+                    </button>
+                </div>
             @endif
         @else
-            <div class="py-4 text-center text-muted">
-                <i class="mb-3 fa fa-comments fa-3x"></i>
-                <p>No reviews yet. Be the first to review this product!</p>
+            <div class="reviews-empty-state">
+                <div class="reviews-empty-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h6 class="reviews-empty-title">No Reviews Yet</h6>
+                <p class="reviews-empty-text">Have you bought this product? Be the first to share your thoughts!</p>
+                <a href="#review-form-container" class="btn btn-sm btn-primary" onclick="document.getElementById('order_id')?.focus()">
+                    <i class="fas fa-pen-to-square mr-1"></i> Write a Review
+                </a>
             </div>
         @endif
     </div>
 </div>
-
-@push('styles')
-    <style>
-        .rating-input {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: flex-end;
-            gap: 5px;
-        }
-
-        .rating-input .rating-radio {
-            position: absolute;
-            opacity: 0;
-            width: 1px;
-            height: 1px;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        .rating-input .rating-radio:focus+label {
-            outline: 2px solid #007bff;
-            outline-offset: 2px;
-            border-radius: 2px;
-        }
-
-        .rating-input .rating-radio:focus-visible+label {
-            outline: 2px solid #007bff;
-            outline-offset: 2px;
-        }
-
-        .rating-input label {
-            cursor: pointer;
-            font-size: 24px;
-            color: #ddd;
-            transition: color 0.2s;
-        }
-
-        .rating-input input[type="radio"]:checked~label,
-        .rating-input label:hover,
-        .rating-input label:hover~label {
-            color: #ffc107;
-        }
-
-        .rating-input input[type="radio"]:checked~label {
-            color: #ffc107;
-        }
-
-        .reviews-section {
-            max-width: 100%;
-        }
-
-        .review-item {
-            padding: 1rem;
-            transition: background-color 0.2s;
-        }
-
-        .review-item:hover {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
-
-        .review-avatar {
-            flex-shrink: 0;
-        }
-
-        .review-avatar img {
-            object-fit: cover;
-            border: 2px solid #e9ecef;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .review-content {
-            min-width: 0;
-        }
-
-        .review-author-name {
-            font-size: 1rem;
-            color: #212529;
-        }
-
-        .review-date {
-            font-size: 0.875rem;
-        }
-
-        .review-rating {
-            font-size: 0.875rem;
-        }
-
-        .review-rating i {
-            font-size: 0.875rem;
-            margin: 0 1px;
-        }
-
-        .review-text {
-            color: #495057;
-            line-height: 1.6;
-            margin-bottom: 0.5rem;
-        }
-
-        .review-recommend-badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-        }
-
-        .reviews-list {
-            margin-top: 2rem;
-        }
-    </style>
-@endpush
 
 @push('scripts')
     <script>

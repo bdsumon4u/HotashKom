@@ -14,9 +14,10 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('strokya/vendor/xzoom/xzoom.css') }}">
     <link rel="stylesheet" href="{{ asset('strokya/vendor/xZoom-master/example/css/demo.css') }}">
-        @once
-            <link rel="stylesheet" href="{{ asset('css/hk-customer-reviews-premium.css') }}">
-        @endonce
+    @once
+        <link rel="stylesheet" href="{{ asset('css/hk-product-description-premium.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/hk-customer-reviews-premium.css') }}">
+    @endonce
     <style>
         .review-rating-link {
             transition: opacity 0.2s ease;
@@ -26,31 +27,6 @@
         }
         .review-rating-link:active {
             opacity: 0.5;
-        }
-        #accordion .card {
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
-            margin-bottom: 16px;
-        }
-        #accordion .card-header {
-            background: #ffffff;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        #accordion .card-link {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 16px;
-            padding: 16px 20px;
-            color: #0f172a;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all .2s;
-        }
-        #accordion .card-link:hover {
-            color: var(--brand);
         }
 
         iframe {
@@ -262,14 +238,13 @@
                     @endif
                 </div>
             </div>
-            <div id="accordion" class="mt-3">
+            <div id="accordion" class="mt-4">
                 <div class="card bb-product-description-card">
-                    @once
-                        <link rel="stylesheet" href="{{ asset('css/hk-product-description-premium.css') }}">
-                    @endonce
                     <div class="p-0 card-header">
-                        <a class="px-4 card-link bb-product-description-title" datatoggle="collapse" href="javascript:void(false)">
-                            Product Description
+                        <a class="px-3 px-md-4 card-link bb-product-description-title" data-toggle="collapse" href="#collapseOne">
+                            <span class="bb-accordion-icon"><i class="fas fa-file-lines"></i></span>
+                            <span class="bb-accordion-title-text">Product Description</span>
+                            <span class="bb-accordion-arrow"><i class="fas fa-chevron-down"></i></span>
                         </a>
                     </div>
                     <div id="collapseOne" class="collapse show" data-parent="#accordion">
@@ -298,10 +273,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-3 card">
+                <div class="card bb-delivery-policy-card">
                     <div class="p-0 card-header">
-                        <a class="px-4 card-link" datatoggle="collapse" href="javascript:void(false)">
-                            Delivery & Return Policy
+                        <a class="px-3 px-md-4 card-link" data-toggle="collapse" href="#collapseTwo">
+                            <span class="bb-accordion-icon"><i class="fas fa-truck-fast"></i></span>
+                            <span class="bb-accordion-title-text">Delivery & Return Policy</span>
+                            <span class="bb-accordion-arrow"><i class="fas fa-chevron-down"></i></span>
                         </a>
                     </div>
                     <div id="collapseTwo" class="collapse show" data-parent="#accordion">
@@ -310,16 +287,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-3 card bb-customer-reviews-card">
+                <div class="card bb-customer-reviews-card">
                     <div class="p-0 card-header">
-                        <a class="px-4 card-link" data-toggle="collapse" href="javascript:void(false)" aria-expanded="false">
-                            Customer Reviews
-                            @php
-                                $totalReviews = $product->totalReviews();
-                            @endphp
-                            @if ($totalReviews > 0)
-                                <span class="ml-2 badge badge-primary">{{ $totalReviews }}</span>
-                            @endif
+                        <a class="px-3 px-md-4 card-link" data-toggle="collapse" href="#collapseThree" aria-expanded="false">
+                            <span class="bb-accordion-icon"><i class="fas fa-star"></i></span>
+                            <span class="bb-accordion-title-text">
+                                Customer Reviews
+                                @php
+                                    $totalReviews = $product->totalReviews();
+                                @endphp
+                                @if ($totalReviews > 0)
+                                    <span class="ml-2 badge badge-primary" style="background: var(--brand); color: #fff; border-radius: 999px; font-size: 11px; padding: 3px 8px;">{{ $totalReviews }}</span>
+                                @endif
+                            </span>
+                            <span class="bb-accordion-arrow"><i class="fas fa-chevron-down"></i></span>
                         </a>
                     </div>
                     <div id="collapseThree" class="collapse show" data-parent="#accordion">

@@ -132,8 +132,6 @@
         'terms-and-conditions',
         'privacy-policy',
         'disclaimer',
-        'return-and-refund-policy',
-        'shipping-and-delivery-policy',
     ], true))
         @include('schema.static-page')
     @endif

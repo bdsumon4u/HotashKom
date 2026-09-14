@@ -1,680 +1,446 @@
-/*
- * HotashKom Customer Reviews Premium
- * Visual layer only.
- * Review route, validation, fields, JS and database logic untouched.
- */
+/* =========================================================
+   BagStoreBD Modern Customer Reviews Design
+   ========================================================= */
 
-
-/* =====================================================
-   OUTER CARD
-   ===================================================== */
-
-#accordion .bb-customer-reviews-card {
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid #dfeae4 !important;
-    border-radius: 16px;
-    box-shadow:
-        0 10px 30px rgba(25, 73, 50, .055);
+/* --- Card Body Base --- */
+.bb-customer-reviews-card .card-body {
+    padding: 24px !important;
+    background: #ffffff;
 }
 
-
-/* =====================================================
-   CARD HEADER
-   ===================================================== */
-
-#accordion
-.bb-customer-reviews-card
-> .card-header {
-    padding: 0 !important;
-    background:
-        linear-gradient(
-            135deg,
-            var(--brand-soft) 0%,
-            #ffffff 100%
-        );
-    border-bottom: 1px solid #e0ede6;
+.reviews-section {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-#accordion
-.bb-customer-reviews-card
-.card-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 18px 22px !important;
-    color: #1e3027 !important;
-    border-bottom: 0 !important;
-    font-size: 21px;
-    font-weight: 800;
-    line-height: 1.3;
-    text-decoration: none;
-}
-
-#accordion
-.bb-customer-reviews-card
-.card-link:not(.collapsed) {
-    color: #1e3027 !important;
-    border-bottom: 0 !important;
-}
-
-#accordion
-.bb-customer-reviews-card
-.card-link::before {
-    content: "★";
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 34px;
-    width: 34px;
-    height: 34px;
-    color: var(--brand-dark);
-    background: var(--brand-soft);
-    border-radius: 9px;
-    font-size: 17px;
-    line-height: 1;
-}
-
-#accordion
-.bb-customer-reviews-card
-.card-link .badge {
-    margin-left: auto !important;
-    padding: 5px 9px;
-    color: #14864f;
-    background: #def6e9 !important;
-    border: 1px solid #c8ebd8;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 800;
-}
-
-
-/* =====================================================
-   CARD BODY
-   ===================================================== */
-
-#accordion
-.bb-customer-reviews-card
-> .collapse
-> .card-body {
-    padding: 20px !important;
-}
-
-
-/* =====================================================
-   REVIEW SUMMARY
-   ===================================================== */
-
-.bb-customer-reviews-card
+/* =========================================================
+   1. Rating Summary Hero
+   ========================================================= */
 .reviews-summary {
-    margin-bottom: 18px !important;
-    padding: 15px 17px;
-    background: #fbfdfc;
-    border: 1px solid #e2ebe6;
-    border-radius: 12px;
+    margin-bottom: 24px !important;
+    padding: 22px 26px !important;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
 }
 
-.bb-customer-reviews-card
-.reviews-summary h5 {
-    color: #26382f;
-    font-size: 17px;
-    font-weight: 800;
+.reviews-summary-score {
+    font-size: 38px;
+    font-weight: 900;
+    line-height: 1;
+    color: #0f172a;
+    letter-spacing: -0.03em;
 }
 
-.bb-customer-reviews-card
-.reviews-summary .fa-star,
-.bb-customer-reviews-card
-.reviews-summary .fa-star-half-alt {
-    color: #f5aa16 !important;
-}
-
-
-/* =====================================================
-   WRITE REVIEW FORM CARD
-   ===================================================== */
-
-.bb-customer-reviews-card
-.review-form-container {
-    margin-bottom: 18px !important;
-    padding: 20px;
-    background:
-        linear-gradient(
-            135deg,
-            #fbfefc 0%,
-            #f4faf7 100%
-        );
-    border: 1px solid #deebe4;
-    border-radius: 14px;
-}
-
-.bb-customer-reviews-card
-.review-form-container > h6 {
+.reviews-summary-stars {
     display: flex;
     align-items: center;
-    gap: 9px;
-    margin-bottom: 6px !important;
-    color: #203229;
-    font-size: 17px;
-    font-weight: 800;
+    gap: 3px;
+    color: #f59e0b;
+    font-size: 16px;
+    margin: 6px 0 4px;
 }
 
-.bb-customer-reviews-card
-.review-form-container > h6::before {
-    content: "✓";
+.reviews-summary-count {
+    color: #64748b;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.reviews-write-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--brand-dark, #0f172a);
+    background: var(--brand-soft, #f1f5f9);
+    border: 1px solid var(--brand-border, #e2e8f0);
+    border-radius: 8px;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+.reviews-write-btn:hover {
+    background: var(--brand);
+    color: #ffffff !important;
+    border-color: var(--brand);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(var(--brand-rgb), 0.25);
+}
+
+/* =========================================================
+   2. Write A Review Form Card
+   ========================================================= */
+.review-form-container {
+    margin-bottom: 28px !important;
+    padding: 24px 26px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+}
+
+.review-form-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.review-form-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 25px;
-    height: 25px;
-    color: #fff;
-    background: var(--brand);
-    border-radius: 50%;
-    font-size: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: var(--brand-soft, #f1f5f9);
+    border: 1px solid var(--brand-border, #e2e8f0);
+    color: var(--brand, #0f172a);
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.review-form-title {
+    margin: 0;
+    font-size: 17px;
     font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.01em;
 }
 
-.bb-customer-reviews-card
-.review-form-container > p {
-    margin-left: 34px;
-    margin-bottom: 18px !important;
-    color: #697970 !important;
-    font-size: 12px !important;
-    line-height: 1.55;
+.review-form-subtitle {
+    margin: 2px 0 0;
+    color: #64748b;
+    font-size: 13px;
 }
 
-
-/* =====================================================
-   FORM LABELS
-   ===================================================== */
-
-.bb-customer-reviews-card
+/* Form Controls */
 #review-form label {
     margin-bottom: 6px;
-    color: #35473d;
-    font-size: 13px;
-    font-weight: 700;
+    color: #334155;
+    font-size: 13.5px;
+    font-weight: 600;
 }
 
-.bb-customer-reviews-card
-#review-form .text-danger {
-    color: #db4747 !important;
-}
-
-
-/* =====================================================
-   INPUTS / TEXTAREA
-   ===================================================== */
-
-.bb-customer-reviews-card
 #review-form .form-control {
-    height: 45px;
-    padding: 9px 12px;
-    color: #27382f;
-    background: #fff;
-    border: 1px solid #d6e2db;
-    border-radius: 9px;
-    font-size: 13px;
+    height: 44px;
+    padding: 10px 14px;
+    color: #0f172a;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
     box-shadow: none;
-    transition:
-        border-color .18s ease,
-        box-shadow .18s ease,
-        background .18s ease;
+    transition: all 0.2s ease;
 }
 
-.bb-customer-reviews-card
 #review-form .form-control::placeholder {
-    color: #9aa69f;
+    color: #94a3b8;
+    font-size: 13.5px;
 }
 
-.bb-customer-reviews-card
 #review-form .form-control:focus {
-    background: #fff;
-    border-color: #1DBF73;
-    box-shadow:
-        0 0 0 3px rgba(var(--brand-rgb), .10);
+    background: #ffffff;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-light, rgba(var(--brand-rgb), 0.15));
     outline: 0;
 }
 
-.bb-customer-reviews-card
 #review-form textarea.form-control {
-    min-height: 118px;
+    min-height: 110px;
     height: auto;
-    padding: 11px 12px;
-    line-height: 1.55;
+    padding: 12px 14px;
+    line-height: 1.6;
     resize: vertical;
 }
 
-.bb-customer-reviews-card
 #review-form .form-text {
-    margin-top: 6px;
-    color: #7b8981 !important;
-    font-size: 11px;
-    line-height: 1.4;
+    margin-top: 5px;
+    color: #94a3b8 !important;
+    font-size: 12px;
 }
 
-
-/* =====================================================
-   FORM GROUP SPACING
-   ===================================================== */
-
-.bb-customer-reviews-card
-#review-form .form-group {
-    margin-bottom: 17px;
-}
-
-
-/* =====================================================
-   STAR RATING
-   ===================================================== */
-
-.bb-customer-reviews-card
-.rating-input {
-    min-height: 45px;
+/* Star Rating Input Widget */
+.rating-input-wrapper {
     display: flex;
     align-items: center;
+    height: 44px;
+    padding: 6px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+}
+
+.rating-input-wrapper:focus-within {
+    border-color: var(--brand);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px var(--brand-light, rgba(var(--brand-rgb), 0.15));
+}
+
+.rating-input {
+    display: flex;
     flex-direction: row-reverse;
     justify-content: flex-end;
-    gap: 5px;
-    padding: 6px 10px;
-    background: #fff;
-    border: 1px solid #d6e2db;
-    border-radius: 9px;
+    gap: 6px;
 }
 
-.bb-customer-reviews-card
+.rating-input .rating-radio {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    pointer-events: none;
+}
+
 .rating-input label {
     margin: 0 !important;
-    color: #d9e0dc;
-    font-size: 27px;
+    color: #cbd5e1;
+    font-size: 24px;
     line-height: 1;
     cursor: pointer;
-    transition:
-        color .16s ease,
-        transform .16s ease;
+    transition: color 0.15s ease, transform 0.15s ease;
 }
 
-.bb-customer-reviews-card
 .rating-input label:hover {
-    transform: translateY(-1px);
+    transform: scale(1.15);
 }
 
-.bb-customer-reviews-card
 .rating-input input[type="radio"]:checked ~ label,
-.bb-customer-reviews-card
 .rating-input label:hover,
-.bb-customer-reviews-card
 .rating-input label:hover ~ label {
-    color: #f5aa16;
+    color: #f59e0b !important;
 }
 
-.bb-customer-reviews-card
-.rating-input .rating-radio:focus + label,
-.bb-customer-reviews-card
-.rating-input .rating-radio:focus-visible + label {
-    outline: 2px solid #1DBF73;
-    outline-offset: 2px;
-    border-radius: 4px;
-}
-
-
-/* =====================================================
-   RECOMMEND CHECKBOX
-   ===================================================== */
-
-.bb-customer-reviews-card
+/* Custom Checkbox */
 #review-form .form-check {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    min-height: 38px;
-    padding: 7px 12px;
-    background: #fff;
-    border: 1px solid #dce8e1;
-    border-radius: 9px;
+    padding: 8px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
 }
 
-.bb-customer-reviews-card
+#review-form .form-check:hover {
+    border-color: #cbd5e1;
+}
+
 #review-form .form-check-input {
     position: static;
-    width: 17px;
-    height: 17px;
     margin: 0;
-    accent-color: #1DBF73;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--brand);
     cursor: pointer;
 }
 
-.bb-customer-reviews-card
 #review-form .form-check-label {
     margin: 0;
-    color: #405148;
-    font-size: 12px;
-    font-weight: 700;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
 }
 
-
-/* =====================================================
-   SUBMIT BUTTON
-   ===================================================== */
-
-.bb-customer-reviews-card
-#review-form
-button[type="submit"].btn-primary {
-    min-width: 175px;
-    min-height: 45px;
-    padding: 10px 19px;
-    color: #fff;
-    background: var(--brand);
-    border: 1px solid var(--brand);
-    border-radius: 9px;
+/* Submit Button */
+#review-form button[type="submit"].btn-primary {
+    min-height: 44px;
+    padding: 10px 24px;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%) !important;
+    border: none !important;
+    border-radius: 8px;
     font-size: 14px;
-    font-weight: 800;
-    box-shadow:
-        0 7px 16px rgba(var(--brand-rgb), .15);
-    transition:
-        background .18s ease,
-        border-color .18s ease,
-        box-shadow .18s ease,
-        transform .18s ease;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(var(--brand-rgb), 0.25);
+    transition: all 0.2s ease;
 }
 
-.bb-customer-reviews-card
-#review-form
-button[type="submit"].btn-primary:hover {
-    color: #fff;
-    background: var(--brand-hover, #16a963);
-    border-color: var(--brand-hover, #16a963);
-    box-shadow:
-        0 9px 20px rgba(var(--brand-rgb), .20);
+#review-form button[type="submit"].btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(var(--brand-rgb), 0.35);
+}
+
+/* =========================================================
+   3. Reviews List & Items
+   ========================================================= */
+.reviews-list-title {
+    margin-bottom: 16px !important;
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
+.review-item {
+    margin-bottom: 14px;
+    padding: 18px 20px !important;
+    background: #ffffff;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.02);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.review-item:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 6px 18px -2px rgba(15, 23, 42, 0.06);
     transform: translateY(-1px);
 }
 
-.bb-customer-reviews-card
-#review-form
-button[type="submit"].btn-primary:focus {
-    outline: none;
-    box-shadow:
-        0 0 0 3px rgba(var(--brand-rgb), .14);
-}
-
-
-/* =====================================================
-   ALERTS
-   ===================================================== */
-
-.bb-customer-reviews-card
-#review-form .alert {
-    padding: 10px 12px;
-    border-radius: 9px;
-    font-size: 12px;
-}
-
-
-/* =====================================================
-   REVIEW LIST
-   ===================================================== */
-
-.bb-customer-reviews-card
-.reviews-list {
-    margin-top: 18px !important;
-}
-
-.bb-customer-reviews-card
-.reviews-list > h6 {
-    margin-bottom: 12px !important;
-    color: #26382f;
-    font-size: 16px;
-    font-weight: 800;
-}
-
-
-/* =====================================================
-   EXISTING REVIEW ITEM
-   ===================================================== */
-
-.bb-customer-reviews-card
-.review-item {
-    margin-bottom: 10px;
-    padding: 14px !important;
-    background: #fff;
-    border: 1px solid #e3ebe7 !important;
-    border-radius: 11px;
-    transition:
-        background .18s ease,
-        border-color .18s ease,
-        box-shadow .18s ease;
-}
-
-.bb-customer-reviews-card
-.review-item:hover {
-    background: #fbfdfc;
-    border-color: #d9e7df !important;
-    box-shadow:
-        0 5px 15px rgba(31, 75, 54, .045);
-}
-
-.bb-customer-reviews-card
 .review-avatar img {
-    border: 2px solid #dce9e2;
-    box-shadow: none;
+    border: 2px solid #f1f5f9;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
-.bb-customer-reviews-card
 .review-author-name {
-    color: #24362c;
-    font-size: 14px;
-    font-weight: 800;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
 }
 
-.bb-customer-reviews-card
-.review-date {
-    color: #87948d !important;
-    font-size: 11px;
-}
-
-.bb-customer-reviews-card
-.review-text {
-    color: #53635a;
-    font-size: 13px;
-    line-height: 1.65;
-}
-
-.bb-customer-reviews-card
-.review-rating i {
-    font-size: 13px;
-}
-
-.bb-customer-reviews-card
-.review-recommend-badge {
-    padding: 5px 8px;
-    color: #14824e;
-    background: #e4f8ed;
-    border: 1px solid #cdebd9;
+.review-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
     border-radius: 999px;
-    font-size: 10px;
-}
-
-
-/* =====================================================
-   LOAD MORE
-   ===================================================== */
-
-.bb-customer-reviews-card
-#load-more-reviews {
-    min-height: 40px;
-    padding: 8px 15px;
-    color: var(--brand-dark, #168e56);
-    background: #fff;
-    border-color: #aedad0;
-    border-radius: 8px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 }
 
-.bb-customer-reviews-card
-#load-more-reviews:hover {
-    color: #fff;
-    background: var(--brand);
-    border-color: var(--brand);
+.review-date {
+    color: #94a3b8;
+    font-size: 12.5px;
+    font-weight: 500;
 }
 
-
-/* =====================================================
-   EMPTY STATE
-   ===================================================== */
-
-.bb-customer-reviews-card
-.reviews-list
-> .text-center.text-muted {
-    margin-top: 4px;
-    padding: 22px 15px !important;
-    background: #fbfdfc;
-    border: 1px dashed #d8e7df;
-    border-radius: 11px;
+.review-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: #f59e0b;
+    font-size: 13px;
 }
 
-.bb-customer-reviews-card
-.reviews-list
-> .text-center.text-muted
-.fa-comments {
-    margin-bottom: 8px !important;
-    color: #7db99a;
-    font-size: 32px;
+.review-text {
+    margin: 10px 0 10px;
+    color: #334155;
+    font-size: 14.5px;
+    line-height: 1.65;
 }
 
-.bb-customer-reviews-card
-.reviews-list
-> .text-center.text-muted p {
-    margin: 0;
-    color: #718078;
+.review-recommend-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
     font-size: 12px;
-    line-height: 1.5;
+    font-weight: 600;
 }
 
+/* Empty State */
+.reviews-empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+}
 
-/* =====================================================
-   TABLET
-   ===================================================== */
+.reviews-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 14px;
+    border-radius: 50%;
+    background: var(--brand-soft, #ffffff);
+    color: var(--brand, #64748b);
+    font-size: 24px;
+    border: 1px solid var(--brand-border, #e2e8f0);
+}
 
-@media (max-width: 991px) {
+.reviews-empty-title {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
 
-    #accordion
-    .bb-customer-reviews-card
-    .card-link {
+.reviews-empty-text {
+    color: #64748b;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+}
+
+/* Load More Button */
+#load-more-reviews {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 28px;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 999px;
+    color: var(--brand-dark);
+    border: 1.5px solid var(--brand);
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+#load-more-reviews:hover {
+    background: var(--brand);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(var(--brand-rgb), 0.25);
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   Mobile Optimization
+   ========================================================= */
+@media (max-width: 767px) {
+    .bb-customer-reviews-card .card-body {
+        padding: 16px !important;
+    }
+
+    .reviews-summary {
         padding: 16px 18px !important;
-        font-size: 19px;
     }
 
-    #accordion
-    .bb-customer-reviews-card
-    > .collapse
-    > .card-body {
-        padding: 17px !important;
+    .reviews-summary-score {
+        font-size: 32px;
     }
 
-    .bb-customer-reviews-card
     .review-form-container {
-        padding: 17px;
-    }
-}
-
-
-/* =====================================================
-   MOBILE
-   ===================================================== */
-
-@media (max-width: 575px) {
-
-    #accordion
-    .bb-customer-reviews-card {
-        border-radius: 13px;
+        padding: 18px 16px !important;
     }
 
-    #accordion
-    .bb-customer-reviews-card
-    .card-link {
-        gap: 8px;
-        padding: 14px !important;
-        font-size: 17px;
-    }
-
-    #accordion
-    .bb-customer-reviews-card
-    .card-link::before {
-        flex-basis: 30px;
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        font-size: 15px;
-    }
-
-    #accordion
-    .bb-customer-reviews-card
-    > .collapse
-    > .card-body {
-        padding: 12px !important;
-    }
-
-    .bb-customer-reviews-card
-    .review-form-container {
-        padding: 14px;
-        border-radius: 11px;
-    }
-
-    .bb-customer-reviews-card
-    .review-form-container > p {
-        margin-left: 0;
-        font-size: 11px !important;
-    }
-
-    .bb-customer-reviews-card
-    #review-form .form-control {
-        height: 44px;
-    }
-
-    .bb-customer-reviews-card
-    #review-form textarea.form-control {
-        min-height: 105px;
-        height: auto;
-    }
-
-    .bb-customer-reviews-card
-    .rating-input {
-        min-height: 44px;
-    }
-
-    .bb-customer-reviews-card
-    .rating-input label {
-        font-size: 25px;
-    }
-
-    .bb-customer-reviews-card
-    #review-form
-    button[type="submit"].btn-primary {
-        width: 100%;
-        min-width: 0;
-    }
-
-    .bb-customer-reviews-card
     .review-item {
-        padding: 12px !important;
+        padding: 14px 14px !important;
     }
 
-    .bb-customer-reviews-card
-    .review-avatar {
-        margin-right: 10px !important;
-    }
-
-    .bb-customer-reviews-card
-    .review-avatar img {
-        width: 40px;
-        height: 40px;
-    }
-
-    .bb-customer-reviews-card
-    .review-content
-    > .d-flex {
-        flex-direction: column;
-        gap: 5px;
+    .review-author-name {
+        font-size: 14px;
     }
 }

@@ -642,8 +642,6 @@ This file helps AI systems discover BagBazarBD's public product, category, infor
 
 ## Information Pages
 
-- [Shipping And Delivery Policy](https://bagstorebd.test/shipping-and-delivery-policy): Official BagBazarBD information page. Last updated 2026-08-10.
-- [Return And Refund Policy](https://bagstorebd.test/return-and-refund-policy): Official BagBazarBD information page. Last updated 2026-08-10.
 - [Disclaimer](https://bagstorebd.test/disclaimer): Official BagBazarBD information page. Last updated 2026-08-10.
 - [Privacy Policy](https://bagstorebd.test/privacy-policy): Official BagBazarBD information page. Last updated 2026-08-10.
 - [Terms And Conditions](https://bagstorebd.test/terms-and-conditions): Official BagBazarBD information page. Last updated 2026-08-10.

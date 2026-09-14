@@ -38,16 +38,6 @@
             'name' => 'Disclaimer',
             'description' => 'Read important information and limitations regarding ' . $brandName . ' products, orders, website content and services.',
         ],
-        'return-and-refund-policy' => [
-            'type' => 'WebPage',
-            'name' => 'Return and Refund Policy',
-            'description' => 'Read the ' . $brandName . ' return, replacement and refund conditions, procedures and applicable timeframes.',
-        ],
-        'shipping-and-delivery-policy' => [
-            'type' => 'WebPage',
-            'name' => 'Shipping and Delivery Policy',
-            'description' => 'Read ' . $brandName . ' order processing, delivery time, delivery charge and courier service information.',
-        ],
     ];
 
     $definition = $pageDefinitions[$currentPath] ?? [
