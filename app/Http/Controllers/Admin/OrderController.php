@@ -621,6 +621,9 @@ class OrderController extends Controller
         if ($request->status == 'CONFIRMED') {
             $data['confirmed_at'] = now()->toDateTimeString();
         }
+        if (in_array($request->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
+            $data['returned_at'] = now()->toDateTimeString();
+        }
         $orders = Order::whereIn('id', $request->order_id)->where('status', '!=', $request->status)->get();
 
         $orders->each->update($data);

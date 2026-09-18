@@ -31,7 +31,7 @@ class Order extends Model
     const MANUAL = 1;
 
     protected $fillable = [
-        'admin_id', 'user_id', 'type', 'name', 'phone', 'email', 'address', 'status', 'status_at', 'shipped_at', 'confirmed_at', 'products', 'note', 'data', 'tracking', 'courier_report', 'source_id',
+        'admin_id', 'user_id', 'type', 'name', 'phone', 'email', 'address', 'status', 'status_at', 'shipped_at', 'confirmed_at', 'returned_at', 'products', 'note', 'data', 'tracking', 'courier_report', 'source_id',
     ];
 
     protected $attributes = [
@@ -60,6 +60,10 @@ class Order extends Model
 
                 if ($order->status === 'CONFIRMED' && ! $order->isDirty('confirmed_at')) {
                     $order->confirmed_at = now();
+                }
+
+                if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && ! $order->isDirty('returned_at') && empty($order->returned_at)) {
+                    $order->returned_at = now();
                 }
             }
 
@@ -580,7 +584,7 @@ class Order extends Model
             ->logOnlyDirty()
             ->useLogName('orders')
             ->dontSubmitEmptyLogs()
-            ->dontLogIfAttributesChangedOnly(['status_at', 'updated_at', 'confirmed_at'])
+            ->dontLogIfAttributesChangedOnly(['status_at', 'updated_at', 'confirmed_at', 'returned_at'])
             ->logOnly(['admin_id', 'name', 'phone', 'address', 'status', 'status_at', 'products', 'note', 'data->courier', 'data->advanced', 'data->discount', 'data->shipping_cost', 'data->subtotal', 'data->packaging_charge']);
     }
 
@@ -697,6 +701,7 @@ class Order extends Model
             'status_at' => 'datetime',
             'shipped_at' => 'datetime',
             'confirmed_at' => 'datetime',
+            'returned_at' => 'datetime',
         ];
     }
 }

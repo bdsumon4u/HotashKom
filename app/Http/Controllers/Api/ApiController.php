@@ -517,6 +517,10 @@ class ApiController extends Controller
             $order->status = 'RETURN_RECEIVED';
         }
 
+        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && empty($order->returned_at)) {
+            $order->returned_at = now();
+        }
+
         $order->update([
             'status_at' => now(),
         ]);
@@ -598,6 +602,10 @@ class ApiController extends Controller
             $order->status = 'PAID_RETURN';
         } elseif ($request->status == 'exchanged') {
             $order->status = 'EXCHANGED';
+        }
+
+        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && empty($order->returned_at)) {
+            $order->returned_at = now();
         }
 
         $order->update([
@@ -684,6 +692,10 @@ class ApiController extends Controller
 
         if ($request->message_en || $request->message_bn) {
             $order->tracking_message = $request->message_en ?: $request->message_bn;
+        }
+
+        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && empty($order->returned_at)) {
+            $order->returned_at = now();
         }
 
         $order->status_at = now();

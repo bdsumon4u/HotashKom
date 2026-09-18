@@ -80,6 +80,15 @@ class OrderController extends Controller
                 ]);
         }
 
+        if ($request->returned_at) {
+            $returnedDate = Date::parse($request->returned_at);
+            $orders->whereNotNull('orders.returned_at')
+                ->whereBetween('orders.returned_at', [
+                    $returnedDate->startOfDay()->toDateTimeString(),
+                    $returnedDate->endOfDay()->toDateTimeString(),
+                ]);
+        }
+
         $orders = $orders->when($request->role_id == Admin::SALESMAN, function ($orders): void {
             $orders->where('orders.admin_id', request('admin_id'));
         });
