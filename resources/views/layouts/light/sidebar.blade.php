@@ -114,6 +114,14 @@
                     </li>
 
                     <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/suppliers*') ? 'active' : '' }}"
+                            href="{{ route('admin.suppliers.index') }}">
+                            <i data-feather="users"> </i>
+                            <span>Suppliers</span>
+                        </a>
+                    </li>
+
+                    <li>
                         <a class="nav-link menu-title link-nav {{ request()->is('admin/attributes*') ? 'active' : '' }}"
                             href="{{ route('admin.attributes.index') }}">
                             <i data-feather="box"> </i>
@@ -152,6 +160,42 @@
                             href="{{ route('admin.images.index') }}">
                             <i data-feather="image"> </i>
                             <span>Images</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-title">
+                        <h6>Accounting</h6>
+                    </li>
+
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/accounting/ledger*') ? 'active' : '' }}"
+                            href="{{ route('admin.accounting.ledger.monthly') }}">
+                            <i data-feather="book"> </i>
+                            <span>Monthly Ledger</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/accounting/transactions*') ? 'active' : '' }}"
+                            href="{{ route('admin.accounting.transactions.index') }}">
+                            <i data-feather="dollar-sign"> </i>
+                            <span>Transactions</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/accounting/accounts*') ? 'active' : '' }}"
+                            href="{{ route('admin.accounting.accounts.index') }}">
+                            <i data-feather="credit-card"> </i>
+                            <span>Accounts</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/accounting/categories*') ? 'active' : '' }}"
+                            href="{{ route('admin.accounting.categories.index') }}">
+                            <i data-feather="tag"> </i>
+                            <span>Categories</span>
                         </a>
                     </li>
 

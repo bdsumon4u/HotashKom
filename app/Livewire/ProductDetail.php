@@ -6,7 +6,6 @@ use App\Models\Attribute;
 use App\Models\Product;
 use App\Services\FacebookPixelService;
 use App\Traits\HasCart;
-use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -72,20 +71,6 @@ class ProductDetail extends Component
 
     public function addToCart($instance = 'default')
     {
-        if ($this->selectedVar->should_track && $this->selectedVar->stock_count < 1) {
-            if ($this->selectedVar->parent_id) {
-                $attributes = $this->selectedVar->load('options.attribute')->options->pluck('attribute.name')->implode(', ');
-                throw ValidationException::withMessages([
-                    'quantity' => 'The selected variation is out of stock. Select different options for ('.$attributes.').',
-                ]);
-            }
-            throw ValidationException::withMessages([
-                'quantity' => 'This product is out of stock.',
-            ]);
-
-            return false;
-        }
-
         return $this->addToKart($this->selectedVar, $this->quantity, $instance, $this->retailPrice);
     }
 
@@ -105,7 +90,7 @@ class ProductDetail extends Component
             }
         }
         $this->options = $this->selectedVar->options->pluck('id', 'attribute_id')->toArray();
-        $this->maxQuantity = $this->selectedVar->should_track ? min($this->selectedVar->stock_count, $maxPerProduct) : $maxPerProduct;
+        $this->maxQuantity = (int) $maxPerProduct;
         $this->retailPrice = $this->selectedVar->retailPrice();
     }
 

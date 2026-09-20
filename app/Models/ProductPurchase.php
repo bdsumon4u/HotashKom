@@ -12,6 +12,7 @@ class ProductPurchase extends Model
     protected $table = 'product_purchase';
 
     protected $fillable = [
+        'tenant_id',
         'purchase_id',
         'product_id',
         'price',

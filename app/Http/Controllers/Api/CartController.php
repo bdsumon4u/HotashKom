@@ -36,7 +36,7 @@ class CartController extends Controller
             }
 
             $fraudQuantity = setting('fraud')->max_qty_per_product ?? 3;
-            $maxQuantity = $product->should_track ? min($product->stock_count, $fraudQuantity) : $fraudQuantity;
+            $maxQuantity = (int) $fraudQuantity;
             $quantity = min($quantity, $maxQuantity);
 
             // Use ProductResource to get proper cart item data

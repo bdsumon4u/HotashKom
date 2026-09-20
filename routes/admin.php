@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AccountController;
+use App\Http\Controllers\Admin\AccountingTransactionController;
 use App\Http\Controllers\Admin\ApiController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\AttributeOptionController;
@@ -16,6 +18,7 @@ use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\LandingPageProController;
 use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\Admin\LedgerReportController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\MoneyRequestController;
@@ -31,7 +34,9 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShipmentReportController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\TenantController;
+use App\Http\Controllers\Admin\TransactionCategoryController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UtmReportController;
 use App\Http\Middleware\CheckForMaintenanceDue;
@@ -138,6 +143,19 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::post('reviews/bulk-approve', [ReviewController::class, 'bulkApprove'])->name('reviews.bulk-approve');
         Route::post('reviews/bulk-delete', [ReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
         Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+        // Accounting Module Routes
+        Route::prefix('accounting')->as('accounting.')->group(function (): void {
+            Route::get('ledger/monthly', [LedgerReportController::class, 'monthly'])->name('ledger.monthly');
+            Route::post('ledger/courier-payout', [LedgerReportController::class, 'recordCourierPayout'])->name('ledger.courier-payout');
+            Route::resource('accounts', AccountController::class);
+            Route::resource('categories', TransactionCategoryController::class);
+            Route::resource('transactions', AccountingTransactionController::class)->except(['show']);
+        });
+
+        // Suppliers & Supplier Payments Routes
+        Route::resource('suppliers', SupplierController::class);
+        Route::post('suppliers/{supplier}/payment', [SupplierController::class, 'storePayment'])->name('suppliers.payment');
 
         Route::resources([
             'staffs' => StaffController::class,

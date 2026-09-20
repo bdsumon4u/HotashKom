@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\Supplier;
+use App\Services\AccountingService;
 use App\Services\PurchaseStockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -81,15 +84,30 @@ class PurchaseController extends Controller
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
 
         DB::transaction(function () use ($purchase): void {
+            // Delete linked accounting journal entry if any
+            $linkedEntry = JournalEntry::where('source_type', Purchase::class)
+                ->where('source_id', $purchase->id)
+                ->first();
+            if ($linkedEntry) {
+                app(AccountingService::class)->deleteJournalEntry($linkedEntry);
+            }
+
             // Use service to revert stock changes
             $stockService = new PurchaseStockService;
             $stockService->revertStockChanges($purchase);
+
+            // Delete linked payments & recalculate supplier due
+            $supplierId = $purchase->supplier_id;
+            $purchase->payments()->delete();
+            if ($supplierId && ($supplier = Supplier::find($supplierId))) {
+                $supplier->recalculateDue();
+            }
 
             // Delete the purchase
             $purchase->delete();
         });
 
         return to_route('admin.purchases.index')
-            ->with('success', 'Purchase record deleted successfully!');
+            ->with('success', 'Purchase record deleted and accounting ledger updated successfully!');
     }
 }

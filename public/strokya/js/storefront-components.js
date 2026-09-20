@@ -525,7 +525,7 @@ runWhenJQueryReady(function($) {
                 const productSellingPrice = product.selling_price || productPrice;
                 const productImage = product.base_image_url || '/images/placeholder.jpg';
                 const productUrl = `/products/${encodeURIComponent(productSlug)}`;
-                const inStock = !product.should_track || (product.stock_count || 0) > 0;
+                const inStock = true;
                 const hasDiscount = productPrice !== productSellingPrice && productPrice > 0;
                 const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
 
@@ -542,8 +542,8 @@ runWhenJQueryReady(function($) {
 
                 let buttonsHTML = '';
                 if (!isOninda) {
-                    const available = inStock;
-                    const disabledAttr = available ? '' : 'disabled';
+                    const available = true;
+                    const disabledAttr = '';
 
                     if (showOption.product_grid_button === 'add_to_cart') {
                         buttonsHTML = `
@@ -582,9 +582,8 @@ runWhenJQueryReady(function($) {
                 const discountText = (showOption.discount_text || '<small>Discount:</small> [percent]%').replace(/\[percent\]/g, discountPercent);
 
                 return `
-                    <div class="product-card" data-id="${productId}" data-max="${product.should_track ? (product.stock_count || 0) : -1}">
+                    <div class="product-card" data-id="${productId}" data-max="-1">
                         <div class="product-card__badges-list">
-                            ${!inStock ? '<div class="product-card__badge product-card__badge--sale">Sold</div>' : ''}
                             ${hasDiscount ? `<div class="product-card__badge product-card__badge--sale">${discountText}</div>` : ''}
                         </div>
                         <div class="product-card__image" style="aspect-ratio: 1 / 1; overflow: hidden;">

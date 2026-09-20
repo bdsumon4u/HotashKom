@@ -555,9 +555,9 @@ class ApiController extends Controller
         if ($request->notification_type == 'tracking_update') {
             info('tracking update webhook');
 
-            $order->update([
+            $order->update(['data' => [
                 'tracking_message' => $request->tracking_message,
-            ]);
+            ]]);
 
             return response()->json(['message' => 'Webhook processed'], 202);
         }
@@ -691,7 +691,9 @@ class ApiController extends Controller
         }
 
         if ($request->message_en || $request->message_bn) {
-            $order->tracking_message = $request->message_en ?: $request->message_bn;
+            $order->fill(['data' => [
+                'tracking_message' => $request->message_en ?: $request->message_bn,
+            ]]);
         }
 
         if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && empty($order->returned_at)) {

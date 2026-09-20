@@ -100,4 +100,46 @@
     .notify-alert {
         max-width: 350px !important;
     }
+
+    .card-header h1,
+    .card-header h2,
+    .card-header h3,
+    .card-header h4,
+    .card-header h5,
+    .card-header h6,
+    .card-header .card-title,
+    .card-header strong {
+        color: #1e293b !important;
+    }
+
+    .card-header.bg-primary h1,
+    .card-header.bg-primary h2,
+    .card-header.bg-primary h3,
+    .card-header.bg-primary h4,
+    .card-header.bg-primary h5,
+    .card-header.bg-primary h6,
+    .card-header.bg-primary strong,
+    .card-header.bg-dark h1,
+    .card-header.bg-dark h2,
+    .card-header.bg-dark h3,
+    .card-header.bg-dark h4,
+    .card-header.bg-dark h5,
+    .card-header.bg-dark h6,
+    .card-header.bg-dark strong,
+    .card-header.bg-danger h1,
+    .card-header.bg-danger h2,
+    .card-header.bg-danger h3,
+    .card-header.bg-danger h4,
+    .card-header.bg-danger h5,
+    .card-header.bg-danger h6,
+    .card-header.bg-danger strong,
+    .card-header.bg-success h1,
+    .card-header.bg-success h2,
+    .card-header.bg-success h3,
+    .card-header.bg-success h4,
+    .card-header.bg-success h5,
+    .card-header.bg-success h6,
+    .card-header.bg-success strong {
+        color: #ffffff !important;
+    }
 </style>

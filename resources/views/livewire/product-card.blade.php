@@ -1,17 +1,14 @@
 <div class="product-card" data-id="{{ $product->id }}"
-    data-max="{{ $product->should_track ? $product->stock_count : -1 }}">
+    data-max="-1">
     @if ($is_free_delivery)
         <div class="product-card__ribbon">
             <span class="badge badge--free-delivery">Free Delivery</span>
         </div>
     @endif
     @php
-        $in_stock = !$product->should_track || $product->stock_count > 0;
+        $in_stock = true;
     @endphp
     <div class="product-card__badges-list">
-        @if (!$in_stock)
-            <div class="product-card__badge product-card__badge--sale">Sold</div>
-        @endif
         @if ($product->price != $product->selling_price)
             @php
                 $percent = round(
@@ -128,7 +125,7 @@
         </div>
         @if (!isOninda())
             <div class="product-card__buttons">
-                @php($available = !$product->should_track || $product->stock_count > 0)
+                @php($available = true)
                 @php($has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1)
                 @if (($show_option->product_grid_button ?? false) == 'add_to_cart')
                     @if ($has_variations)

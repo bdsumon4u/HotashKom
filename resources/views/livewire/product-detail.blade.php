@@ -156,7 +156,7 @@
                     </div>
                 </div>
                 <div class="overflow-hidden product__actions">
-                    @php $available = !$selectedVar->should_track || $selectedVar->stock_count > 0 @endphp
+                    @php $available = true; @endphp
                     <div class="product__buttons @if ($show_option->product_detail_buttons_inline ?? false) d-lg-inline-flex @endif w-100"
                         @if ($show_option->product_detail_buttons_inline ?? false) style="gap: .5rem;" @endif>
                         @if ($show_option->product_detail_order_now ?? false)

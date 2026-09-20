@@ -27,8 +27,23 @@ class PurchaseController extends Controller
             ->filterColumn('formatted_date', function ($query, $keyword): void {
                 // Date search is handled in the filter() method
             })
-            ->addColumn('formatted_amount', fn ($purchase): string => number_format($purchase->total_amount ?? 0, 2).' BDT')
-            ->addColumn('supplier_display', fn ($purchase) => $purchase->supplier_name ?? '-')
+            ->addColumn('formatted_amount', function ($purchase): string {
+                $html = '<div>'.number_format($purchase->total_amount ?? 0, 2).' BDT</div>';
+                if ($purchase->due_amount > 0) {
+                    $html .= '<small class="text-danger">Due: '.number_format($purchase->due_amount, 2).' BDT</small>';
+                } else {
+                    $html .= '<small class="text-success"><i class="fa fa-check-circle"></i> Paid</small>';
+                }
+
+                return $html;
+            })
+            ->addColumn('supplier_display', function ($purchase) {
+                if ($purchase->supplier_id && $purchase->supplier) {
+                    return '<a href="'.route('admin.suppliers.show', $purchase->supplier_id).'" class="font-weight-bold text-primary">'.e($purchase->supplier->name).'</a>';
+                }
+
+                return e($purchase->supplier_name ?? '-');
+            })
             ->addColumn('admin_display', fn ($purchase) => $purchase->admin ? $purchase->admin->name : '-')
             ->addColumn('actions', function ($purchase) {
                 $buttons = '<div class="btn-group" role="group">';
@@ -44,7 +59,7 @@ class PurchaseController extends Controller
 
                 return $buttons.'</div>';
             })
-            ->rawColumns(['actions'])
+            ->rawColumns(['formatted_amount', 'supplier_display', 'actions'])
             ->filter(function ($query) use ($request): void {
                 $searchValue = $request->input('search.value');
                 if ($searchValue) {
