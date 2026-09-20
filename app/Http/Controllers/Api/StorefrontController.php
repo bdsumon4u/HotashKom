@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CallOnindaOrderApi;
 use App\Models\Admin;
 use App\Models\Category;
 use App\Models\HomeSection;
@@ -470,6 +471,10 @@ class StorefrontController extends Controller
             } else {
                 $facebookService->trackPurchase($orderPayload, $facebookProducts, $userDataArr, null, $orderTrackingData);
             }
+        }
+
+        if (config('app.instant_order_forwarding') && ! config('app.demo')) {
+            dispatch(new CallOnindaOrderApi($order->id));
         }
 
         return response()->json([

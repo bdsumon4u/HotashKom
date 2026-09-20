@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
+use App\Jobs\CallOnindaOrderApi;
 use App\Models\Admin;
 use App\Models\Image;
 use App\Models\LandingPagePro;
@@ -520,6 +521,10 @@ class LandingPageProController extends Controller
             } else {
                 $facebookService->trackPurchase($orderPayload, $facebookProducts, $userDataArr, null, $orderTrackingData);
             }
+        }
+
+        if (config('app.instant_order_forwarding') && ! config('app.demo')) {
+            dispatch(new CallOnindaOrderApi($order->id));
         }
 
         return response()->json([
