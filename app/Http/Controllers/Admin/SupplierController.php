@@ -141,38 +141,40 @@ class SupplierController extends Controller
 
             $supplier->recalculateDue();
 
-            // Sync with accounting: Find Accounts Payable account and Payment Account
-            $payableAccount = Account::where('type', Account::TYPE_LIABILITY)->first();
-            $paymentAccount = Account::find($validated['account_id']);
+            // Sync with accounting if enabled: Find Accounts Payable account and Payment Account
+            if (config('accounting.enabled', true) && ! empty($validated['account_id'])) {
+                $payableAccount = Account::where('type', Account::TYPE_LIABILITY)->first();
+                $paymentAccount = Account::find($validated['account_id']);
 
-            if ($payableAccount && $paymentAccount) {
-                $this->accountingService->createJournalEntry(
-                    [
-                        'entry_date' => $validated['payment_date'],
-                        'reference' => $validated['reference'] ?? ('Payment to '.$supplier->name),
-                        'description' => 'Supplier Payment: '.$supplier->name.($validated['notes'] ? ' - '.$validated['notes'] : ''),
-                        'source_type' => Supplier::class,
-                        'source_id' => $supplier->id,
-                    ],
-                    [
+                if ($payableAccount && $paymentAccount) {
+                    $this->accountingService->createJournalEntry(
                         [
-                            'account_id' => $payableAccount->id,
-                            'debit' => (float) $validated['amount'],
-                            'credit' => 0,
-                            'notes' => 'Supplier Due Settlement',
+                            'entry_date' => $validated['payment_date'],
+                            'reference' => $validated['reference'] ?? ('Payment to '.$supplier->name),
+                            'description' => 'Supplier Payment: '.$supplier->name.($validated['notes'] ? ' - '.$validated['notes'] : ''),
+                            'source_type' => Supplier::class,
+                            'source_id' => $supplier->id,
                         ],
                         [
-                            'account_id' => $paymentAccount->id,
-                            'debit' => 0,
-                            'credit' => (float) $validated['amount'],
-                            'notes' => 'Payment Disbursed',
-                        ],
-                    ]
-                );
+                            [
+                                'account_id' => $payableAccount->id,
+                                'debit' => (float) $validated['amount'],
+                                'credit' => 0,
+                                'notes' => 'Supplier Due Settlement',
+                            ],
+                            [
+                                'account_id' => $paymentAccount->id,
+                                'debit' => 0,
+                                'credit' => (float) $validated['amount'],
+                                'notes' => 'Payment Disbursed',
+                            ],
+                        ]
+                    );
+                }
             }
         });
 
-        return back()->with('success', 'Supplier payment recorded and accounting ledger updated successfully.');
+        return back()->with('success', 'Supplier payment recorded successfully.');
     }
 
     public function destroy(Supplier $supplier)

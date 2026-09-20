@@ -242,50 +242,52 @@ class PurchaseCreate extends Component
                 $supplierModel->recalculateDue();
             }
 
-            // Sync with accounting double entry
-            $accountingService = app(AccountingService::class);
-            $inventoryAccount = Account::where('code', '1004')->orWhere('type', Account::TYPE_EXPENSE)->first();
-            $payableAccount = Account::where('type', Account::TYPE_LIABILITY)->first();
-            $paymentAccount = $this->payment_account_id ? Account::find($this->payment_account_id) : Account::where('type', Account::TYPE_ASSET)->first();
+            // Sync with accounting double entry if module is enabled
+            if (config('accounting.enabled', true)) {
+                $accountingService = app(AccountingService::class);
+                $inventoryAccount = Account::where('code', '1004')->orWhere('type', Account::TYPE_EXPENSE)->first();
+                $payableAccount = Account::where('type', Account::TYPE_LIABILITY)->first();
+                $paymentAccount = $this->payment_account_id ? Account::find($this->payment_account_id) : Account::where('type', Account::TYPE_ASSET)->first();
 
-            if ($inventoryAccount) {
-                $journalItems = [
-                    [
-                        'account_id' => $inventoryAccount->id,
-                        'debit' => $totalAmount,
-                        'credit' => 0,
-                        'notes' => 'Inventory Purchase (Purchase #'.$purchase->id.')',
-                    ],
-                ];
-
-                if ($paidAmount > 0 && $paymentAccount) {
-                    $journalItems[] = [
-                        'account_id' => $paymentAccount->id,
-                        'debit' => 0,
-                        'credit' => $paidAmount,
-                        'notes' => 'Paid from '.$paymentAccount->name,
+                if ($inventoryAccount) {
+                    $journalItems = [
+                        [
+                            'account_id' => $inventoryAccount->id,
+                            'debit' => $totalAmount,
+                            'credit' => 0,
+                            'notes' => 'Inventory Purchase (Purchase #'.$purchase->id.')',
+                        ],
                     ];
-                }
 
-                if ($dueAmount > 0 && $payableAccount) {
-                    $journalItems[] = [
-                        'account_id' => $payableAccount->id,
-                        'debit' => 0,
-                        'credit' => $dueAmount,
-                        'notes' => 'Supplier Payable (Due for Purchase #'.$purchase->id.')',
-                    ];
-                }
+                    if ($paidAmount > 0 && $paymentAccount) {
+                        $journalItems[] = [
+                            'account_id' => $paymentAccount->id,
+                            'debit' => 0,
+                            'credit' => $paidAmount,
+                            'notes' => 'Paid from '.$paymentAccount->name,
+                        ];
+                    }
 
-                $accountingService->createJournalEntry(
-                    [
-                        'entry_date' => $this->purchase_date,
-                        'reference' => $this->invoice_number ?? ('Purchase #'.$purchase->id),
-                        'description' => 'Purchase #'.$purchase->id.($this->supplier_name ? ' from '.$this->supplier_name : ''),
-                        'source_type' => Purchase::class,
-                        'source_id' => $purchase->id,
-                    ],
-                    $journalItems
-                );
+                    if ($dueAmount > 0 && $payableAccount) {
+                        $journalItems[] = [
+                            'account_id' => $payableAccount->id,
+                            'debit' => 0,
+                            'credit' => $dueAmount,
+                            'notes' => 'Supplier Payable (Due for Purchase #'.$purchase->id.')',
+                        ];
+                    }
+
+                    $accountingService->createJournalEntry(
+                        [
+                            'entry_date' => $this->purchase_date,
+                            'reference' => $this->invoice_number ?? ('Purchase #'.$purchase->id),
+                            'description' => 'Purchase #'.$purchase->id.($this->supplier_name ? ' from '.$this->supplier_name : ''),
+                            'source_type' => Purchase::class,
+                            'source_id' => $purchase->id,
+                        ],
+                        $journalItems
+                    );
+                }
             }
 
             // Apply stock changes

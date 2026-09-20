@@ -145,7 +145,7 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
         // Accounting Module Routes
-        Route::prefix('accounting')->as('accounting.')->group(function (): void {
+        Route::prefix('accounting')->as('accounting.')->middleware('accounting.enabled')->group(function (): void {
             Route::get('ledger/monthly', [LedgerReportController::class, 'monthly'])->name('ledger.monthly');
             Route::post('ledger/courier-payout', [LedgerReportController::class, 'recordCourierPayout'])->name('ledger.courier-payout');
             Route::resource('accounts', AccountController::class);

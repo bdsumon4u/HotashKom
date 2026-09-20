@@ -163,6 +163,7 @@
                         </a>
                     </li>
 
+                    @if (config('accounting.enabled', true))
                     <li class="sidebar-title">
                         <h6>Accounting</h6>
                     </li>
@@ -198,6 +199,7 @@
                             <span>Categories</span>
                         </a>
                     </li>
+                    @endif
 
                     <li class="sidebar-title">
                         <h6>Appearance</h6>

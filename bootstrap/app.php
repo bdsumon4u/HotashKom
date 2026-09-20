@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\CaptureUtmTracking;
+use App\Http\Middleware\EnsureAccountingEnabled;
 use App\Http\Middleware\EnsureSpaResponse;
 use App\Http\Middleware\InitializeTenancyIfTenantDomain;
 use App\Http\Middleware\LogDatabaseUsage;
@@ -55,6 +56,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'doNotCacheResponse' => DoNotCacheResponse::class,
             'tenancy.domain' => InitializeTenancyByDomain::class,
             'tenancy.prevent_central' => PreventAccessFromCentralDomains::class,
+            'accounting.enabled' => EnsureAccountingEnabled::class,
         ])
             ->validateCsrfTokens(except: ['*']);
     })
