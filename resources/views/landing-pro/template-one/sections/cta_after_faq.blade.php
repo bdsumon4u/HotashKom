@@ -17,7 +17,7 @@
                     <a href="#order"
                         class="inline-flex items-center justify-center px-5 py-3 text-sm md:text-base font-black text-white uppercase transition bg-red-600 rounded-md shadow hover:bg-red-700">
                         <i class="mr-2 fas fa-shopping-cart"></i>
-                        এখনই অর্ডার
+                        এখনই অর্ডার করুন
                     </a>
                     @if ($callUrl !== '#order')
                         <a href="{{ $callUrl }}"
