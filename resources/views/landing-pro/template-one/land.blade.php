@@ -363,6 +363,7 @@
                     name: '',
                     phone: '',
                     address: '',
+                    note: '',
                     deliveryArea: @json($defaultDeliveryArea),
                     touched: {
                         name: false,
@@ -835,6 +836,7 @@
                                 name: this.checkout.name,
                                 phone: this.checkout.phone,
                                 address: this.checkout.address,
+                                note: this.checkout.note,
                                 delivery_area: this.checkout.deliveryArea,
                                 items: this.selectedItems.map((item) => ({
                                     landing_product_id: item.landing_product_id,

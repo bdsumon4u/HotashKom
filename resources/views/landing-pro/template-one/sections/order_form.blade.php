@@ -142,6 +142,14 @@
                                 <p x-cloak class="mt-1 text-xs font-semibold text-red-600" x-show="showAddressError">
                                     সম্পূর্ণ ঠিকানা লিখুন।</p>
                             </div>
+
+                            <div class="lg:col-span-2">
+                                <label
+                                    class="block mb-1 text-xs font-bold tracking-wide text-gray-700 uppercase">নোট (অপশনাল)</label>
+                                <textarea x-model.trim="checkout.note" rows="2"
+                                    placeholder="অর্ডার সংক্রান্ত কোনো বিশেষ নির্দেশনা থাকলে লিখুন (ঐচ্ছিক)"
+                                    class="px-3 py-2.5 w-full text-sm bg-white rounded-lg border border-gray-200 transition outline-none focus:border-green-600"></textarea>
+                            </div>
                         </div>
 
                         <div x-show="!selectedCount || (products.length > 4 && selectedCount > 2)"

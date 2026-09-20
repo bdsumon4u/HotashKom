@@ -300,6 +300,7 @@ class LandingPageProController extends Controller
             'name' => ['required', 'string'],
             'phone' => ['required', 'string'],
             'address' => ['required', 'string'],
+            'note' => ['nullable', 'string', 'max:1000'],
             'delivery_area' => ['required', 'string'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.landing_product_id' => ['required', 'integer'],
@@ -432,7 +433,7 @@ class LandingPageProController extends Controller
                 'name' => $validated['name'],
                 'phone' => $validated['phone'],
                 'address' => $validated['address'],
-                'note' => '',
+                'note' => $validated['note'] ?? '',
                 'products' => $productsPayload,
                 'status' => data_get(config('app.orders', []), 0, 'PENDING'),
                 'status_at' => now()->toDateTimeString(),
@@ -541,7 +542,7 @@ class LandingPageProController extends Controller
 
         return User::query()->firstOrCreate(
             ['phone_number' => $data['phone']],
-            array_merge(Arr::except($data, ['phone', 'items', 'delivery_area']), [
+            array_merge(Arr::except($data, ['phone', 'items', 'delivery_area', 'note']), [
                 'email_verified_at' => now(),
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
                 'remember_token' => Str::random(10),
