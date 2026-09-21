@@ -259,15 +259,13 @@ if (! function_exists('pageRoutes')) {
     function pageRoutes()
     {
         try {
-            Schema::hasTable((new Page)->getTable())
-                && Route::get('{page:slug}', PageController::class)
-                    ->where('page', 'test-page|'.implode(
-                        '|', Page::withoutTenancy()->get('slug')
-                            ->map->slug
-                            ->toArray()
-                    ))
+            if (Schema::hasTable((new Page)->getTable())) {
+                $slugs = Page::query()->pluck('slug')->filter()->unique()->implode('|');
+                Route::get('{page:slug}', PageController::class)
+                    ->where('page', $slugs !== '' ? 'test-page|'.$slugs : 'test-page')
                     ->middleware(ShortKodeMiddleware::class)
                     ->name('page');
+            }
         } catch (Throwable $th) {
             // throw $th;
         }

@@ -14,6 +14,7 @@ use App\Pathao\Apis\AreaApi;
 use App\Pathao\Apis\OrderApi;
 use App\Pathao\Apis\StoreApi;
 use App\Pathao\Manage\Manage;
+use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Queue\Events\JobProcessed;
@@ -57,6 +58,11 @@ class AppServiceProvider extends ServiceProvider
             fn ($relation, $constraint) => $this
                 ->whereHas($relation, $constraint)
                 ->with([$relation => $constraint])
+        );
+
+        Builder::macro(
+            'withoutTenancy',
+            fn () => $this->withoutGlobalScope(TenantScope::class)
         );
 
         $this->app->bind('pathao', fn (): Manage => new Manage(

@@ -142,7 +142,7 @@ class LoginController extends Controller
         }
 
         // If on a tenant domain/subdomain, admin must be Super Admin or belong to this tenant
-        if (tenancy()->initialized) {
+        if (config('tenancy.enabled', false) && function_exists('tenancy') && tenancy()->initialized) {
             $tenantId = tenant('id');
             if ($admin->tenant_id !== null && $admin->tenant_id !== $tenantId) {
                 return false;
