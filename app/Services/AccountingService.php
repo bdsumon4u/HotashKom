@@ -429,6 +429,7 @@ final class AccountingService
             ['name' => 'Office Snacks & Food', 'type' => TransactionCategory::TYPE_EXPENSE],
             ['name' => 'Ads & Marketing', 'type' => TransactionCategory::TYPE_EXPENSE],
             ['name' => 'Dollar Cost (Cards/FB Ads)', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'Cost of Goods Sold', 'type' => TransactionCategory::TYPE_EXPENSE],
             ['name' => 'Staff Salary', 'type' => TransactionCategory::TYPE_EXPENSE],
             ['name' => 'Paper & Stationery', 'type' => TransactionCategory::TYPE_EXPENSE],
             ['name' => 'Packaging Material', 'type' => TransactionCategory::TYPE_EXPENSE],

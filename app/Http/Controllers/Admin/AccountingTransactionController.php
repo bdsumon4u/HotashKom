@@ -97,12 +97,19 @@ class AccountingTransactionController extends Controller
     {
         abort_unless(request()->user()->is('admin'), 403);
 
-        $type = $request->input('transaction_type');
+        $type = $request->input('transaction_type', 'expense');
 
         if ($type === 'expense') {
+            $fromAccountId = $request->from_account_id ?? $request->expense_from_account_id;
+            $expenseAccountId = $request->to_account_id ?? $request->expense_account_id;
             $categoryId = $request->category_id ?? $request->expense_category_id;
 
-            $request->merge(['category_id' => $categoryId]);
+            $request->merge([
+                'from_account_id' => $fromAccountId,
+                'expense_account_id' => $expenseAccountId,
+                'category_id' => $categoryId,
+            ]);
+
             $request->validate([
                 'from_account_id' => ['required', 'exists:accounts,id'],
                 'expense_account_id' => ['required', 'exists:accounts,id'],
@@ -127,9 +134,16 @@ class AccountingTransactionController extends Controller
         }
 
         if ($type === 'income') {
+            $toAccountId = $request->from_account_id ?? $request->income_to_account_id ?? $request->to_account_id;
+            $incomeAccountId = $request->to_account_id ?? $request->income_account_id;
             $categoryId = $request->category_id ?? $request->income_category_id;
 
-            $request->merge(['category_id' => $categoryId]);
+            $request->merge([
+                'to_account_id' => $toAccountId,
+                'income_account_id' => $incomeAccountId,
+                'category_id' => $categoryId,
+            ]);
+
             $request->validate([
                 'to_account_id' => ['required', 'exists:accounts,id'],
                 'income_account_id' => ['required', 'exists:accounts,id'],
@@ -154,6 +168,14 @@ class AccountingTransactionController extends Controller
         }
 
         if ($type === 'transfer') {
+            $fromAccountId = $request->from_account_id ?? $request->transfer_from_account_id;
+            $toAccountId = $request->to_account_id ?? $request->transfer_to_account_id;
+
+            $request->merge([
+                'from_account_id' => $fromAccountId,
+                'to_account_id' => $toAccountId,
+            ]);
+
             $request->validate([
                 'from_account_id' => ['required', 'exists:accounts,id', 'different:to_account_id'],
                 'to_account_id' => ['required', 'exists:accounts,id'],
@@ -176,6 +198,14 @@ class AccountingTransactionController extends Controller
         }
 
         if ($type === 'investment') {
+            $toAccountId = $request->from_account_id ?? $request->to_account_id ?? $request->investment_to_account_id;
+            $equityAccountId = $request->to_account_id ?? $request->equity_account_id ?? $request->investment_equity_account_id;
+
+            $request->merge([
+                'to_account_id' => $toAccountId,
+                'equity_account_id' => $equityAccountId,
+            ]);
+
             $request->validate([
                 'to_account_id' => ['required', 'exists:accounts,id'],
                 'equity_account_id' => ['required', 'exists:accounts,id'],
@@ -210,6 +240,14 @@ class AccountingTransactionController extends Controller
         }
 
         if ($type === 'withdrawal') {
+            $fromAccountId = $request->from_account_id ?? $request->withdrawal_from_account_id;
+            $equityAccountId = $request->to_account_id ?? $request->equity_account_id ?? $request->withdrawal_equity_account_id;
+
+            $request->merge([
+                'from_account_id' => $fromAccountId,
+                'equity_account_id' => $equityAccountId,
+            ]);
+
             $request->validate([
                 'from_account_id' => ['required', 'exists:accounts,id'],
                 'equity_account_id' => ['required', 'exists:accounts,id'],
@@ -241,6 +279,81 @@ class AccountingTransactionController extends Controller
             );
 
             return to_route('admin.accounting.transactions.index')->with('success', 'Withdrawal recorded successfully.');
+        }
+
+        if ($type === 'return_restock') {
+            $inventoryAccountId = (int) ($request->to_account_id ?? Account::where('code', '1004')->value('id') ?? Account::where('type', Account::TYPE_ASSET)->value('id'));
+            $cogsAccountId = (int) ($request->from_account_id ?? Account::where('code', '5001')->value('id') ?? Account::where('type', Account::TYPE_EXPENSE)->value('id'));
+
+            $request->validate([
+                'amount' => ['required', 'numeric', 'min:0.01'],
+                'entry_date' => ['required', 'date'],
+                'description' => ['nullable', 'string'],
+                'reference' => ['nullable', 'string'],
+            ]);
+
+            $this->accountingService->createJournalEntry(
+                [
+                    'entry_date' => $request->entry_date,
+                    'reference' => $request->reference,
+                    'description' => $request->description ?? 'Customer Product Return / Inventory Restock',
+                ],
+                [
+                    [
+                        'account_id' => $inventoryAccountId,
+                        'category_id' => $request->category_id,
+                        'debit' => (float) $request->amount,
+                        'credit' => 0,
+                        'notes' => 'Inventory Restocked from Return',
+                    ],
+                    [
+                        'account_id' => $cogsAccountId,
+                        'category_id' => $request->category_id,
+                        'debit' => 0,
+                        'credit' => (float) $request->amount,
+                        'notes' => 'COGS Reversal from Return',
+                    ],
+                ]
+            );
+
+            return to_route('admin.accounting.transactions.index')->with('success', 'Customer return restock recorded successfully.');
+        }
+
+        if ($type === 'custom' || $type === 'adjustment') {
+            $request->validate([
+                'from_account_id' => ['required', 'exists:accounts,id'],
+                'to_account_id' => ['required', 'exists:accounts,id', 'different:from_account_id'],
+                'amount' => ['required', 'numeric', 'min:0.01'],
+                'entry_date' => ['required', 'date'],
+                'description' => ['nullable', 'string'],
+                'reference' => ['nullable', 'string'],
+            ]);
+
+            $this->accountingService->createJournalEntry(
+                [
+                    'entry_date' => $request->entry_date,
+                    'reference' => $request->reference,
+                    'description' => $request->description ?? 'General Ledger Adjustment',
+                ],
+                [
+                    [
+                        'account_id' => (int) $request->to_account_id,
+                        'category_id' => $request->category_id,
+                        'debit' => (float) $request->amount,
+                        'credit' => 0,
+                        'notes' => $request->description ?? 'Debit Adjustment',
+                    ],
+                    [
+                        'account_id' => (int) $request->from_account_id,
+                        'category_id' => $request->category_id,
+                        'debit' => 0,
+                        'credit' => (float) $request->amount,
+                        'notes' => $request->description ?? 'Credit Adjustment',
+                    ],
+                ]
+            );
+
+            return to_route('admin.accounting.transactions.index')->with('success', 'Journal entry recorded successfully.');
         }
 
         return back()->with('danger', 'Invalid transaction type.');
