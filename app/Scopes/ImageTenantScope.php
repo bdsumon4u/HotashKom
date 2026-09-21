@@ -10,15 +10,16 @@ class ImageTenantScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        $column = $model->qualifyColumn('tenant_id');
+        if (! config('tenancy.enabled', false)) {
+            return;
+        }
 
-        if (config('tenancy.enabled', true) && function_exists('tenancy') && tenancy()->initialized) {
+        if (function_exists('tenancy') && tenancy()->initialized) {
+            $column = $model->qualifyColumn('tenant_id');
             $builder->where(function (Builder $query) use ($column): void {
                 $query->where($column, tenant()->getTenantKey())
                     ->orWhereNull($column);
             });
-        } else {
-            $builder->whereNull($column);
         }
     }
 

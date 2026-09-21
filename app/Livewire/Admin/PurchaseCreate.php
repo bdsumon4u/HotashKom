@@ -65,9 +65,11 @@ class PurchaseCreate extends Component
     public function mount(): void
     {
         $this->purchase_date = now()->toDateString();
-        $defaultAccount = Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->first();
-        if ($defaultAccount) {
-            $this->payment_account_id = $defaultAccount->id;
+        if (config('accounting.enabled', false)) {
+            $defaultAccount = Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->first();
+            if ($defaultAccount) {
+                $this->payment_account_id = $defaultAccount->id;
+            }
         }
     }
 
@@ -303,7 +305,9 @@ class PurchaseCreate extends Component
     public function render()
     {
         $suppliers = Supplier::where('is_active', true)->orderBy('name')->get();
-        $accounts = Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->orderBy('name')->get();
+        $accounts = config('accounting.enabled', false)
+            ? Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->orderBy('name')->get()
+            : collect();
 
         return view('livewire.admin.purchase-create', [
             'products' => $this->products,

@@ -22,7 +22,7 @@ class Setting extends Model
     public static function booted(): void
     {
         static::saved(function ($setting): void {
-            $tenantKey = tenancy()->initialized ? tenant('id') : '__central__';
+            $tenantKey = function_exists('tenancy') && tenancy()->initialized ? tenant('id') : '__central__';
             cacheMemo()->put(tenantCachePrefix().'settings:'.$setting->name, $setting->value);
             cacheMemo()->forget(tenantCachePrefix().'settings');
             Cache::forget(tenantCachePrefix().'settings');
@@ -30,7 +30,7 @@ class Setting extends Model
         });
 
         static::deleted(function ($setting): void {
-            $tenantKey = tenancy()->initialized ? tenant('id') : '__central__';
+            $tenantKey = function_exists('tenancy') && tenancy()->initialized ? tenant('id') : '__central__';
             cacheMemo()->forget(tenantCachePrefix().'settings:'.$setting->name);
             cacheMemo()->forget(tenantCachePrefix().'settings');
             Cache::forget(tenantCachePrefix().'settings');
@@ -40,7 +40,7 @@ class Setting extends Model
 
     public static function array()
     {
-        $tenantKey = tenancy()->initialized ? tenant('id') : '__central__';
+        $tenantKey = function_exists('tenancy') && tenancy()->initialized ? tenant('id') : '__central__';
 
         if (isset(self::$settingsArray[$tenantKey])) {
             return self::$settingsArray[$tenantKey];

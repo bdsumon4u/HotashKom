@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AccountController;
-use App\Http\Controllers\Admin\AccountingTransactionController;
 use App\Http\Controllers\Admin\ApiController;
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\AttributeOptionController;
@@ -18,7 +16,6 @@ use App\Http\Controllers\Admin\HomeSectionController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\LandingPageProController;
 use App\Http\Controllers\Admin\LeadController;
-use App\Http\Controllers\Admin\LedgerReportController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\MenuItemController;
 use App\Http\Controllers\Admin\MoneyRequestController;
@@ -36,7 +33,6 @@ use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\TenantController;
-use App\Http\Controllers\Admin\TransactionCategoryController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UtmReportController;
 use App\Http\Middleware\CheckForMaintenanceDue;
@@ -67,9 +63,11 @@ Route::group(['as' => 'admin.'], function (): void {
 
     // Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
 
-    Route::get('tenants/impersonate/{admin}', [TenantController::class, 'impersonateLogin'])
-        ->name('tenants.impersonate.login')
-        ->middleware('signed');
+    if (config('tenancy.enabled', false)) {
+        Route::get('tenants/impersonate/{admin}', [TenantController::class, 'impersonateLogin'])
+            ->name('tenants.impersonate.login')
+            ->middleware('signed');
+    }
 
     Route::permanentRedirect('/admin', '/admin/dashboard'); // Permanent Redirect
     Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', CheckForMaintenanceDue::class]], function (): void {
@@ -97,15 +95,10 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::post('/logout-others/{admin}', [ApiController::class, 'logoutOthers'])->name('logout-others');
         Route::get('/customers', CustomerController::class)->name('customers');
 
-        // Super Admin SaaS Tenant Management
-        Route::get('tenants', [TenantController::class, 'index'])->name('tenants.index');
-        Route::post('tenants', [TenantController::class, 'store'])->name('tenants.store');
-        Route::get('tenants/{tenant}/impersonate', [TenantController::class, 'impersonate'])->name('tenants.impersonate');
-        Route::get('tenants/{tenant}', [TenantController::class, 'show'])->name('tenants.show');
-        Route::put('tenants/{tenant}', [TenantController::class, 'update'])->name('tenants.update');
-        Route::delete('tenants/{tenant}', [TenantController::class, 'destroy'])->name('tenants.destroy');
-        Route::post('tenants/{tenant}/domains', [TenantController::class, 'addDomain'])->name('tenants.domains.add');
-        Route::delete('tenants/domains/{domain}', [TenantController::class, 'deleteDomain'])->name('tenants.domains.delete');
+        // Super Admin SaaS Tenant Management Routes (Only registered when tenancy is enabled)
+        if (config('tenancy.enabled', false)) {
+            require base_path('routes/tenants.php');
+        }
 
         Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
         Route::get('resellers/{reseller}/edit', [ResellerController::class, 'edit'])->name('resellers.edit');
@@ -144,14 +137,10 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::post('reviews/bulk-delete', [ReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
         Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
-        // Accounting Module Routes
-        Route::prefix('accounting')->as('accounting.')->middleware('accounting.enabled')->group(function (): void {
-            Route::get('ledger/monthly', [LedgerReportController::class, 'monthly'])->name('ledger.monthly');
-            Route::post('ledger/courier-payout', [LedgerReportController::class, 'recordCourierPayout'])->name('ledger.courier-payout');
-            Route::resource('accounts', AccountController::class);
-            Route::resource('categories', TransactionCategoryController::class);
-            Route::resource('transactions', AccountingTransactionController::class)->except(['show']);
-        });
+        // Accounting Module Routes (Only registered when accounting is enabled)
+        if (config('accounting.enabled', false)) {
+            Route::prefix('accounting')->as('accounting.')->middleware('accounting.enabled')->group(base_path('routes/accounting.php'));
+        }
 
         // Suppliers & Supplier Payments Routes
         Route::resource('suppliers', SupplierController::class);

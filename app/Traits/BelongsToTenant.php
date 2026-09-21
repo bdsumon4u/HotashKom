@@ -15,13 +15,13 @@ trait BelongsToTenant
 
     public static function bootBelongsToTenant(): void
     {
+        if (! config('tenancy.enabled', false)) {
+            return;
+        }
+
         static::addGlobalScope(new TenantScope);
 
         static::creating(function ($model): void {
-            if (! config('tenancy.enabled', true)) {
-                return;
-            }
-
             if (! $model->getAttribute('tenant_id') && ! $model->relationLoaded('tenant')) {
                 if (function_exists('tenancy') && tenancy()->initialized) {
                     $model->setAttribute('tenant_id', tenant()->getTenantKey());

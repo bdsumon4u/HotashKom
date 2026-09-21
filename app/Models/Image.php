@@ -21,19 +21,17 @@ class Image extends Model
     #[\Override]
     public static function booted(): void
     {
-        static::addGlobalScope(new ImageTenantScope);
+        if (config('tenancy.enabled', false)) {
+            static::addGlobalScope(new ImageTenantScope);
 
-        static::creating(function (self $image): void {
-            if (! config('tenancy.enabled', true)) {
-                return;
-            }
-
-            if (! $image->getAttribute('tenant_id') && ! $image->relationLoaded('tenant')) {
-                if (function_exists('tenancy') && tenancy()->initialized) {
-                    $image->setAttribute('tenant_id', tenant()->getTenantKey());
+            static::creating(function (self $image): void {
+                if (! $image->getAttribute('tenant_id') && ! $image->relationLoaded('tenant')) {
+                    if (function_exists('tenancy') && tenancy()->initialized) {
+                        $image->setAttribute('tenant_id', tenant()->getTenantKey());
+                    }
                 }
-            }
-        });
+            });
+        }
 
         static::saved(function ($image): void {
             // Dispatch job to copy image to reseller databases

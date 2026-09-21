@@ -74,13 +74,15 @@ class PurchaseEdit extends Component
         $this->notes = $purchase->notes;
         $this->invoice_number = $purchase->invoice_number;
 
-        $existingPayment = $purchase->payments()->first();
-        if ($existingPayment && $existingPayment->account_id) {
-            $this->payment_account_id = $existingPayment->account_id;
-        } else {
-            $defaultAccount = Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->first();
-            if ($defaultAccount) {
-                $this->payment_account_id = $defaultAccount->id;
+        if (config('accounting.enabled', false)) {
+            $existingPayment = $purchase->payments()->first();
+            if ($existingPayment && $existingPayment->account_id) {
+                $this->payment_account_id = $existingPayment->account_id;
+            } else {
+                $defaultAccount = Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->first();
+                if ($defaultAccount) {
+                    $this->payment_account_id = $defaultAccount->id;
+                }
             }
         }
 
@@ -371,7 +373,9 @@ class PurchaseEdit extends Component
     public function render()
     {
         $suppliers = Supplier::where('is_active', true)->orderBy('name')->get();
-        $accounts = Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->orderBy('name')->get();
+        $accounts = config('accounting.enabled', false)
+            ? Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->orderBy('name')->get()
+            : collect();
 
         return view('livewire.admin.purchase-edit', [
             'products' => $this->products,

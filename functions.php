@@ -26,7 +26,7 @@ use Illuminate\Support\Str;
 if (! function_exists('tenantCachePrefix')) {
     function tenantCachePrefix(): string
     {
-        if (! config('tenancy.enabled', true)) {
+        if (! config('tenancy.enabled', false)) {
             return '';
         }
 

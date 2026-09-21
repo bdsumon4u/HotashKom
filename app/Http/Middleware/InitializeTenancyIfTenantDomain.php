@@ -10,17 +10,12 @@ use Stancl\Tenancy\Tenancy;
 
 class InitializeTenancyIfTenantDomain
 {
-    public function __construct(
-        protected Tenancy $tenancy,
-        protected DomainTenantResolver $resolver
-    ) {}
-
     /**
      * Handle an incoming request.
      */
     public function handle(Request $request, Closure $next)
     {
-        if (! config('tenancy.enabled', true)) {
+        if (! config('tenancy.enabled', false)) {
             return $next($request);
         }
 
@@ -34,8 +29,10 @@ class InitializeTenancyIfTenantDomain
 
         // Otherwise, resolve tenant by domain/subdomain
         try {
-            $tenant = $this->resolver->resolve($host);
-            $this->tenancy->initialize($tenant);
+            $resolver = app(DomainTenantResolver::class);
+            $tenancy = app(Tenancy::class);
+            $tenant = $resolver->resolve($host);
+            $tenancy->initialize($tenant);
         } catch (TenantCouldNotBeIdentifiedOnDomainException $e) {
             abort(404, 'Store or tenant website not found.');
         }

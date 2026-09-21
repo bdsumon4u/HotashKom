@@ -25,7 +25,9 @@ class SupplierController extends Controller
             ->latest('id')
             ->get();
 
-        $accounts = Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->orderBy('name')->get();
+        $accounts = config('accounting.enabled', false)
+            ? Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->orderBy('name')->get()
+            : collect();
 
         return view('admin.suppliers.index', compact('suppliers', 'accounts'));
     }
@@ -68,7 +70,9 @@ class SupplierController extends Controller
         $supplier->load(['purchases.products', 'purchasePayments.account']);
         $supplier->recalculateDue();
 
-        $accounts = Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->orderBy('name')->get();
+        $accounts = config('accounting.enabled', false)
+            ? Account::where('type', Account::TYPE_ASSET)->where('is_active', true)->orderBy('name')->get()
+            : collect();
 
         return view('admin.suppliers.show', compact('supplier', 'accounts'));
     }
