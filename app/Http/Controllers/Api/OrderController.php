@@ -25,9 +25,9 @@ class OrderController extends Controller
         $_end = Date::parse(\request('end_d'));
 
         $orders = Order::with(['admin', 'latestOrderNote.admin'])->withCount('orderNotes');
-        if (strtolower($request->type) === 'online') {
+        if (strtolower((string) $request->type) === 'online') {
             $orders->where('orders.type', Order::ONLINE);
-        } elseif (strtolower($request->type) === 'manual') {
+        } elseif (strtolower((string) $request->type) === 'manual') {
             $orders->where('orders.type', Order::MANUAL);
         }
 

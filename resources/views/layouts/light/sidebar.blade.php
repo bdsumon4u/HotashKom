@@ -42,9 +42,11 @@
                             <i class="d-block" data-feather="shopping-cart"> </i>
                             <span class="d-block">Carts</span>
                             @php
-                                $count = DB::table('shopping_cart')
-                                    ->where('updated_at', '<', now()->subDay())
-                                    ->count();
+                                $count = cacheMemo()->remember('sidebar_abandoned_carts_count', 60, function () {
+                                    return DB::table('shopping_cart')
+                                        ->where('updated_at', '<', now()->subDay())
+                                        ->count();
+                                });
                             @endphp
                             <span
                                 class="ml-auto text-white d-flex badge badge-primary align-items-center">{{ $count }}</span>
@@ -57,13 +59,17 @@
                             <i class="d-block" data-feather="shopping-bag"> </i>
                             <span class="d-block">Orders</span>
                             @php
-                                $count = \App\Models\Order::where('status', 'PENDING')
-                                    ->when(auth('admin')->user()->role_id == \App\Models\Admin::SALESMAN, function (
-                                        $query,
-                                    ) {
-                                        $query->where('admin_id', auth('admin')->id());
-                                    })
-                                    ->count();
+                                $adminUser = auth('admin')->user();
+                                $orderCacheKey = 'sidebar_pending_orders_count_'.($adminUser && $adminUser->role_id == \App\Models\Admin::SALESMAN ? 'salesman_'.$adminUser->id : 'all');
+                                $count = cacheMemo()->remember($orderCacheKey, 60, function () use ($adminUser) {
+                                    return \App\Models\Order::where('status', 'PENDING')
+                                        ->when($adminUser && $adminUser->role_id == \App\Models\Admin::SALESMAN, function (
+                                            $query,
+                                        ) use ($adminUser) {
+                                            $query->where('admin_id', $adminUser->id);
+                                        })
+                                        ->count();
+                                });
                             @endphp
                             <span
                                 class="ml-auto text-white d-flex badge badge-primary pending-count align-items-center">{{ $count }}</span>
@@ -90,7 +96,9 @@
 
                     <li>
                         @php
-                            $pendingReviewsCount = \App\Models\Review::where('approved', false)->count();
+                            $pendingReviewsCount = cacheMemo()->remember('sidebar_pending_reviews_count', 60, function () {
+                                return \App\Models\Review::where('approved', false)->count();
+                            });
                         @endphp
                         <a class="nav-link menu-title link-nav d-flex align-items-center {{ request()->is('admin/reviews*') ? 'active' : '' }}"
                             href="{{ route('admin.reviews.index') }}">
