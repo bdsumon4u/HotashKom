@@ -79,29 +79,32 @@ class ApiController extends Controller
 
     public function sectionProducts(Request $request, HomeSection $section)
     {
-        $page = $request->get('page', 1);
-        $perPage = min($request->get('per_page', 20), 20);
+        $page = (int) $request->get('page', 1);
+        $perPage = min((int) $request->get('per_page', 20), 20);
+        $category = $request->category;
 
-        $products = $section->products(paginate: $perPage, category: $request->category);
+        return cacheRememberNamespaced('section_products', "api:section:{$section->id}:p{$page}:c{$category}:pp{$perPage}", now()->addHours(2), function () use ($section, $perPage, $category) {
+            $products = $section->products(paginate: $perPage, category: $category);
 
-        // Load relationships and add base image URL
-        $this->loadProductRelationships($products);
-        $this->addBaseImageUrls($products);
+            // Load relationships and add base image URL
+            $this->loadProductRelationships($products);
+            $this->addBaseImageUrls($products);
 
-        if ($products instanceof LengthAwarePaginator) {
-            return [
-                'data' => $products->items(),
-                'pagination' => [
-                    'current_page' => $products->currentPage(),
-                    'last_page' => $products->lastPage(),
-                    'per_page' => $products->perPage(),
-                    'total' => $products->total(),
-                    'has_more' => $products->hasMorePages(),
-                ],
-            ];
-        }
+            if ($products instanceof LengthAwarePaginator) {
+                return [
+                    'data' => $products->items(),
+                    'pagination' => [
+                        'current_page' => $products->currentPage(),
+                        'last_page' => $products->lastPage(),
+                        'per_page' => $products->perPage(),
+                        'total' => $products->total(),
+                        'has_more' => $products->hasMorePages(),
+                    ],
+                ];
+            }
 
-        return $products;
+            return $products;
+        });
     }
 
     public function shopProducts(Request $request)

@@ -280,14 +280,14 @@ if (! function_exists('setting')) {
 }
 
 if (! function_exists('theMoney')) {
-    function theMoney($amount, $decimals = null, $currency = 'TK')
+    function theMoney($amount, $decimals = 0, $currency = 'TK')
     {
         // Ensure amount is numeric to prevent number_format errors
         if (! is_numeric($amount)) {
             $amount = (float) ($amount ?? 0);
         }
 
-        return $currency.'&nbsp;<span>'.number_format($amount, $decimals).'</span>';
+        return $currency.'&nbsp;<span>'.number_format($amount, (int) ($decimals ?? 0)).'</span>';
     }
 }
 
