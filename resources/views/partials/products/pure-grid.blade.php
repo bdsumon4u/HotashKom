@@ -21,7 +21,7 @@
             <div class="products-list__body">
                 @foreach($products as $product)
                     <div class="products-list__item">
-                        <livewire:product-card :product="$product" :key="$product->id" />
+                        @include('partials.products.item', ['product' => $product])
                     </div>
                 @endforeach
             </div>

@@ -1,4 +1,8 @@
-@props(['section'])
+@props(['section', 'initialProducts' => null])
+@php
+    $initialProducts = $initialProducts ?? $section->products();
+    $initialProductIds = $initialProducts ? $initialProducts->pluck('id')->values()->all() : [];
+@endphp
 
 @push('styles')
 <style>
@@ -35,7 +39,7 @@
 </style>
 @endpush
 
-<div class="infinite-scroll-section" x-data="infiniteScroll({{ $section->id }})" x-init="init()" data-section-id="{{ $section->id }}">
+<div class="infinite-scroll-section" x-data="infiniteScroll({{ $section->id }}, {{ json_encode($initialProductIds) }})" x-init="init()" data-section-id="{{ $section->id }}">
 
     @if ($section->type == 'pure-grid')
         <div class="block block-products-carousel">
@@ -69,19 +73,26 @@
                         data-guest-can-see-price="{{ (bool) (setting('show_option')->guest_can_see_price ?? false) ? 'true' : 'false' }}"
                         data-user-guest="{{ auth('user')->guest() ? 'true' : 'false' }}"
                         data-user-verified="{{ auth('user')->check() && auth('user')->user()->is_verified ? 'true' : 'false' }}">
-                        <!-- Products will be loaded here by Alpine.js -->
-                        <!-- Skeleton placeholders to prevent layout shift -->
-                        <div class="products-skeleton" style="--skeleton-cols: {{ optional($section->data)->cols ?? 5 }};">
-                            @for($i = 0; $i < (optional($section->data)->cols ?? 5); $i++)
-                                <div class="product-card-skeleton" style="aspect-ratio: 1 / 1.2; background: #f0f0f0; border-radius: 8px;">
-                                    <div style="aspect-ratio: 1 / 1; background: #e0e0e0; border-radius: 8px 8px 0 0;"></div>
-                                    <div style="padding: 0.75rem;">
-                                        <div style="height: 16px; background: #e0e0e0; border-radius: 4px; margin-bottom: 0.5rem;"></div>
-                                        <div style="height: 14px; background: #e0e0e0; border-radius: 4px; width: 60%;"></div>
-                                    </div>
+                        @if($initialProducts && $initialProducts->isNotEmpty())
+                            @foreach($initialProducts as $product)
+                                <div class="products-list__item" data-product-id="{{ $product->id }}">
+                                    @include('partials.products.item', ['product' => $product])
                                 </div>
-                            @endfor
-                        </div>
+                            @endforeach
+                        @else
+                            <!-- Skeleton placeholders if no initial products -->
+                            <div class="products-skeleton" style="--skeleton-cols: {{ optional($section->data)->cols ?? 5 }};">
+                                @for($i = 0; $i < (optional($section->data)->cols ?? 5); $i++)
+                                    <div class="product-card-skeleton" style="aspect-ratio: 1 / 1.2; background: #f0f0f0; border-radius: 8px;">
+                                        <div style="aspect-ratio: 1 / 1; background: #e0e0e0; border-radius: 8px 8px 0 0;"></div>
+                                        <div style="padding: 0.75rem;">
+                                            <div style="height: 16px; background: #e0e0e0; border-radius: 4px; margin-bottom: 0.5rem;"></div>
+                                            <div style="height: 14px; background: #e0e0e0; border-radius: 4px; width: 60%;"></div>
+                                        </div>
+                                    </div>
+                                @endfor
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -100,22 +111,21 @@
 
 
 <script>
-    function infiniteScroll(sectionId) {
+    function infiniteScroll(sectionId, initialIds = []) {
         return {
             sectionId: sectionId,
-            currentPage: 1,
+            currentPage: Array.isArray(initialIds) && initialIds.length > 0 ? 2 : 1,
             hasMore: true,
             loading: false,
             perPage: 20,
-            loadedProductIds: new Set(),
+            loadedProductIds: new Set(Array.isArray(initialIds) ? initialIds : []),
             observer: null,
 
             init() {
-                // Wait for DOM to be ready
-                setTimeout(() => {
+                if (this.loadedProductIds.size === 0) {
                     this.loadProducts();
-                    this.setupIntersectionObserver();
-                }, 100);
+                }
+                this.setupIntersectionObserver();
             },
 
             async loadProducts() {
