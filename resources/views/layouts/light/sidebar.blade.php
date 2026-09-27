@@ -289,6 +289,14 @@
                         </a>
                     </li>
 
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.reports.return' ? 'active' : '' }}"
+                            href="{{ route('admin.reports.return') }}">
+                            <i data-feather="rotate-ccw"> </i>
+                            <span>Return</span>
+                        </a>
+                    </li>
+
                     @if(config('app.utm'))
                     <li>
                         <a class="nav-link menu-title link-nav {{ Route::currentRouteName() == 'admin.reports.utm' ? 'active' : '' }}"

@@ -1,14 +1,14 @@
 @extends('layouts.light.master')
 
-@section('title', 'Shipment Report')
+@section('title', 'Return Report')
 
 @section('breadcrumb-title')
-    <h3>Shipment Report</h3>
+    <h3>Return Report</h3>
 @endsection
 
 @section('breadcrumb-items')
     <li class="breadcrumb-item">Reports</li>
-    <li class="breadcrumb-item active">Shipment</li>
+    <li class="breadcrumb-item active">Return</li>
 @endsection
 
 @section('breadcrumb-right')
@@ -23,78 +23,48 @@
 
 @section('content')
 <!-- Print Header (hidden on screen, visible when printing) -->
-<div id="print-shipment-header" class="print-header" style="display: none;">
-    <h1>Shipment Report</h1>
+<div id="print-return-header" class="print-header" style="display: none;">
+    <h1>Return Report</h1>
     <div class="date">Date Range: {{ $start->format('M d, Y') }} - {{ $end->format('M d, Y') }} | Generated on: {{ now()->format('F j, Y \a\t g:i A') }}</div>
 </div>
 
 <div class="mb-5 container-fluid">
 
-    <div id="shipment-report-section" class="report-section mb-5">
+    <div id="return-report-section" class="report-section mb-5">
         <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom report-section-heading">
             <h4 class="mb-0 font-weight-bold text-dark d-flex align-items-center">
-                <i data-feather="truck" class="font-primary mr-2" style="width: 22px; height: 22px;"></i>
-                Shipment Report
-                <span class="badge badge-light-primary text-primary ml-2 font-weight-normal" style="font-size: 13px;">Based on Shipped Date</span>
+                <i data-feather="rotate-ccw" class="font-danger mr-2" style="width: 22px; height: 22px;"></i>
+                Return Report
+                <span class="badge badge-light-danger text-danger ml-2 font-weight-normal" style="font-size: 13px;">Based on Return Date</span>
             </h4>
-            <button type="button" class="btn btn-outline-primary btn-xs no-print" onclick="window.print()">
+            <button type="button" class="btn btn-outline-danger btn-xs no-print" onclick="window.print()">
                 <i class="fa fa-print"></i> Print Report
             </button>
         </div>
 
-        <!-- Shipment Summary Cards -->
+        <!-- Return Summary Cards -->
         <div class="row">
-            <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
-                <div class="card o-hidden h-100 kpi-card">
-                    <div class="p-3 card-body">
-                        <div class="d-flex static-top-widget align-items-center">
-                            <div class="align-self-center kpi-icon-wrap kpi-primary">
-                                <i data-feather="truck" class="font-primary"></i>
-                            </div>
-                            <div class="ml-3 flex-grow-1">
-                                <span class="font-roboto text-muted" style="font-size: 13px;">Total Shipped</span>
-                                <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['total_shipped'] }}</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
-                <div class="card o-hidden h-100 kpi-card">
-                    <div class="p-3 card-body">
-                        <div class="d-flex static-top-widget align-items-center">
-                            <div class="align-self-center kpi-icon-wrap kpi-warning">
-                                <i data-feather="clock" class="font-warning"></i>
-                            </div>
-                            <div class="ml-3 flex-grow-1">
-                                <span class="font-roboto text-muted" style="font-size: 13px;">Shipping</span>
-                                <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['SHIPPING']['count'] ?? 0 }}</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
-                <div class="card o-hidden h-100 kpi-card">
-                    <div class="p-3 card-body">
-                        <div class="d-flex static-top-widget align-items-center">
-                            <div class="align-self-center kpi-icon-wrap kpi-success">
-                                <i data-feather="check-circle" class="font-success"></i>
-                            </div>
-                            <div class="ml-3 flex-grow-1">
-                                <span class="font-roboto text-muted" style="font-size: 13px;">Delivered</span>
-                                <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['DELIVERED']['count'] ?? 0 }}</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
+            <div class="mb-3 col-xl-4 col-md-4 col-sm-6">
                 <div class="card o-hidden h-100 kpi-card">
                     <div class="p-3 card-body">
                         <div class="d-flex static-top-widget align-items-center">
                             <div class="align-self-center kpi-icon-wrap kpi-danger">
                                 <i data-feather="rotate-ccw" class="font-danger"></i>
+                            </div>
+                            <div class="ml-3 flex-grow-1">
+                                <span class="font-roboto text-muted" style="font-size: 13px;">Total Returned</span>
+                                <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['total_returned'] }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 col-xl-4 col-md-4 col-sm-6">
+                <div class="card o-hidden h-100 kpi-card">
+                    <div class="p-3 card-body">
+                        <div class="d-flex static-top-widget align-items-center">
+                            <div class="align-self-center kpi-icon-wrap kpi-danger">
+                                <i data-feather="corner-up-left" class="font-danger"></i>
                             </div>
                             <div class="ml-3 flex-grow-1">
                                 <span class="font-roboto text-muted" style="font-size: 13px;">Returned</span>
@@ -104,7 +74,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
+            <div class="mb-3 col-xl-4 col-md-4 col-sm-6">
                 <div class="card o-hidden h-100 kpi-card">
                     <div class="p-3 card-body">
                         <div class="d-flex static-top-widget align-items-center">
@@ -119,7 +89,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
+            <div class="mb-3 col-xl-6 col-md-6 col-sm-6">
                 <div class="card o-hidden h-100 kpi-card">
                     <div class="p-3 card-body">
                         <div class="d-flex static-top-widget align-items-center">
@@ -134,7 +104,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
+            <div class="mb-3 col-xl-6 col-md-6 col-sm-6">
                 <div class="card o-hidden h-100 kpi-card">
                     <div class="p-3 card-body">
                         <div class="d-flex static-top-widget align-items-center">
@@ -149,35 +119,14 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Dynamic Additional Status Cards if any exist (e.g. Courier Hold, Exchanged) -->
-            @foreach($report['status_breakdown'] as $extraStatus => $extraData)
-                @if(!in_array($extraStatus, ['SHIPPING', 'DELIVERED', 'RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && ($extraData['count'] ?? 0) > 0)
-                    <div class="mb-3 col-xl-3 col-md-6 col-sm-6">
-                        <div class="card o-hidden h-100 kpi-card">
-                            <div class="p-3 card-body">
-                                <div class="d-flex static-top-widget align-items-center">
-                                    <div class="align-self-center kpi-icon-wrap kpi-indigo">
-                                        <i data-feather="layers" class="font-indigo"></i>
-                                    </div>
-                                    <div class="ml-3 flex-grow-1">
-                                        <span class="font-roboto text-muted" style="font-size: 13px;">{{ ucwords(strtolower(str_replace('_', ' ', $extraStatus))) }}</span>
-                                        <h4 class="mb-0 font-roboto font-weight-bold">{{ $extraData['count'] }}</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            @endforeach
         </div>
 
-        <!-- Shipment Status & Courier Breakdown -->
+        <!-- Return Status & Courier Breakdown -->
         <div class="row">
             <div class="col-xl-6">
                 <div class="shadow-sm rounded-0 card">
                     <div class="p-3 card-header">
-                        <h5>Status Breakdown</h5>
+                        <h5>Return Status Breakdown</h5>
                     </div>
                     <div class="p-3 card-body">
                         <div class="table-responsive">
@@ -196,14 +145,10 @@
                                     @foreach($report['status_breakdown'] as $status => $data)
                                     @php
                                         $badgeClass = match($status) {
-                                            'DELIVERED' => 'badge-success',
-                                            'SHIPPING' => 'badge-warning',
                                             'RETURNED' => 'badge-danger',
                                             'PAID_RETURN' => 'badge-info',
                                             'RETURN_RECEIVED' => 'badge-secondary',
                                             'PAID_RETURN_RCV' => 'badge-dark',
-                                            'COURIER_HOLD' => 'badge-primary',
-                                            'EXCHANGED' => 'badge-light text-dark border',
                                             default => 'badge-light',
                                         };
                                     @endphp
@@ -219,7 +164,7 @@
                                         <td class="{{ ((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) >= 0 ? 'text-success' : 'text-danger' }}">
                                             {!! theMoney((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) !!}
                                         </td>
-                                        <td>{{ $report['total_shipped'] > 0 ? round(($data['count'] / $report['total_shipped']) * 100, 1) : 0 }}%</td>
+                                        <td>{{ $report['total_returned'] > 0 ? round(($data['count'] / $report['total_returned']) * 100, 1) : 0 }}%</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -229,11 +174,11 @@
                 </div>
             </div>
 
-            <!-- Shipment Courier Breakdown -->
+            <!-- Return Courier Breakdown -->
             <div class="col-xl-6">
                 <div class="shadow-sm rounded-0 card">
                     <div class="p-3 card-header">
-                        <h5>Courier Breakdown</h5>
+                        <h5>Return Courier Breakdown</h5>
                     </div>
                     <div class="p-3 card-body">
                         <div class="table-responsive">
@@ -245,8 +190,6 @@
                                         <th>Purchase</th>
                                         <th>Subtotal</th>
                                         <th>Profit</th>
-                                        <th>Delivered</th>
-                                        <th>Shipping</th>
                                         <th>Returned</th>
                                         <th>Paid Return</th>
                                         <th>Return Rcv</th>
@@ -263,8 +206,6 @@
                                         <td class="{{ ((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) >= 0 ? 'text-success' : 'text-danger' }}">
                                             {!! theMoney((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) !!}
                                         </td>
-                                        <td class="text-success">{{ $data['delivered'] }}</td>
-                                        <td class="text-warning">{{ $data['shipping'] }}</td>
                                         <td class="text-danger">{{ $data['returned'] }}</td>
                                         <td class="text-info">{{ $data['paid_return'] ?? 0 }}</td>
                                         <td class="text-secondary">{{ $data['return_received'] ?? 0 }}</td>
@@ -279,12 +220,12 @@
             </div>
         </div>
 
-        <!-- Shipment Daily Breakdown -->
+        <!-- Return Daily Breakdown -->
         <div class="row">
             <div class="col-12">
                 <div class="shadow-sm rounded-0 card">
                     <div class="p-3 card-header">
-                        <h5>Daily Breakdown</h5>
+                        <h5>Return Daily Breakdown</h5>
                     </div>
                     <div class="p-3 card-body">
                         <div class="table-responsive">
@@ -292,12 +233,10 @@
                                 <thead>
                                     <tr>
                                         <th>Date</th>
-                                        <th>Total Shipped</th>
+                                        <th>Total Returned</th>
                                         <th>Purchase</th>
                                         <th>Subtotal</th>
                                         <th>Profit</th>
-                                        <th>Shipping</th>
-                                        <th>Delivered</th>
                                         <th>Returned</th>
                                         <th>Paid Return</th>
                                         <th>Return Rcv</th>
@@ -308,8 +247,8 @@
                                     @foreach($report['daily_breakdown'] as $date => $data)
                                     <tr>
                                         <td>
-                                            <a href="{{ route('admin.orders.index', ['shipped_at' => $date, 'status' => '']) }}"
-                                               class="text-primary font-weight-bold">
+                                            <a href="{{ route('admin.orders.index', ['returned_at' => $date, 'status' => '']) }}"
+                                               class="text-danger font-weight-bold">
                                                 {{ \Carbon\Carbon::parse($date)->format('M d, Y') }}
                                             </a>
                                         </td>
@@ -319,8 +258,6 @@
                                         <td class="{{ ((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) >= 0 ? 'text-success' : 'text-danger' }}">
                                             {!! theMoney((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) !!}
                                         </td>
-                                        <td class="text-warning">{{ $data['shipping'] }}</td>
-                                        <td class="text-success">{{ $data['delivered'] }}</td>
                                         <td class="text-danger">{{ $data['returned'] }}</td>
                                         <td class="text-info">{{ $data['paid_return'] ?? 0 }}</td>
                                         <td class="text-secondary">{{ $data['return_received'] ?? 0 }}</td>
@@ -335,51 +272,29 @@
             </div>
         </div>
 
-        <!-- Shipped Products List -->
+        <!-- Returned Products List -->
         <div class="row">
             <div class="col-12">
                 <div class="shadow-sm rounded-0 card">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
-                        <h5 class="mb-0">Shipped Products</h5>
+                        <h5 class="mb-0">Returned Products</h5>
                         <div class="report-status-nav">
                             @php
-                                $activeStatus = request('product_status', 'ALL');
-                                
-                                // Base filter status for ALL
-                                $filterStatuses = [
-                                    'ALL' => ['label' => 'ALL', 'class' => 'status-pill-all', 'count' => $report['total_shipped']],
+                                $activeReturnStatus = request('product_status', 'ALL');
+                                $filterReturnStatuses = [
+                                    'ALL' => ['label' => 'ALL', 'class' => 'status-pill-all', 'count' => $report['total_returned']],
+                                    'RETURNED' => ['label' => 'Returned', 'class' => 'status-pill-returned', 'count' => $report['status_breakdown']['RETURNED']['count'] ?? 0],
+                                    'PAID_RETURN' => ['label' => 'Paid Return', 'class' => 'status-pill-paid-return', 'count' => $report['status_breakdown']['PAID_RETURN']['count'] ?? 0],
+                                    'RETURN_RECEIVED' => ['label' => 'Return Received', 'class' => 'status-pill-return-rcv', 'count' => $report['status_breakdown']['RETURN_RECEIVED']['count'] ?? 0],
+                                    'PAID_RETURN_RCV' => ['label' => 'Paid Return Rcv', 'class' => 'status-pill-paid-return-rcv', 'count' => $report['status_breakdown']['PAID_RETURN_RCV']['count'] ?? 0],
                                 ];
-
-                                $statusClassMap = [
-                                    'SHIPPING' => 'status-pill-shipping',
-                                    'DELIVERED' => 'status-pill-delivered',
-                                    'RETURNED' => 'status-pill-returned',
-                                    'PAID_RETURN' => 'status-pill-paid-return',
-                                    'RETURN_RECEIVED' => 'status-pill-return-rcv',
-                                    'PAID_RETURN_RCV' => 'status-pill-paid-return-rcv',
-                                    'COURIER_HOLD' => 'status-pill-courier-hold',
-                                    'EXCHANGED' => 'status-pill-exchanged',
-                                    'LOST' => 'status-pill-lost',
-                                    'PARTIAL_DELIVERY' => 'status-pill-partial',
-                                ];
-
-                                // Add all statuses present in breakdown
-                                foreach ($report['status_breakdown'] as $st => $stData) {
-                                    if (($stData['count'] ?? 0) > 0 || in_array($st, ['SHIPPING', 'DELIVERED', 'RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
-                                        $filterStatuses[$st] = [
-                                            'label' => ucwords(strtolower(str_replace('_', ' ', $st))),
-                                            'class' => $statusClassMap[$st] ?? 'status-pill-default',
-                                            'count' => $stData['count'] ?? 0,
-                                        ];
-                                    }
-                                }
                             @endphp
 
-                            @foreach($filterStatuses as $statusKey => $statusConfig)
+                            @foreach($filterReturnStatuses as $statusKey => $statusConfig)
                                 @php
-                                    $isActive = ($activeStatus === $statusKey);
+                                    $isActive = ($activeReturnStatus === $statusKey);
                                 @endphp
-                                <a href="{{ route('admin.reports.shipment', array_merge(request()->query(), ['product_status' => $statusKey])) }}"
+                                <a href="{{ route('admin.reports.return', array_merge(request()->query(), ['product_status' => $statusKey])) }}"
                                    class="status-pill {{ $statusConfig['class'] }} {{ $isActive ? 'active' : '' }}">
                                     <span class="status-pill-label">{{ $statusConfig['label'] }}</span>
                                     <span class="status-pill-count">{{ $statusConfig['count'] }}</span>
@@ -388,15 +303,15 @@
                         </div>
                     </div>
                     <div class="p-3 card-body">
-                        @if(!empty($shippedProductsData['products']))
+                        @if(!empty($returnedProductsData['products']))
                             @include('admin.reports.filtered', [
-                                'products' => $shippedProductsData['products'],
-                                'productInOrders' => $shippedProductsData['productInOrders']
+                                'products' => $returnedProductsData['products'],
+                                'productInOrders' => $returnedProductsData['productInOrders']
                             ])
                         @else
                             <div class="py-4 text-center text-muted">
                                 <i class="mb-2 fa fa-box fa-2x"></i>
-                                <p>No shipped products found for the selected date range</p>
+                                <p>No returned products found for the selected date range</p>
                             </div>
                         @endif
                     </div>
@@ -445,11 +360,9 @@
         .kpi-info    { background-color: rgba(6, 182, 212, 0.12); }
         .kpi-secondary { background-color: rgba(139, 92, 246, 0.12); }
         .kpi-dark    { background-color: rgba(30, 41, 59, 0.12); }
-        .kpi-indigo  { background-color: rgba(79, 70, 229, 0.12); }
-        .font-indigo { color: #4f46e5; }
 
-        .badge-light-primary {
-            background-color: rgba(99, 102, 241, 0.12);
+        .badge-light-danger {
+            background-color: rgba(239, 68, 68, 0.12);
         }
 
         /* Modern Filter Pills */
@@ -492,31 +405,11 @@
 
         /* Pill Active Themes */
         .status-pill-all.active {
-            background-color: #4f46e5;
-            border-color: #4f46e5;
+            background-color: #ef4444;
+            border-color: #ef4444;
             color: #ffffff;
         }
         .status-pill-all.active .status-pill-count {
-            background-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
-        }
-
-        .status-pill-shipping.active {
-            background-color: #f59e0b;
-            border-color: #f59e0b;
-            color: #ffffff;
-        }
-        .status-pill-shipping.active .status-pill-count {
-            background-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
-        }
-
-        .status-pill-delivered.active {
-            background-color: #10b981;
-            border-color: #10b981;
-            color: #ffffff;
-        }
-        .status-pill-delivered.active .status-pill-count {
             background-color: rgba(255, 255, 255, 0.25);
             color: #ffffff;
         }
@@ -561,36 +454,6 @@
             color: #ffffff;
         }
 
-        .status-pill-courier-hold.active {
-            background-color: #6366f1;
-            border-color: #6366f1;
-            color: #ffffff;
-        }
-        .status-pill-courier-hold.active .status-pill-count {
-            background-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
-        }
-
-        .status-pill-exchanged.active {
-            background-color: #0ea5e9;
-            border-color: #0ea5e9;
-            color: #ffffff;
-        }
-        .status-pill-exchanged.active .status-pill-count {
-            background-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
-        }
-
-        .status-pill-default.active {
-            background-color: #64748b;
-            border-color: #64748b;
-            color: #ffffff;
-        }
-        .status-pill-default.active .status-pill-count {
-            background-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
-        }
-
         /* Print styles */
         @media print {
             html, body {
@@ -619,7 +482,7 @@
                 height: 0 !important;
             }
 
-            #print-shipment-header {
+            #print-return-header {
                 display: block !important;
             }
 
@@ -771,7 +634,7 @@
         };
 
         function refresh() {
-            window.location = "{!! route('admin.reports.shipment', [
+            window.location = "{!! route('admin.reports.return', [
                 'start_d' => '_start',
                 'end_d' => '_end',
             ]) !!}".replace('_start', window._start.format('YYYY-MM-DD'))

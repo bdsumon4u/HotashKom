@@ -11,11 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
-class ShipmentReportController extends Controller
+class ReturnReportController extends Controller
 {
-    private const array REPORT_STATUSES = [
-        'SHIPPING',
-        'DELIVERED',
+    private const array RETURN_STATUSES = [
         'RETURNED',
         'PAID_RETURN',
         'RETURN_RECEIVED',
@@ -23,44 +21,45 @@ class ShipmentReportController extends Controller
     ];
 
     /**
-     * Show the shipment report page based on shipped_at date.
+     * Show the return report page based on returned_at date.
      */
     public function index(Request $request)
     {
         $start = Date::parse($request->get('start_d', now()));
         $end = Date::parse($request->get('end_d', now()));
 
-        $report = $this->generateReport($start->format('Y-m-d'), $end->format('Y-m-d'));
+        $report = $this->generateReturnReport($start->format('Y-m-d'), $end->format('Y-m-d'));
 
-        // Generate shipped products report for the selected date range
+        // Generate returned products report for the selected date range
         $productStatus = $request->get('product_status', 'ALL');
-        $statuses = ($productStatus === 'ALL' || empty($productStatus)) ? [] : [$productStatus];
+        $statuses = $productStatus === 'ALL' ? self::RETURN_STATUSES : [$productStatus];
 
-        $shippedProductsData = (new ProductReportService)->generateProductsReport(
+        $returnedProductsData = (new ProductReportService)->generateProductsReport(
             $start,
             $end,
             $statuses,
-            'shipped_at'
+            'returned_at'
         );
 
-        return view('admin.reports.shipment', compact(
+        return view('admin.reports.return', compact(
             'report',
             'start',
             'end',
-            'shippedProductsData'
+            'returnedProductsData'
         ));
     }
 
     /**
-     * Generate shipment report for the given date range based on shipped_at
+     * Generate return report for the given date range based on returned_at
      */
-    private function generateReport(string $startDate, string $endDate): array
+    private function generateReturnReport(string $startDate, string $endDate): array
     {
-        $orders = Order::whereNotNull('shipped_at')
-            ->whereBetween(DB::raw('DATE(shipped_at)'), [$startDate, $endDate])
+        $orders = Order::whereNotNull('returned_at')
+            ->whereIn('status', self::RETURN_STATUSES)
+            ->whereBetween(DB::raw('DATE(returned_at)'), [$startDate, $endDate])
             ->get();
 
-        $totalShipped = $orders->count();
+        $totalReturned = $orders->count();
 
         $statusBreakdown = $orders->groupBy('status')->map(function ($group) {
             $totalSubtotal = $group->sum(fn ($order) => $order->data['subtotal'] ?? 0);
@@ -74,8 +73,8 @@ class ShipmentReportController extends Controller
             ];
         })->all();
 
-        // Ensure keys for standard report statuses always exist
-        foreach (self::REPORT_STATUSES as $status) {
+        // Ensure keys for all return statuses always exist
+        foreach (self::RETURN_STATUSES as $status) {
             if (! isset($statusBreakdown[$status])) {
                 $statusBreakdown[$status] = [
                     'count' => 0,
@@ -85,7 +84,7 @@ class ShipmentReportController extends Controller
             }
         }
 
-        $dailyBreakdown = $orders->groupBy(fn ($order) => $order->shipped_at ? Date::parse($order->shipped_at)->format('Y-m-d') : '')
+        $dailyBreakdown = $orders->groupBy(fn ($order) => $order->returned_at ? Date::parse($order->returned_at)->format('Y-m-d') : '')
             ->reject(fn ($group, $key) => empty($key))
             ->map(function ($group) {
                 $totalSubtotal = $group->sum(fn ($order) => $order->data['subtotal'] ?? 0);
@@ -94,8 +93,6 @@ class ShipmentReportController extends Controller
 
                 return [
                     'total' => $group->count(),
-                    'shipping' => $group->where('status', 'SHIPPING')->count(),
-                    'delivered' => $group->where('status', 'DELIVERED')->count(),
                     'returned' => $group->where('status', 'RETURNED')->count(),
                     'paid_return' => $group->where('status', 'PAID_RETURN')->count(),
                     'return_received' => $group->where('status', 'RETURN_RECEIVED')->count(),
@@ -112,8 +109,6 @@ class ShipmentReportController extends Controller
 
             return [
                 'total' => $group->count(),
-                'shipping' => $group->where('status', 'SHIPPING')->count(),
-                'delivered' => $group->where('status', 'DELIVERED')->count(),
                 'returned' => $group->where('status', 'RETURNED')->count(),
                 'paid_return' => $group->where('status', 'PAID_RETURN')->count(),
                 'return_received' => $group->where('status', 'RETURN_RECEIVED')->count(),
@@ -124,7 +119,7 @@ class ShipmentReportController extends Controller
         });
 
         return [
-            'total_shipped' => $totalShipped,
+            'total_returned' => $totalReturned,
             'status_breakdown' => $statusBreakdown,
             'daily_breakdown' => $dailyBreakdown,
             'courier_breakdown' => $courierBreakdown,

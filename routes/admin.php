@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\ProductVariationController;
 use App\Http\Controllers\Admin\PurchaseController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ResellerController;
+use App\Http\Controllers\Admin\ReturnReportController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShipmentReportController;
@@ -80,6 +81,7 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::any('settings', SettingController::class)->name('settings');
         Route::get('/reports/stock', [ReportController::class, 'stock'])->name('reports.stock');
         Route::get('/reports/shipment', [ShipmentReportController::class, 'index'])->name('reports.shipment');
+        Route::get('/reports/return', [ReturnReportController::class, 'index'])->name('reports.return');
         Route::get('/reports/filter', [OrderController::class, 'filter'])->name('orders.filter');
         Route::get('/reports/customer', [ReportController::class, 'customer'])->name('reports.customer');
         Route::get('/reports/utm', UtmReportController::class)->name('reports.utm');
