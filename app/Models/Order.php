@@ -61,7 +61,7 @@ class Order extends Model
                     $order->confirmed_at = now();
                 }
 
-                if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && ! $order->isDirty('returned_at') && empty($order->returned_at)) {
+                if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && ! $order->isDirty('returned_at')) {
                     $order->returned_at = now();
                 }
             }
