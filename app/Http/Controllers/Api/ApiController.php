@@ -520,7 +520,7 @@ class ApiController extends Controller
             $order->status = 'RETURN_RECEIVED';
         }
 
-        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && empty($order->returned_at)) {
+        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
             $order->returned_at = now();
         }
 
@@ -607,7 +607,7 @@ class ApiController extends Controller
             $order->status = 'EXCHANGED';
         }
 
-        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && empty($order->returned_at)) {
+        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
             $order->returned_at = now();
         }
 
@@ -699,7 +699,7 @@ class ApiController extends Controller
             ]]);
         }
 
-        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV']) && empty($order->returned_at)) {
+        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
             $order->returned_at = now();
         }
 
