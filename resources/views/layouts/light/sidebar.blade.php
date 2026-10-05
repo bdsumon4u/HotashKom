@@ -209,6 +209,63 @@
                     </li>
                     @endif
 
+                    @if (config('investment.enabled', false))
+                    <li class="sidebar-title">
+                        <h6>Investment</h6>
+                    </li>
+
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/investment/investors*') ? 'active' : '' }}"
+                            href="{{ route('admin.investment.investors.index') }}">
+                            <i data-feather="user-check"> </i>
+                            <span>Investors</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/investment/investments*') ? 'active' : '' }}"
+                            href="{{ route('admin.investment.investments.index') }}">
+                            <i data-feather="trending-up"> </i>
+                            <span>Investments</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link d-flex menu-title link-nav {{ request()->is('admin/investment/withdrawals*') ? 'active' : '' }}"
+                            href="{{ route('admin.investment.withdrawals.index') }}">
+                            <i data-feather="dollar-sign"> </i>
+                            <span>Withdrawals</span>
+                            @php
+                                $investorPendingAmount = cacheMemo()->remember(
+                                    'investor_pending_withdrawal_amount',
+                                    300,
+                                    function () {
+                                        return abs(
+                                            (float) \Bavix\Wallet\Models\Transaction::where('type', 'withdraw')
+                                                ->where('confirmed', false)
+                                                ->where('payable_type', (new \App\Models\Investor)->getMorphClass())
+                                                ->sum('amount'),
+                                        );
+                                    },
+                                );
+                            @endphp
+                            @if ($investorPendingAmount > 0)
+                                <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
+                                    {{ number_format($investorPendingAmount, 0) }} tk
+                                </span>
+                            @endif
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('admin/investment/earnings*') ? 'active' : '' }}"
+                            href="{{ route('admin.investment.earnings.index') }}">
+                            <i data-feather="pie-chart"> </i>
+                            <span>Company Earnings</span>
+                        </a>
+                    </li>
+                    @endif
+
                     <li class="sidebar-title">
                         <h6>Appearance</h6>
                     </li>

@@ -110,6 +110,11 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
         });
     });
 
+    // Investor Panel Routes (Only registered when investment module is enabled)
+    if (config('investment.enabled', false)) {
+        Route::prefix('investor')->name('investor.')->middleware('investment.enabled')->group(base_path('routes/investor.php'));
+    }
+
     Route::post('save-checkout-progress', [ApiController::class, 'saveCheckoutProgress']);
 
     Route::get('/', HomeController::class)->name('/');
