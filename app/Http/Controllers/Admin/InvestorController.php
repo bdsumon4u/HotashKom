@@ -40,9 +40,9 @@ class InvestorController extends Controller
                 }, true)
                 ->addIndexColumn()
                 ->editColumn('name', function ($row): string {
-                    return '<div>
-                        <a href="'.route('admin.investment.investors.show', $row->id).'" class="font-weight-bold text-primary">'.e($row->name).'</a>
-                        '.($row->phone_number ? '<br><small class="text-muted"><i class="fa fa-phone"></i> '.e($row->phone_number).'</small>' : '').'
+                    return '<div class="text-nowrap" style="white-space: nowrap;">
+                        <a href="'.route('admin.investment.investors.show', $row->id).'" class="font-weight-bold text-primary text-nowrap d-inline-block">'.e($row->name).'</a>
+                        '.($row->phone_number ? '<br><small class="text-muted text-nowrap"><i class="fa fa-phone"></i> '.e($row->phone_number).'</small>' : '').'
                     </div>';
                 })
                 ->addColumn('referral_code', function ($row): string {

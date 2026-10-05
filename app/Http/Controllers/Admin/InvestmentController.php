@@ -47,8 +47,10 @@ class InvestmentController extends Controller
                         return 'N/A';
                     }
 
-                    return '<a href="'.route('admin.investment.investors.show', $row->investor->id).'" class="font-weight-bold">'.e($row->investor->name).'</a>
-                        <br><small class="text-muted">'.e($row->investor->phone_number ?? $row->investor->email).'</small>';
+                    return '<div class="text-nowrap" style="white-space: nowrap;">
+                        <a href="'.route('admin.investment.investors.show', $row->investor->id).'" class="font-weight-bold text-nowrap d-inline-block">'.e($row->investor->name).'</a>
+                        '.($row->investor->phone_number ? '<br><small class="text-muted text-nowrap"><i class="fa fa-phone"></i> '.e($row->investor->phone_number).'</small>' : '').'
+                    </div>';
                 })
                 ->addColumn('invested_amount', fn ($row): string => '<span class="font-weight-bold">'.number_format($row->invested_amount, 2).' TK</span>')
                 ->addColumn('total_return', fn ($row): string => '<span class="font-weight-bold text-success">'.number_format($row->total_return_amount, 2).' TK</span>')

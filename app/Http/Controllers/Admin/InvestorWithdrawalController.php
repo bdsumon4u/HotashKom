@@ -60,9 +60,9 @@ class InvestorWithdrawalController extends Controller
                     return 'N/A';
                 }
 
-                return '<div>
-                    <a href="'.route('admin.investment.investors.show', $investor->id).'" class="font-weight-bold">'.e($investor->name).'</a>
-                    <br><small class="text-muted"><i class="fa fa-phone"></i> '.e($investor->phone_number ?? 'N/A').'</small>
+                return '<div class="text-nowrap" style="white-space: nowrap;">
+                    <a href="'.route('admin.investment.investors.show', $investor->id).'" class="font-weight-bold text-nowrap d-inline-block">'.e($investor->name).'</a>
+                    '.($investor->phone_number ? '<br><small class="text-muted text-nowrap"><i class="fa fa-phone"></i> '.e($investor->phone_number).'</small>' : '').'
                 </div>';
             })
             ->addColumn('account_details', function ($row): string {
