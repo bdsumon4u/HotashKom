@@ -520,13 +520,14 @@ class ApiController extends Controller
             $order->status = $order->status === 'PAID_RETURN' ? 'PAID_RETURN_RCV' : 'RETURN_RECEIVED';
         }
 
-        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
-            $order->returned_at = now();
+        if ($order->isDirty('status')) {
+            $order->status_at = now();
+            if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
+                $order->returned_at = now();
+            }
         }
 
-        $order->update([
-            'status_at' => now(),
-        ]);
+        $order->save();
 
         return response()->json(['message' => 'Webhook processed'], 202)
             ->header('X-Pathao-Merchant-Webhook-Integration-Secret', 'f3992ecc-59da-4cbe-a049-a13da2018d51');
@@ -607,13 +608,14 @@ class ApiController extends Controller
             $order->status = 'EXCHANGED';
         }
 
-        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
-            $order->returned_at = now();
+        if ($order->isDirty('status')) {
+            $order->status_at = now();
+            if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
+                $order->returned_at = now();
+            }
         }
 
-        $order->update([
-            'status_at' => now(),
-        ]);
+        $order->save();
 
         return response()->json(['message' => 'Webhook processed'], 202);
     }
@@ -699,11 +701,13 @@ class ApiController extends Controller
             ]]);
         }
 
-        if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
-            $order->returned_at = now();
+        if ($order->isDirty('status')) {
+            $order->status_at = now();
+            if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
+                $order->returned_at = now();
+            }
         }
 
-        $order->status_at = now();
         $order->save();
 
         return response()->json(['message' => 'Webhook processed'], 200);
