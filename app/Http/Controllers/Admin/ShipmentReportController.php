@@ -103,7 +103,8 @@ class ShipmentReportController extends Controller
                     'total_subtotal' => $totalSubtotal,
                     'total_purchase_cost' => $totalPurchaseCost,
                 ];
-            });
+            })
+            ->sortKeys();
 
         $courierBreakdown = $orders->groupBy(fn ($order) => $order->data['courier'] ?? 'Other')->map(function ($group) {
             $totalSubtotal = $group->sum(fn ($order) => $order->data['subtotal'] ?? 0);

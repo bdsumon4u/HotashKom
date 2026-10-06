@@ -63,36 +63,6 @@
                 <div class="card o-hidden h-100 kpi-card">
                     <div class="p-3 card-body">
                         <div class="d-flex static-top-widget align-items-center">
-                            <div class="align-self-center kpi-icon-wrap kpi-danger">
-                                <i data-feather="corner-up-left" class="font-danger"></i>
-                            </div>
-                            <div class="ml-3 flex-grow-1">
-                                <span class="font-roboto text-muted" style="font-size: 13px;">Returned</span>
-                                <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['RETURNED']['count'] ?? 0 }}</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3 col-xl-4 col-md-4 col-sm-6">
-                <div class="card o-hidden h-100 kpi-card">
-                    <div class="p-3 card-body">
-                        <div class="d-flex static-top-widget align-items-center">
-                            <div class="align-self-center kpi-icon-wrap kpi-info">
-                                <i data-feather="repeat" class="font-info"></i>
-                            </div>
-                            <div class="ml-3 flex-grow-1">
-                                <span class="font-roboto text-muted" style="font-size: 13px;">Paid Return</span>
-                                <h4 class="mb-0 font-roboto font-weight-bold">{{ $report['status_breakdown']['PAID_RETURN']['count'] ?? 0 }}</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3 col-xl-6 col-md-6 col-sm-6">
-                <div class="card o-hidden h-100 kpi-card">
-                    <div class="p-3 card-body">
-                        <div class="d-flex static-top-widget align-items-center">
                             <div class="align-self-center kpi-icon-wrap kpi-secondary">
                                 <i data-feather="package" class="font-secondary"></i>
                             </div>
@@ -104,7 +74,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-3 col-xl-6 col-md-6 col-sm-6">
+            <div class="mb-3 col-xl-4 col-md-4 col-sm-6">
                 <div class="card o-hidden h-100 kpi-card">
                     <div class="p-3 card-body">
                         <div class="d-flex static-top-widget align-items-center">
@@ -190,8 +160,6 @@
                                         <th>Purchase</th>
                                         <th>Subtotal</th>
                                         <th>Profit</th>
-                                        <th>Returned</th>
-                                        <th>Paid Return</th>
                                         <th>Return Rcv</th>
                                         <th>Paid Return Rcv</th>
                                     </tr>
@@ -206,8 +174,6 @@
                                         <td class="{{ ((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) >= 0 ? 'text-success' : 'text-danger' }}">
                                             {!! theMoney((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) !!}
                                         </td>
-                                        <td class="text-danger">{{ $data['returned'] }}</td>
-                                        <td class="text-info">{{ $data['paid_return'] ?? 0 }}</td>
                                         <td class="text-secondary">{{ $data['return_received'] ?? 0 }}</td>
                                         <td class="text-dark">{{ $data['paid_return_rcv'] ?? 0 }}</td>
                                     </tr>
@@ -237,8 +203,6 @@
                                         <th>Purchase</th>
                                         <th>Subtotal</th>
                                         <th>Profit</th>
-                                        <th>Returned</th>
-                                        <th>Paid Return</th>
                                         <th>Return Rcv</th>
                                         <th>Paid Return Rcv</th>
                                     </tr>
@@ -258,8 +222,6 @@
                                         <td class="{{ ((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) >= 0 ? 'text-success' : 'text-danger' }}">
                                             {!! theMoney((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) !!}
                                         </td>
-                                        <td class="text-danger">{{ $data['returned'] }}</td>
-                                        <td class="text-info">{{ $data['paid_return'] ?? 0 }}</td>
                                         <td class="text-secondary">{{ $data['return_received'] ?? 0 }}</td>
                                         <td class="text-dark">{{ $data['paid_return_rcv'] ?? 0 }}</td>
                                     </tr>
@@ -283,8 +245,6 @@
                                 $activeReturnStatus = request('product_status', 'ALL');
                                 $filterReturnStatuses = [
                                     'ALL' => ['label' => 'ALL', 'class' => 'status-pill-all', 'count' => $report['total_returned']],
-                                    'RETURNED' => ['label' => 'Returned', 'class' => 'status-pill-returned', 'count' => $report['status_breakdown']['RETURNED']['count'] ?? 0],
-                                    'PAID_RETURN' => ['label' => 'Paid Return', 'class' => 'status-pill-paid-return', 'count' => $report['status_breakdown']['PAID_RETURN']['count'] ?? 0],
                                     'RETURN_RECEIVED' => ['label' => 'Return Received', 'class' => 'status-pill-return-rcv', 'count' => $report['status_breakdown']['RETURN_RECEIVED']['count'] ?? 0],
                                     'PAID_RETURN_RCV' => ['label' => 'Paid Return Rcv', 'class' => 'status-pill-paid-return-rcv', 'count' => $report['status_breakdown']['PAID_RETURN_RCV']['count'] ?? 0],
                                 ];

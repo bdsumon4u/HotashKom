@@ -517,7 +517,7 @@ class ApiController extends Controller
         } elseif ($request->event == 'order.exchanged') {
             $order->status = 'EXCHANGED';
         } elseif ($request->event == 'order.returned-to-merchant') {
-            $order->status = 'RETURN_RECEIVED';
+            $order->status = $order->status === 'PAID_RETURN' ? 'PAID_RETURN_RCV' : 'RETURN_RECEIVED';
         }
 
         if (in_array($order->status, ['RETURNED', 'PAID_RETURN', 'RETURN_RECEIVED', 'PAID_RETURN_RCV'])) {
@@ -681,7 +681,7 @@ class ApiController extends Controller
         } elseif ($status === 'agent-returning') {
             $order->status = 'RETURNED';
         } elseif ($status === 'returned') {
-            $order->status = 'RETURN_RECEIVED';
+            $order->status = $order->status === 'PAID_RETURN' ? 'PAID_RETURN_RCV' : 'RETURN_RECEIVED';
         } elseif ($status === 'paid') {
             $order->status = 'PAID';
         }

@@ -14,8 +14,6 @@ use Illuminate\Support\Facades\DB;
 class ReturnReportController extends Controller
 {
     private const array RETURN_STATUSES = [
-        'RETURNED',
-        'PAID_RETURN',
         'RETURN_RECEIVED',
         'PAID_RETURN_RCV',
     ];
@@ -93,14 +91,13 @@ class ReturnReportController extends Controller
 
                 return [
                     'total' => $group->count(),
-                    'returned' => $group->where('status', 'RETURNED')->count(),
-                    'paid_return' => $group->where('status', 'PAID_RETURN')->count(),
                     'return_received' => $group->where('status', 'RETURN_RECEIVED')->count(),
                     'paid_return_rcv' => $group->where('status', 'PAID_RETURN_RCV')->count(),
                     'total_subtotal' => $totalSubtotal,
                     'total_purchase_cost' => $totalPurchaseCost,
                 ];
-            });
+            })
+            ->sortKeys();
 
         $courierBreakdown = $orders->groupBy(fn ($order) => $order->data['courier'] ?? 'Other')->map(function ($group) {
             $totalSubtotal = $group->sum(fn ($order) => $order->data['subtotal'] ?? 0);
@@ -109,8 +106,6 @@ class ReturnReportController extends Controller
 
             return [
                 'total' => $group->count(),
-                'returned' => $group->where('status', 'RETURNED')->count(),
-                'paid_return' => $group->where('status', 'PAID_RETURN')->count(),
                 'return_received' => $group->where('status', 'RETURN_RECEIVED')->count(),
                 'paid_return_rcv' => $group->where('status', 'PAID_RETURN_RCV')->count(),
                 'total_subtotal' => $totalSubtotal,
