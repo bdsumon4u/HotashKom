@@ -345,7 +345,8 @@
             assetAccounts.forEach(acc => {
                 fromSelect.add(new Option(`${acc.name} (Balance: ${Number(acc.current_balance).toLocaleString('en-US', {minimumFractionDigits: 2})})`, acc.id));
             });
-            equityAccounts.forEach(acc => {
+            const capitalAccounts = equityAccounts.filter(acc => !acc.name.toLowerCase().includes('drawing') && !acc.name.toLowerCase().includes('withdrawal'));
+            (capitalAccounts.length > 0 ? capitalAccounts : equityAccounts).forEach(acc => {
                 toSelect.add(new Option(`${acc.name}`, acc.id));
             });
 
@@ -359,7 +360,8 @@
             assetAccounts.forEach(acc => {
                 fromSelect.add(new Option(`${acc.name} (Balance: ${Number(acc.current_balance).toLocaleString('en-US', {minimumFractionDigits: 2})})`, acc.id));
             });
-            equityAccounts.forEach(acc => {
+            const drawingAccounts = equityAccounts.filter(acc => acc.name.toLowerCase().includes('drawing') || acc.name.toLowerCase().includes('withdrawal'));
+            (drawingAccounts.length > 0 ? drawingAccounts : equityAccounts).forEach(acc => {
                 toSelect.add(new Option(`${acc.name}`, acc.id));
             });
 

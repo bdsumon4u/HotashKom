@@ -423,19 +423,24 @@ final class AccountingService
     public function seedDefaultAccounts(): void
     {
         $defaultCategories = [
-            ['name' => 'Utility Bills', 'type' => TransactionCategory::TYPE_EXPENSE],
+            // Expense Sub-Tags / Classifications
             ['name' => 'AC & Electricity Bill', 'type' => TransactionCategory::TYPE_EXPENSE],
-            ['name' => 'Water Bill', 'type' => TransactionCategory::TYPE_EXPENSE],
-            ['name' => 'Office Snacks & Food', 'type' => TransactionCategory::TYPE_EXPENSE],
-            ['name' => 'Ads & Marketing', 'type' => TransactionCategory::TYPE_EXPENSE],
-            ['name' => 'Dollar Cost (Cards/FB Ads)', 'type' => TransactionCategory::TYPE_EXPENSE],
-            ['name' => 'Cost of Goods Sold', 'type' => TransactionCategory::TYPE_EXPENSE],
-            ['name' => 'Staff Salary', 'type' => TransactionCategory::TYPE_EXPENSE],
-            ['name' => 'Paper & Stationery', 'type' => TransactionCategory::TYPE_EXPENSE],
-            ['name' => 'Packaging Material', 'type' => TransactionCategory::TYPE_EXPENSE],
-            ['name' => 'Courier Payout (Sales)', 'type' => TransactionCategory::TYPE_INCOME],
-            ['name' => 'Delivery Charges Income', 'type' => TransactionCategory::TYPE_INCOME],
-            ['name' => 'Extra / Misc Income', 'type' => TransactionCategory::TYPE_INCOME],
+            ['name' => 'Water & Sanitation Bill', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'Internet & Wi-Fi Bill', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'Facebook & Meta Ads', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'TikTok & Video Ads', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'Google & YouTube Ads', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'Packaging Poly, Boxes & Tape', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'Courier Return / Parcel Damage Fee', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'Staff Festival Bonus & Incentives', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'Tea, Coffee & Daily Office Snacks', 'type' => TransactionCategory::TYPE_EXPENSE],
+            ['name' => 'Office Cleaning & Maintenance', 'type' => TransactionCategory::TYPE_EXPENSE],
+
+            // Income Sub-Tags / Classifications
+            ['name' => 'Wholesale & Bulk Orders', 'type' => TransactionCategory::TYPE_INCOME],
+            ['name' => 'Scrap & Box Packaging Sales', 'type' => TransactionCategory::TYPE_INCOME],
+            ['name' => 'Affiliate & Referral Earnings', 'type' => TransactionCategory::TYPE_INCOME],
+            ['name' => 'Bank Profit & Interest', 'type' => TransactionCategory::TYPE_INCOME],
         ];
 
         foreach ($defaultCategories as $cat) {
@@ -448,6 +453,7 @@ final class AccountingService
             ['name' => 'Bank Account', 'code' => '1002', 'type' => Account::TYPE_ASSET, 'is_system' => true],
             ['name' => 'bKash / Mobile Wallet', 'code' => '1003', 'type' => Account::TYPE_ASSET, 'is_system' => true],
             ['name' => 'Inventory / Product Stock', 'code' => '1004', 'type' => Account::TYPE_ASSET, 'is_system' => true],
+            ['name' => 'Accounts Receivable (Customer / Courier Dues)', 'code' => '1005', 'type' => Account::TYPE_ASSET, 'is_system' => true],
 
             // Liabilities
             ['name' => 'Accounts Payable (Supplier Dues)', 'code' => '2001', 'type' => Account::TYPE_LIABILITY, 'is_system' => true],
