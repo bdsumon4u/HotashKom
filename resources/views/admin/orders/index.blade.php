@@ -246,6 +246,8 @@
                 return;
             }
 
+            $.fn.dataTable.ext.errMode = 'throw';
+
             // Check if DataTable is already initialized on this element
             if ($.fn.dataTable.isDataTable('.datatable')) {
                 // Already initialized, get the instance and refresh
