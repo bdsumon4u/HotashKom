@@ -54,20 +54,24 @@ class LedgerReportController extends Controller
         $year = (int) $date->format('Y');
         $month = (int) $date->format('m');
 
-        $rawAccountId = $request->input('account_id');
-        $accountId = filter_var($rawAccountId, FILTER_VALIDATE_INT) !== false && (int) $rawAccountId > 0 ? (int) $rawAccountId : null;
-        if ($accountId && ! Account::where('id', $accountId)->exists()) {
-            $accountId = null;
+        $rawAccountIds = $request->input('account_ids') ?? $request->input('account_id') ?? [];
+        if (! is_array($rawAccountIds)) {
+            $rawAccountIds = [$rawAccountIds];
         }
+
+        $selectedAccountIds = array_values(array_unique(array_filter(
+            array_map(fn ($id) => is_numeric($id) ? (int) $id : 0, $rawAccountIds),
+            fn ($id) => $id > 0
+        )));
 
         // Ensure default chart of accounts is seeded
         if (Account::count() === 0) {
             $this->accountingService->seedDefaultAccounts();
         }
 
-        $ledgerData = $this->accountingService->getMonthlyLedger($year, $month, $accountId);
+        $ledgerData = $this->accountingService->getMonthlyLedger($year, $month, $selectedAccountIds);
 
-        $accounts = Account::where('is_active', true)->orderBy('name')->get();
+        $accounts = Account::where('is_active', true)->orderBy('type')->orderBy('name')->get();
         $assetAccounts = $accounts->where('type', Account::TYPE_ASSET);
         $incomeAccounts = $accounts->where('type', Account::TYPE_INCOME);
         $categories = TransactionCategory::where('is_active', true)->orderBy('name')->get();
@@ -79,7 +83,7 @@ class LedgerReportController extends Controller
             'assetAccounts',
             'incomeAccounts',
             'categories',
-            'accountId'
+            'selectedAccountIds'
         ));
     }
 

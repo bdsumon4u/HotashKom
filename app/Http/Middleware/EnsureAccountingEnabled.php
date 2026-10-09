@@ -19,6 +19,12 @@ class EnsureAccountingEnabled
             abort(404);
         }
 
+        $admin = $request->user('admin') ?? auth('admin')->user();
+
+        if (! $admin || ! $admin->is('admin')) {
+            abort(403, 'Unauthorized access.');
+        }
+
         return $next($request);
     }
 }

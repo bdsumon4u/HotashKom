@@ -307,13 +307,19 @@ final class AccountingService
 
     /**
      * Get monthly ledger and company balance sheet for given year and month.
+     *
+     * @param  array<int>|int|null  $filterAccountIds
      */
-    public function getMonthlyLedger(int $year, int $month, ?int $filterAccountId = null): array
+    public function getMonthlyLedger(int $year, int $month, array|int|null $filterAccountIds = null): array
     {
         $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
         $endDate = $startDate->copy()->endOfMonth();
 
-        $accountsQuery = Account::query()->when($filterAccountId, fn ($q) => $q->where('id', $filterAccountId));
+        $accountIds = is_array($filterAccountIds)
+            ? array_values(array_filter(array_map('intval', $filterAccountIds)))
+            : ($filterAccountIds ? [(int) $filterAccountIds] : []);
+
+        $accountsQuery = Account::query()->when(! empty($accountIds), fn ($q) => $q->whereIn('id', $accountIds));
         $accounts = $accountsQuery->orderBy('type')->orderBy('name')->get();
 
         $ledgerData = [];

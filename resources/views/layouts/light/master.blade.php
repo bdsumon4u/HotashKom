@@ -165,6 +165,9 @@
         width: 2px;
         height: 8px;
       }
+      .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        color: white !important;
+      }
     </style>
     @stack('styles')
     @bukStyles(true)

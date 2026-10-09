@@ -171,7 +171,7 @@
                         </a>
                     </li>
 
-                    @if (config('accounting.enabled', true))
+                    @if (config('accounting.enabled', true) && auth('admin')->user()?->is('admin'))
                     <li class="sidebar-title">
                         <h6>Accounting</h6>
                     </li>
