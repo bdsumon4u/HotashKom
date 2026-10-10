@@ -42,3 +42,10 @@ Schedule::command('sitemap:generate')
     ->daily()
     ->withoutOverlapping()
     ->runInBackground();
+
+if (config('investment.enabled', false)) {
+    Schedule::command('investment:process-installments')
+        ->dailyAt('00:05')
+        ->withoutOverlapping()
+        ->runInBackground();
+}

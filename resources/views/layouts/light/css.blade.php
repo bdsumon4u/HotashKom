@@ -142,4 +142,37 @@
     .card-header.bg-success strong {
         color: #ffffff !important;
     }
+
+    /* Compact Layout & Table Styling */
+    .card .card-header {
+        padding: 16px 20px;
+    }
+    .card .card-body {
+        padding: 20px;
+    }
+    .card .card-footer {
+        padding: 14px 20px;
+    }
+    .table thead th {
+        white-space: nowrap !important;
+        vertical-align: middle !important;
+    }
+    .table tbody td {
+        vertical-align: middle !important;
+    }
+
+    /* Prevent Sidebar Horizontal Scroll */
+    header.main-nav,
+    .main-navbar,
+    #mainnav,
+    .nav-menu,
+    .nav-menu.custom-scrollbar,
+    .page-wrapper.compact-wrapper .page-body-wrapper.sidebar-icon header.main-nav .main-navbar .nav-menu {
+        overflow-x: hidden !important;
+    }
+    .nav-menu > li,
+    .nav-menu > li > a {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
 </style>

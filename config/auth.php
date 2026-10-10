@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Admin;
+use App\Models\Investor;
 use App\Models\User;
 
 return [
@@ -49,6 +50,11 @@ return [
             'provider' => 'users',
         ],
 
+        'investor' => [
+            'driver' => 'session',
+            'provider' => 'investors',
+        ],
+
         'api' => [
             'driver' => 'token',
             'provider' => 'users',
@@ -82,6 +88,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        'investors' => [
+            'driver' => 'eloquent',
+            'model' => Investor::class,
         ],
 
         // 'users' => [
@@ -118,6 +129,13 @@ return [
 
         'users' => [
             'provider' => 'users',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'investors' => [
+            'provider' => 'investors',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,

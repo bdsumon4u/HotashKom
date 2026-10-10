@@ -144,6 +144,11 @@ Route::group(['as' => 'admin.'], function (): void {
             Route::prefix('accounting')->as('accounting.')->middleware('accounting.enabled')->group(base_path('routes/accounting.php'));
         }
 
+        // Investment Module Routes (Only registered when investment is enabled)
+        if (config('investment.enabled', false)) {
+            Route::prefix('investment')->as('investment.')->middleware('investment.enabled')->group(base_path('routes/advest.php'));
+        }
+
         // Suppliers & Supplier Payments Routes
         Route::resource('suppliers', SupplierController::class);
         Route::post('suppliers/{supplier}/payment', [SupplierController::class, 'storePayment'])->name('suppliers.payment');
