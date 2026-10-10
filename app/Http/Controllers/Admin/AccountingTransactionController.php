@@ -38,16 +38,23 @@ class AccountingTransactionController extends Controller
             $endDate = now()->endOfMonth()->toDateString();
         }
 
-        $rawAccountId = $request->input('account_id');
-        $accountId = filter_var($rawAccountId, FILTER_VALIDATE_INT) !== false && (int) $rawAccountId > 0 ? (int) $rawAccountId : null;
+        $rawAccountIds = $request->input('account_ids') ?? $request->input('account_id') ?? [];
+        if (! is_array($rawAccountIds)) {
+            $rawAccountIds = [$rawAccountIds];
+        }
+
+        $selectedAccountIds = array_values(array_unique(array_filter(
+            array_map(fn ($id) => is_numeric($id) ? (int) $id : 0, $rawAccountIds),
+            fn ($id) => $id > 0
+        )));
 
         $rawCategoryId = $request->input('category_id');
         $categoryId = filter_var($rawCategoryId, FILTER_VALIDATE_INT) !== false && (int) $rawCategoryId > 0 ? (int) $rawCategoryId : null;
 
         $query = JournalEntry::with(['items.account', 'items.category', 'admin'])
             ->whereBetween('entry_date', [$startDate, $endDate])
-            ->when($accountId, function ($q) use ($accountId): void {
-                $q->whereHas('items', fn ($sub) => $sub->where('account_id', $accountId));
+            ->when(! empty($selectedAccountIds), function ($q) use ($selectedAccountIds): void {
+                $q->whereHas('items', fn ($sub) => $sub->whereIn('account_id', $selectedAccountIds));
             })
             ->when($categoryId, function ($q) use ($categoryId): void {
                 $q->whereHas('items', fn ($sub) => $sub->where('category_id', $categoryId));
@@ -57,7 +64,7 @@ class AccountingTransactionController extends Controller
 
         $entries = $query->paginate(30)->withQueryString();
 
-        $accounts = Account::where('is_active', true)->orderBy('name')->get();
+        $accounts = Account::where('is_active', true)->orderBy('type')->orderBy('name')->get();
         $categories = TransactionCategory::where('is_active', true)->orderBy('name')->get();
 
         return view('admin.accounting.transactions.index', compact(
@@ -65,7 +72,8 @@ class AccountingTransactionController extends Controller
             'accounts',
             'categories',
             'startDate',
-            'endDate'
+            'endDate',
+            'selectedAccountIds'
         ));
     }
 

@@ -29,27 +29,28 @@
     <!-- Filter Card -->
     <div class="card shadow-sm border mb-4" style="background: #ffffff;">
         <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.accounting.transactions.index') }}" class="form-row align-items-end">
-                <div class="form-group col-md-3 mb-2">
-                    <label class="small font-weight-bold text-dark">Start Date</label>
+            <form method="GET" action="{{ route('admin.accounting.transactions.index') }}" class="form-row align-items-end" id="transactionsFilterForm">
+                <div class="form-group col-lg-2 col-md-3 mb-2">
+                    <label class="small font-weight-bold text-dark"><i class="fa fa-calendar mr-1 text-primary"></i> Start Date</label>
                     <input type="date" name="start_d" class="form-control form-control-sm text-dark font-weight-bold" value="{{ $startDate }}">
                 </div>
-                <div class="form-group col-md-3 mb-2">
-                    <label class="small font-weight-bold text-dark">End Date</label>
+                <div class="form-group col-lg-2 col-md-3 mb-2">
+                    <label class="small font-weight-bold text-dark"><i class="fa fa-calendar mr-1 text-primary"></i> End Date</label>
                     <input type="date" name="end_d" class="form-control form-control-sm text-dark font-weight-bold" value="{{ $endDate }}">
                 </div>
-                <div class="form-group col-md-3 mb-2">
-                    <label class="small font-weight-bold text-dark">Account</label>
-                    <select name="account_id" class="form-control form-control-sm text-dark font-weight-bold">
-                        <option value="">All Accounts</option>
+                <div class="form-group col-lg-5 col-md-6 mb-2">
+                    <label class="small font-weight-bold text-dark"><i class="fa fa-filter mr-1 text-primary"></i> Filter by Accounts (Multi-Select)</label>
+                    <select name="account_ids[]" id="account_ids_select" class="form-control form-control-sm text-dark font-weight-bold select2" multiple="multiple" data-placeholder="-- All Accounts (Select to filter) --">
                         @foreach($accounts as $acc)
-                            <option value="{{ $acc->id }}" {{ request('account_id') == $acc->id ? 'selected' : '' }}>{{ $acc->name }}</option>
+                            <option value="{{ $acc->id }}" {{ in_array($acc->id, $selectedAccountIds ?? []) ? 'selected' : '' }}>
+                                [{{ strtoupper($acc->type) }}] {{ $acc->name }} ({{ $acc->code }})
+                            </option>
                         @endforeach
                     </select>
                 </div>
-                <div class="form-group col-md-3 mb-2 d-flex">
+                <div class="form-group col-lg-3 col-md-12 mb-2 d-flex">
                     <button type="submit" class="btn btn-primary btn-sm mr-2 flex-grow-1 font-weight-bold"><i class="fa fa-filter mr-1"></i> Filter</button>
-                    <a href="{{ route('admin.accounting.transactions.index') }}" class="btn btn-light btn-sm border text-dark">Reset</a>
+                    <a href="{{ route('admin.accounting.transactions.index') }}" class="btn btn-light btn-sm border text-dark font-weight-bold" title="Reset all filters">Reset</a>
                 </div>
             </form>
         </div>
@@ -69,8 +70,8 @@
                             <th class="text-dark font-weight-bold" style="width: 110px;">Date</th>
                             <th class="text-dark font-weight-bold" style="width: 140px;">Entry #</th>
                             <th class="text-dark font-weight-bold">Description / Reference</th>
-                            <th class="text-dark font-weight-bold">Debit Details</th>
-                            <th class="text-dark font-weight-bold">Credit Details</th>
+                            <th class="text-dark font-weight-bold">Debit Details (Dr)</th>
+                            <th class="text-dark font-weight-bold">Credit Details (Cr)</th>
                             <th class="text-right text-dark font-weight-bold" style="width: 140px;">Total Amount</th>
                             <th class="text-center text-dark font-weight-bold" style="width: 80px;">Action</th>
                         </tr>
@@ -99,27 +100,45 @@
                                 </td>
                                 <td>
                                     @foreach($entry->items->where('debit', '>', 0) as $item)
-                                        <div class="d-flex justify-content-between small mb-1">
+                                        @php
+                                            $isDebitNature = in_array($item->account?->type, ['asset', 'expense'], true);
+                                            $drSign = $isDebitNature ? '(+)' : '(-)';
+                                        @endphp
+                                        <div class="d-flex justify-content-between align-items-center small mb-1">
                                             <span>
                                                 <strong class="text-dark">{{ $item->account->name ?? 'Unknown' }}</strong>
+                                                @if($item->account?->type)
+                                                    <span class="badge badge-light border text-muted ml-1" style="font-size: 10px;">{{ strtoupper($item->account->type) }} {{ $drSign }}</span>
+                                                @endif
                                                 @if($item->category)
                                                     <span class="badge badge-light-primary text-primary border ml-1">#{{ $item->category->name }}</span>
                                                 @endif
                                             </span>
-                                            <span class="font-roboto text-danger font-weight-bold ml-2">{!! theMoney($item->debit) !!}</span>
+                                            <span class="font-roboto text-danger font-weight-bold ml-2">
+                                                {!! theMoney($item->debit) !!}
+                                            </span>
                                         </div>
                                     @endforeach
                                 </td>
                                 <td>
                                     @foreach($entry->items->where('credit', '>', 0) as $item)
-                                        <div class="d-flex justify-content-between small mb-1">
+                                        @php
+                                            $isDebitNature = in_array($item->account?->type, ['asset', 'expense'], true);
+                                            $crSign = $isDebitNature ? '(-)' : '(+)';
+                                        @endphp
+                                        <div class="d-flex justify-content-between align-items-center small mb-1">
                                             <span>
                                                 <strong class="text-dark">{{ $item->account->name ?? 'Unknown' }}</strong>
+                                                @if($item->account?->type)
+                                                    <span class="badge badge-light border text-muted ml-1" style="font-size: 10px;">{{ strtoupper($item->account->type) }} {{ $crSign }}</span>
+                                                @endif
                                                 @if($item->category)
                                                     <span class="badge badge-light-secondary text-secondary border ml-1">#{{ $item->category->name }}</span>
                                                 @endif
                                             </span>
-                                            <span class="font-roboto text-success font-weight-bold ml-2">{!! theMoney($item->credit) !!}</span>
+                                            <span class="font-roboto text-success font-weight-bold ml-2">
+                                               {!! theMoney($item->credit) !!}
+                                            </span>
                                         </div>
                                     @endforeach
                                 </td>
@@ -168,3 +187,54 @@
     </div>
 </div>
 @endsection
+
+@push('css')
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/select2.css') }}">
+<style>
+    .select2-container {
+        width: 100% !important;
+    }
+    .select2-container--default .select2-selection--multiple {
+        border: 1px solid #ced4da !important;
+        border-radius: 4px !important;
+        min-height: 33px !important;
+        padding: 2px 4px !important;
+    }
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: #4f46e5 !important;
+        box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25) !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #eff6ff !important;
+        border: 1px solid #bfdbfe !important;
+        color: #1e40af !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        padding: 2px 8px !important;
+        border-radius: 3px !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #ef4444 !important;
+        margin-right: 5px !important;
+        font-weight: bold !important;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: #b91c1c !important;
+    }
+</style>
+@endpush
+
+@push('js')
+<script src="{{ asset('assets/js/select2/select2.full.min.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        if (typeof $.fn.select2 !== 'undefined') {
+            $('#account_ids_select').select2({
+                placeholder: '-- All Accounts (Select to filter) --',
+                allowClear: true,
+                width: '100%'
+            });
+        }
+    });
+</script>
+@endpush

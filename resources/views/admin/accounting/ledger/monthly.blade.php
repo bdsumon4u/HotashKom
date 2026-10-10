@@ -161,6 +161,9 @@
                         'expense' => 'warning',
                         default => 'secondary'
                     };
+                    $isDebitNature = in_array($acc->type, ['asset', 'expense'], true);
+                    $drSign = $isDebitNature ? '(+)' : '(-)';
+                    $crSign = $isDebitNature ? '(-)' : '(+)';
                 @endphp
                 <div class="card shadow-sm border mb-4 ledger-account-card">
                     <div class="card-header p-3 ledger-card-header d-flex justify-content-between align-items-center flex-wrap" style="gap: 10px;">
@@ -173,8 +176,8 @@
                         </div>
                         <div class="d-flex align-items-center flex-wrap" style="gap: 10px;">
                             <span class="ledger-stat-pill">Opening: <strong class="font-roboto">{!! theMoney($accLedger['opening_balance']) !!}</strong></span>
-                            <span class="ledger-stat-pill text-danger">Total Dr: <strong class="font-roboto">{!! theMoney($accLedger['total_debit']) !!}</strong></span>
-                            <span class="ledger-stat-pill text-success">Total Cr: <strong class="font-roboto">{!! theMoney($accLedger['total_credit']) !!}</strong></span>
+                            <span class="ledger-stat-pill text-danger">Total Dr {{ $drSign }}: <strong class="font-roboto">{!! theMoney($accLedger['total_debit']) !!}</strong></span>
+                            <span class="ledger-stat-pill text-success">Total Cr {{ $crSign }}: <strong class="font-roboto">{!! theMoney($accLedger['total_credit']) !!}</strong></span>
                             <span class="ledger-ending-pill">Ending Balance: <span class="font-roboto">{!! theMoney($accLedger['ending_balance']) !!}</span></span>
                         </div>
                     </div>
@@ -187,8 +190,8 @@
                                         <th style="width: 140px;">Entry #</th>
                                         <th>Description / Reference</th>
                                         <th style="width: 160px;">Category</th>
-                                        <th class="text-right" style="width: 140px;">Debit (Dr)</th>
-                                        <th class="text-right" style="width: 140px;">Credit (Cr)</th>
+                                        <th class="text-right" style="width: 150px;">Debit / Dr {{ $drSign }}</th>
+                                        <th class="text-right" style="width: 150px;">Credit / Cr {{ $crSign }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -230,8 +233,12 @@
                                 <tfoot>
                                     <tr>
                                         <th colspan="4" class="text-right text-dark">Month Totals & Net Movement:</th>
-                                        <th class="text-right font-roboto text-danger font-weight-bold">{!! theMoney($accLedger['total_debit']) !!}</th>
-                                        <th class="text-right font-roboto text-success font-weight-bold">{!! theMoney($accLedger['total_credit']) !!}</th>
+                                        <th class="text-right font-roboto text-danger font-weight-bold">
+                                            <span class="small font-weight-normal mr-1">Dr {{ $drSign }}:</span>{!! theMoney($accLedger['total_debit']) !!}
+                                        </th>
+                                        <th class="text-right font-roboto text-success font-weight-bold">
+                                            <span class="small font-weight-normal mr-1">Cr {{ $crSign }}:</span>{!! theMoney($accLedger['total_credit']) !!}
+                                        </th>
                                     </tr>
                                 </tfoot>
                             </table>
