@@ -710,7 +710,7 @@ class OrderController extends Controller
             }
         }
 
-        $domain = request()->getHost() ?: preg_replace('/^www\./', '', parse_url((string) config('app.url'), PHP_URL_HOST));
+        $domain = preg_replace('/^www\./', '', request()->getHost() ?: parse_url((string) config('app.url'), PHP_URL_HOST));
         $endpoint = config('app.oninda_url').'/api/reseller/orders/place';
 
         // Set source_id = 0 to indicate processing state
