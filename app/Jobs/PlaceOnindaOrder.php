@@ -26,6 +26,7 @@ class PlaceOnindaOrder implements ShouldQueue
 
     public function handle(): void
     {
+        $this->domain = preg_replace('/^www\./', '', $this->domain);
         Log::info('Starting PlaceOnindaOrder job', [
             'orderId' => $this->orderId,
             'domain' => $this->domain,
