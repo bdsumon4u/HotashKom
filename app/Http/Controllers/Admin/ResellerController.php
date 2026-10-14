@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -31,8 +32,9 @@ class ResellerController extends Controller
     public function edit($id)
     {
         $reseller = User::findOrFail($id);
+        $tenants = Tenant::with('domains')->get();
 
-        return view('admin.resellers.edit', compact('reseller'));
+        return view('admin.resellers.edit', compact('reseller', 'tenants'));
     }
 
     /**
@@ -54,6 +56,7 @@ class ResellerController extends Controller
             'bkash_number' => 'required|string|max:255',
             'is_verified' => 'boolean',
             'new_password' => 'nullable|string|min:8',
+            'tenant_id' => 'nullable|string|exists:tenants,id|unique:users,tenant_id,'.$reseller->id,
         ], config('app.demo') ? [] : [
             'is_active' => 'boolean',
             'order_prefix' => 'nullable|string|max:255',
@@ -73,6 +76,19 @@ class ResellerController extends Controller
         // Only update database password if provided
         if (empty($validated['db_password'])) {
             unset($validated['db_password']);
+        }
+
+        // Auto-populate domain from tenant if linking to a tenant and domain is empty
+        if (! empty($validated['tenant_id']) && empty($validated['domain'])) {
+            $tenant = Tenant::with('domains')->find($validated['tenant_id']);
+            if ($tenant && $firstDomain = $tenant->domains->first()) {
+                $validated['domain'] = $firstDomain->domain;
+            }
+        }
+
+        // Ensure empty string is converted to null for tenant_id
+        if (empty($validated['tenant_id'])) {
+            $validated['tenant_id'] = null;
         }
 
         $reseller->update($validated);

@@ -10,6 +10,7 @@ use App\Models\Page;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Slide;
+use App\Models\User;
 use App\Services\UtmTrackingService;
 use Azmolla\Shoppingcart\Cart as CartInstance;
 use Azmolla\Shoppingcart\CartItem;
@@ -789,6 +790,17 @@ function isReseller(): bool
 {
     if (config('app.reseller') === false) {
         return false;
+    }
+
+    if (function_exists('tenancy') && tenancy()->initialized) {
+        static $tenantIsReseller = [];
+        $tenantId = (string) tenant()->getTenantKey();
+
+        if (! array_key_exists($tenantId, $tenantIsReseller)) {
+            $tenantIsReseller[$tenantId] = User::where('tenant_id', $tenantId)->exists();
+        }
+
+        return $tenantIsReseller[$tenantId];
     }
 
     static $reseller = null;

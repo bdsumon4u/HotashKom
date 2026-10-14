@@ -141,15 +141,46 @@
                             <input type="text" class="form-control bg-light" value="{{ $tenant->id }}" disabled style="font-family: monospace;">
                             <small class="text-muted">Unique immutable tenant key for multi-tenant database records.</small>
                         </div>
-                        <div class="form-group mb-4">
+                        <div class="form-group mb-3">
                             <label for="name" class="font-weight-bold text-dark" style="font-size: 13px;">Store Display Name</label>
                             <input type="text" name="name" id="name" class="form-control font-weight-bold" value="{{ old('name', $tenant->data['name'] ?? $tenant->id) }}" required>
                             <small class="text-muted">Public facing name shown across customer storefront.</small>
                         </div>
+                        <div class="form-group mb-4">
+                            <label for="user_id" class="font-weight-bold text-dark" style="font-size: 13px;">Linked Reseller Account</label>
+                            <select name="user_id" id="user_id" class="form-control">
+                                <option value="">-- None (Standalone Store) --</option>
+                                @foreach($resellers as $reseller)
+                                    <option value="{{ $reseller->id }}" {{ old('user_id', $tenant->reseller?->id) == $reseller->id ? 'selected' : '' }}>
+                                        {{ $reseller->shop_name ?: $reseller->name }} ({{ $reseller->email }}){{ $reseller->tenant_id && $reseller->tenant_id !== $tenant->id ? ' [Linked: ' . $reseller->tenant_id . ']' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <small class="text-muted">When linked, confirmed orders forwarded from this store are automatically placed on the wholesaler platform under this reseller's account.</small>
+                        </div>
                         <button type="submit" class="btn btn-primary btn-sm px-3 font-weight-bold shadow-sm" style="border-radius: 6px;">
-                            <i class="fa fa-save mr-1"></i> Update Store Name
+                            <i class="fa fa-save mr-1"></i> Save Store Settings
                         </button>
                     </form>
+
+                    @if($tenant->reseller)
+                        <div class="mt-4 p-3 bg-light border rounded">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="font-weight-bold text-dark" style="font-size: 13px;">
+                                    <i class="fa fa-user-tag text-success mr-1"></i> Active Linked Reseller
+                                </div>
+                                <a href="{{ route('admin.resellers.edit', $tenant->reseller->id) }}" class="btn btn-light btn-sm border action-btn-sm">
+                                    <i class="fa fa-user-edit text-primary"></i> Edit Account
+                                </a>
+                            </div>
+                            <div class="row small text-muted">
+                                <div class="col-6 mb-1"><strong>Shop:</strong> {{ $tenant->reseller->shop_name }}</div>
+                                <div class="col-6 mb-1"><strong>Name:</strong> {{ $tenant->reseller->name }}</div>
+                                <div class="col-6 mb-1"><strong>Email:</strong> {{ $tenant->reseller->email }}</div>
+                                <div class="col-6 mb-1"><strong>Phone:</strong> {{ $tenant->reseller->phone_number }}</div>
+                            </div>
+                        </div>
+                    @endif
 
                     <hr class="my-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">

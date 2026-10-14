@@ -303,6 +303,7 @@ class CloneTenantResources
             $newProduct = new Product;
             $newProduct->forceFill([
                 'tenant_id' => $tenant->id,
+                'source_id' => $sourceProduct->source_id ?: $sourceProduct->id,
                 'parent_id' => null,
                 'brand_id' => ($cloneBrands && $sourceProduct->brand_id) ? ($brandMap[$sourceProduct->brand_id] ?? null) : null,
                 'name' => $sourceProduct->name,
@@ -383,6 +384,7 @@ class CloneTenantResources
             $newVar = new Product;
             $newVar->forceFill([
                 'tenant_id' => $tenant->id,
+                'source_id' => $sourceVar->source_id ?: $sourceVar->id,
                 'parent_id' => $newParentId,
                 'brand_id' => ($cloneBrands && $sourceVar->brand_id) ? ($brandMap[$sourceVar->brand_id] ?? null) : null,
                 'name' => $sourceVar->name,

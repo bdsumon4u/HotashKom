@@ -93,10 +93,15 @@ class DeleteTenantAction
 
             foreach ($tablesWithTenantId as $row) {
                 $tableName = $row->TABLE_NAME;
-                // Exclude tenants table itself for last step
-                if ($tableName !== 'tenants' && Schema::hasTable($tableName)) {
+                // Exclude tenants and users tables for special handling
+                if ($tableName !== 'tenants' && $tableName !== 'users' && Schema::hasTable($tableName)) {
                     DB::table($tableName)->where('tenant_id', $tenantId)->delete();
                 }
+            }
+
+            // 4. Detach any linked reseller user accounts
+            if (Schema::hasTable('users')) {
+                DB::table('users')->where('tenant_id', $tenantId)->update(['tenant_id' => null]);
             }
 
             // 4. Delete domains

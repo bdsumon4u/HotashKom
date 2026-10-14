@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Domain;
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
@@ -26,7 +27,7 @@ class TenantController extends Controller
     public function index(): View
     {
         $tenants = Tenant::query()
-            ->with(['domains', 'admins'])
+            ->with(['domains', 'admins', 'reseller'])
             ->withCount(['products', 'orders'])
             ->latest()
             ->paginate(15);
@@ -34,8 +35,9 @@ class TenantController extends Controller
         $totalTenants = Tenant::count();
         $totalDomains = Domain::count();
         $totalAdmins = Admin::whereNotNull('tenant_id')->count();
+        $resellers = User::select('id', 'name', 'shop_name', 'email', 'tenant_id')->orderBy('name')->get();
 
-        return view('admin.tenants.index', compact('tenants', 'totalTenants', 'totalDomains', 'totalAdmins'));
+        return view('admin.tenants.index', compact('tenants', 'totalTenants', 'totalDomains', 'totalAdmins', 'resellers'));
     }
 
     /**
@@ -46,6 +48,7 @@ class TenantController extends Controller
         $validated = $request->validate([
             'id' => ['required', 'string', 'max:50', 'alpha_dash', 'unique:tenants,id'],
             'name' => ['required', 'string', 'max:255'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
             'custom_domain' => ['nullable', 'string', 'max:255', 'unique:domains,domain'],
             'admin_name' => ['nullable', 'string', 'max:255'],
             'admin_email' => ['nullable', 'email', 'max:255', 'unique:admins,email'],
@@ -61,6 +64,7 @@ class TenantController extends Controller
             'clone_blogs' => ['nullable', 'boolean'],
         ]);
 
+        $validated['user_id'] = $request->input('user_id');
         $validated['clone_products'] = $request->boolean('clone_products');
         $validated['clone_categories'] = $request->boolean('clone_categories');
         $validated['clone_brands'] = $request->boolean('clone_brands');
@@ -82,9 +86,10 @@ class TenantController extends Controller
      */
     public function show(Tenant $tenant): View
     {
-        $tenant->load(['domains', 'admins']);
+        $tenant->load(['domains', 'admins', 'reseller']);
+        $resellers = User::select('id', 'name', 'shop_name', 'email', 'tenant_id')->orderBy('name')->get();
 
-        return view('admin.tenants.show', compact('tenant'));
+        return view('admin.tenants.show', compact('tenant', 'resellers'));
     }
 
     /**
@@ -94,11 +99,24 @@ class TenantController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
         ]);
 
         $data = $tenant->data ?? [];
         $data['name'] = $validated['name'];
         $tenant->update(['data' => $data]);
+
+        if ($request->has('user_id')) {
+            $newUserId = $validated['user_id'] ?: null;
+            // Detach previous reseller if any and different
+            User::where('tenant_id', $tenant->id)
+                ->when($newUserId, fn ($q) => $q->where('id', '!=', $newUserId))
+                ->update(['tenant_id' => null]);
+
+            if ($newUserId) {
+                User::where('id', $newUserId)->update(['tenant_id' => $tenant->id]);
+            }
+        }
 
         return back()->with('success', 'Tenant website updated successfully!');
     }

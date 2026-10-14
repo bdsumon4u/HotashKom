@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\Tenant\ForwardTenantOrdersAction;
 use App\Exports\PathaoExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use App\Notifications\User\OrderConfirmed;
 use App\Pathao\Exceptions\PathaoException;
 use App\Pathao\Facade\Pathao;
@@ -61,32 +63,8 @@ class OrderController extends Controller
 
         // Get reseller data if applicable (needed for invoice display)
         $resellerData = [];
-        if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $order->user && $order->user->db_username && $order->user->db_password) {
-            // Reseller is connected - fetch from their database
-            try {
-                $resellerConfig = $order->user->getDatabaseConfig();
-                config(['database.connections.reseller' => $resellerConfig]);
-                DB::purge('reseller');
-                DB::reconnect('reseller');
-
-                $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
-                $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
-
-                $resellerData[$order->user->id] = [
-                    'company' => json_decode($resellerCompany ?? '{}'),
-                    'logo' => json_decode($resellerLogo ?? '{}'),
-                    'connected' => true,
-                ];
-
-                DB::purge('reseller');
-            } catch (\Exception) {
-                // If database connection fails, mark as not connected
-                $resellerData[$order->user->id] = [
-                    'company' => null,
-                    'logo' => null,
-                    'connected' => false,
-                ];
-            }
+        if ($order->user) {
+            $resellerData[$order->user->id] = $this->getSingleResellerData($order->user);
         }
 
         // Other orders are now loaded lazily via Livewire component
@@ -188,6 +166,57 @@ class OrderController extends Controller
     }
 
     /**
+     * Fetch reseller data for a single reseller user
+     */
+    private function getSingleResellerData(?User $reseller): array
+    {
+        if (! $reseller || ! isOninda() || ! (setting('show_option')->resellers_invoice ?? false)) {
+            return ['company' => null, 'logo' => null, 'connected' => false];
+        }
+
+        if ($reseller->isTenant()) {
+            try {
+                $resellerCompany = DB::table('settings')->where('tenant_id', $reseller->tenant_id)->where('name', 'company')->value('value');
+                $resellerLogo = DB::table('settings')->where('tenant_id', $reseller->tenant_id)->where('name', 'logo')->value('value');
+
+                return [
+                    'company' => json_decode($resellerCompany ?? '{}'),
+                    'logo' => json_decode($resellerLogo ?? '{}'),
+                    'connected' => true,
+                ];
+            } catch (\Exception) {
+                return ['company' => null, 'logo' => null, 'connected' => false];
+            }
+        }
+
+        if ($reseller->db_name && $reseller->db_username) {
+            try {
+                $resellerConfig = $reseller->getDatabaseConfig();
+                config(['database.connections.reseller' => $resellerConfig]);
+                DB::purge('reseller');
+                DB::reconnect('reseller');
+
+                $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
+                $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
+
+                $data = [
+                    'company' => json_decode($resellerCompany ?? '{}'),
+                    'logo' => json_decode($resellerLogo ?? '{}'),
+                    'connected' => true,
+                ];
+
+                DB::purge('reseller');
+
+                return $data;
+            } catch (\Exception) {
+                return ['company' => null, 'logo' => null, 'connected' => false];
+            }
+        }
+
+        return ['company' => null, 'logo' => null, 'connected' => false];
+    }
+
+    /**
      * Fetch reseller data for given orders
      */
     private function fetchResellerData($orders): array
@@ -196,37 +225,7 @@ class OrderController extends Controller
         $resellerData = [];
 
         foreach ($uniqueResellers as $reseller) {
-            if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $reseller->db_name && $reseller->db_username) {
-                try {
-                    $resellerConfig = $reseller->getDatabaseConfig();
-                    config(['database.connections.reseller' => $resellerConfig]);
-                    DB::purge('reseller');
-                    DB::reconnect('reseller');
-
-                    $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
-                    $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
-
-                    $resellerData[$reseller->id] = [
-                        'company' => json_decode($resellerCompany ?? '{}'),
-                        'logo' => json_decode($resellerLogo ?? '{}'),
-                        'connected' => true,
-                    ];
-
-                    DB::purge('reseller');
-                } catch (\Exception) {
-                    $resellerData[$reseller->id] = [
-                        'company' => null,
-                        'logo' => null,
-                        'connected' => false,
-                    ];
-                }
-            } else {
-                $resellerData[$reseller->id] = [
-                    'company' => null,
-                    'logo' => null,
-                    'connected' => false,
-                ];
-            }
+            $resellerData[$reseller->id] = $this->getSingleResellerData($reseller);
         }
 
         return $resellerData;
@@ -242,47 +241,7 @@ class OrderController extends Controller
         // Eager load user relationship
         $orders = Order::with('user')->whereIn('id', $order_ids)->get();
 
-        // Get unique resellers
-        $uniqueResellers = $orders->pluck('user')->filter()->unique('id');
-        $resellerData = [];
-
-        // Fetch reseller data once per unique reseller
-        foreach ($uniqueResellers as $reseller) {
-            if (isOninda() && (setting('show_option')->resellers_invoice ?? false) && $reseller->db_name && $reseller->db_username) {
-                // Reseller is connected - fetch from their database
-                try {
-                    $resellerConfig = $reseller->getDatabaseConfig();
-                    config(['database.connections.reseller' => $resellerConfig]);
-                    DB::purge('reseller');
-                    DB::reconnect('reseller');
-
-                    $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
-                    $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
-
-                    $resellerData[$reseller->id] = [
-                        'company' => json_decode($resellerCompany ?? '{}'),
-                        'logo' => json_decode($resellerLogo ?? '{}'),
-                        'connected' => true,
-                    ];
-
-                    DB::purge('reseller');
-                } catch (\Exception) {
-                    // If database connection fails, mark as not connected
-                    $resellerData[$reseller->id] = [
-                        'company' => null,
-                        'logo' => null,
-                        'connected' => false,
-                    ];
-                }
-            } else {
-                // Reseller not connected or not applicable
-                $resellerData[$reseller->id] = [
-                    'company' => null,
-                    'logo' => null,
-                    'connected' => false,
-                ];
-            }
-        }
+        $resellerData = $this->fetchResellerData($orders);
 
         $invoicesPerPage = request('invoices_per_page', setting('show_option')->invoices_per_page ?? 3);
 
@@ -707,6 +666,43 @@ class OrderController extends Controller
                 return response()->json(['message' => 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.'], 422);
             } else {
                 return back()->with('danger', 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.');
+            }
+        }
+
+        // If running inside a tenant context
+        if (function_exists('tenancy') && tenancy()->initialized) {
+            $reseller = User::where('tenant_id', tenant('id'))->first();
+
+            if (! $reseller) {
+                $msg = 'This tenant store is not linked to any Reseller account on the central platform.';
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => $msg], 422);
+                } else {
+                    return back()->with('danger', $msg);
+                }
+            }
+
+            try {
+                $count = app(ForwardTenantOrdersAction::class)->execute(tenant(), $reseller, $orders);
+
+                $msg = $count > 0
+                    ? "Successfully forwarded {$count} order(s) to the Wholesaler."
+                    : 'No orders were forwarded.';
+
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => $msg]);
+                } else {
+                    return back()->with('success', $msg);
+                }
+            } catch (\Exception $e) {
+                Log::error('Tenant order forwarding failed: '.$e->getMessage(), ['exception' => $e]);
+                $msg = 'Failed to forward orders to the Wholesaler: '.$e->getMessage();
+
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => $msg], 500);
+                } else {
+                    return back()->with('danger', $msg);
+                }
             }
         }
 

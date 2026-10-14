@@ -9,6 +9,7 @@ use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\CanConfirm;
 use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
@@ -27,7 +28,7 @@ class User extends Authenticatable implements Confirmable, Wallet
      * @var array
      */
     protected $fillable = [
-        'name', 'shop_name', 'email', 'phone_number', 'bkash_number', 'address',
+        'tenant_id', 'name', 'shop_name', 'email', 'phone_number', 'bkash_number', 'address',
         'website', 'order_prefix', 'domain', 'is_active', 'password', 'is_verified',
         'db_name', 'db_username', 'db_password', 'logo',
         'inside_dhaka_shipping', 'outside_dhaka_shipping', 'delivery_areas',
@@ -76,6 +77,38 @@ class User extends Authenticatable implements Confirmable, Wallet
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the tenant store linked to this reseller.
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'tenant_id');
+    }
+
+    /**
+     * Determine if this reseller operates as an internal tenant store.
+     */
+    public function isTenant(): bool
+    {
+        return ! empty($this->tenant_id);
+    }
+
+    /**
+     * Determine if this reseller operates as an external standalone website.
+     */
+    public function isExternal(): bool
+    {
+        return empty($this->tenant_id) && ! empty($this->domain);
+    }
+
+    /**
+     * Check if reseller is connected to a storefront (either internal tenant or external database).
+     */
+    public function isConnected(): bool
+    {
+        return $this->isTenant() || (! empty($this->db_name) && ! empty($this->db_username));
     }
 
     /**

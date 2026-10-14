@@ -46,6 +46,35 @@ class SyncOrderStatusWithReseller implements ShouldQueue
             return;
         }
 
+        // Handle internal tenant store
+        if ($reseller->isTenant()) {
+            try {
+                DB::table('orders')
+                    ->where('tenant_id', $reseller->tenant_id)
+                    ->where(function ($q) use ($order): void {
+                        $q->where('source_id', $this->orderId)
+                            ->orWhere('id', $order->source_id);
+                    })
+                    ->update(['status' => $order->status]);
+
+                info('Order status synced with internal tenant store', [
+                    'orderId' => $this->orderId,
+                    'status' => $order->status,
+                    'tenantId' => $reseller->tenant_id,
+                    'resellerId' => $reseller->id,
+                ]);
+            } catch (\Exception $e) {
+                info('Failed to sync order status with internal tenant store', [
+                    'orderId' => $this->orderId,
+                    'status' => $order->status,
+                    'tenantId' => $reseller->tenant_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return;
+        }
+
         try {
             // Configure reseller database connection
             config(['database.connections.reseller' => $reseller->getDatabaseConfig()]);

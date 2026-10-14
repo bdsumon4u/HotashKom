@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
@@ -38,6 +39,7 @@ class Tenant extends BaseTenant
     public static function booted(): void
     {
         static::deleting(function ($tenant): void {
+            User::where('tenant_id', $tenant->id)->update(['tenant_id' => null]);
             $tenant->admins()->delete();
             $tenant->settings()->delete();
 
@@ -104,5 +106,13 @@ class Tenant extends BaseTenant
     {
         return $this->hasMany(Order::class, 'tenant_id')
             ->withoutGlobalScope(TenantScope::class);
+    }
+
+    /**
+     * Reseller user account linked to this tenant store.
+     */
+    public function reseller(): HasOne
+    {
+        return $this->hasOne(User::class, 'tenant_id');
     }
 }

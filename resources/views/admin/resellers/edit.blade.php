@@ -99,28 +99,59 @@
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 font-weight-bold">Storefront Connection & Multi-Tenant Store</h6>
+                                    @if($reseller->isTenant())
+                                        <span class="badge badge-success"><i class="fa fa-store mr-1"></i> Internal Tenant Store</span>
+                                    @elseif($reseller->isExternal())
+                                        <span class="badge badge-info"><i class="fa fa-external-link-alt mr-1"></i> External Compatible Website</span>
+                                    @else
+                                        <span class="badge badge-secondary"><i class="fa fa-times-circle mr-1"></i> No Storefront Connected</span>
+                                    @endif
+                                </div>
+                                <div class="p-3 card-body">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <div class="form-group">
-                                                    <label for="domain">Domain</label>
-                                                    <input type="text" class="form-control @error('domain') is-invalid @enderror" id="domain" name="domain"
-                                                        placeholder="e.g. myshop.com" value="{{ old('domain', $reseller->domain) }}">
-                                                    @error('domain')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
+                                                <label for="tenant_id" class="font-weight-bold">Internal Tenant Store</label>
+                                                <select class="form-control @error('tenant_id') is-invalid @enderror" id="tenant_id" name="tenant_id">
+                                                    <option value="">-- None (External Website or Standalone) --</option>
+                                                    @foreach($tenants as $tenant)
+                                                        <option value="{{ $tenant->id }}" {{ old('tenant_id', $reseller->tenant_id) == $tenant->id ? 'selected' : '' }}>
+                                                            {{ $tenant->data['name'] ?? $tenant->id }} ({{ $tenant->domains->pluck('domain')->join(', ') ?: 'No domain' }})
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('tenant_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                                <small class="form-text text-muted">
+                                                    Connect to an internal tenant store. Orders from this store will be forwarded seamlessly without needing external database credentials.
+                                                </small>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="order_prefix">Order Prefix</label>
-                                                <input type="text" class="form-control @error('order_prefix') is-invalid @enderror" id="order_prefix" name="order_prefix"
-                                                    placeholder="e.g. ORD" value="{{ old('order_prefix', $reseller->order_prefix) }}">
+                                                <label for="domain" class="font-weight-bold">Storefront Domain</label>
+                                                <input type="text" class="form-control @error('domain') is-invalid @enderror" id="domain" name="domain"
+                                                    placeholder="e.g. myshop.com or demo-store.hotashkom.test" value="{{ old('domain', $reseller->domain) }}">
+                                                @error('domain')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                                <small class="form-text text-muted">Public domain of reseller's store (auto-filled if internal tenant selected).</small>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="order_prefix">Order Prefix</label>
+                                        <input type="text" class="form-control @error('order_prefix') is-invalid @enderror" id="order_prefix" name="order_prefix"
+                                            placeholder="e.g. ORD" value="{{ old('order_prefix', $reseller->order_prefix) }}">
                                     </div>
                                 </div>
 
@@ -141,8 +172,9 @@
                             </div>
 
                             <div class="card">
-                                <div class="p-3 card-header">
-                                    <h6 class="mb-0">Database Configuration</h6>
+                                <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">External Database Configuration</h6>
+                                    <small class="text-muted">Only required for external compatible websites (Leave blank for internal tenant)</small>
                                 </div>
                                 <div class="p-3 card-body">
                                     <div class="row">

@@ -38,6 +38,12 @@ class PlaceOnindaOrder implements ShouldQueue
             // Find reseller in Oninda database
             $reseller = User::where('domain', $this->domain)->first();
             if (! $reseller) {
+                $reseller = User::whereHas('tenant.domains', function ($q): void {
+                    $q->where('domain', $this->domain);
+                })->first();
+            }
+
+            if (! $reseller) {
                 Log::error("Reseller not found in Oninda database for domain {$this->domain}");
 
                 return;
@@ -48,31 +54,37 @@ class PlaceOnindaOrder implements ShouldQueue
             if ($existingOnindaOrder) {
                 Log::info("Order {$this->orderId} already placed on Oninda");
 
+                if ($reseller->isTenant()) {
+                    $this->updateResellerOrderSourceId($this->orderId, $existingOnindaOrder->id, $reseller);
+                } else {
+                    $this->configureResellerDatabaseConnection($reseller);
+                    $this->updateResellerOrderSourceId($this->orderId, $existingOnindaOrder->id, $reseller);
+                }
+
+                return;
+            }
+
+            if ($reseller->isTenant()) {
+                // Internal tenant: read order from local database
+                $resellerOrder = Order::withoutTenancy()->where('tenant_id', $reseller->tenant_id)->find($this->orderId);
+            } else {
+                // External reseller: configure database connection
                 $this->configureResellerDatabaseConnection($reseller);
-                $this->updateResellerOrderSourceId($this->orderId, $existingOnindaOrder->id);
 
-                return;
+                // Test reseller connection
+                try {
+                    DB::connection('reseller')->getPdo();
+                } catch (\Exception $e) {
+                    Log::error('Failed to connect to reseller database', [
+                        'domain' => $this->domain,
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    return;
+                }
+
+                $resellerOrder = Order::on('reseller')->find($this->orderId);
             }
-
-            // Configure reseller database connection
-            $this->configureResellerDatabaseConnection($reseller);
-
-            // Test reseller connection
-            try {
-                DB::connection('reseller')->getPdo();
-            } catch (\Exception $e) {
-                Log::error('Failed to connect to reseller database', [
-                    'domain' => $this->domain,
-                    'error' => $e->getMessage(),
-                ]);
-
-                return;
-            }
-
-            // ===== RESELLER DATABASE OPERATIONS =====
-
-            // Find order in reseller's database
-            $resellerOrder = Order::on('reseller')->find($this->orderId);
             if (! $resellerOrder) {
                 Log::error("Order {$this->orderId} not found in reseller database {$this->domain}");
 

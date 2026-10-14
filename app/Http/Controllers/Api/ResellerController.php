@@ -53,7 +53,16 @@ class ResellerController extends Controller
             ->addIndexColumn()
             ->editColumn('id', fn ($row): string => $row->id)
             ->editColumn('name', fn ($row): string => '<a href="'.route('admin.orders.index', ['user_id' => $row->id, 'status' => '']).'">'.$row->name.'</a>')
-            ->editColumn('shop_name', fn ($row): string => $row->shop_name ?? '-')
+            ->editColumn('shop_name', function ($row) {
+                $html = e($row->shop_name ?? '-');
+                if ($row->tenant_id) {
+                    $html .= '<br><span class="badge badge-success text-white" style="font-size: 10px;"><i class="fa fa-store mr-1"></i>Tenant: '.e($row->tenant_id).'</span>';
+                } elseif ($row->isConnected()) {
+                    $html .= '<br><span class="badge badge-info text-white" style="font-size: 10px;"><i class="fa fa-external-link-alt mr-1"></i>External</span>';
+                }
+
+                return $html;
+            })
             ->editColumn('phone_number', fn ($row): string => $row->phone_number ?? '-')
             ->editColumn('bkash_number', fn ($row): string => $row->bkash_number ?? '-')
             ->editColumn('created_at', fn ($row): string => $row->created_at?->format('d-M-Y'));
@@ -138,9 +147,9 @@ class ResellerController extends Controller
 
         // Set raw columns based on view type
         if ($isPendingView) {
-            $dataTable = $dataTable->rawColumns(['name', 'actions']);
+            $dataTable = $dataTable->rawColumns(['name', 'shop_name', 'actions']);
         } else {
-            $dataTable = $dataTable->rawColumns(['name', 'balance', 'actions']);
+            $dataTable = $dataTable->rawColumns(['name', 'shop_name', 'balance', 'actions']);
         }
 
         return $dataTable->make(true);

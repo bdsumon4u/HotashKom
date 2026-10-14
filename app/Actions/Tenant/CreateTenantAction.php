@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\Domain;
 use App\Models\Setting;
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -102,6 +103,11 @@ class CreateTenantAction
                     $companyData['name'] = $data['name'];
                     $companySetting->update(['value' => $companyData]);
                 }
+            }
+
+            // 8. Associate Reseller User if provided
+            if (! empty($data['user_id'])) {
+                User::where('id', $data['user_id'])->update(['tenant_id' => $tenant->id]);
             }
 
             return $tenant;

@@ -320,8 +320,10 @@
                                     $scheme = request()->getScheme();
                                     $storeName = $tenant->data['name'] ?? $tenant->id;
                                     $admin = $tenant->admins->first();
+                                    $reseller = $tenant->reseller;
+                                    $resellerSearch = $reseller ? ($reseller->name . ' ' . $reseller->shop_name . ' ' . $reseller->email) : '';
                                 @endphp
-                                <tr class="tenant-row" data-search="{{ strtolower($storeName . ' ' . $tenant->id . ' ' . $tenant->domains->pluck('domain')->implode(' ') . ' ' . ($admin?->email ?? '')) }}">
+                                <tr class="tenant-row" data-search="{{ strtolower($storeName . ' ' . $tenant->id . ' ' . $tenant->domains->pluck('domain')->implode(' ') . ' ' . ($admin?->email ?? '') . ' ' . $resellerSearch) }}">
                                     <!-- Store Info -->
                                     <td>
                                         <div class="d-flex align-items-center">
@@ -332,10 +334,15 @@
                                                 <a href="{{ route('admin.tenants.show', $tenant) }}" class="font-weight-bold text-dark d-block text-decoration-none" style="font-size: 14px;">
                                                     {{ $storeName }}
                                                 </a>
-                                                <div class="d-flex align-items-center mt-1" style="gap: 6px;">
+                                                <div class="d-flex align-items-center flex-wrap mt-1" style="gap: 6px;">
                                                     <span class="badge badge-light border text-muted" style="font-family: monospace; font-size: 11px; padding: 2px 6px;">
                                                         ID: {{ $tenant->id }}
                                                     </span>
+                                                    @if($reseller)
+                                                        <a href="{{ route('admin.resellers.edit', $reseller->id) }}" class="badge badge-success text-white text-decoration-none" style="font-size: 11px; padding: 2px 6px;" title="Linked Reseller">
+                                                            <i class="fa fa-user-tag mr-1"></i> {{ $reseller->shop_name ?: $reseller->name }}
+                                                        </a>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -498,17 +505,38 @@
                         </div>
                     </div>
 
-                    <div class="form-group mb-4">
-                        <label for="custom_domain" class="font-weight-bold text-dark" style="font-size: 13px;">
-                            Custom Domain (Optional)
-                        </label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text bg-light text-muted"><i class="fa fa-globe"></i></span>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="custom_domain" class="font-weight-bold text-dark" style="font-size: 13px;">
+                                Custom Domain (Optional)
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light text-muted"><i class="fa fa-globe"></i></span>
+                                </div>
+                                <input type="text" name="custom_domain" id="custom_domain" class="form-control" placeholder="e.g. trendyfashion.com" value="{{ old('custom_domain') }}">
                             </div>
-                            <input type="text" name="custom_domain" id="custom_domain" class="form-control" placeholder="e.g. trendyfashion.com" value="{{ old('custom_domain') }}">
+                            <small class="form-text text-muted">Point DNS CNAME/A record to this server.</small>
                         </div>
-                        <small class="form-text text-muted">You can attach custom domains anytime. Point DNS CNAME/A record to this server.</small>
+                        <div class="col-md-6 form-group">
+                            <label for="user_id" class="font-weight-bold text-dark" style="font-size: 13px;">
+                                Link to Reseller Account (Optional)
+                            </label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light text-muted"><i class="fa fa-user-tag"></i></span>
+                                </div>
+                                <select name="user_id" id="user_id" class="form-control">
+                                    <option value="">-- None (Standalone Store) --</option>
+                                    @foreach($resellers as $reseller)
+                                        <option value="{{ $reseller->id }}" {{ old('user_id') == $reseller->id ? 'selected' : '' }}>
+                                            {{ $reseller->shop_name ?: $reseller->name }} ({{ $reseller->email }}){{ $reseller->tenant_id ? ' [Linked: ' . $reseller->tenant_id . ']' : '' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <small class="form-text text-muted">Orders from this store forward directly to this reseller's account.</small>
+                        </div>
                     </div>
 
                     <!-- Admin User Credentials Section -->
