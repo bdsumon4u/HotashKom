@@ -460,6 +460,7 @@ final class AccountingService
             ['name' => 'bKash / Mobile Wallet', 'code' => '1003', 'type' => Account::TYPE_ASSET, 'is_system' => true],
             ['name' => 'Inventory / Product Stock', 'code' => '1004', 'type' => Account::TYPE_ASSET, 'is_system' => true],
             ['name' => 'Accounts Receivable (Customer / Courier Dues)', 'code' => '1005', 'type' => Account::TYPE_ASSET, 'is_system' => true],
+            ['name' => 'In Courier (Products Shipped)', 'code' => '1006', 'type' => Account::TYPE_ASSET, 'is_system' => true],
 
             // Liabilities
             ['name' => 'Accounts Payable (Supplier Dues)', 'code' => '2001', 'type' => Account::TYPE_LIABILITY, 'is_system' => true],
@@ -483,10 +484,443 @@ final class AccountingService
             ['name' => 'Stationery, Paper & Office Supplies', 'code' => '5007', 'type' => Account::TYPE_EXPENSE, 'is_system' => true],
             ['name' => 'Office Rent', 'code' => '5008', 'type' => Account::TYPE_EXPENSE, 'is_system' => true],
             ['name' => 'Miscellaneous Expenses', 'code' => '5009', 'type' => Account::TYPE_EXPENSE, 'is_system' => true],
+            ['name' => 'Damaged & Lost Goods Expense', 'code' => '5011', 'type' => Account::TYPE_EXPENSE, 'is_system' => true],
         ];
 
         foreach ($defaultAccounts as $acc) {
             Account::firstOrCreate(['name' => $acc['name']], $acc);
         }
+    }
+
+    /**
+     * Get or create the 'In Courier (Products Shipped)' asset account.
+     */
+    public function getInCourierAccount(): Account
+    {
+        return Account::where('code', '1006')
+            ->orWhere('name', 'like', '%In Courier%')
+            ->first() ?? Account::firstOrCreate(
+                ['code' => '1006'],
+                [
+                    'name' => 'In Courier (Products Shipped)',
+                    'type' => Account::TYPE_ASSET,
+                    'is_system' => true,
+                    'is_active' => true,
+                ]
+            );
+    }
+
+    /**
+     * Get or create the 'Inventory / Product Stock' asset account.
+     */
+    public function getInventoryAccount(): Account
+    {
+        return Account::where('code', '1004')
+            ->orWhere('name', 'like', '%Inventory%')
+            ->orWhere('name', 'like', '%Product Stock%')
+            ->first() ?? Account::firstOrCreate(
+                ['code' => '1004'],
+                [
+                    'name' => 'Inventory / Product Stock',
+                    'type' => Account::TYPE_ASSET,
+                    'is_system' => true,
+                    'is_active' => true,
+                ]
+            );
+    }
+
+    /**
+     * Get or create the 'Product Purchase Cost' expense account (COGS).
+     */
+    public function getProductPurchaseCostAccount(): Account
+    {
+        return Account::where('code', '5001')
+            ->orWhere('name', 'like', '%Product Purchase Cost%')
+            ->orWhere('name', 'like', '%Purchase Cost%')
+            ->first() ?? Account::firstOrCreate(
+                ['code' => '5001'],
+                [
+                    'name' => 'Product Purchase Cost',
+                    'type' => Account::TYPE_EXPENSE,
+                    'is_system' => true,
+                    'is_active' => true,
+                ]
+            );
+    }
+
+    /**
+     * Get or create the 'Product Sales Revenue' income account.
+     */
+    public function getProductSalesRevenueAccount(): Account
+    {
+        return Account::where('code', '4001')
+            ->orWhere('name', 'like', '%Product Sales Revenue%')
+            ->orWhere('name', 'like', '%Sales Revenue%')
+            ->first() ?? Account::firstOrCreate(
+                ['code' => '4001'],
+                [
+                    'name' => 'Product Sales Revenue',
+                    'type' => Account::TYPE_INCOME,
+                    'is_system' => true,
+                    'is_active' => true,
+                ]
+            );
+    }
+
+    /**
+     * Get or create the courier delivery charges / expense account.
+     */
+    public function getCourierDeliveryExpenseAccount(): Account
+    {
+        return Account::where('name', 'like', '%Courier Return%')
+            ->orWhere('name', 'like', '%Delivery%')
+            ->orWhere('code', '5009')
+            ->orWhere('type', Account::TYPE_EXPENSE)
+            ->first() ?? Account::firstOrCreate(
+                ['name' => 'Courier Delivery Charges & Fees'],
+                [
+                    'code' => '5010',
+                    'type' => Account::TYPE_EXPENSE,
+                    'is_system' => true,
+                    'is_active' => true,
+                ]
+            );
+    }
+
+    /**
+     * Record shipment of goods from warehouse Inventory to 'In Courier' asset account.
+     *
+     * @param  array{
+     *     entry_date: string,
+     *     courier_name: string,
+     *     tracking_code?: ?string,
+     *     notes?: ?string,
+     *     total_purchase_cost: float,
+     *     items_summary?: ?string
+     * }  $data
+     */
+    public function recordShipmentToCourier(array $data): JournalEntry
+    {
+        $inCourierAccount = $this->getInCourierAccount();
+        $inventoryAccount = $this->getInventoryAccount();
+        $totalCost = (float) $data['total_purchase_cost'];
+
+        $description = 'Shipment to Courier: '.$data['courier_name'];
+        if (! empty($data['tracking_code'])) {
+            $description .= ' (Tracking: '.$data['tracking_code'].')';
+        }
+        if (! empty($data['notes'])) {
+            $description .= ' - '.$data['notes'];
+        }
+
+        return $this->createJournalEntry(
+            [
+                'entry_date' => $data['entry_date'] ?? now()->toDateString(),
+                'reference' => $data['tracking_code'] ?? null,
+                'description' => $description,
+                'source_type' => 'Shipment',
+            ],
+            [
+                [
+                    'account_id' => $inCourierAccount->id,
+                    'debit' => $totalCost,
+                    'credit' => 0,
+                    'notes' => 'Shipped to courier: '.$data['courier_name'].(! empty($data['items_summary']) ? ' ['.$data['items_summary'].']' : ''),
+                ],
+                [
+                    'account_id' => $inventoryAccount->id,
+                    'debit' => 0,
+                    'credit' => $totalCost,
+                    'notes' => 'Inventory deducted for courier dispatch',
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Record delivery settlement / payout from courier.
+     * Moves purchase cost from 'In Courier' asset to 'Product Purchase Cost' expense.
+     * Records gross sales revenue into 'Product Sales Revenue' and courier fee expense.
+     * Deposits net cash/bank into selected asset account.
+     *
+     * @param  array{
+     *     entry_date: string,
+     *     deposit_account_id: int,
+     *     gross_sales: float,
+     *     total_purchase_cost: float,
+     *     courier_charge?: float,
+     *     courier_name?: ?string,
+     *     reference?: ?string,
+     *     description?: ?string,
+     *     items_summary?: ?string
+     * }  $data
+     */
+    public function recordCourierPayoutSettlement(array $data): JournalEntry
+    {
+        $depositAccount = Account::findOrFail($data['deposit_account_id']);
+        $salesAccount = $this->getProductSalesRevenueAccount();
+        $inCourierAccount = $this->getInCourierAccount();
+        $cogsAccount = $this->getProductPurchaseCostAccount();
+
+        $grossSales = (float) $data['gross_sales'];
+        $courierCharge = (float) ($data['courier_charge'] ?? 0);
+        $totalPurchaseCost = (float) ($data['total_purchase_cost'] ?? 0);
+        $netReceived = max(0, $grossSales - $courierCharge);
+
+        $journalItems = [];
+
+        // 1. Debit Deposit Account (Cash/Bank/bKash) with net payout received
+        if ($netReceived > 0) {
+            $journalItems[] = [
+                'account_id' => $depositAccount->id,
+                'debit' => $netReceived,
+                'credit' => 0,
+                'notes' => 'Net Payout Received'.(! empty($data['courier_name']) ? ' from '.$data['courier_name'] : ''),
+            ];
+        }
+
+        // 2. Debit Courier Charge Expense if any
+        if ($courierCharge > 0) {
+            $deliveryExpenseAccount = $this->getCourierDeliveryExpenseAccount();
+            $journalItems[] = [
+                'account_id' => $deliveryExpenseAccount->id,
+                'debit' => $courierCharge,
+                'credit' => 0,
+                'notes' => 'Courier Delivery Fee Deducted'.(! empty($data['courier_name']) ? ' by '.$data['courier_name'] : ''),
+            ];
+        }
+
+        // 3. Credit Product Sales Revenue for gross sales
+        if ($grossSales > 0) {
+            $journalItems[] = [
+                'account_id' => $salesAccount->id,
+                'debit' => 0,
+                'credit' => $grossSales,
+                'notes' => 'Gross Delivered Sales Revenue',
+            ];
+        }
+
+        // 4. Cost of Goods Sold (COGS): Debit Product Purchase Cost (Expense), Credit In Courier (Asset)
+        if ($totalPurchaseCost > 0) {
+            $journalItems[] = [
+                'account_id' => $cogsAccount->id,
+                'debit' => $totalPurchaseCost,
+                'credit' => 0,
+                'notes' => 'Product Cost of Goods Sold (Delivered)'.(! empty($data['items_summary']) ? ' ['.$data['items_summary'].']' : ''),
+            ];
+
+            $journalItems[] = [
+                'account_id' => $inCourierAccount->id,
+                'debit' => 0,
+                'credit' => $totalPurchaseCost,
+                'notes' => 'Relieved from In Courier asset upon delivery',
+            ];
+        }
+
+        $description = $data['description'] ?? ('Courier Payout / Sales Settlement'.(! empty($data['courier_name']) ? ' ('.$data['courier_name'].')' : ''));
+
+        return $this->createJournalEntry(
+            [
+                'entry_date' => $data['entry_date'] ?? now()->toDateString(),
+                'reference' => $data['reference'] ?? null,
+                'description' => $description,
+                'source_type' => 'CourierPayout',
+            ],
+            $journalItems
+        );
+    }
+
+    /**
+     * Record returned products from courier back into warehouse Inventory.
+     * Transfers purchase cost from 'In Courier' asset back to 'Inventory / Product Stock' asset.
+     * If a courier return fee was charged, records it as an expense and credits the payment account.
+     *
+     * @param  array{
+     *     entry_date: string,
+     *     courier_name?: ?string,
+     *     tracking_code?: ?string,
+     *     notes?: ?string,
+     *     total_purchase_cost: float,
+     *     return_charge?: float,
+     *     paid_from_account_id?: ?int,
+     *     items_summary?: ?string
+     * }  $data
+     */
+    public function recordCourierReturn(array $data): JournalEntry
+    {
+        $inCourierAccount = $this->getInCourierAccount();
+        $inventoryAccount = $this->getInventoryAccount();
+        $totalCost = (float) $data['total_purchase_cost'];
+        $returnCharge = (float) ($data['return_charge'] ?? 0);
+        $paidFromAccountId = ! empty($data['paid_from_account_id']) ? (int) $data['paid_from_account_id'] : null;
+
+        $description = 'Courier Return Restocked'.(! empty($data['courier_name']) ? ': '.$data['courier_name'] : '');
+        if (! empty($data['tracking_code'])) {
+            $description .= ' (Tracking: '.$data['tracking_code'].')';
+        }
+        if (! empty($data['notes'])) {
+            $description .= ' - '.$data['notes'];
+        }
+
+        $journalItems = [];
+
+        // 1. Move value from In Courier back to Inventory
+        if ($totalCost > 0) {
+            $journalItems[] = [
+                'account_id' => $inventoryAccount->id,
+                'debit' => $totalCost,
+                'credit' => 0,
+                'notes' => 'Returned stock restocked to warehouse'.(! empty($data['items_summary']) ? ' ['.$data['items_summary'].']' : ''),
+            ];
+
+            $journalItems[] = [
+                'account_id' => $inCourierAccount->id,
+                'debit' => 0,
+                'credit' => $totalCost,
+                'notes' => 'Relieved from In Courier asset upon return',
+            ];
+        }
+
+        // 2. Return fee / courier penalty charge if any
+        if ($returnCharge > 0 && $paidFromAccountId) {
+            $deliveryExpenseAccount = $this->getCourierDeliveryExpenseAccount();
+            $journalItems[] = [
+                'account_id' => $deliveryExpenseAccount->id,
+                'debit' => $returnCharge,
+                'credit' => 0,
+                'notes' => 'Courier Return / Damage Fee'.(! empty($data['courier_name']) ? ' ('.$data['courier_name'].')' : ''),
+            ];
+
+            $journalItems[] = [
+                'account_id' => $paidFromAccountId,
+                'debit' => 0,
+                'credit' => $returnCharge,
+                'notes' => 'Paid courier return fee',
+            ];
+        }
+
+        return $this->createJournalEntry(
+            [
+                'entry_date' => $data['entry_date'] ?? now()->toDateString(),
+                'reference' => $data['tracking_code'] ?? null,
+                'description' => $description,
+                'source_type' => 'CourierReturn',
+            ],
+            $journalItems
+        );
+    }
+
+    /**
+     * Get or create the 'Damaged & Lost Goods Expense' account.
+     */
+    public function getDamagedGoodsExpenseAccount(): Account
+    {
+        return Account::where('code', '5011')
+            ->orWhere('name', 'like', '%Damaged%')
+            ->orWhere('name', 'like', '%Spoiled%')
+            ->first() ?? Account::firstOrCreate(
+                ['code' => '5011'],
+                [
+                    'name' => 'Damaged & Lost Goods Expense',
+                    'type' => Account::TYPE_EXPENSE,
+                    'is_system' => true,
+                    'is_active' => true,
+                ]
+            );
+    }
+
+    /**
+     * Get or create the 'Advertising & Marketing Cost' expense account.
+     */
+    public function getMarketingExpenseAccount(): Account
+    {
+        return Account::where('code', '5002')
+            ->orWhere('name', 'like', '%Advertising%')
+            ->orWhere('name', 'like', '%Marketing%')
+            ->first() ?? Account::firstOrCreate(
+                ['code' => '5002'],
+                [
+                    'name' => 'Advertising & Marketing Cost',
+                    'type' => Account::TYPE_EXPENSE,
+                    'is_system' => true,
+                    'is_active' => true,
+                ]
+            );
+    }
+
+    /**
+     * Get or create the 'Owner\'s Drawings / Withdrawals' equity account.
+     */
+    public function getOwnersDrawingsAccount(): Account
+    {
+        return Account::where('code', '3002')
+            ->orWhere('name', 'like', '%Drawings%')
+            ->orWhere('name', 'like', '%Withdrawals%')
+            ->first() ?? Account::firstOrCreate(
+                ['code' => '3002'],
+                [
+                    'name' => "Owner's Drawings / Withdrawals",
+                    'type' => Account::TYPE_EQUITY,
+                    'is_system' => true,
+                    'is_active' => true,
+                ]
+            );
+    }
+
+    /**
+     * Record a stock adjustment / inventory write-off (damaged goods, promotional gift, personal drawing, etc.).
+     * Decreases 'Inventory / Product Stock (#1004)' asset account and debits the designated expense or drawing account.
+     *
+     * @param  array{
+     *     entry_date: string,
+     *     reason: string,
+     *     debit_account_id: int,
+     *     total_purchase_cost: float,
+     *     notes?: ?string,
+     *     reference?: ?string,
+     *     items_summary?: ?string
+     * }  $data
+     */
+    public function recordStockAdjustment(array $data): JournalEntry
+    {
+        $inventoryAccount = $this->getInventoryAccount();
+        $debitAccount = Account::findOrFail($data['debit_account_id']);
+        $totalCost = (float) $data['total_purchase_cost'];
+
+        $reasonLabels = [
+            'damage' => 'Damaged / Broken / Expired Goods (পণ্য নষ্ট/ড্যামেজ)',
+            'gift' => 'Promotional Gift / Sample (বিজ্ঞাপন ও উপহার)',
+            'drawing' => "Owner's Personal Use / Gift (ব্যক্তিগত উত্তোলন)",
+            'other' => 'Other Stock Adjustment (অন্যান্য স্টক সমন্বয়)',
+        ];
+        $reasonText = $reasonLabels[$data['reason']] ?? ucfirst($data['reason']);
+
+        $description = 'Stock Adjustment: '.$reasonText;
+        if (! empty($data['notes'])) {
+            $description .= ' - '.$data['notes'];
+        }
+
+        return $this->createJournalEntry(
+            [
+                'entry_date' => $data['entry_date'] ?? now()->toDateString(),
+                'reference' => $data['reference'] ?? null,
+                'description' => $description,
+                'source_type' => 'StockAdjustment',
+            ],
+            [
+                [
+                    'account_id' => $debitAccount->id,
+                    'debit' => $totalCost,
+                    'credit' => 0,
+                    'notes' => 'Stock write-off: '.$reasonText.(! empty($data['items_summary']) ? ' ['.$data['items_summary'].']' : ''),
+                ],
+                [
+                    'account_id' => $inventoryAccount->id,
+                    'debit' => 0,
+                    'credit' => $totalCost,
+                    'notes' => 'Inventory asset reduced for stock write-off',
+                ],
+            ]
+        );
     }
 }

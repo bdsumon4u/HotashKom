@@ -7,6 +7,17 @@
 
 @section('breadcrumb-items')
 <li class="breadcrumb-item">Reports</li>
+<li class="breadcrumb-item active">Stock</li>
+@endsection
+
+@section('breadcrumb-right')
+    @if (config('accounting.enabled', true) && auth('admin')->user()?->is('admin'))
+        <div class="d-flex justify-content-end align-items-center">
+            <a href="{{ route('admin.accounting.adjustments.create') }}" class="btn btn-warning btn-sm font-weight-bold text-dark shadow-sm">
+                <i class="fa fa-sliders mr-1"></i> Stock Adjustment (Damage / Gift)
+            </a>
+        </div>
+    @endif
 @endsection
 
 @push('styles')
@@ -101,6 +112,11 @@
             <div class="shadow-sm card rounded-0">
                 <div class="p-3 card-header d-flex justify-content-between align-items-center">
                     <strong>Stock Report</strong>
+                    @if (config('accounting.enabled', true) && auth('admin')->user()?->is('admin'))
+                        <a href="{{ route('admin.accounting.adjustments.create') }}" class="btn btn-warning btn-xs font-weight-bold text-dark no-print">
+                            <i class="fa fa-sliders mr-1"></i> Adjust / Write-Off Stock
+                        </a>
+                    @endif
                 </div>
                 <div class="p-3 card-body">
                     <div class="table-responsive">

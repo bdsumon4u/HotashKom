@@ -12,8 +12,8 @@
 @endsection
 
 @section('breadcrumb-right')
-    <div class="theme-form m-t-10 d-flex align-items-center flex-wrap" style="gap: 8px;">
-        <div style="max-width: 250px; margin-left: auto;">
+    <div class="theme-form m-t-10 d-flex justify-content-end">
+        <div style="max-width: 250px;">
             <div class="input-group">
                 <input class="form-control" id="reportrange" type="text">
             </div>
@@ -37,9 +37,16 @@
                 Shipment Report
                 <span class="badge badge-light-primary text-primary ml-2 font-weight-normal" style="font-size: 13px;">Based on Shipped Date</span>
             </h4>
-            <button type="button" class="btn btn-outline-primary btn-xs no-print" onclick="window.print()">
-                <i class="fa fa-print"></i> Print Report
-            </button>
+            <div class="d-flex align-items-center no-print" style="gap: 8px;">
+                @if (config('accounting.enabled', true) && auth('admin')->user()?->is('admin'))
+                    <a href="{{ route('admin.accounting.shipments.create') }}" class="btn btn-primary btn-sm font-weight-bold mr-2">
+                        <i class="fa fa-truck mr-1"></i> Ship to Courier
+                    </a>
+                @endif
+                <button type="button" class="btn btn-outline-primary btn-xs" onclick="window.print()">
+                    <i class="fa fa-print"></i> Print Report
+                </button>
+            </div>
         </div>
 
         <!-- Shipment Summary Cards -->

@@ -14,16 +14,19 @@
 @section('breadcrumb-right')
     <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
         <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#accountingGuideModal">
-            <i class="fa fa-graduation-cap mr-1"></i> Accounting Guide
+            <i class="fa fa-graduation-cap mr-1"></i> Guide
         </button>
-        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#courierPayoutModal">
-            <i class="fa fa-truck mr-1"></i> Record Courier Payout / Sales
-        </button>
+        <a href="{{ route('admin.accounting.settlements.create') }}" class="btn btn-success btn-sm font-weight-bold">
+            <i class="fa fa-money mr-1"></i> Courier Settlement
+        </a>
+        <a href="{{ route('admin.accounting.adjustments.create') }}" class="btn btn-warning btn-sm font-weight-bold text-dark">
+            <i class="fa fa-sliders mr-1"></i> Stock Adjustment
+        </a>
         <a href="{{ route('admin.accounting.transactions.create') }}" class="btn btn-danger btn-sm">
-            <i class="fa fa-plus mr-1"></i> Record Transaction
+            <i class="fa fa-plus mr-1"></i> Transaction
         </a>
         <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">
-            <i class="fa fa-print mr-1"></i> Print Ledger
+            <i class="fa fa-print mr-1"></i> Print
         </button>
     </div>
 @endsection
@@ -259,79 +262,6 @@
                     <p class="mb-0">Create your initial accounts in <a href="{{ route('admin.accounting.accounts.index') }}">Chart of Accounts</a>.</p>
                 </div>
             @endforelse
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Record Courier Payout / Sales Settlement -->
-<div class="modal fade" id="courierPayoutModal" tabindex="-1" role="dialog" aria-labelledby="courierPayoutModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content border-0 shadow-lg">
-            <form action="{{ route('admin.accounting.ledger.courier-payout') }}" method="POST">
-                @csrf
-                <div class="modal-header bg-primary text-white p-3">
-                    <h5 class="modal-title font-weight-bold text-white" id="courierPayoutModalLabel">
-                        <i class="fa fa-truck mr-2"></i> Record Courier Payout / Sales Settlement
-                    </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body p-4 bg-white text-dark">
-                    <div class="alert alert-info py-2 px-3 small mb-3">
-                        <i class="fa fa-info-circle mr-1"></i> Use this form to post courier payout settlements (Steadfast, Pathao, Redx, Paperfly) into your double-entry accounting ledger.
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="entry_date_cp" class="font-weight-bold text-dark">Payout Date <span class="text-danger">*</span></label>
-                            <input type="date" name="entry_date" id="entry_date_cp" class="form-control text-dark font-weight-bold" value="{{ now()->toDateString() }}" required>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="courier_name_cp" class="font-weight-bold text-dark">Courier Service Name <span class="text-danger">*</span></label>
-                            <input type="text" name="courier_name" id="courier_name_cp" class="form-control text-dark" placeholder="e.g. Steadfast Courier, Pathao Courier" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="total_sales_cp" class="font-weight-bold text-dark">Total Delivered Sales (COD Amount) <span class="text-danger">*</span></label>
-                            <input type="number" step="0.01" name="total_sales" id="total_sales_cp" class="form-control font-weight-bold text-success" placeholder="e.g. 50000.00" required>
-                            <small class="text-muted">Total value of orders delivered to customers.</small>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="courier_charge_cp" class="font-weight-bold text-dark">Delivery Fee Deducted by Courier</label>
-                            <input type="number" step="0.01" name="courier_charge" id="courier_charge_cp" class="form-control font-weight-bold text-danger" placeholder="e.g. 3500.00" value="0">
-                            <small class="text-muted">Delivery fee and COD charge subtracted by courier.</small>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="deposit_account_id_cp" class="font-weight-bold text-dark">Deposit To Account (Received Net Amount) <span class="text-danger">*</span></label>
-                            <select name="deposit_account_id" id="deposit_account_id_cp" class="form-control text-dark font-weight-bold" required>
-                                @foreach($accounts->where('type', 'asset') as $acc)
-                                    <option value="{{ $acc->id }}">{{ $acc->name }} ({{ number_format($acc->current_balance, 2) }})</option>
-                                @endforeach
-                            </select>
-                            <small class="text-muted">Bank account or bKash wallet where money was deposited.</small>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="reference_cp" class="font-weight-bold text-dark">Payout / Settlement Invoice #</label>
-                            <input type="text" name="reference" id="reference_cp" class="form-control text-dark" placeholder="e.g. STDF-PAYOUT-9823">
-                        </div>
-                    </div>
-
-                    <div class="form-group mb-0">
-                        <label for="description_cp" class="font-weight-bold text-dark">Notes / Remarks</label>
-                        <input type="text" name="description" id="description_cp" class="form-control text-dark" placeholder="e.g. Weekly settlement payment received via bank transfer">
-                    </div>
-                </div>
-                <div class="modal-footer p-3 bg-light">
-                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success btn-sm px-4 font-weight-bold"><i class="fa fa-check mr-1"></i> Post Payout to Ledger</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>

@@ -12,8 +12,8 @@
 @endsection
 
 @section('breadcrumb-right')
-    <div class="theme-form m-t-10 d-flex align-items-center flex-wrap" style="gap: 8px;">
-        <div style="max-width: 250px; margin-left: auto;">
+    <div class="theme-form m-t-10 d-flex justify-content-end">
+        <div style="max-width: 250px;">
             <div class="input-group">
                 <input class="form-control" id="reportrange" type="text">
             </div>
@@ -37,9 +37,16 @@
                 Return Report
                 <span class="badge badge-light-danger text-danger ml-2 font-weight-normal" style="font-size: 13px;">Based on Return Date</span>
             </h4>
-            <button type="button" class="btn btn-outline-danger btn-xs no-print" onclick="window.print()">
-                <i class="fa fa-print"></i> Print Report
-            </button>
+            <div class="d-flex align-items-center no-print" style="gap: 8px;">
+                @if (config('accounting.enabled', true) && auth('admin')->user()?->is('admin'))
+                    <a href="{{ route('admin.accounting.returns.create') }}" class="btn btn-danger btn-sm font-weight-bold mr-2">
+                        <i class="fa fa-undo mr-1"></i> Receive Courier Return
+                    </a>
+                @endif
+                <button type="button" class="btn btn-outline-danger btn-xs" onclick="window.print()">
+                    <i class="fa fa-print"></i> Print Report
+                </button>
+            </div>
         </div>
 
         <!-- Return Summary Cards -->

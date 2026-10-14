@@ -287,6 +287,12 @@ class Order extends Model
 
     public function adjustStock(): void
     {
+        // When accounting module is enabled, stock is never automatically changed on order status change.
+        // Stock count is reduced only when a Shipment form is submitted.
+        if (config('accounting.enabled', false)) {
+            return;
+        }
+
         info('adjusting stock', ['order' => $this->id]);
         $sign = function () {
             $increment = config('app.increment');

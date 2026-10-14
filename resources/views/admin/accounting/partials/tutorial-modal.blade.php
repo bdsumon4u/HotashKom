@@ -64,7 +64,7 @@
                                             <span class="text-muted small">ব্যবসার নিজস্ব নগদ টাকা, ব্যাংক ব্যালেন্স ও বিক্রির জন্য রাখা পণ্য।</span>
                                         </td>
                                         <td>
-                                            Cash in Hand (#1001), Bank Account (#1002), bKash/Nagad (#1003), <strong>Inventory / Stock (#1004)</strong>, Accounts Receivable (#1005)
+                                            Cash in Hand (#1001), Bank Account (#1002), bKash/Nagad (#1003), <strong>Inventory / Stock (#1004)</strong>, Accounts Receivable (#1005), <strong>In Courier (Products Shipped) (#1006)</strong>
                                         </td>
                                         <td class="text-center font-weight-bold text-danger">
                                             DEBIT (Dr) / ডেবিট (+)
@@ -144,62 +144,125 @@
                 <div class="card shadow-sm border mb-4 bg-white" style="border-left: 4px solid #4f46e5 !important;">
                     <div class="card-header bg-light border-bottom p-3">
                         <h6 class="mb-0 font-weight-bold text-dark">
-                            <i class="fa fa-question-circle text-primary mr-2"></i> 2. Common Question: Inventory Asset (#1004) vs. Product Purchase Cost Expense (#5001) <br>
-                            <small class="text-muted font-weight-normal">পণ্য কেনার সময় ইনভেন্টরি স্টক ও পণ্য বিক্রির পর খরচ কিভাবে সমন্বয় হয়?</small>
+                            <i class="fa fa-question-circle text-primary mr-2"></i> 2. Complete Stock Lifecycle: Inventory (#1004) &rarr; In Courier (#1006) &rarr; Cost of Goods Sold (#5001)<br>
+                            <small class="text-muted font-weight-normal">মাল ক্রয় থেকে কুরিয়ারে পাঠানো এবং ডেলিভারি হওয়ার সম্পূর্ণ ৩-ধাপের হিসাব পদ্ধতি</small>
                         </h6>
                     </div>
                     <div class="card-body p-4 text-dark">
                         <div class="row">
-                            <div class="col-lg-6 mb-3">
+                            <div class="col-lg-4 mb-3">
                                 <div class="p-3 border rounded h-100" style="background: #eff6ff;">
                                     <h6 class="font-weight-bold text-primary mb-1">
-                                        <i class="fa fa-shopping-cart mr-1"></i> Phase 1: When You Buy Stock (পণ্য কেনার সময়)
+                                        <i class="fa fa-shopping-cart mr-1"></i> Phase 1: Purchase Stock
                                     </h6>
+                                    <small class="text-muted font-weight-bold d-block mb-2">গুদামে পণ্য ক্রয় ও জমা</small>
                                     <p class="small text-secondary mb-2">
-                                        পণ্য কেনার সাথে সাথেই তা "খরচ" হয় না। আপনার নগদ টাকা কেবল ফিজিক্যাল প্রোডাক্ট হিসেবে গুদামে জমা হলো (Asset Exchange):
+                                        পণ্য কেনার সময় নগদ বা বকেয়া দিয়ে গুদামে স্টক বাড়লো (Asset):
                                     </p>
                                     <div class="bg-white p-2 rounded border small">
                                         <div class="d-flex justify-content-between text-dark">
-                                            <span><strong>Debit (+)</strong>: ASSET Inventory / Stock #1004 (স্টক বাড়লো)</span>
+                                            <span><strong>Debit (+)</strong>: Inventory #1004</span>
                                             <span class="text-danger font-weight-bold font-roboto">৳600</span>
                                         </div>
                                         <div class="d-flex justify-content-between text-dark mt-1">
-                                            <span><strong>Credit (-)</strong>: ASSET Cash in Hand #1001 (ক্যাশ কমলো)</span>
+                                            <span><strong>Credit (-)</strong>: Cash #1001 / Payable</span>
                                             <span class="text-success font-weight-bold font-roboto">৳600</span>
                                         </div>
                                     </div>
                                     <small class="text-muted d-block mt-2 font-italic">
-                                        ফলাফল: আপনার মোট সম্পদের পরিমাণ সমান রইলো। খরচ হিসেবে কাউন্ট হলো = <strong>৳০</strong>।
+                                        গুদামের stock_count বাড়ল। এখনো খরচ বা আয় হয়নি।
                                     </small>
                                 </div>
                             </div>
 
-                            <div class="col-lg-6 mb-3">
-                                <div class="p-3 border rounded h-100" style="background: #f0fdf4;">
-                                    <h6 class="font-weight-bold text-success mb-1">
-                                        <i class="fa fa-truck mr-1"></i> Phase 2: When Sold & Delivered (পণ্য বিক্রির সময়)
+                            <div class="col-lg-4 mb-3">
+                                <div class="p-3 border rounded h-100" style="background: #fefce8;">
+                                    <h6 class="font-weight-bold text-warning mb-1">
+                                        <i class="fa fa-truck mr-1"></i> Phase 2: Ship to Courier
                                     </h6>
+                                    <small class="text-muted font-weight-bold d-block mb-2">কুরিয়ারে পার্সেল পাঠানো</small>
                                     <p class="small text-secondary mb-2">
-                                        যখন ওই ৳৬০০ দামের পণ্যটি <strong>৳১,০০০</strong> টাকায় বিক্রি হলো, তখন আয় ও বিক্রিত পণ্যের আসল খরচ (COGS) রিকগনাইজ হবে:
+                                        গুদাম থেকে পণ্য বের হয়ে কুরিয়ারে গেল। গুদামের স্টক_কাউন্ট কমে <strong>In Courier (চলমান সম্পদ)</strong> এ আসল:
                                     </p>
                                     <div class="bg-white p-2 rounded border small">
                                         <div class="d-flex justify-content-between text-dark">
-                                            <span><strong>Credit (+)</strong>: INCOME Sales Revenue #4001 (বিক্রয় আয়)</span>
-                                            <span class="text-success font-weight-bold font-roboto">৳1,000</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between text-dark mt-1">
-                                            <span><strong>Debit (+)</strong>: EXPENSE Purchase Cost / COGS #5001 (পণ্যের খরচ)</span>
+                                            <span><strong>Debit (+)</strong>: In Courier #1006</span>
                                             <span class="text-danger font-weight-bold font-roboto">৳600</span>
                                         </div>
                                         <div class="d-flex justify-content-between text-dark mt-1">
-                                            <span><strong>Credit (-)</strong>: ASSET Inventory #1004 (গুদাম থেকে স্টক কমলো)</span>
+                                            <span><strong>Credit (-)</strong>: Inventory #1004</span>
                                             <span class="text-muted font-weight-bold font-roboto">৳600</span>
                                         </div>
                                     </div>
-                                    <div class="alert alert-success p-2 mt-2 mb-0 small text-center font-weight-bold">
-                                        মোট লাভ (Gross Profit) = ৳১,০০০ (আয়) - ৳৬০০ (পণ্যের ক্রয়মূল্য) = ৳৪০০ লাভ
+                                    <small class="text-muted d-block mt-2 font-italic">
+                                        গুদামের stock_count কমল। কুরিয়ারে পণ্যগুলো এখনো আপনার সম্পদ।
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 mb-3">
+                                <div class="p-3 border rounded h-100" style="background: #f0fdf4;">
+                                    <h6 class="font-weight-bold text-success mb-1">
+                                        <i class="fa fa-check-circle mr-1"></i> Phase 3: Delivered & Payout
+                                    </h6>
+                                    <small class="text-muted font-weight-bold d-block mb-2">ডেলিভারি ও পেমেন্ট সেটেলমেন্ট</small>
+                                    <p class="small text-secondary mb-2">
+                                        কাস্টমার পণ্য গ্রহণ করল এবং কুরিয়ার পেমেন্ট দিল। আয় ও আসল ক্রয়মূল্য (COGS) রিকগনাইজ হলো:
+                                    </p>
+                                    <div class="bg-white p-2 rounded border small">
+                                        <div class="d-flex justify-content-between text-dark">
+                                            <span><strong>Debit (+)</strong>: Bank #1002 (টাকা আসল)</span>
+                                            <span class="text-danger font-weight-bold font-roboto">৳900</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-dark mt-1">
+                                            <span><strong>Debit (+)</strong>: Delivery Fee (খরচ)</span>
+                                            <span class="text-danger font-weight-bold font-roboto">৳100</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-dark mt-1">
+                                            <span><strong>Credit (+)</strong>: Sales Revenue #4001</span>
+                                            <span class="text-success font-weight-bold font-roboto">৳1,000</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-dark mt-1">
+                                            <span><strong>Debit (+)</strong>: COGS Expense #5001</span>
+                                            <span class="text-danger font-weight-bold font-roboto">৳600</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-dark mt-1">
+                                            <span><strong>Credit (-)</strong>: In Courier #1006</span>
+                                            <span class="text-muted font-weight-bold font-roboto">৳600</span>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-success p-1 mt-2 mb-0 small text-center font-weight-bold">
+                                        নিট লাভ = ৳১,০০০ - ৳১০০ - ৳৬০০ = ৳৩০০
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Return Case Callout -->
+                        <div class="alert alert-light border border-danger p-3 mt-2 mb-0 rounded">
+                            <h6 class="font-weight-bold text-danger mb-1">
+                                <i class="fa fa-undo mr-1"></i> If Product is Returned from Courier (কুরিয়ার থেকে পণ্য ফেরত আসলে):
+                            </h6>
+                            <p class="small text-secondary mb-1">
+                                কুরিয়ার রিটার্ন ফর্ম সাবমিট করলে গুদামের ফিজিক্যাল স্টক_কাউন্ট বৃদ্ধি পাবে এবং পণ্যের মূল্য ইন-কুরিয়ার থেকে ইনভেন্টরিতে ব্যাক করবে:
+                            </p>
+                            <div class="row small font-weight-bold">
+                                <div class="col-md-6 text-danger"><i class="fa fa-check text-success mr-1"></i> Debit (+): ASSET Inventory / Stock #1004 (গুদামে স্টক ফেরত আসল)</div>
+                                <div class="col-md-6 text-secondary"><i class="fa fa-minus text-danger mr-1"></i> Credit (-): ASSET In Courier #1006 (কুরিয়ার অ্যাকাউন্ট থেকে কমল)</div>
+                            </div>
+                        </div>
+
+                        <!-- Stock Adjustment (Damage / Gift) Callout -->
+                        <div class="alert alert-light border border-warning p-3 mt-2 mb-0 rounded">
+                            <h6 class="font-weight-bold text-dark mb-1">
+                                <i class="fa fa-sliders text-warning mr-1"></i> If Product is Damaged, Expired or Gifted (পণ্য নষ্ট, অপচয় বা উপহার দেওয়া হলে):
+                            </h6>
+                            <p class="small text-secondary mb-1">
+                                স্টক অ্যাডজাস্টমেন্ট ফর্ম সাবমিট করলে গুদামের স্টক_কাউন্ট কমবে এবং ক্রয়মূল্য ইনভেন্টরি থেকে অপচয় বা বিজ্ঞাপন খরচে যুক্ত হবে:
+                            </p>
+                            <div class="row small font-weight-bold">
+                                <div class="col-md-6 text-danger"><i class="fa fa-check text-danger mr-1"></i> Debit (+): EXPENSE Damaged Goods (#5011) / Advertising (#5002)</div>
+                                <div class="col-md-6 text-secondary"><i class="fa fa-minus text-secondary mr-1"></i> Credit (-): ASSET Inventory / Stock #1004 (গুদাম থেকে স্টক কমল)</div>
                             </div>
                         </div>
                     </div>
@@ -295,6 +358,33 @@
                                         <td><span class="badge badge-primary">ASSET</span> Inventory / Stock (#1004)</td>
                                         <td><span class="badge badge-warning">EXPENSE</span> Purchase Cost / COGS (#5001)</td>
                                         <td><span class="text-muted">-- No Category --</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Damaged / Broken / Expired Stock</strong><br>
+                                            <span class="text-muted">পণ্য নষ্ট বা ড্যামেজ হয়ে বাতিল হওয়া</span>
+                                        </td>
+                                        <td><span class="badge badge-warning">EXPENSE</span> Damaged Goods (#5011)</td>
+                                        <td><span class="badge badge-primary">ASSET</span> Inventory / Stock (#1004)</td>
+                                        <td><span class="text-muted">Stock Adjustment</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Promotional Gift / Sample to Influencer</strong><br>
+                                            <span class="text-muted">বিজ্ঞাপন ও প্রচারের জন্য উপহার বা স্যাম্পল প্রদান</span>
+                                        </td>
+                                        <td><span class="badge badge-warning">EXPENSE</span> Advertising Cost (#5002)</td>
+                                        <td><span class="badge badge-primary">ASSET</span> Inventory / Stock (#1004)</td>
+                                        <td><span class="badge badge-light border">Marketing Freebies</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Owner's Personal Product Drawing</strong><br>
+                                            <span class="text-muted">মালিকের নিজের ব্যবহারের জন্য পণ্য উত্তোলন</span>
+                                        </td>
+                                        <td><span class="badge badge-dark">EQUITY</span> Owner's Drawings (#3002)</td>
+                                        <td><span class="badge badge-primary">ASSET</span> Inventory / Stock (#1004)</td>
+                                        <td><span class="text-muted">Personal Drawings</span></td>
                                     </tr>
                                 </tbody>
                             </table>
