@@ -9,12 +9,12 @@
 
     RewriteEngine On
 
-    # Force WWW except for API routes, /public/, /storage/, etc.
+    # Force non-WWW except for API routes, /public/, /storage/, etc.
     RewriteCond %{REQUEST_URI} !^/api/ [NC]
     RewriteCond %{REQUEST_URI} !^/public/ [NC]
     RewriteCond %{REQUEST_URI} !^/storage/ [NC]
-    RewriteCond %{HTTP_HOST} !^www\. [NC]
-    RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 
     # Laravel public folder handling
     RewriteCond %{REQUEST_FILENAME} -d [OR]
