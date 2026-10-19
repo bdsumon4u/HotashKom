@@ -783,7 +783,11 @@ function deleteOrUpdateCart()
 
 function isOninda(): bool
 {
-    return config('app.oninda');
+    if (function_exists('tenancy') && tenancy()->initialized) {
+        return false;
+    }
+
+    return (bool) config('app.oninda');
 }
 
 function isReseller(): bool

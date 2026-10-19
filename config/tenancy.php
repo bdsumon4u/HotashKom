@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Domain;
 use App\Models\Tenant;
+use App\Tenancy\Bootstrappers\TenantConfigBootstrapper;
 use Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper;
 use Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper;
 use Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper;
@@ -41,6 +42,7 @@ return [
         // Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class, // Disabled for single database tenancy
         // Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class, // Disabled: file/database cache stores do not support tagging; prefixed keys used instead
         // FilesystemTenancyBootstrapper::class, // Disabled: single storage with public/storage symlink
+        TenantConfigBootstrapper::class,
         QueueTenancyBootstrapper::class,
         // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
     ],
