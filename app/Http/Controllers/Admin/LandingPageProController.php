@@ -59,6 +59,13 @@ class LandingPageProController extends Controller
         return to_route('admin.landing-page-pros.index')->withSuccess('Landing Page Pro created successfully.');
     }
 
+    public function show(LandingPagePro $landing_page_pro): RedirectResponse
+    {
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
+
+        return to_route('admin.landing-page-pros.edit', $landing_page_pro);
+    }
+
     public function edit(LandingPagePro $landing_page_pro)
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
