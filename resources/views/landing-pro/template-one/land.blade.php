@@ -51,6 +51,41 @@
             scroll-snap-align: start;
         }
     </style>
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    {{-- Google Tag Manager --}}
+    @php
+        $gtmId = config('googletagmanager.id') ?: setting('gtm_id');
+        $gtmEnabled = false;
+        if ($gtmId) {
+            try {
+                if (! \Spatie\GoogleTagManager\GoogleTagManagerFacade::isEnabled()) {
+                    config(['googletagmanager.id' => $gtmId]);
+                    \Spatie\GoogleTagManager\GoogleTagManagerFacade::setId($gtmId);
+                    \Spatie\GoogleTagManager\GoogleTagManagerFacade::enable();
+                }
+                $gtmEnabled = \Spatie\GoogleTagManager\GoogleTagManagerFacade::isEnabled();
+            } catch (\Exception $e) {
+                $gtmEnabled = false;
+            }
+        }
+    @endphp
+    @if ($gtmEnabled)
+        @php
+            try {
+                echo view('googletagmanager::head')->render();
+            } catch (\Exception $e) {
+                // GTM not properly configured, skip
+            }
+        @endphp
+    @endif
+    @if (session('datalayer_events'))
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            @foreach (session('datalayer_events') as $dlEvent)
+                window.dataLayer.push({{ Js::from($dlEvent) }});
+            @endforeach
+        </script>
+    @endif
     <x-metapixel-head />
     <script>
         window._csrfToken = '{{ csrf_token() }}';
@@ -330,6 +365,15 @@
 @endphp
 
 <body class="text-gray-900 bg-gray-50" x-data="landingProPage()" x-init="init()">
+    @if (! empty($gtmEnabled))
+        @php
+            try {
+                echo view('googletagmanager::body')->render();
+            } catch (\Exception $e) {
+                // GTM not properly configured, skip
+            }
+        @endphp
+    @endif
     @includeIf('landing-pro.template-one.sections.announcement_bar')
 
     @foreach ($configuredSectionOrder as $sectionKey)
