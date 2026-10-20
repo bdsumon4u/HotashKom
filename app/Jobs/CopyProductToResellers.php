@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class CopyProductToResellers implements ShouldQueue
 {
@@ -244,6 +245,10 @@ class CopyProductToResellers implements ShouldQueue
         if (config('app.resell')) {
             // Ensure reseller selling price equals retail price
             $productData['selling_price'] = $this->product->retailPrice();
+        }
+
+        if (isset($productData['stock_group']) && ! Schema::connection('reseller')->hasColumn('products', 'stock_group')) {
+            unset($productData['stock_group']);
         }
 
         // ===== RESELLER DATABASE OPERATIONS =====

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Collection;
 use Laravel\Scout\Searchable;
 use Nicolaslopezj\Searchable\SearchableTrait;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
@@ -29,7 +30,7 @@ class Product extends Model
 
     protected $fillable = [
         'brand_id', 'name', 'slug', 'description', 'short_description', 'price', 'average_purchase_price', 'selling_price', 'suggested_price', 'wholesale', 'sku',
-        'source_id', 'should_track', 'stock_count', 'desc_img', 'desc_img_pos', 'is_active', 'hot_sale', 'new_arrival', 'shipping_inside', 'shipping_outside', 'delivery_charges', 'delivery_text',
+        'source_id', 'should_track', 'stock_count', 'stock_group', 'desc_img', 'desc_img_pos', 'is_active', 'hot_sale', 'new_arrival', 'shipping_inside', 'shipping_outside', 'delivery_charges', 'delivery_text',
         'packaging_charge',
     ];
 
@@ -224,6 +225,32 @@ class Product extends Model
         return Attribute::make(get: fn () => $this->track_stock
             ? $this->stock_count
             : true);
+    }
+
+    protected function stockGroup(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                $group = trim((string) $value);
+                if ($group !== '' && strtolower($group) !== 'null') {
+                    return $group;
+                }
+
+                if ($this->parent_id) {
+                    $parentGroup = trim((string) ($this->parent?->stock_group ?? ''));
+                    if ($parentGroup !== '' && strtolower($parentGroup) !== 'null') {
+                        return $parentGroup;
+                    }
+                }
+
+                return 'uncategorized';
+            },
+            set: function ($value) {
+                $trimmed = trim((string) $value);
+
+                return ['stock_group' => $trimmed !== '' ? $trimmed : 'uncategorized'];
+            }
+        );
     }
 
     public function categories()
@@ -456,10 +483,42 @@ class Product extends Model
         return $this->is_active;
     }
 
-    public static function stockStatistics(): array
+    /**
+     * Get all unique stock groups across products.
+     *
+     * @return Collection<int, string>
+     */
+    public static function stockGroups(): Collection
     {
-        $products = static::where('should_track', true)->where('stock_count', '>', 0)->get([
-            'id', 'stock_count', 'average_purchase_price', 'selling_price',
+        $groups = static::withoutGlobalScopes()
+            ->select('stock_group')
+            ->distinct()
+            ->whereNotNull('stock_group')
+            ->where('stock_group', '!=', '')
+            ->reorder('stock_group')
+            ->pluck('stock_group')
+            ->map(fn ($group) => trim((string) $group))
+            ->filter()
+            ->unique();
+
+        if (! $groups->contains('uncategorized')) {
+            $groups->push('uncategorized');
+        }
+
+        return $groups->values();
+    }
+
+    public static function stockStatistics(?string $stockGroup = null): array
+    {
+        $query = static::withoutGlobalScopes()
+            ->where('should_track', true)
+            ->where('stock_count', '>', 0);
+        if (! empty($stockGroup) && strtolower($stockGroup) !== 'all') {
+            $query->where('stock_group', $stockGroup);
+        }
+
+        $products = $query->get([
+            'id', 'stock_count', 'average_purchase_price', 'selling_price', 'stock_group',
         ]);
         $totalStockCount = $products->sum('stock_count');
         $totalPurchaseValue = $products->sum(fn ($product): int|float => $product->stock_count * ($product->average_purchase_price ?? $product->selling_price));

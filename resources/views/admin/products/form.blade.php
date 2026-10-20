@@ -80,6 +80,19 @@
                     <x-error field="stock_count" />
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="stock_group">Stock Group</label>
+                    <input type="text" list="stock_group_options" name="stock_group" id="stock_group" class="form-control @error('stock_group') is-invalid @enderror" value="{{ old('stock_group', $product->stock_group ?? 'uncategorized') }}" placeholder="e.g. Bag/Cap, Gadget">
+                    <datalist id="stock_group_options">
+                        @foreach(\App\Models\Product::stockGroups() as $groupOption)
+                            <option value="{{ $groupOption }}">
+                        @endforeach
+                    </datalist>
+                    <x-error field="stock_group" />
+                    <small class="form-text text-muted">Group for stock reports (e.g. Bag/Cap, Gadget). Defaults to "uncategorized".</small>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-md-6">

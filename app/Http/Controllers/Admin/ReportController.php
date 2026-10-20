@@ -139,11 +139,50 @@ class ReportController extends Controller
     public function stock(Request $request)
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
-        $products = Product::with('parent')->whereShouldTrack(true)->orderBy('stock_count')->where('stock_count', '>', 0)->get();
+
+        $selectedGroup = (string) $request->get('group', 'all');
+
+        $products = Product::with('parent')
+            ->whereShouldTrack(true)
+            ->orderBy('stock_count')
+            ->where('stock_count', '>', 0)
+            ->get();
+
+        // Unique stock groups present among tracked products or distinct groups
+        $uniqueGroupsFromProducts = $products->pluck('stock_group')
+            ->map(fn ($group) => trim((string) $group))
+            ->filter()
+            ->unique();
+
+        $uniqueGroupsFromDb = Product::stockGroups();
+
+        // Custom groups sorted, uncategorized placed at the end
+        $customGroups = $uniqueGroupsFromProducts
+            ->merge($uniqueGroupsFromDb)
+            ->unique()
+            ->filter(fn ($group) => strtolower($group) !== 'uncategorized')
+            ->sort(fn ($a, $b) => strcasecmp($a, $b))
+            ->values();
+
+        $hasUncategorized = $products->contains(fn ($p) => strtolower($p->stock_group) === 'uncategorized')
+            || $uniqueGroupsFromDb->contains(fn ($g) => strtolower($g) === 'uncategorized');
+
+        $stockGroups = $customGroups;
+        if ($hasUncategorized) {
+            $stockGroups->push('uncategorized');
+        }
+
+        // Counts per group for badges
+        $groupCounts = $products->groupBy(fn ($p) => strtolower($p->stock_group ?: 'uncategorized'))
+            ->map->count();
+
         $stats = Product::stockStatistics();
 
         return view('admin.reports.stock', array_merge([
             'products' => $products,
+            'stockGroups' => $stockGroups,
+            'selectedGroup' => $selectedGroup,
+            'groupCounts' => $groupCounts,
         ], $stats));
     }
 

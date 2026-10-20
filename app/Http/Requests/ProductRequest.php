@@ -75,6 +75,7 @@ class ProductRequest extends FormRequest
             'delivery_charges.*' => 'nullable|integer|min:0',
             'packaging_charge' => 'nullable|integer|min:0',
             'delivery_text' => 'nullable',
+            'stock_group' => 'nullable|string|max:255',
         ];
 
         if (! $this->isMethod('POST')) {
@@ -113,6 +114,8 @@ class ProductRequest extends FormRequest
 
         $data['brand_id'] = $data['brand'] ?? null;
         $data['stock_count'] = intval($data['stock_count'] ?? 0);
+        $stockGroup = trim((string) ($data['stock_group'] ?? ''));
+        $data['stock_group'] = $stockGroup !== '' ? $stockGroup : 'uncategorized';
 
         return $data;
     }

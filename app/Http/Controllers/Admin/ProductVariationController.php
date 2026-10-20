@@ -249,6 +249,10 @@ class ProductVariationController extends Controller
                     'stock_count' => $variationData['stock_count'],
                 ];
 
+                if (isset($variationData['stock_group'])) {
+                    $updateData['stock_group'] = $variationData['stock_group'];
+                }
+
                 // Handle wholesale pricing if provided
                 if (isset($variationData['wholesale']['quantity']) && isset($variationData['wholesale']['price'])) {
                     $wholesale = [];

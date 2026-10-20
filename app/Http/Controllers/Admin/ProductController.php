@@ -123,6 +123,13 @@ class ProductController extends Controller
             $this->syncPriceChangesToVariations($product, $fieldsToUpdate);
         }
 
+        // Sync stock_group to variations if parent product has variations
+        if (! $product->parent_id && $product->variations()->count() > 0) {
+            $product->variations()->update([
+                'stock_group' => $product->stock_group,
+            ]);
+        }
+
         // Handle relationships and dispatch copy job
         $this->handleProductRelationships($product, $data);
 
