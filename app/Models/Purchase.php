@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Purchase extends Model
 {
-    use BelongsToTenant;
     use HasFactory;
 
     public const STATUS_PAID = 'paid';
@@ -59,7 +57,7 @@ class Purchase extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_purchase')
-            ->withPivot(['tenant_id', 'price', 'quantity', 'subtotal'])
+            ->withPivot(['price', 'quantity', 'subtotal'])
             ->withTimestamps();
     }
 

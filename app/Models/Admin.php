@@ -6,19 +6,16 @@ use App\Notifications\Admin\ResetPassword;
 use App\Notifications\Admin\VerifyEmail;
 use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
-use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
 use Spatie\Activitylog\Traits\CausesActivity;
 
 /**
  * @method bool is(string|array $role) Check if the admin has the specified role(s)
  */
-class Admin extends Authenticatable implements FilamentUser, HasTenants
+class Admin extends Authenticatable implements FilamentUser
 {
     use CausesActivity;
     use HasFactory;
@@ -32,58 +29,14 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
 
     const UPLOADER = 3;
 
-    #[\Override]
-    public static function booted(): void
-    {
-        static::deleting(function (self $admin): void {
-            if ($admin->isSuperAdmin()) {
-                if (function_exists('tenancy') && tenancy()->initialized) {
-                    throw new \Exception('Tenant admin cannot delete a global super admin.');
-                }
-
-                if (auth('admin')->check() && ! auth('admin')->user()->isSuperAdmin()) {
-                    throw new \Exception('Non-super admin cannot delete a global super admin.');
-                }
-            }
-        });
-    }
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'tenant_id', 'name', 'email', 'password', 'role_id', 'is_active', 'last_order_received_at',
+        'name', 'email', 'password', 'role_id', 'is_active', 'last_order_received_at',
     ];
-
-    /**
-     * Get the tenant that the admin belongs to.
-     */
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class, 'tenant_id');
-    }
-
-    /**
-     * Check if admin is a global super admin.
-     */
-    public function isSuperAdmin(): bool
-    {
-        return is_null($this->tenant_id);
-    }
-
-    /**
-     * Check if admin belongs to a specific tenant.
-     */
-    public function isTenantAdmin(?string $tenantId = null): bool
-    {
-        if (is_null($this->tenant_id)) {
-            return false;
-        }
-
-        return $tenantId === null || $this->tenant_id === $tenantId;
-    }
 
     /**
      * The attributes that should be hidden for arrays.
@@ -145,16 +98,6 @@ class Admin extends Authenticatable implements FilamentUser, HasTenants
             'is_active' => 'boolean',
             'email_verified_at' => 'datetime',
         ];
-    }
-
-    public function canAccessTenant(Model $tenant): bool
-    {
-        return $this->isSuperAdmin() || $this->tenant_id === $tenant->getTenantKey();
-    }
-
-    public function getTenants(Panel $panel): array|Collection
-    {
-        return [];
     }
 
     public function canAccessPanel(Panel $panel): bool

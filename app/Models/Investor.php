@@ -26,7 +26,6 @@ class Investor extends Authenticatable implements Confirmable, Wallet
      * @var array<int, string>
      */
     protected $fillable = [
-        'tenant_id',
         'name',
         'email',
         'phone_number',

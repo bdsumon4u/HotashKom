@@ -59,10 +59,6 @@ class ImageController extends Controller
     {
         abort_if(request()->user()->is('salesman'), 403, 'You don\'t have permission.');
 
-        if (function_exists('tenancy') && tenancy()->initialized && $image->isGlobal()) {
-            abort(403, 'You cannot edit central platform images.');
-        }
-
         $request->validate([
             'filename' => ['required', 'string'],
         ]);
@@ -82,12 +78,6 @@ class ImageController extends Controller
     public function destroy(Image $image)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
-
-        if (function_exists('tenancy') && tenancy()->initialized && $image->isGlobal()) {
-            return request()->expectsJson()
-                ? response()->json(['danger' => 'You cannot delete central platform images.'], 403)
-                : back()->with('danger', 'You cannot delete central platform images.');
-        }
 
         if ($image->products->isNotEmpty()) {
             return request()->expectsJson()

@@ -2,17 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductPurchase extends Model
 {
-    use BelongsToTenant;
-
     protected $table = 'product_purchase';
 
     protected $fillable = [
-        'tenant_id',
         'purchase_id',
         'product_id',
         'price',

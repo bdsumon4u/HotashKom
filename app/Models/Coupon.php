@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class Coupon extends Model
 {
-    use BelongsToTenant;
-
     protected $fillable = [
         'code',
         'name',

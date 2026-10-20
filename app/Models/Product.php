@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Jobs\RemoveResourceFromResellers;
 use App\Jobs\SyncProductActiveWithResellers;
 use App\Jobs\SyncProductStockWithResellers;
-use App\Traits\BelongsToTenant;
 use Codebyray\ReviewRateable\Traits\ReviewRateable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -20,7 +19,6 @@ use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class Product extends Model
 {
-    use BelongsToTenant;
     use HasFactory;
     use HasSEO;
     use ReviewRateable;

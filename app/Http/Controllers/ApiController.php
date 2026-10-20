@@ -59,26 +59,7 @@ class ApiController extends Controller
 
     public function clearCache()
     {
-        if (function_exists('tenancy') && tenancy()->initialized) {
-            // Tenant context: invalidate tenant-specific cache
-            bumpCacheNamespace('section_products');
-            bumpCacheNamespace('categories');
-            bumpCacheNamespace('brands');
-            \cacheMemo()->forget(tenantCachePrefix().'settings');
-            \cacheMemo()->forget(tenantCachePrefix().'slides');
-            \cacheMemo()->forget(tenantCachePrefix().'homesections');
-            \cacheMemo()->forget(tenantCachePrefix().'categories:carousel');
-            \cacheMemo()->forget(tenantCachePrefix().'brands:carousel');
-
-            if (cacheSupportsTags()) {
-                \cache()->tags(tenantCachePrefix().'section_products')->flush();
-                \cache()->tags(tenantCachePrefix().'categories')->flush();
-                \cache()->tags(tenantCachePrefix().'brands')->flush();
-            }
-        } else {
-            // Central context: run optimize:clear
-            Artisan::call('optimize:clear');
-        }
+        Artisan::call('optimize:clear');
 
         // Only clear response cache if it's enabled
         if (config('cache.response_cache.enabled', false)) {

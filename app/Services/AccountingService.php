@@ -424,7 +424,7 @@ final class AccountingService
     }
 
     /**
-     * Seed initial default chart of accounts and categories for the current tenant.
+     * Seed initial default chart of accounts and categories for the application.
      */
     public function seedDefaultAccounts(): void
     {

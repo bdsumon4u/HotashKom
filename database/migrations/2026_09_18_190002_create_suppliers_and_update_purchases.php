@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table): void {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->string('name');
             $table->string('company_name')->nullable();
             $table->string('phone')->nullable();
@@ -35,7 +34,6 @@ return new class extends Migration
 
         Schema::create('purchase_payments', function (Blueprint $table): void {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->foreignId('purchase_id')->nullable()->constrained('purchases')->nullOnDelete();
             $table->foreignId('supplier_id')->constrained('suppliers')->cascadeOnDelete();
             $table->foreignId('account_id')->constrained('accounts')->restrictOnDelete();

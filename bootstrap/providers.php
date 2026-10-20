@@ -6,7 +6,6 @@ use App\Providers\ComposerServiceProvider;
 use App\Providers\EventServiceProvider;
 use App\Providers\Filament\LandingPanelProvider;
 use App\Providers\TelescopeServiceProvider;
-use App\Providers\TenancyServiceProvider;
 use Yajra\DataTables\DataTablesServiceProvider;
 
 return [
@@ -17,5 +16,4 @@ return [
     LandingPanelProvider::class,
     TelescopeServiceProvider::class,
     DataTablesServiceProvider::class,
-    TenancyServiceProvider::class,
 ];

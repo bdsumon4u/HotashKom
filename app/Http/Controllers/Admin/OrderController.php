@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\Tenant\ForwardTenantOrdersAction;
 use App\Exports\PathaoExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
@@ -172,21 +171,6 @@ class OrderController extends Controller
     {
         if (! $reseller || ! isOninda() || ! (setting('show_option')->resellers_invoice ?? false)) {
             return ['company' => null, 'logo' => null, 'connected' => false];
-        }
-
-        if ($reseller->isTenant()) {
-            try {
-                $resellerCompany = DB::table('settings')->where('tenant_id', $reseller->tenant_id)->where('name', 'company')->value('value');
-                $resellerLogo = DB::table('settings')->where('tenant_id', $reseller->tenant_id)->where('name', 'logo')->value('value');
-
-                return [
-                    'company' => json_decode($resellerCompany ?? '{}'),
-                    'logo' => json_decode($resellerLogo ?? '{}'),
-                    'connected' => true,
-                ];
-            } catch (\Exception) {
-                return ['company' => null, 'logo' => null, 'connected' => false];
-            }
         }
 
         if ($reseller->db_name && $reseller->db_username) {
@@ -666,43 +650,6 @@ class OrderController extends Controller
                 return response()->json(['message' => 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.'], 422);
             } else {
                 return back()->with('danger', 'No orders available to forward. All selected orders must be confirmed and not already forwarded to the Wholesaler.');
-            }
-        }
-
-        // If running inside a tenant context
-        if (function_exists('tenancy') && tenancy()->initialized) {
-            $reseller = User::where('tenant_id', tenant('id'))->first();
-
-            if (! $reseller) {
-                $msg = 'This tenant store is not linked to any Reseller account on the central platform.';
-                if ($request->expectsJson()) {
-                    return response()->json(['message' => $msg], 422);
-                } else {
-                    return back()->with('danger', $msg);
-                }
-            }
-
-            try {
-                $count = app(ForwardTenantOrdersAction::class)->execute(tenant(), $reseller, $orders);
-
-                $msg = $count > 0
-                    ? "Successfully forwarded {$count} order(s) to the Wholesaler."
-                    : 'No orders were forwarded.';
-
-                if ($request->expectsJson()) {
-                    return response()->json(['message' => $msg]);
-                } else {
-                    return back()->with('success', $msg);
-                }
-            } catch (\Exception $e) {
-                Log::error('Tenant order forwarding failed: '.$e->getMessage(), ['exception' => $e]);
-                $msg = 'Failed to forward orders to the Wholesaler: '.$e->getMessage();
-
-                if ($request->expectsJson()) {
-                    return response()->json(['message' => $msg], 500);
-                } else {
-                    return back()->with('danger', $msg);
-                }
             }
         }
 

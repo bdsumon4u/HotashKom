@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('investment_installments', function (Blueprint $table): void {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->foreignId('investment_id')->constrained('investments')->cascadeOnDelete();
             $table->foreignId('investor_id')->constrained('investors')->cascadeOnDelete();
             $table->unsignedSmallInteger('installment_number');

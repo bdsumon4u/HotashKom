@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('investors', function (Blueprint $table): void {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone_number')->nullable()->index();

@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('investments', function (Blueprint $table): void {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->foreignId('investor_id')->constrained('investors')->cascadeOnDelete();
             $table->decimal('invested_amount', 15, 2);
             $table->decimal('multiplier', 4, 2)->default(2.00);

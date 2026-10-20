@@ -52,14 +52,11 @@
                                             @endif
                                             <td>
                                                 @php
-                                                    $isGlobalOnTenant = function_exists('tenancy') && tenancy()->initialized && $admin->isSuperAdmin();
-                                                    $canEdit = auth()->user()->is('admin') && (! $isGlobalOnTenant || auth()->user()->isSuperAdmin());
+                                                    $canEdit = auth()->user()->is('admin');
                                                     $canDelete = auth()->user()->is('admin')
                                                         && $admin->id !== auth()->id()
-                                                        && ! $admin->isSuperAdmin()
                                                         && ! str_ends_with($admin->email, '@cyber32.com')
-                                                        && ! str_ends_with($admin->email, '@hotash.tech')
-                                                        && (! (function_exists('tenancy') && tenancy()->initialized) || auth()->user()->isSuperAdmin() || $admin->tenant_id === tenant('id'));
+                                                        && ! str_ends_with($admin->email, '@hotash.tech');
                                                 @endphp
                                                 @if($canEdit)
                                                     <a href="{{ route('admin.staffs.edit', $admin->id) }}" class="btn btn-sm btn-primary">Edit</a>
@@ -70,9 +67,6 @@
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                                     </form>
-                                                @endif
-                                                @if($isGlobalOnTenant)
-                                                    <span class="badge badge-light border text-muted py-1 px-2"><i class="fa fa-shield-alt mr-1"></i>Global Admin</span>
                                                 @endif
                                             </td>
                                         </tr>

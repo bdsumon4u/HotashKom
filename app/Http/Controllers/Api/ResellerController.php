@@ -55,9 +55,7 @@ class ResellerController extends Controller
             ->editColumn('name', fn ($row): string => '<a href="'.route('admin.orders.index', ['user_id' => $row->id, 'status' => '']).'">'.$row->name.'</a>')
             ->editColumn('shop_name', function ($row) {
                 $html = e($row->shop_name ?? '-');
-                if ($row->tenant_id) {
-                    $html .= '<br><span class="badge badge-success text-white" style="font-size: 10px;"><i class="fa fa-store mr-1"></i>Tenant: '.e($row->tenant_id).'</span>';
-                } elseif ($row->isConnected()) {
+                if ($row->isConnected()) {
                     $html .= '<br><span class="badge badge-info text-white" style="font-size: 10px;"><i class="fa fa-external-link-alt mr-1"></i>External</span>';
                 }
 

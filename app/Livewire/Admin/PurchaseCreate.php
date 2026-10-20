@@ -216,10 +216,8 @@ class PurchaseCreate extends Component
             ]);
 
             $attachData = [];
-            $tenantId = function_exists('tenant') && tenant() ? tenant()->getTenantKey() : null;
             foreach ($this->items as $item) {
                 $attachData[$item['product_id']] = [
-                    'tenant_id' => $tenantId,
                     'price' => $item['price'] ?? 0,
                     'quantity' => $item['quantity'] ?? 0,
                     'subtotal' => (float) ($item['price'] ?? 0) * (float) ($item['quantity'] ?? 0),

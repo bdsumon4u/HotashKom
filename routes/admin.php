@@ -33,7 +33,6 @@ use App\Http\Controllers\Admin\ShipmentReportController;
 use App\Http\Controllers\Admin\SlideController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\SupplierController;
-use App\Http\Controllers\Admin\TenantController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UtmReportController;
 use App\Http\Middleware\CheckForMaintenanceDue;
@@ -62,14 +61,6 @@ Route::group(['as' => 'admin.'], function (): void {
         // ...
     });
 
-    // Route::post('resend-otp', 'Auth\LoginController@resendOTP')->name('resend-otp');
-
-    if (config('tenancy.enabled', false)) {
-        Route::get('tenants/impersonate/{admin}', [TenantController::class, 'impersonateLogin'])
-            ->name('tenants.impersonate.login')
-            ->middleware('signed');
-    }
-
     Route::permanentRedirect('/admin', '/admin/dashboard'); // Permanent Redirect
     Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', CheckForMaintenanceDue::class]], function (): void {
         // Admin Level Namespace & 'admin' Prefix
@@ -96,11 +87,6 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::patch('/orders/{order}/update-quantity', [OrderController::class, 'updateQuantity'])->name('orders.update-quantity');
         Route::post('/logout-others/{admin}', [ApiController::class, 'logoutOthers'])->name('logout-others');
         Route::get('/customers', CustomerController::class)->name('customers');
-
-        // Super Admin SaaS Tenant Management Routes (Only registered when tenancy is enabled)
-        if (config('tenancy.enabled', false)) {
-            require base_path('routes/tenants.php');
-        }
 
         Route::get('resellers', [ResellerController::class, 'index'])->name('resellers.index');
         Route::get('resellers/{reseller}/edit', [ResellerController::class, 'edit'])->name('resellers.edit');

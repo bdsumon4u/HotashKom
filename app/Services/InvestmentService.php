@@ -65,7 +65,6 @@ class InvestmentService
             $hasReferrer
         ): Investment {
             $investment = Investment::create([
-                'tenant_id' => $investor->tenant_id,
                 'investor_id' => $investor->id,
                 'invested_amount' => $amount,
                 'multiplier' => $multiplier,
@@ -99,7 +98,6 @@ class InvestmentService
             // 2. Process initial company earning
             if ($initialCompanyAmount > 0) {
                 InvestmentEarning::create([
-                    'tenant_id' => $investor->tenant_id,
                     'investment_id' => $investment->id,
                     'investor_id' => $investor->id,
                     'type' => 'initial_deduction',
@@ -132,7 +130,6 @@ class InvestmentService
                 $netInvestorAmount = round($grossAmount - $deductionAmount, 2);
 
                 InvestmentInstallment::create([
-                    'tenant_id' => $investor->tenant_id,
                     'investment_id' => $investment->id,
                     'investor_id' => $investor->id,
                     'installment_number' => $month,
@@ -223,7 +220,6 @@ class InvestmentService
             // 3. Record Company Earning
             if ($lockedInstallment->company_amount > 0) {
                 InvestmentEarning::create([
-                    'tenant_id' => $investor->tenant_id,
                     'investment_id' => $investment->id,
                     'installment_id' => $lockedInstallment->id,
                     'investor_id' => $investor->id,

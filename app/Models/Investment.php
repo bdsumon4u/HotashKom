@@ -16,7 +16,6 @@ class Investment extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'tenant_id',
         'investor_id',
         'invested_amount',
         'multiplier',

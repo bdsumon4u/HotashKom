@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('investment_earnings', function (Blueprint $table): void {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->foreignId('investment_id')->nullable()->constrained('investments')->nullOnDelete();
             $table->foreignId('installment_id')->nullable()->constrained('investment_installments')->nullOnDelete();
             $table->foreignId('investor_id')->nullable()->constrained('investors')->nullOnDelete();

@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table): void {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->string('name');
             $table->string('code')->nullable();
             $table->enum('type', ['asset', 'liability', 'equity', 'income', 'expense']);
@@ -27,7 +26,6 @@ return new class extends Migration
 
         Schema::create('transaction_categories', function (Blueprint $table): void {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->string('name');
             $table->enum('type', ['expense', 'income', 'both'])->default('expense');
             $table->text('description')->nullable();
@@ -37,7 +35,6 @@ return new class extends Migration
 
         Schema::create('journal_entries', function (Blueprint $table): void {
             $table->id();
-            $table->string('tenant_id')->nullable()->index();
             $table->string('entry_number')->nullable()->index();
             $table->date('entry_date')->index();
             $table->string('reference')->nullable();

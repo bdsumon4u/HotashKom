@@ -306,7 +306,7 @@
 @elseif($section->type == 'content')
     @php
         $pageId = $section->data->page_id ?? null;
-        $page = $pageId ? cacheMemo()->remember(tenantCachePrefix().'page:'.$pageId, 3600, fn() => \App\Models\Page::find($pageId)) : null;
+        $page = $pageId ? cacheMemo()->remember('page:'.$pageId, 3600, fn() => \App\Models\Page::find($pageId)) : null;
     @endphp
     @if($page)
     <div class="block">
