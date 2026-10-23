@@ -70,7 +70,12 @@ class CopyMissingProductsToReseller extends Command
             DB::connection('reseller')->getPdo();
             $this->info('✓ Successfully connected to reseller database');
         } catch (\Exception $e) {
-            $this->error("Failed to connect to reseller database: {$e->getMessage()}");
+            $this->error("Failed to connect to reseller database: " . json_encode([
+                'connection' => config('database.connections.reseller'),
+                'resellerId' => $reseller->id,
+                'domain' => $reseller->domain,
+                'error' => $e->getMessage(),
+            ]));
 
             return 1;
         }

@@ -63,6 +63,7 @@ class PlaceOnindaOrder implements ShouldQueue
                 DB::connection('reseller')->getPdo();
             } catch (\Exception $e) {
                 Log::error('Failed to connect to reseller database', [
+                    'connection' => config('database.connections.reseller'),
                     'domain' => $this->domain,
                     'error' => $e->getMessage(),
                 ]);
