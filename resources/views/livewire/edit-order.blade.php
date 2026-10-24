@@ -283,40 +283,108 @@
                                             @endforeach
                                         @endif
 
-                                        <div class="mt-2 d-flex flex-column">
-                                            @if(isOninda() && config('app.resell'))
-                                            <div class="text-nowrap">
-                                                Unit Price: {{ (int)($product['price'] ?? 0) }} (buy); {{ (int)($product['retail_price'] ?? $product['price'] ?? 0) }} (sell)
+                                        @if(isOninda() && config('app.resell'))
+                                            <div class="mt-2">
+                                                <div class="form-row align-items-center mb-1">
+                                                    <div class="col-auto">
+                                                        <label class="mb-0 small text-muted font-weight-bold" for="product-price-{{ $product['id'] }}">Buy Price:</label>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <input type="number"
+                                                            id="product-price-{{ $product['id'] }}"
+                                                            wire:key="selected-product-price-{{ $product['id'] }}"
+                                                            class="form-control form-control-sm"
+                                                            style="width: 100px; height: auto; padding: 2px 8px;"
+                                                            wire:model.live.debounce.500ms="selectedProducts.{{ $product['id'] }}.price"
+                                                            min="0"
+                                                            step="any"
+                                                            @focus="$event.target.select()"
+                                                            @disabled(isReseller() && !is_null($order->source_id))>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <label class="mb-0 small text-muted font-weight-bold" for="product-retail-price-{{ $product['id'] }}">Sell Price:</label>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <input type="number"
+                                                            id="product-retail-price-{{ $product['id'] }}"
+                                                            wire:key="selected-product-retail-price-{{ $product['id'] }}"
+                                                            class="form-control form-control-sm"
+                                                            style="width: 100px; height: auto; padding: 2px 8px;"
+                                                            wire:model.live.debounce.500ms="selectedProducts.{{ $product['id'] }}.retail_price"
+                                                            min="0"
+                                                            step="any"
+                                                            @focus="$event.target.select()"
+                                                            @disabled(isReseller() && !is_null($order->source_id))>
+                                                    </div>
+                                                </div>
+                                                @error('selectedProducts.' . $product['id'] . '.price')
+                                                    <span class="text-danger small d-block">{{ $message }}</span>
+                                                @enderror
+                                                @error('selectedProducts.' . $product['id'] . '.retail_price')
+                                                    <span class="text-danger small d-block">{{ $message }}</span>
+                                                @enderror
+                                                <div class="text-nowrap small text-muted mt-1">
+                                                    Total Price: {!! theMoney(((float)($product['price'] ?? 0)) * (int)($product['quantity'] ?? 0)) !!} (buy);
+                                                    <strong class="text-dark">{!! theMoney($amount = ((float)($product['retail_price'] ?? $product['price'] ?? 0)) * (int)($product['quantity'] ?? 0)) !!}</strong> (sell)
+                                                </div>
                                             </div>
-                                            <div class="text-nowrap">
-                                                Total Price: {{ (int)($product['price'] ?? 0) * (int)($product['quantity'] ?? 0) }} (buy); {{ $amount = ((int)($product['retail_price'] ?? 0) ?? (int)($product['price'] ?? 0)) * (int)($product['quantity'] ?? 0) }} (sell)
+                                        @else
+                                            <div class="mt-2">
+                                                <div class="form-row align-items-center mb-1">
+                                                    <div class="col-auto">
+                                                        <label class="mb-0 small text-muted font-weight-bold" for="product-price-{{ $product['id'] }}">Price:</label>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <input type="number"
+                                                            id="product-price-{{ $product['id'] }}"
+                                                            wire:key="selected-product-price-{{ $product['id'] }}"
+                                                            class="form-control form-control-sm"
+                                                            style="width: 110px; height: auto; padding: 2px 8px;"
+                                                            wire:model.live.debounce.500ms="selectedProducts.{{ $product['id'] }}.price"
+                                                            min="0"
+                                                            step="any"
+                                                            @focus="$event.target.select()"
+                                                            @disabled(isReseller() && !is_null($order->source_id))>
+                                                    </div>
+                                                </div>
+                                                @error('selectedProducts.' . $product['id'] . '.price')
+                                                    <span class="text-danger small d-block">{{ $message }}</span>
+                                                @enderror
+                                                <div class="text-nowrap small text-muted mt-1">
+                                                    Total Price: <strong class="text-dark">{!! theMoney($amount = ((float)($product['price'] ?? 0)) * (int)($product['quantity'] ?? 0)) !!}</strong>
+                                                </div>
                                             </div>
-                                            @else
-                                            <div class="text-nowrap">
-                                                Total Price: {{ $amount = ((int)($product[isOninda() ? 'retail_price' : 'price'] ?? 0) ?? (int)($product['price'] ?? 0)) * (int)($product['quantity'] ?? 0) }}
-                                            </div>
-                                            @endif
-                                        </div>
+                                        @endif
                                     </td>
                                     <td>
-                                        <div class="input-number product__quantity">
-                                            <input type="number" id="quantity-{{ $product['id'] }}"
-                                                class="form-control input-number__input"
-                                                name="quantity[{{ $product['id'] }}]"
-                                                value="{{ old('quantity.' . $product['id'], $product['quantity']) }}"
-                                                min="1" readonly style="border-radius: 2px;" @disabled(isReseller() && !is_null($order->source_id))>
-                                            <div class="input-number__add"
-                                                @unless(isReseller() && !is_null($order->source_id))
-                                                wire:click="increaseQuantity({{ $product['id'] }})"
-                                                @endunless
-                                            >
+                                        <div class="d-flex align-items-center">
+                                            <div class="input-number product__quantity">
+                                                <input type="number" id="quantity-{{ $product['id'] }}"
+                                                    class="form-control input-number__input"
+                                                    name="quantity[{{ $product['id'] }}]"
+                                                    value="{{ old('quantity.' . $product['id'], $product['quantity']) }}"
+                                                    min="1" readonly style="border-radius: 2px;" @disabled(isReseller() && !is_null($order->source_id))>
+                                                <div class="input-number__add"
+                                                    @unless(isReseller() && !is_null($order->source_id))
+                                                    wire:click="increaseQuantity({{ $product['id'] }})"
+                                                    @endunless
+                                                >
+                                                </div>
+                                                <div class="input-number__sub"
+                                                    @unless(isReseller() && !is_null($order->source_id))
+                                                    wire:click="decreaseQuantity({{ $product['id'] }})"
+                                                    @endunless
+                                                >
+                                                </div>
                                             </div>
-                                            <div class="input-number__sub"
-                                                @unless(isReseller() && !is_null($order->source_id))
-                                                wire:click="decreaseQuantity({{ $product['id'] }})"
-                                                @endunless
-                                            >
-                                            </div>
+                                            @unless(isReseller() && !is_null($order->source_id))
+                                            <button type="button" class="btn btn-sm btn-link text-danger ml-2 p-0"
+                                                wire:click="removeProduct({{ $product['id'] }})"
+                                                wire:confirm="Are you sure you want to remove this product?"
+                                                title="Remove Product">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                            @endunless
                                         </div>
                                     </td>
                                 </tr>
@@ -454,8 +522,8 @@
                         <tr>
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
-                                <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost + (float) ($order->data['packaging_charge'] ?? 25) - (float) $discount - (float) ($couponDiscount ?? 0)) !!}</strong> (buy)<br>
-                                <strong>{!! theMoney((float) $retail + (float) ($order->data['retail_delivery_fee'] ?? $shipping_cost) - (float) $advanced - (float) ($order->data['retail_discount'] ?? 0)) !!}</strong> (sell)
+                                <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost + (float) ($packaging_charge ?? $order->data['packaging_charge'] ?? 25) - (float) $discount - (float) ($couponDiscount ?? 0)) !!}</strong> (buy)<br>
+                                <strong>{!! theMoney((float) $retail + (float) ($retail_delivery_fee ?: ($order->data['retail_delivery_fee'] ?? $shipping_cost)) - (float) $advanced - (float) ($retail_discount ?: ($order->data['retail_discount'] ?? 0))) !!}</strong> (sell)
                             </td>
                         </tr>
                         @else
@@ -463,7 +531,7 @@
                             <th style="vertical-align: middle;">Grand Total</th>
                             <td class="checkout-subtotal">
                                 @if(isOninda())
-                                <strong>{!! theMoney((float) $retail + (float) ($order->data['retail_delivery_fee'] ?? 0) - (float) $advanced - (float) ($order->data['discount'] ?? 0) - (float) ($couponDiscount ?? 0)) !!}</strong>
+                                <strong>{!! theMoney((float) $retail + (float) ($retail_delivery_fee ?: ($order->data['retail_delivery_fee'] ?? 0)) - (float) $advanced - (float) $discount - (float) ($couponDiscount ?? 0)) !!}</strong>
                                 @else
                                 <strong>{!! theMoney((float) $subtotal + (float) $shipping_cost - (float) $discount - (float) $advanced - (float) ($couponDiscount ?? 0)) !!}</strong>
                                 @endif

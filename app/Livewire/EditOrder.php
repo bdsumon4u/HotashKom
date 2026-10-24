@@ -123,13 +123,13 @@ class EditOrder extends Component
         }
 
         // Cast meta data to proper types
-        $this->discount = (int) ($this->order->data['discount'] ?? 0);
-        $this->advanced = (int) ($this->order->data['advanced'] ?? 0);
-        $this->retail_discount = (int) ($this->order->data['retail_discount'] ?? 0);
-        $this->retail_delivery_fee = (int) ($this->order->data['retail_delivery_fee'] ?? 0);
-        $this->shipping_cost = (int) ($this->order->data['shipping_cost'] ?? 0);
-        $this->subtotal = (int) ($this->order->data['subtotal'] ?? 0);
-        $this->packaging_charge = (int) ($this->order->data['packaging_charge'] ?? config('app.packaging_charge', 25));
+        $this->discount = (float) ($this->order->data['discount'] ?? 0);
+        $this->advanced = (float) ($this->order->data['advanced'] ?? 0);
+        $this->retail_discount = (float) ($this->order->data['retail_discount'] ?? 0);
+        $this->retail_delivery_fee = (float) ($this->order->data['retail_delivery_fee'] ?? 0);
+        $this->shipping_cost = (float) ($this->order->data['shipping_cost'] ?? 0);
+        $this->subtotal = (float) ($this->order->data['subtotal'] ?? 0);
+        $this->packaging_charge = (float) ($this->order->data['packaging_charge'] ?? config('app.packaging_charge', 25));
         $this->weight = (float) ($this->order->data['weight'] ?? 0.5);
 
         // Handle string properties
@@ -139,6 +139,15 @@ class EditOrder extends Component
         $this->area_id = $this->order->data['area_id'] ?? '';
 
         foreach (json_decode(json_encode($this->order->products), true) ?? [] as $product) {
+            $product['price'] = (float) ($product['price'] ?? 0);
+            $product['quantity'] = (int) ($product['quantity'] ?? 1);
+            if (! isset($product['retail_price'])) {
+                $product['retail_price'] = $product['price'];
+            } else {
+                $product['retail_price'] = (float) $product['retail_price'];
+            }
+            $product['total'] = $product['quantity'] * $product['price'];
+
             $this->selectedProducts[$product['id']] = $product;
 
             $parentId = $product['parent_id'] ?? $product['id'];
@@ -177,6 +186,10 @@ class EditOrder extends Component
                 }
             }
         }
+
+        if ($this->subtotal <= 0 && ! empty($this->selectedProducts)) {
+            $this->subtotal = $this->order->getSubtotal($this->selectedProducts);
+        }
     }
 
     protected function productWithOptionsQuery(): Builder
@@ -205,6 +218,9 @@ class EditOrder extends Component
         }
 
         $productData = (new ProductResource($product))->toCartItem($quantity);
+        $productData['price'] = (float) $productData['price'];
+        $productData['retail_price'] = (float) ($productData['retail_price'] ?? $productData['price']);
+        $productData['total'] = $quantity * $productData['price'];
 
         // Store parent product ID and selected options for variation changes
         $productData['parent_id'] = $product->parent_id ?? $product->id;
@@ -264,10 +280,16 @@ class EditOrder extends Component
         $productData['parent_id'] = $parentId;
         $productData['selected_options'] = $this->options[$parentId];
 
-        // Preserve retail_price if it exists
-        if (isset($selectedProduct['retail_price'])) {
-            $productData['retail_price'] = $selectedProduct['retail_price'];
+        // In resell mode preserve custom retail price if set, otherwise keep retail_price synced with price
+        if (isOninda() && config('app.resell')) {
+            if (isset($selectedProduct['retail_price'])) {
+                $productData['retail_price'] = (float) $selectedProduct['retail_price'];
+            }
+        } else {
+            $productData['retail_price'] = (float) $productData['price'];
         }
+        $productData['price'] = (float) $productData['price'];
+        $productData['total'] = $quantity * $productData['price'];
 
         // Update the product in selectedProducts, keeping the same key
         // but updating the ID to the new variation's ID
@@ -283,13 +305,60 @@ class EditOrder extends Component
         $this->updatedShippingArea($this->shipping_area);
     }
 
+    public function updated($property): void
+    {
+        if (preg_match('/^selectedProducts\.([^\.]+)\.(price|retail_price)$/', (string) $property, $matches)) {
+            $productId = $matches[1];
+            $field = $matches[2];
+            $this->handleProductPriceUpdate($productId, $field);
+        }
+    }
+
+    public function handleProductPriceUpdate($productId, string $field = 'price'): void
+    {
+        if (! isset($this->selectedProducts[$productId])) {
+            return;
+        }
+
+        $rawPrice = $this->selectedProducts[$productId]['price'] ?? 0;
+        $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
+
+        $rawRetailPrice = $this->selectedProducts[$productId]['retail_price'] ?? $price;
+        $retailPrice = is_numeric($rawRetailPrice) ? (float) $rawRetailPrice : 0.0;
+
+        $quantity = (int) ($this->selectedProducts[$productId]['quantity'] ?? 1);
+
+        if (! (isOninda() && config('app.resell'))) {
+            if ($field === 'price') {
+                $this->selectedProducts[$productId]['retail_price'] = $price;
+                $retailPrice = $price;
+            } elseif ($field === 'retail_price') {
+                $this->selectedProducts[$productId]['price'] = $retailPrice;
+                $price = $retailPrice;
+            }
+        }
+
+        $this->selectedProducts[$productId]['total'] = $quantity * $price;
+
+        $this->updatedShippingArea($this->shipping_area);
+    }
+
+    public function removeProduct($id): void
+    {
+        if (isset($this->selectedProducts[$id])) {
+            unset($this->selectedProducts[$id]);
+            $this->updatedShippingArea($this->shipping_area);
+        }
+    }
+
     public function increaseQuantity($id): void
     {
         if (! isset($this->selectedProducts[$id])) {
             return;
         }
         $this->selectedProducts[$id]['quantity']++;
-        $this->selectedProducts[$id]['total'] = $this->selectedProducts[$id]['quantity'] * $this->selectedProducts[$id]['price'];
+        $price = (float) ($this->selectedProducts[$id]['price'] ?? 0);
+        $this->selectedProducts[$id]['total'] = $this->selectedProducts[$id]['quantity'] * $price;
 
         $this->updatedShippingArea($this->shipping_area);
     }
@@ -301,7 +370,8 @@ class EditOrder extends Component
         }
         if ($this->selectedProducts[$id]['quantity'] > 1) {
             $this->selectedProducts[$id]['quantity']--;
-            $this->selectedProducts[$id]['total'] = $this->selectedProducts[$id]['quantity'] * $this->selectedProducts[$id]['price'];
+            $price = (float) ($this->selectedProducts[$id]['price'] ?? 0);
+            $this->selectedProducts[$id]['total'] = $this->selectedProducts[$id]['quantity'] * $price;
         } else {
             unset($this->selectedProducts[$id]);
         }
@@ -329,6 +399,11 @@ class EditOrder extends Component
             $this->packaging_charge = $this->resolvePackagingCharge($this->selectedProducts);
             $this->updatedPackagingCharge($this->packaging_charge);
         }
+
+        $this->order->fill(['data' => array_merge($this->order->data, [
+            'subtotal' => $this->subtotal,
+            'shipping_cost' => $this->shipping_cost,
+        ])]);
     }
 
     public function updatedRetailDeliveryFee($value): void
@@ -344,6 +419,25 @@ class EditOrder extends Component
         $this->order->fill(['data' => array_merge($this->order->data, ['packaging_charge' => $value])]);
     }
 
+    public function updatedDiscount($value): void
+    {
+        $this->order->fill(['data' => array_merge($this->order->data, ['discount' => $value])]);
+        if (isOninda() && ! config('app.resell')) {
+            $this->retail_discount = $value;
+            $this->order->fill(['data' => array_merge($this->order->data, ['retail_discount' => $value])]);
+        }
+    }
+
+    public function updatedAdvanced($value): void
+    {
+        $this->order->fill(['data' => array_merge($this->order->data, ['advanced' => $value])]);
+    }
+
+    public function updatedShippingCost($value): void
+    {
+        $this->order->fill(['data' => array_merge($this->order->data, ['shipping_cost' => $value])]);
+    }
+
     public function updateOrder()
     {
         $this->validate();
@@ -356,13 +450,25 @@ class EditOrder extends Component
             return session()->flash('error', 'Please add products to the order.');
         }
 
+        foreach ($this->selectedProducts as $id => $product) {
+            if (! isset($product['price']) || ! is_numeric($product['price']) || (float) $product['price'] < 0) {
+                return session()->flash('error', 'Please enter a valid price for all products.');
+            }
+            if (isset($product['retail_price']) && (! is_numeric($product['retail_price']) || (float) $product['retail_price'] < 0)) {
+                return session()->flash('error', 'Please enter a valid retail price for all products.');
+            }
+        }
+
         if (isOninda() && ! config('app.resell')) {
             $this->retail_discount = $this->discount;
         }
 
+        $this->subtotal = $this->order->getSubtotal($this->selectedProducts);
+
         $this->order
             ->fill($this->only($this->attrs))
             ->fill(['data' => array_merge($this->only($this->meta), [
+                'subtotal' => $this->subtotal,
                 'purchase_cost' => $this->order->getPurchaseCost($this->selectedProducts),
             ])])
             ->fill(['products' => $this->selectedProducts]);
