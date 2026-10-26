@@ -271,18 +271,35 @@ class FacebookPixelService
     }
 
     /**
-     * Get a list of unique pixel IDs from setting('pixel_ids') for browser-side pixel tracking.
+     * Determine if at least one valid Meta Pixel ID is configured.
+     */
+    public function hasPixel(): bool
+    {
+        return count($this->getPixelIds()) > 0;
+    }
+
     /**
      * Get Meta Pixel CAPI configuration string from settings with fallback to env config.
      */
     public function getMetaPixelConfig(): string
     {
-        return (string) (setting('meta_pixel') ?: config('meta-pixel.meta_pixel', ''));
+        $raw = setting('meta_pixel');
+        if (empty($raw)) {
+            $raw = config('meta-pixel.meta_pixel', '');
+        }
+
+        // If configured as boolean true/1 flag, it is not a credentials string
+        if (is_bool($raw) || in_array((string) $raw, ['1', '0', 'true', 'false'], true)) {
+            return '';
+        }
+
+        return (string) $raw;
     }
 
     /**
-     * Get a list of unique pixel IDs from setting('pixel_ids') for browser-side pixel tracking.
-     * Parses space, comma, and newline separators.
+     * Get a list of unique, valid pixel IDs from setting('pixel_ids') and CAPI config for browser-side pixel tracking.
+     * Parses space, comma, newline, and pipe separators.
+     * Only returns valid numeric Meta Pixel IDs (6-20 digits).
      *
      * @return array<int, string>
      */
@@ -295,7 +312,7 @@ class FacebookPixelService
         if (! empty($rawSetting)) {
             $parsed = preg_split('/[\s\r\n,]+/', (string) $rawSetting);
             if ($parsed) {
-                $ids = array_merge($ids, array_filter(array_map('trim', $parsed)));
+                $ids = array_merge($ids, array_map('trim', $parsed));
             }
         }
 
@@ -313,7 +330,12 @@ class FacebookPixelService
             }
         }
 
-        return array_values(array_unique(array_filter($ids)));
+        // 3. Filter only valid numeric Meta Pixel IDs (digits only, at least 6 digits)
+        $validIds = array_filter($ids, function ($id) {
+            return is_string($id) && preg_match('/^\d{6,20}$/', trim($id));
+        });
+
+        return array_values(array_unique(array_map('trim', $validIds)));
     }
 
     /**

@@ -893,10 +893,13 @@
     @endif
     {{-- Expose tracking config and CSRF token to JavaScript --}}
     <script data-navigate-once>
+        @php
+            $yellowPixelIds = app(App\Services\FacebookPixelService::class)->getPixelIds();
+        @endphp
         window._csrfToken = '{{ csrf_token() }}';
         window.trackingConfig = {
-            pixelIds: {{ Js::from(app(App\Services\FacebookPixelService::class)->getPixelIds()) }},
-            pixelEnabled: {{ (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')) ? 'true' : 'false' }},
+            pixelIds: {{ Js::from($yellowPixelIds) }},
+            pixelEnabled: {{ count($yellowPixelIds) > 0 ? 'true' : 'false' }},
             advancedTracking: {{ config('meta-pixel.advanced_tracking') ? 'true' : 'false' }},
         };
         window.dataLayer = window.dataLayer || [];
@@ -1100,9 +1103,10 @@
 
                 window.trackingConfig.pixelIds.forEach(function(pixelId) {
                     var isInitialized = isPixelInitialized(pixelId);
-                    if (!isInitialized || hasUserData) {
+                    if (!isInitialized || (hasUserData && !initializedPixels[pixelId + '_userData'])) {
                         if (hasUserData) {
                             fbq('init', pixelId, userData);
+                            initializedPixels[pixelId + '_userData'] = true;
                         } else {
                             fbq('init', pixelId);
                         }

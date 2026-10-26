@@ -1,18 +1,7 @@
-@if ($metaPixel->isEnabled() || !empty(setting('pixel_ids')) || !empty(setting('meta_pixel')))
-    @php
-        $dbPixelIds = preg_split('/[\s\r\n,]+/', (string) setting('pixel_ids', '')) ?: [];
-        $rawPixelConfig = setting('meta_pixel') ?: config('meta-pixel.meta_pixel');
-        $configPixelIds = collect(preg_split('/[\r\n|]+/', (string) $rawPixelConfig))
-            ->map(fn($p) => explode(':', trim($p))[0])
-            ->filter()
-            ->all();
-
-        $metaPixelIds = collect(array_merge($dbPixelIds, $configPixelIds))
-            ->map(fn($id) => trim($id))
-            ->filter()
-            ->unique()
-            ->values();
-    @endphp
+@php
+    $metaPixelIds = app(\App\Services\FacebookPixelService::class)->getPixelIds();
+@endphp
+@if (count($metaPixelIds) > 0)
     <!-- Meta Pixel Code -->
     <script>
         ! function(f, b, e, v, n, t, s) {
@@ -33,13 +22,18 @@
             s.parentNode.insertBefore(t, s)
         }(window, document, 'script',
             'https://connect.facebook.net/en_US/fbevents.js');
+
+        window.initializedMetaPixels = window.initializedMetaPixels || {};
         @if($user = $metaPixel->getUser())
             @foreach ($metaPixelIds as $id)
                 fbq('init', '{{ $id }}', {{ Js::from($user) }});
+                window.initializedMetaPixels['{{ $id }}'] = true;
+                window.initializedMetaPixels['{{ $id }}_userData'] = true;
             @endforeach
         @else
             @foreach ($metaPixelIds as $id)
                 fbq('init', '{{ $id }}');
+                window.initializedMetaPixels['{{ $id }}'] = true;
             @endforeach
         @endif
     </script>

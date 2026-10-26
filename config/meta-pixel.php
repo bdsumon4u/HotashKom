@@ -1,7 +1,16 @@
 <?php
 
 return [
-    'meta_pixel' => env('META_PIXEL', ''),
+    'meta_pixel' => (function () {
+        $val = env('META_PIXEL', '');
+        if (is_bool($val) || in_array(strtolower((string) $val), ['true', 'false', '1', '0'], true)) {
+            return '';
+        }
+
+        return (string) $val;
+    })(),
+
+    'capi_enabled' => env('META_PIXEL_CAPI_ENABLED', env('META_PIXEL') === true || env('META_PIXEL') === 'true' || env('META_PIXEL') === '1'),
 
     /*
      * Enable advanced tracking: fire Lead at checkout, Purchase on confirm,

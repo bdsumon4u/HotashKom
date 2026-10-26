@@ -15,7 +15,7 @@
             </div>
         </div>
     </div>
-    @if(config('meta-pixel.meta_pixel') === true)
+    @if(config('meta-pixel.capi_enabled') || config('meta-pixel.meta_pixel') || setting('meta_pixel'))
     <div class="row">
         <div class="col-md-12">
             <div class="form-group">
