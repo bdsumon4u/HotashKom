@@ -279,6 +279,14 @@ class FacebookPixelService
     }
 
     /**
+     * Get configured tracking currency (defaults to BDT).
+     */
+    public function getCurrency(): string
+    {
+        return (string) config('meta-pixel.currency', 'BDT');
+    }
+
+    /**
      * Get Meta Pixel CAPI configuration string from settings with fallback to env config.
      */
     public function getMetaPixelConfig(): string
@@ -417,7 +425,7 @@ class FacebookPixelService
             if (isset($customData['value'])) {
                 $customData['value'] = (float) $customData['value'];
                 if (empty($customData['currency'])) {
-                    $customData['currency'] = 'BDT';
+                    $customData['currency'] = $this->getCurrency();
                 }
             }
 
@@ -469,7 +477,7 @@ class FacebookPixelService
             ]);
 
             $customData = [
-                'currency' => 'BDT',
+                'currency' => $this->getCurrency(),
                 'value' => $product->selling_price,
                 'content_ids' => [$product->id],
                 'content_name' => $product->name,
@@ -505,7 +513,7 @@ class FacebookPixelService
     {
         try {
             $cartItems = cart()->content();
-            $cartTotal = cart()->subTotal();
+            $cartTotal = (float) str_replace(',', '', (string) cart()->subTotal());
             $contentIds = $cartItems->pluck('id')->values()->all();
 
             $eventId = $this->generateEventId('InitiateCheckout', [], [
@@ -514,10 +522,10 @@ class FacebookPixelService
             ]);
 
             $customData = [
-                'currency' => 'BDT',
+                'currency' => $this->getCurrency(),
                 'value' => $cartTotal,
                 'content_ids' => array_map('strval', $contentIds),
-                'num_items' => $cartItems->sum('qty'),
+                'num_items' => (int) $cartItems->sum('qty'),
                 'content_type' => 'product',
             ];
 
@@ -526,8 +534,8 @@ class FacebookPixelService
             $dataLayerItems = $cartItems->map(fn ($item): array => [
                 'item_id' => (string) $item->id,
                 'item_name' => $item->name,
-                'price' => $item->price,
-                'quantity' => $item->qty,
+                'price' => (float) $item->price,
+                'quantity' => (int) $item->qty,
             ])->values()->all();
 
             session()->flash('datalayer_events', array_merge(
@@ -538,7 +546,7 @@ class FacebookPixelService
                     'meta_event_id' => $eventId,
                     'meta_event_data' => $customData,
                     'ecommerce' => [
-                        'currency' => 'BDT',
+                        'currency' => $this->getCurrency(),
                         'value' => $cartTotal,
                         'items' => $dataLayerItems,
                     ],
@@ -575,12 +583,13 @@ class FacebookPixelService
     public function trackAddToCart(array $product, ?Component $component = null, array $tracking = []): void
     {
         $this->trackEvent('AddToCart', [
-            'currency' => 'BDT',
-            'value' => $product['price'],
-            'content_ids' => [$product['id']],
-            'content_name' => $product['name'],
-            'quantity' => 1,
-            'page_url' => $product['page_url'],
+            'currency' => $this->getCurrency(),
+            'value' => (float) ($product['price'] ?? 0),
+            'content_ids' => array_map('strval', (array) ($product['id'] ?? [])),
+            'content_name' => $product['name'] ?? '',
+            'content_type' => 'product',
+            'quantity' => (int) ($product['quantity'] ?? 1),
+            'page_url' => $product['page_url'] ?? null,
         ], [], $component, $tracking);
     }
 
@@ -596,7 +605,7 @@ class FacebookPixelService
     {
         $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('Lead', [
-            'currency' => 'BDT',
+            'currency' => $this->getCurrency(),
             'value' => $order['total'],
             'content_ids' => array_column($products, 'id'),
             'content_name' => 'Lead',
@@ -617,7 +626,7 @@ class FacebookPixelService
     {
         $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('Purchase', [
-            'currency' => 'BDT',
+            'currency' => $this->getCurrency(),
             'value' => $order['total'],
             'content_ids' => array_column($products, 'id'),
             'content_name' => 'Purchase',
@@ -653,7 +662,7 @@ class FacebookPixelService
     {
         $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('OrderCancelled', [
-            'currency' => 'BDT',
+            'currency' => $this->getCurrency(),
             'value' => $order['total'],
             'content_ids' => array_column($products, 'id'),
             'content_name' => 'OrderCancelled',
@@ -674,7 +683,7 @@ class FacebookPixelService
     {
         $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('OrderReturned', [
-            'currency' => 'BDT',
+            'currency' => $this->getCurrency(),
             'value' => $order['total'],
             'content_ids' => array_column($products, 'id'),
             'content_name' => 'OrderReturned',
@@ -695,7 +704,7 @@ class FacebookPixelService
     {
         $this->enrichUserDataForOrder($order['id'] ?? 0, $userData);
         $this->trackEvent('OrderDelivered', [
-            'currency' => 'BDT',
+            'currency' => $this->getCurrency(),
             'value' => $order['total'],
             'content_ids' => array_column($products, 'id'),
             'content_name' => 'OrderDelivered',

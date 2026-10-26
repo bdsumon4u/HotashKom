@@ -33,23 +33,43 @@ if (window.hasInitializedFacebookEvents) {
         tracking: tracking
     });
 
+    // Deduplicate event by eventId if provided
+    window.trackedFacebookEvents = window.trackedFacebookEvents || {};
+    if (eventId && window.trackedFacebookEvents[eventId]) {
+        console.log('[Meta Pixel] Skipping duplicate event with ID:', eventId);
+        return;
+    }
+    if (eventId) {
+        window.trackedFacebookEvents[eventId] = true;
+    }
+
+    // Ensure customData value is numeric
+    if (customData && typeof customData.value !== 'undefined') {
+        customData.value = Number(customData.value) || 0;
+    }
+
     // Read fbp/fbc from cookies if not already sent from server
     var fbp = tracking.fbp || getCookie('_fbp') || '';
     var fbc = tracking.fbc || getCookie('_fbc') || buildFbcFromUrl() || '';
 
-    // Re-initialize fbq matching parameters dynamically if updated matching data is received
+    // Re-initialize fbq matching parameters dynamically ONLY IF updated matching data has actually changed
     var hasUserData = userData && (Array.isArray(userData) ? userData.length > 0 : Object.keys(userData).length > 0);
     if (hasUserData) {
-        if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelIds && window.trackingConfig.pixelIds.length > 0) {
-            window.trackingConfig.pixelIds.forEach(function (pixelId) {
-                console.log('[Meta Pixel] Re-initializing fbq for pixel:', pixelId, 'with new userData:', userData);
-                fbq('init', pixelId, userData);
-            });
-        } else {
-            console.warn('[Meta Pixel] Attempted to re-initialize fbq with userData but fbq or window.trackingConfig.pixelIds is missing', {
-                fbqExists: typeof fbq === 'function',
-                pixelConfig: window.trackingConfig
-            });
+        var prevUserDataStr = JSON.stringify(window.lastFbqUserData || {});
+        var newUserDataStr = JSON.stringify(userData);
+        if (newUserDataStr !== prevUserDataStr && newUserDataStr !== '{}') {
+            if (typeof fbq === 'function' && window.trackingConfig && window.trackingConfig.pixelIds && window.trackingConfig.pixelIds.length > 0) {
+                window.trackingConfig.pixelIds.forEach(function (pixelId) {
+                    console.log('[Meta Pixel] Updating fbq advanced matching for pixel:', pixelId, 'with new userData:', userData);
+                    fbq('init', pixelId, userData);
+                });
+                window.lastFbqUserData = userData;
+            } else {
+                console.warn('[Meta Pixel] Attempted to re-initialize fbq with userData but fbq or window.trackingConfig.pixelIds is missing', {
+                    fbqExists: typeof fbq === 'function',
+                    pixelConfig: window.trackingConfig
+                });
+            }
         }
     }
 
@@ -64,7 +84,7 @@ if (window.hasInitializedFacebookEvents) {
         meta_fbp: fbp,
         meta_fbc: fbc,
         ecommerce: {
-            currency: customData.currency || 'BDT',
+            currency: customData.currency || (window.trackingConfig && window.trackingConfig.currency) || 'BDT',
             value: customData.value || 0,
             transaction_id: customData.transaction_id || customData.order_id || undefined,
             items: (customData.content_ids || []).map(function (id) {

@@ -1,5 +1,7 @@
 @php
-    $metaPixelIds = app(\App\Services\FacebookPixelService::class)->getPixelIds();
+    $metaPixelService = app(\App\Services\FacebookPixelService::class);
+    $metaPixelIds = $metaPixelService->getPixelIds();
+    $userData = $metaPixel->getUser() ?: $metaPixelService->getNormalizedUserData();
 @endphp
 @if (count($metaPixelIds) > 0)
     <!-- Meta Pixel Code -->
@@ -24,9 +26,10 @@
             'https://connect.facebook.net/en_US/fbevents.js');
 
         window.initializedMetaPixels = window.initializedMetaPixels || {};
-        @if($user = $metaPixel->getUser())
+        window.lastFbqUserData = @json($userData ?: []);
+        @if(!empty($userData))
             @foreach ($metaPixelIds as $id)
-                fbq('init', '{{ $id }}', {{ Js::from($user) }});
+                fbq('init', '{{ $id }}', {{ Js::from($userData) }});
                 window.initializedMetaPixels['{{ $id }}'] = true;
                 window.initializedMetaPixels['{{ $id }}_userData'] = true;
             @endforeach

@@ -12,6 +12,8 @@ return [
 
     'capi_enabled' => env('META_PIXEL_CAPI_ENABLED', env('META_PIXEL') === true || env('META_PIXEL') === 'true' || env('META_PIXEL') === '1'),
 
+    'currency' => env('META_PIXEL_CURRENCY', 'BDT'),
+
     /*
      * Enable advanced tracking: fire Lead at checkout, Purchase on confirm,
      * and custom events for cancelled/returned orders.

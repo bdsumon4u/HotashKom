@@ -782,10 +782,10 @@
     @if (!empty($trackingDetails) && (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')))
         @php
             $jsItems = array_map(fn($p) => [
-                'item_id' => $p['item_id'],
-                'item_name' => $p['item_name'],
-                'price' => $p['price'],
-                'quantity' => $p['quantity']
+                'item_id' => (string) $p['item_id'],
+                'item_name' => (string) $p['item_name'],
+                'price' => (float) $p['price'],
+                'quantity' => (int) $p['quantity']
             ], $trackingDetails['dataLayerItems']);
         @endphp
         <script>
@@ -793,6 +793,17 @@
                 var eventName = 'InitiateCheckout';
                 var eventId = @json($trackingDetails['event_id']);
                 var eventData = @json($trackingDetails['custom_data']);
+
+                // Prevent duplicate tracking if the component or page re-renders
+                window.trackedInitiateCheckoutEvents = window.trackedInitiateCheckoutEvents || {};
+                if (window.trackedInitiateCheckoutEvents[eventId]) {
+                    return;
+                }
+                window.trackedInitiateCheckoutEvents[eventId] = true;
+
+                if (eventData && typeof eventData.value !== 'undefined') {
+                    eventData.value = parseFloat(eventData.value) || 0;
+                }
 
                 // 1. Push to dataLayer (standard and custom events)
                 window.dataLayer = window.dataLayer || [];
@@ -802,8 +813,8 @@
                     meta_event_id: eventId,
                     meta_event_data: eventData,
                     ecommerce: {
-                        currency: 'BDT',
-                        value: eventData.value,
+                        currency: '{{ app(\App\Services\FacebookPixelService::class)->getCurrency() }}',
+                        value: eventData ? eventData.value : 0,
                         items: @json($jsItems)
                     }
                 });

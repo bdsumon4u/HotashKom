@@ -901,6 +901,7 @@
             pixelIds: {{ Js::from($yellowPixelIds) }},
             pixelEnabled: {{ count($yellowPixelIds) > 0 ? 'true' : 'false' }},
             advancedTracking: {{ config('meta-pixel.advanced_tracking') ? 'true' : 'false' }},
+            currency: '{{ app(App\Services\FacebookPixelService::class)->getCurrency() }}',
         };
         window.dataLayer = window.dataLayer || [];
     </script>
@@ -1101,18 +1102,25 @@
                     return false;
                 }
 
+                var prevUserDataStr = JSON.stringify(window.lastFbqUserData || {});
+                var newUserDataStr = JSON.stringify(userData || {});
+                var userDataChanged = hasUserData && newUserDataStr !== prevUserDataStr && newUserDataStr !== '{}';
+
                 window.trackingConfig.pixelIds.forEach(function(pixelId) {
                     var isInitialized = isPixelInitialized(pixelId);
-                    if (!isInitialized || (hasUserData && !initializedPixels[pixelId + '_userData'])) {
+                    if (!isInitialized || userDataChanged) {
                         if (hasUserData) {
                             fbq('init', pixelId, userData);
                             initializedPixels[pixelId + '_userData'] = true;
-                        } else {
+                        } else if (!isInitialized) {
                             fbq('init', pixelId);
                         }
                         initializedPixels[pixelId] = true;
                     }
                 });
+                if (hasUserData) {
+                    window.lastFbqUserData = userData;
+                }
                 window.initializedMetaPixels = initializedPixels;
             }
         })();
