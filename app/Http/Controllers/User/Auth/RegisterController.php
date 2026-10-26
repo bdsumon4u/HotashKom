@@ -95,6 +95,10 @@ class RegisterController extends Controller
             return redirect('/');
         }
 
+        if (request()->filled('ref')) {
+            session(['ref' => request('ref')]);
+        }
+
         return view('user.auth.register');
     }
 

@@ -86,7 +86,8 @@ class ResellerController extends Controller
 
         $dataTable = $dataTable->addColumn('actions', function ($row) use ($isPendingView) {
             $actions = '<div class="btn-group">';
-            $actions .= '<a href="'.route('admin.resellers.edit', $row->id).'" class="btn btn-sm btn-primary"><i class="fa fa-edit"></i></a>';
+            $actions .= '<a href="'.route('admin.resellers.edit', $row->id).'" class="btn btn-sm btn-primary" title="Edit Profile"><i class="fa fa-edit"></i></a>';
+            $actions .= '<a href="'.route('admin.resellers.affiliate', $row->id).'" class="btn btn-sm btn-info" title="Affiliate Network"><i class="fa fa-users"></i></a>';
 
             if (! $isPendingView) {
                 $actions .= '<button type="button" class="btn btn-sm'.($row->is_verified ? ' btn-danger' : ' btn-success').' toggle-verify" data-id="'.$row->id.'" data-verified="'.$row->is_verified.'"><i class="fa'.($row->is_verified ? ' fa-times' : ' fa-check').'"></i></button>';

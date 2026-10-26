@@ -100,6 +100,7 @@ Route::middleware([GoogleTagManagerMiddleware::class, MetaPixelMiddleware::class
                 Route::get('orders/{order}/edit', [ResellerController::class, 'editOrder'])->name('orders.edit');
                 Route::post('orders/{order}/cancel', [ResellerController::class, 'cancelOrder'])->name('orders.cancel');
                 Route::get('transactions', [ResellerController::class, 'transactions'])->name('transactions');
+                Route::get('affiliate', [ResellerController::class, 'affiliate'])->name('affiliate');
                 Route::match(['GET', 'POST'], 'checkout', [ResellerController::class, 'checkout'])
                     ->name('checkout')
                     ->middleware('doNotCacheResponse');

@@ -61,6 +61,14 @@
                     </li>
 
                     <li>
+                        <a class="nav-link menu-title link-nav {{ request()->is('reseller/affiliate*') ? 'active' : '' }}"
+                            href="{{ route('reseller.affiliate') }}">
+                            <i data-feather="users"> </i>
+                            <span>Affiliate Network</span>
+                        </a>
+                    </li>
+
+                    <li>
                         <a class="nav-link menu-title link-nav {{ request()->is('reseller/profile*') ? 'active' : '' }}"
                             href="{{ route('reseller.profile') }}">
                             <i data-feather="user"> </i>

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\AffiliateCommission;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ResellerAffiliate;
+use App\Services\AffiliateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +18,7 @@ use Illuminate\Validation\Rule;
 
 final class ResellerController extends Controller
 {
-    public function dashboard()
+    public function dashboard(AffiliateService $affiliateService)
     {
         $user = Auth::guard('user')->user();
 
@@ -35,12 +38,88 @@ final class ResellerController extends Controller
             ->take(5)
             ->get();
 
+        $affiliate = $user->affiliate ?? $affiliateService->ensureAffiliateProfile($user);
+        $referralLink = route('user.register', ['ref' => $affiliate->referral_code]);
+
         return view('reseller.dashboard', compact(
             'totalOrders',
             'totalSales',
             'availableBalance',
             'recentOrders',
-            'recentTransactions'
+            'recentTransactions',
+            'affiliate',
+            'referralLink'
+        ));
+    }
+
+    public function affiliate(Request $request, AffiliateService $affiliateService)
+    {
+        $user = Auth::guard('user')->user();
+        $affiliate = $user->affiliate ?? $affiliateService->ensureAffiliateProfile($user);
+        $referralLink = route('user.register', ['ref' => $affiliate->referral_code]);
+
+        $query = ResellerAffiliate::with('user')
+            ->where('referrer_id', $user->id)
+            ->latest('id');
+
+        if ($request->filled('leg') && in_array($request->leg, ['left', 'right'])) {
+            $query->where('direct_leg', $request->leg);
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'verified') {
+                $query->whereNotNull('verified_at');
+            } elseif ($request->status === 'pending') {
+                $query->whereNull('verified_at');
+            }
+        }
+
+        $directReferrals = $query->paginate(15)->withQueryString();
+
+        $directTotal = ResellerAffiliate::where('referrer_id', $user->id)->count();
+        $directVerified = ResellerAffiliate::where('referrer_id', $user->id)->whereNotNull('verified_at')->count();
+        $directPending = ResellerAffiliate::where('referrer_id', $user->id)->whereNull('verified_at')->count();
+
+        $commissions = AffiliateCommission::with('triggeredBy')
+            ->where('user_id', $user->id)
+            ->latest('id')
+            ->get();
+        $totalCommissionEarned = $commissions->sum('amount');
+
+        $tiersConfig = config('affiliate.tiers', []);
+        $pairsCount = min($affiliate->left_total, $affiliate->right_total);
+        $verificationFee = (float) config('app.verification_fee', 1000);
+
+        $tiersProgress = [];
+        foreach ($tiersConfig as $x => $tier) {
+            $awarded = $commissions->firstWhere('milestone_x', $x);
+            $baseAmount = 2 * $x * $verificationFee;
+            $potentialCommission = ($tier['percentage'] / 100) * $baseAmount;
+
+            $tiersProgress[] = [
+                'milestone_x' => $x,
+                'percentage' => $tier['percentage'],
+                'base_amount' => $baseAmount,
+                'commission' => $potentialCommission,
+                'is_awarded' => ! is_null($awarded),
+                'awarded_at' => $awarded?->created_at,
+                'awarded_amount' => $awarded?->amount,
+                'progress_percent' => min(100, round(($pairsCount / $x) * 100)),
+            ];
+        }
+
+        return view('reseller.affiliate', compact(
+            'user',
+            'affiliate',
+            'referralLink',
+            'directReferrals',
+            'directTotal',
+            'directVerified',
+            'directPending',
+            'commissions',
+            'totalCommissionEarned',
+            'tiersProgress',
+            'pairsCount'
         ));
     }
 

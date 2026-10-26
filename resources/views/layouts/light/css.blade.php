@@ -175,4 +175,23 @@
         max-width: 100% !important;
         box-sizing: border-box !important;
     }
+
+    /* Fix Collapsed Sidebar Badges and Icon Alignment */
+    .page-wrapper.compact-wrapper .page-body-wrapper.sidebar-icon header.main-nav.close_icon .badge,
+    .page-wrapper.compact-wrapper header.main-nav.close_icon .badge,
+    header.main-nav.close_icon .badge {
+        display: none !important;
+    }
+    .page-wrapper.compact-wrapper .page-body-wrapper.sidebar-icon header.main-nav.close_icon .nav-menu > li > a.d-flex svg,
+    header.main-nav.close_icon .nav-menu > li > a.d-flex svg {
+        margin-left: auto !important;
+        margin-right: 0 !important;
+    }
+
+    /* Affiliate Network Leg Headers */
+    .leg-header-left h1, .leg-header-left h2, .leg-header-left h3, .leg-header-left h4, .leg-header-left h5, .leg-header-left h6, .leg-header-left strong,
+    .leg-header-right h1, .leg-header-right h2, .leg-header-right h3, .leg-header-right h4, .leg-header-right h5, .leg-header-right h6, .leg-header-right strong {
+        color: #ffffff !important;
+    }
 </style>
+

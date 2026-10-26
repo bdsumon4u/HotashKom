@@ -15,10 +15,32 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
-                    <div class="p-3 card-header">
-                        <h5>Edit Reseller Information</h5>
+                    <div class="p-3 card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Edit Reseller Information</h5>
+                        <div>
+                            <a href="{{ route('admin.resellers.affiliate', $reseller->id) }}" class="btn btn-info btn-sm">
+                                <i class="fa fa-users mr-1"></i> View Affiliate Network
+                            </a>
+                            <a href="{{ route('admin.orders.index', ['user_id' => $reseller->id, 'status' => '']) }}" class="btn btn-outline-primary btn-sm ml-1">
+                                <i class="fa fa-shopping-bag mr-1"></i> Orders
+                            </a>
+                        </div>
                     </div>
                     <div class="p-3 card-body">
+                        @if ($reseller->affiliate)
+                            <div class="alert alert-light border border-info p-3 mb-3 d-flex flex-wrap align-items-center justify-content-between">
+                                <div>
+                                    <strong class="text-info"><i class="fa fa-share-alt mr-1"></i> Affiliate Info:</strong>
+                                    <span class="ml-2 mr-3">Referral Code: <strong>{{ $reseller->affiliate->referral_code }}</strong></span>
+                                    <span class="mr-3">Referrer: <strong>{{ $reseller->affiliate->referrer?->name ?? 'Root Node' }}</strong></span>
+                                    <span class="badge badge-primary mr-1">Left: {{ $reseller->affiliate->left_total }}</span>
+                                    <span class="badge badge-success">Right: {{ $reseller->affiliate->right_total }}</span>
+                                </div>
+                                <a href="{{ route('admin.resellers.affiliate', $reseller->id) }}" class="btn btn-link btn-sm text-info p-0 font-weight-bold">
+                                    Open Affiliate Dashboard &rarr;
+                                </a>
+                            </div>
+                        @endif
                         <form method="POST" action="{{ route('admin.resellers.update', $reseller->id) }}">
                             @csrf
                             @method('PUT')

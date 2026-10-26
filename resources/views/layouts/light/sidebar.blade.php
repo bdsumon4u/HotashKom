@@ -49,7 +49,7 @@
                                 });
                             @endphp
                             <span
-                                class="ml-auto text-white d-flex badge badge-primary align-items-center">{{ $count }}</span>
+                                class="ml-auto text-white badge badge-primary">{{ $count }}</span>
                         </a>
                     </li>
 
@@ -72,7 +72,7 @@
                                 });
                             @endphp
                             <span
-                                class="ml-auto text-white d-flex badge badge-primary pending-count align-items-center">{{ $count }}</span>
+                                class="ml-auto text-white badge badge-primary pending-count">{{ $count }}</span>
                         </a>
                     </li>
 
@@ -90,7 +90,7 @@
                             <i data-feather="layers"> </i>
                             <span>Landing Page</span>
                             <span
-                                class="ml-auto text-white d-flex badge badge-primary align-items-center">Pro</span>
+                                class="ml-auto text-white badge badge-primary">Pro</span>
                         </a>
                     </li>
 
@@ -250,7 +250,7 @@
                                 );
                             @endphp
                             @if ($investorPendingAmount > 0)
-                                <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
+                                <span class="ml-auto text-white badge badge-warning">
                                     {{ number_format($investorPendingAmount, 0) }} tk
                                 </span>
                             @endif
@@ -378,7 +378,7 @@
                                 <span>Leads</span>
                             </span>
                             @if ($todayLeadCount > 0)
-                                <span class="ml-auto text-white d-flex badge badge-primary align-items-center">
+                                <span class="ml-auto text-white badge badge-primary">
                                     {{ $todayLeadCount }}
                                 </span>
                             @endif
@@ -417,7 +417,7 @@
                                         $pendingResellersCount = \App\Models\User::where('is_verified', false)->count();
                                     @endphp
                                     @if ($pendingResellersCount > 0)
-                                        <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
+                                        <span class="ml-auto text-white badge badge-warning">
                                             {{ $pendingResellersCount }}
                                         </span>
                                     @endif
@@ -444,7 +444,7 @@
                                         );
                                     @endphp
                                     @if ($pendingAmount > 0)
-                                        <span class="ml-auto text-white d-flex badge badge-warning align-items-center">
+                                        <span class="ml-auto text-white badge badge-warning">
                                             {{ number_format($pendingAmount, 0) }} tk
                                         </span>
                                     @endif

@@ -37,9 +37,43 @@
                             </div>
                         @endif
 
+                        @php $user = auth('user')->user(); @endphp
+
+                        @if ($user->is_verified && $user->affiliate)
+                            <div class="alert alert-light border border-primary p-3 mb-4 rounded">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0 text-primary font-weight-bold"><i class="fa fa-share-alt mr-1"></i> Your Referral Code & Link</h6>
+                                    <a href="{{ route('reseller.affiliate') }}" class="btn btn-outline-primary btn-sm">View Affiliate Stats &rarr;</a>
+                                </div>
+                                <div class="row align-items-center">
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <small class="text-muted font-weight-bold">Referral Code:</small>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" readonly class="form-control font-weight-bold text-primary" value="{{ $user->affiliate->referral_code }}">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="button" onclick="navigator.clipboard.writeText('{{ $user->affiliate->referral_code }}'); alert('Referral code copied!');">
+                                                    <i class="fa fa-copy"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <small class="text-muted font-weight-bold">Referral Link:</small>
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" readonly class="form-control" value="{{ route('user.register', ['ref' => $user->affiliate->referral_code]) }}">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="button" onclick="navigator.clipboard.writeText('{{ route('user.register', ['ref' => $user->affiliate->referral_code]) }}'); alert('Referral link copied!');">
+                                                    <i class="fa fa-copy mr-1"></i> Copy Link
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                         <form method="POST" action="{{ route('reseller.profile.update') }}" enctype="multipart/form-data">
                             @csrf
-                            @php $user = auth()->user(); @endphp
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">

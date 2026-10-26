@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Jobs\PropagateReferralVerification;
 use App\Notifications\User\ResetPassword;
 use App\Notifications\User\VerifyEmail;
+use App\Services\AffiliateService;
 use Bavix\Wallet\Interfaces\Confirmable;
 use Bavix\Wallet\Interfaces\Wallet;
 use Bavix\Wallet\Traits\CanConfirm;
 use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
@@ -20,6 +24,8 @@ class User extends Authenticatable implements Confirmable, Wallet
     use CanConfirm;
     use HasWallet;
     use Notifiable;
+
+    public ?string $referral_code_input = null;
 
     /**
      * The attributes that are mass assignable.
@@ -46,13 +52,32 @@ class User extends Authenticatable implements Confirmable, Wallet
     #[\Override]
     public static function booted(): void
     {
+        static::created(function (User $user): void {
+            $refCode = $user->referral_code_input ?? request()?->input('ref') ?? session('ref');
+            app(AffiliateService::class)->ensureAffiliateProfile($user, $refCode);
+        });
+
         static::updated(function (User $user): void {
             if (Arr::get($user->getChanges(), 'is_verified')) {
                 $user->deposit(0, [
                     'reason' => 'Verify Reseller Account',
                 ]);
+
+                if ($user->is_verified) {
+                    PropagateReferralVerification::dispatch($user->id);
+                }
             }
         });
+    }
+
+    public function affiliate(): HasOne
+    {
+        return $this->hasOne(ResellerAffiliate::class, 'user_id');
+    }
+
+    public function affiliateCommissions(): HasMany
+    {
+        return $this->hasMany(AffiliateCommission::class, 'user_id');
     }
 
     /**

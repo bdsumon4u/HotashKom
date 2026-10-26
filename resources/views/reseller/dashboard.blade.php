@@ -62,6 +62,64 @@
 @section('content')
     <div class="mb-5 container-fluid">
         <x-reseller-verification-alert />
+
+        @if (auth('user')->user()->is_verified && isset($affiliate))
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%); border-left: 5px solid #0062cc !important;">
+                        <div class="card-body p-3 p-md-4">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+                                <div>
+                                    <h5 class="mb-1 text-primary font-weight-bold">
+                                        <i class="fa fa-share-alt mr-2"></i> Your Affiliate Referral Code & Link
+                                    </h5>
+                                    <span class="text-muted small">Share your unique link to refer new resellers. Direct referrals alternate between your Left & Right legs.</span>
+                                </div>
+                                <a href="{{ route('reseller.affiliate') }}" class="btn btn-primary btn-sm mt-2 mt-md-0 shadow-sm">
+                                    <i class="fa fa-users mr-1"></i> View Affiliate Network &rarr;
+                                </a>
+                            </div>
+
+                            <div class="row align-items-center">
+                                <div class="col-lg-3 col-md-4 mb-2 mb-md-0">
+                                    <label class="small text-muted font-weight-bold mb-1">Your Referral Code</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control font-weight-bold bg-white text-primary text-center" readonly value="{{ $affiliate->referral_code }}" id="dashboardRefCode">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-primary" type="button" onclick="navigator.clipboard.writeText('{{ $affiliate->referral_code }}'); alert('Referral code copied: {{ $affiliate->referral_code }}');">
+                                                <i class="fa fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-5 mb-2 mb-md-0">
+                                    <label class="small text-muted font-weight-bold mb-1">Your Referral Registration Link</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-white" readonly value="{{ $referralLink }}" id="dashboardRefLink">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button" onclick="navigator.clipboard.writeText('{{ $referralLink }}'); alert('Referral link copied to clipboard!');">
+                                                <i class="fa fa-copy mr-1"></i> Copy Link
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-3 text-md-right mt-2 mt-md-0">
+                                    <label class="small text-muted font-weight-bold mb-1 d-block">Network Sub-totals</label>
+                                    <span class="badge badge-primary px-2 py-1 font-roboto f-12 mr-1">
+                                        <i class="fa fa-arrow-left mr-1"></i> Left: {{ $affiliate->left_total }}
+                                    </span>
+                                    <span class="badge badge-success px-2 py-1 font-roboto f-12">
+                                        Right: {{ $affiliate->right_total }} <i class="fa fa-arrow-right ml-1"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="row size-column">
             <div class="col-xl-7 box-col-12 xl-100">
                 <div class="row dash-chart">
