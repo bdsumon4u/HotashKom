@@ -27,12 +27,18 @@ class AffiliateService
      */
     public function ensureAffiliateProfile(User $user, ?string $referralCode = null): ResellerAffiliate
     {
-        $referralCode = $referralCode ?: (request()?->input('ref') ?: session('ref'));
+        if ($referralCode === null) {
+            if (request()?->has('referral_code')) {
+                $referralCode = request()?->input('referral_code');
+            } else {
+                $referralCode = request()?->input('ref') ?: session('ref');
+            }
+        }
 
         $existing = ResellerAffiliate::where('user_id', $user->id)->first();
         if ($existing) {
             if (! empty($referralCode) && ! $existing->referrer_id) {
-                $referrerAffiliate = ResellerAffiliate::where('referral_code', trim($referralCode))->first();
+                $referrerAffiliate = ResellerAffiliate::where('referral_code', strtoupper(trim($referralCode)))->first();
                 if ($referrerAffiliate && $referrerAffiliate->user_id !== $user->id) {
                     $existing->update(['referrer_id' => $referrerAffiliate->user_id]);
                     $existing->refresh();
@@ -44,7 +50,7 @@ class AffiliateService
 
         $referrerId = null;
         if (! empty($referralCode)) {
-            $referrerAffiliate = ResellerAffiliate::where('referral_code', trim($referralCode))->first();
+            $referrerAffiliate = ResellerAffiliate::where('referral_code', strtoupper(trim($referralCode)))->first();
             if ($referrerAffiliate && $referrerAffiliate->user_id !== $user->id) {
                 $referrerId = $referrerAffiliate->user_id;
             }

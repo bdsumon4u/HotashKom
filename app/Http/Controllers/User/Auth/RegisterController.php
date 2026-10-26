@@ -53,6 +53,10 @@ class RegisterController extends Controller
     {
         $this->prefixCountryCode($data);
 
+        if (! empty($data['referral_code'])) {
+            $data['referral_code'] = strtoupper(trim($data['referral_code']));
+        }
+
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'shop_name' => ['required', 'string', 'max:255'],
@@ -60,6 +64,9 @@ class RegisterController extends Controller
             'phone_number' => ['required', 'string', 'regex:/^\+8801\d{9}$/', 'unique:users'],
             'bkash_number' => ['required', 'string', 'regex:/^\+8801\d{9}$/', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'referral_code' => ['nullable', 'string', 'max:50', 'exists:reseller_affiliates,referral_code'],
+        ], [
+            'referral_code.exists' => 'The provided referral code is invalid.',
         ]);
     }
 
@@ -72,9 +79,11 @@ class RegisterController extends Controller
     {
         $this->prefixCountryCode($data);
 
-        // dd($data);
+        $referralCode = ! empty($data['referral_code'])
+            ? strtoupper(trim($data['referral_code']))
+            : null;
 
-        return User::create([
+        $user = new User([
             'name' => $data['name'],
             'shop_name' => $data['shop_name'],
             'email' => $data['email'],
@@ -82,6 +91,18 @@ class RegisterController extends Controller
             'bkash_number' => $data['bkash_number'],
             'password' => Hash::make($data['password']),
         ]);
+
+        if ($referralCode) {
+            $user->referral_code_input = $referralCode;
+            session()->forget('ref');
+        } elseif (array_key_exists('referral_code', $data)) {
+            $user->referral_code_input = '';
+            session()->forget('ref');
+        }
+
+        $user->save();
+
+        return $user;
     }
 
     /**
@@ -95,8 +116,9 @@ class RegisterController extends Controller
             return redirect('/');
         }
 
-        if (request()->filled('ref')) {
-            session(['ref' => request('ref')]);
+        $ref = request('ref') ?? request('referral_code');
+        if (! empty($ref)) {
+            session(['ref' => $ref]);
         }
 
         return view('user.auth.register');

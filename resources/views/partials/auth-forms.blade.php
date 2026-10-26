@@ -186,6 +186,22 @@
                                         </div>
                                     </div>
 
+                                    <div class="form-group">
+                                        <label for="modal_referral_code">Referral Code <span class="text-muted font-weight-normal">(Optional)</span></label>
+                                        <input id="modal_referral_code" type="text"
+                                               class="form-control @error('referral_code') is-invalid @enderror"
+                                               name="referral_code"
+                                               value="{{ old('referral_code', request('ref', request('referral_code', session('ref')))) }}"
+                                               autocomplete="off"
+                                               placeholder="e.g. HK123456">
+                                        <small class="form-text text-muted">If you were invited by another reseller, enter their referral code.</small>
+                                        @error('referral_code')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+
                                     <button type="submit" class="btn btn-block"
                                             style="background: #ffb200; color: #fff; font-weight: bold;">
                                         {{ __('Register') }}

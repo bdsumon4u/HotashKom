@@ -112,6 +112,23 @@
                                             placeholder="Confirm your password">
                                     </div>
                                 </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-12">
+                                        <label for="referral_code">Referral Code <span class="text-muted font-weight-normal">(Optional)</span></label>
+                                        <input id="referral_code" type="text"
+                                            class="form-control @error('referral_code') is-invalid @enderror"
+                                            name="referral_code"
+                                            value="{{ old('referral_code', request('ref', request('referral_code', session('ref')))) }}"
+                                            autocomplete="off"
+                                            placeholder="e.g. HK123456">
+                                        <small class="form-text text-muted">If you were invited by another reseller, enter their referral code.</small>
+                                        @error('referral_code')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </div>
+                                </div>
                                 <button type="submit" class="mt-3 btn btn-block"
                                     style="background: #ffb200; color: #fff; font-weight: bold;">
                                     {{ __('Register') }}

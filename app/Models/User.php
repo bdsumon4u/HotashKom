@@ -53,8 +53,15 @@ class User extends Authenticatable implements Confirmable, Wallet
     public static function booted(): void
     {
         static::created(function (User $user): void {
-            $refCode = $user->referral_code_input ?? request()?->input('ref') ?? session('ref');
-            app(AffiliateService::class)->ensureAffiliateProfile($user, $refCode);
+            $refCode = $user->referral_code_input;
+            if ($refCode === null) {
+                if (request()?->has('referral_code')) {
+                    $refCode = request()?->input('referral_code');
+                } else {
+                    $refCode = request()?->input('ref') ?? session('ref');
+                }
+            }
+            app(AffiliateService::class)->ensureAffiliateProfile($user, ! empty($refCode) ? $refCode : null);
         });
 
         static::updated(function (User $user): void {
