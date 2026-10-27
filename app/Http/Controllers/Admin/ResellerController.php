@@ -67,21 +67,40 @@ class ResellerController extends Controller
         $verificationFee = (float) config('app.verification_fee', 1000);
 
         $tiersProgress = [];
+        $rankRewards = [];
         foreach ($tiersConfig as $x => $tier) {
+            $hasPercentage = isset($tier['percentage']) && (float) $tier['percentage'] > 0;
+            $percentage = $hasPercentage ? (float) $tier['percentage'] : null;
+            $label = $tier['label'] ?? null;
+            $benefit = $tier['benefit'] ?? null;
             $awarded = $commissions->firstWhere('milestone_x', $x);
-            $baseAmount = 2 * $x * $verificationFee;
-            $potentialCommission = ($tier['percentage'] / 100) * $baseAmount;
 
-            $tiersProgress[] = [
+            $baseAmount = $hasPercentage ? (2 * $x * $verificationFee) : null;
+            $potentialCommission = $hasPercentage ? (($percentage / 100) * $baseAmount) : null;
+            $isQualified = $pairsCount >= $x;
+            $progressPercent = min(100, round(($pairsCount / $x) * 100));
+
+            $item = [
                 'milestone_x' => $x,
-                'percentage' => $tier['percentage'],
+                'has_percentage' => $hasPercentage,
+                'percentage' => $percentage,
+                'label' => $label,
+                'benefit' => $benefit,
+                'is_manual' => ! $hasPercentage,
                 'base_amount' => $baseAmount,
                 'commission' => $potentialCommission,
                 'is_awarded' => ! is_null($awarded),
                 'awarded_at' => $awarded?->created_at,
                 'awarded_amount' => $awarded?->amount,
-                'progress_percent' => min(100, round(($pairsCount / $x) * 100)),
+                'is_qualified' => $isQualified,
+                'progress_percent' => $progressPercent,
             ];
+
+            $tiersProgress[] = $item;
+
+            if (! $hasPercentage) {
+                $rankRewards[] = $item;
+            }
         }
 
         return view('admin.resellers.affiliate', compact(
@@ -96,6 +115,7 @@ class ResellerController extends Controller
             'commissions',
             'totalCommissionEarned',
             'tiersProgress',
+            'rankRewards',
             'pairsCount'
         ));
     }

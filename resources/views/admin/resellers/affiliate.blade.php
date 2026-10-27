@@ -60,6 +60,46 @@
             height: 8px;
             border-radius: 4px;
         }
+        .rank-card {
+            border-radius: 12px;
+            transition: all 0.25s ease;
+            border: 1px solid rgba(0,0,0,0.06);
+            overflow: hidden;
+            position: relative;
+        }
+        .rank-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        .rank-card.rank-silver {
+            border-top: 4px solid #757F9A;
+        }
+        .rank-card.rank-gold {
+            border-top: 4px solid #f39c12;
+        }
+        .rank-card.rank-diamon, .rank-card.rank-diamond {
+            border-top: 4px solid #00bcd4;
+        }
+        .rank-badge-silver {
+            background: linear-gradient(135deg, #757F9A 0%, #D7DDE8 100%);
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        .rank-badge-gold {
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .rank-badge-diamon, .rank-badge-diamond {
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .rank-prize-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
     </style>
 @endpush
 
@@ -275,7 +315,95 @@
             </div>
         </div>
 
-        <!-- 4. Matching Milestone Commission Progress -->
+        <!-- 4. Special Rank & Leadership Rewards Showcase -->
+        @if (!empty($rankRewards))
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white p-3 d-flex flex-wrap justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1 font-weight-bold text-dark">
+                                    <i class="fa fa-crown text-warning mr-2"></i> Special Rank &amp; Leadership Rewards
+                                </h5>
+                                <span class="text-muted small">Special milestone achievements awarded with exclusive honors. Disbursed manually by administration upon verification.</span>
+                            </div>
+                            <span class="badge badge-light border text-muted px-3 py-2 font-roboto f-12 mt-2 mt-md-0">
+                                <i class="fa fa-hand-holding-usd mr-1"></i> Manual Disbursement
+                            </span>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="row">
+                                @foreach ($rankRewards as $rr)
+                                    @php
+                                        $labelLower = strtolower($rr['label'] ?? '');
+                                        $isSilver = str_contains($labelLower, 'silver');
+                                        $isGold = str_contains($labelLower, 'gold');
+                                        $isDiamond = str_contains($labelLower, 'diamon');
+                                        $rankClass = $isSilver ? 'rank-silver' : ($isGold ? 'rank-gold' : ($isDiamond ? 'rank-diamond' : ''));
+                                        $badgeClass = $isSilver ? 'rank-badge-silver' : ($isGold ? 'rank-badge-gold' : ($isDiamond ? 'rank-badge-diamond' : 'badge-primary text-white'));
+                                        $iconClass = $isSilver ? 'fa-award' : ($isGold ? 'fa-crown' : ($isDiamond ? 'fa-gem' : 'fa-trophy'));
+                                    @endphp
+                                    <div class="col-lg-4 col-md-6 mb-3">
+                                        <div class="card rank-card {{ $rankClass }} h-100 shadow-sm bg-white mb-0">
+                                            <div class="card-body p-4 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                                        <span class="badge {{ $badgeClass }} px-3 py-2 text-uppercase f-12">
+                                                            <i class="fa {{ $iconClass }} mr-1"></i> {{ $rr['label'] }} Rank
+                                                        </span>
+                                                        <span class="small font-weight-bold text-muted">
+                                                            {{ number_format($rr['milestone_x']) }} Pairs
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="rank-prize-box mb-3 text-center">
+                                                        <span class="text-muted small text-uppercase font-weight-bold d-block mb-1">Benefit / Reward</span>
+                                                        <h5 class="mb-0 font-weight-bold text-dark">
+                                                            <i class="fa fa-gift text-warning mr-1"></i> {{ $rr['benefit'] }}
+                                                        </h5>
+                                                    </div>
+
+                                                    <p class="text-muted small mb-3">
+                                                        Requires reaching <strong>{{ number_format($rr['milestone_x']) }}</strong> verified resellers on both Left &amp; Right teams.
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <div class="d-flex align-items-center justify-content-between small text-muted font-weight-bold mb-1">
+                                                        <span>Progress</span>
+                                                        <span>{{ number_format($pairsCount) }} / {{ number_format($rr['milestone_x']) }} pairs ({{ $rr['progress_percent'] }}%)</span>
+                                                    </div>
+                                                    <div class="progress progress-thin mb-3 bg-light">
+                                                        <div class="progress-bar {{ $rr['is_qualified'] ? 'bg-success' : 'bg-primary' }}"
+                                                             role="progressbar" style="width: {{ $rr['progress_percent'] }}%"></div>
+                                                    </div>
+
+                                                    @if ($rr['is_qualified'])
+                                                        <div class="text-center">
+                                                            <span class="badge badge-success px-3 py-2 w-100 font-roboto f-13">
+                                                                <i class="fa fa-check-circle mr-1"></i> Qualified for Award
+                                                            </span>
+                                                        </div>
+                                                    @else
+                                                        <div class="text-center">
+                                                            <span class="badge badge-light border text-muted px-3 py-2 w-100 font-roboto f-12">
+                                                                <i class="fa fa-clock mr-1"></i> {{ number_format(max(0, $rr['milestone_x'] - $pairsCount)) }} pairs remaining
+                                                            </span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- 5. Matching Milestone Commission Progress -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card shadow-sm border-0">
@@ -285,7 +413,7 @@
                             <span class="text-muted small">Commissions trigger when an active leg reaches milestone <strong>x</strong> and counter leg has <strong>&ge; x</strong> verified referrals.</span>
                         </div>
                         <span class="badge badge-primary px-3 py-2 font-roboto f-13 mt-2 mt-md-0">
-                            Current Balanced Pairs: <strong>{{ $pairsCount }}</strong>
+                            Current Balanced Pairs: <strong>{{ number_format($pairsCount) }}</strong>
                         </span>
                     </div>
                     <div class="card-body p-0">
@@ -294,9 +422,9 @@
                                 <thead class="bg-light">
                                     <tr>
                                         <th>Milestone (x Pairs)</th>
-                                        <th>Commission Rate</th>
+                                        <th>Commission / Type</th>
                                         <th>Base Calculation</th>
-                                        <th>Reward Amount</th>
+                                        <th>Reward / Benefit</th>
                                         <th>Status / Progress</th>
                                     </tr>
                                 </thead>
@@ -304,24 +432,53 @@
                                     @foreach ($tiersProgress as $tp)
                                         <tr>
                                             <td class="font-weight-bold">
-                                                <i class="fa fa-medal mr-1 {{ $tp['is_awarded'] ? 'text-warning' : 'text-muted' }}"></i>
-                                                {{ $tp['milestone_x'] }} Left &amp; {{ $tp['milestone_x'] }} Right
+                                                <i class="fa fa-medal mr-1 {{ $tp['is_awarded'] || $tp['is_qualified'] ? 'text-warning' : 'text-muted' }}"></i>
+                                                {{ number_format($tp['milestone_x']) }} Left &amp; {{ number_format($tp['milestone_x']) }} Right
+                                                @if (! empty($tp['label']))
+                                                    @php
+                                                        $lbl = strtolower($tp['label']);
+                                                        $bColor = str_contains($lbl, 'gold') ? 'badge-warning text-dark' : (str_contains($lbl, 'silver') ? 'badge-secondary' : 'badge-info');
+                                                    @endphp
+                                                    <span class="badge {{ $bColor }} ml-1 px-2 py-1"><i class="fa fa-crown mr-1"></i>{{ $tp['label'] }}</span>
+                                                @endif
                                             </td>
-                                            <td><span class="badge badge-light border">{{ $tp['percentage'] }}%</span></td>
-                                            <td class="text-muted small">{{ number_format($tp['base_amount'], 2) }} BDT</td>
-                                            <td class="font-weight-bold text-success">{{ number_format($tp['commission'], 2) }} BDT</td>
+                                            <td>
+                                                @if ($tp['has_percentage'])
+                                                    <span class="badge badge-light border">{{ $tp['percentage'] }}%</span>
+                                                @else
+                                                    <span class="badge badge-warning text-dark"><i class="fa fa-gift mr-1"></i> Special Reward</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-muted small">
+                                                @if ($tp['has_percentage'])
+                                                    {{ number_format($tp['base_amount'], 2) }} BDT
+                                                @else
+                                                    <span class="text-muted font-italic">Manual Disbursement</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($tp['has_percentage'])
+                                                    <span class="font-weight-bold text-success">{{ number_format($tp['commission'], 2) }} BDT</span>
+                                                @else
+                                                    <span class="font-weight-bold text-dark"><i class="fa fa-gift text-warning mr-1"></i> {{ $tp['benefit'] }}</span>
+                                                @endif
+                                            </td>
                                             <td style="min-width: 220px;">
                                                 @if ($tp['is_awarded'])
                                                     <span class="badge badge-success px-2 py-1">
                                                         <i class="fa fa-check mr-1"></i> Paid ({{ number_format($tp['awarded_amount'], 2) }} BDT)
                                                     </span>
                                                     <small class="text-muted ml-1">{{ $tp['awarded_at']?->format('d M Y') }}</small>
+                                                @elseif ($tp['is_manual'] && $tp['is_qualified'])
+                                                    <span class="badge badge-success px-2 py-1">
+                                                        <i class="fa fa-check-circle mr-1"></i> Qualified
+                                                    </span>
                                                 @else
                                                     <div class="d-flex align-items-center">
                                                         <div class="progress progress-thin flex-grow-1 mr-2 bg-light">
-                                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $tp['progress_percent'] }}%"></div>
+                                                            <div class="progress-bar {{ $tp['is_qualified'] ? 'bg-success' : 'bg-primary' }}" role="progressbar" style="width: {{ $tp['progress_percent'] }}%"></div>
                                                         </div>
-                                                        <small class="text-muted font-weight-bold">{{ $pairsCount }}/{{ $tp['milestone_x'] }}</small>
+                                                        <small class="text-muted font-weight-bold">{{ number_format($pairsCount) }}/{{ number_format($tp['milestone_x']) }}</small>
                                                     </div>
                                                 @endif
                                             </td>

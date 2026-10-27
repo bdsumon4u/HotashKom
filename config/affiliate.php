@@ -34,6 +34,18 @@ return [
         500 => [
             'percentage' => 3,
         ],
+        20_000 => [
+            'label' => 'Silver',
+            'benefit' => '10,00,000 Tk Cash',
+        ],
+        40_000 => [
+            'label' => 'Gold',
+            'benefit' => '46,00,000 Tk Car',
+        ],
+        80_000 => [
+            'label' => 'Diamon',
+            'benefit' => '80,00,000 Tk Flat',
+        ],
     ],
 
 ];

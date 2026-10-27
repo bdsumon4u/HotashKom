@@ -155,7 +155,7 @@ class AffiliateService
 
                 // Check milestone matching commission condition:
                 // Active leg just completed exactly x, and counter leg has >= x
-                if (isset($tiers[$activeCount]) && $counterCount >= $activeCount) {
+                if (isset($tiers[$activeCount]['percentage']) && (float) $tiers[$activeCount]['percentage'] > 0 && $counterCount >= $activeCount) {
                     $x = $activeCount;
                     $z = (float) $tiers[$x]['percentage'];
 
