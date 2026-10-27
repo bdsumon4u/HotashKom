@@ -5,6 +5,7 @@ namespace App\Traits;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\FacebookPixelService;
+use Azmolla\Shoppingcart\Facades\Cart;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 trait HasCart
@@ -12,8 +13,8 @@ trait HasCart
     public function addToKart(Product $product, int $quantity = 1, string $instance = 'default', $retailPrice = null)
     {
         session(['kart' => $instance]);
-        if ($instance === 'landing') {
-            cart()->destroy();
+        if (in_array($instance, ['kart', 'landing'], true)) {
+            Cart::instance($instance)->destroy();
         }
 
         if (! ($product->parent ?? $product)->is_active) {

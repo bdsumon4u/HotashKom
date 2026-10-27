@@ -774,7 +774,7 @@
     @endphp
     <div class="block mt-1 checkout {{ $checkoutTemplate === 'simple' ? 'checkout--simple' : ($checkoutTemplate === 'modern' ? 'checkout--modern' : '') }}">
         <div class="{{ $checkoutTemplate === 'simple' ? 'container-fluid px-lg-5' : ($checkoutTemplate === 'modern' ? 'container' : 'container') }}">
-            <x-form checkoutform :action="route('checkout')" method="POST">
+            <x-form checkoutform :action="route('checkout')" method="POST" onsubmit="event.preventDefault();">
                 <livewire:checkout />
             </x-form>
         </div>

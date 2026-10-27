@@ -2,10 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Azmolla\Shoppingcart\Facades\Cart;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
 class GoogleTagManagerMiddleware
@@ -26,15 +24,33 @@ class GoogleTagManagerMiddleware
             GoogleTagManagerFacade::disable();
         }
 
-        if (! $request->is('checkout') && ! $request->is('save-checkout-progress')) {
-            Cart::instance('kart')->destroy();
-            Cart::instance('landing')->destroy();
+        // Only cleanup temporary direct checkout carts ('kart', 'landing') when the user
+        // genuinely navigates away from checkout via a standard, full-page GET request.
+        $isSafeRoute = $request->is([
+            'checkout*',
+            'reseller/checkout*',
+            'save-checkout-progress*',
+            'cart*',
+            'livewire*',
+            'api/*',
+            'thank-you*',
+            'payment*',
+            'bkash*',
+            'nagad*',
+            'order*',
+            'track-order*',
+        ]);
 
-            DB::table('shopping_cart')
-                ->where('identifier', session()->getId())
-                ->whereIn('instance', ['kart', 'landing'])
-                ->delete();
+        $isBackgroundOrSubrequest = ! $request->isMethod('GET')
+            || $request->ajax()
+            || $request->expectsJson()
+            || $request->prefetch()
+            || $request->header('Purpose') === 'prefetch'
+            || $request->header('Sec-Purpose') === 'prefetch'
+            || $request->hasHeader('X-Livewire')
+            || $request->hasHeader('X-Livewire-Navigate');
 
+        if (! $isSafeRoute && ! $isBackgroundOrSubrequest && in_array(session('kart'), ['kart', 'landing'], true)) {
             session(['kart' => 'default']);
         }
 

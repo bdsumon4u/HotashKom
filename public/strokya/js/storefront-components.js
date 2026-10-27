@@ -228,6 +228,11 @@ runWhenJQueryReady(function($) {
                     navigator.sendBeacon('/api/track-add-to-cart', new Blob([capiPayload], { type: 'application/json' }));
                     // ─────────────────────────────────────────────────────────
 
+                    if (action === 'kart' || data.redirect_url) {
+                        window.location.href = data.redirect_url || '/checkout';
+                        return;
+                    }
+
                     if (window.Livewire) {
                         window.Livewire.dispatch('cartUpdated');
                         window.Livewire.dispatch('notify', {
@@ -237,12 +242,6 @@ runWhenJQueryReady(function($) {
                         window.$.notify('Product added to cart');
                     } else {
                         alert('Product added to cart');
-                    }
-
-                    if (action === 'kart' || data.redirect_url) {
-                        setTimeout(() => {
-                            window.location.href = data.redirect_url || '/checkout';
-                        }, 500);
                     }
                 } else {
                     console.error('Failed to add product to cart:', data.message);

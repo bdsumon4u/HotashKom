@@ -15,6 +15,7 @@ use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
 use App\Services\UtmTrackingService;
 use App\Traits\ResolvesPackagingCharge;
+use Azmolla\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
@@ -89,6 +90,10 @@ class Checkout extends Component
 
     public function hydrate(): void
     {
+        if (session('kart') !== 'kart' && Cart::instance('default')->count() === 0 && Cart::instance('kart')->count() > 0) {
+            session(['kart' => 'kart']);
+        }
+
         if (app()->environment('local') && request()->has('calls')) {
             logger()->debug('Checkout Livewire call queue', [
                 'calls' => request()->input('calls'),
@@ -334,6 +339,10 @@ class Checkout extends Component
 
     public function mount(): void
     {
+        if (session('kart') !== 'kart' && Cart::instance('default')->count() === 0 && Cart::instance('kart')->count() > 0) {
+            session(['kart' => 'kart']);
+        }
+
         if (isOninda() && auth('user')->guest()) {
             $this->redirect(route('user.login'), navigate: true);
         }
@@ -381,6 +390,10 @@ class Checkout extends Component
 
     public function checkout()
     {
+        if (session('kart') !== 'kart' && Cart::instance('default')->count() === 0 && Cart::instance('kart')->count() > 0) {
+            session(['kart' => 'kart']);
+        }
+
         if (! ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)) {
             if (Str::startsWith($this->phone, '01')) {
                 $this->phone = Str::after($this->phone, '0');
@@ -594,6 +607,9 @@ class Checkout extends Component
         }
 
         cart()->destroy();
+        if (session('kart') !== 'default') {
+            session(['kart' => 'default']);
+        }
         session()->flash('completed', 'Dear '.$data['name'].', Your Order is Successfully Received. Thanks For Your Order.');
 
         return to_route($this->getRedirectRoute(), [

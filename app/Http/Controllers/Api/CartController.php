@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Azmolla\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
@@ -31,8 +32,8 @@ class CartController extends Controller
         try {
             // Follow the HasCart trait logic but avoid problematic services
             session(['kart' => $instance]);
-            if ($instance == 'landing') {
-                cart()->destroy();
+            if (in_array($instance, ['kart', 'landing'], true)) {
+                Cart::instance($instance)->destroy();
             }
 
             $fraudQuantity = setting('fraud')->max_qty_per_product ?? 3;

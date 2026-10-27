@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutRequest;
 use App\Services\FacebookPixelService;
+use Azmolla\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Response;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
 
@@ -19,6 +20,10 @@ class CheckoutController extends Controller
     public function __invoke(CheckoutRequest $request)
     {
         if ($request->isMethod('GET')) {
+            if (session('kart') !== 'kart' && Cart::instance('default')->count() === 0 && Cart::instance('kart')->count() > 0) {
+                session(['kart' => 'kart']);
+            }
+
             if (GoogleTagManagerFacade::isEnabled()) {
                 GoogleTagManagerFacade::set([
                     'event' => 'begin_checkout',

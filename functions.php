@@ -474,7 +474,19 @@ function longCookie($field, $value)
 
 function cart($id = null): CartInstance|CartItem|null
 {
-    $cart = Cart::instance(session('kart', 'default'));
+    $instance = session('kart', 'default');
+
+    if ($instance === 'default' && Cart::instance('default')->count() === 0) {
+        if (Cart::instance('kart')->count() > 0) {
+            $instance = 'kart';
+            session(['kart' => 'kart']);
+        } elseif (Cart::instance('landing')->count() > 0) {
+            $instance = 'landing';
+            session(['kart' => 'landing']);
+        }
+    }
+
+    $cart = Cart::instance($instance);
 
     if (! $id) {
         return $cart;
