@@ -187,8 +187,8 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="modal_referral_code">Referral Code <span class="text-muted font-weight-normal">(Optional)</span></label>
-                                        <input id="modal_referral_code" type="text"
+                                        <label for="referral_code">Referral Code <span class="text-muted font-weight-normal">(Optional)</span></label>
+                                        <input id="referral_code" type="text"
                                                class="form-control @error('referral_code') is-invalid @enderror"
                                                name="referral_code"
                                                value="{{ old('referral_code', request('ref', request('referral_code', session('ref')))) }}"

@@ -25,6 +25,11 @@ class HomeController extends Controller
             ]);
         }
 
+        $ref = $request->query('ref') ?? $request->query('referral_code');
+        if (! empty($ref)) {
+            session(['ref' => $ref]);
+        }
+
         return view('index');
     }
 }

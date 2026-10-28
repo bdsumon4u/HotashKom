@@ -24,6 +24,11 @@ class CaptureUtmTracking
     {
         if ($request->isMethod('GET')) {
             $this->utmTrackingService->captureFromRequest($request);
+
+            $ref = $request->query('ref') ?? $request->query('referral_code');
+            if (! empty($ref)) {
+                session(['ref' => $ref]);
+            }
         }
 
         return $next($request);

@@ -25,6 +25,11 @@ class StorefrontCacheProfile extends BaseCacheProfile
             return false;
         }
 
+        // Never cache requests with referral codes or for users with active referral in session
+        if ($request->filled('ref') || $request->filled('referral_code') || session()->has('ref')) {
+            return false;
+        }
+
         // Cache API storefront endpoints
         if ($request->is('api/storefront/*')) {
             return true;
