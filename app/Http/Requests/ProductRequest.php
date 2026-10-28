@@ -49,6 +49,7 @@ class ProductRequest extends FormRequest
         $rules = [
             'name' => 'required|max:255',
             'slug' => ['required', 'max:255', 'regex:~^[^\s\[\],!:;{}=+%^()/\\?><`|"\']+$~u', 'unique:products'],
+            'short_description' => 'nullable|string|max:2000',
             'description' => 'required',
             'categories' => 'required|array',
             'brand' => 'nullable|integer',
@@ -94,6 +95,7 @@ class ProductRequest extends FormRequest
             'slug.regex' => 'The link field may contain letters (including Bangla), numbers, and hyphens. No spaces or special characters are allowed.',
             'slug.format' => 'The link field may contain letters (including Bangla), numbers, and hyphens. No spaces or special characters are allowed.',
             'slug.unique' => 'This link is already in use. Please choose a different one.',
+            'short_description.max' => 'The short description may not be greater than :max characters.',
         ];
     }
 
@@ -101,6 +103,7 @@ class ProductRequest extends FormRequest
     {
         return [
             'slug' => 'link',
+            'short_description' => 'short description',
         ];
     }
 

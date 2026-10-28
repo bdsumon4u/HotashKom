@@ -12,7 +12,9 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Traits\PreventsSourcedResourceDeletion;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
@@ -57,7 +59,11 @@ class ProductController extends Controller
         $data = $request->validationData();
 
         // Create the product
-        $product = Product::create($data);
+        try {
+            $product = Product::create($data);
+        } catch (QueryException $e) {
+            $this->handleDatabaseStringException($e);
+        }
 
         // Handle relationships and dispatch copy job
         $this->handleProductRelationships($product, $data);
@@ -116,7 +122,11 @@ class ProductController extends Controller
             }
         }
 
-        $product->update($data);
+        try {
+            $product->update($data);
+        } catch (QueryException $e) {
+            $this->handleDatabaseStringException($e);
+        }
 
         // Sync price changes to variations if price fields were updated
         if ($priceFieldsChanged && ! $product->parent_id && $product->variations()->count() > 0) {
@@ -239,5 +249,42 @@ class ProductController extends Controller
 
         // Update all variations with the changed price fields
         $product->variations()->update($fieldsToUpdate);
+    }
+
+    /**
+     * Handle database string-related exceptions (e.g. charset/emoji or data too long) as validation errors.
+     *
+     * @throws ValidationException
+     */
+    private function handleDatabaseStringException(QueryException $e): void
+    {
+        $message = $e->getMessage();
+        $code = (int) $e->getCode();
+
+        // 1366: Incorrect string value (e.g. 4-byte UTF-8 emojis on a utf8mb3/latin1 table)
+        if ($code === 22007 || str_contains($message, '1366 Incorrect string value')) {
+            $field = 'short_description';
+            if (preg_match('/for column [`\']?(?:[^`\']*\.)*([a-zA-Z0-9_]+)[`\']? at row/i', $message, $matches)) {
+                $field = $matches[1];
+            }
+
+            throw ValidationException::withMessages([
+                $field => 'The '.str_replace('_', ' ', $field).' contains emojis or special characters not supported by your database table character set. Please update the table charset to utf8mb4 or remove unsupported emojis.',
+            ]);
+        }
+
+        // 1406: Data too long for column
+        if ($code === 22001 || str_contains($message, '1406 Data too long')) {
+            $field = 'short_description';
+            if (preg_match('/for column [`\']?(?:[^`\']*\.)*([a-zA-Z0-9_]+)[`\']? at row/i', $message, $matches)) {
+                $field = $matches[1];
+            }
+
+            throw ValidationException::withMessages([
+                $field => 'The '.str_replace('_', ' ', $field).' is too long for the database.',
+            ]);
+        }
+
+        throw $e;
     }
 }
