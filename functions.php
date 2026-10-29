@@ -743,6 +743,11 @@ function isOninda(): bool
     return (bool) config('app.oninda');
 }
 
+function isGbazTheme(): bool
+{
+    return config('app.theme') === 'gbaz';
+}
+
 function isReseller(): bool
 {
     if (config('app.reseller') === false) {

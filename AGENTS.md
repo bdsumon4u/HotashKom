@@ -32,8 +32,9 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
 
-## Verification Scripts
-- Do not create verification scripts or tinker when tests cover that functionality and prove it works. Unit and feature tests are more important.
+## Verification & Code Review
+- Never run automated tests (`php artisan test`, `vendor/bin/pest`, `vendor/bin/phpunit`) or create test/verification scripts on this project unless explicitly requested by the user.
+- Instead of running tests, carefully double-check all modified files for syntax, logic, styling, and edge-case correctness.
 
 ## Application Structure & Architecture
 - Stick to existing directory structure - don't create new base folders without approval.
@@ -403,11 +404,7 @@ it('is true', function () {
 </code-snippet>
 
 ### Running Tests
-- Run the minimal number of tests using an appropriate filter before finalizing code edits.
-- To run all tests: `php artisan test`.
-- To run all tests in a file: `php artisan test tests/Feature/ExampleTest.php`.
-- To filter on a particular test name: `php artisan test --filter=testName` (recommended after making a change to a related file).
-- When the tests relating to your changes are passing, ask the user if they would like to run the entire test suite to ensure everything is still passing.
+- Never run tests (`php artisan test`, Pest, or PHPUnit) on this project. Double-check the modified code instead.
 
 ### Pest Assertions
 - When asserting status codes on a response, use the specific method like `assertForbidden` and `assertNotFound` instead of using `assertStatus(403)` or similar, e.g.:
@@ -471,8 +468,8 @@ it('has emails', function (string $email) {
 
 === tests rules ===
 
-## Test Enforcement
+## Code Verification Policy
 
-- Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
-- Run the minimum number of tests needed to ensure code quality and speed. Use `php artisan test` with a specific filename or filter.
+- Never run tests on this project or create new test files unless explicitly asked by the user.
+- Always double-check the modified code thoroughly to verify correctness before finalizing changes.
 </laravel-boost-guidelines>

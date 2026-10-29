@@ -1,4 +1,250 @@
 <div class="product__info">
+@if (isGbazTheme())
+    <h1 class="gb-detail-title product__name" data-name="{{ $selectedVar->var_name }}">{{ $product->name }}</h1>
+    @if ($product->short_description)
+        <p class="mb-2 text-muted">{{ $product->short_description }}</p>
+    @endif
+    @php
+        // Use loaded reviews if available to avoid N+1 queries
+        if ($product->relationLoaded('reviews')) {
+            $approvedReviews = $product->reviews->where('approved', true);
+            $totalReviews = $approvedReviews->count();
+            $overallRatings = $approvedReviews->flatMap(
+                fn($review) => $review->relationLoaded('ratings')
+                    ? $review->ratings->where('key', 'overall')
+                    : collect(),
+            );
+            $averageRating = $overallRatings->count() > 0 ? $overallRatings->avg('value') : 0;
+        } else {
+            $averageRating = $product->averageRating('overall') ?? 0;
+            $totalReviews = $product->totalReviews() ?? 0;
+        }
+    @endphp
+    @if ($averageRating > 0)
+        <div class="gap-2 mb-2 d-flex align-items-center">
+            <a href="#review-form-container" class="d-flex align-items-center text-decoration-none review-rating-link"
+                style="margin-top: -1px; cursor: pointer;" onclick="scrollToReviews(event)">
+                @for ($i = 1; $i <= 5; $i++)
+                    @if ($i <= floor($averageRating))
+                        <i class="fa fa-star text-warning"></i>
+                    @elseif($i - 0.5 <= $averageRating)
+                        <i class="fa fa-star-half-alt text-warning"></i>
+                    @else
+                        <i class="far fa-star text-muted"></i>
+                    @endif
+                @endfor
+            </a>
+            <a href="#review-form-container" class="text-muted small text-decoration-none review-rating-link"
+                style="margin-top: 1px; cursor: pointer;" onclick="scrollToReviews(event)">
+                <strong>{{ number_format($averageRating, 1) }}</strong>
+                ({{ $totalReviews }} {{ Str::plural('review', $totalReviews) }})
+            </a>
+        </div>
+    @endif
+
+    @php
+        $show_option = setting('show_option');
+        $guest_can_see_price = (bool) ($show_option->guest_can_see_price ?? false);
+        $should_hide_price =
+            isOninda() &&
+            ! $guest_can_see_price &&
+            (auth('user')->guest() || (auth('user')->check() && ! auth('user')->user()->is_verified));
+        $selling = $selectedVar->getPrice($quantity);
+        $hasDiscount = $selling != $selectedVar->price && $selectedVar->price > $selling;
+        $savePercent = $hasDiscount && $selectedVar->price > 0
+            ? round((($selectedVar->price - $selling) * 100) / $selectedVar->price)
+            : 0;
+    @endphp
+    <div class="gb-detail-price-row product__prices {{ $hasDiscount ? 'has-special' : '' }}">
+        @if ($should_hide_price)
+            <span class="gb-detail-new-price text-danger">
+                {{ auth('user')->guest() ? 'Login to see price' : 'Verify account to see price' }}
+            </span>
+        @elseif (! $hasDiscount)
+            <span class="gb-detail-new-price">{{ $selling ? '৳' . number_format((float) $selectedVar->price, 2) : 'Contact Us' }}</span>
+        @else
+            <span class="gb-detail-new-price">৳{{ number_format((float) $selling, 2) }}</span>
+            <span class="gb-detail-old-price">৳{{ number_format((float) $selectedVar->price, 2) }}</span>
+            @if ($savePercent > 0)
+                <span class="gb-detail-save-badge">Save {{ $savePercent }}%</span>
+            @endif
+        @endif
+    </div>
+
+    @if (isOninda())
+        <div class="px-3 py-2 pt-1 mb-2 product__actions-item d-flex justify-content-between align-items-center"
+            style="border: 3px double #000;">
+            <div class="mr-2 font-weight-bold text-danger" style="white-space:nowrap;">Retail Price</div>
+            <div class="input-group input-group-sm">
+                <input type="number" class="form-control form-control-sm" wire:model="retailPrice" min="0"
+                    @focus="$event.target.select()" required>
+                <div class="input-group-append">
+                    <span class="input-group-text">৳</span>
+                </div>
+            </div>
+        </div>
+        <div class="mt-1 mb-2 small text-muted">
+            <i class="fa fa-info-circle"></i> Suggested retail price:
+            <strong>{{ $selectedVar->suggestedRetailPrice() }}</strong>
+        </div>
+    @endif
+
+    @foreach ($attributes as $attribute)
+        @php
+            $attributeOptions = $optionGroup[$attribute->id] ?? [];
+            if (empty($attributeOptions)) {
+                continue;
+            }
+        @endphp
+        <div class="mb-2 form-group product__option d-flex align-items-center" style="column-gap: .5rem;">
+            <label class="product__option-label mb-0">{{ $attribute->name }}:</label>
+            @if (strtolower($attribute->name) == 'color')
+                <div class="input-radio-color">
+                    <div class="input-radio-color__list">
+                        @foreach ($attributeOptions as $option)
+                            <label
+                                class="input-radio-color__item @if (strtolower($option->name) == 'white') input-radio-color__item--white @endif"
+                                style="color: {{ $option->value }};" data-toggle="tooltip" title=""
+                                data-original-title="{{ $option->name }}">
+                                <input type="radio" wire:model.live="options.{{ $attribute->id }}"
+                                    name="options[{{ $attribute->id }}]" value="{{ $option->id }}"
+                                    class="option-picker">
+                                <span></span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                <div class="input-radio-label">
+                    <div class="input-radio-label__list">
+                        @foreach ($attributeOptions as $option)
+                            <label>
+                                <input type="radio" wire:model.live="options.{{ $attribute->id }}"
+                                    name="options[{{ $attribute->id }}]" value="{{ $option->id }}"
+                                    class="option-picker">
+                                <span
+                                    class="p-1 @if (($options[$attribute->id] ?? null) == $option->id) border-primary @endif">{{ $option->name }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endforeach
+
+    <div class="product__sidebar">
+        <form class="product__options" onsubmit="return false;">
+            <div class="gb-quantity-row">
+                <label class="gb-quantity-label" for="product-quantity">Quantity:</label>
+                <div class="gb-quantity-box">
+                    <button type="button" class="gb-qty-btn" wire:click="decrement" aria-label="Decrease quantity">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <input id="product-quantity" class="gb-qty-input"
+                        wire:model.live.debounce.250ms="quantity" type="number" min="1" max="{{ $maxQuantity }}"
+                        value="1">
+                    <button type="button" class="gb-qty-btn" wire:click="increment" aria-label="Increase quantity">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            @php
+                $available = true;
+                $company = setting('company');
+                $phone = preg_replace('/[^\d]/', '', $company->whatsapp ?? '');
+                $phone = strlen($phone) == 11 ? '88' . $phone : $phone;
+                $whatsappMessage = rawurlencode(
+                    "Hello! I'm interested in:\r\nProduct: {$product->name}\r\n" . url()->current(),
+                );
+                $whatsappLink = "https://wa.me/{$phone}?text={$whatsappMessage}";
+
+                $callForOrderPhones = array_values(array_filter(array_map('trim', explode(' ', setting('call_for_order') ?? ''))));
+                $primaryPhone = $callForOrderPhones[0] ?? ($company->phone ?? $company->whatsapp ?? '');
+            @endphp
+
+            <div class="gb-action-grid">
+                <button type="button" wire:click="addToCart"
+                    class="gb-btn gb-btn--addtocart"
+                    {{ $available ? '' : 'disabled' }}>
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>{{ ! empty(trim($show_option->add_to_cart_text ?? '')) ? $show_option->add_to_cart_text : 'ADD TO CART' }}</span>
+                </button>
+                <button type="button" wire:click="addToCart('kart')"
+                    class="gb-btn gb-btn--buynow"
+                    {{ $available ? '' : 'disabled' }}>
+                    <span>{{ ! empty(trim($show_option->order_now_text ?? '')) ? $show_option->order_now_text : 'BUY NOW' }}</span>
+                </button>
+            </div>
+
+            <div class="gb-action-grid">
+                <a href="{{ $whatsappLink }}" target="_blank" rel="noopener"
+                    data-contact-type="whatsapp"
+                    class="gb-btn gb-btn--whatsapp whatsapp-link"
+                    data-whatsapp-url="{{ $whatsappLink }}">
+                    <i class="fab fa-whatsapp" style="font-size: 18px;"></i>
+                    <span>Order On WhatsApp</span>
+                </a>
+                <a href="{{ $primaryPhone ? 'tel:' . $primaryPhone : 'javascript:void(0)' }}"
+                    class="gb-btn gb-btn--call">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>Call For Order</span>
+                </a>
+            </div>
+
+            @if ($product->brand)
+                <div class="gb-brand-box">
+                    <span class="gb-brand-label">Brand:</span>
+                    <a href="{{ route('brands.products', $product->brand) }}" wire:navigate.hover class="gb-brand-link">
+                        @if ($product->brand->image)
+                            <img src="{{ asset($product->brand->image->src) }}" alt="{{ $product->brand->name }}" class="gb-brand-logo">
+                        @else
+                            <span class="gb-brand-name">{{ $product->brand->name }}</span>
+                        @endif
+                    </a>
+                </div>
+            @endif
+
+            @if (($free_delivery->enabled ?? false) && $deliveryText)
+                <div class="mt-2 p-2 text-center border rounded font-weight-bold">
+                    <p class="mb-1 border-bottom">আজ অর্ডার করলে <br> সারা বাংলাদেশে ডেলিভারি চার্জ <strong
+                            class="text-danger">ফ্রি</strong></p>
+                    {!! $deliveryText !!}
+                </div>
+            @endif
+
+            @php
+                $wholesale = $selectedVar->wholesale ?? ['quantity' => [], 'price' => []];
+                $quantities = is_array($wholesale['quantity'] ?? null) ? $wholesale['quantity'] : [];
+                $prices = is_array($wholesale['price'] ?? null) ? $wholesale['price'] : [];
+            @endphp
+
+            @if (!empty($quantities) && !empty($prices))
+                <div class="mt-3">
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="text-center">Wholesale Price</th>
+                            </tr>
+                            <tr>
+                                <th width="50%">Min. Quantity</th>
+                                <th width="50%">Unit Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($quantities as $i => $qty)
+                                <tr>
+                                    <td>{{ $qty }}</td>
+                                    <td>{!! theMoney($prices[$i] ?? null) !!}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </form>
+    </div>
+@else
     <h1 class="mb-1 product__name" data-name="{{ $selectedVar->var_name }}">{{ $product->name }}</h1>
     @if ($product->short_description)
         <p class="mb-2">{{ $product->short_description }}</p>
@@ -305,4 +551,5 @@
             @endif
         </form><!-- .product__options / end -->
     </div><!-- .product__end -->
+@endif
 </div>

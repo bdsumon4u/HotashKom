@@ -117,7 +117,7 @@ class ProductController extends Controller
             $product = $product->parent;
         }
         $product->load([
-            'brand',
+            'brand.image',
             'categories',
             'images',
             'parent.images',

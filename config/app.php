@@ -212,4 +212,6 @@ return [
 
     'checkout_template' => env('CHECKOUT_TEMPLATE', 'legacy'),
 
+    'theme' => env('APP_THEME'),
+
 ];

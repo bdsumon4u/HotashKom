@@ -219,44 +219,74 @@
         color: {{ $color->primary->text_hover ?? null }} !important;
     }
 
-    .product-card__addtocart,
-    .product__addtocart {
-        padding-left: 1rem;
-        padding-right: 1rem;
-        background-color: {{ $color->add_to_cart->background_color ?? null }} !important;
-        border-color: {{ $color->add_to_cart->background_color ?? null }} !important;
-        color: {{ $color->add_to_cart->text_color ?? null }} !important;
-    }
+    @if (isGbazTheme())
+        .product__addtocart {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            background-color: {{ $color->add_to_cart->background_color ?? '#f38020' }} !important;
+            border-color: {{ $color->add_to_cart->background_color ?? '#f38020' }} !important;
+            color: {{ $color->add_to_cart->text_color ?? '#ffffff' }} !important;
+        }
 
-    .product-card__addtocart:hover,
-    .product__addtocart:hover {
-        background-color: {{ $color->add_to_cart->background_hover ?? null }} !important;
-        border-color: {{ $color->add_to_cart->background_hover ?? null }} !important;
-        color: {{ $color->add_to_cart->text_hover ?? null }} !important;
-    }
+        .product__addtocart:hover {
+            background-color: {{ $color->add_to_cart->background_hover ?? '#d96e14' }} !important;
+            border-color: {{ $color->add_to_cart->background_hover ?? '#d96e14' }} !important;
+            color: {{ $color->add_to_cart->text_hover ?? '#ffffff' }} !important;
+        }
 
-    .product-card__ordernow,
-    .product__ordernow {
-        padding-left: 1rem;
-        padding-right: 1rem;
-        background-color: {{ $color->order_now->background_color ?? null }} !important;
-        border-color: {{ $color->order_now->background_color ?? null }} !important;
-        color: {{ $color->order_now->text_color ?? null }} !important;
-        animation: driftZoom 2s ease-in-out infinite;
-    }
+        .product__ordernow {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            background-color: {{ $color->order_now->background_color ?? '#0b2219' }} !important;
+            border-color: {{ $color->order_now->background_color ?? '#0b2219' }} !important;
+            color: {{ $color->order_now->text_color ?? '#ffffff' }} !important;
+        }
 
-    .product-card__ordernow:hover,
-    .product__ordernow:hover {
-        background-color: {{ $color->order_now->background_hover ?? null }} !important;
-        border-color: {{ $color->order_now->background_hover ?? null }} !important;
-        color: {{ $color->order_now->text_hover ?? null }} !important;
-        animation-play-state: paused;
-    }
+        .product__ordernow:hover {
+            background-color: {{ $color->order_now->background_hover ?? '#163d2e' }} !important;
+            border-color: {{ $color->order_now->background_hover ?? '#163d2e' }} !important;
+            color: {{ $color->order_now->text_hover ?? '#ffffff' }} !important;
+        }
+    @else
+        .product-card__addtocart,
+        .product__addtocart {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            background-color: {{ $color->add_to_cart->background_color ?? null }} !important;
+            border-color: {{ $color->add_to_cart->background_color ?? null }} !important;
+            color: {{ $color->add_to_cart->text_color ?? null }} !important;
+        }
 
-    .product-card__ordernow:disabled,
-    .product__ordernow:disabled {
-        animation: none;
-    }
+        .product-card__addtocart:hover,
+        .product__addtocart:hover {
+            background-color: {{ $color->add_to_cart->background_hover ?? null }} !important;
+            border-color: {{ $color->add_to_cart->background_hover ?? null }} !important;
+            color: {{ $color->add_to_cart->text_hover ?? null }} !important;
+        }
+
+        .product-card__ordernow,
+        .product__ordernow {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            background-color: {{ $color->order_now->background_color ?? null }} !important;
+            border-color: {{ $color->order_now->background_color ?? null }} !important;
+            color: {{ $color->order_now->text_color ?? null }} !important;
+            animation: driftZoom 2s ease-in-out infinite;
+        }
+
+        .product-card__ordernow:hover,
+        .product__ordernow:hover {
+            background-color: {{ $color->order_now->background_hover ?? null }} !important;
+            border-color: {{ $color->order_now->background_hover ?? null }} !important;
+            color: {{ $color->order_now->text_hover ?? null }} !important;
+            animation-play-state: paused;
+        }
+
+        .product-card__ordernow:disabled,
+        .product__ordernow:disabled {
+            animation: none;
+        }
+    @endif
 
     @keyframes driftZoom {
 

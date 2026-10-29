@@ -223,10 +223,14 @@
 
                 formatMoney(amount) {
                     const num = Number(amount || 0);
+                    if (window.__isGbazTheme) {
+                        return '৳' + num.toLocaleString('en-US');
+                    }
                     return 'TK&nbsp;<span>' + num.toLocaleString() + '</span>';
                 },
 
                 getProductHTML(product, index) {
+                    const isGbaz = Boolean(window.__isGbazTheme);
                     const productId = product.id || index;
                     const productName = product.name || 'Product';
                     const productSlug = product.slug || productId;
@@ -234,11 +238,15 @@
                     const productSellingPrice = Number(product.selling_price || productPrice);
                     const productImage = product.base_image_url || '/images/placeholder.jpg';
                     const productUrl = `/products/${encodeURIComponent(productSlug)}`;
-                    const hasDiscount = productPrice !== productSellingPrice;
+                    const hasDiscount = isGbaz
+                        ? (productPrice !== productSellingPrice && productPrice > productSellingPrice)
+                        : (productPrice !== productSellingPrice);
+                    const discountPercent = (hasDiscount && productPrice > 0)
+                        ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice)
+                        : 0;
 
                     let discountText = '';
                     if (hasDiscount && productPrice > 0) {
-                        const discountPercent = Math.round(((productPrice - productSellingPrice) * 100) / productPrice);
                         const template = (this.showOption.discount_text || '').toString();
                         discountText = template.replace('[percent]', discountPercent);
                         if (!discountText.trim()) {
@@ -247,28 +255,43 @@
                     }
 
                     const hasVariations = (product.variations_count !== undefined ? product.variations_count : (product.variations ? product.variations.length : 0)) > 1;
+                    const addToCartIcon = isGbaz
+                        ? ((this.showOption.add_to_cart_icon || '').trim() || '<i class="fas fa-shopping-cart"></i>')
+                        : (this.showOption.add_to_cart_icon || '');
+                    const addToCartText = isGbaz
+                        ? ((this.showOption.add_to_cart_text || '').trim() || 'Add To Cart')
+                        : (this.showOption.add_to_cart_text || 'Add to Cart');
+                    const orderNowIcon = isGbaz
+                        ? ((this.showOption.order_now_icon || '').trim() || '<i class="fas fa-shopping-cart"></i>')
+                        : (this.showOption.order_now_icon || '');
+                    const orderNowText = isGbaz
+                        ? ((this.showOption.order_now_text || '').trim() || 'Add To Cart')
+                        : (this.showOption.order_now_text || 'Order Now');
 
                     let buttonsHTML = '';
                     if (!this.isOninda) {
                         const buttonType = this.showOption.product_grid_button || 'add_to_cart';
+                        const btnPrimaryClass = isGbaz ? 'btn' : 'btn btn-primary';
+                        const spanClass = isGbaz ? '' : ' class="ml-1"';
+                        const orderDriftClass = isGbaz ? 'product-card__ordernow' : 'product-card__ordernow order-now-drift';
 
                         if (buttonType === 'add_to_cart') {
                             if (hasVariations) {
                                 buttonsHTML = `
                                     <div class="product-card__buttons">
-                                        <a class="btn btn-primary product-card__addtocart" href="${productUrl}" wire:navigate.hover style="text-decoration: none;">
-                                            ${this.showOption.add_to_cart_icon || ''}
-                                            <span class="ml-1">${this.showOption.add_to_cart_text || 'Add to Cart'}</span>
+                                        <a class="${btnPrimaryClass} product-card__addtocart" href="${productUrl}" wire:navigate.hover style="text-decoration: none;">
+                                            ${addToCartIcon}
+                                            <span${spanClass}>${addToCartText}</span>
                                         </a>
                                     </div>
                                 `;
                             } else {
                                 buttonsHTML = `
                                     <div class="product-card__buttons">
-                                        <button class="btn btn-primary product-card__addtocart" type="button"
+                                        <button class="${btnPrimaryClass} product-card__addtocart" type="button"
                                                 data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
-                                            ${this.showOption.add_to_cart_icon || ''}
-                                            <span class="ml-1">${this.showOption.add_to_cart_text || 'Add to Cart'}</span>
+                                            ${addToCartIcon}
+                                            <span${spanClass}>${addToCartText}</span>
                                         </button>
                                     </div>
                                 `;
@@ -277,19 +300,19 @@
                             if (hasVariations) {
                                 buttonsHTML = `
                                     <div class="product-card__buttons">
-                                        <a class="btn btn-primary product-card__ordernow order-now-drift" href="${productUrl}" wire:navigate.hover style="text-decoration: none;">
-                                            ${this.showOption.order_now_icon || ''}
-                                            <span class="ml-1">${this.showOption.order_now_text || 'Order Now'}</span>
+                                        <a class="${btnPrimaryClass} ${orderDriftClass}" href="${productUrl}" wire:navigate.hover style="text-decoration: none;">
+                                            ${orderNowIcon}
+                                            <span${spanClass}>${orderNowText}</span>
                                         </a>
                                     </div>
                                 `;
                             } else {
                                 buttonsHTML = `
                                     <div class="product-card__buttons">
-                                        <button class="btn btn-primary product-card__ordernow order-now-drift" type="button"
+                                        <button class="${btnPrimaryClass} ${orderDriftClass}" type="button"
                                                 data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
-                                            ${this.showOption.order_now_icon || ''}
-                                            <span class="ml-1">${this.showOption.order_now_text || 'Order Now'}</span>
+                                            ${orderNowIcon}
+                                            <span${spanClass}>${orderNowText}</span>
                                         </button>
                                     </div>
                                 `;
@@ -338,8 +361,43 @@
                             priceHTML =
                                 `<span class="product-card__new-price">${this.formatMoney(productSellingPrice)}</span><span class="product-card__old-price">${this.formatMoney(productPrice)}</span>`;
                         } else {
-                            priceHTML = `${this.formatMoney(productPrice)}`;
+                            priceHTML = isGbaz
+                                ? `<span class="product-card__new-price">${this.formatMoney(productPrice)}</span>`
+                                : `${this.formatMoney(productPrice)}`;
                         }
+                    }
+
+                    if (isGbaz) {
+                        let badgesHTML = '';
+                        if (hasDiscount && discountPercent > 0) {
+                            badgesHTML = `<span class="gb-badge-offer">Offered Items</span><span class="gb-badge-save">Save ${discountPercent}%</span>`;
+                        } else if (product.free_delivery) {
+                            badgesHTML = `<span class="gb-badge-offer">Free Delivery</span>`;
+                        }
+
+                        return `
+                            <div class="product-card" data-id="${productId}" data-max="-1">
+                                <div class="product-card__badges-list">
+                                    ${badgesHTML}
+                                </div>
+                                <div class="product-card__image">
+                                    <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
+                                        <img src="${productImage}" alt="${productName}" loading="lazy">
+                                    </a>
+                                </div>
+                                <div class="product-card__info">
+                                    <div class="product-card__name">
+                                        <a href="${productUrl}" class="product-link" wire:navigate.hover data-name="${product.var_name || productName}">${productName}</a>
+                                    </div>
+                                </div>
+                                <div class="product-card__actions">
+                                    <div class="product-card__prices ${hasDiscount ? 'has-special' : ''}">
+                                        ${priceHTML}
+                                    </div>
+                                    ${buttonsHTML}
+                                </div>
+                            </div>
+                        `;
                     }
 
                     return `
