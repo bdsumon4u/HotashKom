@@ -124,6 +124,18 @@ class FacebookPixelService
             $name = Cookie::get('name');
         }
 
+        // Authenticated user fallback
+        $authUser = auth('user')->user();
+        if (empty($email) && $authUser?->email) {
+            $email = $authUser->email;
+        }
+        if (empty($phone) && $authUser?->phone_number) {
+            $phone = $authUser->phone_number;
+        }
+        if (empty($name) && $authUser?->name) {
+            $name = $authUser->name;
+        }
+
         // Default country fallback to bd
         if (empty($country)) {
             $country = 'bd';
@@ -221,50 +233,56 @@ class FacebookPixelService
      */
     protected function createServerUserData(array $userData, ?string $eventName = null): UserData
     {
-        /** @var UserData $obj */
-        $obj = MetaPixel::userData();
+        $obj = new UserData;
+
+        $clientIp = $userData['client_ip_address'] ?? request()->ip();
+        if ($clientIp) {
+            $obj->setClientIpAddress($clientIp);
+        }
+
+        $userAgent = $userData['client_user_agent'] ?? request()->userAgent();
+        if ($userAgent) {
+            $obj->setClientUserAgent($userAgent);
+        }
+
+        $fbp = $userData['fbp'] ?? request()->cookie('_fbp') ?? ($_COOKIE['_fbp'] ?? null);
+        if ($fbp) {
+            $obj->setFbp($fbp);
+        }
+
+        $fbc = $userData['fbc'] ?? request()->cookie('_fbc') ?? ($_COOKIE['_fbc'] ?? null);
+        if ($fbc) {
+            $obj->setFbc($fbc);
+        }
 
         $normalized = $this->getNormalizedUserData($userData, $eventName);
 
-        if (isset($normalized['em'])) {
+        if (! empty($normalized['em'])) {
             $obj->setEmail($normalized['em']);
         }
 
-        if (isset($normalized['ph'])) {
+        if (! empty($normalized['ph'])) {
             $obj->setPhone($normalized['ph']);
         }
 
-        if (isset($normalized['fn'])) {
+        if (! empty($normalized['fn'])) {
             $obj->setFirstName($normalized['fn']);
         }
 
-        if (isset($normalized['ln'])) {
+        if (! empty($normalized['ln'])) {
             $obj->setLastName($normalized['ln']);
         }
 
-        if (isset($normalized['ct'])) {
+        if (! empty($normalized['ct'])) {
             $obj->setCity($normalized['ct']);
         }
 
-        if (isset($normalized['cn'])) {
+        if (! empty($normalized['cn'])) {
             $obj->setCountryCode($normalized['cn']);
         }
 
-        // Browser tracking signals
-        if (! empty($userData['fbp'])) {
-            $obj->setFbp($userData['fbp']);
-        }
-
-        if (! empty($userData['fbc'])) {
-            $obj->setFbc($userData['fbc']);
-        }
-
-        if (! empty($userData['client_ip_address'])) {
-            $obj->setClientIpAddress($userData['client_ip_address']);
-        }
-
-        if (! empty($userData['client_user_agent'])) {
-            $obj->setClientUserAgent($userData['client_user_agent']);
+        if (! empty($normalized['external_id'])) {
+            $obj->setExternalId($normalized['external_id']);
         }
 
         return $obj;

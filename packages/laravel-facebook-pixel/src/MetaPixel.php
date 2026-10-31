@@ -243,7 +243,9 @@ class MetaPixel
     public function getUser(): ?array
     {
         if ($this->isAdvancedMatchingEnabled()) {
-            return app(FacebookPixelService::class)->getNormalizedUserData();
+            $user = app(FacebookPixelService::class)->getNormalizedUserData();
+
+            return ! empty($user) ? $user : null;
         }
 
         return null;
