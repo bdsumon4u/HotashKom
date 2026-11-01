@@ -54,7 +54,7 @@ return new class extends Migration
             $table->foreignId('category_id')->nullable()->constrained('transaction_categories')->nullOnDelete();
             $table->decimal('debit', 15, 2)->default(0);
             $table->decimal('credit', 15, 2)->default(0);
-            $table->string('notes')->nullable();
+            $table->longText('notes')->nullable();
             $table->timestamps();
 
             $table->index('account_id');
