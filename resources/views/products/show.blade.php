@@ -505,15 +505,18 @@
                 }
 
                 .gb-action-grid {
-                    grid-template-columns: 1fr !important;
-                    gap: 10px !important;
-                    margin-bottom: 10px !important;
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 8px !important;
+                    margin-bottom: 8px !important;
                 }
 
                 .gb-btn {
-                    height: 46px !important;
-                    font-size: 14px !important;
+                    height: 44px !important;
+                    font-size: 13px !important;
+                    padding: 0 8px !important;
+                    gap: 6px !important;
                     width: 100% !important;
+                    white-space: nowrap !important;
                 }
             }
 
@@ -548,9 +551,32 @@
                     font-size: 16px !important;
                 }
 
+                .gb-action-grid {
+                    grid-template-columns: 1fr 1fr !important;
+                    gap: 6px !important;
+                    margin-bottom: 6px !important;
+                }
+
                 .gb-btn {
-                    height: 44px !important;
-                    font-size: 13.5px !important;
+                    height: 42px !important;
+                    font-size: 12px !important;
+                    padding: 0 6px !important;
+                    gap: 4px !important;
+                }
+
+                .gb-btn i {
+                    font-size: 13px !important;
+                }
+            }
+
+            @media (max-width: 380px) {
+                .gb-btn {
+                    font-size: 11px !important;
+                    padding: 0 4px !important;
+                }
+
+                .gb-btn i {
+                    font-size: 12px !important;
                 }
             }
         </style>
