@@ -87,6 +87,17 @@
             background: #ffffff;
         }
 
+        .product-card__image a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            text-decoration: none !important;
+            color: inherit;
+            overflow: hidden;
+        }
+
         .product-card__image img {
             width: 100%;
             height: 100%;
@@ -214,6 +225,59 @@
             border-radius: 4px;
             line-height: 1.3;
             white-space: nowrap;
+        }
+
+        @media (max-width: 576px) {
+            .product-card {
+                padding: 8px 6px !important;
+                border-radius: 6px !important;
+            }
+
+            .product-card__badges-list {
+                top: 6px !important;
+                left: 6px !important;
+                right: 6px !important;
+            }
+
+            .gb-badge-save,
+            .gb-badge-offer {
+                font-size: 9.5px !important;
+                padding: 2px 5px !important;
+            }
+
+            .product-card__image {
+                padding: 4px !important;
+                margin-bottom: 6px !important;
+            }
+
+            .product-card__name {
+                font-size: 12.5px !important;
+                line-height: 1.3 !important;
+                min-height: 32px !important;
+                margin-bottom: 4px !important;
+            }
+
+            .product-card__prices {
+                font-size: 13px !important;
+                gap: 4px !important;
+                margin-bottom: 6px !important;
+            }
+
+            .product-card__new-price {
+                font-size: 13.5px !important;
+            }
+
+            .product-card__old-price {
+                font-size: 11.5px !important;
+            }
+
+            .product-card__buttons .btn,
+            .product-card__addtocart,
+            .product-card__ordernow {
+                font-size: 11.5px !important;
+                padding: 6px 4px !important;
+                gap: 4px !important;
+            }
         }
     @else
         .product-card {

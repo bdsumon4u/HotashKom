@@ -101,9 +101,10 @@
                     const productSlug = product.slug || productId;
                     const productPrice = product.compareAtPrice || product.price || 0;
                     const productSellingPrice = product.price || productPrice;
+                    const fallbackPlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' width='300' height='300'%3E%3Crect width='300' height='300' fill='%23f9fafb'/%3E%3Cpath d='M120 105a20 20 0 1 1-40 0 20 20 0 0 1 40 0zm-50 95 40-50 30 35 35-45 45 60H70z' fill='%23d1d5db'/%3E%3C/svg%3E";
                     const productImage = product.base_image_url || (product.images && product.images.length > 0 ?
                         `/storage/${product.images[0]}` :
-                        '/images/placeholder.jpg');
+                        fallbackPlaceholder);
                     const productUrl = `/products/${encodeURIComponent(productSlug)}`;
                     const inStock = product.availability !== 'Out of Stock' && (product.availability === 'In Stock' || (product.availability && parseInt(product.availability) > 0));
                     const stockCount = typeof product.availability === 'number' ? product.availability : (product.availability === 'In Stock' ? null : 0);
@@ -188,7 +189,7 @@
                         if (!inStock) {
                             badgesHTML = '<span class="gb-badge-offer" style="background-color:#dc2626 !important;">Sold Out</span>';
                         } else if (hasDiscount && discountPercent > 0) {
-                            badgesHTML = `<span class="gb-badge-offer">Offered Items</span><span class="gb-badge-save">Save ${discountPercent}%</span>`;
+                            badgesHTML = `<span class="gb-badge-save">Save ${discountPercent}%</span>`;
                         }
 
                         return `
@@ -198,7 +199,7 @@
                                 </div>
                                 <div class="product-card__image">
                                     <a href="${productUrl}" class="product-link" wire:navigate.hover style="display: block; width: 100%; height: 100%;">
-                                        <img src="${productImage}" alt="${productName}" loading="lazy">
+                                        <img src="${productImage}" alt="${productName}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackPlaceholder}';">
                                     </a>
                                 </div>
                                 <div class="product-card__info">
@@ -354,6 +355,7 @@
                     title: true,
                     tint: '#333',
                     Xoffset: 15,
+                    openOnSmall: false,
                 });
             }
 

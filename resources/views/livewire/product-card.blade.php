@@ -18,7 +18,6 @@
     <div class="product-card" data-id="{{ $product->id }}" data-max="-1">
         <div class="product-card__badges-list">
             @if ($hasDiscount && $percent > 0)
-                <span class="gb-badge-offer">Offered Items</span>
                 <span class="gb-badge-save">Save {{ $percent }}%</span>
             @elseif ($is_free_delivery)
                 <span class="gb-badge-offer">Free Delivery</span>

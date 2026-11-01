@@ -106,19 +106,23 @@
                 min-width: 0;
                 position: relative;
                 border: 1px solid #f0f0f0;
-                border-radius: 6px;
+                border-radius: 8px;
                 background: #ffffff;
                 padding: 16px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                aspect-ratio: 1 / 1;
+                max-height: 480px;
             }
 
             .original img.xzoom {
                 width: 100% !important;
+                height: 100% !important;
                 max-height: 440px;
                 object-fit: contain;
                 box-shadow: none !important;
+                display: block;
             }
 
             .zoom-nav {
@@ -131,30 +135,32 @@
                 justify-content: space-between;
                 align-items: center;
                 pointer-events: none;
+                z-index: 5;
             }
 
             .zoom-control {
                 pointer-events: auto;
-                height: 34px;
-                width: 34px;
+                height: 36px;
+                width: 36px;
                 outline: none;
-                border: none;
+                border: 1px solid #e5e7eb;
                 cursor: pointer;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin: 0 8px;
+                margin: 0 10px;
                 border-radius: 50%;
-                color: #3b82f6;
-                background: rgba(255, 255, 255, 0.85);
+                color: #374151;
+                background: rgba(255, 255, 255, 0.9);
                 font-size: 13px;
-                transition: background 0.2s ease, color 0.2s ease;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
             }
 
             .zoom-control:hover {
                 background: #ffffff;
                 color: #f38020;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
             }
 
             .zoom-control:focus {
@@ -364,50 +370,187 @@
                 color: #111827;
             }
 
+            #accordion .card-body {
+                overflow-x: auto;
+                word-break: break-word;
+            }
+
+            #accordion .card-body table {
+                max-width: 100% !important;
+            }
+
+            #accordion .card-body img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+
             @media (max-width: 991px) {
                 .product__content {
-                    grid-template-columns: 1fr;
-                    grid-row-gap: 24px;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    width: 100% !important;
+                    gap: 24px;
                 }
             }
 
             @media (max-width: 768px) {
                 .gb-product-detail-card {
                     padding: 16px;
+                    border-radius: 8px;
                 }
 
                 .xzoom-container {
+                    display: flex !important;
                     flex-direction: column !important;
+                    width: 100% !important;
+                    gap: 12px !important;
                 }
 
                 .original {
-                    order: 1;
-                    width: 100%;
+                    order: 1 !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    aspect-ratio: 1 / 1 !important;
+                    min-height: 280px !important;
+                    max-height: 380px !important;
+                    padding: 12px !important;
+                    margin: 0 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+
+                .original img.xzoom {
+                    width: 100% !important;
+                    height: 100% !important;
+                    max-height: 100% !important;
+                    object-fit: contain !important;
+                    display: block !important;
+                    margin: 0 auto !important;
                 }
 
                 .xzoom-thumbs {
-                    order: 2;
+                    order: 2 !important;
+                    display: flex !important;
                     flex-direction: row !important;
-                    overflow-x: auto;
-                    width: 100%;
-                    padding-bottom: 4px;
+                    flex-wrap: nowrap !important;
+                    overflow-x: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    width: 100% !important;
+                    gap: 8px !important;
+                    margin: 0 0 14px 0 !important;
+                    padding: 2px 2px 6px 2px !important;
+                    scrollbar-width: thin;
+                }
+
+                .xzoom-thumbs::-webkit-scrollbar {
+                    height: 4px;
+                }
+
+                .xzoom-thumbs::-webkit-scrollbar-thumb {
+                    background: #e5e7eb;
+                    border-radius: 4px;
+                }
+
+                .xzoom-thumbs a {
+                    display: block !important;
+                    flex-shrink: 0 !important;
+                    margin: 0 !important;
+                }
+
+                .xzoom-thumbs .xzoom-gallery {
+                    width: 60px !important;
+                    height: 60px !important;
+                    flex-shrink: 0 !important;
+                    border-radius: 6px !important;
+                    padding: 3px !important;
+                }
+
+                .zoom-control {
+                    height: 34px !important;
+                    width: 34px !important;
+                    margin: 0 6px !important;
+                    font-size: 12px !important;
                 }
 
                 .gb-detail-title {
-                    font-size: 21px;
+                    font-size: 20px !important;
+                    line-height: 1.35 !important;
+                    margin-bottom: 12px !important;
+                    word-break: break-word !important;
+                }
+
+                .gb-detail-price-row {
+                    gap: 8px 12px !important;
+                    margin-bottom: 14px !important;
                 }
 
                 .gb-detail-new-price {
-                    font-size: 22px;
+                    font-size: 22px !important;
                 }
 
                 .gb-detail-old-price {
-                    font-size: 18px;
+                    font-size: 17px !important;
+                }
+
+                .gb-detail-save-badge {
+                    font-size: 11px !important;
+                    padding: 3px 8px !important;
+                }
+
+                .gb-quantity-row {
+                    margin: 14px 0 16px 0 !important;
+                    gap: 16px !important;
+                    flex-wrap: wrap !important;
                 }
 
                 .gb-action-grid {
-                    grid-template-columns: 1fr;
-                    gap: 10px;
+                    grid-template-columns: 1fr !important;
+                    gap: 10px !important;
+                    margin-bottom: 10px !important;
+                }
+
+                .gb-btn {
+                    height: 46px !important;
+                    font-size: 14px !important;
+                    width: 100% !important;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .gb-product-detail-card {
+                    padding: 12px !important;
+                    border-radius: 6px !important;
+                }
+
+                .original {
+                    min-height: 250px !important;
+                    max-height: 340px !important;
+                    padding: 8px !important;
+                }
+
+                .xzoom-thumbs .xzoom-gallery {
+                    width: 52px !important;
+                    height: 52px !important;
+                }
+
+                .gb-detail-title {
+                    font-size: 18px !important;
+                    line-height: 1.35 !important;
+                    margin-bottom: 10px !important;
+                }
+
+                .gb-detail-new-price {
+                    font-size: 20px !important;
+                }
+
+                .gb-detail-old-price {
+                    font-size: 16px !important;
+                }
+
+                .gb-btn {
+                    height: 44px !important;
+                    font-size: 13.5px !important;
                 }
             }
         </style>
@@ -546,10 +689,20 @@
             <div class="container">
                 <div class="product product--layout--standard gb-product-detail-card" data-layout="standard">
                     <div class="product__content">
+                        @php
+                            $placeholderSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400' width='400' height='400'%3E%3Crect width='400' height='400' fill='%23f9fafb'/%3E%3Cpath d='M160 140a25 25 0 1 1-50 0 25 25 0 0 1 50 0zm-65 125 50-65 40 45 45-60 60 80H95z' fill='%23d1d5db'/%3E%3C/svg%3E";
+                            $rawBaseImg = optional($product->base_image)->src
+                                ?? $product->thumbnail->first()?->src
+                                ?? optional($product->images->first())->src
+                                ?? null;
+                            $mainProductImgUrl = $rawBaseImg ? asset($rawBaseImg) : $placeholderSvg;
+                        @endphp
                         <div class="xzoom-container">
                             <div class="original">
-                                <img class="xzoom" id="xzoom-default" src="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}"
-                                    xoriginal="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}" />
+                                <img class="xzoom" id="xzoom-default" src="{{ $mainProductImgUrl }}"
+                                    xoriginal="{{ $mainProductImgUrl }}"
+                                    alt="{{ $product->name }}"
+                                    onerror="this.onerror=null;this.src='{{ $placeholderSvg }}';" />
                                 <div class="zoom-nav">
                                     <button class="zoom-control left" type="button" aria-label="Previous image">
                                         <i class="fa fa-chevron-left"></i>
@@ -560,11 +713,13 @@
                                 </div>
                             </div>
                             <div class="xzoom-thumbs">
-                                <a href="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}"><img
+                                <a href="{{ $mainProductImgUrl }}"><img
                                         data-detail="{{ route('products.show', $product) }}"
-                                        class="xzoom-gallery product-base__image" width="70"
-                                        src="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}"
-                                        xpreview="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}"></a>
+                                        class="xzoom-gallery product-base__image" width="70" height="70"
+                                        src="{{ $mainProductImgUrl }}"
+                                        xpreview="{{ $mainProductImgUrl }}"
+                                        alt="{{ $product->name }}"
+                                        onerror="this.onerror=null;this.src='{{ $placeholderSvg }}';"></a>
                                 @php
                                     // Collect all variant base images
                                     $variantImages = $product->variations->pluck('base_image')->filter();
@@ -580,11 +735,14 @@
                                             ->pluck('id')
                                             ->toArray();
                                         $hasVariants = !empty($variantIds);
+                                        $thumbImgUrl = $image->src ? asset($image->src) : $placeholderSvg;
                                     @endphp
-                                    <a href="{{ asset($image->src) }}"
+                                    <a href="{{ $thumbImgUrl }}"
                                         @if ($hasVariants) class="variant-image-link" data-variant-ids="{{ json_encode($variantIds) }}" @endif>
                                         <img class="xzoom-gallery @if ($hasVariants) variant-image @endif"
-                                            width="70" src="{{ asset($image->src) }}"
+                                            width="70" height="70" src="{{ $thumbImgUrl }}"
+                                            alt="{{ $product->name }}"
+                                            onerror="this.onerror=null;this.src='{{ $placeholderSvg }}';"
                                             @if ($hasVariants) data-variant-ids="{{ json_encode($variantIds) }}" @endif>
                                     </a>
                                 @endforeach

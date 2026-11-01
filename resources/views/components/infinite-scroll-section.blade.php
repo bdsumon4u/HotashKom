@@ -370,7 +370,7 @@
                     if (isGbaz) {
                         let badgesHTML = '';
                         if (hasDiscount && discountPercent > 0) {
-                            badgesHTML = `<span class="gb-badge-offer">Offered Items</span><span class="gb-badge-save">Save ${discountPercent}%</span>`;
+                            badgesHTML = `<span class="gb-badge-save">Save ${discountPercent}%</span>`;
                         } else if (product.free_delivery) {
                             badgesHTML = `<span class="gb-badge-offer">Free Delivery</span>`;
                         }

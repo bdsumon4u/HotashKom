@@ -220,7 +220,7 @@
             @endphp
 
             @if (!empty($quantities) && !empty($prices))
-                <div class="mt-3">
+                <div class="mt-3 table-responsive">
                     <table class="table table-sm table-bordered">
                         <thead>
                             <tr>
@@ -527,7 +527,7 @@
             @endphp
 
             @if (!empty($quantities) && !empty($prices))
-                <div class="mt-3">
+                <div class="mt-3 table-responsive">
                     <table class="table table-sm table-bordered">
                         <thead>
                             <tr>
