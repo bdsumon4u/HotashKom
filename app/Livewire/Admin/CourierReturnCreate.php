@@ -198,7 +198,9 @@ class CourierReturnCreate extends Component
             // 1. Restock physical warehouse count for returned items
             foreach ($this->items as $item) {
                 $product = Product::find($item['product_id']);
-                if ($product && $product->should_track) {
+                if ($product) {
+                    $product->should_track = true;
+                    $product->save();
                     $product->increment('stock_count', (int) $item['quantity']);
 
                     if (class_exists(SyncProductStockWithResellers::class)) {

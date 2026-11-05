@@ -37,9 +37,13 @@
     Header unset Reporting-Endpoints
 </IfModule>
 
+<FilesMatch "^\.env$">
+    Require all denied
+</FilesMatch>
+
 # BEGIN cPanel-generated php ini directives
 <IfModule php_module>
-    php_flag display_errors On
+    php_flag display_errors Off
     php_value max_execution_time 300
     php_value max_input_time 80
     php_value max_input_vars 1000
@@ -57,7 +61,7 @@
 </IfModule>
 
 <IfModule lsapi_module>
-    php_flag display_errors On
+    php_flag display_errors Off
     php_value max_execution_time 300
     php_value max_input_time 80
     php_value max_input_vars 1000

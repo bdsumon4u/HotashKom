@@ -131,10 +131,6 @@ class ResellerEditOrder extends Component
         $quantity = 1;
         $id = $product->id;
 
-        if ($product->should_track && $product->stock_count <= 0) {
-            return session()->flash('error', 'Out of Stock.');
-        }
-
         $productData = (new ProductResource($product))->toCartItem($quantity);
 
         $productData['retail_price'] = $product->retailPrice();

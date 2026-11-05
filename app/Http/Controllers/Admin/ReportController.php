@@ -145,7 +145,7 @@ class ReportController extends Controller
         $products = Product::with('parent')
             ->whereShouldTrack(true)
             ->orderBy('stock_count')
-            ->where('stock_count', '>', 0)
+            ->where('stock_count', '>=', 0)
             ->get();
 
         // Unique stock groups present among tracked products or distinct groups

@@ -213,10 +213,6 @@ class EditOrder extends Component
         $quantity = 1;
         $id = $product->id;
 
-        if ($product->should_track && $product->stock_count <= 0) {
-            return session()->flash('error', 'Out of Stock.');
-        }
-
         $productData = (new ProductResource($product))->toCartItem($quantity);
         $productData['price'] = (float) $productData['price'];
         $productData['retail_price'] = (float) ($productData['retail_price'] ?? $productData['price']);
@@ -267,12 +263,6 @@ class EditOrder extends Component
 
         // If no variation found, use parent product
         $product = $variation ?? $parentProduct;
-
-        if ($product->should_track && $product->stock_count <= 0) {
-            session()->flash('error', 'Selected variation is out of stock.');
-
-            return;
-        }
 
         // Update the selected product data
         $quantity = $selectedProduct['quantity'] ?? 1;

@@ -231,6 +231,10 @@
                     @endif
                 </div>
                 <div class="p-3 card-body">
+                    <div class="form-group no-print">
+                        <label for="stock-product-search">Search products</label>
+                        <input type="search" id="stock-product-search" class="form-control" placeholder="Search by product name, SKU, or ID">
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover datatable" id="stock-report-table" style="width: 100%;">
                             <thead>
@@ -245,6 +249,7 @@
                             <tbody id="stock-report-tbody">
                                 @foreach($products as $product)
                                     <tr class="stock-row"
+                                        data-search="{{ strtolower($product->var_name.' '.$product->sku.' '.$product->id) }}"
                                         data-stock-group="{{ $product->stock_group }}"
                                         data-stock-count="{{ (int) $product->stock_count }}"
                                         data-buy-total="{{ (float) ($product->average_purchase_price ?? 0) * (int) ($product->stock_count ?? 0) }}"
@@ -319,11 +324,13 @@ runWhenJQueryReady(function ($) {
         let sumStockCount = 0;
         let sumBuyTotal = 0;
         let sumSellTotal = 0;
+        const searchTerm = String($('#stock-product-search').val() || '').trim().toLowerCase();
 
         const $rows = $('#stock-report-tbody tr.stock-row');
         $rows.each(function () {
             const rowGroup = String($(this).data('stock-group') || 'uncategorized').toLowerCase();
-            const showRow = isAll || (rowGroup === targetGroup);
+            const rowText = String($(this).data('search') || $(this).text()).toLowerCase();
+            const showRow = (isAll || (rowGroup === targetGroup)) && (!searchTerm || rowText.includes(searchTerm));
 
             if (showRow) {
                 $(this).show();
@@ -369,6 +376,11 @@ runWhenJQueryReady(function ($) {
         e.preventDefault();
         const selected = $(this).data('group');
         filterByGroup(selected);
+    });
+
+    $('#stock-product-search').on('input', function () {
+        const activeGroup = $('#stockGroupTabs .nav-link.active').data('group') || 'all';
+        filterByGroup(activeGroup);
     });
 
     // Handle initial state on page load from URL query parameter or server variable

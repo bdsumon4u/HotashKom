@@ -225,7 +225,7 @@ class ApiController extends Controller
 
         $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         $options = $selectedVar->options->pluck('id', 'attribute_id')->toArray();
-        $maxQuantity = $selectedVar->should_track ? min($selectedVar->stock_count, $maxPerProduct) : $maxPerProduct;
+        $maxQuantity = (int) $maxPerProduct;
 
         $optionGroup = $product->variations->pluck('options')->flatten()->unique('id')->groupBy('attribute_id');
 
