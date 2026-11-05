@@ -39,6 +39,9 @@
             </h4>
             <div class="d-flex align-items-center no-print" style="gap: 8px;">
                 @if (config('accounting.enabled', true) && auth('admin')->user()?->is('admin'))
+                    <a href="{{ route('admin.accounting.shipments.index') }}" class="btn btn-outline-primary btn-sm font-weight-bold mr-2">
+                        <i class="fa fa-history mr-1"></i> Courier Shipment History
+                    </a>
                     <a href="{{ route('admin.accounting.shipments.create') }}" class="btn btn-primary btn-sm font-weight-bold mr-2">
                         <i class="fa fa-truck mr-1"></i> Ship to Courier
                     </a>

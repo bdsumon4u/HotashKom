@@ -13,6 +13,9 @@
 @endsection
 
 @section('breadcrumb-right')
+    <a href="{{ route('admin.accounting.returns.index') }}" class="btn btn-outline-primary btn-sm mr-2 font-weight-bold">
+        <i class="fa fa-history mr-1"></i> Courier Return History
+    </a>
     <a href="{{ route('admin.reports.return') }}" class="btn btn-outline-secondary btn-sm mr-2 font-weight-bold">
         <i class="fa fa-arrow-left mr-1"></i> Return Report
     </a>

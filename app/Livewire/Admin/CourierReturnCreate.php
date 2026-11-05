@@ -193,7 +193,7 @@ class CourierReturnCreate extends Component
 
         return DB::transaction(function () use ($accountingService) {
             $totalCost = $this->final_purchase_cost;
-            $itemsSummaryList = [];
+            $details = [];
 
             // 1. Restock physical warehouse count for returned items
             foreach ($this->items as $item) {
@@ -208,10 +208,17 @@ class CourierReturnCreate extends Component
                     }
                 }
 
-                $itemsSummaryList[] = $item['name'].' (x'.$item['quantity'].')';
+                $quantity = (int) $item['quantity'];
+                $purchasePrice = (float) $item['price'];
+                $details[] = [
+                    'product_id' => (int) $item['product_id'],
+                    'product_name' => $item['name'],
+                    'sku' => $item['sku'] ?: null,
+                    'quantity' => $quantity,
+                    'purchase_price' => $purchasePrice,
+                    'line_purchase_total' => round($purchasePrice * $quantity, 2),
+                ];
             }
-
-            $itemsSummary = implode(', ', $itemsSummaryList);
 
             // 2. Transfer value from In Courier (Asset) back to Inventory (Asset)
             $accountingService->recordCourierReturn([
@@ -222,7 +229,7 @@ class CourierReturnCreate extends Component
                 'total_purchase_cost' => $totalCost,
                 'return_charge' => $this->return_charge_amount,
                 'paid_from_account_id' => $this->paid_from_account_id,
-                'items_summary' => $itemsSummary,
+                'details' => $details,
             ]);
 
             session()->flash(

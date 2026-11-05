@@ -39,6 +39,9 @@
             </h4>
             <div class="d-flex align-items-center no-print" style="gap: 8px;">
                 @if (config('accounting.enabled', true) && auth('admin')->user()?->is('admin'))
+                    <a href="{{ route('admin.accounting.returns.index') }}" class="btn btn-outline-primary btn-sm font-weight-bold mr-2">
+                        <i class="fa fa-history mr-1"></i> Courier Return History
+                    </a>
                     <a href="{{ route('admin.accounting.returns.create') }}" class="btn btn-danger btn-sm font-weight-bold mr-2">
                         <i class="fa fa-undo mr-1"></i> Receive Courier Return
                     </a>

@@ -64,6 +64,7 @@ final class AccountingService
                 'entry_date' => $entryDate->format('Y-m-d'),
                 'reference' => $header['reference'] ?? null,
                 'description' => $header['description'] ?? null,
+                'details' => $header['details'] ?? null,
                 'source_type' => $header['source_type'] ?? null,
                 'source_id' => $header['source_id'] ?? null,
                 'admin_id' => $header['admin_id'] ?? auth('admin')->id(),
@@ -356,10 +357,12 @@ final class AccountingService
                 ->where('journal_entry_items.account_id', $account->id)
                 ->whereBetween('journal_entries.entry_date', [$startDate->toDateString(), $endDate->toDateString()])
                 ->select([
+                    'journal_entries.id as journal_entry_id',
                     'journal_entries.entry_date',
                     'journal_entries.entry_number',
                     'journal_entries.reference',
                     'journal_entries.description as entry_description',
+                    'journal_entries.source_type',
                     'journal_entry_items.notes',
                     'journal_entry_items.debit',
                     'journal_entry_items.credit',
@@ -596,7 +599,8 @@ final class AccountingService
      *     tracking_code?: ?string,
      *     notes?: ?string,
      *     total_purchase_cost: float,
-     *     items_summary?: ?string
+     *     items_summary?: ?string,
+     *     details?: array<int, array<string, int|float|string|null>>
      * }  $data
      */
     public function recordShipmentToCourier(array $data): JournalEntry
@@ -619,13 +623,14 @@ final class AccountingService
                 'reference' => $data['tracking_code'] ?? null,
                 'description' => $description,
                 'source_type' => 'Shipment',
+                'details' => $data['details'] ?? null,
             ],
             [
                 [
                     'account_id' => $inCourierAccount->id,
                     'debit' => $totalCost,
                     'credit' => 0,
-                    'notes' => 'Shipped to courier: '.$data['courier_name'].(! empty($data['items_summary']) ? ' ['.$data['items_summary'].']' : ''),
+                    'notes' => 'Shipped to courier: '.$data['courier_name'],
                 ],
                 [
                     'account_id' => $inventoryAccount->id,
@@ -743,7 +748,8 @@ final class AccountingService
      *     total_purchase_cost: float,
      *     return_charge?: float,
      *     paid_from_account_id?: ?int,
-     *     items_summary?: ?string
+     *     items_summary?: ?string,
+     *     details?: array<int, array<string, int|float|string|null>>
      * }  $data
      */
     public function recordCourierReturn(array $data): JournalEntry
@@ -770,7 +776,7 @@ final class AccountingService
                 'account_id' => $inventoryAccount->id,
                 'debit' => $totalCost,
                 'credit' => 0,
-                'notes' => 'Returned stock restocked to warehouse'.(! empty($data['items_summary']) ? ' ['.$data['items_summary'].']' : ''),
+                'notes' => 'Returned stock restocked to warehouse',
             ];
 
             $journalItems[] = [
@@ -805,6 +811,7 @@ final class AccountingService
                 'reference' => $data['tracking_code'] ?? null,
                 'description' => $description,
                 'source_type' => 'CourierReturn',
+                'details' => $data['details'] ?? null,
             ],
             $journalItems
         );

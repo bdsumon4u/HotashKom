@@ -19,6 +19,7 @@ class JournalEntry extends Model
         'entry_date',
         'reference',
         'description',
+        'details',
         'source_type',
         'source_id',
         'admin_id',
@@ -53,6 +54,7 @@ class JournalEntry extends Model
     {
         return [
             'entry_date' => 'date',
+            'details' => 'array',
         ];
     }
 }

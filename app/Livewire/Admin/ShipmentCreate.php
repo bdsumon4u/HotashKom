@@ -153,7 +153,7 @@ class ShipmentCreate extends Component
 
         return DB::transaction(function () use ($accountingService) {
             $totalCost = $this->total_purchase_cost;
-            $itemsSummaryList = [];
+            $details = [];
 
             // 1. Decrement warehouse stock for each shipped product
             foreach ($this->items as $item) {
@@ -166,10 +166,18 @@ class ShipmentCreate extends Component
                     }
                 }
 
-                $itemsSummaryList[] = $item['name'].' (x'.$item['quantity'].')';
+                $quantity = (int) $item['quantity'];
+                $purchasePrice = (float) $item['price'];
+                $details[] = [
+                    'product_id' => (int) $item['product_id'],
+                    'product_name' => $item['name'],
+                    'sku' => $item['sku'] ?: null,
+                    'quantity' => $quantity,
+                    'purchase_price' => $purchasePrice,
+                    'selling_price' => (float) $item['selling_price'],
+                    'line_purchase_total' => round($purchasePrice * $quantity, 2),
+                ];
             }
-
-            $itemsSummary = implode(', ', $itemsSummaryList);
 
             // 2. Transfer value from Inventory (Asset) to In Courier (Asset) via double-entry Journal Entry
             $accountingService->recordShipmentToCourier([
@@ -178,7 +186,7 @@ class ShipmentCreate extends Component
                 'tracking_code' => $this->tracking_code ?: null,
                 'notes' => $this->notes ?: null,
                 'total_purchase_cost' => $totalCost,
-                'items_summary' => $itemsSummary,
+                'details' => $details,
             ]);
 
             session()->flash(

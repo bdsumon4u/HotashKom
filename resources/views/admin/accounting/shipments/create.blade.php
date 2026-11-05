@@ -13,6 +13,9 @@
 @endsection
 
 @section('breadcrumb-right')
+    <a href="{{ route('admin.accounting.shipments.index') }}" class="btn btn-outline-primary btn-sm mr-2 font-weight-bold">
+        <i class="fa fa-history mr-1"></i> Shipment History
+    </a>
     <a href="{{ route('admin.accounting.settlements.create') }}" class="btn btn-outline-success btn-sm mr-2 font-weight-bold">
         <i class="fa fa-money mr-1"></i> Courier Payout Settlement
     </a>

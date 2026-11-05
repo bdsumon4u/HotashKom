@@ -288,7 +288,7 @@
     @endif
     <div class="pt-2 mb-2 d-flex-justify-content-between border-top">
         <div>Product Code: <strong>{{ $selectedVar->sku }}</strong></div>
-        <div>Availability:
+        <div class="stock-availability">Availability:
             <strong>
                 @if (!$product->is_active)
                     <span class="text-danger">Inactive</span>

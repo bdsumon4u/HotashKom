@@ -87,6 +87,9 @@
                                         @if($entry->reference)
                                             <span class="badge badge-light border text-muted">Ref: {{ $entry->reference }}</span>
                                         @endif
+                                        @if(in_array($entry->source_type, ['Shipment', 'CourierReturn'], true))
+                                            <a href="{{ route('admin.accounting.movements.show', $entry) }}" class="badge badge-light-primary text-primary border">View products</a>
+                                        @endif
                                         @if($entry->source_type === \App\Models\Purchase::class && $entry->source_id)
                                             <a href="{{ route('admin.purchases.edit', $entry->source_id) }}" class="badge badge-light-info text-info border">
                                                 <i class="fa fa-shopping-cart mr-1"></i> Purchase #{{ $entry->source_id }}

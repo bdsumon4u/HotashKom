@@ -208,7 +208,16 @@
                                             <td class="font-roboto font-weight-bold text-dark">{{ \Carbon\Carbon::parse($item->entry_date)->format('M d, Y') }}</td>
                                             <td class="font-roboto small text-primary font-weight-bold">{{ $item->entry_number }}</td>
                                             <td>
-                                                <div class="font-weight-500 text-dark">{{ $item->notes ?: ($item->entry_description ?: '—') }}</div>
+                                                <div class="font-weight-500 text-dark">
+                                                    @if(in_array($item->source_type, ['Shipment', 'CourierReturn'], true))
+                                                        {{ \Illuminate\Support\Str::before($item->notes ?: ($item->entry_description ?: '—'), ' [') }}
+                                                    @else
+                                                        {{ $item->notes ?: ($item->entry_description ?: '—') }}
+                                                    @endif
+                                                </div>
+                                                @if(in_array($item->source_type, ['Shipment', 'CourierReturn'], true))
+                                                    <a href="{{ route('admin.accounting.movements.show', $item->journal_entry_id) }}" class="btn btn-outline-primary btn-xs mt-1">Details</a>
+                                                @endif
                                                 @if($item->reference)
                                                     <span class="badge badge-light border text-muted mt-1">Ref: {{ $item->reference }}</span>
                                                 @endif
