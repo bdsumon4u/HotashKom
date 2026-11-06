@@ -437,9 +437,19 @@
                                                 @if (! empty($tp['label']))
                                                     @php
                                                         $lbl = strtolower($tp['label']);
-                                                        $bColor = str_contains($lbl, 'gold') ? 'badge-warning text-dark' : (str_contains($lbl, 'silver') ? 'badge-secondary' : 'badge-info');
+                                                        if (str_contains($lbl, 'gold')) {
+                                                            $bColor = 'badge-warning text-dark';
+                                                        } elseif (str_contains($lbl, 'silver')) {
+                                                            $bColor = 'badge-secondary';
+                                                        } elseif (str_contains($lbl, 'diamon')) {
+                                                            $bColor = 'badge-info';
+                                                        } else {
+                                                            $bColor = 'badge-primary';
+                                                        }
                                                     @endphp
-                                                    <span class="badge {{ $bColor }} ml-1 px-2 py-1"><i class="fa fa-crown mr-1"></i>{{ $tp['label'] }}</span>
+                                                    <div class="mt-1">
+                                                        <span class="badge {{ $bColor }} px-2 py-1"><i class="fa fa-crown mr-1"></i>{{ $tp['label'] }}</span>
+                                                    </div>
                                                 @endif
                                             </td>
                                             <td>
