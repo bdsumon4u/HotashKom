@@ -50,7 +50,7 @@ return [
             'benefit' => '46,00,000 Tk Car',
         ],
         80_000 => [
-            'label' => 'Diamon',
+            'label' => 'Diamond',
             'benefit' => '80,00,000 Tk Flat',
         ],
     ],
