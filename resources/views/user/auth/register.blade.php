@@ -120,7 +120,7 @@
                                             name="referral_code"
                                             value="{{ old('referral_code', request('ref', request('referral_code', session('ref')))) }}"
                                             autocomplete="off"
-                                            placeholder="e.g. HK123456">
+                                            placeholder="e.g. 123456">
                                         <small class="form-text text-muted">If you were invited by another reseller, enter their referral code.</small>
                                         @error('referral_code')
                                         <span class="invalid-feedback" role="alert">

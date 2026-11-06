@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Str;
 
 class Investor extends Authenticatable implements Confirmable, Wallet
 {
@@ -59,12 +58,12 @@ class Investor extends Authenticatable implements Confirmable, Wallet
     }
 
     /**
-     * Generate unique referral code.
+     * Generate unique 6-digit numeric referral code.
      */
     public static function generateReferralCode(): string
     {
         do {
-            $code = 'INV'.strtoupper(Str::random(6));
+            $code = (string) random_int(100000, 999999);
         } while (self::query()->where('referral_code', $code)->exists());
 
         return $code;

@@ -6,17 +6,16 @@ use App\Models\AffiliateCommission;
 use App\Models\ResellerAffiliate;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class AffiliateService
 {
     /**
-     * Generate a unique uppercase referral code.
+     * Generate a unique 6-digit numeric referral code.
      */
     public function generateUniqueCode(): string
     {
         do {
-            $code = 'HK'.Str::upper(Str::random(6));
+            $code = (string) random_int(100000, 999999);
         } while (ResellerAffiliate::where('referral_code', $code)->exists());
 
         return $code;
