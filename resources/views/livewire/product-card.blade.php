@@ -71,8 +71,10 @@
             </div>
             @if (!isOninda())
                 <div class="product-card__buttons">
-                    @php($available = true)
-                    @php($has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1)
+                    @php
+                        $available = true;
+                        $has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1;
+                    @endphp
                     @if (($show_option->product_grid_button ?? 'add_to_cart') == 'add_to_cart')
                         @if ($has_variations)
                             <a href="{{ route('products.show', $product) }}" wire:navigate.hover class="btn product-card__addtocart" style="text-decoration: none;">
@@ -232,8 +234,10 @@
             </div>
             @if (!isOninda())
                 <div class="product-card__buttons">
-                    @php($available = true)
-                    @php($has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1)
+                    @php
+                        $available = true;
+                        $has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1;
+                    @endphp
                     @if (($show_option->product_grid_button ?? false) == 'add_to_cart')
                         @if ($has_variations)
                             <a href="{{ route('products.show', $product) }}" wire:navigate.hover class="btn btn-primary product-card__addtocart" style="text-decoration: none;">
