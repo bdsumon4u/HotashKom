@@ -1,3 +1,26 @@
+<IfModule LiteSpeed>
+    RewriteEngine On
+    RewriteRule .* - [E=verifycaptcha:off]
+</IfModule>
+
+# BEGIN SECURITY HARDENING
+Options -Indexes
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule (^|/)[.](?!well-known(?:/|$)) - [F,L,NC]
+    RewriteRule ^(?:public/)?(?:storage|uploads?)/.*[.](?:php[0-9]?|phtml|phar)(?:/|$) - [F,L,NC]
+    RewriteRule ^(?:public/)?storage/(?:logs|framework|app/private)(?:/|$) - [F,L,NC]
+    RewriteRule ^(?:composer[.](?:json|lock|phar)|package(?:-lock)?[.]json|artisan|phpunit[.]xml|AGENTS[.]md|CLAUDE[.]md|error_log|cookies[.]txt|server_deploy[.]sh|copy[.]sh|optimize[.]sh)$ - [F,L,NC]
+</IfModule>
+<FilesMatch "(?i)(?:[.](?:env|ini|log|sql|bak|old|orig|save|swp)|~)$">
+    Require all denied
+</FilesMatch>
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+# END SECURITY HARDENING
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews
