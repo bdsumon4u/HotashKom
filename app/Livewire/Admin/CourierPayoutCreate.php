@@ -211,11 +211,20 @@ class CourierPayoutCreate extends Component
         }
 
         return DB::transaction(function () use ($accountingService, $grossSales, $purchaseCost) {
-            $itemsSummaryList = [];
+            $details = [];
             foreach ($this->items as $item) {
-                $itemsSummaryList[] = $item['name'].' (x'.$item['quantity'].')';
+                $quantity = (int) $item['quantity'];
+                $purchasePrice = (float) $item['unit_purchase_cost'];
+                $details[] = [
+                    'product_id' => (int) $item['product_id'],
+                    'product_name' => $item['name'],
+                    'sku' => $item['sku'] ?: null,
+                    'quantity' => $quantity,
+                    'purchase_price' => $purchasePrice,
+                    'selling_price' => (float) $item['unit_retail_price'],
+                    'line_purchase_total' => round($purchasePrice * $quantity, 2),
+                ];
             }
-            $itemsSummary = implode(', ', $itemsSummaryList);
 
             $accountingService->recordCourierPayoutSettlement([
                 'entry_date' => $this->entry_date,
@@ -226,7 +235,7 @@ class CourierPayoutCreate extends Component
                 'courier_name' => $this->courier_name ?: null,
                 'reference' => $this->reference ?: null,
                 'description' => $this->notes ?: null,
-                'items_summary' => $itemsSummary ?: null,
+                'details' => $details,
             ]);
 
             session()->flash(

@@ -23,7 +23,7 @@ class AccountingMovementController extends Controller
     public function show(JournalEntry $journalEntry): View
     {
         abort_unless(request()->user()->is('admin'), 403);
-        abort_unless(in_array($journalEntry->source_type, ['Shipment', 'CourierReturn'], true), 404);
+        abort_unless(in_array($journalEntry->source_type, ['Shipment', 'CourierReturn', 'CourierPayout'], true), 404);
 
         $journalEntry->load('items.account');
         $details = $journalEntry->details;

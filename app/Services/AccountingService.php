@@ -657,7 +657,8 @@ final class AccountingService
      *     courier_name?: ?string,
      *     reference?: ?string,
      *     description?: ?string,
-     *     items_summary?: ?string
+     *     items_summary?: ?string,
+     *     details?: array<int, array<string, int|float|string|null>>
      * }  $data
      */
     public function recordCourierPayoutSettlement(array $data): JournalEntry
@@ -711,7 +712,7 @@ final class AccountingService
                 'account_id' => $cogsAccount->id,
                 'debit' => $totalPurchaseCost,
                 'credit' => 0,
-                'notes' => 'Product Cost of Goods Sold (Delivered)'.(! empty($data['items_summary']) ? ' ['.$data['items_summary'].']' : ''),
+                'notes' => 'Product Cost of Goods Sold (Delivered)',
             ];
 
             $journalItems[] = [
@@ -730,6 +731,7 @@ final class AccountingService
                 'reference' => $data['reference'] ?? null,
                 'description' => $description,
                 'source_type' => 'CourierPayout',
+                'details' => $data['details'] ?? null,
             ],
             $journalItems
         );

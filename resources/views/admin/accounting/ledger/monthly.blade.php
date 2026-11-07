@@ -209,13 +209,13 @@
                                             <td class="font-roboto small text-primary font-weight-bold">{{ $item->entry_number }}</td>
                                             <td>
                                                 <div class="font-weight-500 text-dark">
-                                                    @if(in_array($item->source_type, ['Shipment', 'CourierReturn'], true))
+                                                    @if(in_array($item->source_type, ['Shipment', 'CourierReturn', 'CourierPayout'], true))
                                                         {{ \Illuminate\Support\Str::before($item->notes ?: ($item->entry_description ?: '—'), ' [') }}
                                                     @else
                                                         {{ $item->notes ?: ($item->entry_description ?: '—') }}
                                                     @endif
                                                 </div>
-                                                @if(in_array($item->source_type, ['Shipment', 'CourierReturn'], true))
+                                                @if(in_array($item->source_type, ['Shipment', 'CourierReturn', 'CourierPayout'], true))
                                                     <a href="{{ route('admin.accounting.movements.show', $item->journal_entry_id) }}" class="btn btn-outline-primary btn-xs mt-1">Details</a>
                                                 @endif
                                                 @if($item->reference)

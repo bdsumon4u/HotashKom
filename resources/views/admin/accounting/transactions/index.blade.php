@@ -87,7 +87,7 @@
                                         @if($entry->reference)
                                             <span class="badge badge-light border text-muted">Ref: {{ $entry->reference }}</span>
                                         @endif
-                                        @if(in_array($entry->source_type, ['Shipment', 'CourierReturn'], true))
+                                        @if(in_array($entry->source_type, ['Shipment', 'CourierReturn', 'CourierPayout'], true))
                                             <a href="{{ route('admin.accounting.movements.show', $entry) }}" class="badge badge-light-primary text-primary border">View products</a>
                                         @endif
                                         @if($entry->source_type === \App\Models\Purchase::class && $entry->source_id)
