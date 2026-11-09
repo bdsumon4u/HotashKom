@@ -1,5 +1,5 @@
 @if (data_get($sections, 'size_guide.enabled', true) && !empty($sizeRows))
-    <section class="py-5 border-green-100 md:py-10 border-y-2 bg-green-50">
+    <section id="size-guide" class="py-5 border-green-100 md:py-10 border-y-2 bg-green-50">
         <div class="max-w-3xl px-2 mx-auto md:px-4">
             <div class="p-8 bg-white border-2 border-green-700 rounded-md shadow-xl">
                 <h3 class="mb-6 text-2xl font-black text-center text-gray-900 uppercase">

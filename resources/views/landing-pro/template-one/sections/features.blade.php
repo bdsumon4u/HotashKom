@@ -2,7 +2,7 @@
     @php
         $hasImage = filled(data_get($sections, 'features.image_src'));
     @endphp
-    <section class="py-5 bg-white md:py-10">
+    <section id="features" class="py-5 bg-white md:py-10">
         <div
             class="grid {{ $hasImage ? 'max-w-6xl' : 'max-w-3xl' }} gap-8 px-2 mx-auto md:px-4 @if ($hasImage) md:grid-cols-2 @endif md:items-center">
             <div>

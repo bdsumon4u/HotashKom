@@ -1,5 +1,5 @@
 @if (data_get($sections, 'video.enabled', true))
-    <section class="py-5 border-b md:py-10 bg-gray-50">
+    <section id="video" class="py-5 border-b md:py-10 bg-gray-50">
         <div class="max-w-4xl px-2 mx-auto text-center md:px-4">
             <h2 class="mb-8 text-2xl font-black text-green-900">
                 {{ data_get($sections, 'video.title', 'ভিডিওতে বিস্তারিত দেখুন') }}</h2>

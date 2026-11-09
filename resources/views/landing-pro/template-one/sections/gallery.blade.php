@@ -1,5 +1,5 @@
 @if (data_get($sections, 'gallery.enabled', true) && !empty($galleryImages))
-    <section class="py-5 bg-white border-b md:py-10">
+    <section id="gallery" class="py-5 bg-white border-b md:py-10">
         <div class="px-2 mx-auto md:px-4 max-w-7xl">
             <h2 class="mb-8 text-2xl font-black text-center text-gray-900">
                 {{ data_get($sections, 'gallery.title', 'পণ্যটির আরও কিছু ছবি') }}</h2>

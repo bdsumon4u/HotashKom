@@ -1,5 +1,5 @@
 @if (data_get($sections, 'gallery.enabled', true) && data_get($sections, 'cta_after_gallery.enabled', true))
-    <section class="flex justify-center py-5 bg-white md:py-10">
+    <section id="cta-after-gallery" class="flex justify-center py-5 bg-white md:py-10">
         <div class="max-w-5xl p-3 mx-2 text-white bg-green-800 rounded-md md:p-6">
             <div class="flex flex-col items-center justify-between gap-5 md:flex-row">
                 <div class="text-center md:text-left">

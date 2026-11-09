@@ -1,5 +1,5 @@
 @if (data_get($sections, 'reviews.enabled', true) && !empty($reviews))
-    <section class="py-5 bg-gray-100 border-b md:py-10">
+    <section id="reviews" class="py-5 bg-gray-100 border-b md:py-10">
         <div class="max-w-6xl px-2 mx-auto md:px-4">
             <h3 class="mb-8 text-3xl font-black text-center text-gray-900">
                 {{ data_get($sections, 'reviews.title', 'আমাদের কাস্টমারদের মতামত') }}</h3>

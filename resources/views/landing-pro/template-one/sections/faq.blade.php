@@ -1,5 +1,5 @@
 @if (data_get($sections, 'faq.enabled', true) && !empty($faqs))
-    <section class="py-5 bg-white md:py-10">
+    <section id="faq" class="py-5 bg-white md:py-10">
         <div class="max-w-4xl px-2 mx-auto md:px-4" x-data="{ activeFaq: 0 }">
             <h2 class="mb-8 text-3xl font-black text-center text-green-900">
                 {{ data_get($sections, 'faq.title', 'সাধারণ জিজ্ঞাসা') }}</h2>

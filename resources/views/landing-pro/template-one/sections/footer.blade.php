@@ -1,5 +1,5 @@
 @if (data_get($sections, 'footer.enabled', true))
-    <footer class="py-5 text-center text-white bg-gray-900 md:py-10">
+    <footer id="footer" class="py-5 text-center text-white bg-gray-900 md:py-10">
         <div class="max-w-4xl px-2 mx-auto md:px-4">
             @if (filled(data_get($logo, 'desktop')) || filled(data_get($logo, 'dashboard')) || filled(data_get($logo, 'login')))
                 <img src="{{ asset(data_get($logo, 'desktop') ?? (data_get($logo, 'dashboard') ?? data_get($logo, 'login'))) }}"

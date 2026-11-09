@@ -1,5 +1,5 @@
 @if (data_get($sections, 'hero.enabled', true))
-    <section class="py-5 text-center text-white bg-green-800 md:py-20">
+    <section id="hero" class="py-5 text-center text-white bg-green-800 md:py-20">
         <div class="max-w-5xl px-2 mx-auto md:px-4">
             <h1 class="text-3xl font-extrabold uppercase md:text-5xl">
                 {{ data_get($sections, 'hero.title', $landingPagePro->title) }}
@@ -41,7 +41,7 @@
 @endif
 
 @if (filled($heroImageUrl))
-    <section class="py-5 bg-white border-b md:py-10">
+    <section id="hero-image" class="py-5 bg-white border-b md:py-10">
         <div class="max-w-3xl px-2 mx-auto md:px-4">
             <img src="{{ $heroImageUrl }}" alt="Hero image"
                 class="object-cover w-full border border-gray-100 rounded-md shadow-lg">

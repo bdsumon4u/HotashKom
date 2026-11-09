@@ -1,5 +1,5 @@
 @if (data_get($sections, 'final_cta.enabled', true))
-    <section class="flex justify-center py-5 bg-white border-b md:py-10">
+    <section id="final-cta" class="flex justify-center py-5 bg-white border-b md:py-10">
         <div class="max-w-5xl p-3 mx-2 text-center text-white bg-gray-900 rounded-md md:p-6">
             <h3 class="text-2xl font-black">
                 {{ data_get($sections, 'final_cta.title', 'রিভিউ দেখলেন, এবার অর্ডার কনফার্ম করুন') }}</h3>
