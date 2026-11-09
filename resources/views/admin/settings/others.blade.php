@@ -243,6 +243,12 @@
                         :checked="!!($show_option->email ?? false)" />
                     <label for="show-email" class="my-1">Email Field</label>
                 </div>
+                <div class="checkbox checkbox-secondary">
+                    <input type="hidden" name="show_option[order_status_confirmation]" value="0">
+                    <x-checkbox id="show-order-status-confirmation" name="show_option[order_status_confirmation]" value="1"
+                        :checked="!!($show_option->order_status_confirmation ?? false)" />
+                    <label for="show-order-status-confirmation" class="my-1">Order Status Confirmation</label>
+                </div>
             </div>
         </div>
     </div>

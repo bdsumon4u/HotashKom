@@ -51,7 +51,7 @@
                             <div class="col-auto pr-0 d-flex align-items-center" check-count></div>
                             @unless (false && in_array(request('status'), ['CONFIRMED', 'PACKAGING']))
                                 <div class="col-auto px-1">
-                                    <select name="status" id="status" onchange="changeStatus()"
+                                    <select name="status" id="status"
                                         class="text-white form-control form-control-sm bg-primary">
                                         <option value="">Change Status</option>
                                         @foreach (config('app.orders', []) as $status)
@@ -178,6 +178,28 @@
                 </div>
                 <div class="p-3 modal-body" style="max-height: 70vh; overflow-y: auto;">
                     <div id="orderAdminNotesModalBody" class="text-muted">Click on a notes count to load notes.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderStatusConfirmModal" tabindex="-1" role="dialog"
+        aria-labelledby="orderStatusConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content rounded-0">
+                <div class="p-3 modal-header bg-primary text-white">
+                    <h5 class="mb-0 modal-title font-weight-bold text-white" id="orderStatusConfirmModalLabel">Confirm Status Change</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="p-4 modal-body text-center">
+                    <i class="fa fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                    <p class="mb-0 text-dark" id="orderStatusConfirmModalMessage" style="font-size: 15px;"></p>
+                </div>
+                <div class="p-2 modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary btn-sm px-3" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary btn-sm px-4 font-weight-bold" id="orderStatusConfirmBtn">Confirm Change</button>
                 </div>
             </div>
         </div>
@@ -446,6 +468,13 @@
                 },
                 drawCallback: function() {
                     updateBulkMenu();
+                    $('.status-column').each(function() {
+                        var val = $(this).val();
+                        if (!$(this).attr('data-status')) {
+                            $(this).attr('data-status', val);
+                        }
+                        $(this).data('status', $(this).attr('data-status'));
+                    });
                     $(document).on('change', '[name="order_id[]"]', function() {
                         if ($(this).prop('checked')) {
                             checklist.add($(this).val());
@@ -471,16 +500,108 @@
             initializeDataTable();
         });
 
-        $(document).on('change', '.status-column', changeStatus);
+        var requireStatusConfirmation = {{ (setting('show_option')->order_status_confirmation ?? false) ? 'true' : 'false' }};
+        var pendingStatusChange = null;
+        var statusChangeConfirmed = false;
 
-        function changeStatus() {
+        $(document).on('change', '.status-column', function() {
+            changeStatus(this);
+        });
+
+        $(document).on('change', '#status', function() {
+            changeStatus(this);
+        });
+
+        function changeStatus(el) {
+            var $el = el ? $(el) : $(this);
+            var orderId = $el.data('id') || $el.attr('data-id');
+            var isSingle = !!orderId;
+            var order_id, newStatus, oldStatus;
+
+            if (isSingle) {
+                order_id = [orderId];
+                newStatus = $el.val();
+                oldStatus = $el.attr('data-status') || $el.data('status') || '';
+
+                if (oldStatus && newStatus === oldStatus) {
+                    return;
+                }
+            } else {
+                order_id = Array.from(checklist);
+                newStatus = $('#status').val();
+
+                if (!newStatus) {
+                    return;
+                }
+
+                if (order_id.length === 0) {
+                    $.notify('Please select at least one order', 'warning');
+                    $('#status').val('');
+                    return;
+                }
+            }
+
+            if (!requireStatusConfirmation) {
+                executeStatusChange(order_id, newStatus, isSingle ? $el : null);
+                return;
+            }
+
+            statusChangeConfirmed = false;
+            pendingStatusChange = {
+                order_id: order_id,
+                status: newStatus,
+                oldStatus: oldStatus,
+                isSingle: isSingle,
+                $el: $el
+            };
+
+            var msg = '';
+            if (isSingle) {
+                msg = 'Are you sure you want to change the status of Order <strong>#' + order_id[0] + '</strong>';
+                if (oldStatus) {
+                    msg += ' from <span class="badge badge-light border">' + oldStatus + '</span>';
+                }
+                msg += ' to <span class="badge badge-primary">' + newStatus + '</span>?';
+            } else {
+                msg = 'Are you sure you want to change the status of <strong>' + order_id.length + '</strong> selected order(s) to <span class="badge badge-primary">' + newStatus + '</span>?';
+            }
+
+            $('#orderStatusConfirmModalMessage').html(msg);
+            $('#orderStatusConfirmModal').modal('show');
+        }
+
+        $('#orderStatusConfirmBtn').on('click', function() {
+            if (!pendingStatusChange) {
+                return;
+            }
+            statusChangeConfirmed = true;
+            $('#orderStatusConfirmModal').modal('hide');
+            executeStatusChange(
+                pendingStatusChange.order_id,
+                pendingStatusChange.status,
+                pendingStatusChange.isSingle ? pendingStatusChange.$el : null
+            );
+        });
+
+        $('#orderStatusConfirmModal').on('hidden.bs.modal', function() {
+            if (!statusChangeConfirmed && pendingStatusChange) {
+                if (pendingStatusChange.isSingle && pendingStatusChange.$el) {
+                    var prevStatus = pendingStatusChange.oldStatus || pendingStatusChange.$el.attr('data-status') || pendingStatusChange.$el.data('status');
+                    if (prevStatus) {
+                        pendingStatusChange.$el.val(prevStatus);
+                    }
+                } else {
+                    $('#status').val('');
+                }
+            }
+            pendingStatusChange = null;
+            statusChangeConfirmed = false;
+        });
+
+        function executeStatusChange(order_id, status, $el) {
             $('[name="status"]').prop('disabled', true);
-
-            var order_id = Array.from(checklist);
-            var status = $('[name="status"]').val();
-            if ($(this).data('id')) {
-                order_id = [$(this).data('id')];
-                status = $(this).val();
+            if ($el) {
+                $el.prop('disabled', true);
             }
 
             $.post({
@@ -491,15 +612,32 @@
                     status: status,
                 },
                 success: function(response) {
+                    if ($el) {
+                        $el.attr('data-status', status);
+                        $el.data('status', status);
+                    }
                     checklist.clear();
                     updateBulkMenu();
-                    table.draw();
+                    table.draw(false);
 
                     $.notify('Status updated successfully', 'success');
+                },
+                error: function(xhr) {
+                    var errorMsg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Failed to update status';
+                    $.notify(errorMsg, 'danger');
+                    if ($el && $el.hasClass('status-column')) {
+                        var prev = $el.attr('data-status') || $el.data('status');
+                        if (prev) {
+                            $el.val(prev);
+                        }
+                    }
                 },
                 complete: function() {
                     $('[name="status"]').prop('disabled', false);
                     $('[name="status"]').val('');
+                    if ($el) {
+                        $el.prop('disabled', false);
+                    }
                 }
             });
         }

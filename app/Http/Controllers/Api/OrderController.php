@@ -172,7 +172,7 @@ class OrderController extends Controller
             ->editColumn('updated_at', fn ($row): string => "<div class='text-nowrap'>".$row->updated_at->format('d-M-Y').'<br>'.$row->updated_at->format('h:i A').'</div>')
             ->addColumn('amount', fn ($row): int => $row->condition)
             ->editColumn('status', function ($row) {
-                $return = '<select data-id="'.$row->id.'" onchange="changeStatus" class="status-column form-control-sm">';
+                $return = '<select data-id="'.$row->id.'" data-status="'.$row->status.'" class="status-column form-control-sm">';
                 foreach (config('app.orders', []) as $status) {
                     $selected = $status === $row->status ? 'selected' : '';
                     $return .= '<option value="'.$status.'" '.$this->isDisabled($row, $status).' '.$selected.'>'.$status.'</option>';

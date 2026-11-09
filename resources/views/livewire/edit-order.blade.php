@@ -722,10 +722,79 @@
             </div>
             @endif
         @endif
+        @if (setting('show_option')->order_status_confirmation ?? false)
+            <div class="modal fade" id="editOrderStatusConfirmModal" tabindex="-1" role="dialog"
+                aria-labelledby="editOrderStatusConfirmModalLabel" aria-hidden="true" wire:ignore>
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content rounded-0">
+                        <div class="p-3 modal-header bg-primary text-white">
+                            <h5 class="mb-0 modal-title font-weight-bold text-white" id="editOrderStatusConfirmModalLabel">Confirm Status Change</h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="p-4 modal-body text-center">
+                            <i class="fa fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                            <p class="mb-0 text-dark" id="editOrderStatusConfirmModalMessage" style="font-size: 15px;"></p>
+                        </div>
+                        <div class="p-2 modal-footer justify-content-center">
+                            <button type="button" class="btn btn-secondary btn-sm px-3" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary btn-sm px-4 font-weight-bold" id="editOrderStatusConfirmBtn">Confirm Change</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 @push('scripts')
     <script>
+        @if (setting('show_option')->order_status_confirmation ?? false)
+            var previousSelectStatus = '{{ $order->status }}';
+            var editStatusConfirmed = false;
+            var pendingEditStatus = '';
+
+            $(document).on('focusin mousedown', '#status', function() {
+                previousSelectStatus = $(this).val();
+            });
+
+            $(document).on('change', '#status', function(e) {
+                var newStatus = $(this).val();
+                if (newStatus === previousSelectStatus) {
+                    return;
+                }
+
+                pendingEditStatus = newStatus;
+                editStatusConfirmed = false;
+
+                var msg = 'Are you sure you want to change order status';
+                if (previousSelectStatus) {
+                    msg += ' from <span class="badge badge-light border">' + previousSelectStatus + '</span>';
+                }
+                msg += ' to <span class="badge badge-primary">' + newStatus + '</span>?';
+
+                $('#editOrderStatusConfirmModalMessage').html(msg);
+                $('#editOrderStatusConfirmModal').modal('show');
+            });
+
+            $('#editOrderStatusConfirmBtn').on('click', function() {
+                editStatusConfirmed = true;
+                previousSelectStatus = pendingEditStatus;
+                $('#editOrderStatusConfirmModal').modal('hide');
+            });
+
+            $('#editOrderStatusConfirmModal').on('hidden.bs.modal', function() {
+                if (!editStatusConfirmed) {
+                    $('#status').val(previousSelectStatus);
+                    if (typeof @this !== 'undefined') {
+                        @this.set('status', previousSelectStatus);
+                    }
+                }
+                pendingEditStatus = '';
+                editStatusConfirmed = false;
+            });
+        @endif
+
         function selector() {
             // Check if Select2 is available and element exists
             if (typeof $.fn.select2 === 'undefined') {
