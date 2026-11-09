@@ -17,6 +17,7 @@ class LandingPagePro extends Model
         'is_published',
         'seo',
         'section_settings',
+        'custom_css',
         'published_at',
     ];
 

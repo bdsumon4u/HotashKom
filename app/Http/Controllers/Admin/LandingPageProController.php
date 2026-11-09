@@ -8,7 +8,9 @@ use App\Http\Requests\UpdateLandingPageProRequest;
 use App\Models\LandingPagePro;
 use App\Models\Product;
 use App\Services\LandingPageProTemplateRegistry;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -96,6 +98,24 @@ class LandingPageProController extends Controller
         $this->syncItems($landing_page_pro, $request->input('items', []));
 
         return to_route('admin.landing-page-pros.index')->withSuccess('Landing Page Pro updated successfully.');
+    }
+
+    public function updateCustomCss(Request $request, LandingPagePro $landing_page_pro): JsonResponse|RedirectResponse
+    {
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
+
+        $landing_page_pro->update([
+            'custom_css' => $request->input('custom_css'),
+        ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Custom CSS updated successfully.',
+            ]);
+        }
+
+        return back()->withSuccess('Custom CSS updated successfully.');
     }
 
     public function destroy(LandingPagePro $landing_page_pro): RedirectResponse

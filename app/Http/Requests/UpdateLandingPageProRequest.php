@@ -37,6 +37,7 @@ class UpdateLandingPageProRequest extends FormRequest
             'published_at' => ['nullable', 'date'],
             'seo.title' => ['nullable', 'string', 'max:255'],
             'seo.description' => ['nullable', 'string', 'max:500'],
+            'custom_css' => ['nullable', 'string'],
             'section_settings' => ['nullable', 'array'],
             'section_settings.*' => ['nullable'],
             'section_settings.phone' => ['nullable', 'string', 'max:50'],

@@ -29,6 +29,7 @@
                                     <th>Title</th>
                                     <th>Template</th>
                                     <th>Status</th>
+                                    <th>Custom CSS</th>
                                     <th>Public URL</th>
                                     <th>Action</th>
                                 </tr>
@@ -45,6 +46,19 @@
                                             @else
                                                 <span class="badge badge-secondary">Draft</span>
                                             @endif
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm" style="min-width: 220px;">
+                                                <input type="text" class="form-control form-control-sm js-custom-css-input"
+                                                    data-url="{{ route('admin.landing-page-pros.custom-css', $landing) }}"
+                                                    value="{{ $landing->custom_css }}"
+                                                    placeholder="Custom CSS...">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-outline-primary btn-sm js-save-custom-css" type="button" title="Save Custom CSS">
+                                                        <i class="fa fa-save"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td>
                                             @if ($landing->is_published)
@@ -74,3 +88,39 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).on('click', '.js-save-custom-css', function() {
+            var $btn = $(this);
+            var $input = $btn.closest('.input-group').find('.js-custom-css-input');
+            var url = $input.data('url');
+            var css = $input.val();
+
+            $btn.prop('disabled', true);
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    custom_css: css
+                },
+                success: function(response) {
+                    $.notify(response.message || 'Custom CSS updated successfully.', 'success');
+                },
+                error: function(xhr) {
+                    $.notify('Failed to update Custom CSS.', 'danger');
+                },
+                complete: function() {
+                    $btn.prop('disabled', false);
+                }
+            });
+        });
+
+        $(document).on('keypress', '.js-custom-css-input', function(e) {
+            if (e.which === 13) {
+                $(this).closest('.input-group').find('.js-save-custom-css').trigger('click');
+            }
+        });
+    </script>
+@endpush

@@ -136,6 +136,11 @@
             }
         })();
     </script>
+    @if (filled($landingPagePro->custom_css))
+        <style id="custom-css">
+            {!! $landingPagePro->custom_css !!}
+        </style>
+    @endif
 </head>
 
 @php

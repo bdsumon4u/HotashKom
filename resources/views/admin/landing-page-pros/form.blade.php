@@ -576,6 +576,18 @@
                     placeholder="Short SEO description (recommended around 150-160 chars)">{{ old('seo.description', $defaultSeoDescription) }}</textarea>
             </div>
         </div>
+
+        <div class="p-3 mb-3 lp-card">
+            <h5 class="mb-3">Custom CSS</h5>
+            <div class="mb-0 form-group">
+                <label for="custom_css">CSS Code</label>
+                <textarea name="custom_css" id="custom_css" rows="6" class="form-control"
+                    style="font-family: monospace; font-size: 13px;"
+                    placeholder="/* Write custom CSS here. e.g. .hero-title { color: #ff0000; } */">{{ old('custom_css', $landingPagePro->custom_css) }}</textarea>
+                <small class="form-text text-muted">This CSS will be injected into the &lt;style&gt; tag of this landing page.</small>
+                <x-error field="custom_css" />
+            </div>
+        </div>
     </div>
 
     <div class="col-lg-4">
