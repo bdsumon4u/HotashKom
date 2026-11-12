@@ -152,6 +152,7 @@
                             <th class="text-dark font-weight-bold">Reference / Cheque</th>
                             <th class="text-dark font-weight-bold">Notes</th>
                             <th class="text-right text-dark font-weight-bold" style="width: 150px;">Amount Paid</th>
+                            <th class="text-center text-dark font-weight-bold" style="width: 80px;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -162,16 +163,30 @@
                                     <span class="badge badge-light-primary text-primary font-weight-bold">
                                         {{ $payment->account->name ?? 'Cash/Bank' }}
                                     </span>
+                                    @if($payment->purchase_id)
+                                        <div class="small mt-1 text-muted">
+                                            <i class="fa fa-shopping-bag mr-1"></i>Purchase #{{ $payment->purchase?->invoice_number ?: $payment->purchase_id }}
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>{{ $payment->reference ?? '—' }}</td>
                                 <td>{{ $payment->notes ?? '—' }}</td>
                                 <td class="text-right font-roboto font-weight-bold text-success">
                                     {!! theMoney($payment->amount) !!}
                                 </td>
+                                <td class="text-center">
+                                    <form action="{{ route('admin.suppliers.payments.destroy', [$supplier, $payment]) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this payment of TK {{ number_format((float) $payment->amount, 2) }}? The supplier outstanding due will be updated and any linked accounting transaction will be removed.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger btn-xs" title="Delete Payment">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">No payments recorded for this supplier yet.</td>
+                                <td colspan="6" class="text-center text-muted py-4">No payments recorded for this supplier yet.</td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -14,6 +14,7 @@ use App\Models\TransactionCategory;
 use App\Services\AccountingService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AccountingTransactionController extends Controller
 {
@@ -463,7 +464,54 @@ class AccountingTransactionController extends Controller
 
         $entry = $transaction instanceof JournalEntry ? $transaction : JournalEntry::findOrFail($transaction);
 
-        $this->accountingService->deleteJournalEntry($entry);
+        DB::transaction(function () use ($entry): void {
+            if ($entry->source_type === PurchasePayment::class && $entry->source_id) {
+                $payment = PurchasePayment::find($entry->source_id);
+                if ($payment) {
+                    if ($payment->purchase_id && ($purchase = $payment->purchase)) {
+                        $purchase->paid_amount = max(0, (float) $purchase->paid_amount - (float) $payment->amount);
+                        $purchase->due_amount = max(0, (float) $purchase->total_amount - (float) $purchase->paid_amount);
+                        $purchase->payment_status = $purchase->paid_amount <= 0
+                            ? Purchase::STATUS_UNPAID
+                            : ($purchase->due_amount <= 0 ? Purchase::STATUS_PAID : Purchase::STATUS_PARTIAL);
+                        $purchase->save();
+                    }
+
+                    $supplier = $payment->supplier;
+                    $payment->delete();
+                    $supplier?->recalculateDue();
+                }
+            } elseif ($entry->source_type === Supplier::class && $entry->source_id) {
+                $supplier = Supplier::find($entry->source_id);
+                if ($supplier) {
+                    $creditItem = $entry->items->where('credit', '>', 0)->first();
+                    $amount = (float) ($creditItem ? $creditItem->credit : 0);
+                    $accountId = $creditItem?->account_id;
+
+                    $payment = $supplier->purchasePayments()
+                        ->whereDate('payment_date', $entry->entry_date)
+                        ->where('amount', $amount)
+                        ->when($accountId, fn ($q) => $q->where('account_id', $accountId))
+                        ->latest('id')
+                        ->first();
+
+                    if ($payment) {
+                        if ($payment->purchase_id && ($purchase = $payment->purchase)) {
+                            $purchase->paid_amount = max(0, (float) $purchase->paid_amount - (float) $payment->amount);
+                            $purchase->due_amount = max(0, (float) $purchase->total_amount - (float) $purchase->paid_amount);
+                            $purchase->payment_status = $purchase->paid_amount <= 0
+                                ? Purchase::STATUS_UNPAID
+                                : ($purchase->due_amount <= 0 ? Purchase::STATUS_PAID : Purchase::STATUS_PARTIAL);
+                            $purchase->save();
+                        }
+                        $payment->delete();
+                    }
+                    $supplier->recalculateDue();
+                }
+            }
+
+            $this->accountingService->deleteJournalEntry($entry);
+        });
 
         return back()->with('success', 'Transaction deleted and account balances recalculated.');
     }

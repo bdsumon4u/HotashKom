@@ -6,6 +6,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
+use App\Models\JournalEntry;
+use App\Models\Purchase;
+use App\Models\PurchasePayment;
 use App\Models\Supplier;
 use App\Services\AccountingService;
 use Illuminate\Http\Request;
@@ -67,7 +70,12 @@ class SupplierController extends Controller
     {
         abort_unless(request()->user()->is('admin'), 403);
 
-        $supplier->load(['purchases.products', 'purchasePayments.account']);
+        $supplier->load([
+            'purchases.products',
+            'purchasePayments' => fn ($q) => $q->latest('payment_date')->latest('id'),
+            'purchasePayments.account',
+            'purchasePayments.purchase',
+        ]);
         $supplier->recalculateDue();
 
         $accounts = config('accounting.enabled', false)
@@ -156,8 +164,8 @@ class SupplierController extends Controller
                             'entry_date' => $validated['payment_date'],
                             'reference' => $validated['reference'] ?? ('Payment to '.$supplier->name),
                             'description' => 'Supplier Payment: '.$supplier->name.($validated['notes'] ? ' - '.$validated['notes'] : ''),
-                            'source_type' => Supplier::class,
-                            'source_id' => $supplier->id,
+                            'source_type' => PurchasePayment::class,
+                            'source_id' => $payment->id,
                         ],
                         [
                             [
@@ -179,6 +187,58 @@ class SupplierController extends Controller
         });
 
         return back()->with('success', 'Supplier payment recorded successfully.');
+    }
+
+    public function destroyPayment(Supplier $supplier, PurchasePayment $payment)
+    {
+        abort_unless(request()->user()->is('admin'), 403);
+
+        if ((int) $payment->supplier_id !== (int) $supplier->id) {
+            abort(404);
+        }
+
+        DB::transaction(function () use ($supplier, $payment): void {
+            // 1. If paying against a specific purchase, restore purchase's paid/due amount
+            if (! empty($payment->purchase_id)) {
+                $purchase = $supplier->purchases()->find($payment->purchase_id);
+                if ($purchase) {
+                    $purchase->paid_amount = max(0, (float) $purchase->paid_amount - (float) $payment->amount);
+                    $purchase->due_amount = max(0, (float) $purchase->total_amount - (float) $purchase->paid_amount);
+                    $purchase->payment_status = $purchase->paid_amount <= 0
+                        ? Purchase::STATUS_UNPAID
+                        : ($purchase->due_amount <= 0 ? Purchase::STATUS_PAID : Purchase::STATUS_PARTIAL);
+                    $purchase->save();
+                }
+            }
+
+            // 2. Delete linked accounting journal entry if exists
+            $linkedEntry = JournalEntry::where('source_type', PurchasePayment::class)
+                ->where('source_id', $payment->id)
+                ->first();
+
+            // Fallback for older entries recorded under Supplier::class
+            if (! $linkedEntry) {
+                $linkedEntry = JournalEntry::where('source_type', Supplier::class)
+                    ->where('source_id', $supplier->id)
+                    ->whereDate('entry_date', $payment->payment_date)
+                    ->whereHas('items', function ($q) use ($payment): void {
+                        $q->where('credit', $payment->amount)->where('account_id', $payment->account_id);
+                    })
+                    ->first();
+            }
+
+            if ($linkedEntry) {
+                $this->accountingService->deleteJournalEntry($linkedEntry);
+            }
+
+            // 3. Delete the payment record
+            $payment->delete();
+
+            // 4. Recalculate supplier due
+            $supplier->recalculateDue();
+        });
+
+        return back()->with('success', 'Supplier payment deleted and outstanding due updated successfully.');
     }
 
     public function destroy(Supplier $supplier)

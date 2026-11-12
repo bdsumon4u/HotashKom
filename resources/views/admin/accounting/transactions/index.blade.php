@@ -155,7 +155,12 @@
                                                 <i class="fa fa-pencil"></i>
                                             </a>
                                         @elseif($entry->source_type === \App\Models\Supplier::class || $entry->source_type === \App\Models\PurchasePayment::class)
-                                            <a href="{{ route('admin.suppliers.index') }}" class="btn btn-outline-warning btn-xs" title="View Supplier Payments">
+                                            @php
+                                                $supplierId = $entry->source_type === \App\Models\Supplier::class
+                                                    ? $entry->source_id
+                                                    : \App\Models\PurchasePayment::find($entry->source_id)?->supplier_id;
+                                            @endphp
+                                            <a href="{{ $supplierId ? route('admin.suppliers.show', $supplierId) : route('admin.suppliers.index') }}" class="btn btn-outline-warning btn-xs" title="View Supplier Ledger">
                                                 <i class="fa fa-external-link"></i>
                                             </a>
                                         @else
