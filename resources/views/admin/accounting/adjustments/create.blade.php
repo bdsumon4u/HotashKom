@@ -13,6 +13,9 @@
 @endsection
 
 @section('breadcrumb-right')
+    <a href="{{ route('admin.accounting.adjustments.index') }}" class="btn btn-outline-danger btn-sm mr-2 font-weight-bold">
+        <i class="fa fa-history mr-1"></i> Adjustment History & Summary
+    </a>
     <a href="{{ route('admin.reports.stock') }}" class="btn btn-outline-primary btn-sm mr-2 font-weight-bold">
         <i class="fa fa-boxes mr-1"></i> Stock Report
     </a>

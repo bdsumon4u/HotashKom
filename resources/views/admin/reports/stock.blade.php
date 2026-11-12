@@ -12,7 +12,10 @@
 
 @section('breadcrumb-right')
     @if (config('accounting.enabled', true) && auth('admin')->user()?->is('admin'))
-        <div class="d-flex justify-content-end align-items-center">
+        <div class="d-flex justify-content-end align-items-center flex-wrap" style="gap: 8px;">
+            <a href="{{ route('admin.accounting.adjustments.index') }}" class="btn btn-outline-danger btn-sm font-weight-bold shadow-sm">
+                <i class="fa fa-history mr-1"></i> Damage & Adjustment Summary
+            </a>
             <a href="{{ route('admin.accounting.adjustments.create') }}" class="btn btn-warning btn-sm font-weight-bold text-dark shadow-sm">
                 <i class="fa fa-sliders mr-1"></i> Stock Adjustment (Damage / Gift)
             </a>

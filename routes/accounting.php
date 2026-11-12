@@ -39,6 +39,7 @@ Route::get('returns/create', function () {
 
     return view('admin.accounting.returns.create');
 })->name('returns.create');
+Route::get('adjustments', [AccountingMovementController::class, 'adjustments'])->name('adjustments.index');
 Route::get('adjustments/create', function () {
     abort_unless(request()->user()->is('admin'), 403);
 

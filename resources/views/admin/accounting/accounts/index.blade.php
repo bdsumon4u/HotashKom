@@ -95,15 +95,17 @@
                                         <th class="text-right text-dark font-weight-bold" style="width: 160px;">Opening Balance</th>
                                         <th class="text-right text-dark font-weight-bold" style="width: 180px;">Current Balance</th>
                                         <th class="text-center text-dark font-weight-bold" style="width: 100px;">Status</th>
-                                        <th class="text-center text-dark font-weight-bold" style="width: 110px;">Action</th>
+                                        <th class="text-center text-dark font-weight-bold" style="width: 140px;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($typeAccounts as $account)
                                         <tr>
                                             <td class="font-roboto font-weight-bold text-muted">{{ $account->code ?? '—' }}</td>
-                                            <td class="font-weight-bold text-dark">
-                                                {{ $account->name }}
+                                            <td>
+                                                <a href="{{ route('admin.accounting.accounts.show', $account) }}" class="font-weight-bold text-primary" title="View Statement / History">
+                                                    {{ $account->name }}
+                                                </a>
                                                 @if($account->is_system)
                                                     <span class="badge badge-light border text-muted small ml-1">System</span>
                                                 @endif
@@ -121,6 +123,9 @@
                                                 @endif
                                             </td>
                                             <td class="text-center">
+                                                <a href="{{ route('admin.accounting.accounts.show', $account) }}" class="btn btn-outline-info btn-xs mr-1" title="View Statement & History">
+                                                    <i class="fa fa-list-alt"></i>
+                                                </a>
                                                 <a href="{{ route('admin.accounting.accounts.edit', $account) }}" class="btn btn-outline-primary btn-xs mr-1" title="Edit">
                                                     <i class="fa fa-edit"></i>
                                                 </a>

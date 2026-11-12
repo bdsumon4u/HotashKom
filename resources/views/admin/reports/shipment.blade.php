@@ -289,6 +289,109 @@
             </div>
         </div>
 
+        @php
+            $monthTotals = [
+                'total' => collect($report['monthly_breakdown'] ?? [])->sum('total'),
+                'purchase' => collect($report['monthly_breakdown'] ?? [])->sum('total_purchase_cost'),
+                'subtotal' => collect($report['monthly_breakdown'] ?? [])->sum('total_subtotal'),
+                'shipping' => collect($report['monthly_breakdown'] ?? [])->sum('shipping'),
+                'delivered' => collect($report['monthly_breakdown'] ?? [])->sum('delivered'),
+                'returned' => collect($report['monthly_breakdown'] ?? [])->sum('returned'),
+                'paid_return' => collect($report['monthly_breakdown'] ?? [])->sum('paid_return'),
+                'return_received' => collect($report['monthly_breakdown'] ?? [])->sum('return_received'),
+                'paid_return_rcv' => collect($report['monthly_breakdown'] ?? [])->sum('paid_return_rcv'),
+            ];
+            $monthProfit = $monthTotals['subtotal'] - $monthTotals['purchase'];
+
+            $dailyTotals = [
+                'total' => collect($report['daily_breakdown'] ?? [])->sum('total'),
+                'purchase' => collect($report['daily_breakdown'] ?? [])->sum('total_purchase_cost'),
+                'subtotal' => collect($report['daily_breakdown'] ?? [])->sum('total_subtotal'),
+                'shipping' => collect($report['daily_breakdown'] ?? [])->sum('shipping'),
+                'delivered' => collect($report['daily_breakdown'] ?? [])->sum('delivered'),
+                'returned' => collect($report['daily_breakdown'] ?? [])->sum('returned'),
+                'paid_return' => collect($report['daily_breakdown'] ?? [])->sum('paid_return'),
+                'return_received' => collect($report['daily_breakdown'] ?? [])->sum('return_received'),
+                'paid_return_rcv' => collect($report['daily_breakdown'] ?? [])->sum('paid_return_rcv'),
+            ];
+            $dailyProfit = $dailyTotals['subtotal'] - $dailyTotals['purchase'];
+        @endphp
+
+        <!-- Shipment Monthly Breakdown -->
+        <div class="row">
+            <div class="col-12">
+                <div class="shadow-sm rounded-0 card mb-4">
+                    <div class="p-3 card-header bg-light border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 font-weight-bold text-dark"><i class="fa fa-calendar text-primary mr-2"></i> Shipment Monthly Breakdown</h5>
+                        <span class="text-muted small">Aggregated shipment metrics and gross profit grouped by month</span>
+                    </div>
+                    <div class="p-3 card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Month</th>
+                                        <th class="text-center">Total Shipped</th>
+                                        <th class="text-right">Purchase Cost</th>
+                                        <th class="text-right">Subtotal</th>
+                                        <th class="text-right">Profit</th>
+                                        <th class="text-center text-warning">Shipping</th>
+                                        <th class="text-center text-success">Delivered</th>
+                                        <th class="text-center text-danger">Returned</th>
+                                        <th class="text-center text-info">Paid Return</th>
+                                        <th class="text-center text-secondary">Return Rcv</th>
+                                        <th class="text-center text-dark">Paid Return Rcv</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($report['monthly_breakdown'] ?? [] as $monthKey => $data)
+                                    <tr>
+                                        <td>
+                                            <span class="text-primary font-weight-bold font-roboto">
+                                                <i class="fa fa-calendar-check-o text-muted mr-1"></i> {{ $data['month_label'] }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center font-roboto font-weight-bold">{{ $data['total'] }}</td>
+                                        <td class="text-right font-roboto">{!! theMoney($data['total_purchase_cost']) !!}</td>
+                                        <td class="text-right font-roboto">{!! theMoney($data['total_subtotal']) !!}</td>
+                                        <td class="text-right font-roboto font-weight-bold {{ ((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) >= 0 ? 'text-success' : 'text-danger' }}">
+                                            {!! theMoney((float) ($data['total_subtotal'] ?? 0) - (float) ($data['total_purchase_cost'] ?? 0)) !!}
+                                        </td>
+                                        <td class="text-center font-roboto text-warning">{{ $data['shipping'] }}</td>
+                                        <td class="text-center font-roboto text-success">{{ $data['delivered'] }}</td>
+                                        <td class="text-center font-roboto text-danger">{{ $data['returned'] }}</td>
+                                        <td class="text-center font-roboto text-info">{{ $data['paid_return'] ?? 0 }}</td>
+                                        <td class="text-center font-roboto text-secondary">{{ $data['return_received'] ?? 0 }}</td>
+                                        <td class="text-center font-roboto text-dark">{{ $data['paid_return_rcv'] ?? 0 }}</td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="11" class="text-center text-muted py-3">No shipment activity recorded for the selected period.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                                <tfoot style="background-color: #f1f5f9; border-top: 2px solid #94a3b8;">
+                                    <tr>
+                                        <th class="font-weight-bold text-dark">Grand Total Summation:</th>
+                                        <th class="text-center font-roboto font-weight-bold text-dark">{{ $monthTotals['total'] }}</th>
+                                        <th class="text-right font-roboto font-weight-bold text-dark">{!! theMoney($monthTotals['purchase']) !!}</th>
+                                        <th class="text-right font-roboto font-weight-bold text-dark">{!! theMoney($monthTotals['subtotal']) !!}</th>
+                                        <th class="text-right font-roboto font-weight-bold {{ $monthProfit >= 0 ? 'text-success' : 'text-danger' }}">{!! theMoney($monthProfit) !!}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-warning">{{ $monthTotals['shipping'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-success">{{ $monthTotals['delivered'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-danger">{{ $monthTotals['returned'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-info">{{ $monthTotals['paid_return'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-secondary">{{ $monthTotals['return_received'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-dark">{{ $monthTotals['paid_return_rcv'] }}</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Shipment Daily Breakdown -->
         <div class="row">
             <div class="col-12">
@@ -338,6 +441,21 @@
                                     </tr>
                                     @endforeach
                                 </tbody>
+                                <tfoot style="background-color: #f1f5f9; border-top: 2px solid #94a3b8;">
+                                    <tr>
+                                        <th class="font-weight-bold text-dark">Grand Total Summation:</th>
+                                        <th class="text-center font-roboto font-weight-bold text-dark">{{ $dailyTotals['total'] }}</th>
+                                        <th class="text-right font-roboto font-weight-bold text-dark">{!! theMoney($dailyTotals['purchase']) !!}</th>
+                                        <th class="text-right font-roboto font-weight-bold text-dark">{!! theMoney($dailyTotals['subtotal']) !!}</th>
+                                        <th class="text-right font-roboto font-weight-bold {{ $dailyProfit >= 0 ? 'text-success' : 'text-danger' }}">{!! theMoney($dailyProfit) !!}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-warning">{{ $dailyTotals['shipping'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-success">{{ $dailyTotals['delivered'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-danger">{{ $dailyTotals['returned'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-info">{{ $dailyTotals['paid_return'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-secondary">{{ $dailyTotals['return_received'] }}</th>
+                                        <th class="text-center font-roboto font-weight-bold text-dark">{{ $dailyTotals['paid_return_rcv'] }}</th>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
