@@ -85,86 +85,23 @@
         </div>
     </div>
 
-    <!-- Monthly Purchase Summary Table -->
-    <div class="mb-4 rounded-sm shadow-sm card border">
-        <div class="p-3 card-header bg-light border-bottom d-flex justify-content-between align-items-center flex-wrap" style="gap: 8px;">
-            <h5 class="mb-0 font-weight-bold text-dark">
-                <i class="fa fa-calendar text-primary mr-2"></i> Monthly Purchase Summary
-            </h5>
-            <span class="text-muted small">Aggregated purchase bills, payments, and dues by month</span>
-        </div>
-        <div class="p-0 card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th style="min-width: 140px;">Month</th>
-                            <th class="text-center" style="width: 130px;">PO Count</th>
-                            <th class="text-right" style="width: 170px;">Total Bill Amount</th>
-                            <th class="text-right" style="width: 170px;">Total Paid Amount</th>
-                            <th class="text-right" style="width: 170px;">Total Due Amount</th>
-                            <th class="text-center" style="min-width: 220px;">Payment Status Breakdown</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($monthlyPurchases as $row)
-                            <tr>
-                                <td class="font-roboto font-weight-bold text-dark">
-                                    <i class="fa fa-calendar-check-o text-muted mr-1"></i> {{ $row->month_label }}
-                                </td>
-                                <td class="text-center font-roboto">
-                                    <span class="badge badge-light border px-2 py-1 font-weight-bold">{{ number_format($row->total_orders) }}</span>
-                                </td>
-                                <td class="text-right font-roboto font-weight-bold text-dark">{!! theMoney($row->total_amount) !!}</td>
-                                <td class="text-right font-roboto font-weight-bold text-success">{!! theMoney($row->total_paid) !!}</td>
-                                <td class="text-right font-roboto font-weight-bold {{ $row->total_due > 0 ? 'text-danger' : 'text-muted' }}">
-                                    {!! theMoney($row->total_due) !!}
-                                </td>
-                                <td class="text-center">
-                                    @if($row->paid_count > 0)
-                                        <span class="badge badge-success px-2 py-1 mr-1" title="Paid POs">Paid: {{ $row->paid_count }}</span>
-                                    @endif
-                                    @if($row->partial_count > 0)
-                                        <span class="badge badge-warning px-2 py-1 mr-1 text-white" title="Partial Paid POs">Partial: {{ $row->partial_count }}</span>
-                                    @endif
-                                    @if($row->unpaid_count > 0)
-                                        <span class="badge badge-danger px-2 py-1 mr-1" title="Unpaid POs">Unpaid: {{ $row->unpaid_count }}</span>
-                                    @endif
-                                    @if($row->paid_count == 0 && $row->partial_count == 0 && $row->unpaid_count == 0)
-                                        <span class="text-muted small">—</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-3">No purchases recorded yet.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                    <tfoot style="background-color: #f1f5f9; border-top: 2px solid #94a3b8;">
-                        <tr>
-                            <th class="font-weight-bold text-dark">Grand Total Summation:</th>
-                            <th class="text-center font-roboto font-weight-bold text-dark">{{ number_format($purchaseTotals['orders']) }}</th>
-                            <th class="text-right font-roboto font-weight-bold text-dark">{!! theMoney($purchaseTotals['amount']) !!}</th>
-                            <th class="text-right font-roboto font-weight-bold text-success">{!! theMoney($purchaseTotals['paid']) !!}</th>
-                            <th class="text-right font-roboto font-weight-bold {{ $purchaseTotals['due'] > 0 ? 'text-danger' : 'text-dark' }}">{!! theMoney($purchaseTotals['due']) !!}</th>
-                            <th class="text-center font-roboto">
-                                <span class="badge badge-success px-2 py-1 mr-1">Paid: {{ $purchaseTotals['paid_count'] }}</span>
-                                <span class="badge badge-warning px-2 py-1 mr-1 text-white">Partial: {{ $purchaseTotals['partial_count'] }}</span>
-                                <span class="badge badge-danger px-2 py-1 mr-1">Unpaid: {{ $purchaseTotals['unpaid_count'] }}</span>
-                            </th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-    </div>
-
     <!-- Purchases Table -->
-    <div class="mb-5 rounded-sm shadow-sm card">
-        <div class="p-3 card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5>Purchase History</h5>
+    <div class="mb-5 rounded-sm shadow-sm card border">
+        <div class="p-3 card-header bg-light border-bottom d-flex justify-content-between align-items-center flex-wrap" style="gap: 12px;">
+            <div class="d-flex align-items-center flex-wrap" style="gap: 12px;">
+                <h5 class="mb-0 font-weight-bold text-dark"><i class="fa fa-shopping-bag text-primary mr-1"></i> Purchase History</h5>
+                <div class="d-flex align-items-center" style="gap: 6px;">
+                    <label for="filter-purchase-month" class="mb-0 text-muted small font-weight-bold">Month:</label>
+                    <input type="month" id="filter-purchase-month" class="form-control form-control-sm" style="width: 155px; height: 32px;">
+                    <button type="button" id="clear-month-btn" class="btn btn-outline-secondary btn-xs" title="Show All Purchases">
+                        <i class="fa fa-times mr-1"></i> All
+                    </button>
+                </div>
+            </div>
+            <div class="d-flex align-items-center" style="gap: 8px;">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.print()">
+                    <i class="fa fa-print mr-1"></i> Print Table
+                </button>
                 <a href="{{ route('admin.purchases.create') }}" class="btn btn-primary btn-sm d-flex align-items-center justify-content-center">
                     <i data-feather="plus"></i> Add Purchase
                 </a>
@@ -172,18 +109,26 @@
         </div>
         <div class="p-3 card-body">
             <div class="table-responsive">
-                <table class="table table-striped" id="purchases-table">
+                <table class="table table-striped table-bordered mb-0" id="purchases-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Date</th>
-                            <th>Products</th>
-                            <th>Subtotal</th>
+                            <th style="width: 70px;">ID</th>
+                            <th style="width: 120px;">Date</th>
+                            <th style="width: 100px;">Products</th>
+                            <th style="width: 170px;">Total Bill / Due</th>
                             <th>Supplier</th>
-                            <th>Admin</th>
-                            <th>Actions</th>
+                            <th style="width: 140px;">Admin</th>
+                            <th style="width: 110px;">Actions</th>
                         </tr>
                     </thead>
+                    <tfoot style="background-color: #f8fafc; border-top: 2px solid #cbd5e1;">
+                        <tr>
+                            <th colspan="2" id="footer-count" class="font-weight-bold text-dark">Total: —</th>
+                            <th id="footer-products" class="font-weight-bold text-dark">—</th>
+                            <th id="footer-amount" class="font-weight-bold text-dark font-roboto">—</th>
+                            <th colspan="3" id="footer-summary" class="font-roboto text-muted small">—</th>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -303,6 +248,9 @@ $(document).ready(function() {
         serverSide: true,
         ajax: {
             url: '{{ route("api.purchases") }}',
+            data: function(d) {
+                d.month = $('#filter-purchase-month').val();
+            }
         },
         columns: [
             {data: 'id', name: 'id'},
@@ -314,11 +262,41 @@ $(document).ready(function() {
             {data: 'actions', name: 'actions', orderable: false, searchable: false}
         ],
         order: [[0, 'desc']],
-        pageLength: 15,
+        pageLength: 25,
         lengthMenu: [[10, 25, 50, 100, 250, 500], [10, 25, 50, 100, 250, 500]],
         language: {
             processing: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>'
+        },
+        drawCallback: function() {
+            var json = table.ajax.json();
+            if (json && json.aggregation) {
+                var agg = json.aggregation;
+                var countText = 'Total: ' + agg.total_records + ' POs';
+                var selectedMonth = $('#filter-purchase-month').val();
+                if (selectedMonth) {
+                    countText += ' (' + selectedMonth + ')';
+                }
+                $('#footer-count').html('<strong>' + countText + '</strong>');
+
+                var amountText = '<span class="text-dark font-weight-bold">৳' + Number(agg.total_amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</span>';
+                $('#footer-amount').html(amountText);
+
+                var summaryHtml = '<span class="text-success font-weight-bold mr-2">Paid: ৳' + Number(agg.total_paid).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</span>';
+                if (agg.total_due > 0) {
+                    summaryHtml += '<span class="text-danger font-weight-bold">Due: ৳' + Number(agg.total_due).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</span>';
+                }
+                $('#footer-summary').html(summaryHtml);
+            }
         }
+    });
+
+    $('#filter-purchase-month').on('change', function() {
+        table.ajax.reload();
+    });
+
+    $('#clear-month-btn').on('click', function() {
+        $('#filter-purchase-month').val('');
+        table.ajax.reload();
     });
 });
 </script>

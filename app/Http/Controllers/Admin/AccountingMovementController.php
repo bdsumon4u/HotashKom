@@ -138,8 +138,81 @@ class AccountingMovementController extends Controller
     {
         abort_unless(request()->user()->is('admin'), 403);
 
-        $startDate = $this->dateValue($request->input('start_d'), now()->startOfMonth());
-        $endDate = $this->dateValue($request->input('end_d'), now()->endOfMonth());
+        if ($request->filled('month')) {
+            $monthInput = (string) $request->input('month');
+            $startDate = Carbon::parse($monthInput.'-01')->startOfMonth()->toDateString();
+            $endDate = Carbon::parse($monthInput.'-01')->endOfMonth()->toDateString();
+        } else {
+            $startDate = $this->dateValue($request->input('start_d'), now()->startOfMonth());
+            $endDate = $this->dateValue($request->input('end_d'), now()->endOfMonth());
+        }
+
+        // All-time entries of this sourceType for monthly summary
+        $allEntries = JournalEntry::where('source_type', $sourceType)
+            ->with('items.account')
+            ->orderBy('entry_date', 'desc')
+            ->get();
+
+        $monthlyBreakdown = $allEntries->groupBy(function ($entry) {
+            return $entry->entry_date ? $entry->entry_date->format('Y-m') : 'unknown';
+        })->reject(fn ($group, $key) => $key === 'unknown')
+            ->map(function ($group, $monthKey) {
+                $totalCost = 0.0;
+                $totalQty = 0;
+
+                foreach ($group as $entry) {
+                    $details = $entry->details ?? [];
+                    $inventoryItem = $entry->items->first(fn ($item) => $item->account?->code === '1004');
+                    $cost = $inventoryItem
+                        ? (float) ($inventoryItem->debit ?: $inventoryItem->credit)
+                        : (float) collect($details)->sum(fn ($d) => (float) ($d['line_purchase_total'] ?? ((float) ($d['purchase_price'] ?? 0) * (int) ($d['quantity'] ?? 0))));
+
+                    $qty = (int) collect($details)->sum(fn ($d) => (int) ($d['quantity'] ?? 0));
+
+                    $totalCost += $cost;
+                    $totalQty += $qty;
+                }
+
+                return [
+                    'month' => $monthKey,
+                    'month_label' => Carbon::parse($monthKey.'-01')->format('F Y'),
+                    'count' => $group->count(),
+                    'total_qty' => $totalQty,
+                    'total_cost' => $totalCost,
+                ];
+            });
+
+        $monthTotals = [
+            'count' => (int) $monthlyBreakdown->sum('count'),
+            'total_qty' => (int) $monthlyBreakdown->sum('total_qty'),
+            'total_cost' => (float) $monthlyBreakdown->sum('total_cost'),
+        ];
+
+        // Period statistics for selected month/range
+        $periodEntries = $allEntries->filter(function ($entry) use ($startDate, $endDate) {
+            $d = $entry->entry_date?->format('Y-m-d');
+
+            return $d >= $startDate && $d <= $endDate;
+        });
+
+        $periodStats = [
+            'count' => $periodEntries->count(),
+            'total_qty' => 0,
+            'total_cost' => 0.0,
+        ];
+
+        foreach ($periodEntries as $entry) {
+            $details = $entry->details ?? [];
+            $inventoryItem = $entry->items->first(fn ($item) => $item->account?->code === '1004');
+            $cost = $inventoryItem
+                ? (float) ($inventoryItem->debit ?: $inventoryItem->credit)
+                : (float) collect($details)->sum(fn ($d) => (float) ($d['line_purchase_total'] ?? ((float) ($d['purchase_price'] ?? 0) * (int) ($d['quantity'] ?? 0))));
+
+            $qty = (int) collect($details)->sum(fn ($d) => (int) ($d['quantity'] ?? 0));
+
+            $periodStats['total_cost'] += $cost;
+            $periodStats['total_qty'] += $qty;
+        }
 
         $entries = JournalEntry::query()
             ->where('source_type', $sourceType)
@@ -150,7 +223,16 @@ class AccountingMovementController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        return view('admin.accounting.movements.index', compact('entries', 'startDate', 'endDate', 'title', 'sourceType'));
+        return view('admin.accounting.movements.index', compact(
+            'entries',
+            'startDate',
+            'endDate',
+            'title',
+            'sourceType',
+            'monthlyBreakdown',
+            'monthTotals',
+            'periodStats'
+        ));
     }
 
     private function dateValue(mixed $value, Carbon $fallback): string

@@ -100,11 +100,15 @@
                                 <td class="font-roboto font-weight-bold">{{ $purchase->purchase_date->format('M d, Y') }}</td>
                                 <td class="font-roboto small text-primary">{{ $purchase->invoice_number ?: ('PO-#'.$purchase->id) }}</td>
                                 <td>
-                                    @foreach($purchase->products as $p)
-                                        <div class="small">
-                                            • <strong>{{ $p->name }}</strong> (Qty: {{ $p->pivot->quantity }}, Price: {!! theMoney($p->pivot->price) !!})
-                                        </div>
-                                    @endforeach
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap" style="gap: 6px;">
+                                        <span class="text-dark font-weight-bold">
+                                            <i class="fa fa-cubes text-muted mr-1"></i> {{ $purchase->products->count() }} {{ \Illuminate\Support\Str::plural('Item', $purchase->products->count()) }}
+                                            <small class="text-muted">({{ $purchase->products->sum('pivot.quantity') }} pcs)</small>
+                                        </span>
+                                        <a href="{{ route('admin.purchases.show', $purchase) }}" class="btn btn-outline-primary btn-xs font-weight-bold" title="View Purchase Details">
+                                            <i class="fa fa-list mr-1"></i> Details
+                                        </a>
+                                    </div>
                                 </td>
                                 <td class="text-right font-roboto font-weight-bold">{!! theMoney($purchase->total_amount) !!}</td>
                                 <td class="text-right font-roboto text-success">{!! theMoney($purchase->paid_amount) !!}</td>

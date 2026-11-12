@@ -18,15 +18,37 @@ class PurchaseController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $query = Purchase::with(['productPurchases.product', 'admin']);
+        $query = Purchase::with(['productPurchases.product', 'admin', 'supplier']);
+
+        if ($month = $request->input('month')) {
+            $query->whereRaw("DATE_FORMAT(purchase_date, '%Y-%m') = ?", [$month]);
+        }
+
+        $searchValue = $request->input('search.value');
+        if ($searchValue) {
+            $date = \DateTime::createFromFormat('d M Y', $searchValue);
+            if ($date) {
+                $query->whereDate('purchase_date', $date->format('Y-m-d'));
+            } else {
+                $query->where(function ($q) use ($searchValue): void {
+                    $q->where('supplier_name', 'like', "%{$searchValue}%")
+                        ->orWhereHas('admin', function ($adminQuery) use ($searchValue): void {
+                            $adminQuery->where('name', 'like', "%{$searchValue}%");
+                        });
+                });
+            }
+        }
+
+        $clone = clone $query;
+        $totalRecords = (int) $clone->count();
+        $totalAmount = (float) $clone->sum('total_amount');
+        $totalPaid = (float) $clone->sum('paid_amount');
+        $totalDue = (float) $clone->sum('due_amount');
 
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('products_count', fn ($purchase) => $purchase->productPurchases->count())
             ->addColumn('formatted_date', fn ($purchase) => $purchase->purchase_date ? $purchase->purchase_date->format('d M Y') : '-')
-            ->filterColumn('formatted_date', function ($query, $keyword): void {
-                // Date search is handled in the filter() method
-            })
             ->addColumn('formatted_amount', function ($purchase): string {
                 $html = '<div>'.number_format($purchase->total_amount ?? 0, 2).' BDT</div>';
                 if ($purchase->due_amount > 0) {
@@ -60,22 +82,12 @@ class PurchaseController extends Controller
                 return $buttons.'</div>';
             })
             ->rawColumns(['formatted_amount', 'supplier_display', 'actions'])
-            ->filter(function ($query) use ($request): void {
-                $searchValue = $request->input('search.value');
-                if ($searchValue) {
-                    $date = \DateTime::createFromFormat('d M Y', $searchValue);
-                    if ($date) {
-                        $query->whereDate('purchase_date', $date->format('Y-m-d'));
-                    } else {
-                        $query->where(function ($q) use ($searchValue): void {
-                            $q->where('supplier_name', 'like', "%{$searchValue}%")
-                                ->orWhereHas('admin', function ($adminQuery) use ($searchValue): void {
-                                    $adminQuery->where('name', 'like', "%{$searchValue}%");
-                                });
-                        });
-                    }
-                }
-            })
+            ->with('aggregation', [
+                'total_records' => $totalRecords,
+                'total_amount' => $totalAmount,
+                'total_paid' => $totalPaid,
+                'total_due' => $totalDue,
+            ])
             ->make(true);
     }
 

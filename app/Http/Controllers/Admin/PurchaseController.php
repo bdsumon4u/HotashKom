@@ -22,42 +22,7 @@ class PurchaseController extends Controller
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
 
-        $stockStats = Product::stockStatistics();
-
-        $monthlyPurchases = Purchase::selectRaw("
-                DATE_FORMAT(purchase_date, '%Y-%m') as month,
-                COUNT(*) as total_orders,
-                COALESCE(SUM(total_amount), 0) as total_amount,
-                COALESCE(SUM(paid_amount), 0) as total_paid,
-                COALESCE(SUM(due_amount), 0) as total_due,
-                SUM(CASE WHEN payment_status = 'paid' THEN 1 ELSE 0 END) as paid_count,
-                SUM(CASE WHEN payment_status = 'partial' THEN 1 ELSE 0 END) as partial_count,
-                SUM(CASE WHEN payment_status = 'unpaid' THEN 1 ELSE 0 END) as unpaid_count
-            ")
-            ->whereNotNull('purchase_date')
-            ->groupBy('month')
-            ->orderBy('month', 'desc')
-            ->get()
-            ->map(function ($row) {
-                $row->month_label = Carbon::parse($row->month.'-01')->format('F Y');
-
-                return $row;
-            });
-
-        $purchaseTotals = [
-            'orders' => (int) $monthlyPurchases->sum('total_orders'),
-            'amount' => (float) $monthlyPurchases->sum('total_amount'),
-            'paid' => (float) $monthlyPurchases->sum('total_paid'),
-            'due' => (float) $monthlyPurchases->sum('total_due'),
-            'paid_count' => (int) $monthlyPurchases->sum('paid_count'),
-            'partial_count' => (int) $monthlyPurchases->sum('partial_count'),
-            'unpaid_count' => (int) $monthlyPurchases->sum('unpaid_count'),
-        ];
-
-        return view('admin.purchases.index', array_merge($stockStats, [
-            'monthlyPurchases' => $monthlyPurchases,
-            'purchaseTotals' => $purchaseTotals,
-        ]));
+        return view('admin.purchases.index', Product::stockStatistics());
     }
 
     /**

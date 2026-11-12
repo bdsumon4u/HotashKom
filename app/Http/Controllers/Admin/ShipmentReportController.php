@@ -106,29 +106,6 @@ class ShipmentReportController extends Controller
             })
             ->sortKeys();
 
-        $monthlyBreakdown = $orders->groupBy(fn ($order) => $order->shipped_at ? Date::parse($order->shipped_at)->format('Y-m') : '')
-            ->reject(fn ($group, $key) => empty($key))
-            ->map(function ($group, $monthKey) {
-                $totalSubtotal = $group->sum(fn ($order) => $order->data['subtotal'] ?? 0);
-
-                $totalPurchaseCost = $group->sum(fn ($order) => (isset($order->data['purchase_cost']) && $order->data['purchase_cost']) ? $order->data['purchase_cost'] : ($order->data['subtotal'] ?? 0));
-
-                return [
-                    'month' => $monthKey,
-                    'month_label' => Date::parse($monthKey.'-01')->format('F Y'),
-                    'total' => $group->count(),
-                    'shipping' => $group->where('status', 'SHIPPING')->count(),
-                    'delivered' => $group->where('status', 'DELIVERED')->count(),
-                    'returned' => $group->where('status', 'RETURNED')->count(),
-                    'paid_return' => $group->where('status', 'PAID_RETURN')->count(),
-                    'return_received' => $group->where('status', 'RETURN_RECEIVED')->count(),
-                    'paid_return_rcv' => $group->where('status', 'PAID_RETURN_RCV')->count(),
-                    'total_subtotal' => $totalSubtotal,
-                    'total_purchase_cost' => $totalPurchaseCost,
-                ];
-            })
-            ->sortKeys();
-
         $courierBreakdown = $orders->groupBy(fn ($order) => $order->data['courier'] ?? 'Other')->map(function ($group) {
             $totalSubtotal = $group->sum(fn ($order) => $order->data['subtotal'] ?? 0);
 
@@ -151,7 +128,6 @@ class ShipmentReportController extends Controller
             'total_shipped' => $totalShipped,
             'status_breakdown' => $statusBreakdown,
             'daily_breakdown' => $dailyBreakdown,
-            'monthly_breakdown' => $monthlyBreakdown,
             'courier_breakdown' => $courierBreakdown,
         ];
     }
