@@ -384,6 +384,11 @@ class AccountingTransactionController extends Controller
                 ->with('info', 'This transaction is linked to supplier payments. Please manage payments from the Suppliers section.');
         }
 
+        if (in_array($entry->source_type, ['CourierPayout', 'Shipment', 'CourierReturn', 'StockAdjustment'], true) || count($entry->details ?? []) > 0) {
+            return redirect()->route('admin.accounting.movements.show', $entry)
+                ->with('info', 'This is a multi-legged itemized movement/settlement voucher. It cannot be edited with the simple 2-account form to prevent corrupting product cost tracking.');
+        }
+
         $accounts = Account::where('is_active', true)->orderBy('name')->get();
         $categories = TransactionCategory::where('is_active', true)->orderBy('name')->get();
 
@@ -411,6 +416,11 @@ class AccountingTransactionController extends Controller
         abort_unless(request()->user()->is('admin'), 403);
 
         $entry = $transaction instanceof JournalEntry ? $transaction : JournalEntry::findOrFail($transaction);
+
+        if (in_array($entry->source_type, ['CourierPayout', 'Shipment', 'CourierReturn', 'StockAdjustment'], true) || count($entry->details ?? []) > 0) {
+            return redirect()->route('admin.accounting.movements.show', $entry)
+                ->with('danger', 'Multi-legged itemized movement/settlement vouchers cannot be modified with the simple transaction form.');
+        }
 
         $validated = $request->validate([
             'entry_date' => ['required', 'date'],
