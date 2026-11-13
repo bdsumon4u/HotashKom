@@ -147,40 +147,45 @@ class AccountingMovementController extends Controller
             $endDate = $this->dateValue($request->input('end_d'), now()->endOfMonth());
         }
 
-        // All-time entries of this sourceType for monthly summary
-        $allEntries = JournalEntry::where('source_type', $sourceType)
-            ->with('items.account')
-            ->orderBy('entry_date', 'desc')
-            ->get();
+        // Monthly breakdown via lightweight aggregate query (no eager-loading all entries)
+        $monthlyBreakdown = JournalEntry::query()
+            ->where('source_type', $sourceType)
+            ->selectRaw("DATE_FORMAT(entry_date, '%Y-%m') as month_key, COUNT(*) as entry_count")
+            ->groupByRaw("DATE_FORMAT(entry_date, '%Y-%m')")
+            ->orderByDesc('month_key')
+            ->get()
+            ->keyBy('month_key');
 
-        $monthlyBreakdown = $allEntries->groupBy(function ($entry) {
-            return $entry->entry_date ? $entry->entry_date->format('Y-m') : 'unknown';
-        })->reject(fn ($group, $key) => $key === 'unknown')
-            ->map(function ($group, $monthKey) {
-                $totalCost = 0.0;
-                $totalQty = 0;
+        // Enrich monthly breakdown with qty/cost from details JSON
+        $monthKeys = $monthlyBreakdown->keys()->all();
+        $monthlyDetails = JournalEntry::query()
+            ->where('source_type', $sourceType)
+            ->whereNotNull('details')
+            ->select(['id', 'entry_date', 'details'])
+            ->get()
+            ->groupBy(fn ($e) => $e->entry_date?->format('Y-m'));
 
-                foreach ($group as $entry) {
-                    $details = $entry->details ?? [];
-                    $inventoryItem = $entry->items->first(fn ($item) => $item->account?->code === '1004');
-                    $cost = $inventoryItem
-                        ? (float) ($inventoryItem->debit ?: $inventoryItem->credit)
-                        : (float) collect($details)->sum(fn ($d) => (float) ($d['line_purchase_total'] ?? ((float) ($d['purchase_price'] ?? 0) * (int) ($d['quantity'] ?? 0))));
+        $monthlyBreakdown = collect($monthKeys)->mapWithKeys(function (string $monthKey) use ($monthlyBreakdown, $monthlyDetails) {
+            $row = $monthlyBreakdown->get($monthKey);
+            $entriesInMonth = $monthlyDetails->get($monthKey, collect());
 
-                    $qty = (int) collect($details)->sum(fn ($d) => (int) ($d['quantity'] ?? 0));
-
-                    $totalCost += $cost;
-                    $totalQty += $qty;
+            $totalQty = 0;
+            $totalCost = 0.0;
+            foreach ($entriesInMonth as $entry) {
+                foreach ($entry->details ?? [] as $d) {
+                    $totalQty += (int) ($d['quantity'] ?? 0);
+                    $totalCost += (float) ($d['line_purchase_total'] ?? ((float) ($d['purchase_price'] ?? 0) * (int) ($d['quantity'] ?? 0)));
                 }
+            }
 
-                return [
-                    'month' => $monthKey,
-                    'month_label' => Carbon::parse($monthKey.'-01')->format('F Y'),
-                    'count' => $group->count(),
-                    'total_qty' => $totalQty,
-                    'total_cost' => $totalCost,
-                ];
-            });
+            return [$monthKey => [
+                'month' => $monthKey,
+                'month_label' => Carbon::parse($monthKey.'-01')->format('F Y'),
+                'count' => (int) $row->entry_count,
+                'total_qty' => $totalQty,
+                'total_cost' => $totalCost,
+            ]];
+        });
 
         $monthTotals = [
             'count' => (int) $monthlyBreakdown->sum('count'),
@@ -188,43 +193,55 @@ class AccountingMovementController extends Controller
             'total_cost' => (float) $monthlyBreakdown->sum('total_cost'),
         ];
 
-        // Period statistics for selected month/range
-        $periodEntries = $allEntries->filter(function ($entry) use ($startDate, $endDate) {
-            $d = $entry->entry_date?->format('Y-m-d');
+        // Period entries for product summary
+        $periodEntries = JournalEntry::query()
+            ->where('source_type', $sourceType)
+            ->whereBetween('entry_date', [$startDate, $endDate])
+            ->select(['id', 'entry_date', 'entry_number', 'description', 'details'])
+            ->latest('entry_date')
+            ->latest('id')
+            ->get();
 
-            return $d >= $startDate && $d <= $endDate;
-        });
+        // Build aggregated product summary from details JSON
+        $productMap = [];
+        foreach ($periodEntries as $entry) {
+            foreach ($entry->details ?? [] as $d) {
+                $productId = $d['product_id'] ?? $d['product_name'] ?? 'unknown';
+                $qty = (int) ($d['quantity'] ?? 0);
+                $purchasePrice = (float) ($d['purchase_price'] ?? 0);
+                $lineTotal = (float) ($d['line_purchase_total'] ?? ($purchasePrice * $qty));
+
+                if (! isset($productMap[$productId])) {
+                    $productMap[$productId] = [
+                        'product_id' => $d['product_id'] ?? null,
+                        'product_name' => $d['product_name'] ?? 'Unknown Product',
+                        'sku' => $d['sku'] ?? '—',
+                        'purchase_price' => $purchasePrice,
+                        'total_qty' => 0,
+                        'total_cost' => 0.0,
+                        'shipment_count' => 0,
+                    ];
+                }
+
+                $productMap[$productId]['total_qty'] += $qty;
+                $productMap[$productId]['total_cost'] += $lineTotal;
+                $productMap[$productId]['shipment_count']++;
+            }
+        }
+
+        // Sort by total quantity descending
+        $productSummary = collect($productMap)->sortByDesc('total_qty')->values();
 
         $periodStats = [
             'count' => $periodEntries->count(),
-            'total_qty' => 0,
-            'total_cost' => 0.0,
+            'total_qty' => (int) $productSummary->sum('total_qty'),
+            'total_cost' => (float) $productSummary->sum('total_cost'),
+            'unique_products' => $productSummary->count(),
         ];
 
-        foreach ($periodEntries as $entry) {
-            $details = $entry->details ?? [];
-            $inventoryItem = $entry->items->first(fn ($item) => $item->account?->code === '1004');
-            $cost = $inventoryItem
-                ? (float) ($inventoryItem->debit ?: $inventoryItem->credit)
-                : (float) collect($details)->sum(fn ($d) => (float) ($d['line_purchase_total'] ?? ((float) ($d['purchase_price'] ?? 0) * (int) ($d['quantity'] ?? 0))));
-
-            $qty = (int) collect($details)->sum(fn ($d) => (int) ($d['quantity'] ?? 0));
-
-            $periodStats['total_cost'] += $cost;
-            $periodStats['total_qty'] += $qty;
-        }
-
-        $entries = JournalEntry::query()
-            ->where('source_type', $sourceType)
-            ->whereBetween('entry_date', [$startDate, $endDate])
-            ->with('items.account')
-            ->latest('entry_date')
-            ->latest('id')
-            ->paginate(25)
-            ->withQueryString();
-
         return view('admin.accounting.movements.index', compact(
-            'entries',
+            'productSummary',
+            'periodEntries',
             'startDate',
             'endDate',
             'title',

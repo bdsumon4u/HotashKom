@@ -97,9 +97,9 @@
 <div id="print-movements-header" style="display: none;">
     <div style="display: flex; justify-content-between; align-items: flex-start;">
         <div>
-            <h2 style="margin: 0; font-size: 22px; font-weight: bold; color: #1e293b;">{{ $title }} & Monthly Statistics</h2>
+            <h2 style="margin: 0; font-size: 22px; font-weight: bold; color: #1e293b;">{{ $title }} — Product Summary</h2>
             <div style="font-size: 13px; color: #64748b; margin-top: 4px;">
-                {{ $sourceType === 'Shipment' ? 'Courier dispatch history, inventory deductions and receivables' : 'Courier return arrivals, inventory restock and receivable adjustments' }}
+                {{ $sourceType === 'Shipment' ? 'Products dispatched to courier with quantities and purchase cost' : 'Products returned from courier with quantities and purchase cost' }}
             </div>
         </div>
         <div style="text-align: right; font-size: 12px; color: #475569;">
@@ -108,30 +108,38 @@
         </div>
     </div>
     <div style="margin-top: 15px; padding: 10px; background: #f8fafc; border: 1px solid #cbd5e1; display: flex; justify-content: space-between; font-size: 13px;">
-        <span><strong>Period Entries:</strong> {{ $periodStats['count'] }}</span>
+        <span><strong>Batches:</strong> {{ $periodStats['count'] }}</span>
+        <span><strong>Unique Products:</strong> {{ $periodStats['unique_products'] }}</span>
         <span><strong>Total Units:</strong> {{ number_format($periodStats['total_qty']) }} pcs</span>
-        <span><strong>Total Purchase Cost Value:</strong> {!! theMoney($periodStats['total_cost']) !!}</span>
+        <span><strong>Total Purchase Cost:</strong> {!! theMoney($periodStats['total_cost']) !!}</span>
     </div>
 </div>
 
 <div class="container-fluid mb-5">
     <!-- Statistics for Selected Period KPI Cards -->
     <div class="row mb-4">
-        <div class="col-md-4 mb-3">
+        <div class="col-xl-3 col-md-6 mb-3">
             <div class="kpi-card p-3 shadow-sm h-100" style="border-left: 4px solid #3b82f6 !important;">
-                <span class="text-muted small d-block">Period Vouchers / Entries</span>
+                <span class="text-muted small d-block">Period Batches / Entries</span>
                 <h4 class="font-roboto font-weight-bold mb-0 mt-1 text-primary">{{ number_format($periodStats['count']) }}</h4>
                 <small class="text-muted">{{ \Carbon\Carbon::parse($startDate)->format('M d') }} — {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}</small>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="kpi-card p-3 shadow-sm h-100" style="border-left: 4px solid #8b5cf6 !important;">
+                <span class="text-muted small d-block">Unique Products</span>
+                <h4 class="font-roboto font-weight-bold mb-0 mt-1" style="color: #8b5cf6;">{{ number_format($periodStats['unique_products']) }}</h4>
+                <small class="text-muted">Distinct products in period</small>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
             <div class="kpi-card p-3 shadow-sm h-100" style="border-left: 4px solid #10b981 !important;">
                 <span class="text-muted small d-block">Total Units {{ $sourceType === 'Shipment' ? 'Shipped' : 'Returned' }}</span>
                 <h4 class="font-roboto font-weight-bold mb-0 mt-1 text-success">{{ number_format($periodStats['total_qty']) }} <small class="text-muted" style="font-size: 13px;">pcs</small></h4>
                 <small class="text-muted">Total physical quantity in period</small>
             </div>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-xl-3 col-md-6 mb-3">
             <div class="kpi-card p-3 shadow-sm h-100" style="border-left: 4px solid {{ $sourceType === 'Shipment' ? '#f59e0b' : '#8b5cf6' }} !important;">
                 <span class="text-muted small d-block">Total Purchase Cost (Inventory Value)</span>
                 <h4 class="font-roboto font-weight-bold mb-0 mt-1 text-dark">{!! theMoney($periodStats['total_cost']) !!}</h4>
@@ -202,11 +210,12 @@
         </div>
     </div>
 
-    <!-- Detailed Records for Selected Period -->
+    <!-- Product Summary for Selected Period -->
     <div class="card shadow-sm border mb-4" style="background: #ffffff;">
         <div class="card-header p-3 bg-light border-bottom d-flex justify-content-between align-items-center flex-wrap" style="gap: 12px;">
             <h5 class="mb-0 font-weight-bold text-dark">
-                <i class="fa fa-list text-primary mr-1"></i> Detailed Records
+                <i class="fa fa-cubes {{ $sourceType === 'Shipment' ? 'text-primary' : 'text-danger' }} mr-1"></i>
+                Product {{ $sourceType === 'Shipment' ? 'Shipment' : 'Return' }} Summary
                 <span class="badge badge-light-primary text-primary ml-2 font-weight-normal" style="font-size: 13px;">
                     {{ \Carbon\Carbon::parse($startDate)->format('M d, Y') }} — {{ \Carbon\Carbon::parse($endDate)->format('M d, Y') }}
                 </span>
@@ -237,68 +246,113 @@
                 <table class="table table-hover table-bordered mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th style="width: 120px;">Date</th>
-                            <th style="width: 140px;">Entry #</th>
-                            <th>Courier / Description</th>
-                            <th style="width: 120px;">Products</th>
-                            <th class="text-center" style="width: 120px;">Quantity</th>
-                            <th class="text-right" style="width: 160px;">Purchase Cost</th>
-                            <th class="text-center no-print" style="width: 100px;">Details</th>
+                            <th style="width: 50px;">#</th>
+                            <th style="width: 100px;">SKU</th>
+                            <th>Product Name</th>
+                            <th class="text-right" style="width: 130px;">Purchase Price</th>
+                            <th class="text-center" style="width: 130px;">Qty {{ $sourceType === 'Shipment' ? 'Shipped' : 'Returned' }}</th>
+                            <th class="text-center" style="width: 100px;">Batches</th>
+                            <th class="text-right" style="width: 170px;">Total Cost</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($entries as $entry)
-                            @php
-                                $details = $entry->details ?? [];
-                                $inventoryItem = $entry->items->first(fn ($item) => $item->account?->code === '1004');
-                                $purchaseCost = $inventoryItem
-                                    ? (float) ($inventoryItem->debit ?: $inventoryItem->credit)
-                                    : (float) collect($details)->sum(fn ($detail) => (float) ($detail['line_purchase_total'] ?? ((float) ($detail['purchase_price'] ?? 0) * (int) ($detail['quantity'] ?? 0))));
-                                $qty = (int) collect($details)->sum(fn ($detail) => (int) ($detail['quantity'] ?? 0));
-                            @endphp
+                        @forelse($productSummary as $index => $product)
                             <tr>
-                                <td class="font-roboto font-weight-bold text-muted">{{ $entry->entry_date->format('M d, Y') }}</td>
-                                <td class="font-roboto font-weight-bold">
-                                    <a href="{{ route('admin.accounting.movements.show', $entry) }}" class="text-primary font-weight-bold">
-                                        {{ $entry->entry_number }}
-                                    </a>
-                                </td>
-                                <td>{{ $entry->description ?: '—' }}</td>
+                                <td class="text-muted font-roboto">{{ $index + 1 }}</td>
+                                <td class="font-roboto font-weight-bold text-muted">{{ $product['sku'] }}</td>
                                 <td>
-                                    @if(count($details) > 0)
-                                        <span class="badge badge-light border text-dark">{{ count($details) }} {{ \Illuminate\Support\Str::plural('product', count($details)) }}</span>
-                                    @else
-                                        <span class="text-muted small">—</span>
-                                    @endif
+                                    <div class="font-weight-bold text-dark">{{ $product['product_name'] }}</div>
                                 </td>
-                                <td class="text-center font-roboto font-weight-bold">{{ $qty > 0 ? $qty . ' pcs' : '—' }}</td>
-                                <td class="text-right font-roboto font-weight-bold text-dark">{!! theMoney($purchaseCost) !!}</td>
-                                <td class="text-center no-print">
-                                    <a href="{{ route('admin.accounting.movements.show', $entry) }}" class="btn btn-outline-primary btn-xs font-weight-bold">
-                                        <i class="fa fa-eye mr-1"></i> View
-                                    </a>
+                                <td class="text-right font-roboto text-muted">{!! theMoney($product['purchase_price']) !!}</td>
+                                <td class="text-center font-roboto font-weight-bold text-dark">{{ number_format($product['total_qty']) }} pcs</td>
+                                <td class="text-center font-roboto">
+                                    <span class="badge badge-light border px-2 py-1 font-weight-bold">{{ $product['shipment_count'] }}</span>
                                 </td>
+                                <td class="text-right font-roboto font-weight-bold text-dark">{!! theMoney($product['total_cost']) !!}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">No records found for this date range.</td>
+                                <td colspan="7" class="text-center text-muted py-4">No product records found for this date range.</td>
                             </tr>
                         @endforelse
                     </tbody>
                     <tfoot style="background-color: #f1f5f9; border-top: 2px solid #94a3b8;">
                         <tr>
-                            <th colspan="4" class="font-weight-bold text-dark">Selected Period Summation:</th>
+                            <th colspan="4" class="font-weight-bold text-dark">
+                                Period Summation ({{ $productSummary->count() }} {{ \Illuminate\Support\Str::plural('product', $productSummary->count()) }}):
+                            </th>
                             <th class="text-center font-roboto font-weight-bold text-dark">{{ number_format($periodStats['total_qty']) }} pcs</th>
+                            <th class="text-center font-roboto font-weight-bold text-dark">{{ $periodStats['count'] }} batches</th>
                             <th class="text-right font-roboto font-weight-bold text-dark">{!! theMoney($periodStats['total_cost']) !!}</th>
-                            <th class="no-print"></th>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
-        @if($entries->hasPages())
-            <div class="card-footer bg-light p-2 no-print">{{ $entries->links() }}</div>
-        @endif
+    </div>
+
+    <!-- Daily Batch Entries (Collapsible) -->
+    <div class="card shadow-sm border mb-4" style="background: #ffffff;">
+        <div class="card-header p-3 bg-light border-bottom d-flex justify-content-between align-items-center flex-wrap" style="gap: 8px;">
+            <h5 class="mb-0 font-weight-bold text-dark">
+                <i class="fa fa-list text-muted mr-1"></i> Batch Entries
+                <span class="badge badge-light border ml-1 text-muted" style="font-size: 12px;">{{ $periodEntries->count() }} entries</span>
+            </h5>
+            <button class="btn btn-outline-secondary btn-sm no-print" type="button" data-toggle="collapse" data-target="#batchEntries" aria-expanded="false" aria-controls="batchEntries">
+                <i class="fa fa-chevron-down mr-1"></i> Toggle Details
+            </button>
+        </div>
+        <div class="collapse" id="batchEntries">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 120px;">Date</th>
+                                <th style="width: 160px;">Entry #</th>
+                                <th>Description</th>
+                                <th class="text-center" style="width: 110px;">Products</th>
+                                <th class="text-center no-print" style="width: 100px;">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($periodEntries as $entry)
+                                @php
+                                    $details = $entry->details ?? [];
+                                    $qty = (int) collect($details)->sum(fn ($d) => (int) ($d['quantity'] ?? 0));
+                                @endphp
+                                <tr>
+                                    <td class="font-roboto font-weight-bold text-muted">{{ $entry->entry_date->format('M d, Y') }}</td>
+                                    <td class="font-roboto font-weight-bold">
+                                        <a href="{{ route('admin.accounting.movements.show', $entry) }}" class="text-primary font-weight-bold">
+                                            {{ $entry->entry_number }}
+                                        </a>
+                                    </td>
+                                    <td>{{ $entry->description ?: '—' }}</td>
+                                    <td class="text-center">
+                                        @if(count($details) > 0)
+                                            <span class="badge badge-light border text-dark">{{ count($details) }} {{ \Illuminate\Support\Str::plural('product', count($details)) }}</span>
+                                            <div class="small text-muted">{{ $qty }} pcs</div>
+                                        @else
+                                            <span class="text-muted small">—</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center no-print">
+                                        <a href="{{ route('admin.accounting.movements.show', $entry) }}" class="btn btn-outline-primary btn-xs font-weight-bold">
+                                            <i class="fa fa-eye mr-1"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">No batch entries found for this date range.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
