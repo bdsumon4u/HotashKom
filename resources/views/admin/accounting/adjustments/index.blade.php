@@ -235,16 +235,16 @@
                                             {!! theMoney($m['total_amount']) !!}
                                         </td>
                                         <td class="text-right font-roboto text-danger font-weight-bold">
-                                            {{ $m['damage_amount'] > 0 ? theMoney($m['damage_amount']) : '—' }}
+                                            {!! $m['damage_amount'] > 0 ? theMoney($m['damage_amount']) : '—' !!}
                                         </td>
                                         <td class="text-right font-roboto text-primary font-weight-bold">
-                                            {{ $m['gift_amount'] > 0 ? theMoney($m['gift_amount']) : '—' }}
+                                            {!! $m['gift_amount'] > 0 ? theMoney($m['gift_amount']) : '—' !!}
                                         </td>
                                         <td class="text-right font-roboto text-dark font-weight-bold">
-                                            {{ $m['drawing_amount'] > 0 ? theMoney($m['drawing_amount']) : '—' }}
+                                            {!! $m['drawing_amount'] > 0 ? theMoney($m['drawing_amount']) : '—' !!}
                                         </td>
                                         <td class="text-right font-roboto text-muted">
-                                            {{ $m['other_amount'] > 0 ? theMoney($m['other_amount']) : '—' }}
+                                            {!! $m['other_amount'] > 0 ? theMoney($m['other_amount']) : '—' !!}
                                         </td>
                                     </tr>
                                 @empty

@@ -319,10 +319,10 @@
                                             @endif
                                         </td>
                                         <td class="text-right font-roboto font-weight-bold {{ $txn['debit'] > 0 ? 'text-primary' : 'text-muted' }}">
-                                            {{ $txn['debit'] > 0 ? theMoney($txn['debit']) : '—' }}
+                                            {!! $txn['debit'] > 0 ? theMoney($txn['debit']) : '—' !!}
                                         </td>
                                         <td class="text-right font-roboto font-weight-bold {{ $txn['credit'] > 0 ? 'text-danger' : 'text-muted' }}">
-                                            {{ $txn['credit'] > 0 ? theMoney($txn['credit']) : '—' }}
+                                            {!! $txn['credit'] > 0 ? theMoney($txn['credit']) : '—' !!}
                                         </td>
                                         <td class="text-right font-roboto font-weight-bold text-dark">
                                             {!! theMoney($txn['balance']) !!}
@@ -376,10 +376,10 @@
                                             <span class="badge badge-light border px-2 py-1 font-weight-bold">{{ $day['count'] }}</span>
                                         </td>
                                         <td class="text-right font-roboto font-weight-bold text-primary">
-                                            {{ $day['debit'] > 0 ? theMoney($day['debit']) : '—' }}
+                                            {!! $day['debit'] > 0 ? theMoney($day['debit']) : '—' !!}
                                         </td>
                                         <td class="text-right font-roboto font-weight-bold text-danger">
-                                            {{ $day['credit'] > 0 ? theMoney($day['credit']) : '—' }}
+                                            {!! $day['credit'] > 0 ? theMoney($day['credit']) : '—' !!}
                                         </td>
                                         <td class="text-right font-roboto font-weight-bold {{ $day['net_movement'] >= 0 ? 'text-success' : 'text-warning' }}">
                                             {!! theMoney($day['net_movement']) !!}
@@ -438,10 +438,10 @@
                                             <span class="badge badge-light border px-2 py-1 font-weight-bold">{{ $m['count'] }}</span>
                                         </td>
                                         <td class="text-right font-roboto font-weight-bold text-primary">
-                                            {{ $m['debit'] > 0 ? theMoney($m['debit']) : '—' }}
+                                            {!! $m['debit'] > 0 ? theMoney($m['debit']) : '—' !!}
                                         </td>
                                         <td class="text-right font-roboto font-weight-bold text-danger">
-                                            {{ $m['credit'] > 0 ? theMoney($m['credit']) : '—' }}
+                                            {!! $m['credit'] > 0 ? theMoney($m['credit']) : '—' !!}
                                         </td>
                                         <td class="text-right font-roboto font-weight-bold {{ $m['net_movement'] >= 0 ? 'text-success' : 'text-warning' }}">
                                             {!! theMoney($m['net_movement']) !!}
