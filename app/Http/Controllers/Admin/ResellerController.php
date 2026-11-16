@@ -150,6 +150,7 @@ class ResellerController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,'.$reseller->id,
             'phone_number' => 'required|string|max:255',
             'bkash_number' => 'required|string|max:255',
+            'verification_amount' => 'nullable|numeric|min:0',
             'is_verified' => 'boolean',
             'new_password' => 'nullable|string|min:8',
         ], config('app.demo') ? [] : [

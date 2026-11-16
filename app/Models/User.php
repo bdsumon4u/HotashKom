@@ -35,6 +35,7 @@ class User extends Authenticatable implements Confirmable, Wallet
     protected $fillable = [
         'name', 'shop_name', 'email', 'phone_number', 'bkash_number', 'address',
         'website', 'order_prefix', 'domain', 'is_active', 'password', 'is_verified',
+        'verification_amount',
         'db_name', 'db_username', 'db_password', 'logo',
         'inside_dhaka_shipping', 'outside_dhaka_shipping', 'delivery_areas',
     ];
@@ -246,6 +247,30 @@ class User extends Authenticatable implements Confirmable, Wallet
     }
 
     /**
+     * Get the verification amount for this reseller (defaulting to config).
+     */
+    public function getVerificationAmountAttribute($value): float
+    {
+        return (float) ($value !== null ? $value : config('app.verification_fee', 1000));
+    }
+
+    /**
+     * Alias for account verification amount.
+     */
+    public function getAccountVerificationAmountAttribute(): float
+    {
+        return $this->verification_amount;
+    }
+
+    /**
+     * Setter alias for account verification amount.
+     */
+    public function setAccountVerificationAmountAttribute($value): void
+    {
+        $this->attributes['verification_amount'] = $value;
+    }
+
+    /**
      * The attributes that should be cast to native types.
      */
     protected function casts(): array
@@ -253,6 +278,8 @@ class User extends Authenticatable implements Confirmable, Wallet
         return [
             'email_verified_at' => 'datetime',
             'is_active' => 'boolean',
+            'is_verified' => 'boolean',
+            'verification_amount' => 'decimal:2',
             'inside_dhaka_shipping' => 'integer',
             'outside_dhaka_shipping' => 'integer',
             'delivery_areas' => 'array',

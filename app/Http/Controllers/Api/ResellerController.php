@@ -169,6 +169,7 @@ class ResellerController extends Controller
             'shop_name' => ['required', 'string', 'max:255'],
             'phone_number' => ['required', 'string', 'max:255'],
             'bkash_number' => ['required', 'string', 'max:255'],
+            'verification_amount' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         $reseller->update($validated);

@@ -136,7 +136,7 @@ class AffiliateService
             // Ancestor propagation
             $currentLeg = $assignedLeg;
             $ancestor = $referrerAffiliate;
-            $verificationFee = (float) config('app.verification_fee', 1000);
+            $verificationFee = (float) ($user->verification_amount ?? config('app.verification_fee', 1000));
             $tiers = config('affiliate.tiers', []);
 
             while ($ancestor) {

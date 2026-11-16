@@ -15,7 +15,7 @@ class PaymentController extends Controller
     public function showPaymentForm(Request $request)
     {
         $user = auth()->user();
-        $verificationFee = config('app.verification_fee', 1000);
+        $verificationFee = (float) ($user?->verification_amount ?? config('app.verification_fee', 1000));
         $appliedCoupon = null;
         $discountAmount = 0;
         $finalAmount = $verificationFee;
@@ -74,7 +74,7 @@ class PaymentController extends Controller
         ]);
 
         $user = auth()->user();
-        $verificationFee = config('app.verification_fee', 1000);
+        $verificationFee = (float) ($user?->verification_amount ?? config('app.verification_fee', 1000));
         $appliedCoupon = null;
         $discountAmount = 0;
         $finalAmount = $verificationFee;

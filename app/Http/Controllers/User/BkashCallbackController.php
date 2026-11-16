@@ -64,9 +64,14 @@ class BkashCallbackController extends Controller
                         'paymentInfo' => $paymentInfo,
                         'response' => $response,
                     ]);
-                    // Update user verification status
+                    // Update user verification status and paid verification amount
                     $user = User::find($paymentInfo['user_id']);
-                    $user->update(['is_verified' => true]);
+                    if ($user) {
+                        $user->update([
+                            'is_verified' => true,
+                            'verification_amount' => $paymentInfo['amount'],
+                        ]);
+                    }
 
                     info('Bkash callback user', [
                         'user' => $user,
