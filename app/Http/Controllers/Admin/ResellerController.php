@@ -75,21 +75,30 @@ class ResellerController extends Controller
             $benefit = $tier['benefit'] ?? null;
             $awarded = $commissions->firstWhere('milestone_x', $x);
 
-            $baseAmount = $hasPercentage ? (2 * $x * $verificationFee) : null;
-            $potentialCommission = $hasPercentage ? (($percentage / 100) * $baseAmount) : null;
+            $isAwarded = ! is_null($awarded);
+            $baseAmount = $isAwarded
+                ? (float) $awarded->base_amount
+                : null;
+            $commission = $isAwarded
+                ? (float) $awarded->amount
+                : null;
+            $displayPercentage = $isAwarded && $awarded->percentage
+                ? (float) $awarded->percentage
+                : $percentage;
+
             $isQualified = $pairsCount >= $x;
             $progressPercent = min(100, round(($pairsCount / $x) * 100));
 
             $item = [
                 'milestone_x' => $x,
                 'has_percentage' => $hasPercentage,
-                'percentage' => $percentage,
+                'percentage' => $displayPercentage,
                 'label' => $label,
                 'benefit' => $benefit,
                 'is_manual' => ! $hasPercentage,
                 'base_amount' => $baseAmount,
-                'commission' => $potentialCommission,
-                'is_awarded' => ! is_null($awarded),
+                'commission' => $commission,
+                'is_awarded' => $isAwarded,
                 'awarded_at' => $awarded?->created_at,
                 'awarded_amount' => $awarded?->amount,
                 'is_qualified' => $isQualified,
@@ -142,7 +151,6 @@ class ResellerController extends Controller
     public function update(Request $request, User $reseller)
     {
         $validated = $request->mergeIfMissing([
-            'is_verified' => 0,
             'is_active' => 0,
         ])->validate(array_merge([
             'name' => 'required|string|max:255',
@@ -150,8 +158,6 @@ class ResellerController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email,'.$reseller->id,
             'phone_number' => 'required|string|max:255',
             'bkash_number' => 'required|string|max:255',
-            'verification_amount' => 'nullable|numeric|min:0',
-            'is_verified' => 'boolean',
             'new_password' => 'nullable|string|min:8',
         ], config('app.demo') ? [] : [
             'is_active' => 'boolean',

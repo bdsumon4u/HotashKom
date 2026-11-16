@@ -460,15 +460,21 @@
                                                 @endif
                                             </td>
                                             <td class="text-muted small">
-                                                @if ($tp['has_percentage'])
-                                                    {{ number_format($tp['base_amount'], 2) }} BDT
+                                                @if ($tp['is_awarded'])
+                                                    <span class="font-weight-bold text-dark">{{ number_format($tp['base_amount'], 2) }} BDT</span>
+                                                @elseif ($tp['has_percentage'])
+                                                    <span class="text-muted font-italic">Based on collected amount</span>
                                                 @else
                                                     <span class="text-muted font-italic">Manual Disbursement</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if ($tp['has_percentage'])
+                                                @if ($tp['is_awarded'])
                                                     <span class="font-weight-bold text-success">{{ number_format($tp['commission'], 2) }} BDT</span>
+                                                    <span class="text-muted small d-block font-italic">({{ $tp['percentage'] }}% of {{ number_format($tp['base_amount'], 2) }} BDT)</span>
+                                                @elseif ($tp['has_percentage'])
+                                                    <span class="font-weight-bold text-success">{{ $tp['percentage'] }}%</span>
+                                                    <span class="text-muted small d-block">of collected amount</span>
                                                 @else
                                                     <span class="font-weight-bold text-dark"><i class="fa fa-gift text-warning mr-1"></i> {{ $tp['benefit'] }}</span>
                                                 @endif

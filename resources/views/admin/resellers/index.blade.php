@@ -79,6 +79,40 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for Reseller Verification -->
+    <div class="modal fade" id="verifyResellerModal" tabindex="-1" role="dialog" aria-labelledby="verifyResellerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <form id="verifyResellerForm">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="verifyResellerModalLabel"><i class="fa fa-user-check mr-2"></i>Verify Reseller Account</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="verify_reseller_id" name="reseller_id">
+                        <div class="form-group">
+                            <label class="text-muted mb-1">Reseller</label>
+                            <p class="font-weight-bold text-dark mb-0" id="verify_reseller_name">-</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="modal_verification_amount" class="font-weight-bold">Verification Amount (BDT) <span class="text-danger">*</span></label>
+                            <input type="number" step="0.01" min="0" class="form-control" id="modal_verification_amount" name="verification_amount" required value="{{ config('app.verification_fee', 1000) }}">
+                            <small class="form-text text-muted">Enter the amount paid or assigned for this reseller's verification.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" id="btnConfirmVerify">
+                            <i class="fa fa-check mr-1"></i> Verify &amp; Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('js')
@@ -228,28 +262,73 @@
     // Set up event handlers (these use delegated events so they work even before table is initialized)
     $(document).on('click', '.toggle-verify', function() {
         var id = $(this).data('id');
-        var isVerified = $(this).data('verified');
-        var button = $(this);
-        var action = isVerified ? 'unverify' : 'verify';
+        var name = $(this).data('name') || ('Reseller #' + id);
+        var amount = $(this).data('amount') !== undefined && $(this).data('amount') !== '' ? $(this).data('amount') : '{{ config('app.verification_fee', 1000) }}';
+        var isVerified = parseInt($(this).data('verified'), 10);
 
-        if (confirm('Are you sure you want to ' + action + ' this reseller?')) {
-            $.ajax({
-                url: '/api/resellers/' + id + '/toggle-verify',
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    if (table) {
-                        table.ajax.reload();
+        if (isVerified) {
+            if (confirm('Are you sure you want to unverify this reseller?')) {
+                $.ajax({
+                    url: '/api/resellers/' + id + '/toggle-verify',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        action: 'unverify'
+                    },
+                    success: function(response) {
+                        if (table) {
+                            table.ajax.reload();
+                        }
+                        $.notify(response.message || 'Reseller unverified successfully', 'success');
+                    },
+                    error: function(xhr) {
+                        $.notify('Error updating verification status', 'error');
                     }
-                    $.notify('Verification status updated successfully', 'success');
-                },
-                error: function(xhr) {
-                    $.notify('Error updating verification status', 'error');
-                }
-            });
+                });
+            }
+        } else {
+            // Open modal to enter verification amount
+            $('#verify_reseller_id').val(id);
+            $('#verify_reseller_name').text(name);
+            $('#modal_verification_amount').val(amount);
+            $('#verifyResellerModal').modal('show');
         }
+    });
+
+    $('#verifyResellerForm').on('submit', function(e) {
+        e.preventDefault();
+        var id = $('#verify_reseller_id').val();
+        var amount = $('#modal_verification_amount').val();
+        var $btn = $('#btnConfirmVerify');
+
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Verifying...');
+
+        $.ajax({
+            url: '/api/resellers/' + id + '/toggle-verify',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            data: {
+                action: 'verify',
+                verification_amount: amount
+            },
+            success: function(response) {
+                $('#verifyResellerModal').modal('hide');
+                $btn.prop('disabled', false).html('<i class="fa fa-check mr-1"></i> Verify &amp; Save');
+                if (table) {
+                    table.ajax.reload();
+                }
+                $.notify(response.message || 'Reseller verified successfully', 'success');
+            },
+            error: function(xhr) {
+                $btn.prop('disabled', false).html('<i class="fa fa-check mr-1"></i> Verify &amp; Save');
+                var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Error verifying reseller';
+                $.notify(msg, 'error');
+            }
+        });
     });
 
     // Delete Reseller (only shown for unverified/pending view)

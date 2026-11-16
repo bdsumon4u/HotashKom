@@ -90,11 +90,11 @@ class ResellerController extends Controller
             $actions .= '<a href="'.route('admin.resellers.affiliate', $row->id).'" class="btn btn-sm btn-info" title="Affiliate Network"><i class="fa fa-users"></i></a>';
 
             if (! $isPendingView) {
-                $actions .= '<button type="button" class="btn btn-sm'.($row->is_verified ? ' btn-danger' : ' btn-success').' toggle-verify" data-id="'.$row->id.'" data-verified="'.$row->is_verified.'"><i class="fa'.($row->is_verified ? ' fa-times' : ' fa-check').'"></i></button>';
+                $actions .= '<button type="button" class="btn btn-sm'.($row->is_verified ? ' btn-danger' : ' btn-success').' toggle-verify" data-id="'.$row->id.'" data-name="'.e($row->name).'" data-amount="'.(float) ($row->verification_amount ?? config('app.verification_fee', 1000)).'" data-verified="'.($row->is_verified ? '1' : '0').'" title="'.($row->is_verified ? 'Unverify Reseller' : 'Verify Reseller').'"><i class="fa'.($row->is_verified ? ' fa-times' : ' fa-check').'"></i></button>';
             } else {
                 // For pending resellers, show verify and delete
-                $actions .= '<button type="button" class="btn btn-sm btn-success toggle-verify" data-id="'.$row->id.'" data-verified="0"><i class="fa fa-check"></i></button>';
-                $actions .= '<button type="button" class="btn btn-sm btn-danger delete-reseller" data-id="'.$row->id.'"><i class="fa fa-trash"></i></button>';
+                $actions .= '<button type="button" class="btn btn-sm btn-success toggle-verify" data-id="'.$row->id.'" data-name="'.e($row->name).'" data-amount="'.(float) ($row->verification_amount ?? config('app.verification_fee', 1000)).'" data-verified="0" title="Verify Reseller"><i class="fa fa-check"></i></button>';
+                $actions .= '<button type="button" class="btn btn-sm btn-danger delete-reseller" data-id="'.$row->id.'" title="Delete Reseller"><i class="fa fa-trash"></i></button>';
             }
 
             return $actions.'</div>';
@@ -169,7 +169,6 @@ class ResellerController extends Controller
             'shop_name' => ['required', 'string', 'max:255'],
             'phone_number' => ['required', 'string', 'max:255'],
             'bkash_number' => ['required', 'string', 'max:255'],
-            'verification_amount' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         $reseller->update($validated);
@@ -183,14 +182,32 @@ class ResellerController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function toggleVerify($id)
+    public function toggleVerify(Request $request, $id)
     {
         $reseller = User::findOrFail($id);
-        $reseller->update(['is_verified' => ! $reseller->is_verified]);
+
+        if ($request->input('action') === 'verify' || (! $reseller->is_verified && ! $request->has('action'))) {
+            $validated = $request->validate([
+                'verification_amount' => ['required', 'numeric', 'min:0'],
+            ]);
+
+            $reseller->update([
+                'is_verified' => true,
+                'verification_amount' => $validated['verification_amount'],
+            ]);
+
+            return response()->json([
+                'message' => 'Reseller verified successfully',
+                'is_verified' => true,
+                'verification_amount' => $reseller->verification_amount,
+            ]);
+        }
+
+        $reseller->update(['is_verified' => false]);
 
         return response()->json([
-            'message' => 'Verification status updated successfully',
-            'is_verified' => $reseller->is_verified,
+            'message' => 'Reseller unverified successfully',
+            'is_verified' => false,
         ]);
     }
 

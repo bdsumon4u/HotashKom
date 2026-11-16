@@ -146,26 +146,10 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="verification_amount">Account Verification Amount</label>
-                                        <input type="number" step="0.01" min="0" class="form-control @error('verification_amount') is-invalid @enderror" id="verification_amount" name="verification_amount"
-                                            value="{{ old('verification_amount', $reseller->verification_amount) }}">
-                                        @error('verification_amount')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                        <small class="form-text text-muted">Verification fee paid or assigned to this reseller (default from config: {{ config('app.verification_fee', 1000) }}).</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" id="is_verified" name="is_verified"
-                                                value="1" {{ $reseller->is_verified ? 'checked' : '' }}>
-                                            <label class="custom-control-label" for="is_verified">Verified</label>
-                                        </div>
-                                        <div class="mt-2 custom-control custom-switch">
                                             <input type="checkbox" class="custom-control-input" id="is_active" name="is_active"
                                                 value="1" {{ $reseller->is_active ? 'checked' : '' }}>
-                                            <label class="custom-control-label" for="is_active">Active</label>
+                                            <label class="custom-control-label" for="is_active">API Site</label>
                                         </div>
                                     </div>
                                 </div>
