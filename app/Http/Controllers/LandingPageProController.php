@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CheckoutLandingPageProRequest;
 use App\Http\Resources\ProductResource;
 use App\Jobs\CallOnindaOrderApi;
 use App\Models\Admin;
@@ -14,8 +15,8 @@ use App\Notifications\User\OrderPlaced;
 use App\Services\FacebookPixelService;
 use App\Services\LandingPageProTemplateRegistry;
 use App\Services\UtmTrackingService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -61,6 +62,8 @@ class LandingPageProController extends Controller
     private function buildProductCards(LandingPagePro $landingPagePro): Collection
     {
         return $landingPagePro->items
+            ->filter(fn ($item): bool => $item->product?->is_active
+                && ($item->product->variations->isEmpty() || $item->product->variations->contains('is_active', true)))
             ->map(function ($item): array {
                 /** @var Product $product */
                 $product = $item->product;
@@ -68,9 +71,6 @@ class LandingPageProController extends Controller
                 $productImages = $product->images->pluck('src')->filter();
 
                 $variationSource = $product->variations->where('is_active', true)->values();
-                if ($variationSource->isEmpty()) {
-                    $variationSource = $product->variations;
-                }
 
                 $variations = $variationSource
                     ->map(fn (Product $variation): array => $this->buildVariationPayload($variation))
@@ -287,26 +287,17 @@ class LandingPageProController extends Controller
         return [6, 0];
     }
 
-    public function checkout(Request $request, LandingPagePro $landingPagePro): JsonResponse
+    public function checkout(CheckoutLandingPageProRequest $request, LandingPagePro $landingPagePro): JsonResponse
     {
         abort_unless($landingPagePro->is_published, 404);
 
         $landingItems = $landingPagePro->items()
             ->where('is_active', true)
+            ->whereHas('product', fn (Builder $query): Builder => $query->where('is_active', true))
             ->get(['product_id', 'free_delivery'])
             ->keyBy('product_id');
 
-        $validated = $request->validate([
-            'name' => ['required', 'string'],
-            'phone' => ['required', 'string'],
-            'address' => ['required', 'string'],
-            'note' => ['nullable', 'string', 'max:1000'],
-            'delivery_area' => ['required', 'string'],
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.landing_product_id' => ['required', 'integer'],
-            'items.*.product_id' => ['required', 'exists:products,id'],
-            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:10'],
-        ]);
+        $validated = $request->validated();
 
         $normalizedPhone = preg_replace('/[^\d]/', '', (string) $validated['phone']);
         if (Str::startsWith($normalizedPhone, '8801') && strlen($normalizedPhone) === 13) {
@@ -364,10 +355,12 @@ class LandingPageProController extends Controller
 
         $products = Product::query()
             ->whereIn('id', $requestedProductIds->all())
+            ->withCount('variations')
             ->get()
             ->keyBy('id');
 
         $productsPayload = [];
+        $hasQuantityOffer = count($landingPagePro->quantityDiscountTiers()) > 0;
 
         foreach ($validated['items'] as $item) {
             $landingProductId = (int) $item['landing_product_id'];
@@ -376,23 +369,32 @@ class LandingPageProController extends Controller
             $product = $products->get($productId);
 
             if (! $product) {
-                continue;
+                return response()->json(['message' => 'A selected product is unavailable. Please refresh and choose again.'], 422);
             }
 
             $belongsToLandingProduct = $product->id === $landingProductId || (int) $product->parent_id === $landingProductId;
-            if (! $belongsToLandingProduct || ! $landingItems->has($landingProductId)) {
-                continue;
+            if (! $belongsToLandingProduct || ! $landingItems->has($landingProductId) || ! $product->is_active || $product->variations_count > 0) {
+                return response()->json(['message' => 'A selected product is unavailable. Please refresh and choose again.'], 422);
             }
 
             $fraudQuantity = setting('fraud')->max_qty_per_product ?? 3;
-            $maxQuantity = (int) $fraudQuantity;
-            $quantity = min((int) $requestedQuantity, $maxQuantity);
+            $maxQuantity = max(1, min(10, (int) $fraudQuantity));
+            $quantity = $requestedQuantity;
+
+            if ($quantity > $maxQuantity) {
+                return response()->json(['message' => "You can order up to {$maxQuantity} pieces of each variation."], 422);
+            }
 
             if ($quantity <= 0) {
                 continue;
             }
 
             $productData = (new ProductResource($product))->toCartItem($quantity);
+            if ($hasQuantityOffer) {
+                $productData['price'] = (float) $product->selling_price;
+                $productData['retail_price'] = $productData['price'];
+                $productData['total'] = $productData['price'] * $quantity;
+            }
             $productData['landing_free_delivery'] = (bool) data_get($landingItems->get($landingProductId), 'free_delivery', false);
 
             $productsPayload[$product->id] = $productData;
@@ -404,7 +406,7 @@ class LandingPageProController extends Controller
             ], 422);
         }
 
-        $order = DB::transaction(function () use ($validated, $shippingArea, $productsPayload) {
+        $order = DB::transaction(function () use ($validated, $shippingArea, $productsPayload, $landingPagePro) {
 
             $user = $this->getOrCreateUser($validated);
             $oldOrders = Order::select(['id', 'admin_id', 'status'])->where('phone', $validated['phone'])->get();
@@ -425,6 +427,10 @@ class LandingPageProController extends Controller
                 fn (array $item): int|float => (($item['price'] ?? 0) * ($item['quantity'] ?? 0))
             );
             $shippingCost = $orderModel->getShippingCost($productsPayload, $subtotal, $shippingArea);
+            $selectedQuantity = (int) collect($productsPayload)->sum('quantity');
+            $discountPercentage = $landingPagePro->quantityDiscountPercentage($selectedQuantity);
+            $offerSubtotal = $landingPagePro->quantityOfferSubtotal($selectedQuantity, $subtotal);
+            $quantityDiscount = $subtotal - $offerSubtotal;
 
             $order = Order::create([
                 'source_id' => config('app.instant_order_forwarding') ? 0 : null,
@@ -445,7 +451,11 @@ class LandingPageProController extends Controller
                     'shipping_cost' => $shippingCost,
                     'retail_delivery_fee' => $shippingCost,
                     'advanced' => 0,
-                    'retail_discount' => 0,
+                    'discount' => $quantityDiscount,
+                    'retail_discount' => $quantityDiscount,
+                    'landing_quantity_discount_percentage' => $discountPercentage,
+                    'landing_quantity_pricing_type' => $landingPagePro->quantityPricingType(),
+                    'landing_offer_subtotal' => $offerSubtotal,
                     'coupon_discount' => 0,
                     'subtotal' => $subtotal,
                     'purchase_cost' => collect($productsPayload)->sum(
@@ -499,7 +509,7 @@ class LandingPageProController extends Controller
 
             $orderPayload = [
                 'id' => $order->id,
-                'total' => (float) ($order->data['subtotal'] ?? 0),
+                'total' => (float) ($order->data['subtotal'] ?? 0) - (float) ($order->data['discount'] ?? 0),
             ];
 
             $userDataArr = [

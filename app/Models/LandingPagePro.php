@@ -41,6 +41,59 @@ class LandingPagePro extends Model
         return 'slug';
     }
 
+    public function quantityPricingType(): string
+    {
+        return data_get($this->section_settings, 'order_form.quantity_pricing_type') === 'fixed_total'
+            ? 'fixed_total'
+            : 'percentage';
+    }
+
+    /**
+     * @return array<int, array{min_quantity: int, percentage: int, total_price: int}>
+     */
+    public function quantityDiscountTiers(): array
+    {
+        $hasFixedTotalPricing = $this->quantityPricingType() === 'fixed_total';
+
+        return collect(data_get($this->section_settings, 'order_form.quantity_discounts', []))
+            ->filter(fn ($tier): bool => is_array($tier)
+                && is_numeric($tier['min_quantity'] ?? null)
+                && $tier['min_quantity'] >= 1
+                && $tier['min_quantity'] <= 100
+                && ($hasFixedTotalPricing
+                    ? is_numeric($tier['total_price'] ?? null) && $tier['total_price'] >= 1 && $tier['total_price'] <= 10000000
+                    : is_numeric($tier['percentage'] ?? null) && $tier['percentage'] > 0 && $tier['percentage'] <= 100))
+            ->map(fn (array $tier): array => [
+                'min_quantity' => (int) $tier['min_quantity'],
+                'percentage' => $hasFixedTotalPricing ? 0 : (int) $tier['percentage'],
+                'total_price' => $hasFixedTotalPricing ? (int) $tier['total_price'] : 0,
+            ])
+            ->sortBy('min_quantity')
+            ->values()
+            ->all();
+    }
+
+    public function quantityDiscountPercentage(int $quantity): int
+    {
+        return (int) collect($this->quantityDiscountTiers())
+            ->filter(fn (array $tier): bool => $quantity >= $tier['min_quantity'])
+            ->max('percentage');
+    }
+
+    public function quantityOfferSubtotal(int $quantity, float $subtotal): float
+    {
+        if ($this->quantityPricingType() === 'fixed_total') {
+            $tier = collect($this->quantityDiscountTiers())
+                ->filter(fn (array $tier): bool => $quantity >= $tier['min_quantity'])
+                ->sortByDesc('min_quantity')
+                ->first();
+
+            return $tier ? round($tier['total_price'] * $quantity / $tier['min_quantity']) : $subtotal;
+        }
+
+        return $subtotal - round($subtotal * $this->quantityDiscountPercentage($quantity) / 100);
+    }
+
     public static function sectionLabels(): array
     {
         return [

@@ -9,7 +9,7 @@
 
     $sectionSettings = array_replace_recursive($createSectionDefaults, $sectionSettings);
 
-    $defaultFormTitle = $isCreateForm ? 'Hotash Clothing | Premium Exported Trousers' : $landingPagePro->title;
+    $defaultFormTitle = $isCreateForm ? '' : $landingPagePro->title;
     $defaultFormSlug = $isCreateForm ? '' : $landingPagePro->slug;
     $defaultSeoTitle = $isCreateForm
         ? ''
@@ -26,6 +26,7 @@
                     fn($item) => [
                         'product_id' => $item->product_id,
                         'free_delivery' => (bool) $item->free_delivery,
+                        'is_active' => (bool) $item->is_active,
                     ],
                 )
                 ->values()
@@ -36,13 +37,14 @@
             return [
                 'product_id' => data_get($item, 'product_id'),
                 'free_delivery' => filter_var(data_get($item, 'free_delivery', false), FILTER_VALIDATE_BOOL),
+                'is_active' => filter_var(data_get($item, 'is_active', true), FILTER_VALIDATE_BOOL),
             ];
         })
         ->values()
         ->all();
 
     if (blank($itemsInitial)) {
-        $itemsInitial = [['product_id' => null, 'free_delivery' => false]];
+        $itemsInitial = [];
     }
 
     $galleryImageIds = collect(old('section_settings.gallery.images', data_get($sectionSettings, 'gallery.images', [])))
@@ -91,6 +93,50 @@
         })
         ->all();
 
+    $rowEditorFields = [
+        'features' => ['text' => ['label' => 'Feature', 'placeholder' => 'e.g. Comfortable stretch fabric', 'max' => 1000]],
+        'size_guide' => [
+            'size' => ['label' => 'Size', 'placeholder' => 'e.g. L', 'max' => 100],
+            'waist' => ['label' => 'Waist', 'placeholder' => 'e.g. 30–32 inches', 'max' => 100],
+            'length' => ['label' => 'Length', 'placeholder' => 'e.g. 39 inches', 'max' => 100],
+        ],
+        'faq' => [
+            'q' => ['label' => 'Question', 'placeholder' => 'e.g. Can I mix different colors?', 'max' => 500],
+            'a' => ['label' => 'Answer', 'placeholder' => 'Write the answer customers will see', 'multiline' => true, 'max' => 10000],
+        ],
+        'reviews' => [
+            'name' => ['label' => 'Customer name', 'placeholder' => 'Customer name', 'max' => 255],
+            'text' => ['label' => 'Review', 'placeholder' => 'Paste a real customer review', 'multiline' => true, 'max' => 10000],
+        ],
+    ];
+    $sizeGuideHeadersInitial = data_get($sectionSettings, 'size_guide.headers', [
+        'size' => 'SIZE', 'waist' => 'WAIST (কোমর)', 'length' => 'LENGTH (লম্বা)',
+    ]);
+    $contentRowsInitial = [];
+    foreach ($rowEditorFields as $sectionKey => $fields) {
+        $savedRows = data_get($sectionSettings, "$sectionKey.rows");
+        if (is_array($savedRows)) {
+            $contentRowsInitial[$sectionKey] = array_values($savedRows);
+            continue;
+        }
+        $textKey = $sectionKey === 'size_guide' ? 'rows_text' : 'items_text';
+        $fieldKeys = array_keys($fields);
+        $contentRowsInitial[$sectionKey] = collect(preg_split('/\r\n|\r|\n/', (string) data_get($sectionSettings, "$sectionKey.$textKey", '')))
+            ->filter(fn (string $line): bool => trim($line) !== '')
+            ->map(function (string $line) use ($fieldKeys): array {
+                $values = count($fieldKeys) === 1 ? [trim($line)] : array_map('trim', explode('|', $line, count($fieldKeys)));
+
+                return array_combine($fieldKeys, array_pad($values, count($fieldKeys), ''));
+            })
+            ->values()
+            ->all();
+    }
+    $firstSizeRow = $contentRowsInitial['size_guide'][0] ?? [];
+    if (!is_array(data_get($sectionSettings, 'size_guide.rows'))
+        && preg_match('/size|সাইজ|waist|কোমর|length|লম্বা|লেন্থ/iu', implode(' ', $firstSizeRow))) {
+        $sizeGuideHeadersInitial = array_shift($contentRowsInitial['size_guide']);
+    }
+
     $sections = $accordionSections ?? \App\Models\LandingPagePro::sectionLabels();
     $sectionOrderLabels = $sectionOrderLabels ?? \App\Models\LandingPagePro::reorderableSectionLabels();
     $richTextSections ??= \App\Models\LandingPagePro::getRichTextSections();
@@ -125,24 +171,37 @@
     }
     $sections = $sortedSections;
 
+    $quantityPricingTypeInitial = data_get($sectionSettings, 'order_form.quantity_pricing_type', $isCreateForm ? 'fixed_total' : 'percentage');
+    $discountTiersInitial = array_values(data_get($sectionSettings, 'order_form.quantity_discounts') ?? []);
+    $savedPageUrl = $landingPagePro->exists ? route('landing-pro.show', $landingPagePro) : null;
     $accordionSectionKeys = array_keys($sections);
 
     $sectionOpenInitial = collect($accordionSectionKeys)
-        ->mapWithKeys(fn($key) => [$key => (bool) data_get($sectionSettings, $key . '.enabled', true)])
+        ->mapWithKeys(fn($key) => [$key => collect($errors->keys())->contains(fn(string $field): bool => str_starts_with($field, "section_settings.$key."))])
         ->all();
 @endphp
 
 @push('css')
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/select2.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/datatables.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/dropzone.css') }}">
 @endpush
 
 @push('styles')
     <style>
-        .select2 {
-            width: 100% !important;
-        }
+        .lp-builder [x-cloak] { display: none !important; }
+        .lp-builder details > summary { cursor: pointer; font-weight: 700; }
+        .lp-builder details[open] > summary { margin-bottom: 12px; }
+        .lp-builder .lp-anchor { scroll-margin-top: 100px; }
+        .lp-builder .lp-product-list { max-height: 320px; overflow-y: auto; }
+        .lp-builder .lp-product-image { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; }
+        .lp-builder .lp-product-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e9ecef; }
+        .lp-builder .lp-product-info { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+        .lp-builder .lp-product-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .lp-builder .lp-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+        .lp-builder .lp-editor-row { padding: 12px; border: 1px solid #e9ecef; border-radius: 8px; }
+        .lp-builder .lp-editor-rows { display: grid; gap: 12px; }
+        .lp-builder .lp-steps { display: flex; flex-wrap: wrap; gap: 8px; }
+        @media (min-width: 992px) { .lp-builder .lp-publish { position: sticky; top: 90px; } }
 
         .lp-card {
             border: 1px solid #e9ecef;
@@ -194,13 +253,32 @@
     </style>
 @endpush
 
-<div x-data="landingProForm()" x-init="init()" class="row">
-    <div class="col-lg-8">
+<div x-data="landingProForm()" class="row lp-builder" @invalid.capture="revealInvalidField($event.target)">
+    <div class="col-12">
         <div class="p-3 mb-3 lp-card">
-            <h5 class="mb-3">Landing Basics</h5>
+            <h4>Build your combo campaign</h4>
+            <p class="text-muted">Choose products, set quantity prices or discounts, then customize your page. Customers can mix products and colors and choose a size for each selection.</p>
+            <nav class="lp-steps" aria-label="Builder sections">
+                <a @click="openBuilderPanel('lp-basics')" href="#lp-basics" class="btn btn-sm btn-outline-primary">1. Campaign details</a>
+                <a @click="openBuilderPanel('lp-products')" href="#lp-products" class="btn btn-sm btn-outline-primary">2. Products & offer</a>
+                <a @click="openBuilderPanel('lp-content')" href="#lp-content" class="btn btn-sm btn-outline-primary">3. Page content & images</a>
+                <button type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllSections">Expand all options</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllSections">Collapse all options</button>
+            </nav>
+        </div>
+        @if ($errors->any())
+            <div class="alert alert-danger" role="alert">
+                <strong>Please fix the following before saving:</strong>
+                <ul class="mb-0">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+            </div>
+        @endif
+    </div>
+    <div class="col-lg-8">
+        <details id="lp-basics" class="p-3 mb-3 lp-card lp-anchor" open>
+            <summary>1. Campaign details</summary>
             <div class="mb-3 form-group">
                 <label for="title">Title</label><span class="text-danger">*</span>
-                <input type="text" name="title" id="title" data-target="#slug"
+                <input type="text" name="title" id="title" @input="updateSlug($event.target.value)" required
                     value="{{ old('title', $defaultFormTitle) }}"
                     class="form-control @error('title') is-invalid @enderror"
                     placeholder="e.g. Premium Cotton T-Shirt Offer">
@@ -216,8 +294,9 @@
                     <x-input id="slug" name="slug" :value="old('slug', $defaultFormSlug)"
                         placeholder="e.g. premium-cotton-tshirt-offer" />
                     <button class="btn btn-secondary input-group-append align-items-center" type="button"
-                        onclick="window.open('/lp/' + document.getElementById('slug').value, '_blank')">VISIT</button>
+                        @click="visitPage" @disabled(!$landingPagePro->exists || !$landingPagePro->is_published)>View saved page</button>
                 </div>
+                <small class="form-text text-muted">Keep this link unchanged once your ads are running. Save and publish before viewing the page.</small>
                 <x-error field="slug" />
             </div>
 
@@ -259,106 +338,100 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </details>
 
-        <div class="p-3 mb-3 lp-card">
-            <div class="mb-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Selected Product</h5>
-                <button type="button" class="btn btn-sm btn-primary" @click="addItem">Add Row</button>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table mb-0 table-bordered">
-                    <thead>
-                        <tr>
-                            <th style="min-width: 280px; max-width: 280px; width: 280px;">Product</th>
-                            <th style="min-width: 150px;">Free Delivery</th>
-                            <th style="min-width: 90px;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template x-for="(item, index) in items" :key="index">
-                            <tr>
-                                <td style="width: 280px; max-width: 640px;">
-                                    <select class="form-control js-product-select w-100"
-                                        :name="`items[${index}][product_id]`" x-model="item.product_id">
-                                        <option value="">Select product</option>
-                                        @foreach ($productChoices as $product)
-                                            <option value="{{ $product['id'] }}">{{ $product['label'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td class="align-middle">
-                                    <input type="hidden" :name="`items[${index}][free_delivery]`" value="0">
-                                    <div class="mt-2 mb-0 checkbox checkbox-success">
-                                        <input :id="`item-free-delivery-${index}`" type="checkbox"
-                                            :name="`items[${index}][free_delivery]`" value="1"
-                                            x-model="item.free_delivery">
-                                        <label :for="`item-free-delivery-${index}`">Free</label>
-                                    </div>
-                                </td>
-                                <td class="align-middle">
-                                    <button type="button" class="btn btn-sm btn-danger"
-                                        @click="removeItem(index)">Remove</button>
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-            <x-error field="items" class="mt-2 d-block" />
-        </div>
-
-        <div class="p-3 mb-3 lp-card">
-            <div class="mb-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Image Picker Integration</h5>
-                <button type="button" class="btn btn-sm btn-outline-primary" @click="openGalleryPicker">Add Gallery
-                    Images</button>
-            </div>
-
-            <div class="mb-3">
-                <label class="d-block font-weight-bold">Gallery Images</label>
-                <template x-for="(image, index) in galleryImages" :key="`gallery-${image.id}`">
-                    <div class="mb-2 mr-2 d-inline-block position-relative">
-                        <img :src="image.src" alt="Gallery" class="lp-preview-image" style="max-width: 120px;">
-                        <button type="button" class="btn btn-sm btn-danger position-absolute"
-                            style="top: 2px; right: 2px;" @click="removeGalleryImage(index)">x</button>
-                        <input type="hidden" :name="`section_settings[gallery][images][${index}]`"
-                            :value="image.id">
+        <details id="lp-products" class="p-3 mb-3 lp-card lp-anchor" open>
+            <summary>2. Products & quantity offer</summary>
+            <p class="text-muted">Add each product once. Its colors and sizes appear automatically on the customer page. Prices come from your product catalog.</p>
+            <label for="lp-product-search">Find a product by name or SKU</label>
+            <input id="lp-product-search" type="search" x-model.debounce.200ms="productSearch" class="form-control" placeholder="Search your catalog…">
+            <small class="d-block mt-2 text-muted">Showing up to 10 results. Refine your search to find a specific product.</small>
+            <div class="lp-product-list mb-3">
+                <template x-for="product in filteredProducts" :key="product.id">
+                    <div class="lp-product-row">
+                        <img x-show="product.image" :src="product.image" alt="" class="lp-product-image" loading="lazy">
+                        <div class="lp-product-info">
+                            <strong x-text="product.label"></strong>
+                            <small class="d-block text-muted" x-text="product.sku ? 'SKU: ' + product.sku : ''"></small>
+                            <small x-text="priceLabel(product)"></small>
+                            <small class="d-block text-danger" x-cloak x-show.important="!product.is_active">Inactive in catalog</small>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-primary" @click="addProduct(product)" :disabled="isProductSelected(product.id) || !product.is_active" x-text="isProductSelected(product.id) ? 'Added' : 'Add'"></button>
                     </div>
                 </template>
-                <div class="text-muted" x-show="galleryImages.length === 0">No gallery images selected.</div>
+                <p class="py-3 text-muted" x-show="filteredProducts.length === 0">No matching products. Try another name or SKU.</p>
             </div>
-
-            <div class="row">
-                @foreach ($singleImageFieldMap as $field => $label)
-                    <div class="mb-3 col-md-4">
-                        <label class="d-block font-weight-bold">{{ $label }}</label>
-                        <div class="mb-2" x-show="sectionImages.{{ $field }}">
-                            <img :src="sectionImages.{{ $field }}?.src" alt="{{ $label }}"
-                                class="lp-preview-image">
+            <strong class="d-block" aria-live="polite" x-text="items.length + ' products in this campaign'"></strong>
+            <p x-show="items.length === 0" class="mt-2 text-muted">Add products above to start building your offer.</p>
+            <template x-for="(item, index) in items" :key="item.key">
+                <div class="lp-product-row">
+                    <div class="lp-product-info">
+                        <input type="hidden" :name="`items[${index}][product_id]`" :value="item.product_id">
+                        <strong x-text="productFor(item).label || 'Product no longer available'"></strong>
+                        <small class="d-block text-muted" x-text="priceLabel(productFor(item))"></small>
+                        <template x-for="attribute in (productFor(item).attributes || [])" :key="attribute.name">
+                            <small class="d-block text-muted" x-text="attribute.name + ': ' + attribute.values.join(', ')"></small>
+                        </template>
+                        <small class="d-block text-warning" x-cloak x-show.important="productFor(item).has_variations && !productFor(item).variation_count">No active variations. Activate variations in the product catalog before advertising.</small>
+                        <small class="d-block text-danger" x-cloak x-show.important="!productFor(item).is_active">Product is inactive or unavailable. Review it before publishing.</small>
+                        <div class="lp-product-actions mt-2">
+                            <label class="mb-0">
+                                <input type="hidden" :name="`items[${index}][free_delivery]`" value="0">
+                                <input type="checkbox" :name="`items[${index}][free_delivery]`" value="1" x-model="item.free_delivery"> Free delivery
+                            </label>
+                            <label class="mb-0">
+                                <input type="hidden" :name="`items[${index}][is_active]`" value="0">
+                                <input type="checkbox" :name="`items[${index}][is_active]`" value="1" x-model="item.is_active"> Show on page
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-danger" @click="removeItem(index)">Remove</button>
                         </div>
-                        <div class="gap-2 d-flex">
-                            <button type="button" class="mr-2 btn btn-sm btn-primary"
-                                @click="openSinglePicker('{{ $field }}')">Choose Image</button>
-                            <button type="button" class="btn btn-sm btn-light"
-                                @click="sectionImages.{{ $field }} = null">Clear</button>
-                        </div>
-                        <input type="hidden" name="section_settings[{{ $field }}][image_id]"
-                            :value="sectionImages.{{ $field }}?.id || ''">
                     </div>
-                @endforeach
-            </div>
-        </div>
-
-        <div class="p-3 mb-3 lp-card">
-            <div class="mb-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Per-Section Controls</h5>
-                <div class="d-flex" style="gap: 8px;">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllSections">Expand all</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllSections">Collapse all</button>
                 </div>
+            </template>
+            <small class="d-block mt-2 text-muted">Selecting any product marked “Free delivery” makes delivery free for the entire order.</small>
+            <x-error field="items" class="mt-2 d-block" />
+            <hr>
+            <details>
+            <summary>Quantity pricing</summary>
+            <div class="d-flex justify-content-end mb-2">
+                <button type="button" class="btn btn-sm btn-outline-primary" @click="addDiscountTier" :disabled="discountTiers.length >= 10">Add tier</button>
             </div>
+            <label for="lp-quantity-pricing-type">Offer type</label>
+            <select id="lp-quantity-pricing-type" name="section_settings[order_form][quantity_pricing_type]" x-model="quantityPricingType" class="form-control mb-2">
+                <option value="fixed_total">Fixed total price by quantity (৳)</option>
+                <option value="percentage">Percentage discount (%)</option>
+            </select>
+            <p class="text-muted" x-show="quantityPricingType === 'fixed_total'">Set a minimum quantity and the total price for that quantity. The highest qualifying quantity sets the per-piece rate until the next tier applies. Example: minimum 2 pieces, total ৳1,490 means ৳745 per piece for 2 or more. Totals are rounded to the nearest taka. Below the first tier, regular product prices apply.</p>
+            <p class="text-muted" x-show="quantityPricingType === 'percentage'">Count all selected pieces across products and colors. The highest eligible percentage applies to the product subtotal. Discounts do not stack.</p>
+            <p class="text-muted">Delivery is separate. Catalog wholesale pricing is replaced by this offer when tiers are configured.</p>
+            <p x-show="!discountTiers.length" class="text-muted">No quantity offer configured. Add a tier to set your campaign pricing.</p>
+            <template x-for="(tier, index) in discountTiers" :key="tier.key">
+                <div class="row mb-2">
+                    <div class="col-5">
+                        <label :for="'tier-quantity-' + tier.key">Minimum pieces</label>
+                        <input :id="'tier-quantity-' + tier.key" type="number" min="1" max="100" step="1" required class="form-control" x-model.number="tier.min_quantity" :name="`section_settings[order_form][quantity_discounts][${index}][min_quantity]`">
+                    </div>
+                    <div class="col-4">
+                        <div x-show="quantityPricingType === 'percentage'">
+                            <label :for="'tier-percent-' + tier.key">Discount (%)</label>
+                            <input :id="'tier-percent-' + tier.key" type="number" min="1" max="100" step="1" :required="quantityPricingType === 'percentage'" :disabled="quantityPricingType !== 'percentage'" class="form-control" x-model.number="tier.percentage" :name="`section_settings[order_form][quantity_discounts][${index}][percentage]`">
+                        </div>
+                        <div x-show="quantityPricingType === 'fixed_total'">
+                            <label :for="'tier-total-' + tier.key">Tier total (৳)</label>
+                            <input :id="'tier-total-' + tier.key" type="number" min="1" max="10000000" step="1" :required="quantityPricingType === 'fixed_total'" :disabled="quantityPricingType !== 'fixed_total'" class="form-control" x-model.number="tier.total_price" :name="`section_settings[order_form][quantity_discounts][${index}][total_price]`">
+                        </div>
+                    </div>
+                    <div class="col-3 d-flex align-items-end">
+                        <button type="button" class="btn btn-sm btn-outline-danger" @click="discountTiers.splice(index, 1)" :aria-label="'Remove discount tier ' + (index + 1)">Remove</button>
+                    </div>
+                </div>
+            </template>
+            </details>
+        </details>
+
+        <details id="lp-content" class="p-3 mb-3 lp-card lp-anchor">
+            <summary>3. Page content & images</summary>
+            <p class="text-muted">Expand a section to edit its content. Use its checkbox to show or hide it, and drag the handle to change its position.</p>
 
             <template x-for="(sectionKey, index) in sectionOrder" :key="`section-order-${sectionKey}`">
                 <input type="hidden" :name="`section_settings[section_order][${index}]`" :value="sectionKey">
@@ -368,15 +441,24 @@
                 @foreach ($sections as $key => $label)
                     <div class="lp-section-card" data-section-key="{{ $key }}"
                         data-reorderable="{{ in_array($key, $reorderableSectionKeys, true) ? '1' : '0' }}">
-                        <div class="lp-section-head" @click="toggleSection('{{ $key }}')">
+                        <div class="lp-section-head" @click="toggleSection('{{ $key }}')"
+                            role="button" tabindex="0" :aria-expanded="sectionOpen['{{ $key }}']"
+                            @keydown.enter.self.prevent="toggleSection('{{ $key }}')"
+                            @keydown.space.self.prevent="toggleSection('{{ $key }}')">
                         <div class="lp-section-title">
                                 @if (in_array($key, $reorderableSectionKeys, true))
-                                    <span class="mr-1 text-muted" title="Drag to reorder" style="cursor: grab;">&#x2630;</span>
+                                    <span class="mr-1 text-muted lp-drag-handle" title="Drag to reorder" style="cursor: grab;">&#x2630;</span>
                                 @endif
                                 <span class="lp-section-toggle" x-text="sectionOpen['{{ $key }}'] ? '-' : '+'"></span>
                             <div>
                                 <strong>{{ $label }}</strong>
-                                <small class="d-block text-muted">Toggle + custom content</small>
+                                @if (isset($rowEditorFields[$key]))
+                                    <small class="d-block text-muted" x-text="contentRows.{{ $key }}.length + ' rows · click to edit'"></small>
+                                @elseif ($key === 'gallery')
+                                    <small class="d-block text-muted" x-text="galleryImages.length + ' custom images · click to edit'"></small>
+                                @else
+                                    <small class="d-block text-muted">Click to edit content and settings</small>
+                                @endif
                             </div>
                         </div>
                         <div class="mb-0 checkbox checkbox-success">
@@ -385,11 +467,47 @@
                             <input id="section-{{ $key }}" type="checkbox"
                                 name="section_settings[{{ $key }}][enabled]" value="1"
                                 @checked((bool) data_get($sectionSettings, $key . '.enabled', true)) @click.stop>
-                            <label for="section-{{ $key }}">Enabled</label>
+                            <label for="section-{{ $key }}" @click.stop>Enabled</label>
                         </div>
                     </div>
                         <div class="lp-section-body" x-show="sectionOpen['{{ $key }}']" x-cloak>
                             <div class="row">
+                                @if (isset($singleImageFieldMap[$key]))
+                                    <div class="mb-3 col-12">
+                                        <label class="d-block font-weight-bold">{{ $singleImageFieldMap[$key] }}</label>
+                                        <div class="mb-2" x-show="sectionImages.{{ $key }}">
+                                            <img :src="sectionImages.{{ $key }}?.src" alt="{{ $singleImageFieldMap[$key] }}" class="lp-preview-image">
+                                        </div>
+                                        <div class="lp-product-actions">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" @click="openSinglePicker('{{ $key }}')" x-text="sectionImages.{{ $key }} ? 'Replace image' : 'Choose image'"></button>
+                                            <button type="button" class="btn btn-sm btn-light" @click="sectionImages.{{ $key }} = null" :disabled="!sectionImages.{{ $key }}">Remove image</button>
+                                        </div>
+                                        <input type="hidden" name="section_settings[{{ $key }}][image_id]" :value="sectionImages.{{ $key }}?.id || ''">
+                                    </div>
+                                @endif
+                                @if ($key === 'gallery')
+                                    <div class="mb-3 col-12">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="mb-0 font-weight-bold">Gallery images</label>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" @click="openGalleryPicker">Add images</button>
+                                        </div>
+                                        <p class="text-muted">Choose images in display order, or use the arrows to reorder them. When empty, the gallery uses product images.</p>
+                                        <div class="lp-gallery-grid">
+                                            <template x-for="(image, index) in galleryImages" :key="`gallery-${image.id}`">
+                                                <div class="p-2 border rounded">
+                                                    <img :src="image.src" :alt="'Gallery image ' + (index + 1)" class="lp-preview-image mb-2">
+                                                    <div class="lp-product-actions">
+                                                        <button type="button" class="btn btn-sm btn-light" @click="moveRow(galleryImages, index, -1)" :disabled="index === 0" :aria-label="'Move gallery image ' + (index + 1) + ' earlier'">↑</button>
+                                                        <button type="button" class="btn btn-sm btn-light" @click="moveRow(galleryImages, index, 1)" :disabled="index === galleryImages.length - 1" :aria-label="'Move gallery image ' + (index + 1) + ' later'">↓</button>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger" @click="removeGalleryImage(index)">Remove</button>
+                                                    </div>
+                                                    <input type="hidden" :name="`section_settings[gallery][images][${index}]`" :value="image.id">
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <p class="text-muted" x-show="galleryImages.length === 0">No custom gallery images selected.</p>
+                                    </div>
+                                @endif
                                 @if ($key === 'announcement_bar')
                                     <div class="mb-3 col-md-12">
                                         <label>Announcement Text</label>
@@ -449,11 +567,7 @@
                                 @endif
 
                                 @if ($key === 'features')
-                                    <div class="mb-3 col-md-12">
-                                        <label>Feature List (one per line)</label>
-                                        <textarea name="section_settings[features][items_text]" rows="4" class="form-control"
-                                            placeholder="Premium quality fabric&#10;Comfort fit&#10;Durable stitching">{{ old('section_settings.features.items_text', data_get($sectionSettings, 'features.items_text')) }}</textarea>
-                                    </div>
+                                    @include('admin.landing-page-pros.row-editor', ['editorKey' => 'features', 'rowFields' => $rowEditorFields['features'], 'rowLabel' => 'feature'])
                                 @endif
 
                                 @if ($key === 'gallery')
@@ -484,11 +598,19 @@
                                 @endif
 
                                 @if ($key === 'size_guide')
-                                    <div class="mb-3 col-md-12">
-                                        <label>Size Guide Rows (format: SIZE|WAIST (কোমর)|LENGTH (লম্বা), one per line)</label>
-                                        <textarea name="section_settings[size_guide][rows_text]" rows="4" class="form-control"
-                                            placeholder="SIZE|WAIST (কোমর)|LENGTH (লম্বা)&#10;M|28-30|38&#10;L|30-32|39">{{ old('section_settings.size_guide.rows_text', data_get($sectionSettings, 'size_guide.rows_text')) }}</textarea>
+                                    <div class="mb-3 col-12">
+                                        <h6>Table headings</h6>
+                                        <p class="text-muted">Include units in the headings, for example Waist (inches).</p>
+                                        <div class="row">
+                                            @foreach ($rowEditorFields['size_guide'] as $field => $config)
+                                                <div class="col-sm-4 mb-2">
+                                                    <label for="size-heading-{{ $field }}">{{ $config['label'] }} column</label>
+                                                    <input id="size-heading-{{ $field }}" name="section_settings[size_guide][headers][{{ $field }}]" x-model="sizeGuideHeaders.{{ $field }}" class="form-control" maxlength="100">
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     </div>
+                                    @include('admin.landing-page-pros.row-editor', ['editorKey' => 'size_guide', 'rowFields' => $rowEditorFields['size_guide'], 'rowLabel' => 'size'])
 
                                     <div class="mb-2 col-md-12">
                                         <div class="pt-3 border-top font-weight-bold">CTA After Size Guide</div>
@@ -517,11 +639,7 @@
                                 @endif
 
                                 @if ($key === 'faq')
-                                    <div class="mb-3 col-md-12">
-                                        <label>FAQ Rows (format: Question|Answer, one per line)</label>
-                                        <textarea name="section_settings[faq][items_text]" rows="4" class="form-control"
-                                            placeholder="How long is delivery?|Inside Dhaka 1-2 days">{{ old('section_settings.faq.items_text', data_get($sectionSettings, 'faq.items_text')) }}</textarea>
-                                    </div>
+                                    @include('admin.landing-page-pros.row-editor', ['editorKey' => 'faq', 'rowFields' => $rowEditorFields['faq'], 'rowLabel' => 'question'])
 
                                     <div class="mb-2 col-md-12">
                                         <div class="pt-3 border-top font-weight-bold">CTA After FAQ</div>
@@ -550,21 +668,48 @@
                                 @endif
 
                                 @if ($key === 'reviews')
-                                    <div class="mb-3 col-md-12">
-                                        <label>Review Rows (format: Name|Review text, one per line)</label>
-                                        <textarea name="section_settings[reviews][items_text]" rows="4" class="form-control"
-                                            placeholder="Customer One|Amazing quality and fit.">{{ old('section_settings.reviews.items_text', data_get($sectionSettings, 'reviews.items_text')) }}</textarea>
-                                    </div>
+                                    @include('admin.landing-page-pros.row-editor', ['editorKey' => 'reviews', 'rowFields' => $rowEditorFields['reviews'], 'rowLabel' => 'review'])
                                 @endif
                             </div>
                         </div>
                     </div>
                 @endforeach
             </div>
-        </div>
+        </details>
 
+    </div>
+
+    <div class="col-lg-4">
+        <div class="lp-publish">
+        <details class="p-3 mb-3 lp-card" open>
+            <summary>Publishing options</summary>
+            <div class="mb-3 form-group">
+                <input type="hidden" name="is_published" value="0">
+                <div class="mb-0 checkbox checkbox-success">
+                    <input id="is_published" type="checkbox" name="is_published" value="1"
+                        @checked(old('is_published', $landingPagePro->is_published))>
+                    <label for="is_published">Publish this landing page</label>
+                </div>
+            </div>
+            <div class="mb-0 form-group">
+                <label for="published_at">Published timestamp (optional)</label>
+                <input type="datetime-local" name="published_at" id="published_at"
+                    value="{{ old('published_at', optional($landingPagePro->published_at)->format('Y-m-d\\TH:i')) }}"
+                    class="form-control">
+                <small class="form-text text-muted">This records the publish time; it does not schedule a launch. The checkbox controls whether the page is live.</small>
+            </div>
+        </details>
+
+        <details class="p-3 mb-3 lp-card" open>
+            <summary>Offer at a glance</summary>
+            <p class="mb-2" x-text="items.filter(item => item.is_active).length + ' products shown on the page'"></p>
+            <template x-for="tier in discountTiers" :key="'summary-' + tier.key">
+                <p class="mb-1" x-text="quantityPricingType === 'fixed_total' ? (tier.min_quantity || '…') + '+ pieces → ৳' + (tier.min_quantity && tier.total_price ? Math.round(tier.total_price / tier.min_quantity * 100) / 100 : '…') + ' per piece' : 'Buy ' + (tier.min_quantity || '…') + '+ pieces → ' + (tier.percentage || '…') + '% off'"></p>
+            </template>
+            <small class="text-muted">Save, then check the customer page on mobile before starting your ads.</small>
+        </details>
         <div class="p-3 mb-3 lp-card">
-            <h5 class="mb-3">SEO</h5>
+            <details><summary class="font-weight-bold">Search engine settings (optional)</summary>
             <div class="mb-3 form-group">
                 <label>SEO Title</label>
                 <input type="text" name="seo[title]" value="{{ old('seo.title', $defaultSeoTitle) }}"
@@ -575,10 +720,11 @@
                 <textarea name="seo[description]" rows="4" class="form-control"
                     placeholder="Short SEO description (recommended around 150-160 chars)">{{ old('seo.description', $defaultSeoDescription) }}</textarea>
             </div>
+            </details>
         </div>
 
         <div class="p-3 mb-3 lp-card">
-            <h5 class="mb-3">Custom CSS</h5>
+            <details><summary class="font-weight-bold">Custom CSS (advanced)</summary>
             <div class="mb-0 form-group">
                 <label for="custom_css">CSS Code</label>
                 <textarea name="custom_css" id="custom_css" rows="6" class="form-control"
@@ -587,39 +733,16 @@
                 <small class="form-text text-muted">This CSS will be injected into the &lt;style&gt; tag of this landing page.</small>
                 <x-error field="custom_css" />
             </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4">
-        <div class="p-3 mb-3 lp-card">
-            <h5 class="mb-3">Publish Controls</h5>
-            <div class="mb-3 form-group">
-                <input type="hidden" name="is_published" value="0">
-                <div class="mb-0 checkbox checkbox-success">
-                    <input id="is_published" type="checkbox" name="is_published" value="1"
-                        @checked(old('is_published', $landingPagePro->is_published))>
-                    <label for="is_published">Publish this landing page</label>
-                </div>
-            </div>
-            <div class="mb-0 form-group">
-                <label for="published_at">Publish Date Time</label>
-                <input type="datetime-local" name="published_at" id="published_at"
-                    value="{{ old('published_at', optional($landingPagePro->published_at)->format('Y-m-d\\TH:i')) }}"
-                    class="form-control">
-            </div>
+            </details>
         </div>
 
-        @foreach ($errors->all() as $error)
-            <div class="mb-2 alert alert-danger">{{ $error }}</div>
-        @endforeach
-
-        <button type="submit" class="btn btn-success btn-block">Save Landing Page Pro</button>
+        <button type="submit" class="btn btn-success btn-block" :disabled="items.length === 0">{{ $isCreateForm ? 'Create landing page' : 'Save changes' }}</button>
+        <a href="{{ route('admin.landing-page-pros.index') }}" class="btn btn-light btn-block mt-2">Back to landing pages</a>
+        </div>
     </div>
 </div>
 
 @push('js')
-    <script src="{{ asset('assets/js/select2/select2.full.min.js') }}" defer></script>
-    <script src="{{ asset('assets/js/select2/select2-custom.js') }}" defer></script>
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/dropzone/dropzone.js') }}" defer></script>
     <script src="{{ asset('js/tinymce.js') }}" defer></script>
@@ -631,7 +754,16 @@
         function landingProForm() {
             return {
                 items: @json($itemsInitial),
+                productChoices: @json($productChoices),
+                productSearch: '',
+                discountTiers: @json($discountTiersInitial),
+                quantityPricingType: @json($quantityPricingTypeInitial),
+                nextKey: 0,
+                slugEdited: @json(!$isCreateForm || filled(old('slug'))),
+                savedPageUrl: @json($savedPageUrl),
                 galleryImages: @json($galleryImagesInitial),
+                contentRows: @json($contentRowsInitial),
+                sizeGuideHeaders: @json($sizeGuideHeadersInitial),
                 sectionImages: @json($sectionImagesInitial),
                 sectionOrder: @json($sectionOrderInitial),
                 sectionOpen: @json($sectionOpenInitial),
@@ -640,9 +772,16 @@
                 sortableInstance: null,
 
                 init() {
+                    this.items = this.items.filter(item => item.product_id).map(item => ({...item, key: ++this.nextKey}));
+                    this.discountTiers = this.discountTiers.map(tier => ({...tier, key: ++this.nextKey}));
+                    Object.keys(this.contentRows).forEach(section => {
+                        this.contentRows[section] = this.contentRows[section].map(row => ({...row, key: ++this.nextKey}));
+                    });
+                    this.$root.querySelector('#slug').addEventListener('input', () => { this.slugEdited = true; });
                     this.$nextTick(() => {
-                        this.initSlugSync();
-                        this.initSelect2();
+                        if (@json($errors->any())) {
+                            this.$root.querySelectorAll('details').forEach(panel => { panel.open = true; });
+                        }
                         this.initSectionSortable();
                     });
                 },
@@ -664,7 +803,7 @@
                     this.sortableInstance = new Sortable(container, {
                         animation: 150,
                         draggable: '.lp-section-card[data-reorderable="1"]',
-                        handle: '.lp-section-head',
+                        handle: '.lp-drag-handle',
                         onEnd: () => this.syncSectionOrderFromDom(),
                     });
 
@@ -678,73 +817,101 @@
                         .filter((key) => this.reorderableSectionKeys.includes(key));
                 },
 
+                openBuilderPanel(id) {
+                    const panel = this.$root.querySelector('#' + id);
+                    if (panel) { panel.open = true; }
+                },
+
+                revealInvalidField(field) {
+                    let parent = field.parentElement;
+                    while (parent && this.$root.contains(parent)) {
+                        if (parent.tagName === 'DETAILS') { parent.open = true; }
+                        if (parent.dataset.sectionKey) { this.sectionOpen[parent.dataset.sectionKey] = true; }
+                        parent = parent.parentElement;
+                    }
+                },
+
                 toggleSection(key) {
                     this.sectionOpen[key] = !this.sectionOpen[key];
                 },
 
                 expandAllSections() {
+                    this.$root.querySelectorAll('details').forEach(panel => { panel.open = true; });
                     this.accordionSectionKeys.forEach((key) => {
                         this.sectionOpen[key] = true;
                     });
                 },
 
                 collapseAllSections() {
+                    this.$root.querySelectorAll('details').forEach(panel => { panel.open = false; });
                     this.accordionSectionKeys.forEach((key) => {
                         this.sectionOpen[key] = false;
                     });
                 },
 
-                initSlugSync() {
-                    runWhenJQueryReady(function($) {
-                        $('[name="title"]').off('keyup.landingPageProSlug').on('keyup.landingPageProSlug',
-                            function() {
-                                const $slug = $($(this).data('target'));
-                                $slug.val(slugify($(this).val()));
-                            });
-                    });
+                get filteredProducts() {
+                    const query = this.productSearch.trim().toLowerCase();
+                    return this.productChoices.filter(product =>
+                        (product.label + ' ' + (product.sku || '')).toLowerCase().includes(query)
+                    ).slice(0, 10);
                 },
 
-                initSelect2() {
-                    runWhenJQueryReady(() => {
-                        this.$nextTick(() => {
-                            const self = this;
-                            const $selects = $('.js-product-select');
-                            $selects.each(function() {
-                                const $el = $(this);
-                                if ($el.hasClass('select2-hidden-accessible')) {
-                                    return;
-                                }
-
-                                $el.select2({
-                                    placeholder: 'Search product',
-                                    allowClear: true,
-                                }).on('change', function() {
-                                    const index = $selects.index(this);
-                                    if (index !== -1 && self.items[index]) {
-                                        self.items[index].product_id = $el.val() ? Number($el.val()) : null;
-                                    }
-                                });
-                            });
-                        });
-                    });
+                productFor(item) {
+                    return this.productChoices.find(product => Number(product.id) === Number(item.product_id)) || {};
                 },
 
-                addItem() {
-                    this.items.push({
-                        product_id: null,
-                        free_delivery: false,
-                    });
+                priceLabel(product) {
+                    if (product.min_price === undefined) { return ''; }
+                    return product.min_price === product.max_price
+                        ? product.min_price + '৳ per piece'
+                        : product.min_price + '–' + product.max_price + '৳ per piece';
+                },
 
-                    this.$nextTick(() => this.initSelect2());
+                isProductSelected(id) {
+                    return this.items.some(item => Number(item.product_id) === Number(id));
+                },
+
+                addProduct(product) {
+                    if (this.isProductSelected(product.id) || !product.is_active) { return; }
+                    this.items.push({key: ++this.nextKey, product_id: product.id, free_delivery: false, is_active: true});
                 },
 
                 removeItem(index) {
-                    if (this.items.length === 1) {
-                        return;
-                    }
-
                     this.items.splice(index, 1);
-                    this.$nextTick(() => this.initSelect2());
+                },
+
+                addDiscountTier() {
+                    if (this.discountTiers.length >= 10) { return; }
+                    this.discountTiers.push({key: ++this.nextKey, min_quantity: '', percentage: '', total_price: ''});
+                },
+
+                updateSlug(title) {
+                    if (this.slugEdited) { return; }
+                    this.$root.querySelector('#slug').value = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                },
+
+                visitPage() {
+                    if (this.savedPageUrl) { window.open(this.savedPageUrl, '_blank', 'noopener'); }
+                },
+
+                addContentRow(section, fields) {
+                    this.contentRows[section].push({
+                        ...Object.fromEntries(fields.map(field => [field, ''])), key: ++this.nextKey,
+                    });
+                    this.$nextTick(() => {
+                        const rows = this.$root.querySelectorAll(`[data-editor-section="${section}"] .lp-editor-row`);
+                        const lastRow = rows[rows.length - 1];
+                        if (lastRow) {
+                            lastRow.open = true;
+                            lastRow.querySelector('input, textarea')?.focus();
+                        }
+                    });
+                },
+
+                moveRow(rows, index, direction) {
+                    const destination = index + direction;
+                    if (destination < 0 || destination >= rows.length) { return; }
+                    rows.splice(destination, 0, rows.splice(index, 1)[0]);
                 },
 
                 openGalleryPicker() {

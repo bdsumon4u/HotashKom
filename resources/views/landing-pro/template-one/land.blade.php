@@ -306,8 +306,31 @@
         ];
     }
 
+    if (is_array(data_get($sections, 'features.rows'))) {
+        $features = collect(data_get($sections, 'features.rows'))->pluck('text')->filter()->values()->all();
+    }
+    if (is_array(data_get($sections, 'size_guide.rows'))) {
+        $sizeRows = array_values(data_get($sections, 'size_guide.rows'));
+        if ($sizeRows !== []) {
+            array_unshift($sizeRows, data_get($sections, 'size_guide.headers', [
+                'size' => 'SIZE', 'waist' => 'WAIST (কোমর)', 'length' => 'LENGTH (লম্বা)',
+            ]));
+        }
+    }
+    if (is_array(data_get($sections, 'faq.rows'))) {
+        $faqs = array_values(data_get($sections, 'faq.rows'));
+    }
+    if (is_array(data_get($sections, 'reviews.rows'))) {
+        $reviews = collect(data_get($sections, 'reviews.rows'))
+            ->map(fn (array $row, int $index): array => ['id' => $index + 1, 'name' => $row['name'], 'text' => $row['text']])
+            ->values()
+            ->all();
+    }
+
     $reviewCount = count($reviews);
     $useReviewCarousel = $reviewCount > 3;
+
+    $maxProductQuantity = max(1, min(10, (int) (setting('fraud')->max_qty_per_product ?? 3)));
 
     $productsPayload = collect($selectedProducts)
         ->flatMap(function ($item): array {
@@ -428,6 +451,9 @@
                 insideDhakaDeliveryCharge: @json($insideDhakaDeliveryCharge),
                 outsideDhakaDeliveryCharge: @json($outsideDhakaDeliveryCharge),
                 products: @json($productsPayload),
+                quantityDiscountTiers: @json($landingPagePro->quantityDiscountTiers()),
+                quantityPricingType: @json($landingPagePro->quantityPricingType()),
+                maxProductQuantity: @json($maxProductQuantity),
 
                 init() {
                     this.startTimer();
@@ -534,7 +560,9 @@
                 },
 
                 increment(index) {
-                    this.products[index].qty++;
+                    if (this.products[index].qty < this.maxProductQuantity) {
+                        this.products[index].qty++;
+                    }
                 },
 
                 decrement(index) {
@@ -615,6 +643,8 @@
                     });
 
                     if (!matchedVariant) {
+                        product.selected_product_id = null;
+                        product.attribute_warnings = ['এই কালার ও সাইজের সমন্বয় পাওয়া যাচ্ছে না। অন্যটি'];
                         return;
                     }
 
@@ -644,6 +674,9 @@
                         }
 
                         const missingNames = this.getMissingAttributeNames(product);
+                        if (!missingNames.length && !product.selected_product_id) {
+                            missingNames.push('এই কালার ও সাইজের সমন্বয় পাওয়া যাচ্ছে না। অন্যটি');
+                        }
                         product.attribute_warnings = missingNames;
 
                         if (missingNames.length > 0) {
@@ -701,8 +734,37 @@
                         .insideDhakaDeliveryCharge;
                 },
 
+                get selectedQuantity() {
+                    return this.selectedItems.reduce((sum, item) => sum + item.qty, 0);
+                },
+
+                get quantityDiscountPercentage() {
+                    if (this.quantityPricingType === 'fixed_total') { return 0; }
+                    return this.quantityDiscountTiers.reduce((best, tier) =>
+                        this.selectedQuantity >= Number(tier.min_quantity)
+                            ? Math.max(best, Number(tier.percentage)) : best, 0);
+                },
+
+                get fixedQuantityTier() {
+                    if (this.quantityPricingType !== 'fixed_total') { return null; }
+                    return this.quantityDiscountTiers.reduce((selectedTier, tier) =>
+                        this.selectedQuantity >= Number(tier.min_quantity) && (!selectedTier || Number(tier.min_quantity) > Number(selectedTier.min_quantity))
+                            ? tier : selectedTier, null);
+                },
+
+                get offerSubtotal() {
+                    if (this.fixedQuantityTier) {
+                        return Math.round(Number(this.fixedQuantityTier.total_price) * this.selectedQuantity / Number(this.fixedQuantityTier.min_quantity));
+                    }
+                    return this.totalPrice - Math.round(this.totalPrice * this.quantityDiscountPercentage / 100);
+                },
+
+                get quantityDiscount() {
+                    return Math.max(0, this.totalPrice - this.offerSubtotal);
+                },
+
                 get grandTotal() {
-                    return this.totalPrice + this.deliveryCharge;
+                    return this.offerSubtotal + this.deliveryCharge;
                 },
 
                 get showNameError() {

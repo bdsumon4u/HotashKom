@@ -8,6 +8,18 @@
                 <p class="mb-6 text-sm font-semibold text-gray-600">
                     {{ data_get($sections, 'order_form.subtitle', 'Choose Products & Quantity') }}</p>
 
+                <div x-cloak x-show="quantityDiscountTiers.length" class="grid gap-2 mb-4">
+                    <p class="text-sm font-bold text-green-800">পণ্য ও কালার মিলিয়ে কম্বো তৈরি করুন</p>
+                    <template x-for="tier in quantityDiscountTiers" :key="tier.min_quantity">
+                        <div class="p-3 text-sm font-bold rounded border"
+                            :class="(quantityPricingType === 'fixed_total' ? fixedQuantityTier && Number(fixedQuantityTier.min_quantity) === Number(tier.min_quantity) : selectedQuantity >= Number(tier.min_quantity)) ? 'bg-green-50 border-green-500 text-green-800' : 'bg-gray-50 border-gray-200 text-gray-700'">
+                            <span x-text="quantityPricingType === 'fixed_total' ? `${tier.min_quantity}+ পিসে প্রতিটি ${Math.round(Number(tier.total_price) / Number(tier.min_quantity) * 100) / 100}৳` : `${tier.min_quantity}+ পিস নিলে ${tier.percentage}% ছাড়`"></span>
+                        </div>
+                    </template>
+                    <p class="text-sm text-gray-600" x-text="quantityPricingType === 'fixed_total' ? `${selectedQuantity} পিস নির্বাচন করেছেন। ডেলিভারি চার্জ আলাদা।` : `${selectedQuantity} পিস নির্বাচন করেছেন। সর্বোচ্চ প্রযোজ্য ছাড় অটোমেটিক যোগ হবে।`"></p>
+                    <p x-show="quantityPricingType === 'fixed_total' && selectedQuantity > 0 && !fixedQuantityTier" class="text-sm text-amber-800">এই পরিমাণের জন্য কম্বো মূল্য নেই। নিয়মিত পণ্যের মূল্য প্রযোজ্য।</p>
+                </div>
+
                 <div class="grid gap-4" :class="products.length > 4 ? 'md:grid-cols-2' : ''">
                     <template x-for="(product, index) in products" :key="product.id">
                         <div class="p-3 bg-white rounded-md border shadow-sm transition-all cursor-pointer group"
@@ -28,10 +40,10 @@
                                     <div class="inline-flex items-center mt-2 text-sm bg-white rounded border"
                                         @click.stop>
                                         <button @click="decrement(index)" type="button"
-                                            class="px-3 py-1 hover:bg-gray-100">−</button>
+                                            :disabled="product.qty <= 1" aria-label="পরিমাণ কমান" class="px-3 py-1 hover:bg-gray-100 disabled:opacity-40">−</button>
                                         <span class="w-10 font-bold text-center" x-text="product.qty"></span>
                                         <button @click="increment(index)" type="button"
-                                            class="px-3 py-1 hover:bg-gray-100">+</button>
+                                            :disabled="product.qty >= maxProductQuantity" aria-label="পরিমাণ বাড়ান" class="px-3 py-1 hover:bg-gray-100 disabled:opacity-40">+</button>
                                     </div>
 
                                     <template x-if="product.attributes.length > 0">
@@ -153,9 +165,9 @@
                             </div>
                         </div>
 
-                        <div x-show="!selectedCount || (products.length > 4 && selectedCount > 2)"
+                        <div
                             class="p-4 bg-white rounded-md border-2 border-green-300 border-dashed">
-                            <div x-cloak x-show="products.length > 4 && selectedCount > 2">
+                            <div x-cloak x-show="selectedCount > 0">
                                 <div class="flex justify-between items-center text-sm font-bold text-gray-700">
                                     <span>Selected Items</span>
                                     <span class="px-2 py-1 text-white bg-green-600 rounded-sm"
@@ -181,7 +193,7 @@
                                 </div>
                             </div>
 
-                            <p x-show="!selectedCount" class="font-bold text-red-600" x-show="selectedCount === 0">অন্তত একটি প্রোডাক্ট
+                            <p x-show="!selectedCount" class="font-bold text-red-600">অন্তত একটি প্রোডাক্ট
                                 সিলেক্ট করুন।</p>
                         </div>
 
@@ -199,6 +211,14 @@
                             <div class="flex justify-between items-center mb-1 text-sm font-bold text-gray-700">
                                 <span>Subtotal</span>
                                 <span x-text="totalPrice + '৳'"></span>
+                            </div>
+                            <div x-cloak x-show="quantityDiscount > 0 && quantityPricingType === 'percentage'" class="flex justify-between items-center mb-2 text-sm font-bold text-green-700">
+                                <span x-text="`কম্বো ছাড় (${quantityDiscountPercentage}%)`"></span>
+                                <span x-text="'−' + quantityDiscount + '৳'"></span>
+                            </div>
+                            <div x-cloak x-show="fixedQuantityTier" class="flex justify-between items-center mb-2 text-sm font-bold text-green-700">
+                                <span x-text="`${selectedQuantity} পিসের কম্বো মূল্য`"></span>
+                                <span x-text="offerSubtotal + '৳'"></span>
                             </div>
                             <div class="flex justify-between items-center mb-2 text-sm font-bold text-gray-700">
                                 <span>Delivery</span>

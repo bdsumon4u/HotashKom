@@ -16,7 +16,7 @@
                         </button>
                         <div x-show="activeFaq === {{ $index }}" x-cloak
                             class="px-6 py-4 text-gray-700 border-t bg-gray-50">
-                            {{ $faq['a'] }}
+                            <p class="whitespace-pre-line">{{ $faq['a'] }}</p>
                         </div>
                     </div>
                 @endforeach

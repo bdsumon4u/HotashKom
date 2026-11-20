@@ -51,12 +51,14 @@ class LandingPageProController extends Controller
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
 
-        $landingPagePro = LandingPagePro::query()->create([
-            ...$request->safe()->except(['items']),
-            'published_at' => $this->resolvePublishedAt($request->boolean('is_published'), $request->input('published_at')),
-        ]);
+        (new LandingPagePro)->getConnection()->transaction(function () use ($request): void {
+            $landingPagePro = LandingPagePro::query()->create([
+                ...$request->safe()->except(['items']),
+                'published_at' => $this->resolvePublishedAt($request->boolean('is_published'), $request->input('published_at')),
+            ]);
 
-        $this->syncItems($landingPagePro, $request->input('items', []));
+            $this->syncItems($landingPagePro, $request->input('items', []));
+        });
 
         return to_route('admin.landing-page-pros.index')->withSuccess('Landing Page Pro created successfully.');
     }
@@ -90,12 +92,14 @@ class LandingPageProController extends Controller
     {
         abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
 
-        $landing_page_pro->update([
-            ...$request->safe()->except(['items']),
-            'published_at' => $this->resolvePublishedAt($request->boolean('is_published'), $request->input('published_at')),
-        ]);
+        $landing_page_pro->getConnection()->transaction(function () use ($request, $landing_page_pro): void {
+            $landing_page_pro->update([
+                ...$request->safe()->except(['items']),
+                'published_at' => $this->resolvePublishedAt($request->boolean('is_published'), $request->input('published_at')),
+            ]);
 
-        $this->syncItems($landing_page_pro, $request->input('items', []));
+            $this->syncItems($landing_page_pro, $request->input('items', []));
+        });
 
         return to_route('admin.landing-page-pros.index')->withSuccess('Landing Page Pro updated successfully.');
     }
@@ -165,12 +169,33 @@ class LandingPageProController extends Controller
     {
         return Product::query()
             ->whereNull('parent_id')
-            ->orderBy('name')
-            ->get(['id', 'name', 'sku', 'is_active'])
-            ->map(fn (Product $product): array => [
-                'id' => $product->id,
-                'label' => $product->name.($product->is_active ? '' : ' (Inactive)'),
-            ])
+            ->with(['variations.options.attribute'])
+            ->reorder('name')
+            ->get(['id', 'name', 'sku', 'is_active', 'selling_price'])
+            ->map(function (Product $product): array {
+                $variations = $product->variations->where('is_active', true);
+                $prices = $variations->isNotEmpty() ? $variations->pluck('selling_price') : collect([$product->selling_price]);
+
+                return [
+                    'id' => $product->id,
+                    'label' => $product->name,
+                    'sku' => $product->sku,
+                    'is_active' => (bool) $product->is_active,
+                    'image' => $product->thumbnail->first()?->src,
+                    'min_price' => (float) $prices->min(),
+                    'max_price' => (float) $prices->max(),
+                    'variation_count' => $variations->count(),
+                    'has_variations' => $product->variations->isNotEmpty(),
+                    'attributes' => $variations->flatMap->options
+                        ->groupBy('attribute_id')
+                        ->map(fn (Collection $options): array => [
+                            'name' => $options->first()->attribute?->name ?? 'Options',
+                            'values' => $options->pluck('name')->unique()->values()->all(),
+                        ])
+                        ->values()
+                        ->all(),
+                ];
+            })
             ->values();
     }
 }

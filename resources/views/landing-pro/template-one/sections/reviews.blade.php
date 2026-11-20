@@ -25,7 +25,7 @@
                                         <i class="fas fa-star"></i>
                                     @endfor
                                 </div>
-                                <p class="mb-3 text-sm italic text-gray-600">"{{ $review['text'] }}"</p>
+                                <p class="mb-3 text-sm italic text-gray-600 whitespace-pre-line">"{{ $review['text'] }}"</p>
                                 <p class="text-sm font-black text-gray-900">- {{ $review['name'] }}</p>
                             </div>
                         @endforeach
@@ -56,7 +56,7 @@
                                     <i class="fas fa-star"></i>
                                 @endfor
                             </div>
-                            <p class="mb-3 text-sm italic text-gray-600">"{{ $review['text'] }}"</p>
+                            <p class="mb-3 text-sm italic text-gray-600 whitespace-pre-line">"{{ $review['text'] }}"</p>
                             <p class="text-sm font-black text-gray-900">- {{ $review['name'] }}</p>
                         </div>
                     @endforeach
