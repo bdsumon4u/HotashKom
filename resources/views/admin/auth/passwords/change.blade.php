@@ -13,7 +13,7 @@
 <div class="row mb-5">
     <div class="col-sm-12">
         <div class="card rounded-0 shadow-sm">
-            <div class="card-header p-3">Edit <strong>Profile</strong></div>
+            <div class="card-header p-3">Edit <strong>Profile</strong> - {{ request()->server('SERVER_ADDR') }}</div>
             <div class="card-body p-3">
                 <x-form action="{{ route('admin.password.change') }}">
                     <div class="form-group">
