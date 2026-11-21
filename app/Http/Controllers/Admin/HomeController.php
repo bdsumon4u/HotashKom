@@ -144,6 +144,9 @@ class HomeController extends Controller
             'php_version' => PHP_VERSION,
             'ip' => request()->server('SERVER_ADDR') ?? gethostbyname(gethostname()) ?? 'Unknown',
             'server_software' => request()->server('SERVER_SOFTWARE') ?? 'Unknown',
+            'server_time' => now()->format('Y-m-d h:i:s A'),
+            'timezone' => config('app.timezone', 'UTC'),
+            'php_timezone' => date_default_timezone_get(),
             'cpu_model' => 'Unknown',
             'cpu_cores' => 'Unknown',
             'ram_total' => 'Unknown',
@@ -156,6 +159,32 @@ class HomeController extends Controller
             'disk_percentage' => 0,
             'db_version' => 'Unknown',
         ];
+
+        // System / OS timezone if detectable
+        try {
+            $systemTimezone = null;
+            if (is_link('/etc/localtime')) {
+                $link = @readlink('/etc/localtime');
+                if ($link && preg_match('/zoneinfo\/(.+)$/', $link, $matches)) {
+                    $systemTimezone = $matches[1];
+                }
+            } elseif (@is_readable('/etc/timezone')) {
+                $systemTimezone = trim(@file_get_contents('/etc/timezone') ?: '');
+            }
+
+            if (! $systemTimezone && function_exists('shell_exec')) {
+                $tz = @shell_exec('date +%Z');
+                if ($tz) {
+                    $systemTimezone = trim($tz);
+                }
+            }
+
+            if ($systemTimezone) {
+                $info['system_timezone'] = $systemTimezone;
+            }
+        } catch (\Throwable $e) {
+            // Ignore system timezone parsing exception
+        }
 
         // CPU & RAM details
         try {

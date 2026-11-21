@@ -282,7 +282,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-sm card d-none">
+                <div class="rounded-sm card">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center">
                         <h5>Server Information</h5>
                         <span class="badge badge-primary">{{ $serverInfo['os'] }}</span>
@@ -305,6 +305,24 @@
                                         <td class="pl-0 font-weight-bold">PHP Version:</td>
                                         <td class="pr-0 text-right">{{ $serverInfo['php_version'] }}</td>
                                     </tr>
+                                    <tr>
+                                        <td class="pl-0 font-weight-bold">Server Time:</td>
+                                        <td class="pr-0 text-right">{{ $serverInfo['server_time'] }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="pl-0 font-weight-bold">Timezone:</td>
+                                        <td class="pr-0 text-right">{{ $serverInfo['timezone'] }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="pl-0 font-weight-bold">PHP Timezone:</td>
+                                        <td class="pr-0 text-right">{{ $serverInfo['php_timezone'] }}</td>
+                                    </tr>
+                                    @if (! empty($serverInfo['system_timezone']) && $serverInfo['system_timezone'] !== $serverInfo['timezone'])
+                                    <tr>
+                                        <td class="pl-0 font-weight-bold">System Timezone:</td>
+                                        <td class="pr-0 text-right">{{ $serverInfo['system_timezone'] }}</td>
+                                    </tr>
+                                    @endif
                                     <tr>
                                         <td class="pl-0 font-weight-bold">DB Version:</td>
                                         <td class="pr-0 text-right text-truncate" style="max-width: 180px;" title="{{ $serverInfo['db_version'] }}">
