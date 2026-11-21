@@ -282,6 +282,7 @@
                     </div>
                 </div>
 
+                @if(request('server-info'))
                 <div class="rounded-sm card">
                     <div class="p-3 card-header d-flex justify-content-between align-items-center">
                         <h5>Server Information</h5>
@@ -372,6 +373,7 @@
                         @endif
                     </div>
                 </div>
+                @endif
             </div>
             <div class="col-xl-4 xl-50 box-xl-12">
                 @isset($lowStockProducts)
