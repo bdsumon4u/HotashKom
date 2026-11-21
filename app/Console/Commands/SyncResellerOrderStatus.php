@@ -50,6 +50,7 @@ class SyncResellerOrderStatus extends Command
 
         $orders = Order::query()
             ->select('id')
+            ->where('created_at', '>=', now()->subDays(3))
             ->whereHas('user', function (Builder $query): void {
                 $query->where('is_active', true)
                     ->whereNotNull('db_name')
