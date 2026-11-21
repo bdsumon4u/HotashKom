@@ -15,7 +15,7 @@
                 <div class="elementor-element elementor-element-8e20db8 elementor-align-left elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
                     data-id="8e20db8" data-element_type="widget" data-widget_type="icon-list.default">
                     <div class="elementor-widget-container">
-                        {!! $content !!}
+                        {!! storage_content($content) !!}
                     </div>
                 </div>
                 <div class="elementor-element elementor-element-1dc7ff05 elementor-align-center elementor-widget elementor-widget-button"
@@ -36,7 +36,7 @@
                     data-id="9e86776" data-element_type="widget" data-widget_type="image.default">
                     <div class="elementor-widget-container">
                         <img fetchpriority="high" decoding="async" width="1080" height="1080"
-                            src="{{ Str::isUrl($image) ? $image : asset('storage/'.$image) }}"
+                            src="{{ storage_url($image) }}"
                             class="attachment-large size-large wp-image-27434" alt=""
                             />
                     </div>

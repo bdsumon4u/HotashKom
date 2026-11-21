@@ -36,7 +36,7 @@
                                 <div class="swiper-slide" role="group" aria-roledescription="slide">
                                     <figure class="swiper-slide-inner"><img decoding="async"
                                             class="swiper-slide-image"
-                                            src="{{ Str::isUrl($image) ? $image : asset('storage/'.$image) }}"
+                                            src="{{ storage_url($image) }}"
                                             alt="" /></figure>
                                 </div>
                                 @endforeach
@@ -67,7 +67,7 @@
                 <div class="elementor-element elementor-element-61b505b elementor-element-1a4b772 elementor-align-left elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
                     data-id="1a4b772" data-element_type="widget" data-widget_type="icon-list.default">
                     <div class="elementor-widget-container">
-                        {!! fix_youtube_embeds($description) !!}
+                        {!! fix_youtube_embeds(storage_content($description)) !!}
                     </div>
                 </div>
             </div>

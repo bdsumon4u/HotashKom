@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Jobs\CopyResourceToResellers;
 use App\Jobs\RemoveResourceFromResellers;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
@@ -78,6 +79,13 @@ class Brand extends Model
     public function image()
     {
         return $this->belongsTo(Image::class);
+    }
+
+    protected function imageSrc(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => $this->image?->src ?? cdn('https://placehold.co/600x600?text=No+Product'),
+        );
     }
 
     public function products()

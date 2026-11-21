@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
@@ -16,6 +17,13 @@ class Blog extends Model
         'content',
         'image',
     ];
+
+    protected function image(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value): ?string => storage_url($value),
+        );
+    }
 
     #[\Override]
     public function getRouteKeyName()

@@ -350,12 +350,11 @@
                                 $defaultCompany = (object) ($settings['company'] ?? []);
                                 $defaultLogo = (object) ($settings['logo'] ?? []);
                                 $user = $order->user;
-                                $hasLogo = $user && $user->logo;
                                 $shopName = $user && $user->shop_name ? $user->shop_name : null;
 
                                 // Use reseller's information
                                 $companyName = $shopName ?? ($defaultCompany->name ?? '');
-                                $logoUrl = $hasLogo ? asset('storage/' . $user->logo) : (isset($defaultLogo->mobile) ? asset($defaultLogo->mobile) : null);
+                                $logoUrl = $user?->logo_url ?: (isset($defaultLogo->mobile) ? asset($defaultLogo->mobile) : null);
                                 $phoneNumber = ($user && $user->phone_number) ? $user->phone_number : ($defaultCompany->phone ?? '');
                                 $address = ($user && $user->address) ? $user->address : ($defaultCompany->address ?? '');
 

@@ -7,8 +7,6 @@ use App\Models\Image;
 use App\Traits\ImageUploader;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ImageController extends Controller
 {
@@ -41,7 +39,7 @@ class ImageController extends Controller
         $file = $request->file('file');
 
         return Image::create([
-            'disk' => 'public',
+            'disk' => config('filesystems.default'),
             'filename' => $file->getClientOriginalName(),
             'path' => $this->uploadImage($file, [
                 'width' => 700,
@@ -85,9 +83,11 @@ class ImageController extends Controller
                 : back()->with('danger', 'Image Is Used.');
         }
 
-        // $this->delete();
-        $imagePath = ltrim(Str::after($image->path, '/storage/'), '/');
-        $image->delete() && Storage::disk($image->disk)->delete($imagePath);
+        abort_if(isReseller() && $image->source_id, 403, 'Cannot delete a sourced image.');
+
+        if ($image->delete()) {
+            delete_storage_file($image->path);
+        }
 
         return request()->expectsJson()
             ? response()->json(['success' => 'Image Has Been Deleted.'])

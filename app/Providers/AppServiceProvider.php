@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use AmidEsfahani\FilamentTinyEditor\TinyEditor;
 use App\Extensions\DatabaseSessionHandler;
 use App\Models\Brand;
 use App\Models\Category;
@@ -14,6 +15,7 @@ use App\Pathao\Apis\AreaApi;
 use App\Pathao\Apis\OrderApi;
 use App\Pathao\Apis\StoreApi;
 use App\Pathao\Manage\Manage;
+use Filament\Forms\Components\RichEditor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Queue\Events\JobProcessed;
@@ -32,7 +34,10 @@ class AppServiceProvider extends ServiceProvider
     #[\Override]
     public function register(): void
     {
-        //
+        config([
+            'filament.default_filesystem_disk' => config('filesystems.default'),
+            'livewire.temporary_file_upload.disk' => 'local',
+        ]);
     }
 
     /**
@@ -40,6 +45,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        foreach ([TinyEditor::class, RichEditor::class] as $editor) {
+            $editor::configureUsing(fn (TinyEditor|RichEditor $component): TinyEditor|RichEditor => $component
+                ->fileAttachmentsDisk(config('filesystems.default'))
+                ->getUploadedAttachmentUrlUsing(fn (?string $file): ?string => storage_url($file)));
+        }
+
         Schema::defaultStringLength(191);
 
         Paginator::useBootstrap();

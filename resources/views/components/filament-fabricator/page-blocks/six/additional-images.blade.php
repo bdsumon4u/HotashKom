@@ -57,7 +57,7 @@
                                 @foreach($imageList as $image)
                                 <div class="swiper-slide" role="group" aria-roledescription="slide" aria-label="{{$loop->iteration}} of {{count($imageList)}}">
                                     <figure class="swiper-slide-inner"><img style="width:100%" decoding="async" class="swiper-slide-image"
-                                            src="{{ Str::isUrl($image) ? $image : asset('storage/'.$image) }}"
+                                            src="{{ storage_url($image) }}"
                                             alt="{{$loop->iteration}} of {{count($imageList)}}" /></figure>
                                 </div>
                                 @endforeach

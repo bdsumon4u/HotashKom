@@ -96,7 +96,7 @@
                     @foreach ($order->products as $product)
                         <tr>
                             <td>
-                                <img src="{{ asset($product->image) }}" alt="Image" width="70" height="60">
+                                <img src="{{ storage_url($product->image) }}" alt="Image" width="70" height="60">
                             </td>
                             <td>{{ $product->name }}</td>
                             <td>{{ isOninda() && config('app.resell') ? $product->retail_price ?? $product->price : $product->price }}

@@ -35,32 +35,17 @@ if ($isWalkIn || ! $isResellerInvoice) {
             $companyName = $resellerCompany->name ?? $companyName;
         }
 
-        // Logo with proper URL construction
-        if (isset($resellerLogo->mobile)) {
-            $domain = $user->domain ?? '';
-            if ($domain && ! str_starts_with((string) $domain, 'http')) {
-                $domain = (parse_url((string) config('app.url'), PHP_URL_SCHEME) ?: 'https').'://'.$domain;
-            }
-            $logoUrl = $domain.$resellerLogo->mobile;
+        if (! empty($resellerLogo->mobile)) {
+            $logoUrl = $resellerLogo->mobile;
         } else {
-            $logoUrl = $getUserOrCompany('logo', 'mobile');
-            if ($user && $user->logo) {
-                $logoUrl = asset('storage/'.$user->logo);
-            } elseif (isset($logo->mobile)) {
-                $logoUrl = asset($logo->mobile);
-            }
+            $logoUrl = $user?->logo_url ?: ($logo->mobile ?? null);
         }
 
         $phoneNumber = $getFallback($resellerCompany->phone ?? null, $getUserOrCompany('phone_number', 'phone'));
         $address = $getFallback($resellerCompany->address ?? null, $getUserOrCompany('address', 'address'));
     } else {
         $companyName = $getUserOrCompany('shop_name', 'name');
-        $logoUrl = $getUserOrCompany('logo', 'mobile');
-        if ($user && $user->logo) {
-            $logoUrl = asset('storage/'.$user->logo);
-        } elseif (isset($logo->mobile) && ! ($user && $user->shop_name)) {
-            $logoUrl = asset($logo->mobile);
-        }
+        $logoUrl = $user?->logo_url ?: (! $user?->shop_name ? ($logo->mobile ?? null) : null);
         $phoneNumber = $getUserOrCompany('phone_number', 'phone');
         $address = $getUserOrCompany('address', 'address');
     }

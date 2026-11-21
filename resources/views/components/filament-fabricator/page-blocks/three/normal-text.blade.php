@@ -9,7 +9,7 @@
                 <div class="elementor-element elementor-element-c8f9014 elementor-widget elementor-widget-heading"
                     data-id="c8f9014" data-element_type="widget" data-widget_type="heading.default">
                     <div class="elementor-widget-container">
-                        {!! $content !!}
+                        {!! storage_content($content) !!}
                     </div>
                 </div>
             </div>

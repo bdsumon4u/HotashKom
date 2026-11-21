@@ -24,7 +24,7 @@
                                     data-id="e196775" data-element_type="widget" data-widget_type="image.default">
                                     <div class="elementor-widget-container">
                                         <img decoding="async"
-                                            src="{{asset('storage/'.$item['image'])}}"
+                                            src="{{ storage_url($item['image']) }}"
                                             class="attachment-large size-large wp-image-186" alt="" />
                                     </div>
                                 </div>

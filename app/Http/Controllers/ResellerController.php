@@ -12,7 +12,6 @@ use App\Services\AffiliateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -550,16 +549,10 @@ final class ResellerController extends Controller
         $user->outside_dhaka_shipping = $outsideAreaSetting ? (int) data_get($outsideAreaSetting, 'cost', 0) : ($formattedAreas[1] ?? $insideAreaSetting ? (int) data_get($formattedAreas[1] ?? $insideAreaSetting, 'cost', 0) : 0);
 
         if ($request->hasFile('logo')) {
-            // Delete old logo if exists
-            if ($user->logo && Storage::disk('public')->exists($user->logo)) {
-                Storage::disk('public')->delete($user->logo);
-            }
-
-            $logoPath = $request->file('logo')->store('reseller-logos', 'public');
-            $user->logo = $logoPath;
+            $user->updateLogo($request->file('logo'));
+        } else {
+            $user->save();
         }
-
-        $user->save();
 
         return to_route('reseller.profile')
             ->with('success', 'Profile updated successfully!');

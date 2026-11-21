@@ -7,8 +7,6 @@ use App\Models\Slide;
 use App\Traits\ImageUploader;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class SlideController extends Controller
 {
@@ -120,9 +118,10 @@ class SlideController extends Controller
     public function destroy(Slide $slide)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
-        Storage::disk('public')->delete(ltrim(Str::after($slide->mobile_src, '/storage/'), '/'));
-        Storage::disk('public')->delete(ltrim(Str::after($slide->desktop_src, '/storage/'), '/'));
-        $slide->delete();
+        if ($slide->delete()) {
+            delete_storage_file($slide->getRawOriginal('mobile_src'));
+            delete_storage_file($slide->getRawOriginal('desktop_src'));
+        }
 
         return back()->with('success', 'Slide Has Been Deleted.');
     }

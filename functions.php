@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 if (! function_exists('cacheMemo')) {
@@ -375,6 +376,101 @@ function cdn(?string $url, int $w = 150, int $h = 150)
     }
 
     return asset($url);
+}
+
+if (! function_exists('storage_key')) {
+    function storage_key(?string $path, ?string $assetUrl = null): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        if (preg_match('~^(?:https?:)?//~i', $path)) {
+            $assetUrl ??= config('filesystems.disks.r2.url');
+            $host = parse_url($path, PHP_URL_HOST);
+            $urlPath = parse_url($path, PHP_URL_PATH) ?: '';
+            $prefix = rtrim(parse_url($assetUrl ?: '', PHP_URL_PATH) ?: '', '/').'/';
+
+            if ($host && strcasecmp($host, (string) parse_url($assetUrl ?: '', PHP_URL_HOST)) === 0 && str_starts_with($urlPath, $prefix)) {
+                $path = substr($urlPath, strlen($prefix));
+            } elseif ($host && str_starts_with($urlPath, '/storage/') && (
+                strcasecmp($host, (string) parse_url(config('app.url'), PHP_URL_HOST)) === 0 ||
+                strcasecmp($host, (string) parse_url(config('app.oninda_url') ?: '', PHP_URL_HOST)) === 0
+            )) {
+                $path = substr($urlPath, strlen('/storage/'));
+            } else {
+                return null;
+            }
+        } else {
+            $path = ltrim($path, '/');
+            if (str_starts_with($path, 'storage/')) {
+                $path = substr($path, strlen('storage/'));
+            }
+        }
+
+        $path = rawurldecode($path);
+
+        return $path === '' || str_contains($path, '://') || preg_match('~(?:^|/)\.\.?(?:/|$)|[\\\\\x00-\x1F\x7F]~', $path)
+            ? null
+            : $path;
+    }
+}
+
+if (! function_exists('storage_url')) {
+    function storage_url(?string $path, ?string $assetUrl = null): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        if (! $assetUrl && isReseller() && str_contains($path, '/storage/')) {
+            $masterHost = parse_url(config('app.oninda_url') ?: '', PHP_URL_HOST);
+            $host = parse_url($path, PHP_URL_HOST);
+            if ($masterHost && $host && strcasecmp($host, $masterHost) === 0) {
+                $assetUrl = config('app.oninda_asset_url');
+            }
+        }
+
+        $key = storage_key($path, $assetUrl);
+        if ($key === null) {
+            return preg_match('~^(?:https?:)?//~i', $path) ? $path : null;
+        }
+
+        $encoded = implode('/', array_map(rawurlencode(...), explode('/', $key)));
+
+        return $assetUrl
+            ? rtrim($assetUrl, '/').'/'.$encoded
+            : Storage::disk(config('filesystems.default'))->url($encoded);
+    }
+}
+
+if (! function_exists('delete_storage_file')) {
+    function delete_storage_file(?string $path): bool
+    {
+        $key = storage_key($path);
+
+        return $key !== null && Storage::disk(config('filesystems.default'))->delete($key);
+    }
+}
+
+if (! function_exists('storage_content')) {
+    function storage_content(?string $html): string
+    {
+        return preg_replace_callback(
+            '~(<(?:img|source|video)\b[^>]*?\b(?:src|poster)\s*=\s*)([\"\'])(.*?)\2~is',
+            function (array $matches): string {
+                $path = html_entity_decode($matches[3], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                if (! preg_match('~^(?:https?:)?//|^/?storage/|^/?uploads/~i', $path)) {
+                    return $matches[0];
+                }
+
+                $url = storage_url($path);
+
+                return $matches[1].$matches[2].htmlspecialchars($url ?? $path, ENT_QUOTES, 'UTF-8').$matches[2];
+            },
+            $html ?? '',
+        ) ?? ($html ?? '');
+    }
 }
 
 if (! function_exists('cdnAsset')) {

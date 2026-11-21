@@ -131,6 +131,8 @@ return [
 
     'oninda_url' => env('ONINDA_URL'),
 
+    'oninda_asset_url' => env('ONINDA_ASSET_URL') ?: rtrim((string) env('ONINDA_URL'), '/').'/storage',
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

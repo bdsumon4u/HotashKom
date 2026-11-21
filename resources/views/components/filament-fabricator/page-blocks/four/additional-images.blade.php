@@ -35,7 +35,7 @@
                                 @foreach($imageList as $image)
                                 <div class="swiper-slide" role="group" aria-roledescription="slide">
                                     <figure class="swiper-slide-inner"><img class="swiper-slide-image swiper-lazy"
-                                            data-src="{{Str::isUrl($image) ? $image : asset('storage/'.$image)}}" />
+                                            data-src="{{ storage_url($image) }}" />
                                         <div class="swiper-lazy-preloader"></div>
                                     </figure>
                                 </div>

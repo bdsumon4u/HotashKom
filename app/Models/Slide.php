@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class Slide extends Model
@@ -13,6 +14,20 @@ class Slide extends Model
     protected $attributes = [
         'object_fit' => 'cover',
     ];
+
+    protected function mobileSrc(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value): ?string => storage_url($value),
+        );
+    }
+
+    protected function desktopSrc(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value): ?string => storage_url($value),
+        );
+    }
 
     #[\Override]
     public static function booted(): void

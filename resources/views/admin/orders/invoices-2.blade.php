@@ -194,7 +194,7 @@
                                 <tr>
                                     @unless (setting('show_option')->hide_invoice_image ?? false)
                                     <td>
-                                        <img src="{{ asset($product->image) }}" alt="Image" width="70" height="60">
+                                        <img src="{{ storage_url($product->image) }}" alt="Image" width="70" height="60">
                                     </td>
                                     @endunless
                                     <td>{{ $product->name }}</td>

@@ -21,7 +21,7 @@
                                 <div class="elementor-element elementor-element-5bb578b elementor-widget elementor-widget-text-editor"
                                     data-id="5bb578b" data-element_type="widget" data-widget_type="text-editor.default">
                                     <div class="elementor-widget-container">
-                                        {!! $content !!}
+                                        {!! storage_content($content) !!}
                                     </div>
                                 </div>
                                 <div class="elementor-element elementor-element-ae527d0 elementor-mobile-align-justify elementor-widget elementor-widget-button"

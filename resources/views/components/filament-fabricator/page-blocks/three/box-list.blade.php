@@ -18,7 +18,7 @@
                     <div class="elementor-container elementor-column-gap-default">
                         <div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-3e4875f"
                             data-id="3e4875f" data-element_type="column">
-                            {!! $content !!}
+                            {!! storage_content($content) !!}
                         </div>
                     </div>
                 </section>

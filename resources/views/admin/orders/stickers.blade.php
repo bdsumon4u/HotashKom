@@ -24,75 +24,32 @@
 </head>
 <body>
     @php
-        // Helper function to safely load remote images with fallback
-        function safeLoadRemoteImage($url, $fallbackPath = null) {
-            if (!$url) {
-                return $fallbackPath;
+        $loadImage = static function (?string $path, ?string $fallback = null): ?string {
+            if (! $path) {
+                return $fallback;
             }
 
             try {
-                if (str_starts_with($url, 'http')) {
-                    // Remote URL - convert to data URI for PDF
-                    $imageContent = file_get_contents($url);
-                    if ($imageContent !== false) {
-                        return "data:image/jpeg;base64, " . base64_encode($imageContent);
-                    }
+                $url = storage_url($path);
+                $key = storage_key($url);
+                if ($key !== null) {
+                    $content = \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->get($key);
                 } else {
-                    // Local path - check if file exists and is a file
-                    $localPath = public_path(str_replace(asset(''), '', $url));
-                    if (file_exists($localPath) && is_file($localPath)) {
-                        return $localPath;
-                    }
+                    $content = @file_get_contents($url, false, stream_context_create([
+                        'http' => ['timeout' => 10],
+                    ]));
                 }
-            } catch (Exception $e) {
-                // Log error for debugging (optional)
-                // error_log("Failed to load image from URL: " . $url . " - " . $e->getMessage());
-            }
 
-            return $fallbackPath;
-        }
-
-        // Helper function to safely load storage images with fallback
-        function safeLoadStorageImage($imagePath, $fallbackHtml = null) {
-            try {
-                $path = str($imagePath)->after('storage/')->prepend('app/public/');
-                if (file_exists(storage_path($path))) {
-                    return "data:image/jpeg;base64, " . base64_encode(file_get_contents(storage_path($path)));
+                $image = $content ? @getimagesizefromstring($content) : false;
+                if ($image) {
+                    return 'data:'.$image['mime'].';base64,'.base64_encode($content);
                 }
-            } catch (Exception $e) {
-                // Image failed to load
-            }
-            return $fallbackHtml;
-        }
-
-        // Helper function to safely load barcode with fallback
-        function safeLoadBarcode($barcode, $fallbackHtml = null) {
-            try {
-                return "data:image/jpeg;base64, " . base64_encode(file_get_contents('https://barcode.tec-it.com/barcode.ashx?data='.$barcode.'&code=Code128'));
-            } catch (Exception $e) {
-                return $fallbackHtml;
-            }
-        }
-
-        // Helper function to safely load fallback logo
-        function safeLoadFallbackLogo($logoPath) {
-            if (!$logoPath) {
-                return null;
+            } catch (\Throwable) {
+                return $fallback;
             }
 
-            $fullPath = public_path($logoPath);
-
-            // Check if path exists and is a file (not a directory)
-            if (file_exists($fullPath) && is_file($fullPath)) {
-                try {
-                    return "data:image/jpeg;base64, " . base64_encode(file_get_contents($fullPath));
-                } catch (Exception $e) {
-                    return null;
-                }
-            }
-
-            return null;
-        }
+            return $fallback;
+        };
     @endphp
 
     @foreach ($orders as $order)
@@ -104,11 +61,11 @@
                     <td align="left">
                         @php
                             // First try to load the reseller logo (could be remote or local)
-                            $logoImage = safeLoadRemoteImage($logoUrl ?? null, null);
+                            $logoImage = $loadImage($logoUrl ?? null, null);
 
                             // If no reseller logo, try the fallback logo
                             if (!$logoImage) {
-                                $logoImage = safeLoadFallbackLogo($logo->mobile ?? null);
+                                $logoImage = $loadImage($logo->mobile ?? null);
                             }
 
                             // If still no logo, we'll show company name
@@ -127,7 +84,7 @@
                     </td>
                     <td align="right">
                         @php
-                            $barcodeImage = safeLoadBarcode($order->barcode, '<div style="width: 150px; text-align: center; font-family: monospace; font-size: 8px; border: 1px solid #000; padding: 2px;">' . $order->barcode . '</div>');
+                            $barcodeImage = $loadImage('https://barcode.tec-it.com/barcode.ashx?data='.rawurlencode($order->barcode).'&code=Code128', '<div style="width: 150px; text-align: center; font-family: monospace; font-size: 8px; border: 1px solid #000; padding: 2px;">' . $order->barcode . '</div>');
                         @endphp
 
                         @if(str_starts_with($barcodeImage, 'data:image'))
@@ -168,7 +125,7 @@
                 <tr>
                     <td>
                         @php
-                            $productImage = safeLoadStorageImage($product->image, '<div style="height: 36px; width: 36px; float: left; margin: 0; background-color: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #666;">IMG</div>');
+                            $productImage = $loadImage($product->image, '<div style="height: 36px; width: 36px; float: left; margin: 0; background-color: #f0f0f0; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #666;">IMG</div>');
                         @endphp
                         <div style="clear: both;">
                             @if(str_starts_with($productImage, 'data:image'))

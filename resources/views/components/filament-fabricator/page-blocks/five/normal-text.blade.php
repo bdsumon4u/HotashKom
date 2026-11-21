@@ -11,7 +11,7 @@
                     data-settings="{&quot;marker&quot;:&quot;curly&quot;,&quot;highlighted_text&quot;:&quot;\u09eb*\u09ac\u099b*\u09b0&quot;,&quot;headline_style&quot;:&quot;highlight&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;highlight_animation_duration&quot;:1200,&quot;highlight_iteration_delay&quot;:8000}"
                     data-widget_type="animated-headline.default">
                     <div class="elementor-widget-container">
-                        {!! $content !!}
+                        {!! storage_content($content) !!}
                     </div>
                 </div>
                 <div class="elementor-element elementor-element-e1cd4df elementor-align-justify elementor-widget elementor-widget-button"

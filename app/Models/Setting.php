@@ -35,11 +35,7 @@ class Setting extends Model
 
     public static function array()
     {
-        if (! empty(self::$settingsArray)) {
-            return self::$settingsArray;
-        }
-
-        return self::$settingsArray = cacheMemo()->rememberForever('settings', function () {
+        self::$settingsArray = self::$settingsArray ?: cacheMemo()->rememberForever('settings', function () {
             $settings = self::all()->flatMap(fn ($setting): array => [$setting->name => $setting->value])->toArray();
 
             if (empty($settings['company'])) {
@@ -97,6 +93,14 @@ class Setting extends Model
 
             return $settings;
         });
+
+        $settings = self::$settingsArray;
+        $settings['logo'] = (object) array_map(
+            fn ($value): mixed => is_string($value) ? storage_url($value) : $value,
+            (array) ($settings['logo'] ?? []),
+        );
+
+        return $settings;
     }
 
     protected function value(): Attribute

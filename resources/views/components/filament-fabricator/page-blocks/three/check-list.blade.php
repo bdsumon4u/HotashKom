@@ -18,7 +18,7 @@
                     data-settings="{&quot;_animation&quot;:&quot;fadeInLeft&quot;}"
                     data-widget_type="icon-list.default">
                     <div class="elementor-widget-container">
-                        {!! $content !!}
+                        {!! storage_content($content) !!}
                     </div>
                 </div>
             </div>

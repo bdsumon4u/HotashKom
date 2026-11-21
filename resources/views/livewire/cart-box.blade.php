@@ -4,7 +4,7 @@
             <div class="dropcart__product" data-id="{{ $product->id }}">
                 <div class="dropcart__product-image">
                     <a href="{{ route('products.show', $product->options->slug) }}" wire:navigate.hover>
-                        <img src="{{ asset($product->options->image) }}" alt="">
+                        <img src="{{ storage_url($product->options->image) }}" alt="">
                     </a>
                 </div>
                 <div class="dropcart__product-info">

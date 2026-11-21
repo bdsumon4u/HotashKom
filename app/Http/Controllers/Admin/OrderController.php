@@ -183,9 +183,19 @@ class OrderController extends Controller
                 $resellerCompany = DB::connection('reseller')->table('settings')->where('name', 'company')->value('value');
                 $resellerLogo = DB::connection('reseller')->table('settings')->where('name', 'logo')->value('value');
 
+                $domain = $reseller->domain;
+                if ($domain && ! str_starts_with($domain, 'http')) {
+                    $domain = (parse_url((string) config('app.url'), PHP_URL_SCHEME) ?: 'https').'://'.$domain;
+                }
+
+                $logos = (array) json_decode($resellerLogo ?? '{}');
+                foreach ($logos as $type => $path) {
+                    $logos[$type] = is_string($path) && $domain ? storage_url($path, rtrim($domain, '/').'/storage') : null;
+                }
+
                 $data = [
                     'company' => json_decode($resellerCompany ?? '{}'),
-                    'logo' => json_decode($resellerLogo ?? '{}'),
+                    'logo' => (object) $logos,
                     'connected' => true,
                 ];
 

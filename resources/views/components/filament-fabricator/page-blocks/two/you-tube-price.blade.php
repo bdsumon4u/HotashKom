@@ -199,7 +199,7 @@
             <!-- Description -->
             @if($description ?? false)
                 <div class="youtube-price-description">
-                    {!! fix_youtube_embeds($description) !!}
+                    {!! fix_youtube_embeds(storage_content($description)) !!}
                 </div>
             @endif
 

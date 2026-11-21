@@ -23,7 +23,7 @@
                                 <div class="elementor-element elementor-element-e5992bb elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
                                     data-id="e5992bb" data-element_type="widget" data-widget_type="icon-list.default">
                                     <div class="elementor-widget-container">
-                                        {!! $content !!}
+                                        {!! storage_content($content) !!}
                                     </div>
                                 </div>
                             </div>
@@ -36,7 +36,7 @@
                                     <div class="elementor-widget-container">
                                         @php($image ??= $page->product->base_image->src)
                                         <img loading="lazy" decoding="async" width="350" height="350"
-                                            src="{{Str::isUrl($image) ? $image : asset('storage/'.$image)}}"
+                                            src="{{ storage_url($image) }}"
                                             class="attachment-large size-large wp-image-191" alt="" />
                                     </div>
                                 </div>

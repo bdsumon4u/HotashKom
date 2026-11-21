@@ -22,7 +22,6 @@ class BoxList extends PageBlock
                 // RichEditor::make('content')
                 //     ->required(),
                 TinyEditor::make('content')
-                    ->fileAttachmentsDisk('public')
                     ->fileAttachmentsVisibility('public')
                     ->fileAttachmentsDirectory('uploads')
                     ->profile('full')

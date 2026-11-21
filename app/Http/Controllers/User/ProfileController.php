@@ -30,10 +30,13 @@ class ProfileController extends Controller
         ]);
 
         $user = auth('user')->user();
+        unset($data['logo']);
+        $user->fill($data);
         if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('reseller-logos', 'public');
+            $user->updateLogo($request->file('logo'));
+        } else {
+            $user->save();
         }
-        $user->update($data);
 
         return back()->withSuccess('Profile Updated.');
     }

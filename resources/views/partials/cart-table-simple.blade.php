@@ -25,7 +25,7 @@
                                     <i class="fa fa-trash"></i>
                                 </button>
                                 <div class="mr-3 simple-cart-thumb">
-                                    <img src="{{ asset($product->options->image) }}" alt="{{ $product->name }}">
+                                    <img src="{{ storage_url($product->options->image) }}" alt="{{ $product->name }}">
                                 </div>
                                 <div class="simple-cart-product">
                                     <div class="font-weight-semibold">

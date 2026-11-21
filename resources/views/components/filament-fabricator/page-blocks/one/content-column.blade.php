@@ -19,7 +19,7 @@
             <div class="elementor-element elementor-element-804d6cf elementor-widget elementor-widget-text-editor elementor-element-0fea8d5 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget-icon-list"
                 data-id="0fea8d5" data-element_type="widget" data-widget_type="icon-list.default">
                 <div class="elementor-widget-container">
-                    {!! $content !!}
+                    {!! storage_content($content) !!}
                 </div>
             </div>
         </div>
@@ -43,7 +43,7 @@
                     <div class="elementor-element elementor-element-e708d06 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
                         data-id="e708d06" data-element_type="widget" data-widget_type="icon-list.default">
                         <div class="elementor-widget-container">
-                            {!! $leftContent !!}
+                            {!! storage_content($leftContent) !!}
                         </div>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
                     <div class="elementor-element elementor-element-7913f0d elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
                         data-id="7913f0d" data-element_type="widget" data-widget_type="icon-list.default">
                         <div class="elementor-widget-container">
-                            {!! $rightContent !!}
+                            {!! storage_content($rightContent) !!}
                         </div>
                     </div>
                 </div>

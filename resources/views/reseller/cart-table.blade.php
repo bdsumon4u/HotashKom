@@ -18,7 +18,7 @@
                 <tr class="cart-table__row" data-id="{{ $product->id }}">
                     <td class="cart-table__column cart-table__column--image">
                         <a href="{{ route('products.show', $product->options->slug) }}" target="_blank">
-                            <img src="{{ asset($product->options->image) }}" alt="" width="100px"
+                            <img src="{{ storage_url($product->options->image) }}" alt="" width="100px"
                                 height="100px"></a>
                     </td>
                     <td class="cart-table__column cart-table__column--product">

@@ -25,7 +25,7 @@
                                     data-id="c7d23c7" data-element_type="widget" data-widget_type="image.default">
                                     <div class="elementor-widget-container">
                                         <img loading="lazy" decoding="async"
-                                            src="{{asset('storage/'.$item['image'])}}"
+                                            src="{{ storage_url($item['image']) }}"
                                             class="attachment-large size-large wp-image-193" alt="" />
                                     </div>
                                 </div>

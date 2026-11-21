@@ -23,7 +23,7 @@
                                 <div class="elementor-element elementor-element-8f23b62 elementor-icon-list--layout-traditional elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list"
                                     data-id="8f23b62" data-element_type="widget" data-widget_type="icon-list.default">
                                     <div class="elementor-widget-container">
-                                        {!! $content !!}
+                                        {!! storage_content($content) !!}
                                     </div>
                                 </div>
                                 <div class="elementor-element elementor-element-802d395 elementor-mobile-align-justify elementor-align-center elementor-widget elementor-widget-button"

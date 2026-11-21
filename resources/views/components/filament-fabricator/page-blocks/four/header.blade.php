@@ -33,7 +33,7 @@
                                 <div class="elementor-element elementor-element-d7af012 elementor-widget elementor-widget-heading"
                                     data-id="d7af012" data-element_type="widget" data-widget_type="heading.default">
                                     <div class="elementor-widget-container">
-                                        {!! $content !!}
+                                        {!! storage_content($content) !!}
                                     </div>
                                 </div>
                                 <div class="elementor-element elementor-element-a95dc69 elementor-mobile-align-center elementor-widget elementor-widget-button"

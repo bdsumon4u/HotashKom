@@ -224,7 +224,7 @@
                                     <div class="modern-cart-item-row d-flex">
                                         {{-- Thumbnail --}}
                                         <div class="mr-2 modern-cart-thumb">
-                                            <img src="{{ asset($product->options->image) }}" alt="{{ $product->name }}">
+                                            <img src="{{ storage_url($product->options->image) }}" alt="{{ $product->name }}">
                                         </div>
 
                                         {{-- Details --}}

@@ -102,7 +102,7 @@
             @endif
 
             <div class="blog-post__content mce-content-body">
-                {!! $blog->content !!}
+                {!! storage_content($blog->content) !!}
             </div>
         </article>
     </div>

@@ -14,10 +14,12 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class User extends Authenticatable implements Confirmable, Wallet
 {
@@ -191,7 +193,20 @@ class User extends Authenticatable implements Confirmable, Wallet
      */
     protected function logoUrl(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => $this->logo ? asset('storage/'.$this->logo) : null);
+        return Attribute::get(fn (): ?string => storage_url($this->logo));
+    }
+
+    public function updateLogo(UploadedFile $file): void
+    {
+        $path = $file->store('reseller-logos', config('filesystems.default'));
+        if (! $path) {
+            throw new RuntimeException('Unable to store the reseller logo.');
+        }
+
+        $previousLogo = $this->logo;
+        $this->logo = $path;
+        $this->saveOrFail();
+        delete_storage_file($previousLogo);
     }
 
     /**

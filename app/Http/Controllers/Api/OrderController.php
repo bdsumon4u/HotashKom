@@ -229,10 +229,7 @@ class OrderController extends Controller
                 foreach ((array) ($row->products) ?? [] as $product) {
                     $imageUrl = $product->image ?? '';
                     if ($imageUrl) {
-                        // Handle both relative paths and full URLs
-                        $imageSrc = (str_starts_with($imageUrl, 'http://') || str_starts_with($imageUrl, 'https://'))
-                            ? $imageUrl
-                            : asset($imageUrl);
+                        $imageSrc = storage_url($imageUrl);
                         $imageHtml = "<img src='{$imageSrc}' alt='{$product->name}' style='width: 40px; height: 40px; object-fit: cover; margin-left: 4px; margin-right: 8px; vertical-align: middle; border-radius: 4px;' />";
                     } else {
                         $imageHtml = '';

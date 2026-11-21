@@ -2,12 +2,14 @@
 
 namespace App\Traits;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
+use RuntimeException;
 
 trait ImageUploader
 {
-    protected function uploadImage($file, $arg = [])
+    protected function uploadImage(UploadedFile $file, array $arg = []): string
     {
         $arg += [
             'dir' => 'images',
@@ -24,8 +26,11 @@ trait ImageUploader
         if (data_get($arg, 'resize', true)) {
             $image = $image->{$arg['method'] ?? 'resize'}($arg['width'], $arg['height']);
         }
-        Storage::disk($arg['disk'] ?? 'public')->put($path, (string) $image->encode());
+        $disk = $arg['disk'] ?? config('filesystems.default');
+        if (! Storage::disk($disk)->put($path, (string) $image->encode())) {
+            throw new RuntimeException('Unable to store the uploaded image.');
+        }
 
-        return Storage::url($path);
+        return $path;
     }
 }

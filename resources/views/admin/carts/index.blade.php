@@ -89,7 +89,7 @@
                                                     <div class="dropcart__product-image">
                                                         <a href="{{ route('products.show', $product->options->slug ?? 'not-found') }}"
                                                             target="_blank">
-                                                            <img src="{{ asset($product->options->image) }}" alt=""
+                                                            <img src="{{ storage_url($product->options->image) }}" alt=""
                                                                 width="50" height="50">
                                                         </a>
                                                     </div>

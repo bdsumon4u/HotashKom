@@ -80,7 +80,6 @@
                             } else {
                                 // Oninda app with resellers_invoice enabled
                                 $user = $order->user;
-                                $hasLogo = $user && $user->logo;
                                 $shopName = $user && $user->shop_name ? $user->shop_name : null;
 
                                 // Get pre-fetched reseller data
@@ -96,7 +95,7 @@
                                     $companyName = $shopName ?? ($resellerCompany->name ?? ($defaultCompany->name ?? ''));
 
                                     // Logo: reseller logo, fallback to reseller's logo, then current website logo
-                                    $logoUrl = $hasLogo ? asset('storage/' . $user->logo) : (isset($resellerLogo->mobile) ? asset($resellerLogo->mobile) : (isset($defaultLogo->mobile) ? asset($defaultLogo->mobile) : null));
+                                    $logoUrl = $user?->logo_url ?: (isset($resellerLogo->mobile) ? asset($resellerLogo->mobile) : (isset($defaultLogo->mobile) ? asset($defaultLogo->mobile) : null));
 
                                     // Phone and address: use reseller's from database, fallback to user fields, then current website
                                     $phoneNumber = ($resellerCompany->phone ?? null) ?: (($user && $user->phone_number) ? $user->phone_number : ($defaultCompany->phone ?? ''));
@@ -104,7 +103,7 @@
                                 } else {
                                     // Reseller not connected - use current approach
                                     $companyName = $shopName ?? ($defaultCompany->name ?? '');
-                                    $logoUrl = $hasLogo ? asset('storage/' . $user->logo) : (isset($defaultLogo->mobile) && !$shopName ? asset($defaultLogo->mobile) : null);
+                                    $logoUrl = $user?->logo_url ?: (isset($defaultLogo->mobile) && !$shopName ? asset($defaultLogo->mobile) : null);
                                     $phoneNumber = ($user && $user->phone_number) ? $user->phone_number : ($defaultCompany->phone ?? '');
                                     $address = ($user && $user->address) ? $user->address : ($defaultCompany->address ?? '');
                                 }

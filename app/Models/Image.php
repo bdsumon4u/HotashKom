@@ -6,11 +6,10 @@ use App\Jobs\CopyResourceToResellers;
 use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Image extends Model
 {
-    protected $appends = ['size_human'];
+    protected $appends = ['size_human', 'src'];
 
     protected $fillable = [
         'filename', 'disk', 'path', 'extension', 'mime', 'size',
@@ -38,7 +37,7 @@ class Image extends Model
 
     protected function sizeHuman(): Attribute
     {
-        $bytes = $this->size;
+        $bytes = (int) $this->size;
         $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
 
         for ($i = 0; $bytes > 1024; $bytes /= 1024, $i++);
@@ -48,17 +47,18 @@ class Image extends Model
 
     protected function src(): Attribute
     {
-        return Attribute::get(function () {
-            $encodedPath = Str::of($this->path)
-                ->dirname()
-                ->append('/')
-                ->append(rawurlencode(Str::of($this->path)->basename()));
+        return Attribute::get(function (): ?string {
+            if ($this->source_id && isReseller() && config('app.oninda_url')) {
+                $assetUrl = config('app.oninda_asset_url');
+                $path = $this->path;
+                if (preg_match('~^(?:https?:)?//~i', $path) && storage_key($path, $assetUrl) === null) {
+                    $path = parse_url($path, PHP_URL_PATH);
+                }
 
-            if ($this->source_id || ! file_exists(public_path($this->path))) {
-                return config('app.oninda_url').$encodedPath;
+                return storage_url($path, $assetUrl);
             }
 
-            return asset($encodedPath);
+            return storage_url($this->path);
         });
     }
 
