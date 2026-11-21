@@ -6,6 +6,7 @@ use App\Jobs\CopyResourceToResellers;
 use App\Jobs\RemoveResourceFromResellers;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Image extends Model
@@ -38,7 +39,7 @@ class Image extends Model
 
     protected function sizeHuman(): Attribute
     {
-        $bytes = $this->size;
+        $bytes = (int) $this->size;
         $units = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
 
         for ($i = 0; $bytes > 1024; $bytes /= 1024, $i++);
@@ -48,17 +49,31 @@ class Image extends Model
 
     protected function src(): Attribute
     {
-        return Attribute::get(function () {
-            $encodedPath = Str::of($this->path)
-                ->dirname()
-                ->append('/')
-                ->append(rawurlencode(Str::of($this->path)->basename()));
-
-            if ($this->source_id || ! file_exists(public_path($this->path))) {
-                return config('app.oninda_url').$encodedPath;
+        return Attribute::get(function (): string {
+            if (str_starts_with($this->path, 'http://') || str_starts_with($this->path, 'https://')) {
+                return $this->path;
             }
 
-            return asset($encodedPath);
+            $cleanPath = ltrim(Str::after($this->path, 'storage/'), '/');
+            $dir = dirname($cleanPath);
+            $base = rawurlencode(basename($cleanPath));
+            $encodedPath = ($dir === '.' || $dir === '/' || $dir === '') ? $base : $dir.'/'.$base;
+
+            $disk = config('filesystems.default');
+
+            // If the active disk or image disk is not public (e.g. R2 / S3), serve directly from that disk without prepending oninda_url
+            if ($disk !== 'public' || ($this->disk && $this->disk !== 'public')) {
+                $targetDisk = $disk !== 'public' ? $disk : $this->disk;
+
+                return Storage::disk($targetDisk)->url($encodedPath);
+            }
+
+            // Only prepend oninda_url when the master site uses the local public disk and this image is sourced
+            if ($this->source_id && config('app.oninda_url')) {
+                return rtrim(config('app.oninda_url'), '/').'/storage/'.$encodedPath;
+            }
+
+            return Storage::disk('public')->url($encodedPath);
         });
     }
 
