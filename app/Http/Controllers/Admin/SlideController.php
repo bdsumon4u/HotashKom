@@ -120,8 +120,9 @@ class SlideController extends Controller
     public function destroy(Slide $slide)
     {
         abort_unless(request()->user()->is('admin'), 403, 'You don\'t have permission.');
-        Storage::disk('public')->delete(ltrim(Str::after($slide->mobile_src, '/storage/'), '/'));
-        Storage::disk('public')->delete(ltrim(Str::after($slide->desktop_src, '/storage/'), '/'));
+        $disk = Storage::disk(config('filesystems.default'));
+        $disk->delete(ltrim(Str::after(parse_url($slide->mobile_src, PHP_URL_PATH), 'storage/'), '/'));
+        $disk->delete(ltrim(Str::after(parse_url($slide->desktop_src, PHP_URL_PATH), 'storage/'), '/'));
         $slide->delete();
 
         return back()->with('success', 'Slide Has Been Deleted.');

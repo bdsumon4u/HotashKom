@@ -41,7 +41,7 @@ class ImageController extends Controller
         $file = $request->file('file');
 
         return Image::create([
-            'disk' => 'public',
+            'disk' => config('filesystems.default'),
             'filename' => $file->getClientOriginalName(),
             'path' => $this->uploadImage($file, [
                 'width' => 700,
@@ -86,7 +86,7 @@ class ImageController extends Controller
         }
 
         // $this->delete();
-        $imagePath = ltrim(Str::after($image->path, '/storage/'), '/');
+        $imagePath = ltrim(Str::after(parse_url($image->path, PHP_URL_PATH), 'storage/'), '/');
         $image->delete() && Storage::disk($image->disk)->delete($imagePath);
 
         return request()->expectsJson()

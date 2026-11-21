@@ -24,8 +24,9 @@ trait ImageUploader
         if (data_get($arg, 'resize', true)) {
             $image = $image->{$arg['method'] ?? 'resize'}($arg['width'], $arg['height']);
         }
-        Storage::disk($arg['disk'] ?? 'public')->put($path, (string) $image->encode());
+        $disk = $arg['disk'] ?? config('filesystems.default');
+        Storage::disk($disk)->put($path, (string) $image->encode());
 
-        return Storage::url($path);
+        return Storage::disk($disk)->url($path);
     }
 }

@@ -29,6 +29,7 @@
         "laravel/scout": "^10.23",
         "laravel/telescope": "^5.16.1",
         "laravel/tinker": "^2.11",
+        "league/flysystem-aws-s3-v3": "^3.35",
         "livewire/livewire": "^3.7.3",
         "loilo/fuse": "^7.1.1",
         "maatwebsite/excel": "4.x-dev",

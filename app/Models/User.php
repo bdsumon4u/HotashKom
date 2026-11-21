@@ -17,6 +17,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable implements Confirmable, Wallet
@@ -191,7 +192,17 @@ class User extends Authenticatable implements Confirmable, Wallet
      */
     protected function logoUrl(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => $this->logo ? asset('storage/'.$this->logo) : null);
+        return Attribute::make(get: function (): ?string {
+            if (! $this->logo) {
+                return null;
+            }
+
+            if (str_starts_with($this->logo, 'http://') || str_starts_with($this->logo, 'https://')) {
+                return $this->logo;
+            }
+
+            return Storage::url(ltrim(Str::after($this->logo, 'storage/'), '/'));
+        });
     }
 
     /**

@@ -31,7 +31,11 @@ class ProfileController extends Controller
 
         $user = auth('user')->user();
         if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('reseller-logos', 'public');
+            $disk = config('filesystems.default');
+            if ($user->logo && Storage::disk($disk)->exists($user->logo)) {
+                Storage::disk($disk)->delete($user->logo);
+            }
+            $data['logo'] = $request->file('logo')->store('reseller-logos', $disk);
         }
         $user->update($data);
 

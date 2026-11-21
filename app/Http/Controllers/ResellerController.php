@@ -550,12 +550,12 @@ final class ResellerController extends Controller
         $user->outside_dhaka_shipping = $outsideAreaSetting ? (int) data_get($outsideAreaSetting, 'cost', 0) : ($formattedAreas[1] ?? $insideAreaSetting ? (int) data_get($formattedAreas[1] ?? $insideAreaSetting, 'cost', 0) : 0);
 
         if ($request->hasFile('logo')) {
-            // Delete old logo if exists
-            if ($user->logo && Storage::disk('public')->exists($user->logo)) {
-                Storage::disk('public')->delete($user->logo);
+            $disk = config('filesystems.default');
+            if ($user->logo && Storage::disk($disk)->exists($user->logo)) {
+                Storage::disk($disk)->delete($user->logo);
             }
 
-            $logoPath = $request->file('logo')->store('reseller-logos', 'public');
+            $logoPath = $request->file('logo')->store('reseller-logos', $disk);
             $user->logo = $logoPath;
         }
 

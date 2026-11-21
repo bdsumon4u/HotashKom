@@ -177,9 +177,9 @@
                                     <!-- Logo Upload Section -->
                                     <div class="form-group">
                                         <label for="logo">Reseller Logo (optional)</label>
-                                        @if($user->logo)
+                                        @if($user->logo_url)
                                             <div class="mb-2">
-                                                <img id="logo-preview" src="{{ asset('storage/' . $user->logo) }}" alt="Reseller Logo" style="max-height: 80px;">
+                                                <img id="logo-preview" src="{{ $user->logo_url }}" alt="Reseller Logo" style="max-height: 80px;">
                                             </div>
                                         @else
                                             <img id="logo-preview" src="" alt="Reseller Logo" style="max-height: 80px; display: none;">

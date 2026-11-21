@@ -42,24 +42,14 @@
                 }
                 $logoUrl = $domain . $resellerLogo->mobile;
             } else {
-                $logoUrl = $getUserOrCompany('logo', 'mobile');
-                if ($user && $user->logo) {
-                    $logoUrl = asset('storage/' . $user->logo);
-                } elseif (isset($logo->mobile)) {
-                    $logoUrl = asset($logo->mobile);
-                }
+                $logoUrl = $user?->logo_url ?: ($getUserOrCompany('logo', 'mobile') ?: (isset($logo->mobile) ? asset($logo->mobile) : null));
             }
 
             $phoneNumber = $getFallback($resellerCompany->phone ?? null, $getUserOrCompany('phone_number', 'phone'));
             $address = $getFallback($resellerCompany->address ?? null, $getUserOrCompany('address', 'address'));
         } else {
             $companyName = $getUserOrCompany('shop_name', 'name');
-            $logoUrl = $getUserOrCompany('logo', 'mobile');
-            if ($user && $user->logo) {
-                $logoUrl = asset('storage/' . $user->logo);
-            } elseif (isset($logo->mobile) && !($user && $user->shop_name)) {
-                $logoUrl = asset($logo->mobile);
-            }
+            $logoUrl = $user?->logo_url ?: ($getUserOrCompany('logo', 'mobile') ?: (isset($logo->mobile) && ! ($user && $user->shop_name) ? asset($logo->mobile) : null));
             $phoneNumber = $getUserOrCompany('phone_number', 'phone');
             $address = $getUserOrCompany('address', 'address');
         }
