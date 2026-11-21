@@ -140,6 +140,7 @@ Route::group(['as' => 'admin.'], function (): void {
         Route::resource('suppliers', SupplierController::class);
         Route::post('suppliers/{supplier}/payment', [SupplierController::class, 'storePayment'])->name('suppliers.payment');
         Route::delete('suppliers/{supplier}/payments/{payment}', [SupplierController::class, 'destroyPayment'])->name('suppliers.payments.destroy');
+        Route::post('landing-page-pros/{landing_page_pro}/duplicate', [LandingPageProController::class, 'duplicate'])->name('landing-page-pros.duplicate');
         Route::patch('landing-page-pros/{landing_page_pro}/custom-css', [LandingPageProController::class, 'updateCustomCss'])->name('landing-page-pros.custom-css');
 
         Route::resources([

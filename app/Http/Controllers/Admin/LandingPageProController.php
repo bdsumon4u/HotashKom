@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class LandingPageProController extends Controller
 {
@@ -102,6 +103,30 @@ class LandingPageProController extends Controller
         });
 
         return to_route('admin.landing-page-pros.index')->withSuccess('Landing Page Pro updated successfully.');
+    }
+
+    public function duplicate(LandingPagePro $landing_page_pro): RedirectResponse
+    {
+        abort_if(request()->user()->is(['salesman', 'uploader']), 403, 'You don\'t have permission.');
+
+        $duplicate = $landing_page_pro->getConnection()->transaction(function () use ($landing_page_pro): LandingPagePro {
+            $duplicate = $landing_page_pro->replicate()->unsetRelations()->fill([
+                'title' => Str::substr($landing_page_pro->title, 0, 248).' (Copy)',
+                'slug' => Str::substr($landing_page_pro->slug, 0, 223).'-copy-'.Str::lower((string) Str::ulid()),
+                'is_published' => false,
+                'published_at' => null,
+            ]);
+            $duplicate->save();
+
+            foreach ($landing_page_pro->items()->get() as $item) {
+                $duplicate->items()->save($item->replicate(['landing_page_pro_id']));
+            }
+
+            return $duplicate;
+        });
+
+        return to_route('admin.landing-page-pros.edit', $duplicate)
+            ->withSuccess('Landing page copied as a draft. Update its title and link before publishing.');
     }
 
     public function updateCustomCss(Request $request, LandingPagePro $landing_page_pro): JsonResponse|RedirectResponse

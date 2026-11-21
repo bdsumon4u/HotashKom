@@ -68,15 +68,20 @@
                                                 <span class="text-muted">Not published</span>
                                             @endif
                                         </td>
-                                        <td width="50">
-                                            <x-form action="{{ route('admin.landing-page-pros.destroy', $landing) }}"
-                                                method="delete">
-                                                <div class="btn-group btn-group-inline">
-                                                    <a class="btn btn-sm btn-primary"
-                                                        href="{{ route('admin.landing-page-pros.edit', $landing) }}">Edit</a>
-                                                    <button class="btn btn-sm btn-danger">Delete</button>
-                                                </div>
-                                            </x-form>
+                                        <td>
+                                            <div class="d-flex" style="gap: 8px;">
+                                                <a class="btn btn-sm btn-primary"
+                                                    href="{{ route('admin.landing-page-pros.edit', $landing) }}">Edit</a>
+                                                <x-form action="{{ route('admin.landing-page-pros.duplicate', $landing) }}"
+                                                    method="post" class="mb-0">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary"
+                                                        title="Copy this landing page as a new draft">Duplicate</button>
+                                                </x-form>
+                                                <x-form action="{{ route('admin.landing-page-pros.destroy', $landing) }}"
+                                                    method="delete" class="mb-0">
+                                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                </x-form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
