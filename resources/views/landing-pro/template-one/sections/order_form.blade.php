@@ -8,16 +8,16 @@
                 <p class="mb-6 text-sm font-semibold text-gray-600">
                     {{ data_get($sections, 'order_form.subtitle', 'Choose Products & Quantity') }}</p>
 
-                <div x-cloak x-show="quantityDiscountTiers.length" class="grid gap-2 mb-4">
+                <div x-cloak x-show="conditionalPricingEnabled" class="grid gap-2 mb-4">
                     <p class="text-sm font-bold text-green-800">পণ্য ও কালার মিলিয়ে কম্বো তৈরি করুন</p>
-                    <template x-for="tier in quantityDiscountTiers" :key="tier.min_quantity">
-                        <div class="p-3 text-sm font-bold rounded border"
-                            :class="(quantityPricingType === 'fixed_total' ? fixedQuantityTier && Number(fixedQuantityTier.min_quantity) === Number(tier.min_quantity) : selectedQuantity >= Number(tier.min_quantity)) ? 'bg-green-50 border-green-500 text-green-800' : 'bg-gray-50 border-gray-200 text-gray-700'">
-                            <span x-text="quantityPricingType === 'fixed_total' ? `${tier.min_quantity}+ পিসে প্রতিটি ${Math.round(Number(tier.total_price) / Number(tier.min_quantity) * 100) / 100}৳` : `${tier.min_quantity}+ পিস নিলে ${tier.percentage}% ছাড়`"></span>
+                    <template x-for="(rule, ruleIndex) in conditionalPricingRules" :key="'conditional-rule-' + ruleIndex">
+                        <div class="p-3 text-sm bg-green-50 border border-green-200 rounded">
+                            <p class="font-bold text-green-900" x-text="rule.name"></p>
+                            <p class="text-gray-700" x-text="conditionalRuleLabel(rule) + ' = ' + rule.total_price + '৳'"></p>
+                            <p x-show="rule.requirements.length === 1" class="text-xs text-gray-600">ন্যূনতম পরিমাণ পূরণ হলে এই হারে প্রতি পিসের মূল্য প্রযোজ্য।</p>
                         </div>
                     </template>
-                    <p class="text-sm text-gray-600" x-text="quantityPricingType === 'fixed_total' ? `${selectedQuantity} পিস নির্বাচন করেছেন। ডেলিভারি চার্জ আলাদা।` : `${selectedQuantity} পিস নির্বাচন করেছেন। সর্বোচ্চ প্রযোজ্য ছাড় অটোমেটিক যোগ হবে।`"></p>
-                    <p x-show="quantityPricingType === 'fixed_total' && selectedQuantity > 0 && !fixedQuantityTier" class="text-sm text-amber-800">এই পরিমাণের জন্য কম্বো মূল্য নেই। নিয়মিত পণ্যের মূল্য প্রযোজ্য।</p>
+                    <p class="text-xs text-gray-600">সব কালার ও সাইজ মিলিয়ে পরিমাণ গণনা হবে। বড় কম্বো আগে যোগ হবে। সম্পূর্ণ কম্বোর বাইরে অতিরিক্ত পণ্যে আলাদা পণ্যের অফার অথবা নিয়মিত মূল্য প্রযোজ্য।</p>
                 </div>
 
                 <div class="grid gap-4" :class="products.length > 4 ? 'md:grid-cols-2' : ''">
@@ -209,16 +209,17 @@
 
                         <div class="p-4 bg-white rounded-md border">
                             <div class="flex justify-between items-center mb-1 text-sm font-bold text-gray-700">
-                                <span>Subtotal</span>
+                                <span x-text="conditionalPricingEnabled ? 'নিয়মিত মূল্য' : 'Subtotal'"></span>
                                 <span x-text="totalPrice + '৳'"></span>
                             </div>
-                            <div x-cloak x-show="quantityDiscount > 0 && quantityPricingType === 'percentage'" class="flex justify-between items-center mb-2 text-sm font-bold text-green-700">
-                                <span x-text="`কম্বো ছাড় (${quantityDiscountPercentage}%)`"></span>
-                                <span x-text="'−' + quantityDiscount + '৳'"></span>
-                            </div>
-                            <div x-cloak x-show="fixedQuantityTier" class="flex justify-between items-center mb-2 text-sm font-bold text-green-700">
-                                <span x-text="`${selectedQuantity} পিসের কম্বো মূল্য`"></span>
-                                <span x-text="offerSubtotal + '৳'"></span>
+                            <div x-cloak x-show="conditionalPricingEnabled && (conditionalQuote.applied_rules.length > 0 || offerSubtotal !== totalPrice)" class="mb-2">
+                                <template x-for="(applied, appliedIndex) in conditionalQuote.applied_rules" :key="'applied-offer-' + appliedIndex">
+                                    <p class="mb-1 text-xs text-green-800" x-text="applied.name + ' · ' + applied.quantity + ' পিস' + (applied.applications > 1 ? ' · ' + applied.applications + ' সেট' : '') + ' · ' + (Math.round(applied.total * 100) / 100) + '৳'"></p>
+                                </template>
+                                <div class="flex justify-between items-center text-sm font-bold text-green-700">
+                                    <span>অফারসহ পণ্যের মূল্য</span>
+                                    <span x-text="offerSubtotal + '৳'"></span>
+                                </div>
                             </div>
                             <div class="flex justify-between items-center mb-2 text-sm font-bold text-gray-700">
                                 <span>Delivery</span>

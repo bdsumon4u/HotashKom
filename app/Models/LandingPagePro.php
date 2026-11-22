@@ -41,57 +41,50 @@ class LandingPagePro extends Model
         return 'slug';
     }
 
-    public function quantityPricingType(): string
+    public function conditionalPricingEnabled(): bool
     {
-        return data_get($this->section_settings, 'order_form.quantity_pricing_type') === 'fixed_total'
-            ? 'fixed_total'
-            : 'percentage';
+        return filter_var(data_get($this->section_settings, 'order_form.conditional_pricing_enabled', false), FILTER_VALIDATE_BOOL);
     }
 
     /**
-     * @return array<int, array{min_quantity: int, percentage: int, total_price: int}>
+     * @return array<int, array{name: string, total_price: int, requirements: array<int, array{product_id: int, min_quantity: int}>}>
      */
-    public function quantityDiscountTiers(): array
+    public function conditionalPricingRules(): array
     {
-        $hasFixedTotalPricing = $this->quantityPricingType() === 'fixed_total';
+        $rules = [];
 
-        return collect(data_get($this->section_settings, 'order_form.quantity_discounts', []))
-            ->filter(fn ($tier): bool => is_array($tier)
-                && is_numeric($tier['min_quantity'] ?? null)
-                && $tier['min_quantity'] >= 1
-                && $tier['min_quantity'] <= 100
-                && ($hasFixedTotalPricing
-                    ? is_numeric($tier['total_price'] ?? null) && $tier['total_price'] >= 1 && $tier['total_price'] <= 10000000
-                    : is_numeric($tier['percentage'] ?? null) && $tier['percentage'] > 0 && $tier['percentage'] <= 100))
-            ->map(fn (array $tier): array => [
-                'min_quantity' => (int) $tier['min_quantity'],
-                'percentage' => $hasFixedTotalPricing ? 0 : (int) $tier['percentage'],
-                'total_price' => $hasFixedTotalPricing ? (int) $tier['total_price'] : 0,
-            ])
-            ->sortBy('min_quantity')
-            ->values()
-            ->all();
-    }
+        foreach (array_values((array) data_get($this->section_settings, 'order_form.conditional_rules', [])) as $index => $rule) {
+            if (! is_array($rule) || ! is_numeric($rule['total_price'] ?? null) || $rule['total_price'] < 1 || $rule['total_price'] > 10000000) {
+                continue;
+            }
 
-    public function quantityDiscountPercentage(int $quantity): int
-    {
-        return (int) collect($this->quantityDiscountTiers())
-            ->filter(fn (array $tier): bool => $quantity >= $tier['min_quantity'])
-            ->max('percentage');
-    }
+            $requirements = $rule['requirements'] ?? [];
+            if (! is_array($requirements) || $requirements === []) {
+                continue;
+            }
 
-    public function quantityOfferSubtotal(int $quantity, float $subtotal): float
-    {
-        if ($this->quantityPricingType() === 'fixed_total') {
-            $tier = collect($this->quantityDiscountTiers())
-                ->filter(fn (array $tier): bool => $quantity >= $tier['min_quantity'])
-                ->sortByDesc('min_quantity')
-                ->first();
+            $normalizedRequirements = [];
+            foreach ($requirements as $requirement) {
+                if (! is_array($requirement) || ! is_numeric($requirement['product_id'] ?? null)
+                    || ! is_numeric($requirement['min_quantity'] ?? null) || $requirement['product_id'] < 1
+                    || $requirement['min_quantity'] < 1 || $requirement['min_quantity'] > 100) {
+                    continue 2;
+                }
+                $normalizedRequirements[] = ['product_id' => (int) $requirement['product_id'], 'min_quantity' => (int) $requirement['min_quantity']];
+            }
 
-            return $tier ? round($tier['total_price'] * $quantity / $tier['min_quantity']) : $subtotal;
+            if (count(array_unique(array_column($normalizedRequirements, 'product_id'))) !== count($normalizedRequirements)) {
+                continue;
+            }
+
+            $rules[] = [
+                'name' => filled($rule['name'] ?? null) ? (string) $rule['name'] : 'Offer '.($index + 1),
+                'total_price' => (int) $rule['total_price'],
+                'requirements' => $normalizedRequirements,
+            ];
         }
 
-        return $subtotal - round($subtotal * $this->quantityDiscountPercentage($quantity) / 100);
+        return $rules;
     }
 
     public static function sectionLabels(): array

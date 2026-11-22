@@ -171,8 +171,8 @@
     }
     $sections = $sortedSections;
 
-    $quantityPricingTypeInitial = data_get($sectionSettings, 'order_form.quantity_pricing_type', $isCreateForm ? 'fixed_total' : 'percentage');
-    $discountTiersInitial = array_values(data_get($sectionSettings, 'order_form.quantity_discounts') ?? []);
+    $conditionalPricingEnabledInitial = filter_var(data_get($sectionSettings, 'order_form.conditional_pricing_enabled', false), FILTER_VALIDATE_BOOL);
+    $conditionalRulesInitial = array_values(data_get($sectionSettings, 'order_form.conditional_rules') ?? []);
     $savedPageUrl = $landingPagePro->exists ? route('landing-pro.show', $landingPagePro) : null;
     $accordionSectionKeys = array_keys($sections);
 
@@ -197,6 +197,31 @@
         .lp-builder .lp-product-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e9ecef; }
         .lp-builder .lp-product-info { flex: 1; min-width: 0; overflow-wrap: anywhere; }
         .lp-builder .lp-product-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .lp-builder .lp-combo-help { background: #f8fafc; }
+        .lp-builder .lp-combo-help, .lp-builder .lp-combo-help p, .lp-builder .lp-combo-help strong { color: #334155; }
+        .lp-builder .lp-combo-editor .lp-editor-row { min-width: 0; padding: 10px; }
+        .lp-builder .lp-combo-editor .lp-editor-rows { gap: 8px; }
+        .lp-builder .lp-combo-editor .lp-product-actions { gap: 6px; }
+        .lp-builder .lp-combo-editor label { margin-bottom: 4px; font-size: 12px; }
+        .lp-builder .lp-combo-editor .form-control { width: 100%; min-width: 0; height: 32px; padding: 4px 8px; font-size: 13px; line-height: 1.3; }
+        .lp-builder .lp-combo-editor .btn { min-width: 0; padding: 5px 8px; font-size: 12px; line-height: 1.25; }
+        .lp-builder .lp-combo-editor .lp-combo-icon { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; }
+        .lp-builder .lp-combo-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(160px, 0.65fr); align-items: end; gap: 8px; }
+        .lp-builder .lp-combo-condition { display: grid; grid-template-columns: minmax(0, 1fr) 96px 28px; align-items: start; gap: 8px; }
+        .lp-builder .lp-combo-condition > div, .lp-builder .lp-combo-fields > div { min-width: 0; }
+        .lp-builder .lp-combo-condition-remove { padding-top: 25px; }
+        .lp-builder .lp-combo-summary { display: flex; align-items: center; gap: 6px; font-size: 14px; list-style: none; }
+        .lp-builder .lp-combo-summary::-webkit-details-marker { display: none; }
+        .lp-builder .lp-combo-summary-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .lp-builder .lp-combo-chevron { flex-shrink: 0; }
+        .lp-builder details[open] > .lp-combo-summary { margin-bottom: 8px; }
+        .lp-builder details[open] > .lp-combo-summary .lp-combo-chevron { transform: rotate(90deg); }
+        .lp-builder .lp-combo-help { font-size: 12px; }
+        @media (max-width: 575px) {
+            .lp-builder .lp-combo-fields { grid-template-columns: minmax(0, 1fr); }
+            .lp-builder .lp-combo-condition { grid-template-columns: minmax(0, 1fr) 28px; }
+            .lp-builder .lp-combo-condition-product { grid-column: 1 / -1; }
+        }
         .lp-builder .lp-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
         .lp-builder .lp-editor-row { padding: 12px; border: 1px solid #e9ecef; border-radius: 8px; }
         .lp-builder .lp-editor-rows { display: grid; gap: 12px; }
@@ -257,7 +282,7 @@
     <div class="col-12">
         <div class="p-3 mb-3 lp-card">
             <h4>Build your combo campaign</h4>
-            <p class="text-muted">Choose products, set quantity prices or discounts, then customize your page. Customers can mix products and colors and choose a size for each selection.</p>
+            <p class="text-muted">Choose products, configure combo offers, then customize your page. Customers can mix products and colors and choose a size for each selection.</p>
             <nav class="lp-steps" aria-label="Builder sections">
                 <a @click="openBuilderPanel('lp-basics')" href="#lp-basics" class="btn btn-sm btn-outline-primary">1. Campaign details</a>
                 <a @click="openBuilderPanel('lp-products')" href="#lp-products" class="btn btn-sm btn-outline-primary">2. Products & offer</a>
@@ -341,7 +366,7 @@
         </details>
 
         <details id="lp-products" class="p-3 mb-3 lp-card lp-anchor" open>
-            <summary>2. Products & quantity offer</summary>
+            <summary>2. Products & combo offers</summary>
             <p class="text-muted">Add each product once. Its colors and sizes appear automatically on the customer page. Prices come from your product catalog.</p>
             <label for="lp-product-search">Find a product by name or SKU</label>
             <input id="lp-product-search" type="search" x-model.debounce.200ms="productSearch" class="form-control" placeholder="Search your catalog…">
@@ -391,42 +416,7 @@
             <small class="d-block mt-2 text-muted">Selecting any product marked “Free delivery” makes delivery free for the entire order.</small>
             <x-error field="items" class="mt-2 d-block" />
             <hr>
-            <details>
-            <summary>Quantity pricing</summary>
-            <div class="d-flex justify-content-end mb-2">
-                <button type="button" class="btn btn-sm btn-outline-primary" @click="addDiscountTier" :disabled="discountTiers.length >= 10">Add tier</button>
-            </div>
-            <label for="lp-quantity-pricing-type">Offer type</label>
-            <select id="lp-quantity-pricing-type" name="section_settings[order_form][quantity_pricing_type]" x-model="quantityPricingType" class="form-control mb-2">
-                <option value="fixed_total">Fixed total price by quantity (৳)</option>
-                <option value="percentage">Percentage discount (%)</option>
-            </select>
-            <p class="text-muted" x-show="quantityPricingType === 'fixed_total'">Set a minimum quantity and the total price for that quantity. The highest qualifying quantity sets the per-piece rate until the next tier applies. Example: minimum 2 pieces, total ৳1,490 means ৳745 per piece for 2 or more. Totals are rounded to the nearest taka. Below the first tier, regular product prices apply.</p>
-            <p class="text-muted" x-show="quantityPricingType === 'percentage'">Count all selected pieces across products and colors. The highest eligible percentage applies to the product subtotal. Discounts do not stack.</p>
-            <p class="text-muted">Delivery is separate. Catalog wholesale pricing is replaced by this offer when tiers are configured.</p>
-            <p x-show="!discountTiers.length" class="text-muted">No quantity offer configured. Add a tier to set your campaign pricing.</p>
-            <template x-for="(tier, index) in discountTiers" :key="tier.key">
-                <div class="row mb-2">
-                    <div class="col-5">
-                        <label :for="'tier-quantity-' + tier.key">Minimum pieces</label>
-                        <input :id="'tier-quantity-' + tier.key" type="number" min="1" max="100" step="1" required class="form-control" x-model.number="tier.min_quantity" :name="`section_settings[order_form][quantity_discounts][${index}][min_quantity]`">
-                    </div>
-                    <div class="col-4">
-                        <div x-show="quantityPricingType === 'percentage'">
-                            <label :for="'tier-percent-' + tier.key">Discount (%)</label>
-                            <input :id="'tier-percent-' + tier.key" type="number" min="1" max="100" step="1" :required="quantityPricingType === 'percentage'" :disabled="quantityPricingType !== 'percentage'" class="form-control" x-model.number="tier.percentage" :name="`section_settings[order_form][quantity_discounts][${index}][percentage]`">
-                        </div>
-                        <div x-show="quantityPricingType === 'fixed_total'">
-                            <label :for="'tier-total-' + tier.key">Tier total (৳)</label>
-                            <input :id="'tier-total-' + tier.key" type="number" min="1" max="10000000" step="1" :required="quantityPricingType === 'fixed_total'" :disabled="quantityPricingType !== 'fixed_total'" class="form-control" x-model.number="tier.total_price" :name="`section_settings[order_form][quantity_discounts][${index}][total_price]`">
-                        </div>
-                    </div>
-                    <div class="col-3 d-flex align-items-end">
-                        <button type="button" class="btn btn-sm btn-outline-danger" @click="discountTiers.splice(index, 1)" :aria-label="'Remove discount tier ' + (index + 1)">Remove</button>
-                    </div>
-                </div>
-            </template>
-            </details>
+            @include('admin.landing-page-pros.conditional-pricing')
         </details>
 
         <details id="lp-content" class="p-3 mb-3 lp-card lp-anchor">
@@ -703,9 +693,13 @@
         <details class="p-3 mb-3 lp-card" open>
             <summary>Offer at a glance</summary>
             <p class="mb-2" x-text="items.filter(item => item.is_active).length + ' products shown on the page'"></p>
-            <template x-for="tier in discountTiers" :key="'summary-' + tier.key">
-                <p class="mb-1" x-text="quantityPricingType === 'fixed_total' ? (tier.min_quantity || '…') + '+ pieces → ৳' + (tier.min_quantity && tier.total_price ? Math.round(tier.total_price / tier.min_quantity * 100) / 100 : '…') + ' per piece' : 'Buy ' + (tier.min_quantity || '…') + '+ pieces → ' + (tier.percentage || '…') + '% off'"></p>
-            </template>
+            <p class="mb-2 text-muted" x-show="!conditionalPricingEnabled">Regular catalog pricing. Enable combo pricing to configure offers.</p>
+            <div x-show="conditionalPricingEnabled">
+                <strong class="d-block mb-2">Conditional combo pricing</strong>
+                <template x-for="rule in conditionalRules" :key="'offer-summary-' + rule.key">
+                    <p class="mb-2" x-text="conditionalRuleDescription(rule)"></p>
+                </template>
+            </div>
             <small class="text-muted">Save, then check the customer page on mobile before starting your ads.</small>
         </details>
         <div class="p-3 mb-3 lp-card">
@@ -756,8 +750,8 @@
                 items: @json($itemsInitial),
                 productChoices: @json($productChoices),
                 productSearch: '',
-                discountTiers: @json($discountTiersInitial),
-                quantityPricingType: @json($quantityPricingTypeInitial),
+                conditionalPricingEnabled: @json($conditionalPricingEnabledInitial),
+                conditionalRules: @json($conditionalRulesInitial),
                 nextKey: 0,
                 slugEdited: @json(!$isCreateForm || filled(old('slug'))),
                 savedPageUrl: @json($savedPageUrl),
@@ -773,7 +767,10 @@
 
                 init() {
                     this.items = this.items.filter(item => item.product_id).map(item => ({...item, key: ++this.nextKey}));
-                    this.discountTiers = this.discountTiers.map(tier => ({...tier, key: ++this.nextKey}));
+                    this.conditionalRules = this.conditionalRules.map(rule => ({
+                        ...rule, key: ++this.nextKey,
+                        requirements: (rule.requirements || []).map(requirement => ({...requirement, key: ++this.nextKey})),
+                    }));
                     Object.keys(this.contentRows).forEach(section => {
                         this.contentRows[section] = this.contentRows[section].map(row => ({...row, key: ++this.nextKey}));
                     });
@@ -849,6 +846,40 @@
                     });
                 },
 
+                get campaignProducts() {
+                    return this.items.filter(item => item.is_active).map(item => this.productFor(item)).filter(product => product.id);
+                },
+
+                conditionalRuleDescription(rule) {
+                    const conditions = rule.requirements.map(requirement =>
+                        (requirement.min_quantity || '…') + ' × ' + (this.productFor(requirement).label || 'Choose product')
+                    ).join(' + ');
+                    return (rule.name ? rule.name + ': ' : '') + conditions + ' → ৳' + (rule.total_price || '…');
+                },
+
+                syncConditionalProductSelect(select, productId, products) {
+                    this.$nextTick(() => {
+                        select.value = products.some(product => Number(product.id) === Number(productId)) ? String(productId) : '';
+                    });
+                },
+
+                addConditionalRule() {
+                    if (this.conditionalRules.length >= 30) { return; }
+                    this.conditionalRules.push({key: ++this.nextKey, name: '', total_price: '', requirements: [
+                        {key: ++this.nextKey, product_id: '', min_quantity: 1},
+                    ]});
+                    this.$nextTick(() => {
+                        const panels = this.$root.querySelectorAll('[data-conditional-rule]');
+                        const panel = panels[panels.length - 1];
+                        if (panel) { panel.open = true; panel.querySelector('input')?.focus(); }
+                    });
+                },
+
+                addConditionalRequirement(rule) {
+                    if (rule.requirements.length >= 10) { return; }
+                    rule.requirements.push({key: ++this.nextKey, product_id: '', min_quantity: 1});
+                },
+
                 get filteredProducts() {
                     const query = this.productSearch.trim().toLowerCase();
                     return this.productChoices.filter(product =>
@@ -878,11 +909,6 @@
 
                 removeItem(index) {
                     this.items.splice(index, 1);
-                },
-
-                addDiscountTier() {
-                    if (this.discountTiers.length >= 10) { return; }
-                    this.discountTiers.push({key: ++this.nextKey, min_quantity: '', percentage: '', total_price: ''});
                 },
 
                 updateSlug(title) {

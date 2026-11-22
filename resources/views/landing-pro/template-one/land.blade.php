@@ -330,6 +330,8 @@
     $reviewCount = count($reviews);
     $useReviewCarousel = $reviewCount > 3;
 
+    $conditionalProductLabels = collect($selectedProducts)->pluck('base_name', 'landing_product_id')->all();
+
     $maxProductQuantity = max(1, min(10, (int) (setting('fraud')->max_qty_per_product ?? 3)));
 
     $productsPayload = collect($selectedProducts)
@@ -451,8 +453,9 @@
                 insideDhakaDeliveryCharge: @json($insideDhakaDeliveryCharge),
                 outsideDhakaDeliveryCharge: @json($outsideDhakaDeliveryCharge),
                 products: @json($productsPayload),
-                quantityDiscountTiers: @json($landingPagePro->quantityDiscountTiers()),
-                quantityPricingType: @json($landingPagePro->quantityPricingType()),
+                conditionalPricingEnabled: @json($landingPagePro->conditionalPricingEnabled()),
+                conditionalPricingRules: @json($landingPagePro->conditionalPricingRules()),
+                conditionalProductLabels: @json($conditionalProductLabels),
                 maxProductQuantity: @json($maxProductQuantity),
 
                 init() {
@@ -734,33 +737,65 @@
                         .insideDhakaDeliveryCharge;
                 },
 
-                get selectedQuantity() {
-                    return this.selectedItems.reduce((sum, item) => sum + item.qty, 0);
+                conditionalRuleLabel(rule) {
+                    return rule.requirements.map(requirement =>
+                        requirement.min_quantity + ' × ' + (this.conditionalProductLabels[requirement.product_id] || 'পণ্য')
+                    ).join(' + ');
                 },
 
-                get quantityDiscountPercentage() {
-                    if (this.quantityPricingType === 'fixed_total') { return 0; }
-                    return this.quantityDiscountTiers.reduce((best, tier) =>
-                        this.selectedQuantity >= Number(tier.min_quantity)
-                            ? Math.max(best, Number(tier.percentage)) : best, 0);
-                },
-
-                get fixedQuantityTier() {
-                    if (this.quantityPricingType !== 'fixed_total') { return null; }
-                    return this.quantityDiscountTiers.reduce((selectedTier, tier) =>
-                        this.selectedQuantity >= Number(tier.min_quantity) && (!selectedTier || Number(tier.min_quantity) > Number(selectedTier.min_quantity))
-                            ? tier : selectedTier, null);
+                get conditionalQuote() {
+                    const quantities = {};
+                    const catalogTotals = {};
+                    this.selectedItems.forEach(item => {
+                        const id = item.landing_product_id;
+                        quantities[id] = (quantities[id] || 0) + Number(item.qty);
+                        catalogTotals[id] = (catalogTotals[id] || 0) + Number(item.price) * Number(item.qty);
+                    });
+                    const remaining = {...quantities};
+                    let subtotal = 0;
+                    const appliedRules = [];
+                    const mixedRules = this.conditionalPricingRules.map((rule, index) => ({...rule, index}))
+                        .filter(rule => rule.requirements.length > 1)
+                        .sort((first, second) =>
+                            second.requirements.reduce((sum, item) => sum + item.min_quantity, 0)
+                            - first.requirements.reduce((sum, item) => sum + item.min_quantity, 0) || first.index - second.index);
+                    mixedRules.forEach(rule => {
+                        const applications = Math.min(...rule.requirements.map(requirement =>
+                            Math.floor((remaining[requirement.product_id] || 0) / requirement.min_quantity)));
+                        if (applications < 1) { return; }
+                        let quantity = 0;
+                        rule.requirements.forEach(requirement => {
+                            const consumed = requirement.min_quantity * applications;
+                            remaining[requirement.product_id] -= consumed;
+                            quantity += consumed;
+                        });
+                        const total = rule.total_price * applications;
+                        subtotal += total;
+                        appliedRules.push({name: rule.name, applications, quantity, total});
+                    });
+                    Object.entries(remaining).forEach(([productId, quantity]) => {
+                        if (quantity < 1) { return; }
+                        const productRule = this.conditionalPricingRules.reduce((selectedRule, rule) => {
+                            const requirement = rule.requirements[0];
+                            return rule.requirements.length === 1 && Number(requirement.product_id) === Number(productId)
+                                && requirement.min_quantity <= quantity
+                                && (!selectedRule || requirement.min_quantity > selectedRule.requirements[0].min_quantity)
+                                ? rule : selectedRule;
+                        }, null);
+                        let total;
+                        if (productRule) {
+                            total = productRule.total_price * quantity / productRule.requirements[0].min_quantity;
+                            appliedRules.push({name: productRule.name, applications: 1, quantity, total});
+                        } else {
+                            total = catalogTotals[productId] * quantity / quantities[productId];
+                        }
+                        subtotal += total;
+                    });
+                    return {subtotal: Math.round(subtotal), applied_rules: appliedRules};
                 },
 
                 get offerSubtotal() {
-                    if (this.fixedQuantityTier) {
-                        return Math.round(Number(this.fixedQuantityTier.total_price) * this.selectedQuantity / Number(this.fixedQuantityTier.min_quantity));
-                    }
-                    return this.totalPrice - Math.round(this.totalPrice * this.quantityDiscountPercentage / 100);
-                },
-
-                get quantityDiscount() {
-                    return Math.max(0, this.totalPrice - this.offerSubtotal);
+                    return this.conditionalPricingEnabled ? this.conditionalQuote.subtotal : this.totalPrice;
                 },
 
                 get grandTotal() {

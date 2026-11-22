@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Notifications\User\OrderPlaced;
 use App\Services\FacebookPixelService;
+use App\Services\LandingPageProComboPricing;
 use App\Services\LandingPageProTemplateRegistry;
 use App\Services\UtmTrackingService;
 use Illuminate\Database\Eloquent\Builder;
@@ -360,7 +361,7 @@ class LandingPageProController extends Controller
             ->keyBy('id');
 
         $productsPayload = [];
-        $hasQuantityOffer = count($landingPagePro->quantityDiscountTiers()) > 0;
+        $hasConditionalPricing = $landingPagePro->conditionalPricingEnabled();
 
         foreach ($validated['items'] as $item) {
             $landingProductId = (int) $item['landing_product_id'];
@@ -390,7 +391,7 @@ class LandingPageProController extends Controller
             }
 
             $productData = (new ProductResource($product))->toCartItem($quantity);
-            if ($hasQuantityOffer) {
+            if ($hasConditionalPricing) {
                 $productData['price'] = (float) $product->selling_price;
                 $productData['retail_price'] = $productData['price'];
                 $productData['total'] = $productData['price'] * $quantity;
@@ -427,10 +428,13 @@ class LandingPageProController extends Controller
                 fn (array $item): int|float => (($item['price'] ?? 0) * ($item['quantity'] ?? 0))
             );
             $shippingCost = $orderModel->getShippingCost($productsPayload, $subtotal, $shippingArea);
-            $selectedQuantity = (int) collect($productsPayload)->sum('quantity');
-            $discountPercentage = $landingPagePro->quantityDiscountPercentage($selectedQuantity);
-            $offerSubtotal = $landingPagePro->quantityOfferSubtotal($selectedQuantity, $subtotal);
-            $quantityDiscount = $subtotal - $offerSubtotal;
+            $offerSubtotal = $subtotal;
+            $comboQuote = null;
+            if ($landingPagePro->conditionalPricingEnabled()) {
+                $comboQuote = app(LandingPageProComboPricing::class)->quote($landingPagePro->conditionalPricingRules(), array_values($productsPayload));
+                $offerSubtotal = $comboQuote['subtotal'];
+            }
+            $comboDiscount = $subtotal - $offerSubtotal;
 
             $order = Order::create([
                 'source_id' => config('app.instant_order_forwarding') ? 0 : null,
@@ -451,10 +455,10 @@ class LandingPageProController extends Controller
                     'shipping_cost' => $shippingCost,
                     'retail_delivery_fee' => $shippingCost,
                     'advanced' => 0,
-                    'discount' => $quantityDiscount,
-                    'retail_discount' => $quantityDiscount,
-                    'landing_quantity_discount_percentage' => $discountPercentage,
-                    'landing_quantity_pricing_type' => $landingPagePro->quantityPricingType(),
+                    'discount' => $comboDiscount,
+                    'retail_discount' => $comboDiscount,
+                    'landing_pricing_type' => $comboQuote ? 'conditional' : 'catalog',
+                    'landing_conditional_offers' => $comboQuote['applied_rules'] ?? [],
                     'landing_offer_subtotal' => $offerSubtotal,
                     'coupon_discount' => 0,
                     'subtotal' => $subtotal,
