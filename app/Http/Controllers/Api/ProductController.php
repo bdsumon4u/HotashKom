@@ -25,10 +25,25 @@ class ProductController extends Controller
             DB::raw('COALESCE((SELECT NULLIF(SUM(v.stock_count), 0) FROM products v WHERE v.parent_id = products.id), products.stock_count) as stock'),
         ];
 
+        $filter = $request->input('filter') ?? $request->input('only');
+
         $query = Product::query()
-            ->when(request('only'), fn ($query) => match (request('only')) {
+            ->when($filter, fn ($query) => match ($filter) {
+                'active' => $query->where('is_active', true),
                 'inactive' => $query->where('is_active', false),
-                'low-stock' => $query->where('should_track', true)->where('stock_count', '<=', 10),
+                'variational', 'variation', 'variations', 'has-variations' => $query->has('variations'),
+                'low-stock', 'low_stock' => $query->where('should_track', true)->where('stock_count', '<=', 10),
+                default => $query,
+            })
+            ->when($request->filled('status'), fn ($query) => match ($request->input('status')) {
+                'active' => $query->where('is_active', true),
+                'inactive' => $query->where('is_active', false),
+                default => $query,
+            })
+            ->when($request->filled('type'), fn ($query) => match ($request->input('type')) {
+                'variational', 'variation', 'variations', 'has-variations' => $query->has('variations'),
+                'single', 'non-variational' => $query->doesntHave('variations'),
+                default => $query,
             })
             ->whereNull('parent_id')
             ->with('variations')

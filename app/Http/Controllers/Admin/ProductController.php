@@ -29,7 +29,15 @@ class ProductController extends Controller
     {
         $stats = Product::stockStatistics();
 
-        return $this->view($stats);
+        $productCounts = [
+            'all' => Product::whereNull('parent_id')->count(),
+            'active' => Product::whereNull('parent_id')->where('is_active', true)->count(),
+            'inactive' => Product::whereNull('parent_id')->where('is_active', false)->count(),
+            'variational' => Product::whereNull('parent_id')->has('variations')->count(),
+            'low_stock' => Product::whereNull('parent_id')->where('should_track', true)->where('stock_count', '<=', 10)->count(),
+        ];
+
+        return $this->view(array_merge($stats, compact('productCounts')));
     }
 
     /**
