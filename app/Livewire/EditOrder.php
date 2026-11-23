@@ -627,7 +627,7 @@ class EditOrder extends Component
                 ->matchingOrderSearch((string) $this->search)
                 ->whereNull('parent_id')
                 ->whereIsActive(1)
-                ->take(5)
+                ->take(15)
                 ->get();
 
             foreach ($products as $product) {

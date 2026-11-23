@@ -284,7 +284,7 @@ class ResellerEditOrder extends Component
                 ->matchingOrderSearch((string) $this->search)
                 ->whereNull('parent_id')
                 ->where('is_active', 1)
-                ->take(5)
+                ->take(15)
                 ->get();
 
             foreach ($products as $product) {

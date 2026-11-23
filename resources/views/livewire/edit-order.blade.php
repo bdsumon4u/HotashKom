@@ -131,7 +131,8 @@
                         <strong class="col-md-6 text-danger d-flex align-items-center">{{ session('error') }}</strong>
                     @endif
                 </div>
-                <div class="my-2 table-responsive">
+                @if ($products->isNotEmpty())
+                <div class="my-2 table-responsive" style="max-height: 420px; overflow-y: auto;" tabindex="0" role="region" aria-label="Product search results">
                     <table class="table table-bordered table-hover">
                         <thead>
                             <tr>
@@ -231,9 +232,26 @@
                                     </td>
                                 </tr>
                             @endforeach
-                            @php
-                                $retail = 0;
-                            @endphp
+                        </tbody>
+                    </table>
+                </div>
+                @endif
+
+                @php
+                    $retail = 0;
+                @endphp
+                @if (! empty($selectedProducts))
+                <h6 class="mt-3">Selected Products</h6>
+                <div class="my-2 table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             @foreach ($selectedProducts as $product)
                                 @php
                                     $parentId = $product['parent_id'] ?? $product['id'];
@@ -396,6 +414,8 @@
                         </tbody>
                     </table>
                 </div>
+
+                @endif
 
                 @if ($order->exists && config('services.courier_report.cheap'))
                 <h5 class="mt-3">Courier Report</h5>

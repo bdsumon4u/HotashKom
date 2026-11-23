@@ -100,7 +100,7 @@
                         <strong class="col-md-6 text-danger d-flex align-items-center">{{ session('error') }}</strong>
                     @endif
                 </div>
-                <div class="my-2 table-responsive">
+                <div class="my-2 table-responsive" style="max-height: 420px; overflow-y: auto;" tabindex="0" role="region" aria-label="Product search results">
                     <table class="table table-bordered table-hover">
                                                     <thead>
                                 <tr>
