@@ -220,6 +220,24 @@ class Product extends Model
         });
     }
 
+    public function scopeMatchingOrderSearch(Builder $query, string $search): Builder
+    {
+        $search = trim($search);
+        $words = preg_split('/\s+/u', $search, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        if ($words === []) {
+            return $query->whereKey([]);
+        }
+
+        return $query->where(function (Builder $query) use ($search, $words): void {
+            $query->where(function (Builder $query) use ($words): void {
+                foreach (array_unique($words) as $word) {
+                    $query->where('name', 'like', '%'.addcslashes($word, '\\%_').'%');
+                }
+            })->orWhere('sku', $search);
+        });
+    }
+
     protected function inStock(): Attribute
     {
         return Attribute::get(fn (): bool => $this->canFulfillQuantity(1));

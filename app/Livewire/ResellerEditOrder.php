@@ -278,10 +278,10 @@ class ResellerEditOrder extends Component
     public function render()
     {
         $products = collect();
-        if (strlen((string) $this->search) > 2) {
+        if (mb_strlen(trim((string) $this->search)) > 2) {
             $products = Product::with('variations.options')
                 ->whereNotIn('id', array_keys($this->selectedProducts))
-                ->where(fn ($q) => $q->where('name', 'like', "%$this->search%")->orWhere('sku', $this->search))
+                ->matchingOrderSearch((string) $this->search)
                 ->whereNull('parent_id')
                 ->where('is_active', 1)
                 ->take(5)
