@@ -647,7 +647,7 @@
                                 default => strtoupper($source),
                             };
                         @endphp
-                        <span class="badge {{ $badgeClass }} text-uppercase">{{ $sourceLabel }}{{ $order->utm_source_is_estimated ? ' (estimated)' : '' }}</span>
+                        <span class="badge {{ $badgeClass }} text-white text-uppercase">{{ $sourceLabel }}{{ $order->utm_source_is_estimated ? ' (estimated)' : '' }}</span>
                     @else
                         <span class="badge badge-secondary">Direct / None</span>
                     @endif
@@ -727,7 +727,7 @@
                     @endif
 
                     @if (empty($order->utm_campaign) || empty($source))
-                        <div class="alert alert-warning mt-3 mb-0" role="status">
+                        <div class="alert alert-warning text-dark mt-3 mb-0" role="status">
                             <strong>{{ ($utmDiagnostics['browser_storage']['cookies'] ?? null) === false ? 'Cookies are unavailable in the customer’s browser' : 'Customer privacy or cookie settings may have limited campaign tracking' }}</strong>
                             <ul class="mt-2 mb-2 pl-3">
                                 @forelse (($utmDiagnostics['reasons'] ?? []) as $reason)
