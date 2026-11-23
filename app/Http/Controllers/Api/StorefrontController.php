@@ -460,7 +460,7 @@ class StorefrontController extends Controller
                 'external_id' => $order->user_id,
             ];
 
-            $orderTrackingData = [];
+            $orderTrackingData = $order->tracking ?? [];
             $eventName = config('meta-pixel.advanced_tracking') ? 'Lead' : 'Purchase';
             $orderTrackingData['event_id'] = 'ch_'.strtolower($eventName).'_'.$order->id.'_'.time();
             $order->update(['tracking' => $orderTrackingData]);

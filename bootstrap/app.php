@@ -7,6 +7,7 @@ use App\Http\Middleware\EnsureInvestmentEnabled;
 use App\Http\Middleware\EnsureSpaResponse;
 use App\Http\Middleware\LogDatabaseUsage;
 use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Services\UtmTrackingService;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -32,6 +33,8 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->encryptCookies(except: [UtmTrackingService::BROWSER_COOKIE_NAME]);
+
         $middleware->web(append: [
             EnsureSpaResponse::class,
             CaptureUtmTracking::class,

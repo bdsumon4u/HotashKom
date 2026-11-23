@@ -7,6 +7,7 @@ use App\Redx\Facade\Redx;
 use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
 use App\Services\ProductStockService;
+use App\Services\UtmTrackingService;
 use Fuse\Fuse;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -42,6 +43,12 @@ class Order extends Model
     #[\Override]
     public static function booted(): void
     {
+        static::creating(function (Order $order): void {
+            if (! app()->runningInConsole() && (int) $order->type === self::ONLINE && ! $order->source_id) {
+                $order->tracking = app(UtmTrackingService::class)->trackingForOrder($order, request(), $order->tracking);
+            }
+        });
+
         static::retrieved(function (Order $order): void {
             if (empty($order->data['city_name'] ?? '') && ! empty($order->data['city_id'] ?? '')) {
                 $order->fill(['data' => ['city_name' => 'N/A', 'area_name' => 'N/A']]);

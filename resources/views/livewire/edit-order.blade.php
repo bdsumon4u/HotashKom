@@ -655,6 +655,7 @@
                 <div class="p-3 card-body">
                     @php
                         $utm = $order->utm;
+                        $utmDiagnostics = $order->tracking['utm_diagnostics'] ?? [];
                     @endphp
                     @if (! empty($utm) || ! empty($source))
                         <table class="table table-sm table-bordered mb-0">
@@ -713,10 +714,58 @@
                                 @endif
                             </tbody>
                         </table>
-                    @else
-                        <div class="text-muted text-center py-2">
-                            <i class="fa fa-info-circle mr-1"></i> No campaign attribution recorded for this order.
+                    @endif
+
+                    @if (empty($order->utm_campaign) || empty($source))
+                        <div class="alert alert-warning mt-3 mb-0" role="status">
+                            <strong>{{ ($utmDiagnostics['browser_storage']['cookies'] ?? null) === false ? 'Cookies are unavailable in the customer’s browser' : 'Customer privacy or cookie settings may have limited campaign tracking' }}</strong>
+                            <ul class="mt-2 mb-2 pl-3">
+                                @forelse (($utmDiagnostics['reasons'] ?? []) as $reason)
+                                    <li>{{ $reason }}</li>
+                                @empty
+                                    <li>{{ empty($utm) && empty($source) ? 'No campaign data is stored on this order.' : 'The stored attribution is missing a campaign name or traffic source.' }}</li>
+                                    <li>Capture diagnostics were not recorded when this order was placed. The exact reason cannot be determined from this record.</li>
+                                @endforelse
+                            </ul>
+                            @if (isset($utmDiagnostics['browser_report_received']))
+                                <div>Browser capture report: {{ $utmDiagnostics['browser_report_received'] ? 'received' : 'not received' }}.</div>
+                            @endif
+                            @if (! empty($utmDiagnostics['referrer_host']))
+                                <div>Reported referrer: {{ $utmDiagnostics['referrer_host'] }}.</div>
+                            @endif
+                            <details class="mt-2">
+                                <summary>Possible causes when no campaign was supplied</summary>
+                                <ul class="mt-2 mb-0 pl-3">
+                                    <li>A direct visit, bookmark, shared link, or advertisement without UTM campaign tags.</li>
+                                    <li>A redirect, short link, or navigation step removed campaign parameters before capture.</li>
+                                    <li>The advertising link contained empty tags or unresolved campaign placeholders.</li>
+                                    <li>Cookies or browser storage were blocked, cleared, expired, or unavailable.</li>
+                                    <li>Cookie encryption keys or session settings changed, making older stored attribution unreadable.</li>
+                                    <li>The customer switched browser, device, or domain without transferring attribution.</li>
+                                    <li>The capture script was blocked, failed to load, or was missing from an older cached page.</li>
+                                    <li>An API or external storefront did not send attribution with checkout.</li>
+                                    <li>A browser or referrer policy omitted the original referral information.</li>
+                                    <li>Only a click ID or referral source was provided; neither supplies the campaign name.</li>
+                                </ul>
+                                <div class="mt-2">These are possibilities, not confirmed causes unless reported above. Missing campaign values cannot be reconstructed reliably.</div>
+                            </details>
                         </div>
+                    @endif
+
+                    @if (! empty($utmDiagnostics['sources']))
+                        <div class="small text-muted mt-2">
+                            Recovered from: {{ collect($utmDiagnostics['sources'])->map(fn ($captureSource) => \Illuminate\Support\Str::headline($captureSource))->implode(', ') }}.
+                        </div>
+                    @endif
+                    @if (! empty($utmDiagnostics['checked_sources']))
+                        <details class="small text-muted mt-2">
+                            <summary>Attribution capture checks</summary>
+                            <ul class="mt-2 mb-0 pl-3">
+                                @foreach ($utmDiagnostics['checked_sources'] as $captureSource => $captureResult)
+                                    <li>{{ \Illuminate\Support\Str::headline($captureSource) }}: {{ \Illuminate\Support\Str::headline($captureResult) }}</li>
+                                @endforeach
+                            </ul>
+                        </details>
                     @endif
                 </div>
             </div>
