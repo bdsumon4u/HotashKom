@@ -26,6 +26,10 @@ class SyncOrderStatusWithReseller implements ShouldQueue
      */
     public function handle(): void
     {
+        if (! isOninda()) {
+            return;
+        }
+
         info('Syncing order status with resellers', [
             'orderId' => $this->orderId,
         ]);
@@ -41,6 +45,15 @@ class SyncOrderStatusWithReseller implements ShouldQueue
             info('Order has no reseller', [
                 'orderId' => $this->orderId,
                 'userId' => $order->user_id,
+            ]);
+
+            return;
+        }
+
+        if (! $reseller->is_active || blank($reseller->db_name) || blank($reseller->db_username)) {
+            info('Skipping order status sync for inactive or unconfigured reseller', [
+                'orderId' => $this->orderId,
+                'resellerId' => $reseller->id,
             ]);
 
             return;

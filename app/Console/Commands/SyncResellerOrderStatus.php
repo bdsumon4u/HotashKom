@@ -16,7 +16,7 @@ class SyncResellerOrderStatus extends Command
      * @var string
      */
     protected $signature = 'sync:reseller-order-status
-                            {--status=CONFIRMED : Only sync master orders with this status (omit to sync all statuses)}';
+                            {--status=CONFIRMED : Only sync master orders with this status (defaults to CONFIRMED)}';
 
     /**
      * The console command description.
@@ -54,9 +54,9 @@ class SyncResellerOrderStatus extends Command
             ->whereHas('user', function (Builder $query): void {
                 $query->where('is_active', true)
                     ->whereNotNull('db_name')
-                    ->where('db_name', '!=', '')
+                    ->whereRaw("TRIM(db_name) != ''")
                     ->whereNotNull('db_username')
-                    ->where('db_username', '!=', '');
+                    ->whereRaw("TRIM(db_username) != ''");
             });
 
         if ($status !== null) {

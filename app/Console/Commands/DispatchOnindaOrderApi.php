@@ -27,6 +27,12 @@ class DispatchOnindaOrderApi extends Command
      */
     public function handle(): int
     {
+        if (isOninda()) {
+            $this->info('Skipping Oninda order API dispatch on the master site.');
+
+            return self::SUCCESS;
+        }
+
         $this->info('Starting to process orders for Oninda API dispatch...');
 
         // Find orders placed within the last hour with null or 0 source_id

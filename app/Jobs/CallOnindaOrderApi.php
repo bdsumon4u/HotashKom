@@ -20,6 +20,10 @@ class CallOnindaOrderApi implements ShouldQueue
 
     public function handle(): void
     {
+        if (isOninda()) {
+            return;
+        }
+
         $domain = preg_replace('/^www\./', '', parse_url((string) config('app.url'), PHP_URL_HOST));
         $endpoint = config('app.oninda_url').'/api/reseller/orders/place';
 
