@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Jobs\SyncOrderStatusWithReseller;
 use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
 use App\Services\DeliveryAreaService;
@@ -16,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\GoogleTagManager\GoogleTagManagerFacade;
@@ -50,6 +50,10 @@ class Order extends Model
         });
 
         static::saving(function (Order $order): void {
+            if (isOninda() && $order->exists && $order->isDirty('status')) {
+                $order->reseller_status_sync_token = (string) Str::uuid();
+            }
+
             info('saving');
             if (! $order->exists || $order->isDirty('status')) {
                 info('does not exist or status changed');
@@ -218,11 +222,6 @@ class Order extends Model
 
             if (! isOninda()) {
                 return;
-            }
-
-            // Dispatch job to sync status with resellers
-            if ($status) {
-                dispatch(new SyncOrderStatusWithReseller($order->id));
             }
 
             if (! in_array($status, ['DELIVERED', 'RETURNED', 'PAID_RETURN'])) {

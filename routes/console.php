@@ -38,6 +38,12 @@ Schedule::command('oninda:dispatch-orders')
     ->withoutOverlapping()
     ->runInBackground();
 
+Schedule::command('sync:reseller-order-status --pending')
+    ->everyFiveMinutes()
+    ->when(fn (): bool => isOninda())
+    ->withoutOverlapping()
+    ->runInBackground();
+
 Schedule::command('sitemap:generate')
     ->daily()
     ->withoutOverlapping()
