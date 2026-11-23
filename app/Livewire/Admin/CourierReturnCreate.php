@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin;
 
-use App\Jobs\SyncProductStockWithResellers;
 use App\Models\Account;
 use App\Models\Product;
 use App\Services\AccountingService;
+use App\Services\ProductStockService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -181,7 +182,7 @@ class CourierReturnCreate extends Component
         return max(0, (float) ($this->return_charge ?? 0));
     }
 
-    public function save(AccountingService $accountingService)
+    public function save(AccountingService $accountingService, ProductStockService $productStockService): ?RedirectResponse
     {
         $this->validate();
 
@@ -191,24 +192,15 @@ class CourierReturnCreate extends Component
             return null;
         }
 
-        return DB::transaction(function () use ($accountingService) {
+        return DB::transaction(function () use ($accountingService, $productStockService): RedirectResponse {
             $totalCost = $this->final_purchase_cost;
             $details = [];
+            $stockChanges = [];
 
-            // 1. Restock physical warehouse count for returned items
             foreach ($this->items as $item) {
-                $product = Product::find($item['product_id']);
-                if ($product) {
-                    $product->should_track = true;
-                    $product->save();
-                    $product->increment('stock_count', (int) $item['quantity']);
-
-                    if (class_exists(SyncProductStockWithResellers::class)) {
-                        dispatch(new SyncProductStockWithResellers($product));
-                    }
-                }
-
                 $quantity = (int) $item['quantity'];
+                $productId = (int) $item['product_id'];
+                $stockChanges[$productId] = ($stockChanges[$productId] ?? 0) + $quantity;
                 $purchasePrice = (float) $item['price'];
                 $details[] = [
                     'product_id' => (int) $item['product_id'],
@@ -219,6 +211,8 @@ class CourierReturnCreate extends Component
                     'line_purchase_total' => round($purchasePrice * $quantity, 2),
                 ];
             }
+
+            $productStockService->adjust($stockChanges, enableTracking: true);
 
             // 2. Transfer value from In Courier (Asset) back to Inventory (Asset)
             $accountingService->recordCourierReturn([

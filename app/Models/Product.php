@@ -103,7 +103,7 @@ class Product extends Model
     /**
      * Clear all product-related caches.
      */
-    private static function clearProductCaches($product): void
+    public static function clearProductCaches(Product $product): void
     {
         // Clear general product filter data
         cacheMemo()->forget('product_filter_data');

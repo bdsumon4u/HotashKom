@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Jobs\SyncOrderStatusWithReseller;
-use App\Jobs\SyncProductStockWithResellers;
 use App\Pathao\Facade\Pathao;
 use App\Redx\Facade\Redx;
 use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
+use App\Services\ProductStockService;
 use Fuse\Fuse;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -292,7 +292,7 @@ class Order extends Model
         }
 
         info('adjusting stock', ['order' => $this->id]);
-        $sign = function () {
+        $sign = function (): int {
             $increment = config('app.increment');
             $decrement = config('app.decrement');
             if (! $this->exists) {
@@ -329,20 +329,13 @@ class Order extends Model
             return;
         }
 
-        info('fact', ['fact' => $fact]);
-        info('products', ['products' => $this->products]);
-        info('x', array_keys($products = (array) $this->products));
-        info('x', $products);
-        $DBproducts = Product::where('should_track', true)->find(array_keys($products = (array) $this->products));
+        $stockChanges = [];
 
-        foreach ($DBproducts as $product) {
-            info('adjusting stock', ['product' => $product->id, 'fact' => $fact, 'quantity' => $products[$product->id]->quantity]);
-            $increment = $fact * $products[$product->id]->quantity;
-            $product->increment('stock_count', $increment);
-            info('incremented', ['product' => $product->id, 'increment' => $increment]);
-            // Dispatch job to sync stock with resellers
-            dispatch(new SyncProductStockWithResellers($product));
+        foreach ((array) $this->products as $productId => $product) {
+            $stockChanges[(int) $productId] = $fact * (int) $product->quantity;
         }
+
+        app(ProductStockService::class)->adjust($stockChanges);
     }
 
     public function getDescriptionForEvent(string $eventName): string

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Livewire\Admin;
 
-use App\Jobs\SyncProductStockWithResellers;
 use App\Models\Product;
 use App\Services\AccountingService;
+use App\Services\ProductStockService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -147,26 +148,19 @@ class ShipmentCreate extends Component
         );
     }
 
-    public function save(AccountingService $accountingService)
+    public function save(AccountingService $accountingService, ProductStockService $productStockService): RedirectResponse
     {
         $this->validate();
 
-        return DB::transaction(function () use ($accountingService) {
+        return DB::transaction(function () use ($accountingService, $productStockService): RedirectResponse {
             $totalCost = $this->total_purchase_cost;
             $details = [];
+            $stockChanges = [];
 
-            // 1. Decrement warehouse stock for each shipped product
             foreach ($this->items as $item) {
-                $product = Product::find($item['product_id']);
-                if ($product && $product->should_track) {
-                    $product->decrement('stock_count', (int) $item['quantity']);
-
-                    if (class_exists(SyncProductStockWithResellers::class)) {
-                        dispatch(new SyncProductStockWithResellers($product));
-                    }
-                }
-
                 $quantity = (int) $item['quantity'];
+                $productId = (int) $item['product_id'];
+                $stockChanges[$productId] = ($stockChanges[$productId] ?? 0) - $quantity;
                 $purchasePrice = (float) $item['price'];
                 $details[] = [
                     'product_id' => (int) $item['product_id'],
@@ -178,6 +172,8 @@ class ShipmentCreate extends Component
                     'line_purchase_total' => round($purchasePrice * $quantity, 2),
                 ];
             }
+
+            $productStockService->adjust($stockChanges);
 
             // 2. Transfer value from Inventory (Asset) to In Courier (Asset) via double-entry Journal Entry
             $accountingService->recordShipmentToCourier([
