@@ -647,7 +647,7 @@
                                 default => strtoupper($source),
                             };
                         @endphp
-                        <span class="badge {{ $badgeClass }} text-uppercase">{{ $sourceLabel }}</span>
+                        <span class="badge {{ $badgeClass }} text-uppercase">{{ $sourceLabel }}{{ $order->utm_source_is_estimated ? ' (estimated)' : '' }}</span>
                     @else
                         <span class="badge badge-secondary">Direct / None</span>
                     @endif
@@ -663,7 +663,7 @@
                                 @if (! empty($order->utm_source))
                                     <tr>
                                         <th width="35%" class="py-1 bg-light">Source</th>
-                                        <td class="py-1 font-weight-bold text-primary text-uppercase">{{ $order->utm_source }}</td>
+                                        <td class="py-1 font-weight-bold text-primary text-uppercase">{{ $order->utm_source }}{{ $order->utm_source_is_estimated ? ' (estimated)' : '' }}</td>
                                     </tr>
                                 @endif
                                 @if (! empty($order->utm_medium))
@@ -714,6 +714,16 @@
                                 @endif
                             </tbody>
                         </table>
+                    @endif
+
+                    @if ($order->utm_source_is_estimated)
+                        <div class="small text-muted mt-2">
+                            @if ($order->utm_source_evidence === 'multiple_platform_cookies')
+                                Multiple platform cookies were found; the referring source cannot be distinguished.
+                            @else
+                                Estimated from {{ \Illuminate\Support\Str::headline($order->utm_source_evidence) }}. This signal does not confirm that the customer arrived from this platform or a paid advertisement.
+                            @endif
+                        </div>
                     @endif
 
                     @if (empty($order->utm_campaign) || empty($source))

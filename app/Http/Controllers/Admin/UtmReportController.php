@@ -45,8 +45,9 @@ class UtmReportController extends Controller
         }
 
         $totalOrdersCount = $allOrders->count();
-        $utmOrders = $allOrders->filter(fn (Order $order): bool => ! empty($order->utm_source));
+        $utmOrders = $allOrders->filter(fn (Order $order): bool => filled($order->utm_source) || $order->utm_source_is_estimated);
         $totalUtmOrdersCount = $utmOrders->count();
+        $totalEstimatedOrdersCount = 0;
 
         // Group orders by Campaign + Source + Medium, and by Unified Platform Group
         $campaigns = [];
@@ -56,6 +57,7 @@ class UtmReportController extends Controller
         $utmDeliveredRevenue = 0.0;
 
         foreach ($utmOrders as $order) {
+            $isEstimated = $order->utm_source_is_estimated;
             $source = strtolower(trim((string) ($order->utm_source ?? 'unknown')));
             $platformMeta = self::resolvePlatformGroup($source);
             $platformKey = $platformMeta['key'];
@@ -69,6 +71,11 @@ class UtmReportController extends Controller
             $campaign = trim((string) ($order->utm_campaign ?: $defaultCampaign));
             $medium = strtolower(trim((string) ($order->utm_medium ?: 'cpc')));
 
+            if ($isEstimated) {
+                $campaign = trim((string) ($order->utm_campaign ?: 'Unknown campaign')).' (estimated source)';
+                $medium = strtolower(trim((string) ($order->utm_medium ?: 'unknown')));
+            }
+
             $campaignKey = $campaign.'|'.$source.'|'.$medium;
 
             if (! isset($campaigns[$campaignKey])) {
@@ -77,6 +84,7 @@ class UtmReportController extends Controller
                     'source' => $source,
                     'medium' => $medium,
                     'total' => 0,
+                    'estimated' => 0,
                     'pending' => 0,
                     'confirmed' => 0,
                     'packaging' => 0,
@@ -96,6 +104,7 @@ class UtmReportController extends Controller
                     'badge' => $platformMeta['badge'],
                     'sources' => [],
                     'total' => 0,
+                    'estimated' => 0,
                     'pending' => 0,
                     'confirmed' => 0,
                     'packaging' => 0,
@@ -109,6 +118,13 @@ class UtmReportController extends Controller
 
             $campaigns[$campaignKey]['total']++;
             $platforms[$platformKey]['total']++;
+
+            if ($isEstimated) {
+                $totalEstimatedOrdersCount++;
+                $campaigns[$campaignKey]['estimated']++;
+                $platforms[$platformKey]['estimated']++;
+            }
+
             $platforms[$platformKey]['sources'][$source] = ($platforms[$platformKey]['sources'][$source] ?? 0) + 1;
 
             $status = (string) $order->status;
@@ -177,6 +193,7 @@ class UtmReportController extends Controller
             'availableSources' => $availableSources,
             'totalOrdersCount' => $totalOrdersCount,
             'totalUtmOrdersCount' => $totalUtmOrdersCount,
+            'totalEstimatedOrdersCount' => $totalEstimatedOrdersCount,
             'utmDeliveredRevenue' => $utmDeliveredRevenue,
             'topSource' => $topPlatformName,
             'topSourceCount' => $topPlatformCount,

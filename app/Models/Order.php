@@ -382,26 +382,17 @@ class Order extends Model
 
     protected function utmSource(): Attribute
     {
-        return Attribute::get(function (): ?string {
-            $source = $this->tracking['utm']['utm_source'] ?? $this->tracking['utm_source'] ?? null;
-            if ($source) {
-                return $source;
-            }
+        return Attribute::get(fn (): ?string => app(UtmTrackingService::class)->inferSource($this->tracking)['source'] ?? null);
+    }
 
-            if (! empty($this->tracking['utm']['gclid']) || ! empty($this->tracking['gclid'])) {
-                return 'google';
-            }
+    protected function utmSourceIsEstimated(): Attribute
+    {
+        return Attribute::get(fn (): bool => app(UtmTrackingService::class)->inferSource($this->tracking)['estimated'] ?? false);
+    }
 
-            if (! empty($this->tracking['utm']['fbclid']) || ! empty($this->tracking['fbclid']) || ! empty($this->tracking['fbc'])) {
-                return 'facebook';
-            }
-
-            if (! empty($this->tracking['utm']['ttclid']) || ! empty($this->tracking['ttclid'])) {
-                return 'tiktok';
-            }
-
-            return null;
-        });
+    protected function utmSourceEvidence(): Attribute
+    {
+        return Attribute::get(fn (): ?string => app(UtmTrackingService::class)->inferSource($this->tracking)['evidence'] ?? null);
     }
 
     protected function utmCampaign(): Attribute

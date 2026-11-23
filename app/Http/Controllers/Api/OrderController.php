@@ -143,6 +143,10 @@ class OrderController extends Controller
                         default => strtoupper($source),
                     };
                     $campaign = $row->utm_campaign ? ' title="Campaign: '.e($row->utm_campaign).'"' : '';
+                    if ($row->utm_source_is_estimated) {
+                        $sourceLabel .= ' (estimated)';
+                    }
+
                     $idHtml .= '<div class="mt-1"><span class="badge '.$badgeClass.'"'.$campaign.' style="font-size: 10px;">'.e($sourceLabel).'</span></div>';
                 }
 

@@ -23,6 +23,77 @@ class UtmTrackingService
         'utm_id', 'utm_source_platform', 'fbclid', 'gclid', 'ttclid', 'msclkid', 'gbraid', 'wbraid',
     ];
 
+    /**
+     * @param  array<string, mixed>  $tracking
+     * @return array{source: string, evidence: string, estimated: bool}|null
+     */
+    public function inferSource(array $tracking): ?array
+    {
+        $data = $this->fields($this->decode($tracking['utm'] ?? [])) + $this->fields($tracking) + $this->fields($this->urlParameters($tracking['event_source_url'] ?? null));
+
+        if (! empty($data['utm_source'])) {
+            return ['source' => $data['utm_source'], 'evidence' => 'utm_source', 'estimated' => false];
+        }
+
+        foreach (['gclid' => 'google', 'gbraid' => 'google', 'wbraid' => 'google', 'fbclid' => 'facebook', 'ttclid' => 'tiktok', 'msclkid' => 'bing'] as $field => $source) {
+            if (! empty($data[$field])) {
+                return ['source' => $source, 'evidence' => $field, 'estimated' => false];
+            }
+        }
+
+        $fbc = $tracking['fbc'] ?? $tracking['_fbc'] ?? null;
+
+        if (is_string($fbc) && preg_match('/^fb\.\d+\.\d+\..+$/', $fbc)) {
+            return ['source' => 'facebook', 'evidence' => 'fbc', 'estimated' => false];
+        }
+
+        $platform = preg_replace('/[^a-z0-9]/', '', strtolower((string) ($data['utm_source_platform'] ?? '')));
+        $platforms = ['fb' => 'facebook', 'facebook' => 'facebook', 'facebookads' => 'facebook', 'meta' => 'facebook', 'metaads' => 'facebook', 'ig' => 'instagram', 'instagram' => 'instagram', 'instagramads' => 'instagram', 'google' => 'google', 'googleads' => 'google', 'tiktok' => 'tiktok', 'tiktokads' => 'tiktok', 'bing' => 'bing', 'microsoft' => 'bing', 'microsoftadvertising' => 'bing'];
+
+        if (isset($platforms[$platform])) {
+            return ['source' => $platforms[$platform], 'evidence' => 'utm_source_platform', 'estimated' => true];
+        }
+
+        $referrer = $tracking['referrer'] ?? $tracking['utm_diagnostics']['referrer_host'] ?? null;
+        $host = $this->host($referrer) ?? (is_string($referrer) ? strtolower($referrer) : '');
+
+        foreach (['facebook.com' => 'facebook', 'fb.com' => 'facebook', 'instagram.com' => 'instagram', 'google.com' => 'google', 'google.com.bd' => 'google', 'tiktok.com' => 'tiktok', 'bing.com' => 'bing', 'youtube.com' => 'youtube', 'youtu.be' => 'youtube'] as $domain => $source) {
+            if ($host === $domain || Str::endsWith($host, '.'.$domain)) {
+                return ['source' => $source, 'evidence' => 'referrer', 'estimated' => true];
+            }
+        }
+
+        $userAgent = $this->sanitize($tracking['ua'] ?? null, 1000) ?? '';
+
+        foreach (['/Instagram/i' => 'instagram', '/FBAN|FBAV|\[FB_/i' => 'facebook', '/TikTok|Bytedance|musical_ly|trill/i' => 'tiktok'] as $pattern => $source) {
+            if (preg_match($pattern, $userAgent)) {
+                return ['source' => $source, 'evidence' => 'in_app_browser', 'estimated' => true];
+            }
+        }
+
+        $cookies = [];
+
+        foreach (['fbp' => 'facebook', 'ttp' => 'tiktok', 'ga' => 'google', 'gcl_aw' => 'google'] as $field => $source) {
+            $value = $this->sanitize($tracking[$field] ?? $tracking['_'.$field] ?? null, 300);
+            $pattern = match ($field) {
+                'fbp' => '/^fb\.\d+\.\d+\..+$/',
+                'ga' => '/^GA\d+\.\d+\..+$/',
+                'gcl_aw' => '/^GCL\.\d+\..+$/',
+                default => '/^[A-Za-z0-9_.-]{6,}$/',
+            };
+
+            if ($value !== null && preg_match($pattern, $value)) {
+                $cookies[$source] = $field;
+            }
+        }
+
+        if (count($cookies) > 1) {
+            return ['source' => 'unknown', 'evidence' => 'multiple_platform_cookies', 'estimated' => true];
+        }
+
+        return $cookies === [] ? null : ['source' => array_key_first($cookies), 'evidence' => reset($cookies), 'estimated' => true];
+    }
+
     /** @return array<string, mixed>|null */
     public function captureFromRequest(Request $request): ?array
     {
@@ -299,10 +370,25 @@ class UtmTrackingService
         $tracking['event_source_url'] ??= $this->publicUrl($browser['page_url'] ?? $request->headers->get('referer')) ?: $request->url();
         $tracking['fbp'] ??= $this->sanitize($request->input('tracking.fbp') ?? $request->input('fbp') ?? $request->cookie('_fbp'), 300);
         $tracking['fbc'] ??= $this->sanitize($request->input('tracking.fbc') ?? $request->input('fbc') ?? $request->cookie('_fbc'), 300);
+        foreach (['fbp', 'ttp', 'ga', 'gcl_aw'] as $identifier) {
+            if (empty($tracking[$identifier])) {
+                $tracking[$identifier] = $this->sanitize($request->input('tracking.'.$identifier) ?? $request->input($identifier) ?? $browser['platform_ids'][$identifier] ?? $request->cookie('_'.$identifier), 300);
+            }
+        }
+
         $tracking['utm'] = $data ?: null;
+        $sourceInference = $this->inferSource($tracking);
+
+        if ($sourceInference !== null && $sourceInference['estimated']) {
+            $reasons[] = $sourceInference['source'] === 'unknown'
+                ? 'Several platform browser cookies are present. They do not establish which platform referred this order.'
+                : 'The source is estimated from '.Str::headline($sourceInference['evidence']).'; this does not confirm a referral or paid campaign.';
+        }
+
         $tracking['utm_diagnostics'] = [
             'version' => 1,
             'status' => $hasCampaign && $hasSource ? 'captured' : ($data === [] ? 'missing' : 'partial'),
+            'source_inference' => $sourceInference,
             'reasons' => $reasons,
             'sources' => array_values(array_unique($sources)),
             'checked_sources' => $checked,

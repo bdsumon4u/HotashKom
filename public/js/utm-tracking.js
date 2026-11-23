@@ -33,6 +33,19 @@
         }
     }
 
+    function platformIdentifiers() {
+        const identifiers = {};
+        try {
+            for (const name of ['fbp', 'ttp', 'ga', 'gcl_aw']) {
+                const cookie = document.cookie.split('; ').find((part) => part.startsWith(`_${name}=`));
+                if (cookie) identifiers[name] = decodeURIComponent(cookie.substring(name.length + 2)).slice(0, 300);
+            }
+        } catch {
+            return identifiers;
+        }
+        return identifiers;
+    }
+
     function storedData() {
         const candidates = [readCookie()];
         for (const [property, label] of [['localStorage', 'local_storage'], ['sessionStorage', 'session_storage']]) {
@@ -109,6 +122,7 @@
             entry_url: newEntry ? safeUrl(location.href) : entry.entry_url,
             referrer: newEntry ? referrer : entry.referrer,
             recorded_at: newEntry ? new Date().toISOString() : entry.recorded_at,
+            platform_ids: platformIdentifiers(),
             storage,
         };
         entry = attribution;

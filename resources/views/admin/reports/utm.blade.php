@@ -74,6 +74,7 @@
                                 <h6 class="mb-1 text-white-50 text-uppercase" style="font-size: 11px;">UTM Orders / Total</h6>
                                 <h3 class="mb-0 font-weight-bold">{{ $totalUtmOrdersCount }} <small class="text-white-50" style="font-size: 14px;">/ {{ $totalOrdersCount }}</small></h3>
                                 <small class="text-white-50">{{ $totalOrdersCount > 0 ? round(($totalUtmOrdersCount / $totalOrdersCount) * 100, 1) : 0 }}% Attributed</small>
+                                <small class="d-block text-white-50">Includes {{ number_format($totalEstimatedOrdersCount) }} estimated orders</small>
                             </div>
                             <i class="fa fa-bullhorn fa-2x text-white-50"></i>
                         </div>
@@ -156,7 +157,12 @@
                                         <td class="text-center font-weight-bold text-muted">
                                             {{ $shareRate }}%
                                         </td>
-                                        <td class="text-center font-weight-bold">{{ number_format($platform['total']) }}</td>
+                                        <td class="text-center font-weight-bold">
+                                            {{ number_format($platform['total']) }}
+                                            @if ($platform['estimated'] > 0)
+                                                <small class="d-block font-weight-normal text-muted">Includes {{ number_format($platform['estimated']) }} estimated</small>
+                                            @endif
+                                        </td>
                                         <td class="text-center">{{ number_format($platform['confirmed']) }}</td>
                                         <td class="text-center">{{ number_format($platform['shipping'] + $platform['packaging']) }}</td>
                                         <td class="text-center font-weight-bold text-success">{{ number_format($platform['delivered']) }}</td>
@@ -230,7 +236,12 @@
                                         <td>
                                             <span class="text-muted">{{ $item['medium'] }}</span>
                                         </td>
-                                        <td class="text-center font-weight-bold">{{ $item['total'] }}</td>
+                                        <td class="text-center font-weight-bold">
+                                            {{ $item['total'] }}
+                                            @if ($item['estimated'] > 0)
+                                                <small class="d-block font-weight-normal text-muted">Includes {{ number_format($item['estimated']) }} estimated</small>
+                                            @endif
+                                        </td>
                                         <td class="text-center">{{ $item['confirmed'] }}</td>
                                         <td class="text-center">{{ $item['shipping'] + $item['packaging'] }}</td>
                                         <td class="text-center font-weight-bold text-success">{{ $item['delivered'] }}</td>
