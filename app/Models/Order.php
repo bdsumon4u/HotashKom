@@ -57,6 +57,8 @@ class Order extends Model
         });
 
         static::saving(function (Order $order): void {
+            app(ProductStockService::class)->assertOrderStock($order);
+
             if (isOninda() && $order->exists && $order->isDirty('status')) {
                 $order->reseller_status_sync_token = (string) Str::uuid();
             }

@@ -222,9 +222,24 @@ class Product extends Model
 
     protected function inStock(): Attribute
     {
-        return Attribute::make(get: fn () => $this->track_stock
-            ? $this->stock_count
-            : true);
+        return Attribute::get(fn (): bool => $this->canFulfillQuantity(1));
+    }
+
+    public static function allowsOverselling(): bool
+    {
+        return (bool) (setting('show_option')->allow_overselling ?? false);
+    }
+
+    public function canFulfillQuantity(int $quantity): bool
+    {
+        return ! $this->should_track || static::allowsOverselling() || (int) $this->stock_count >= $quantity;
+    }
+
+    public function purchaseQuantityLimit(int $limit): int
+    {
+        return $this->should_track && ! static::allowsOverselling()
+            ? max(0, min((int) $this->stock_count, $limit))
+            : $limit;
     }
 
     protected function stockGroup(): Attribute

@@ -1,4 +1,7 @@
 <div class="mb-5 row">
+    @error('products')
+        <div class="col-12 text-danger mb-3" role="alert">{{ $message }}</div>
+    @enderror
     @if (isOninda() && (!auth('user')->user() || !auth('user')->user()->is_verified))
         <div class="col-12">
             <div class="py-5 text-center">

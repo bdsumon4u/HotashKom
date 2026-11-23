@@ -37,6 +37,7 @@ class StorefrontController extends Controller
         $settingsArray = Setting::array();
         $settings = collect($settingsArray)->only($keys)->toArray();
         $settings['pixel_ids'] = implode(' ', app(FacebookPixelService::class)->getPixelIds());
+        $settings['allow_overselling'] = Product::allowsOverselling();
 
         return response()->json([
             'data' => $settings,
@@ -214,8 +215,8 @@ class StorefrontController extends Controller
                 'images' => $variationImages,
                 'regularPrice' => (int) $variation->price,
                 'salePrice' => (int) $variation->selling_price,
-                'inStock' => true,
-                'stockCount' => $variation->should_track ? max(0, $variation->stock_count) : -1,
+                'inStock' => $variation->in_stock,
+                'stockCount' => $variation->should_track && ! Product::allowsOverselling() ? max(0, $variation->stock_count) : -1,
                 'optionIds' => $variation->options->pluck('id')->map(fn ($id) => (int) $id)->toArray(),
             ];
         })->values();
@@ -241,8 +242,8 @@ class StorefrontController extends Controller
                 'image' => $baseImage,
                 'images' => $images,
                 'thumbnails' => $images,
-                'inStock' => true,
-                'stockCount' => $product->should_track ? max(0, $product->stock_count) : -1,
+                'inStock' => $product->in_stock,
+                'stockCount' => $product->should_track && ! Product::allowsOverselling() ? max(0, $product->stock_count) : -1,
                 'averageRating' => $ratingData['averageRating'],
                 'reviewsCount' => $ratingData['reviewsCount'],
                 'description' => str_replace('../../../storage', url('/storage'), $product->description ?? ''),
@@ -507,8 +508,8 @@ class StorefrontController extends Controller
                 : 0,
             'image' => $baseImage,
             'thumbnails' => $product->images->pluck('src')->map(fn ($src) => asset($src))->toArray(),
-            'inStock' => true,
-            'stockCount' => $product->should_track ? max(0, $product->stock_count) : -1,
+            'inStock' => $product->in_stock,
+            'stockCount' => $product->should_track && ! Product::allowsOverselling() ? max(0, $product->stock_count) : -1,
             'averageRating' => $ratingData['averageRating'],
             'reviewsCount' => $ratingData['reviewsCount'],
             'shortDescription' => $product->short_description,

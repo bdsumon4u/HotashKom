@@ -525,7 +525,7 @@ runWhenJQueryReady(function($) {
                 const fallbackPlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' width='300' height='300'%3E%3Crect width='300' height='300' fill='%23f9fafb'/%3E%3Cpath d='M120 105a20 20 0 1 1-40 0 20 20 0 0 1 40 0zm-50 95 40-50 30 35 35-45 45 60H70z' fill='%23d1d5db'/%3E%3C/svg%3E";
                 const productImage = product.base_image_url || fallbackPlaceholder;
                 const productUrl = `/products/${encodeURIComponent(productSlug)}`;
-                const inStock = true;
+                const inStock = product.in_stock !== false;
                 const hasDiscount = productPrice !== productSellingPrice && productPrice > 0;
                 const discountPercent = hasDiscount ? Math.round(((productPrice - productSellingPrice) * 100) / productPrice) : 0;
 
@@ -559,8 +559,8 @@ runWhenJQueryReady(function($) {
 
                 let buttonsHTML = '';
                 if (!isOninda) {
-                    const available = true;
-                    const disabledAttr = '';
+                    const available = inStock;
+                    const disabledAttr = available ? '' : 'disabled';
                     const btnPrimaryClass = isGbaz ? 'btn' : 'btn btn-primary';
                     const spanClass = isGbaz ? '' : ' class="ml-1"';
 

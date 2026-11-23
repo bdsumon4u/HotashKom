@@ -113,7 +113,11 @@ class SettingRequest extends FormRequest
             'products_page' => 'required|array',
             'related_products' => 'required|array',
             'scroll_text' => 'nullable',
-            'show_option' => 'required|array',
+            'show_option' => ['required', 'array', function (string $attribute, mixed $value, \Closure $fail): void {
+                if (is_array($value) && array_key_exists('allow_overselling', $value) && ! in_array($value['allow_overselling'], [true, false, 0, 1, '0', '1'], true)) {
+                    $fail('Allow overselling must be enabled or disabled.');
+                }
+            }],
             'discount_text' => 'nullable',
             'services' => 'required|array',
         ];

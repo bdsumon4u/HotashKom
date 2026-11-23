@@ -12,10 +12,7 @@ trait HasCart
 {
     public function addToKart(Product $product, int $quantity = 1, string $instance = 'default', $retailPrice = null)
     {
-        session(['kart' => $instance]);
-        if (in_array($instance, ['kart', 'landing'], true)) {
-            Cart::instance($instance)->destroy();
-        }
+        $product->refresh();
 
         if (! ($product->parent ?? $product)->is_active) {
             $this->dispatch('notify', ['message' => 'Product is inactive and cannot be added to cart', 'type' => 'danger']);
@@ -24,8 +21,21 @@ trait HasCart
         }
 
         $fraudQuantity = setting('fraud')->max_qty_per_product ?? 3;
-        $maxQuantity = (int) $fraudQuantity;
-        $quantity = min($quantity, $maxQuantity);
+        $maxQuantity = $product->purchaseQuantityLimit((int) $fraudQuantity);
+        $cart = Cart::instance($instance);
+        $existingQuantity = in_array($instance, ['kart', 'landing'], true) ? 0 : (int) $cart->content()->where('id', $product->id)->sum('qty');
+        $quantity = min($quantity, max(0, $maxQuantity - $existingQuantity));
+
+        if ($quantity < 1) {
+            $this->dispatch('notify', ['message' => 'This product is out of stock or its maximum cart quantity has been reached.', 'type' => 'danger']);
+
+            return;
+        }
+
+        session(['kart' => $instance]);
+        if (in_array($instance, ['kart', 'landing'], true)) {
+            $cart->destroy();
+        }
 
         $productData = (new ProductResource($product))->toCartItem($quantity);
         $productData['max'] = $maxQuantity;

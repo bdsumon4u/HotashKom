@@ -213,6 +213,10 @@ class EditOrder extends Component
         $quantity = 1;
         $id = $product->id;
 
+        if (! $product->canFulfillQuantity($quantity)) {
+            return session()->flash('error', 'Out of stock.');
+        }
+
         $productData = (new ProductResource($product))->toCartItem($quantity);
         $productData['price'] = (float) $productData['price'];
         $productData['retail_price'] = (float) ($productData['retail_price'] ?? $productData['price']);
@@ -266,6 +270,14 @@ class EditOrder extends Component
 
         // Update the selected product data
         $quantity = $selectedProduct['quantity'] ?? 1;
+        $product->refresh();
+
+        if ((int) $product->id !== (int) $selectedProduct['id'] && ! $product->canFulfillQuantity((int) $quantity)) {
+            session()->flash('error', 'The selected variation has insufficient stock.');
+
+            return;
+        }
+
         $productData = (new ProductResource($product))->toCartItem($quantity);
         $productData['parent_id'] = $parentId;
         $productData['selected_options'] = $this->options[$parentId];

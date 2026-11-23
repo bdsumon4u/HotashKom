@@ -41,7 +41,7 @@ class ApiController extends Controller
                 'reviews' => 0,
                 'rating' => 0,
                 'attributes' => [],
-                'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+                'availability' => $product->should_track && ! Product::allowsOverselling() ? max(0, $product->stock_count) : 'In Stock',
             ]));
     }
 
@@ -176,6 +176,7 @@ class ApiController extends Controller
                 'price' => $product->price,
                 'selling_price' => $product->selling_price,
                 'should_track' => $product->should_track,
+                'in_stock' => $product->in_stock,
                 'stock_count' => $product->stock_count,
                 'base_image_url' => $product->base_image_url ?? '/images/placeholder.jpg',
                 'var_name' => $product->var_name ?? $product->name,
@@ -225,7 +226,7 @@ class ApiController extends Controller
 
         $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
         $options = $selectedVar->options->pluck('id', 'attribute_id')->toArray();
-        $maxQuantity = (int) $maxPerProduct;
+        $maxQuantity = $selectedVar->purchaseQuantityLimit((int) $maxPerProduct);
 
         $optionGroup = $product->variations->pluck('options')->flatten()->unique('id')->groupBy('attribute_id');
 
@@ -243,7 +244,7 @@ class ApiController extends Controller
             'attributes' => Attribute::find($optionGroup->keys()),
             'free_delivery' => setting('free_delivery'),
             'deliveryText' => $this->deliveryText($product, setting('free_delivery')),
-            'availability' => $selectedVar->should_track ? $product->stock_count : 'In Stock',
+            'availability' => $selectedVar->should_track && ! Product::allowsOverselling() ? max(0, $selectedVar->stock_count) : 'In Stock',
             'showBrandCategory' => $showBrandCategory,
             'options' => $options,
             'maxQuantity' => $maxQuantity,
@@ -286,6 +287,7 @@ class ApiController extends Controller
         $freeDelivery = setting('free_delivery');
 
         $collection->transform(function ($product) use ($freeDelivery) {
+            $product->append('in_stock');
             $product->base_image_url = cdn($product->base_image?->src) ?? '/images/placeholder.jpg';
             $product->setAttribute('retail_price', $product->retailPrice());
             $product->setAttribute('free_delivery', $this->isFreeDeliveryProduct($product, $freeDelivery));
@@ -395,7 +397,7 @@ class ApiController extends Controller
                         'average_rating' => $averageRating,
                         'total_reviews' => $totalReviews,
                         'attributes' => [],
-                        'availability' => $product->should_track ? $product->stock_count : 'In Stock',
+                        'availability' => $product->should_track && ! Product::allowsOverselling() ? max(0, $product->stock_count) : 'In Stock',
                     ]);
                 });
         });

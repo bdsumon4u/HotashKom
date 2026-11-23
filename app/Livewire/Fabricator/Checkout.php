@@ -16,8 +16,8 @@ class Checkout extends \App\Livewire\Checkout
     {
         if (! ($row = cart($id)) && ($product = Product::find($id))) {
             ProductDetail::landing($product);
-        } elseif ($row->qty < $row->options->max || $row->options->max === -1) {
-            cart()->update($row->rowId, $row->qty + 1);
+        } elseif ($row) {
+            parent::increaseQuantity($row->rowId);
         }
         $this->cartUpdated();
     }

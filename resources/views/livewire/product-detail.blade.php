@@ -150,7 +150,7 @@
             </div>
 
             @php
-                $available = true;
+                $available = $selectedVar->in_stock;
                 $company = setting('company');
                 $phone = preg_replace('/[^\d]/', '', $company->whatsapp ?? '');
                 $phone = strlen($phone) == 11 ? '88' . $phone : $phone;
@@ -402,7 +402,7 @@
                     </div>
                 </div>
                 <div class="overflow-hidden product__actions">
-                    @php $available = true; @endphp
+                    @php $available = $selectedVar->in_stock; @endphp
                     <div class="product__buttons @if ($show_option->product_detail_buttons_inline ?? false) d-lg-inline-flex @endif w-100"
                         @if ($show_option->product_detail_buttons_inline ?? false) style="gap: .5rem;" @endif>
                         @if ($show_option->product_detail_order_now ?? false)

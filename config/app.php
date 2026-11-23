@@ -51,7 +51,7 @@ return [
     |
     */
 
-    'asset_version' => env('APP_ASSET_VERSION', '1.0.2'),
+    'asset_version' => env('APP_ASSET_VERSION', '1.0.3'),
 
     // Check: Order->adjustStock
     'orders' => [

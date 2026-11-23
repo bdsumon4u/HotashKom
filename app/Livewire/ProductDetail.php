@@ -51,6 +51,8 @@ class ProductDetail extends Component
 
         if ($variation) {
             $this->selectedVar = $variation;
+            $this->maxQuantity = $variation->purchaseQuantityLimit((int) (setting('fraud')->max_qty_per_product ?? 3));
+            $this->quantity = max(1, min($this->quantity, $this->maxQuantity));
             $this->dispatch('variantChanged', variantId: $variation->id, variantImageSrc: $variation->base_image ? asset($variation->base_image->src) : null);
         }
     }
@@ -90,7 +92,7 @@ class ProductDetail extends Component
             }
         }
         $this->options = $this->selectedVar->options->pluck('id', 'attribute_id')->toArray();
-        $this->maxQuantity = (int) $maxPerProduct;
+        $this->maxQuantity = $this->selectedVar->purchaseQuantityLimit((int) $maxPerProduct);
         $this->retailPrice = $this->selectedVar->retailPrice();
     }
 

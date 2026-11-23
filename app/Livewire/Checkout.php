@@ -242,20 +242,28 @@ class Checkout extends Component
     public function increaseQuantity($id): void
     {
         $item = cart()->get($id);
-        if ($item->qty < $item->options->max || $item->options->max === -1) {
-            $qty = $item->qty + 1;
-            $content = cart()->content();
-            $product = Product::find($item->id);
-            $item->price = $price = $product->getPrice($qty);
-            if (! isOninda() || ! config('app.resell')) {
-                $item->options['retail_price'] = $price;
-            }
-            $content->put($item->rowId, $item);
-            // session()->put(cart()->currentInstance(), $content);
+        $product = Product::find($item->id);
 
-            cart()->update($id, $item->qty + 1);
-            $this->cartUpdated();
+        $maxQuantity = $product?->purchaseQuantityLimit((int) (setting('fraud')->max_qty_per_product ?? 3)) ?? 0;
+        $totalQuantity = (int) cart()->content()->where('id', $item->id)->sum('qty');
+
+        if (! $product || $totalQuantity >= $maxQuantity) {
+            $this->dispatch('notify', ['message' => 'Available stock or the maximum purchase quantity has been reached.', 'type' => 'danger']);
+
+            return;
         }
+
+        $qty = $item->qty + 1;
+        $content = cart()->content();
+        $item->price = $price = $product->getPrice($qty);
+        $item->options['max'] = $maxQuantity;
+        if (! isOninda() || ! config('app.resell')) {
+            $item->options['retail_price'] = $price;
+        }
+        $content->put($item->rowId, $item);
+
+        cart()->update($id, $qty);
+        $this->cartUpdated();
     }
 
     public function decreaseQuantity($id): void

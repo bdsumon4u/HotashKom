@@ -89,6 +89,7 @@
         <div class="shadow-sm card rounded-0">
             <div class="p-3 card-header">
                 <h5 class="card-title">Ordered Products</h5>
+                <x-error field="products" />
             </div>
             <div class="p-3 card-body">
                 <div class="px-3 row">
@@ -131,7 +132,7 @@
                                     }
 
                                     $order->dataId = $selectedVar->id;
-                                    $order->dataMax = $selectedVar->should_track ? $selectedVar->stock_count : -1;
+                                    $order->dataMax = $selectedVar->should_track && ! \App\Models\Product::allowsOverselling() ? max(0, $selectedVar->stock_count) : -1;
 
                                     $optionGroup = $product->variations
                                         ->pluck('options')

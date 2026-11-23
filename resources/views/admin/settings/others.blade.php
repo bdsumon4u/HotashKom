@@ -249,6 +249,14 @@
                         :checked="!!($show_option->order_status_confirmation ?? false)" />
                     <label for="show-order-status-confirmation" class="my-1">Order Status Confirmation</label>
                 </div>
+                <div class="checkbox checkbox-secondary">
+                    <input type="hidden" name="show_option[allow_overselling]" value="0">
+                    <x-checkbox id="allow-overselling" name="show_option[allow_overselling]" value="1"
+                        :checked="!!old('show_option.allow_overselling', $show_option->allow_overselling ?? false)" />
+                    <label for="allow-overselling" class="my-1">Allow overselling</label>
+                    <x-error field="show_option" />
+                    <small class="d-block text-muted">Allow tracked products to be ordered beyond available stock. When disabled, cart and order quantities must fit available stock.</small>
+                </div>
             </div>
         </div>
     </div>

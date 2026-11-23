@@ -5,6 +5,9 @@
         retailDiscount: @js($retailDiscount ?? 0),
         couponDiscount: @js($coupon_discount ?? 0),
     })" class="row simple-checkout-row no-gutters">
+    @error('products')
+        <div class="col-12 text-danger mb-3" role="alert">{{ $message }}</div>
+    @enderror
     @if (session()->has('error'))
         <div class="col-12">
             <div class="py-5 text-center text-danger">

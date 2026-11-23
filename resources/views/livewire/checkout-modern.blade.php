@@ -5,6 +5,9 @@
         retailDiscount: @js($retailDiscount ?? 0),
         couponDiscount: @js($coupon_discount ?? 0),
     })" class="modern-checkout-container">
+    @error('products')
+        <div class="text-danger mb-3" role="alert">{{ $message }}</div>
+    @enderror
 
     @if (session()->has('error'))
         <div class="p-4 mb-4 text-center bg-white border rounded shadow-sm text-danger">

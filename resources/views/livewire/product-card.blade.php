@@ -72,7 +72,7 @@
             @if (!isOninda())
                 <div class="product-card__buttons">
                     @php
-                        $available = true;
+                        $available = $product->in_stock;
                         $has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1;
                     @endphp
                     @if (($show_option->product_grid_button ?? 'add_to_cart') == 'add_to_cart')
@@ -115,7 +115,7 @@
             </div>
         @endif
         @php
-            $in_stock = true;
+            $in_stock = $product->in_stock;
         @endphp
         <div class="product-card__badges-list">
             @if ($product->price != $product->selling_price)
@@ -235,7 +235,7 @@
             @if (!isOninda())
                 <div class="product-card__buttons">
                     @php
-                        $available = true;
+                        $available = $product->in_stock;
                         $has_variations = ($product->relationLoaded('variations') ? $product->variations->count() : ($product->variations_count ?? 0)) > 1;
                     @endphp
                     @if (($show_option->product_grid_button ?? false) == 'add_to_cart')

@@ -28,6 +28,16 @@ class CartController extends Controller
 
         $quantity = $request->quantity ?? 1;
         $instance = $request->instance ?? 'default';
+        $maxQuantity = $product->purchaseQuantityLimit((int) (setting('fraud')->max_qty_per_product ?? 3));
+        $existingQuantity = in_array($instance, ['kart', 'landing'], true) ? 0 : (int) Cart::instance($instance)->content()->where('id', $product->id)->sum('qty');
+        $quantity = min($quantity, max(0, $maxQuantity - $existingQuantity));
+
+        if ($quantity < 1) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This product is out of stock or its maximum cart quantity has been reached.',
+            ], 422);
+        }
 
         try {
             // Follow the HasCart trait logic but avoid problematic services
@@ -35,10 +45,6 @@ class CartController extends Controller
             if (in_array($instance, ['kart', 'landing'], true)) {
                 Cart::instance($instance)->destroy();
             }
-
-            $fraudQuantity = setting('fraud')->max_qty_per_product ?? 3;
-            $maxQuantity = (int) $fraudQuantity;
-            $quantity = min($quantity, $maxQuantity);
 
             // Use ProductResource to get proper cart item data
             $productData = (new ProductResource($product))->toCartItem($quantity);

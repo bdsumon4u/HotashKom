@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Product;
 use App\Services\DeliveryAreaService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -35,7 +36,8 @@ class ProductResource extends JsonResource
             'reviews' => 0,
             'rating' => 0,
             'attributes' => [],
-            'availability' => $this->resource->should_track ? $this->resource->stock_count : 'In Stock',
+            'in_stock' => $this->resource->in_stock,
+            'availability' => $this->resource->should_track && ! Product::allowsOverselling() ? max(0, $this->resource->stock_count) : 'In Stock',
         ]);
     }
 

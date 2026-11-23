@@ -288,7 +288,7 @@
                             } else {
                                 buttonsHTML = `
                                     <div class="product-card__buttons">
-                                        <button class="${btnPrimaryClass} product-card__addtocart" type="button"
+                                        <button class="${btnPrimaryClass} product-card__addtocart" type="button" ${product.in_stock === false ? 'disabled' : ''}
                                                 data-product-id="${productId}" data-action="add" onclick="handleAddToCart(this)">
                                             ${addToCartIcon}
                                             <span${spanClass}>${addToCartText}</span>
@@ -309,7 +309,7 @@
                             } else {
                                 buttonsHTML = `
                                     <div class="product-card__buttons">
-                                        <button class="${btnPrimaryClass} ${orderDriftClass}" type="button"
+                                        <button class="${btnPrimaryClass} ${orderDriftClass}" type="button" ${product.in_stock === false ? 'disabled' : ''}
                                                 data-product-id="${productId}" data-action="kart" onclick="handleAddToCart(this)">
                                             ${orderNowIcon}
                                             <span${spanClass}>${orderNowText}</span>

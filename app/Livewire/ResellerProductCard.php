@@ -37,7 +37,7 @@ class ResellerProductCard extends Component
     {
         $this->facebookService ??= resolve(FacebookPixelService::class);
         $maxPerProduct = setting('fraud')->max_qty_per_product ?? 3;
-        $this->maxQuantity = $this->product->should_track ? min($this->product->stock_count, $maxPerProduct) : $maxPerProduct;
+        $this->maxQuantity = $this->product->purchaseQuantityLimit((int) $maxPerProduct);
         $this->retailPrice = $this->product->retailPrice();
 
         // Set default options if product has variations
@@ -57,7 +57,7 @@ class ResellerProductCard extends Component
 
         if ($variation) {
             $this->product = $variation;
-            $this->maxQuantity = $this->product->should_track ? min($this->product->stock_count, setting('fraud')->max_qty_per_product ?? 3) : (setting('fraud')->max_qty_per_product ?? 3);
+            $this->maxQuantity = $this->product->purchaseQuantityLimit((int) (setting('fraud')->max_qty_per_product ?? 3));
             $this->retailPrice = $this->product->retailPrice();
         }
     }

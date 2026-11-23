@@ -75,7 +75,7 @@
                         if ($product->variations->isNotEmpty()) {
                             $selectedVar = $product->variations->random();
                         }
-                        $available = !$selectedVar->should_track || $selectedVar->stock_count > 0;
+                        $available = $selectedVar->in_stock;
                     @endphp
 
                     <div class="px-2 mb-2 col-lg-3 col-md-4 col-sm-6">

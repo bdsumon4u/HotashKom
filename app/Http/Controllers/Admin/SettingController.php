@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SettingRequest;
+use App\Models\Product;
 use App\Models\Setting;
 use App\Repositories\SettingRepository;
 use App\Traits\ImageUploader;
 use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use Spatie\ResponseCache\Facades\ResponseCache;
 
 class SettingController extends Controller
 {
@@ -67,7 +69,17 @@ class SettingController extends Controller
             }
         }
 
+        $oversellingChanged = $request->get('tab') === 'others'
+            && (! isset(setting('show_option')->allow_overselling) || Product::allowsOverselling() !== (bool) ($data['show_option']['allow_overselling'] ?? false));
+
         $settingRepo->setMany($data);
+
+        if ($oversellingChanged) {
+            ResponseCache::clear();
+            cacheInvalidateNamespace('api_sections');
+            cacheInvalidateNamespace('section_products');
+            cacheInvalidateNamespace('related_products');
+        }
 
         return back()->withSuccess('Settings Has Been Updated.');
     }
