@@ -1,5 +1,25 @@
+@push('styles')
+    <style>
+        @media (max-width: 767px) {
+            .cart-table--compact-mobile .cart-table__column--image {
+                padding: 8px 10px;
+            }
+
+            .cart-table--compact-mobile .cart-table__column--product {
+                padding: 6px 12px 8px;
+            }
+
+            .cart-table--compact-mobile .cart-table__column--price,
+            .cart-table--compact-mobile .cart-table__column--quantity,
+            .cart-table--compact-mobile .cart-table__column--total {
+                padding: 6px 10px;
+            }
+        }
+    </style>
+@endpush
+
 <div class="table-responsive">
-    <table class="cart__table cart-table">
+    <table class="cart__table cart-table cart-table--compact-mobile">
         <thead class="cart-table__head">
             <tr class="cart-table__row">
                 <th class="cart-table__column cart-table__column--image">Image</th>

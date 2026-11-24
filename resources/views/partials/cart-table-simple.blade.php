@@ -83,8 +83,11 @@
         @forelse (cart()->content() as $product)
             <div class="card mb-3 border shadow-sm" data-id="{{ $product->id }}">
                 <div class="card-body p-3">
-                    <div class="d-flex position-relative mb-2">
-                        <div class="w-100 text-center font-weight-semibold text-secondary px-4" style="font-size: 16px;">
+                    <div class="d-flex align-items-center position-relative mb-2">
+                        <div class="mr-3 simple-cart-thumb flex-shrink-0">
+                            <img src="{{ storage_url($product->options->image) }}" alt="{{ $product->name }}" width="60" height="60" loading="lazy">
+                        </div>
+                        <div class="flex-grow-1 text-left font-weight-semibold text-secondary pr-4" style="font-size: 16px; min-width: 0; overflow-wrap: anywhere;">
                             {{ $product->name }}
                         </div>
                         <button type="button"
