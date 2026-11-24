@@ -161,10 +161,11 @@
 
                 <div class="simple-submit-wrapper">
                     <button type="button"
+                        id="simple-checkout-confirm-top"
                         place-order
                         wire:click="checkout"
                         wire:loading.attr="disabled"
-                        class="btn btn-block simple-submit-btn">
+                        class="btn btn-block simple-submit-btn simple-submit-btn--top">
                         {{ setting('show_option')->checkout_button_text ?? 'অর্ডার কনফার্ম করুন' }}
                     </button>
                 </div>
@@ -329,6 +330,16 @@
                             </span>
                         </div>
                     @endif
+                </div>
+                <div class="d-md-none">
+                    <button type="button"
+                        id="simple-checkout-confirm-bottom"
+                        place-order
+                        wire:click="checkout"
+                        wire:loading.attr="disabled"
+                        class="btn btn-block simple-submit-btn simple-submit-btn--bottom">
+                        {{ setting('show_option')->checkout_button_text ?? 'অর্ডার কনফার্ম করুন' }}
+                    </button>
                 </div>
             </div>
         </div>

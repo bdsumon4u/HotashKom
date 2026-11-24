@@ -145,6 +145,11 @@
         color: #ffffff;
     }
 
+    .simple-submit-btn--bottom {
+        display: none;
+        margin-top: 16px;
+    }
+
     @keyframes simplePulse {
         0% {
             transform: scale(1);
