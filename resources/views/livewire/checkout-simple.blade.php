@@ -160,14 +160,26 @@
                 </div>
 
                 <div class="simple-submit-wrapper">
-                    <button type="button"
-                        id="simple-checkout-confirm-top"
-                        place-order
-                        wire:click="checkout"
-                        wire:loading.attr="disabled"
-                        class="btn btn-block simple-submit-btn simple-submit-btn--top">
-                        {{ setting('show_option')->checkout_button_text ?? 'অর্ডার কনফার্ম করুন' }}
-                    </button>
+                    <div class="d-none d-md-block">
+                        <button type="button"
+                            id="simple-checkout-confirm-desktop"
+                            place-order
+                            wire:click="checkout"
+                            wire:loading.attr="disabled"
+                            class="btn btn-block simple-submit-btn simple-submit-btn--desktop">
+                            {{ setting('show_option')->checkout_button_text ?? 'অর্ডার কনফার্ম করুন' }}
+                        </button>
+                    </div>
+                    <div class="d-md-none">
+                        <button type="button"
+                            id="simple-checkout-confirm-top"
+                            place-order
+                            wire:click="checkout"
+                            wire:loading.attr="disabled"
+                            class="btn btn-block simple-submit-btn simple-submit-btn--top simple-submit-btn--mobile-top">
+                            {{ setting('show_option')->checkout_button_text ?? 'অর্ডার কনফার্ম করুন' }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -337,7 +349,7 @@
                         place-order
                         wire:click="checkout"
                         wire:loading.attr="disabled"
-                        class="btn btn-block simple-submit-btn simple-submit-btn--bottom">
+                        class="btn btn-block simple-submit-btn simple-submit-btn--bottom simple-submit-btn--mobile-bottom">
                         {{ setting('show_option')->checkout_button_text ?? 'অর্ডার কনফার্ম করুন' }}
                     </button>
                 </div>
