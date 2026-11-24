@@ -15,7 +15,6 @@ use App\Services\DeliveryAreaService;
 use App\Services\FacebookPixelService;
 use App\Services\UtmTrackingService;
 use App\Traits\ResolvesPackagingCharge;
-use Azmolla\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
@@ -90,9 +89,7 @@ class Checkout extends Component
 
     public function hydrate(): void
     {
-        if (session('kart') !== 'kart' && Cart::instance('default')->count() === 0 && Cart::instance('kart')->count() > 0) {
-            session(['kart' => 'kart']);
-        }
+        checkoutCart();
 
         if (app()->environment('local') && request()->has('calls')) {
             logger()->debug('Checkout Livewire call queue', [
@@ -347,9 +344,7 @@ class Checkout extends Component
 
     public function mount(): void
     {
-        if (session('kart') !== 'kart' && Cart::instance('default')->count() === 0 && Cart::instance('kart')->count() > 0) {
-            session(['kart' => 'kart']);
-        }
+        checkoutCart();
 
         if (isOninda() && auth('user')->guest()) {
             $this->redirect(route('user.login'), navigate: true);
@@ -398,9 +393,7 @@ class Checkout extends Component
 
     public function checkout()
     {
-        if (session('kart') !== 'kart' && Cart::instance('default')->count() === 0 && Cart::instance('kart')->count() > 0) {
-            session(['kart' => 'kart']);
-        }
+        checkoutCart();
 
         if (! ($hidePrefix = setting('show_option')->hide_phone_prefix ?? false)) {
             if (Str::startsWith($this->phone, '01')) {

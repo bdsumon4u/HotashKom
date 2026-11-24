@@ -12,6 +12,8 @@ trait HasCart
 {
     public function addToKart(Product $product, int $quantity = 1, string $instance = 'default', $retailPrice = null)
     {
+        $redirectToCheckout = $instance !== 'default' && $instance !== 'landing';
+        $instance = resolveShoppingCartInstance($instance);
         $product->refresh();
 
         if (! ($product->parent ?? $product)->is_active) {
@@ -41,13 +43,26 @@ trait HasCart
         $productData['max'] = $maxQuantity;
         $productData['retail_price'] = $retailPrice;
 
-        cart()->instance($instance)->add(
-            $product->id,
-            $product->varName,
-            $quantity,
-            $productData['price'], // this is the wholesale price
-            $productData
-        );
+        $matchingItems = $cart->content()->where('id', $product->id);
+
+        if (! orderNowIsOnetime() && $instance === 'default' && $matchingItems->isNotEmpty()) {
+            $existingItem = $matchingItems->first();
+            foreach ($matchingItems->slice(1) as $duplicate) {
+                $cart->remove($duplicate->rowId);
+            }
+            $cart->update($existingItem->rowId, [
+                'qty' => $existingQuantity + $quantity,
+                'price' => $product->getPrice($existingQuantity + $quantity),
+            ]);
+        } else {
+            $cart->add(
+                $product->id,
+                $product->varName,
+                $quantity,
+                $productData['price'],
+                $productData
+            );
+        }
 
         storeOrUpdateCart();
 
@@ -84,7 +99,7 @@ trait HasCart
         $this->dispatch('cartUpdated');
         $this->dispatch('notify', ['message' => 'Product added to cart']);
 
-        if ($instance !== 'default' && $instance !== 'landing') {
+        if ($redirectToCheckout) {
             return to_route('checkout');
         }
     }

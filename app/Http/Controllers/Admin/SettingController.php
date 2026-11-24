@@ -71,10 +71,12 @@ class SettingController extends Controller
 
         $oversellingChanged = $request->get('tab') === 'others'
             && (! isset(setting('show_option')->allow_overselling) || Product::allowsOverselling() !== (bool) ($data['show_option']['allow_overselling'] ?? false));
+        $orderNowModeChanged = $request->get('tab') === 'others'
+            && orderNowIsOnetime() !== (bool) ($data['show_option']['ordernow_is_onetime'] ?? true);
 
         $settingRepo->setMany($data);
 
-        if ($oversellingChanged) {
+        if ($oversellingChanged || $orderNowModeChanged) {
             ResponseCache::clear();
             cacheInvalidateNamespace('api_sections');
             cacheInvalidateNamespace('section_products');

@@ -117,6 +117,9 @@ class SettingRequest extends FormRequest
                 if (is_array($value) && array_key_exists('allow_overselling', $value) && ! in_array($value['allow_overselling'], [true, false, 0, 1, '0', '1'], true)) {
                     $fail('Allow overselling must be enabled or disabled.');
                 }
+                if (is_array($value) && array_key_exists('ordernow_is_onetime', $value) && ! in_array($value['ordernow_is_onetime'], [true, false, 0, 1, '0', '1'], true)) {
+                    $fail('Order Now is one-time must be enabled or disabled.');
+                }
             }],
             'discount_text' => 'nullable',
             'services' => 'required|array',

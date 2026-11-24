@@ -24,6 +24,13 @@
                     <x-input name="show_option[order_now_text]" id="show_option-order_now_text" :value="$show_option->order_now_text ?? ''" />
                     <x-error field="show_option.order_now_text" />
                 </div>
+                <div class="col-12 mt-2 checkbox checkbox-secondary">
+                    <input type="hidden" name="show_option[ordernow_is_onetime]" value="0">
+                    <x-checkbox id="ordernow-is-onetime" name="show_option[ordernow_is_onetime]" value="1"
+                        :checked="!!old('show_option.ordernow_is_onetime', $show_option->ordernow_is_onetime ?? true)" />
+                    <label for="ordernow-is-onetime" class="my-1">Order Now is one-time</label>
+                    <small class="d-block text-muted">Enabled: Order Now uses a separate single-product cart. Disabled: it adds to the regular cart, keeps existing products, and retains the cart when you leave checkout.</small>
+                </div>
             </div>
             <div class="py-2 row borderr">
                 <div class="col-6">

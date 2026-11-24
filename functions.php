@@ -568,12 +568,34 @@ function longCookie($field, $value)
     }
 }
 
+function orderNowIsOnetime(): bool
+{
+    return (bool) (setting('show_option')->ordernow_is_onetime ?? true);
+}
+
+function resolveShoppingCartInstance(string $instance): string
+{
+    return $instance === 'kart' && ! orderNowIsOnetime() ? 'default' : $instance;
+}
+
+function checkoutCart(): CartInstance
+{
+    if (orderNowIsOnetime() && session('kart') !== 'kart' && Cart::instance('default')->count() === 0 && Cart::instance('kart')->count() > 0) {
+        session(['kart' => 'kart']);
+    }
+
+    return cart();
+}
+
 function cart($id = null): CartInstance|CartItem|null
 {
-    $instance = session('kart', 'default');
+    $instance = resolveShoppingCartInstance(session('kart', 'default'));
+    if ($instance !== session('kart', 'default')) {
+        session(['kart' => $instance]);
+    }
 
     if ($instance === 'default' && Cart::instance('default')->count() === 0) {
-        if (Cart::instance('kart')->count() > 0) {
+        if (orderNowIsOnetime() && Cart::instance('kart')->count() > 0) {
             $instance = 'kart';
             session(['kart' => 'kart']);
         } elseif (Cart::instance('landing')->count() > 0) {

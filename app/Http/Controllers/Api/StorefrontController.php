@@ -38,6 +38,7 @@ class StorefrontController extends Controller
         $settings = collect($settingsArray)->only($keys)->toArray();
         $settings['pixel_ids'] = implode(' ', app(FacebookPixelService::class)->getPixelIds());
         $settings['allow_overselling'] = Product::allowsOverselling();
+        $settings['ordernow_is_onetime'] = orderNowIsOnetime();
 
         return response()->json([
             'data' => $settings,

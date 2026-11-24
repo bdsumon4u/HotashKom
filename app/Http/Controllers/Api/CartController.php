@@ -27,7 +27,7 @@ class CartController extends Controller
         }
 
         $quantity = $request->quantity ?? 1;
-        $instance = $request->instance ?? 'default';
+        $instance = resolveShoppingCartInstance($request->instance ?? 'default');
         $maxQuantity = $product->purchaseQuantityLimit((int) (setting('fraud')->max_qty_per_product ?? 3));
         $existingQuantity = in_array($instance, ['kart', 'landing'], true) ? 0 : (int) Cart::instance($instance)->content()->where('id', $product->id)->sum('qty');
         $quantity = min($quantity, max(0, $maxQuantity - $existingQuantity));
@@ -51,13 +51,27 @@ class CartController extends Controller
             $productData['max'] = $maxQuantity;
             $productData['retail_price'] = $product->getPrice($quantity);
 
-            cart()->instance($instance)->add(
-                $product->id,
-                $product->varName,
-                $quantity,
-                $productData['price'], // this is the wholesale price
-                $productData
-            );
+            $cart = Cart::instance($instance);
+            $matchingItems = $cart->content()->where('id', $product->id);
+
+            if (! orderNowIsOnetime() && $instance === 'default' && $matchingItems->isNotEmpty()) {
+                $existingItem = $matchingItems->first();
+                foreach ($matchingItems->slice(1) as $duplicate) {
+                    $cart->remove($duplicate->rowId);
+                }
+                $cart->update($existingItem->rowId, [
+                    'qty' => $existingQuantity + $quantity,
+                    'price' => $product->getPrice($existingQuantity + $quantity),
+                ]);
+            } else {
+                $cart->add(
+                    $product->id,
+                    $product->varName,
+                    $quantity,
+                    $productData['price'],
+                    $productData
+                );
+            }
 
             // Store cart in session
             storeOrUpdateCart();
@@ -84,7 +98,7 @@ class CartController extends Controller
 
     public function get(Request $request)
     {
-        $instance = $request->get('instance', 'default');
+        $instance = resolveShoppingCartInstance($request->get('instance', 'default'));
 
         return response()->json([
             'success' => true,
