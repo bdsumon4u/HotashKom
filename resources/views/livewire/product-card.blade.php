@@ -1,3 +1,4 @@
+<div class="product-card" data-id="{{ $product->id }}" data-max="-1">
 @if (isGbazTheme())
     @php
         $show_option = setting('show_option');
@@ -15,7 +16,6 @@
         $orderNowIcon = ! empty(trim($show_option->order_now_icon ?? '')) ? $show_option->order_now_icon : '<i class="fas fa-shopping-cart"></i>';
         $orderNowText = ! empty(trim($show_option->order_now_text ?? '')) ? $show_option->order_now_text : 'Add To Cart';
     @endphp
-    <div class="product-card" data-id="{{ $product->id }}" data-max="-1">
         <div class="product-card__badges-list">
             @if ($hasDiscount && $percent > 0)
                 <span class="gb-badge-save">Save {{ $percent }}%</span>
@@ -105,10 +105,7 @@
                 </div>
             @endif
         </div>
-    </div>
 @else
-    <div class="product-card" data-id="{{ $product->id }}"
-        data-max="-1">
         @if ($is_free_delivery)
             <div class="product-card__ribbon">
                 <span class="badge badge--free-delivery">Free Delivery</span>
@@ -269,5 +266,5 @@
                 </div>
             @endif
         </div>
-    </div>
 @endif
+</div>
