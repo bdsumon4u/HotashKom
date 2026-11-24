@@ -723,7 +723,7 @@
                                 ?? null;
                             $mainProductImgUrl = $rawBaseImg ? asset($rawBaseImg) : $placeholderSvg;
                         @endphp
-                        <div class="xzoom-container d-flex @unless(config('app.vertical_image_gallery')) flex-column @endunless">
+                        <div class="xzoom-container d-flex @if(config('app.vertical_image_gallery')) align-items-start @else flex-column @endif">
                             <div class="original">
                                 <img class="xzoom" id="xzoom-default" src="{{ $mainProductImgUrl }}"
                                     xoriginal="{{ $mainProductImgUrl }}"
@@ -792,7 +792,7 @@
             <div class="container">
                 <div class="product product--layout--standard" data-layout="standard">
                     <div class="product__content">
-                        <div class="xzoom-container d-flex @unless(config('app.vertical_image_gallery')) flex-column @endunless">
+                        <div class="xzoom-container d-flex @if(config('app.vertical_image_gallery')) align-items-start @else flex-column @endif">
                             <div class="original">
                                 <img class="xzoom" id="xzoom-default" src="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}"
                                     xoriginal="{{ asset($product->base_image?->src ?? 'images/placeholder.jpg') }}" />
