@@ -46,11 +46,13 @@ class StoreLandingPageProRequest extends FormRequest
             'section_settings.*' => ['nullable'],
             'section_settings.order_form.conditional_pricing_enabled' => ['sometimes', 'boolean'],
             'section_settings.order_form.conditional_rules' => [Rule::requiredIf($hasConditionalPricing), 'array', $hasConditionalPricing ? 'min:1' : 'min:0', 'max:30'],
-            'section_settings.order_form.conditional_rules.*' => ['required', 'array:name,total_price,requirements'],
+            'section_settings.order_form.conditional_rules.*' => ['required', 'array:name,total_price,requirements,scope,min_quantity'],
+            'section_settings.order_form.conditional_rules.*.scope' => ['sometimes', Rule::in(['products', 'any'])],
+            'section_settings.order_form.conditional_rules.*.min_quantity' => ['exclude_unless:section_settings.order_form.conditional_rules.*.scope,any', 'required', 'integer', 'min:1', 'max:100'],
             'section_settings.order_form.conditional_rules.*.name' => ['nullable', 'string', 'max:100'],
             'section_settings.order_form.conditional_rules.*.total_price' => ['required', 'integer', 'min:1', 'max:10000000'],
             'section_settings.order_form.conditional_rules.*.requirements' => [
-                'required', 'array', 'min:1', 'max:10',
+                'exclude_if:section_settings.order_form.conditional_rules.*.scope,any', 'required', 'array', 'min:1', 'max:10',
                 function (string $attribute, mixed $value, \Closure $fail): void {
                     if (is_array($value) && collect($value)->pluck('product_id')->filter(fn ($id): bool => is_scalar($id))->map(fn ($id): string => (string) $id)->duplicates()->isNotEmpty()) {
                         $fail('Select each product only once within an offer. Combine its quantity into one condition.');
@@ -108,6 +110,7 @@ class StoreLandingPageProRequest extends FormRequest
             'section_settings.order_form.conditional_rules.*.requirements.*.product_id.required' => 'Choose a product for every offer condition.',
             'section_settings.order_form.conditional_rules.*.requirements.*.product_id.in' => 'Every offer product must be selected and shown on this landing page. Update its conditions or disable conditional pricing.',
             'section_settings.order_form.conditional_rules.*.requirements.*.min_quantity.required' => 'Enter the minimum pieces for every offer condition.',
+            'section_settings.order_form.conditional_rules.*.min_quantity.required' => 'Enter the minimum total pieces for each Any products offer.',
             'slug.regex' => 'The link field may only contain letters, numbers, and hyphens. No spaces or special characters are allowed.',
             'items.required' => 'Please select at least one product or variation for this landing page.',
             'items.*.product_id.distinct' => 'Each product/variation can only be selected once.',
@@ -159,6 +162,21 @@ class StoreLandingPageProRequest extends FormRequest
 
         $normalized['order_form']['conditional_pricing_enabled'] = filter_var(data_get($raw, 'order_form.conditional_pricing_enabled', false), FILTER_VALIDATE_BOOL);
         $normalized['order_form']['conditional_rules'] = data_get($raw, 'order_form.conditional_rules', []);
+
+        if (is_array($normalized['order_form']['conditional_rules'])) {
+            $normalized['order_form']['conditional_rules'] = array_map(function (mixed $rule): mixed {
+                if (! is_array($rule)) {
+                    return $rule;
+                }
+                if (($rule['scope'] ?? 'products') === 'any') {
+                    unset($rule['requirements']);
+                } else {
+                    unset($rule['min_quantity']);
+                }
+
+                return $rule;
+            }, $normalized['order_form']['conditional_rules']);
+        }
 
         $normalized['phone'] = filled(data_get($raw, 'phone')) ? trim((string) data_get($raw, 'phone')) : null;
         $normalized['whatsapp'] = filled(data_get($raw, 'whatsapp')) ? trim((string) data_get($raw, 'whatsapp')) : null;

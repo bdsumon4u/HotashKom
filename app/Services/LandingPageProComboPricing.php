@@ -5,7 +5,7 @@ namespace App\Services;
 class LandingPageProComboPricing
 {
     /**
-     * @param  array<int, array{name: string, total_price: int, requirements: array<int, array{product_id: int, min_quantity: int}>}>  $rules
+     * @param  array<int, array{name: string, scope?: string, total_price: int, min_quantity?: int, requirements: array<int, array{product_id: int, min_quantity: int}>}>  $rules
      * @param  array<int, array{parent_id: int, quantity: int, price: int|float}>  $items
      * @return array{subtotal: float, applied_rules: array<int, array{name: string, applications: int, quantity: int, total: float}>}
      */
@@ -18,6 +18,21 @@ class LandingPageProComboPricing
             $productId = (int) $item['parent_id'];
             $quantities[$productId] = ($quantities[$productId] ?? 0) + $item['quantity'];
             $catalogTotals[$productId] = ($catalogTotals[$productId] ?? 0) + $item['price'] * $item['quantity'];
+        }
+
+        $totalQuantity = array_sum($quantities);
+        $anyProductRule = collect($rules)
+            ->filter(fn (array $rule): bool => ($rule['scope'] ?? 'products') === 'any' && $rule['min_quantity'] <= $totalQuantity)
+            ->sortByDesc('min_quantity')
+            ->first();
+
+        if ($anyProductRule) {
+            $total = $anyProductRule['total_price'] * $totalQuantity / $anyProductRule['min_quantity'];
+
+            return [
+                'subtotal' => round($total),
+                'applied_rules' => [['name' => $anyProductRule['name'], 'applications' => 1, 'quantity' => $totalQuantity, 'total' => (float) $total]],
+            ];
         }
 
         $remaining = $quantities;

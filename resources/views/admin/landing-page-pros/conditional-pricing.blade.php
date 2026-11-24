@@ -3,12 +3,13 @@
     <label class="d-block">
         <input type="hidden" name="section_settings[order_form][conditional_pricing_enabled]" value="0">
         <input type="checkbox" name="section_settings[order_form][conditional_pricing_enabled]" value="1"
-            x-model="conditionalPricingEnabled"> Enable product and mixed-combo offers
+            x-model="conditionalPricingEnabled"> Enable combo offers
     </label>
-    <p class="text-muted">Colors and sizes of the same product count together. Enable these offers to set product-specific and mixed-combo prices. Otherwise regular catalog prices apply.</p>
+    <p class="text-muted">Offer prices for specific products, mixed combos, or any products together. All colors and sizes count. Otherwise regular catalog prices apply.</p>
     <div x-show="conditionalPricingEnabled" x-cloak>
         <details class="p-2 mb-2 lp-combo-help rounded">
             <summary>How combo pricing works</summary>
+            <p class="mb-2"><strong>Any products:</strong> count pieces across every product on this page. The highest qualifying minimum sets the per-piece rate for the entire order. Example: 2 pieces for ৳1,690, or 3 pieces for ৳2,490. This takes priority over specific-product offers when eligible; otherwise those offers apply.</p>
             <p class="mb-2"><strong>Product offer:</strong> choose one product, its minimum pieces, and the total for that quantity. The highest qualifying minimum sets the per-piece rate.</p>
             <p class="mb-2"><strong>Mixed combo:</strong> add two or more product conditions. The total is for one complete set, which repeats as many times as possible.</p>
             <p class="mb-0">Larger mixed sets apply first; ties use the order below. Pieces are used once. Extras then use their product offer, or regular catalog prices if no product offer qualifies. Delivery is separate and the final subtotal is rounded to the nearest taka.</p>
@@ -33,23 +34,42 @@
                     </div>
                     <div class="lp-combo-fields mb-2">
                         <div>
+                            <label :for="'offer-scope-' + rule.key">Offer applies to</label>
+                            <select :id="'offer-scope-' + rule.key" class="form-control" x-model="rule.scope"
+                                @change="ensureConditionalRequirements(rule)"
+                                :name="`section_settings[order_form][conditional_rules][${ruleIndex}][scope]`">
+                                <option value="products">Specific products / mixed combo</option>
+                                <option value="any">Any products (mix & match)</option>
+                            </select>
+                        </div>
+                        <div x-show="rule.scope === 'any'">
+                            <label :for="'offer-any-minimum-' + rule.key">Min. total pieces</label>
+                            <input type="number" :id="'offer-any-minimum-' + rule.key" class="form-control" min="1" max="100" step="1"
+                                x-model.number="rule.min_quantity" :disabled="rule.scope !== 'any'"
+                                :name="`section_settings[order_form][conditional_rules][${ruleIndex}][min_quantity]`">
+                        </div>
+                    </div>
+                    <div class="lp-combo-fields mb-2">
+                        <div>
                             <label :for="'offer-name-' + rule.key">Offer name (optional)</label>
                             <input type="text" :id="'offer-name-' + rule.key" class="form-control" maxlength="100"
                                 placeholder="e.g. Shirt + pant combo" x-model="rule.name"
                                 :name="`section_settings[order_form][conditional_rules][${ruleIndex}][name]`">
                         </div>
                         <div>
-                            <label :for="'offer-total-' + rule.key" x-text="rule.requirements.length > 1 ? 'Combo total (৳)' : 'Tier total (৳)'"></label>
+                            <label :for="'offer-total-' + rule.key" x-text="rule.scope !== 'any' && rule.requirements.length > 1 ? 'Combo total (৳)' : 'Tier total (৳)'"></label>
                             <input type="number" :id="'offer-total-' + rule.key" class="form-control" :min="conditionalPricingEnabled ? 1 : null" :max="conditionalPricingEnabled ? 10000000 : null" step="1"
                                 x-model.number="rule.total_price" placeholder="e.g. 1490"
                                 :name="`section_settings[order_form][conditional_rules][${ruleIndex}][total_price]`">
                         </div>
                     </div>
+                    <p class="text-muted mb-2" x-show="rule.scope === 'any'">No product selection needed. All products, colors and sizes on this page count toward the minimum. This total sets the per-piece rate until a higher tier applies. Totals are rounded to the nearest taka.</p>
+                    <div x-show="rule.scope !== 'any'">
                     <template x-for="(requirement, conditionIndex) in rule.requirements" :key="requirement.key">
                         <div class="lp-combo-condition mb-2">
                             <div class="lp-combo-condition-product">
                                 <label :for="'offer-product-' + requirement.key">Product</label>
-                                <select :id="'offer-product-' + requirement.key" class="form-control" x-model.number="requirement.product_id"
+                                <select :id="'offer-product-' + requirement.key" class="form-control" x-model.number="requirement.product_id" :disabled="rule.scope === 'any'"
                                     x-effect="syncConditionalProductSelect($el, requirement.product_id, campaignProducts)"
                                     :name="`section_settings[order_form][conditional_rules][${ruleIndex}][requirements][${conditionIndex}][product_id]`">
                                     <option value="">Choose product</option>
@@ -62,7 +82,7 @@
                             </div>
                             <div class="lp-combo-condition-quantity">
                                 <label :for="'offer-minimum-' + requirement.key">Min. pieces</label>
-                                <input type="number" :id="'offer-minimum-' + requirement.key" class="form-control" :min="conditionalPricingEnabled ? 1 : null" :max="conditionalPricingEnabled ? 100 : null" step="1"
+                                <input type="number" :id="'offer-minimum-' + requirement.key" class="form-control" :min="conditionalPricingEnabled ? 1 : null" :max="conditionalPricingEnabled ? 100 : null" step="1" :disabled="rule.scope === 'any'"
                                     x-model.number="requirement.min_quantity"
                                     :name="`section_settings[order_form][conditional_rules][${ruleIndex}][requirements][${conditionIndex}][min_quantity]`">
                             </div>
@@ -74,6 +94,7 @@
                     </template>
                     <button type="button" class="btn btn-sm btn-outline-secondary" @click="addConditionalRequirement(rule)"
                         :disabled="rule.requirements.length >= 10 || rule.requirements.length >= campaignProducts.length">Add product</button>
+                    </div>
                 </details>
             </template>
         </div>

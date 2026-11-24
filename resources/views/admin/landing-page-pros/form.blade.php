@@ -768,7 +768,7 @@
                 init() {
                     this.items = this.items.filter(item => item.product_id).map(item => ({...item, key: ++this.nextKey}));
                     this.conditionalRules = this.conditionalRules.map(rule => ({
-                        ...rule, key: ++this.nextKey,
+                        ...rule, scope: rule.scope || 'products', min_quantity: rule.min_quantity || 1, key: ++this.nextKey,
                         requirements: (rule.requirements || []).map(requirement => ({...requirement, key: ++this.nextKey})),
                     }));
                     Object.keys(this.contentRows).forEach(section => {
@@ -851,7 +851,7 @@
                 },
 
                 conditionalRuleDescription(rule) {
-                    const conditions = rule.requirements.map(requirement =>
+                    const conditions = rule.scope === 'any' ? (rule.min_quantity || '…') + '+ pieces, any products' : rule.requirements.map(requirement =>
                         (requirement.min_quantity || '…') + ' × ' + (this.productFor(requirement).label || 'Choose product')
                     ).join(' + ');
                     return (rule.name ? rule.name + ': ' : '') + conditions + ' → ৳' + (rule.total_price || '…');
@@ -863,9 +863,15 @@
                     });
                 },
 
+                ensureConditionalRequirements(rule) {
+                    if (rule.scope !== 'any' && !rule.requirements.length) {
+                        this.addConditionalRequirement(rule);
+                    }
+                },
+
                 addConditionalRule() {
                     if (this.conditionalRules.length >= 30) { return; }
-                    this.conditionalRules.push({key: ++this.nextKey, name: '', total_price: '', requirements: [
+                    this.conditionalRules.push({key: ++this.nextKey, name: '', scope: 'products', min_quantity: 1, total_price: '', requirements: [
                         {key: ++this.nextKey, product_id: '', min_quantity: 1},
                     ]});
                     this.$nextTick(() => {

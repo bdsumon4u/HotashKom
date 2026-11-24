@@ -47,7 +47,7 @@ class LandingPagePro extends Model
     }
 
     /**
-     * @return array<int, array{name: string, total_price: int, requirements: array<int, array{product_id: int, min_quantity: int}>}>
+     * @return array<int, array{name: string, scope: string, total_price: int, min_quantity?: int, requirements: array<int, array{product_id: int, min_quantity: int}>}>
      */
     public function conditionalPricingRules(): array
     {
@@ -55,6 +55,25 @@ class LandingPagePro extends Model
 
         foreach (array_values((array) data_get($this->section_settings, 'order_form.conditional_rules', [])) as $index => $rule) {
             if (! is_array($rule) || ! is_numeric($rule['total_price'] ?? null) || $rule['total_price'] < 1 || $rule['total_price'] > 10000000) {
+                continue;
+            }
+
+            $scope = $rule['scope'] ?? 'products';
+            if (! in_array($scope, ['products', 'any'], true)) {
+                continue;
+            }
+            if ($scope === 'any') {
+                if (! is_numeric($rule['min_quantity'] ?? null) || $rule['min_quantity'] < 1 || $rule['min_quantity'] > 100) {
+                    continue;
+                }
+                $rules[] = [
+                    'name' => filled($rule['name'] ?? null) ? (string) $rule['name'] : 'Offer '.($index + 1),
+                    'scope' => 'any',
+                    'min_quantity' => (int) $rule['min_quantity'],
+                    'total_price' => (int) $rule['total_price'],
+                    'requirements' => [],
+                ];
+
                 continue;
             }
 
@@ -79,6 +98,7 @@ class LandingPagePro extends Model
 
             $rules[] = [
                 'name' => filled($rule['name'] ?? null) ? (string) $rule['name'] : 'Offer '.($index + 1),
+                'scope' => 'products',
                 'total_price' => (int) $rule['total_price'],
                 'requirements' => $normalizedRequirements,
             ];

@@ -14,10 +14,10 @@
                         <div class="p-3 text-sm bg-green-50 border border-green-200 rounded">
                             <p class="font-bold text-green-900" x-text="rule.name"></p>
                             <p class="text-gray-700" x-text="conditionalRuleLabel(rule) + ' = ' + rule.total_price + '৳'"></p>
-                            <p x-show="rule.requirements.length === 1" class="text-xs text-gray-600">ন্যূনতম পরিমাণ পূরণ হলে এই হারে প্রতি পিসের মূল্য প্রযোজ্য।</p>
+                            <p x-show="rule.scope === 'any' || rule.requirements.length === 1" class="text-xs text-gray-600">ন্যূনতম পরিমাণ পূরণ হলে এই হারে প্রতি পিসের মূল্য প্রযোজ্য।</p>
                         </div>
                     </template>
-                    <p class="text-xs text-gray-600">সব কালার ও সাইজ মিলিয়ে পরিমাণ গণনা হবে। বড় কম্বো আগে যোগ হবে। সম্পূর্ণ কম্বোর বাইরে অতিরিক্ত পণ্যে আলাদা পণ্যের অফার অথবা নিয়মিত মূল্য প্রযোজ্য।</p>
+                    <p class="text-xs text-gray-600">সব কালার ও সাইজ মিলিয়ে পরিমাণ গণনা হবে। যেকোনো পণ্যের অফার পূরণ হলে সর্বোচ্চ ন্যূনতম পরিমাণের অফার পুরো অর্ডারে প্রযোজ্য। নইলে বড় কম্বো আগে যোগ হবে। সম্পূর্ণ কম্বোর বাইরে অতিরিক্ত পণ্যে আলাদা পণ্যের অফার অথবা নিয়মিত মূল্য প্রযোজ্য।</p>
                 </div>
 
                 <div class="grid gap-4" :class="products.length > 4 ? 'md:grid-cols-2' : ''">

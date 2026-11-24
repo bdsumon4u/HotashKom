@@ -738,6 +738,7 @@
                 },
 
                 conditionalRuleLabel(rule) {
+                    if (rule.scope === 'any') { return rule.min_quantity + '+ পিস (যেকোনো পণ্য)'; }
                     return rule.requirements.map(requirement =>
                         requirement.min_quantity + ' × ' + (this.conditionalProductLabels[requirement.product_id] || 'পণ্য')
                     ).join(' + ');
@@ -751,6 +752,16 @@
                         quantities[id] = (quantities[id] || 0) + Number(item.qty);
                         catalogTotals[id] = (catalogTotals[id] || 0) + Number(item.price) * Number(item.qty);
                     });
+                    const totalQuantity = Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
+                    const anyProductRule = this.conditionalPricingRules.reduce((selectedRule, rule) =>
+                        rule.scope === 'any' && rule.min_quantity <= totalQuantity
+                            && (!selectedRule || rule.min_quantity > selectedRule.min_quantity) ? rule : selectedRule, null);
+                    if (anyProductRule) {
+                        const total = anyProductRule.total_price * totalQuantity / anyProductRule.min_quantity;
+                        return {subtotal: Math.round(total), applied_rules: [
+                            {name: anyProductRule.name, applications: 1, quantity: totalQuantity, total},
+                        ]};
+                    }
                     const remaining = {...quantities};
                     let subtotal = 0;
                     const appliedRules = [];
