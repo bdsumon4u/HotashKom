@@ -8,7 +8,6 @@ use App\Models\Account;
 use App\Models\Product;
 use App\Services\AccountingService;
 use App\Services\ProductStockService;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -182,17 +181,17 @@ class CourierReturnCreate extends Component
         return max(0, (float) ($this->return_charge ?? 0));
     }
 
-    public function save(AccountingService $accountingService, ProductStockService $productStockService): ?RedirectResponse
+    public function save(AccountingService $accountingService, ProductStockService $productStockService): void
     {
         $this->validate();
 
         if ($this->return_charge_amount > 0 && ! $this->paid_from_account_id) {
             $this->addError('paid_from_account_id', 'Please select the payment account for the return fee.');
 
-            return null;
+            return;
         }
 
-        return DB::transaction(function () use ($accountingService, $productStockService): RedirectResponse {
+        DB::transaction(function () use ($accountingService, $productStockService): void {
             $totalCost = $this->final_purchase_cost;
             $details = [];
             $stockChanges = [];
@@ -235,8 +234,9 @@ class CourierReturnCreate extends Component
                 )
             );
 
-            return to_route('admin.reports.return');
         });
+
+        $this->redirectRoute('admin.reports.return');
     }
 
     public function render()

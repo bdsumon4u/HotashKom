@@ -7,7 +7,6 @@ namespace App\Livewire\Admin;
 use App\Models\Product;
 use App\Services\AccountingService;
 use App\Services\ProductStockService;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -148,11 +147,11 @@ class ShipmentCreate extends Component
         );
     }
 
-    public function save(AccountingService $accountingService, ProductStockService $productStockService): RedirectResponse
+    public function save(AccountingService $accountingService, ProductStockService $productStockService): void
     {
         $this->validate();
 
-        return DB::transaction(function () use ($accountingService, $productStockService): RedirectResponse {
+        DB::transaction(function () use ($accountingService, $productStockService): void {
             $totalCost = $this->total_purchase_cost;
             $details = [];
             $stockChanges = [];
@@ -193,8 +192,9 @@ class ShipmentCreate extends Component
                 )
             );
 
-            return to_route('admin.accounting.transactions.index');
         });
+
+        $this->redirectRoute('admin.accounting.transactions.index');
     }
 
     public function render()
