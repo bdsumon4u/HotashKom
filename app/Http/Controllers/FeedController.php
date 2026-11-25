@@ -5,11 +5,140 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use XMLWriter;
 
 final class FeedController extends Controller
 {
+    public function googleMerchant(): StreamedResponse
+    {
+        return response()->stream(function (): void {
+            $xml = new XMLWriter;
+            $xml->openMemory();
+            $xml->startDocument('1.0', 'UTF-8');
+            $xml->startElement('rss');
+            $xml->writeAttribute('version', '2.0');
+            $xml->writeAttribute('xmlns:g', 'http://base.google.com/ns/1.0');
+            $xml->startElement('channel');
+            $xml->writeElement('title', $this->googleFeedText((string) config('app.name'), 150));
+            $xml->writeElement('link', route('/'));
+            $xml->writeElement('description', 'Google Merchant Center product feed');
+            echo $xml->outputMemory(true);
+
+            Product::query()
+                ->with([
+                    'brand', 'categories', 'images',
+                    'variations' => fn (HasMany $query): HasMany => $query->where('is_active', true),
+                    'variations.images', 'variations.options.attribute',
+                ])
+                ->withCount('variations')
+                ->where('is_active', true)
+                ->whereNull('parent_id')
+                ->reorder()
+                ->chunkById(100, function ($products) use ($xml): void {
+                    foreach ($products as $product) {
+                        if ($product->variations_count > 0) {
+                            foreach ($product->variations as $variant) {
+                                $variant->setRelation('parent', $product);
+                                $this->writeGoogleMerchantItem($xml, $variant, $product);
+                            }
+                        } else {
+                            $this->writeGoogleMerchantItem($xml, $product, $product);
+                        }
+
+                        echo $xml->outputMemory(true);
+                    }
+                });
+
+            $xml->endElement();
+            $xml->endElement();
+            $xml->endDocument();
+            echo $xml->outputMemory(true);
+        }, 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+            'Content-Disposition' => 'inline; filename="google-merchant.xml"',
+            'Cache-Control' => 'no-cache, must-revalidate',
+            'X-Accel-Buffering' => 'no',
+        ]);
+    }
+
+    private function writeGoogleMerchantItem(XMLWriter $xml, Product $product, Product $parent): void
+    {
+        $title = $this->googleFeedText((string) $product->var_name, 150);
+        $description = $this->googleFeedText((string) ($product->description ?: $parent->description ?: $parent->short_description), 5000);
+        $imageLink = $product->base_image?->src;
+        $sellingPrice = $product->getPrice(1);
+        $price = $product->price;
+
+        if ($title === '' || $description === '' || ! $product->slug || ! $imageLink || ! is_numeric($price) || (float) $price <= 0 || ! is_numeric($sellingPrice) || (float) $sellingPrice <= 0) {
+            Log::warning('Product omitted from Google Merchant feed: missing title, description, slug, image, or positive price', [
+                'product_id' => $product->id,
+            ]);
+
+            return;
+        }
+
+        $attributes = [
+            'id' => (string) $product->id,
+            'title' => $title,
+            'description' => $description,
+            'link' => route('products.show', $product->slug),
+            'image_link' => url($imageLink),
+            'availability' => $product->in_stock ? 'in stock' : 'out of stock',
+            'price' => number_format((float) $price, 2, '.', '').' BDT',
+            'condition' => 'new',
+            'brand' => $parent->brand?->name,
+            'product_type' => $parent->categories->pluck('name')->implode(', '),
+        ];
+
+        if ((float) $sellingPrice < (float) $price) {
+            $attributes['sale_price'] = number_format((float) $sellingPrice, 2, '.', '').' BDT';
+        }
+
+        $identifiers = config('google-merchant.product_identifiers.'.$product->id, []);
+        $attributes['gtin'] = $identifiers['gtin'] ?? null;
+        $attributes['mpn'] = $identifiers['mpn'] ?? null;
+
+        foreach ($parent->categories as $category) {
+            $googleCategory = config('google-merchant.category_mapping.'.$category->id);
+            if ($googleCategory !== null && $googleCategory !== '') {
+                $attributes['google_product_category'] = $googleCategory;
+                break;
+            }
+        }
+
+        if ($product->parent_id) {
+            $attributes['item_group_id'] = (string) $parent->id;
+
+            foreach ($product->options as $option) {
+                $attribute = strtolower(trim((string) $option->attribute?->name));
+                if (in_array($attribute, ['color', 'size', 'material', 'pattern', 'gender', 'age_group'], true)) {
+                    $attributes[$attribute] = $option->name;
+                }
+            }
+        }
+
+        $xml->startElement('item');
+        foreach ($attributes as $name => $value) {
+            if ($value !== null && trim((string) $value) !== '') {
+                $xml->writeElement('g:'.$name, $this->googleFeedText((string) $value, 5000));
+            }
+        }
+        $xml->endElement();
+    }
+
+    private function googleFeedText(string $value, int $limit): string
+    {
+        $value = preg_replace('/<[^>]*>/', ' ', $value) ?? '';
+        $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $value = preg_replace('/[^\x{9}\x{A}\x{D}\x{20}-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]/u', '', $value) ?? '';
+        $value = preg_replace('/\s+/u', ' ', $value) ?? '';
+
+        return mb_substr(trim($value), 0, $limit, 'UTF-8');
+    }
+
     public function catalog(): StreamedResponse
     {
         // Log the request for debugging

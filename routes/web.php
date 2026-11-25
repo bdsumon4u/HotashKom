@@ -181,6 +181,7 @@ Route::get('/link-optimize', [ApiController::class, 'linkOptimize']);
 Route::get('/cache-clear', [ApiController::class, 'clearCache'])->name('clear.cache');
 
 // Feed routes
+Route::get('/feed/google-merchant.xml', [FeedController::class, 'googleMerchant'])->name('feed.google-merchant');
 Route::get('/feed/catalog', [FeedController::class, 'catalog'])->name('feed.catalog');
 Route::get('/feed/catalog-simple', [FeedController::class, 'catalogSimple'])->name('feed.catalog.simple');
 
