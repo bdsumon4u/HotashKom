@@ -69,7 +69,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <div class="d-flex" style="gap: 8px;">
+                                            <div class="d-flex flex-column" style="gap: 8px;">
                                                 <a class="btn btn-sm btn-primary"
                                                     href="{{ route('admin.landing-page-pros.edit', $landing) }}">Edit</a>
                                                 <x-form action="{{ route('admin.landing-page-pros.duplicate', $landing) }}"
