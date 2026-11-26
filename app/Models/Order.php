@@ -601,10 +601,8 @@ class Order extends Model
                 return Pathao::area()->city()->data ?? [];
             } catch (\Exception $e) {
                 $exception = true;
-                // Log the error for debugging
                 logger()->warning('Pathao API error when fetching cities', [
                     'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
                 ]);
 
                 return [];
@@ -643,7 +641,6 @@ class Order extends Model
                     logger()->warning('Pathao API error when fetching areas', [
                         'city_id' => $cityId,
                         'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
                     ]);
 
                     return [];

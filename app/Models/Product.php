@@ -392,8 +392,10 @@ class Product extends Model
         });
     }
 
-    public function getPrice(int $quantity)
+    public function getPrice(?int $quantity = null)
     {
+        $quantity ??= 1;
+
         $wholesale = $this->wholesale;
         $price = $this->selling_price;
 

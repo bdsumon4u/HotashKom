@@ -92,7 +92,7 @@
                                             <td>{!! theMoney($retail) !!}</td>
                                             @endif
                                         </tr>
-                                        @if ($data['advanced'])
+                                        @if ((float) ($data['advanced'] ?? 0) > 0)
                                             <tr>
                                                 <th>Advanced</th>
                                                 <td>{!! theMoney(0) !!}</td>
@@ -101,7 +101,7 @@
                                                 @endif
                                             </tr>
                                         @endif
-                                        @if ($data['retail_discount'])
+                                        @if ((float) ($data['retail_discount'] ?? 0) > 0)
                                         <tr>
                                             <th>Discount</th>
                                             <td>{!! theMoney($data['discount'] ?? 0) !!}</td>
