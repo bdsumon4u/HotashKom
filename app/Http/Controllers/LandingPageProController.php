@@ -322,12 +322,18 @@ class LandingPageProController extends Controller
 
         $fraud = setting('fraud');
 
-        if (
-            cacheMemo()->get('fraud:hourly:'.request()->ip()) >= ($fraud->allow_per_hour ?? 3)
-            || cacheMemo()->get('fraud:hourly:'.$validated['phone']) >= ($fraud->allow_per_hour ?? 3)
-            || cacheMemo()->get('fraud:daily:'.request()->ip()) >= ($fraud->allow_per_day ?? 7)
-            || cacheMemo()->get('fraud:daily:'.$validated['phone']) >= ($fraud->allow_per_day ?? 7)
-        ) {
+        $allowPerHour = isset($fraud->allow_per_hour) && $fraud->allow_per_hour !== '' ? (int) $fraud->allow_per_hour : 3;
+        $allowPerDay = isset($fraud->allow_per_day) && $fraud->allow_per_day !== '' ? (int) $fraud->allow_per_day : 7;
+
+        $isRateLimitExceeded = ($allowPerHour > 0 && (
+            cacheMemo()->get('fraud:hourly:'.request()->ip()) >= $allowPerHour
+            || cacheMemo()->get('fraud:hourly:'.$validated['phone']) >= $allowPerHour
+        )) || ($allowPerDay > 0 && (
+            cacheMemo()->get('fraud:daily:'.request()->ip()) >= $allowPerDay
+            || cacheMemo()->get('fraud:daily:'.$validated['phone']) >= $allowPerDay
+        ));
+
+        if ($isRateLimitExceeded) {
             return response()->json([
                 'message' => 'প্রিয় গ্রাহক, আরও অর্ডার করতে চাইলে আমাদের হেল্প লাইন '.setting('company')->phone.' নাম্বারে কল দিয়ে সরাসরি কথা বলুন।',
             ], 422);
@@ -407,7 +413,7 @@ class LandingPageProController extends Controller
             ], 422);
         }
 
-        $order = DB::transaction(function () use ($validated, $shippingArea, $productsPayload, $landingPagePro) {
+        $order = DB::transaction(function () use ($validated, $shippingArea, $productsPayload, $landingPagePro, $allowPerHour, $allowPerDay) {
 
             $user = $this->getOrCreateUser($validated);
             $oldOrders = Order::select(['id', 'admin_id', 'status'])->where('phone', $validated['phone'])->get();
@@ -474,21 +480,25 @@ class LandingPageProController extends Controller
                 ],
             ]);
 
-            defer(function () use ($admin, $user, $order): void {
+            defer(function () use ($admin, $user, $order, $allowPerHour, $allowPerDay): void {
                 $admin?->update(['last_order_received_at' => now()]);
                 $user->notify(new OrderPlaced($order));
 
-                Cache::add('fraud:hourly:'.request()->ip(), 0, now()->addHour());
-                Cache::add('fraud:daily:'.request()->ip(), 0, now()->addDay());
+                if ($allowPerHour > 0) {
+                    Cache::add('fraud:hourly:'.request()->ip(), 0, now()->addHour());
+                    Cache::increment('fraud:hourly:'.request()->ip());
 
-                Cache::increment('fraud:hourly:'.request()->ip());
-                Cache::increment('fraud:daily:'.request()->ip());
+                    Cache::add('fraud:hourly:'.$order->phone, 0, now()->addHour());
+                    Cache::increment('fraud:hourly:'.$order->phone);
+                }
 
-                Cache::add('fraud:hourly:'.$order->phone, 0, now()->addHour());
-                Cache::add('fraud:daily:'.$order->phone, 0, now()->addDay());
+                if ($allowPerDay > 0) {
+                    Cache::add('fraud:daily:'.request()->ip(), 0, now()->addDay());
+                    Cache::increment('fraud:daily:'.request()->ip());
 
-                Cache::increment('fraud:hourly:'.$order->phone);
-                Cache::increment('fraud:daily:'.$order->phone);
+                    Cache::add('fraud:daily:'.$order->phone, 0, now()->addDay());
+                    Cache::increment('fraud:daily:'.$order->phone);
+                }
             });
 
             return $order;

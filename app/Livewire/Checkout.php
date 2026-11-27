@@ -433,16 +433,22 @@ class Checkout extends Component
 
         $fraud = setting('fraud');
 
-        if (
-            cacheMemo()->get('fraud:hourly:'.request()->ip()) >= ($fraud->allow_per_hour ?? 3)
-            || cacheMemo()->get('fraud:hourly:'.$data['phone']) >= ($fraud->allow_per_hour ?? 3)
-            || cacheMemo()->get('fraud:daily:'.request()->ip()) >= ($fraud->allow_per_day ?? 7)
-            || cacheMemo()->get('fraud:daily:'.$data['phone']) >= ($fraud->allow_per_day ?? 7)
-        ) {
+        $allowPerHour = isset($fraud->allow_per_hour) && $fraud->allow_per_hour !== '' ? (int) $fraud->allow_per_hour : 3;
+        $allowPerDay = isset($fraud->allow_per_day) && $fraud->allow_per_day !== '' ? (int) $fraud->allow_per_day : 7;
+
+        $isRateLimitExceeded = ($allowPerHour > 0 && (
+            cacheMemo()->get('fraud:hourly:'.request()->ip()) >= $allowPerHour
+            || cacheMemo()->get('fraud:hourly:'.$data['phone']) >= $allowPerHour
+        )) || ($allowPerDay > 0 && (
+            cacheMemo()->get('fraud:daily:'.request()->ip()) >= $allowPerDay
+            || cacheMemo()->get('fraud:daily:'.$data['phone']) >= $allowPerDay
+        ));
+
+        if ($isRateLimitExceeded) {
             return back()->with('error', 'প্রিয় গ্রাহক, আরও অর্ডার করতে চাইলে আমাদের হেল্প লাইন '.setting('company')->phone.' নাম্বারে কল দিয়ে সরাসরি কথা বলুন।');
         }
 
-        $this->order = DB::transaction(function () use ($data, &$order, $fraud) {
+        $this->order = DB::transaction(function () use ($data, &$order, $fraud, $allowPerHour, $allowPerDay) {
             $data['products'] = Product::find(cart()->content()->pluck('id'))
                 ->mapWithKeys(function (Product $product) use ($fraud) {
                     $id = $product->id;
@@ -544,23 +550,27 @@ class Checkout extends Component
                 $this->applied_coupon->incrementUsage();
             }
 
-            defer(function () use ($admin, $user, $order): void {
+            defer(function () use ($admin, $user, $order, $allowPerHour, $allowPerDay): void {
                 $admin->update(['last_order_received_at' => now()]);
                 $user->notify(new OrderPlaced($order));
 
                 deleteOrUpdateCart();
 
-                Cache::add('fraud:hourly:'.request()->ip(), 0, now()->addHour());
-                Cache::add('fraud:daily:'.request()->ip(), 0, now()->addDay());
+                if ($allowPerHour > 0) {
+                    Cache::add('fraud:hourly:'.request()->ip(), 0, now()->addHour());
+                    Cache::increment('fraud:hourly:'.request()->ip());
 
-                Cache::increment('fraud:hourly:'.request()->ip());
-                Cache::increment('fraud:daily:'.request()->ip());
+                    Cache::add('fraud:hourly:'.$order->phone, 0, now()->addHour());
+                    Cache::increment('fraud:hourly:'.$order->phone);
+                }
 
-                Cache::add('fraud:hourly:'.$order->phone, 0, now()->addHour());
-                Cache::add('fraud:daily:'.$order->phone, 0, now()->addDay());
+                if ($allowPerDay > 0) {
+                    Cache::add('fraud:daily:'.request()->ip(), 0, now()->addDay());
+                    Cache::increment('fraud:daily:'.request()->ip());
 
-                Cache::increment('fraud:hourly:'.$order->phone);
-                Cache::increment('fraud:daily:'.$order->phone);
+                    Cache::add('fraud:daily:'.$order->phone, 0, now()->addDay());
+                    Cache::increment('fraud:daily:'.$order->phone);
+                }
             });
 
             if (setting('meta_pixel') || config('meta-pixel.meta_pixel') || setting('pixel_ids')) {
