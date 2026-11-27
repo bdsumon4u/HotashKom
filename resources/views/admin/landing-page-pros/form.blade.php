@@ -370,7 +370,7 @@
             <p class="text-muted">Add each product once. Its colors and sizes appear automatically on the customer page. Prices come from your product catalog.</p>
             <label for="lp-product-search">Find a product by name or SKU</label>
             <input id="lp-product-search" type="search" x-model.debounce.200ms="productSearch" class="form-control" placeholder="Search your catalog…">
-            <small class="d-block mt-2 text-muted">Showing up to 10 results. Refine your search to find a specific product.</small>
+            <small class="d-block mt-2 text-muted">Showing up to 15 results. Search with words in any order, or by SKU. Scroll to see more matches.</small>
             <div class="lp-product-list mb-3">
                 <template x-for="product in filteredProducts" :key="product.id">
                     <div class="lp-product-row">
@@ -887,10 +887,12 @@
                 },
 
                 get filteredProducts() {
-                    const query = this.productSearch.trim().toLowerCase();
-                    return this.productChoices.filter(product =>
-                        (product.label + ' ' + (product.sku || '')).toLowerCase().includes(query)
-                    ).slice(0, 10);
+                    const searchWords = this.productSearch.trim().toLowerCase().split(/\s+/).filter(Boolean);
+                    return this.productChoices.filter(product => {
+                        const searchableText = (product.label + ' ' + (product.sku || '')).toLowerCase();
+
+                        return searchWords.every(word => searchableText.includes(word));
+                    }).slice(0, 15);
                 },
 
                 productFor(item) {
